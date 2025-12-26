@@ -1,0 +1,169 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{BVR-Sim: An Open High-Fidelity Beyond-Visual-Range Air Combat Environment}
+\author{Haocheng Sun}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Reinforcement learning (RL) agents need simulation environments that expose realistic sensing, guidance, and control constraints when studying beyond-visual-range (BVR) engagements. Most available open-source platforms either reduce missile guidance to proportional navigation, omit radar/datalink modeling, or lack the instrumentation required for trajectory logging, reward debugging, and self-play evaluation. We present \textbf{BVR-Sim}, a fully open environment integrated into the Universal Hulc Reinforcement Learning (UHRL) stack. BVR-Sim unifies high-fidelity aircraft and missile dynamics, sensor fusion, configurable observation spaces, dense+sparse reward shaping, scripted opponents, and ACMI/trajectory export inside a single training loop. We detail the design, contrast it with BVR-Gym~\cite{scukins2024bvrgym}, B-ACE~\cite{kuroswiski2024bace}, and WUKONG~\cite{piao2020wukong}, and show how BVR-Sim lowers the barrier for reproducible BVR combat research.
+\end{abstract}
+
+\section{Introduction}
+Modern BVR combat couples multi-agent tactics with tightly constrained missile guidance envelopes. Researchers have recently released either high-fidelity but closed simulators or lightweight open environments. However, none simultaneously expose realistic air-to-air missile aerodynamics, autopilot-aware action spaces, radar and warning sensors, and reward instrumentation tailored for RL. BVR-Sim fills this gap by shipping an end-to-end pipeline---from spawn randomization and physics integration to reward visualization and imitation-ready trajectory dumps---under the open-source UHRL repository.
+
+\textbf{Contributions.} BVR-Sim provides:
+\begin{itemize}
+    \item A 3D flight and missile stack with autopilot-aware action abstractions, Mach-indexed drag tables, and ``maddog'' launches that preserve energy-management trade-offs missing from simplified PN models.
+    \item A sensor and observation toolkit that layers radar, radar/missile warning receivers, datalink fusion, and configurable encoders so teams can balance partial observability with compute budgets.
+    \item Training instrumentation---baseline opponents, dense+sparse reward decomposition, ACMI and trajectory export---all integrated with the UHRL multi-team runner and JSONC configuration system for reproducible benchmarking.
+\end{itemize}
+These components allow researchers to iterate from single-thread smoke tests to large-scale self-play without rewriting mission glue code.
+
+\section{Related Work}
+\textbf{BVR-Gym}~\cite{scukins2024bvrgym} employs JSBSim for aircraft dynamics and a proportional navigation (PN) missile model but keeps guidance simple and focuses on throttle/altitude controllers without advanced sensing or reward visualization. \textbf{B-ACE}~\cite{kuroswiski2024bace} runs on the Godot engine to prioritize accessibility yet sacrifices aerodynamic realism and missile detail. \textbf{WUKONG}~\cite{piao2020wukong} demonstrates self-play RL with KAERS reward shaping, though the simulator remains proprietary and lacks open instrumentation. BVR-Sim draws on lessons from these works while remaining fully open, emphasizing instrumentation, and integrating tightly with multi-agent RL tooling.
+
+\section{Environment Design}
+\subsection{Architecture}
+The mission resides in \texttt{MISSION/bvr\_sim\_v3} with a Gym-style \texttt{BVR3DEnv}. The UHRL wrapper (\texttt{env\_wrapper.py}) binds the environment to multi-team training, handles Tacview ACMI export, provides per-step reward breakdowns via \texttt{RewardVisualizer}, and exposes MultiDiscrete actions ($15\!\times\!15\!\times\!9\!\times\!2$) covering heading, altitude, speed, and launch commands. A JSONC-driven \texttt{ScenarioConfig} defines spawn geometry, opponent selection, observation presets, reward weights, and logging paths, allowing mission variants to be declared without touching Python code. The discrete action $\mathbf{a}_t=(k_\psi,k_h,k_v,k_\ell)$ maps to continuous rate commands via
+\begin{align}
+\Delta \psi_t &= \gamma_\psi \frac{k_\psi-\bar{k}_\psi}{\bar{k}_\psi},&
+\Delta h_t &= \gamma_h \frac{k_h-\bar{k}_h}{\bar{k}_h},&
+\Delta v_t &= \gamma_v \frac{k_v-\bar{k}_v}{\bar{k}_v}, \label{eq:action_map}
+\end{align}
+with midpoints $\bar{k}_\psi=7$, $\bar{k}_h=7$, $\bar{k}_v=4$ and scaling constants $(\gamma_\psi,\gamma_h,\gamma_v)=(\texttt{max\_delta\_heading},\texttt{max\_delta\_altitude},\texttt{max\_delta\_speed})$. The binary launch command $k_\ell\in\{0,1\}$ fires a missile when combined with a valid radar lock.
+
+\subsection{Physics Fidelity}
+Aircraft instances (\texttt{simulator/aircraft/f16.py}) rely on pluggable flight dynamics models capable of maintaining autopilot-style setpoints so RL agents optimize decision making instead of low-level control. Missile classes (e.g., \texttt{aim120c\_adv\_sim.py}) interpolate Mach-indexed drag tables, account for gravity and aerodynamic losses, and support both guided and ``maddog'' launches. The shared integration step between aircraft and missile solvers preserves time alignment with the RL loop and exposes energy-management trade-offs absent from PN-only baselines. Each aircraft integrates the continuous dynamics
+\begin{align}
+\mathbf{x}_{t+1} &= \mathbf{x}_{t} + f_{\text{FDM}}\big(\mathbf{x}_{t},\mathbf{u}_{t}(\Delta \psi_t,\Delta h_t,\Delta v_t)\big)\,\Delta t, \label{eq:fdm}
+\end{align}
+where $\mathbf{x}_t$ stacks position, velocity, and attitude states while $\mathbf{u}_t$ is the autopilot command generated from the rate deltas in Eq.~\eqref{eq:action_map}. This separation lets new flight-dynamics models be swapped in by redefining $f_{\text{FDM}}$ without touching the RL interface.
+
+\subsection{Sensing and Datalink}
+The sensor suite (\texttt{simulator/sense/}) layers AN/APG-68-inspired radar scanning, radar/missile warning receivers, and an SA datalink that periodically shares noisy enemy tracks. Each detection is serialized through \texttt{DataObj}, enabling Tacview visualization and direct logging to observation tensors. Compact/extended/shadow observation spaces (\texttt{observation\_space.py}) provide configurable encoders with missile warning channels, lock indicators, time-to-impact estimates, and state history so teams can trade observability for dimensionality.
+\begin{align}
+\tilde{\mathbf{p}}_{t} &= \mathbf{p}_{t} + \boldsymbol{\epsilon}_p,&
+\tilde{\mathbf{v}}_{t} &= \mathbf{v}_{t} + \boldsymbol{\epsilon}_v,&
+\boldsymbol{\epsilon}_p &\sim \mathcal{N}\!\left(\mathbf{0},\sigma_p^2 \mathbf{I}_3\right),&
+\boldsymbol{\epsilon}_v \sim \mathcal{N}\!\left(\mathbf{0},\sigma_v^2 \mathbf{I}_3\right), \label{eq:sensing_noise}
+\end{align}
+capture the noisy radar/RWR/datalink measurements that populate each agent's observation tensor and the Tacview stream.
+
+\subsection{Missile Guidance and Drag Modeling}
+BVR-Sim exposes the guidance and drag models that drive missile dynamics. The drag force applied to each missile instance is
+\begin{align}
+D &= \tfrac{1}{2}\,\rho(h)\,v^{2} S_{\text{ref}}\,C_x(M,\alpha), \label{eq:drag}\\
+C_x(M,\alpha) &= C_{x0}(M) + C_{xB}(M) + K_1(M)|\alpha| + K_2(M)\alpha^{2} + C_{x,\text{wave}}(M) + C_{x,\text{sup}}(M), \label{eq:cx}
+\end{align}
+where $v$ is the missile speed, $\rho(h)$ is the altitude-dependent density, $S_{\text{ref}}$ is the reference area, $M=v/a(h)$ is Mach number, and $\alpha$ is the estimated angle of attack. Lookup tables provide $C_{x0}$ (zero-lift drag), $C_{xB}$ (base drag), and the angle-of-attack coefficients $K_1,K_2$. The transonic bump $C_{x,\text{wave}}(M)=k_1\exp(-((M-1)/k_2)^2)$ captures wave drag, whereas the supersonic correction $C_{x,\text{sup}}$ blends a logistic decay with an optional $\sqrt{M-1}$ term to match AIM-120C public data. Equation~\eqref{eq:drag} feeds directly into the thrust--drag--gravity balance inside the Eulerian integrator, ensuring that range and time-to-go estimates produced by RL policies inherit the same Mach-dependent envelope used by flight-test references.
+
+Guidance is likewise modeled through commanded load factors. The horizontal line-of-sight (LOS) rate command blends an angle controller with the measured LOS rate,
+\begin{align}
+\dot{\beta}_{\text{cmd}} &= \lambda(t)\,k_\beta\big[\phi - (\beta - \pi)\big] + \big(1-\lambda(t)\big)\,\dot{\beta}_{\text{meas}}, \label{eq:beta_cmd}\\
+ n_{y} &= \frac{K(R)}{g}\,v\cos\theta\,\dot{\beta}_{\text{cmd}}, \qquad
+ n_{z} = \frac{K(R)}{g}\,v\,\dot{\epsilon} + \cos\theta, \label{eq:load}
+\end{align}
+where $\beta$ and $\epsilon$ are LOS azimuth/elevation, $\phi$ and $\theta$ are missile heading and flight-path angles, and $\dot{\beta}_{\text{meas}},\dot{\epsilon}$ are finite-difference LOS rates. The blend factor $\lambda(t)=\max((t_{\text{thrust}}-t)/t_{\text{thrust}},0)$ weights angle-error steering during booster burn and gradually hands off to pure rate control. The gain $K(R)$ starts at $K_0$ during motor burn, decays with time-of-flight, and escalates up to $2K_0$ when the active radar sees the target within $R_{\min}=1$~NM, mirroring range-dependent PN tuning. Equations~\eqref{eq:load} yield lateral/vertical load factors ($n_y,n_z$) that saturate at $\pm 10$~g before being integrated into body rates. Because these equations are exposed in code, researchers can swap in alternative guidance laws (e.g., augmented PN or differential games) while keeping the drag and sensing stack identical for fair ablations.
+
+\subsection{Observation Encoding and Episode Lifecycle}
+The observation encoder (\texttt{observation\_space.py}) includes relative kinematics for every ally and adversary, plus up to four in-flight friendly missiles, missile-warning booleans, and trigonometric heading embeddings. This richer state exposes whether a hostile missile is still tracking the ego aircraft rather than only reporting the launch platform as in BVR-Gym~\cite{scukins2024bvrgym}. Episode termination likewise waits until all missiles in flight resolve before ranking teams, which prevents premature resets that would otherwise bias agents against long time-of-flight intercepts.
+\begin{align}
+o_t &= \Big[s^{\text{self}}_t,\ \{s^{\text{ally}}_{t,i}\}_{i=1}^{N_a},\ \{s^{\text{enemy}}_{t,j}\}_{j=1}^{N_e},\ \{s^{\text{miss}}_{t,m}\}_{m=1}^{4}\Big], \label{eq:obs_concat}\\
+\text{done}_t &= \mathbb{1}\!\left(\big(n_{\text{red},t}=0 \lor n_{\text{blue},t}=0\big) \land |\mathcal{M}_t|=0\right)\ \lor\ \mathbb{1}(t \ge T_{\max}), \label{eq:termination}
+\end{align}
+where $\mathcal{M}_t$ is the set of active missiles. Eq.~\eqref{eq:obs_concat} concats normalized self, ally, enemy, and missile summaries, while Eq.~\eqref{eq:termination} enforces missile-resolution-aware episode endings.
+
+\section{Learning Interfaces}
+\subsection{Reward Shaping}
+\texttt{reward/reward\_components.py} decomposes dense shaping (engagement pressure, altitude advantage, missile evasion, energy management) and sparse terms (launch, hit/miss, win/loss). Each component is mirrored in the reward visualizer so practitioners can diagnose mode collapse or overly sparse feedback during long training runs. An optional distillation reward compares normalized RL actions against the tactical baseline, enabling guided exploration or imitation learning without external datasets.
+\begin{align}
+R_t &= \sum_{c \in \mathcal{C}} w_c\,r^c_t,&
+\mathcal{C} &= \{\text{engage}, \text{altitude}, \text{safe-alt}, \text{launch}, \text{hit}, \text{win}, \ldots\}, \label{eq:reward_sum}
+\end{align}
+with weights $w_c$ configured in JSONC. Dense terms (e.g., engage, altitude) operate every step, while sparse events (launch, hit, win) trigger only when their conditions fire.
+
+\subsection{Distillation Hooks and Teacher Forcing}
+Beyond emitting penalties, the distillation component can feed the tactical opponent's discretized action back into the environment by toggling \texttt{USE\_DISTILL\_REWARD\_ACTION}. This teacher-forcing loop guarantees safe fallback commands, supports curriculum schedules that gradually reduce the imitation weight, and provides a bridge between scripted tactics and free-play self-learning---capabilities missing from prior open BVR environments.
+\begin{align}
+\mathcal{L}_{\text{dist},t} &= \left\Vert \hat{\mathbf{a}}^{\text{RL}}_t - \hat{\mathbf{a}}^{\star}_t \right\Vert_p + w_{\text{shoot}}\big|\sigma^{\text{RL}}_t - \sigma^{\star}_t\big|, \label{eq:distill_loss}\\
+\tilde{\mathbf{a}}_t &= (1-\eta_t)\,\mathbf{a}^{\text{RL}}_t + \eta_t\,\mathbf{a}^{\star}_t,\qquad \eta_t \in \{0,1\}, \label{eq:teacher_force}
+\end{align}
+where $\hat{\mathbf{a}}$ denotes the normalized rate commands from Eq.~\eqref{eq:action_map} divided by their maxima, $\sigma$ is the shoot bit, and $\eta_t$ toggles teacher forcing when \texttt{USE\_DISTILL\_REWARD\_ACTION} is enabled.
+
+\subsection{Baselines}
+Scripted opponents (random, simple, tactical) may occupy either team or supply fallback control whenever an RL agent dies mid-episode. The runner exposes their decisions to the reward visualizer, yielding per-component curves that highlight when baseline heuristics and learned policies diverge. Because the baselines live inside the same mission directory, researchers can iterate on rulesets without touching the core UHRL framework.
+\begin{align}
+\mathbf{a}^{\star}_t &= \pi_{\text{baseline}}\!\left(o_t;\theta_{\text{rule}}\right),&
+\theta_{\text{rule}} &= \{\text{state machine gains, crank timers, launch thresholds}\}, \label{eq:baseline_policy}
+\end{align}
+and $\pi_{\text{baseline}}$ supplies both the teacher signal in Eq.~\eqref{eq:distill_loss} and the fallback control used when RL agents are dead or paused.
+
+\subsection{Trajectory Recording for Offline RL}
+Every controllable aircraft registers with \texttt{AircraftRecorderManager}, which logs observations, Mach numbers, autopilot-level delta commands, optional low-level surface inputs, and shoot flags into chunked replay pools under \texttt{<logdir>/aircraft\_records/}. Episodic flushing plus \texttt{safe\_dump\_traj\_pool} integration make the data immediately usable for offline RL, behavior cloning, or compliance audits while ensuring alignment with the live reward instrumentation.
+\begin{align}
+\mathcal{D} &= \Big\{(\,o_t, \mathbf{a}_t, r_t, o_{t+1}, \text{aux}_t\,)\Big\}_{t=0}^{T-1},&
+\text{aux}_t &= \{\text{Mach},\ \text{campas},\ \text{shoot},\ \text{physics}\}, \label{eq:dataset}
+\end{align}
+and the recorder periodically writes $\mathcal{D}$ into archive files using \texttt{safe\_dump\_traj\_pool} for downstream imitation or offline RL experiments.
+
+\begin{table}[t]
+    \centering
+    \caption{Feature comparison across open BVR environments.}
+    \label{tab:comparison}
+    \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Feature} & \textbf{BVR-Gym} & \textbf{B-ACE} & \textbf{BVR-Sim (Ours)} \\  
+    \midrule
+    High-Fidelity Aircraft Dynamics & \checkmark & $\times$ & \checkmark \\
+    Advanced Missile Dynamics (Drag \& Gravity) & $\times$ & $\times$ & \checkmark \\
+    Realistic Guidance Law & $\triangle$(PN) & $\triangle$(PN) & \checkmark(Hybrid) \\
+    Realistic Radar \& RWR Modeling & $\times$ & $\triangle$ & \checkmark \\
+    Datalink Simulation & $\times$ & $\times$ & \checkmark \\
+    \midrule
+    Autopilot-aware Action Abstraction & \checkmark & $\times$ & \checkmark \\
+    Configurable Observation Spaces & $\triangle$ & $\triangle$ & \checkmark \\
+    Comprehensive Reward Shaping \& Visualization & $\times$ & $\times$ & \checkmark \\
+    Baseline Opponents for Curriculum Learning & $\triangle$ & $\times$ & \checkmark \\
+    \midrule
+    Trajectory Logging (ACMI) & \checkmark & \checkmark & \checkmark \\
+    Data Export for Imitation Learning & $\times$ & $\times$ & \checkmark \\
+    \midrule
+    Open-source & \checkmark & \checkmark & \checkmark \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Integration and Usage}
+\subsection{Diagnostics and Instrumentation}
+Reward plots are emitted every episode (JSON + PNG) using a symlog scale so dense shaping terms remain readable alongside sparse kill rewards. When \texttt{PRINT\_STEP\_TIME} is enabled inside either \texttt{bvr\_env.py} or the flight-dynamics module, the included \texttt{StepProfiler} reports running means and standard deviations for each stage (action unpacking, aircraft stepping, missile stepping, reward composition, packing). These hooks make it practical to profile performance regressions when scaling thread counts or swapping physics implementations.
+\begin{align}
+\mu_k &= \frac{1}{N_k}\sum_{i=1}^{N_k} \Delta t_{k,i},&
+\sigma_k &= \sqrt{\frac{1}{N_k-1}\sum_{i=1}^{N_k} \left(\Delta t_{k,i}-\mu_k\right)^2}, \label{eq:profiler}
+\end{align}
+where $\Delta t_{k,i}$ is the elapsed time of stage $k$ on step $i$ and $(\mu_k,\sigma_k)$ are printed once $N_k$ hits the reporting interval.
+
+Researchers launch training via \texttt{python main.py --cfg MISSION/bvr\_sim\_v3/conf\_system/<name>.jsonc}. The wrapper auto-creates ACMI dumps, reward plots, and imitation trajectories under the configured log directory, while JSONC overrides control thread counts, spawn seeds, and opponent assignments. Lightweight configs (e.g., \texttt{random-1v1-test.jsonc}) provide smoke tests, whereas full-scale experiments adjust spawn randomization (37.2~NM separation and 2~NM spread by default) and tactical baselines to define reproducible benchmarks for self-play PPO, distillation, or offline RL pipelines.
+
+\section{Conclusion}
+BVR-Sim combines high-fidelity missile/aircraft physics, rich sensing, configurable observation/reward interfaces, and a complete logging toolchain inside an open-source MARL framework. By bridging the gap between lightweight open environments and closed military-grade simulators, it offers the community a practical testbed for reproducible BVR combat research. Future work includes extending to multi-ship formations, adding additional aircraft and missile models, and releasing benchmark suites with standardized training/evaluation splits atop the provided baseline opponents.
+
+\begin{thebibliography}{9}
+\bibitem{scukins2024bvrgym}
+E.~Scukins, M.~Klein, L.~Kroon, and P.~\"Ogren, ``BVR Gym: A Reinforcement Learning Environment for Beyond-Visual-Range Air Combat,'' \emph{arXiv preprint} arXiv:2403.17533, 2024.
+\bibitem{kuroswiski2024bace}
+A.~R. Kuroswiski, A.~S. Wu, and A.~Passaro, ``B-ACE: An Open Lightweight Beyond Visual Range Air Combat Simulation Environment for Multi-Agent Reinforcement Learning,'' doi.org/10.13140/RG.2.2.11999.57762, 2024.
+\bibitem{piao2020wukong}
+H.~Piao \emph{et al.}, ``WUKONG: Beyond-Visual-Range Air Combat Tactics Auto-Generation by Reinforcement Learning,'' \emph{IEEE}, 2020.
+\end{thebibliography}
+
+\end{document}

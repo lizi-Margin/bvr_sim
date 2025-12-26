@@ -1,0 +1,79 @@
+
+{
+    "red_meta": {
+        "A01": {
+            "unit_spec": "F16",
+            "color": "Red",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "R03": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7",
+                "L03": "AIM-120C7"
+            },
+            "opponent_type": "tactical"
+        },
+        "A02": {
+            "unit_spec": "F16",
+            "color": "Red",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "R03": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7",
+                "L03": "AIM-120C7"
+            },
+            "opponent_type": "tactical"
+        }
+    },
+    "blue_meta": {
+        "B01": {
+            "unit_spec": "F16",
+            "color": "Blue",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "R03": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7",
+                "L03": "AIM-120C7"
+            },
+            "opponent_type": "tactical"
+        },
+        "B02": {
+            "unit_spec": "F16",
+            "color": "Blue",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "R03": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7",
+                "L03": "AIM-120C7"
+            },
+            "opponent_type": "tactical"
+        }
+    }
+}

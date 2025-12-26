@@ -1,0 +1,248 @@
+``` 参考信息 LiDAR观测数据的常见表示
+机器人导航/避障任务中，LiDAR 传感器输出通常包含多条激光束的距离信息。常见的观测表示有两种形式：一维距离向量和二维栅格图（或深度图）。
+一维距离向量：将每条激光束的测得距离值按顺序排列成一个向量。这样得到的向量直接作为强化学习模型的输入。许多研究都是采用这种做法，例如将360度扫描结果作为长度为360的一维距离向量
+输入神经网络
+ar5iv.labs.arxiv.org
+。这种表示最直接，适合喂给全连接（MLP）网络。
+二维深度图/占据栅格：也可以把激光束扫过的点云投影到平面上构造二维网格（如极坐标图或笛卡尔成本地图）。例如，有的工作将固定尺寸的低分辨率距离图（distance
+map）作为输入，类似低精度的深度图像
+arxiv.org
+arxiv.org
+。这种 2D 表示保留了空间结构，适合用卷积神经网络（CNN）处理，能够让模型更好地理解障碍物的空间关系
+mdpi.com
+。比如一项研究指出，将原始 LiDAR 数据转换成障碍物成本图（obstacle cost map）可以让 CNN 捕捉到障碍物之间的空间布局，从而优于直接使用纯向量
+mdpi.com
+。
+综上所述，PPO 等算法的 Actor/Critic 输入可以是任意形状的观测：对于 LiDAR 数据，常见做法是使用一维距离向量
+ar5iv.labs.arxiv.org
+；若想利用空间结构信息，也可将其映射为二维深度/占据图
+mdpi.com
+arxiv.org
+。选择哪种形式取决于模型结构（MLP vs CNN）和任务需求。例如最新工作中，将 LiDAR 原始点云编码为固定形状的低分辨率距离图，用作深度控制网络的输入
+arxiv.org
+arxiv.org
+。```    ```问题背景   # Task: Understand the Background Problem in My BVR Air Combat RL Environment
+
+## 1. Environment Background
+I am developing a Beyond Visual Range (BVR) air-combat simulation environment for reinforcement learning.
+The agent controls a fighter aircraft with a moderate discrete action space (e.g., 15×15×9×2).
+The observation space is around 75 dimensions and includes:
+- self state (position, velocity, altitude, heading sin/cos, pitch sin/cos)
+- enemy relative states (3D relative pos/vel, angles, distance, missile lock info)
+- ally relative states
+- team missile states
+- enemy missile warnings
+
+A full observation extractor is available (not included here for brevity).
+
+## 2. Reward Setting
+Initially I used **dense reward shaping** such as:
+- distance reward for approaching enemies
+- speed reward for staying fast
+- various heuristic rewards reflecting human tactics
+
+There are also sparse terminal rewards like win/lose or kill/death.
+
+## 3. Problem After Switching to Pure Sparse Rewards
+When I remove dense shaping and keep only sparse terminal rewards, the agent:
+- fails to learn
+- converges to decreasing reward
+- behaves randomly and cannot explore effectively
+
+I suspect the core issue is related to the **observation representation**.
+
+## 4. Observation-Space Concern
+The current observation space:
+- contains many raw 3D coordinates (x,y,z)
+- is high-dimensional but not spatially structured
+- may not provide the agent with the inductive bias required for learning under sparse rewards
+- may make exploration extremely difficult due to the unstructured numerical inputs
+
+I want to redesign the observation space and have already implemented a polar-coordinate-based 2D representation concept.
+Before proceeding, I want the assistant to fully understand the above background problem.
+
+```  ```已完成的任务 MISSION\bvr_sim\simulator\sense\canvas.py
+这里使用RGB图可视化了俯视视角下的战场态势，然而效果并不好。我觉得是因为RGB图太复杂了，不如使用低维度位置向量（射线检测），并且消耗的显存过多```  ```参考方案  核心方案：Polar
+Ray Observation（极坐标射线扫描）
+🎯 想法
+
+从飞机自身坐标系发射 N×M 条“射线”（ray）模拟雷达扫描
+每条射线返回：
+
+最近的敌机距离
+
+敌机径向速度
+
+是否有导弹在该方向
+
+敌机相对高度
+
+最终你可把它压成一个 2D grid，例如：
+
+(方位角 bins = 36) × (俯仰角 bins = 9) × (channels = 3~6)
+
+
+类似于深度图 + 雷达图的组合。
+
+📊 四、效果：将 75 维无结构向量 → 32×9×4 的“可卷积图像”
+
+你会得到一个 shape：
+
+[azimuth_bins = 32, elevation_bins = 8, channels = 4]
+
+
+深度=4 表示：
+
+敌机距离 (normalized)
+
+相对速度投影
+
+是否被锁
+
+是否有敌机导弹
+
+如果没有目标，这条射线为 0。```  
+
+人类指令：
+其实我觉得，对于lidar风格的深度图应用在空战，每个像素点单独表示一个敌机，一个敌机不会同时出现在多个像素点，因此使用卷积是没有啥意义的，没有跨像素的特征区域。然而，直接使用mlp又让我感觉损失了信息，因为这个图其实是有位置关系的，像素之间有上下左右的位置关系，而mlp本身是位置不敏感的，这让我想到了一种：attention也是位置不敏感的，LLM为了解决这个问题，加了位置嵌入。你觉得除了这种解决方案，还有别的办法吗？或者，这种办法有什么问题？
+
+
+GPT:
+1) 先做“点检测” → 物体列表（object-centric） → Set / GNN / Transformer
+
+思路：先把 ray-grid 做局部聚合（例如连续非零 ray 串或峰值检测）得到目标候选（每个目标：方位、仰角、距离、径向速度、锁定、导弹标志等）。把环境表示成不定长目标集合（N targets），然后用 DeepSets / Set Transformer / GNN/Relation Net 去处理目标间交互与决策输入。
+优点：
+
+非常符合“每个像素代表一个敌机”的事实，去掉大量无用稀疏信息。
+
+更具可解释性（每个节点是“一个飞机/导弹”）。
+
+GNN/Set 模型对交互建模（友军/敌军/导弹）很有效，且样本效率高。
+缺点：
+
+需要一个稳定的目标检测/群聚步骤（可能需要阈值/滤波、短暂丢失的处理）。
+
+如果目标遮挡/检测错误，需要鲁棒处理（masking、置信度）。
+何时用：目标数通常较少（BVR 中通常几十以下），而且你关心对象关系时强烈推荐。
+
+2) Per-ray embedding + 1D 卷积（或轴向 separable conv）
+
+思路：对每条 ray 做一个小 MLP（或线性层）映射到 embedding，然后在方位轴上做 1D 卷积（每个仰角层单独处理或跨仰角做 separable conv）。方位轴用 circular padding（处理 360° wrap-around）。
+优点：
+
+保留局部相邻关系（邻近 ray 的信息能被捕获）。
+
+计算低、参数少，比 2D 卷积更合理（因为 elevation bins 少）。
+
+卷积对稀疏点仍能利用“局部相邻的证据”。
+缺点：
+
+对很远的非局部交互（例如两个相距很远的目标的关系）需要大感受野或后接 Transformer/GNN。
+何时用：当 ray-grid 真正是连续角度采样且你想要一个轻量的、位置感知的前端。
+
+3) Attention / Transformer，但用相对位置编码或 RoPE、以及局部化偏置（local attention）
+
+思路：先把每 ray 的特征嵌入（含角度坐标），用 Transformer，但是不要只用绝对 learned pos embedding。建议使用：
+
+相对位置编码（relative pos）：关注“两个 ray 间的角差”而非绝对索引；对旋转平移（旋转围绕自身）更稳健。
+
+RoPE（rotary）：对角度周期性处理较好。
+
+混合 attention：局部 attention + 若干 global tokens（例如引入 few global summary tokens 或稀疏 attention），以降低计算且保留长程交互。
+优点：
+
+可以直接表达任意长交互与关系。
+
+保留 permutation-invariant 的灵活性并用相对编码恢复位置信息。
+缺点：
+
+训练样本效率较低（尤其在 sparse reward 场景）。
+
+实现需注意 wrap-around（相对 pos 计算要按圆周差处理）。
+
+4) CoordConv / 多通道位置注入（在每个 ray 上显式加角度坐标）
+
+思路：在 per-ray feature 中加入（sin(az), cos(az), sin(el), cos(el)）或原始角度数值，或者使用 CoordConv（即把坐标作为额外通道传入 conv/MLP）。
+优点：
+
+简单有效，特别是当你仍想保留 MLP 的便利性时。
+
+对模型学习位置信息更直接，比无位置输入的 MLP 好很多。
+缺点：
+
+仍然是“显式依赖学习”，可能需要更多数据去学相对关系。
+何时用：作为 baseline，几乎应当至少试验。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+很好，我又做了一点修改，以新的为准。请使用LiDar obs里的技术，对extended obs里，对导弹或者飞机的位置的刻画进行升级，目前是```
+                    rel_pos[0] / self.norm_pos,
+                    rel_pos[1] / self.norm_pos,
+                    rel_pos[2] / self.norm_alt,
+                    rel_vel[0] / self.norm_vel,
+                    rel_vel[1] / self.norm_vel,
+                    rel_vel[2] / self.norm_vel,
+                    distance / self.norm_pos,
+                    np.sin(angle_h),
+                    np.cos(angle_h),
+                    alt_diff / self.norm_alt,
+```
+我们应该尝试造更多的特征，这样学习效果可能更好，至少要加上```
+normalized_range
+normalized_radial_velocity
+normalized_altitude
+is_enemy
+is_ally
+is_missile
+missile_mach      (use get_mach from uhtk.c3utils.i3utils)
+az_sin
+az_cos
+el_sin
+el_cos
+```
+同时，对于obs里的每一个实体，必须把他们的维度统一，比如ego obs是x维，那对方和己方的导弹和飞机的obs都是x维度。特征宁可多不要少，如果有些特征是ego obs独有的，可以考虑也把相应种类添加到其他单位的obs里。这是因为，我们可以在模型中用统一的mlp对每个单位进行编码。
+新obs可以叫entity
+请使用ALGORITHM\ppo_ma算法， 使用entity observation space,  设置EntityOriented为true，把ScenarioConfig.obs_shape设置为[entity_数目， 每个entity(单位)对应的维度]，这样就可以单独编码了。
+
+```背景思考
+如果同时使用Extended的obs和新写的LiDar obs，目前强化学习算法只能接受单路obs，需要让整个体系能够同时接受双路的obs，需要新建了一个ALGORITHM
+  \ppo_ma_bvrsim算法，可以用其中的ALGORITHM\ppo_ma_bvrsim\shell_env.py来接受环境的特殊obs格式，然后改进net.py来完成多路的obs的输入，可以用这种方式：创建一个新的模块，叫做auto
+  encoder，集成目前对于vector和image的encode功能，并对于lidar格式， 对于每一个像素，也就是ray，把他们和一个对应每个像素位置的embeding合并，让后使用一个统一的mlp来进行编码，再用S
+  impleAttention进行ray级别的attention捕捉相关性，最后用mlp映射到完成encode
+
+感觉这样就是一个稀疏的，extended风格的obs，只是相当于对角度做了离散化，并且可以学一个embeding，所以不如直接升级extended obs。
+```
+
+请实现entity obs，并创建一个使用ppo_ma算法的配置文件MISSION\bvr_sim\conf_system\ppo_ma-1v1-entity.jsonc,已有，修改即可
+
+在完成上述功能之后，在ppo_ma算法 的模型中添加一个针对每个entity或者叫单位的embeding，可以拼接到对应的obs里

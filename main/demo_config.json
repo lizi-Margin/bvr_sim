@@ -1,0 +1,41 @@
+{
+    "dt": 0.4,
+    "max_steps": 1000,
+    "red_fighters": {
+        "A01": {"model": "F16", "record": false}
+    },
+    "blue_fighters": {
+        "B01": {"model": "F16", "record": false}
+    },
+    "ground_units": {},
+    "field_size": 100000.0,
+    "obs_type": "text",
+    "blue_opponent_type": "tactical",
+    "reward_config": {
+        "engage_enemy_weight": 0.15,
+        "enemy_distance_weight": 0.15,
+        "altitude_advantage_weight": 0.001,
+        "safe_altitude_weight": 0.002,
+        "missile_evasion_weight": 0.2,
+        "speed_weight": 0.01,
+        "target_speed": 450.0,
+        "survival_weight": 0.01,
+        "missile_launch_weight": 1.0,
+        "missile_launch_reward": 6.0,
+        "missile_duplicated_launch_penalty": -3.0,
+        "missile_result_weight": 1.0,
+        "missile_hit_reward": 100.0,
+        "missile_miss_penalty": -3.0,
+        "win_loss_weight": 1.0,
+        "win_reward": 80.0,
+        "loss_penalty": -50.0,
+        "distill_reward_weight": 0.0,
+        "distill_reward_norm": "l1",
+        "distill_reward_include_shoot": true,
+        "distill_reward_shoot_weight": 2.0,
+        "safe_altitude_min": 400.0,
+        "safe_altitude_max": 12000.0
+    },
+    "initial_separation_nm": 37.2,
+    "formation_max_spread_nm": 2.0
+}

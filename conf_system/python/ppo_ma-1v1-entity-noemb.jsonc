@@ -1,0 +1,73 @@
+{
+    // ========================================================================
+    // BVR 3D - 1v1 Training Configuration
+    // PPO with Entity-Oriented Observation Space
+    // ========================================================================
+
+    // ===================== UHRL Framework Core Config =====================
+    "config.py->GlobalConfig": {
+        "env_name": "bvr_sim",
+        "logdir": "RESULT/bvr_sim-ppo_ma-1v1-entity-noemb",
+        "seed": 1111,
+        "num_threads": 32,
+        "fold": 1,
+        "report_reward_interval": 32,
+        "max_n_episode": 500000
+    },
+
+    // ===================== BVR 3D Environment Config =====================
+    "MISSION.bvr_sim.env_wrapper->ScenarioConfig": {
+        "AGENT_ID_EACH_TEAM": [[0]],
+        "TEAM_NAMES": [
+            "ALGORITHM.ppo_ma.foundation->ReinforceAlgorithmFoundation"
+        ],
+        "interested_team": 0,
+
+        "MaxEpisodeStep": 1000,
+        "dt": 0.4,
+
+        "field_size": 100000.0,
+
+        "initial_separation_nm": 37.2,
+        "formation_max_spread_nm": 2.0,
+
+        "red_meta": {
+            "A01": {"model": "F16", "record": false}
+        },
+        "blue_meta": {
+            "B01": {"model": "F16", "record": false}
+        },
+
+        "EntityOriented": true,
+        "obs_type": "entity",
+        "obs_dim": 208,
+        "obs_shape": [8, 26],
+
+        "blue_opponent_type": ["simple", "mad", "tactical"],
+
+        "render": true,
+        "render_interval": 1
+
+    },
+
+    // --- config ALGORITHM 1/2 ---
+    "ALGORITHM.ppo_ma.foundation->AlgorithmConfig": {
+        "train_traj_needed": 32,
+        "use_normalization": true,
+        "load_checkpoint": true,
+        "gamma": 0.99,
+        "lr": 3e-4,
+        "entropy_coef": 0.0001,
+        "ppo_epoch": 16,
+        "net_hdim": 128,
+        "entity_emb_dim": 0,
+
+        "device": "cuda"
+    },
+    "uhtk.UTIL.tensor_ops->ConfigCache": {
+        "device_to_config": "cuda"
+    },
+
+    "ALGORITHM.random.foundation->AlgorithmConfig": {
+    }
+}

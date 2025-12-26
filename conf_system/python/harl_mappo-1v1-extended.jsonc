@@ -1,0 +1,103 @@
+{
+    // ========================================================================
+    // BVR 3D - 1v1 Training Configuration
+    // HARL-MAPPO integration for Beyond Visual Range air combat
+    // ========================================================================
+
+    // ===================== UHRL Framework Core Config =====================
+    "config.py->GlobalConfig": {
+        "env_name": "bvr_sim",
+        "logdir": "RESULT/bvr_sim-harl_mappo-1v1-extended",
+        "seed": 2025,
+        "num_threads": 32,
+        "fold": 1,
+        "report_reward_interval": 32,
+        "max_n_episode": 500000
+    },
+
+    // ===================== BVR 3D Environment Config =====================
+    "MISSION.bvr_sim.env_wrapper->ScenarioConfig": {
+        // Team configuration
+        "AGENT_ID_EACH_TEAM": [[0]],  // Red team (RL agent)
+        "TEAM_NAMES": [
+            "ALGORITHM.harl_mappo.foundation->ReinforceAlgorithmFoundation"
+        ],
+        "interested_team": 0,  // Train red team (HARL-MAPPO)
+
+        // Episode configuration
+        "MaxEpisodeStep": 1000,
+        "dt": 0.4,
+
+        // Scenario configuration
+        "field_size": 100000.0,  // 100 km battle space
+
+        // Spawn configuration (randomized positions)
+        "initial_separation_nm": 37.2,  // Initial distance between teams (nautical miles)
+        "formation_max_spread_nm": 2.0,  // Maximum formation spread (nautical miles)
+
+        "red_meta": {
+            "A01": {"model": "F16", "record": false}
+        },
+        "blue_meta": {
+            "B01": {"model": "F16", "record": false}
+        },
+
+        // Observation space configuration
+        "EntityOriented": false,
+        "obs_type": "extended",  // 'compact' (47 dims) or 'extended' (73 dims)
+        "obs_dim": 75,
+        "obs_shape": [75],
+
+        // Blue team opponent
+        "blue_opponent_type": ["mad", "tactical"],
+
+        // Rendering configuration
+        "render": true,  // Enable for ACMI recording
+        "render_interval": 1  // Render every step
+
+    },
+
+    // ===================== HARL-MAPPO Algorithm Config =====================
+    "ALGORITHM.harl_mappo.foundation->AlgorithmConfig": {
+        "gamma": 0.99,
+        "tau": 0.95,
+        "train_traj_needed": 512,
+        "use_normalization": true,
+
+        "clip_param": 0.2,
+        "ppo_epoch": 16,
+        "actor_num_mini_batch": 1,
+        "critic_num_mini_batch": 1,
+        "value_loss_coef": 0.1,
+        "entropy_coef": 0.05,
+        "max_grad_norm": 0.5,
+        "lr": 1e-4,
+        "critic_lr": 1e-4,
+
+        "net_hdim": 256,
+        "hidden_sizes": [256, 256],
+        "recurrent_n": 1,
+        "use_recurrent_policy": false,
+        "use_naive_recurrent_policy": false,
+        "use_policy_active_masks": true,
+        "use_max_grad_norm": true,
+        "use_clipped_value_loss": true,
+        "use_huber_loss": false,
+        "huber_delta": 10.0,
+        "use_gae": true,
+        "use_proper_time_limits": true,
+        "action_aggregation": "prod",
+
+        "gain": 0.01,
+        "initialization_method": "orthogonal_",
+        "opti_eps": 1e-5,
+        "weight_decay": 0.0,
+
+        "device": "cuda",
+        "load_checkpoint": false
+    },
+
+    "uhtk.UTIL.tensor_ops->ConfigCache": {
+        "device_to_config": "cuda"
+    }
+}

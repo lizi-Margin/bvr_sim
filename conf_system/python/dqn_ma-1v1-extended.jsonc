@@ -1,0 +1,97 @@
+{
+    // ========================================================================
+    // BVR 3D - 1v1 Training Configuration
+    // CTDE MADQN baseline for Beyond Visual Range air combat
+    // ========================================================================
+
+    // ===================== UHRL Framework Core Config =====================
+    "config.py->GlobalConfig": {
+        "env_name": "bvr_sim",
+        "logdir": "RESULT/bvr_sim-dqn_ma-1v1-extended",
+        "seed": 2025,
+        "num_threads": 32,
+        "fold": 1,
+        "report_reward_interval": 32,
+        "max_n_episode": 500000
+    },
+
+    // ===================== BVR 3D Environment Config =====================
+    "MISSION.bvr_sim.env_wrapper->ScenarioConfig": {
+        // Team configuration
+        "AGENT_ID_EACH_TEAM": [[0]],  // Red team (RL agent)
+        // "AGENT_ID_EACH_TEAM": [[0], [1]],  // Red team (RL agent)
+        "TEAM_NAMES": [
+            "ALGORITHM.dqn_ma.foundation->ReinforceAlgorithmFoundation"
+        ],
+        "interested_team": 0,  // Train red team (PPO-GRU)
+
+        // Episode configuration
+        "MaxEpisodeStep": 1000,   
+        "dt": 0.4, 
+
+        // Scenario configuration
+        "field_size": 100000.0,  // 100 km battle space
+
+        // Spawn configuration (randomized positions)
+        "initial_separation_nm": 37.2,  // Initial distance between teams (nautical miles)
+        "formation_max_spread_nm": 2.0,  // Maximum formation spread (nautical miles)
+
+        "red_meta": {
+            "A01": {"model": "F16", "record": false}
+        },
+        "blue_meta": {
+            "B01": {"model": "F16", "record": false}
+        },
+
+        // Observation space configuration
+        "EntityOriented": false,
+        "obs_type": "extended",  // 'compact' (47 dims) or 'extended' (73 dims)
+        // Compact obs for 1v1: 9 (self) + 10 (enemy) + 0 (allies) + 28 (missiles) = 47
+        "obs_dim": 75,
+        "obs_shape": [75],
+
+        // Blue team opponent
+        // "blue_opponent_type": "tactical",  // str or list of ['random','simple','tactical']
+        // "blue_opponent_type": ["random", "simple", "mad", "tactical"],
+        // "blue_opponent_type": ["simple", "mad", "tactical"],
+        "blue_opponent_type": ["mad", "tactical"],
+        // "blue_opponent_type": "tactical",
+        // "blue_opponent_type": null,  // null = both teams RL-controlled (self-play)
+
+        // Rendering configuration
+        "render": true,  // Enable for ACMI recording (set to true for visualization)
+        "render_interval": 1  // Render every step (ACMI is fast)
+
+    },
+
+    // ===================== MADQN Algorithm Config =====================
+    "ALGORITHM.dqn_ma.foundation->AlgorithmConfig": {
+        "gamma": 0.99,
+        "lr": 3e-4,
+        "max_grad_norm": 10.0,
+
+        "replay_buffer_size": 400000,
+        "batch_size": 256,
+        "warmup_transitions": 4096,
+        "train_freq": 1,
+        "gradient_steps": 1,
+        "target_sync_interval": 1000,
+        "target_tau": 1.0,
+        "double_dqn": true,
+
+        "eps_start": 1.0,
+        "eps_end": 0.05,
+        "eps_decay": 200000,
+        "min_eps": 0.01,
+
+        "net_hdim": 256,
+        "use_normalization": true,
+
+        "device": "cuda",
+        "load_checkpoint": true
+    },
+
+    "uhtk.UTIL.tensor_ops->ConfigCache": {
+        "device_to_config": "cuda"
+    }
+}

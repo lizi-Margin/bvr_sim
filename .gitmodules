@@ -1,0 +1,12 @@
+[submodule "src/extern/pybind11"]
+	path = src/extern/pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "src/extern/eigen"]
+	path = src/extern/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+[submodule "src/extern/jsbsim"]
+	path = src/extern/jsbsim
+	url = https://github.com/JSBSim-Team/jsbsim.git
+[submodule "src/extern/cpptrace"]
+	path = src/extern/cpptrace
+	url = https://github.com/jeremy-rifkin/cpptrace.git
