@@ -96,8 +96,20 @@ scenario_config_dict = {
         'safe_altitude_max': 12000.0,       # 12 km maximum
     }
 }
+
+
+from harl.common.base_logger import BaseLogger
+class HARLLogger(BaseLogger):
+    def get_task_name(self):
+        return f"{self.env_args['cpp_env_init_file']}"
+
+
 class BVRSimEnv:
-    def __init__(self, rank, env_args) -> None:
+    def __init__(self, rank, env_args_in) -> None:
+        assert isinstance(env_args_in, dict), "env_args_in must be a dict"
+        env_args = scenario_config_dict.copy()
+        env_args.update(env_args_in)
+
         self.id = rank
         self.env_args = env_args
         self.render = env_args['render'] and (self.id == 0)
@@ -280,8 +292,7 @@ class BVRSimEnv:
             # dones = self._get_dones(False)
             pass
 
-        del dones
-        return (obs, shared_obs, rewards, env_done, self.repeat(info))
+        return (obs, shared_obs, rewards, dones, self.repeat(info))
 
     def reset(self):
         """Reset environment"""
@@ -289,6 +300,7 @@ class BVRSimEnv:
         self.reset_render()
 
         obs, info = self._env.reset()
+        shared_obs = self._get_share_obs(obs)
 
         # Reset reward visualizer tracking for new episode (only if tracking is enabled)
         if self.reward_tracking_enabled:
@@ -300,13 +312,6 @@ class BVRSimEnv:
 
         info["env_done"] = False
 
-        # Add state
-        if ScenarioConfig.StateProvided:
-            info['State'] = obs.copy()
-        else:
-            # info['State'] = obs.copy()
-            info['State'] = None  # reduce IPC overhead
-
         # # Add available actions
         # if ScenarioConfig.AvailActProvided:
         #     next_avail_act = np.ones(shape=(self.n_each_team[self.interested_team], sum(self.n_actions)))
@@ -314,7 +319,7 @@ class BVRSimEnv:
         #     info['avail_act'] = next_avail_act
         #     info['Avail-Act'] = next_avail_act
 
-        return obs, info
+        return obs, shared_obs, self.repeat(info)
 
     def _get_dones(self, env_done: bool):
         """Get done flags"""
@@ -335,6 +340,8 @@ class BVRSimEnv:
         # obs: (n_agents, obs_dim)
         shared_obs = np.concatenate(obs, axis=0)
         assert shared_obs.shape == self.share_observation_space.shape, str(shared_obs.shape) + str(self.share_observation_space.shape)
+
+        return np.array([shared_obs.copy() for _ in range(self.n_each_team[self.interested_team])])
 
     def repeat(self, a):
         return [a for _ in range(self.n_each_team[self.interested_team])]
