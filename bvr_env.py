@@ -57,7 +57,7 @@ class BVR3DEnv(gymnasium.Env):
 
     metadata = {"render_modes": ["acmi"]}
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, logdir: str):
         super().__init__()
 
         self.config = config
@@ -126,7 +126,7 @@ class BVR3DEnv(gymnasium.Env):
         self.recorder_manager = AircraftRecorderManager(
             traj_limit=self.max_steps + 200,
             max_len=20,
-            save_dir=f"{cfg.logdir}/aircraft_records"
+            save_dir=f"{logdir}/aircraft_records"
         )
 
         self._step_profiler = StepProfiler(name=self.__class__.__name__) if PRINT_STEP_TIME else None
