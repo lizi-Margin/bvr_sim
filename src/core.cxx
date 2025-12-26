@@ -1,5 +1,6 @@
 #include "core.hxx"
 #include "cmd_handler.hxx"
+#include "rubbish_can/check.hxx"
 #include "so_pool.hxx"
 #include "bsl_pool.hxx"
 #include "rubbish_can/rubbish_can.hxx"
@@ -168,7 +169,7 @@ void SimCore::update_physics() {
         check(obj, "wtf obj from so pool is nullptr");
         if (ticked_uids.find(obj->uid) == ticked_uids.end()) {
             obj->tick();
-            check(!obj->trashed(), "obj->uid: %s, obj->type: %s is trashed, which is just created", obj->uid.c_str(), SOT_to_string(obj->Type).c_str());
+            format_check(!obj->trashed(),"obj->uid: %s, obj->type: %s is trashed, which is just created", obj->uid.c_str(), SOT_to_string(obj->Type).c_str());
         }
     }
     SL::get().print("---SimCore::update_physics---");

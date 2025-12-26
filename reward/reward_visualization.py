@@ -8,7 +8,7 @@ import os, json
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Dict, List, Any
-from config import GlobalConfig as cfg
+# from config import GlobalConfig as cfg
 
 
 class RewardVisualizer:

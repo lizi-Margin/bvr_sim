@@ -13,8 +13,10 @@ PRINT_STEP_TIME = False
 import importlib
 
 auto_import = False
+# _bvr_sim_path = os.path.dirname(os.path.abspath(__file__))
+# _cpp_binary_path = os.path.join(_bvr_sim_path, "install/lib/")
 try:
-    import MISSION.bvr_sim.install.lib.bvr_sim_cpp as bvr_sim_cpp
+    bvr_sim_cpp = importlib.import_module(".install.lib.bvr_sim_cpp", package=".")
     print(f"Successfully imported bvr_sim_cpp")
 except ImportError as e:
     auto_import = True

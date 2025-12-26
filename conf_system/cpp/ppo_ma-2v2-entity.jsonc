@@ -9,7 +9,7 @@
         "env_name": "bvr_sim",
         "logdir": "RESULT/bvr_sim-ppo_ma-2v2-entity",
         "seed": 1111,
-        "num_threads": 2,
+        "num_threads": 64,
         "fold": 1,
         "report_reward_interval": 64,
         "max_n_episode": 500000
