@@ -9,7 +9,7 @@
         "env_name": "bvr_sim",
         "logdir": "RESULT/bvr_sim-ppo_ma-2v2-entity",
         "seed": 1111,
-        "num_threads": 2,
+        "num_threads": 64,
         "fold": 1,
         "report_reward_interval": 64,
         "max_n_episode": 500000
@@ -89,6 +89,10 @@
         // "use_bc_update_actor": false,
         "use_normalization": true,
         "load_checkpoint": true,
+
+        "entropy_coef": 0.0002,
+        "clip_param": 0.8,  // no clip
+        
         "gamma": 0.99,
         "lr": 3e-4,
         "ppo_epoch": 16,
