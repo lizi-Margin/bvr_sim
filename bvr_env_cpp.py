@@ -15,11 +15,22 @@ import importlib
 auto_import = False
 # _bvr_sim_path = os.path.dirname(os.path.abspath(__file__))
 # _cpp_binary_path = os.path.join(_bvr_sim_path, "install/lib/")
-try:
-    bvr_sim_cpp = importlib.import_module(".install.lib.bvr_sim_cpp", package=".")
-    print(f"Successfully imported bvr_sim_cpp")
-except ImportError as e:
-    auto_import = True
+
+try_list = [
+    "MISSION.bvr_sim",
+    "harl.envs.bvr_sim"
+]
+for package in try_list:
+    e = None
+    bvr_sim_cpp = None
+    try:
+        bvr_sim_cpp = importlib.import_module(".install.lib.bvr_sim_cpp", package=package)
+        print(f"Successfully imported bvr_sim_cpp")
+        break
+    except ImportError as e:
+        pass
+if bvr_sim_cpp is None:
+    # raise ImportError("Failed to import bvr_sim_cpp from any package")
     raise e
 
 # if auto_import:
