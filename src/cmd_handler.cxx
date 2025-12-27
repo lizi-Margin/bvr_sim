@@ -148,8 +148,8 @@ json::JSON CmdHandler::handle_clear(const ParsedCommand& parsed) noexcept {
     check(parsed.type == ParsedCommand::CLEAR, "clear command must be clear");
     // delete all existing obj
     size_t n = SOPool::instance().size();
-    SOPool::instance().clear();
     BaselinePool::instance().clear();
+    SOPool::instance().clear();
     json::JSON res = json::JSON::Make( json::JSON::Class::Object );
     res["status"] = json::String("ok");
     res["message"] = json::String("all " + std::to_string(n) + " units cleared (deleted)");

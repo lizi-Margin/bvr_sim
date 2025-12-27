@@ -80,6 +80,11 @@ public:
 
     std::string log_suffix() const noexcept override;
 
+    virtual void clean_up() noexcept override {
+        SensorBase::clean_up();
+        track_targets.clear();
+    }
+
 private:
     c3utils::Vector3 _get_parent_nose_vec() const noexcept;
 

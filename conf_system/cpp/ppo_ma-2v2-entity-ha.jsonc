@@ -7,19 +7,20 @@
     // ===================== UHRL Framework Core Config =====================
     "config.py->GlobalConfig": {
         "env_name": "bvr_sim",
-        "logdir": "RESULT/bvr_sim-ppo_ma-2v2-entity",
-        "seed": 0,
-        "num_threads": 64,
+        "logdir": "RESULT/bvr_sim-ppo_ma-2v2-entity-ha",
+        "seed": 1111,
+        "num_threads": 32,
         "fold": 1,
-        "report_reward_interval": 64,
+        "report_reward_interval": 32,
         "max_n_episode": 500000
     },
 
     // ===================== BVR 3D Environment Config =====================
     "MISSION.bvr_sim.env_wrapper->ScenarioConfig": {
-        "AGENT_ID_EACH_TEAM": [[0, 1]],
+        "AGENT_ID_EACH_TEAM": [[0], [1]],
         "TEAM_NAMES": [
-            "ALGORITHM.ppo_ma.foundation->ReinforceAlgorithmFoundation"
+            "ALGORITHM.ppo_ma.foundation->ReinforceAlgorithmFoundation",
+            "ALGORITHM.ppo_ma.foundation->ReinforceAlgorithmFoundation",
         ],
         "interested_team": 0,
 
@@ -28,10 +29,10 @@
 
         "field_size": 100000.0,
 
-        "initial_separation_nm": 37.2,
+        // "initial_separation_nm": 37.2,
+        "initial_separation_nm": 30.0,
         "formation_max_spread_nm": 2.0,
 
-        // "cpp_env_init_file": "MISSION/bvr_sim/conf_system/cpp/init/2v2-simple_fdm.jsonc",
         "cpp_env_init_file": "MISSION/bvr_sim/conf_system/cpp/init/2v2.jsonc",
         // "red_meta": {
         //     "A01": {"model": "F16", "record": false},
@@ -44,7 +45,7 @@
 
         "reward_config" :{
             // Dense rewards
-            "engage_enemy_weight": 0.01,         // Reward for closing rate
+            "engage_enemy_weight": 0.00,         // Reward for closing rate
             "enemy_distance_weight": 0.0,       // Reward for closing distance to enemy
             "enemy_tracking_weight": 0.01,     // radar tracking reward
             "altitude_advantage_weight": 0.04,  // 3D-specific: altitude advantage
@@ -62,7 +63,7 @@
             "missile_result_weight": 0.1,      // Reward for hits, penalty for misses
             "missile_hit_reward": 50.0,
             "missile_miss_penalty": -0.5,
-            "win_loss_weight": 0.2,             // Episode outcome
+            "win_loss_weight": 0.0,             // Episode outcome
             "win_reward": 100.0,
             "loss_penalty": -80.0,
 
@@ -71,10 +72,11 @@
             "safe_altitude_max": 12000.0, 
         },
 
+
         "EntityOriented": true,
         "obs_type": "entity",
-        "obs_dim": 175,
-        "obs_shape": [5, 35],
+        "obs_dim": 350,
+        "obs_shape": [10, 35],
 
         // "blue_opponent_type": ["simple", "mad", "tactical"],
         "blue_opponent_type": ["tactical"],
@@ -86,7 +88,7 @@
 
     // --- config ALGORITHM 1/2 ---
     "ALGORITHM.ppo_ma.foundation->AlgorithmConfig": {
-        "train_traj_needed": 64,
+        "train_traj_needed": 32,
         // "use_bc_update_actor": false,
         "use_normalization": true,
         "load_checkpoint": true,

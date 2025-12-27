@@ -34,7 +34,7 @@ protected:
 
 class EntityObsSpace : public ObservationSpace {
 public:
-    EntityObsSpace(int max_team_missiles = 4, int max_enemy_missiles = 2);
+    EntityObsSpace();
 
     int get_obs_dim(int num_red, int num_blue) const override;
 

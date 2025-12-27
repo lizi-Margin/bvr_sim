@@ -85,7 +85,7 @@ private:
     std::string JSBSim_dir;
     std::string aircraft_model;
 
-    std::shared_ptr<JSBSim::FGFDMExec> jsbsim_exec;
+    std::unique_ptr<JSBSim::FGFDMExec> jsbsim_exec;
     bool initialized;
 
     double jsbsim_dt_max;

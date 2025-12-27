@@ -58,7 +58,7 @@ os.environ["JSBSIM_DEBUG"] = "0"
 class BVR3DEnvCpp:
     """BVR 3D environment adapter for C++ simulation core (new 3-segment protocol)"""
 
-    def __init__(self, config: Dict):
+    def __init__(self, config: Dict, rl_index: list):
         self.config = config
         self.dt = config.get("dt", 0.4)
         self.core = bvr_sim_cpp.SimCore(dt=self.dt)
@@ -84,10 +84,12 @@ class BVR3DEnvCpp:
 
         # Determine controllable teams (ego_ids)
         self.blue_opponent_type = config.get('blue_opponent_type', 'tactical')
-        if self.blue_opponent_type is None:
-            self.ego_ids = self.red_ids + self.blue_ids  # Both teams controllable
-        else:
-            self.ego_ids = self.red_ids  # Only red team controllable
+        # if self.blue_opponent_type is None:
+        #     self.ego_ids = self.red_ids + self.blue_ids  # Both teams controllable
+        # else:
+        #     self.ego_ids = self.red_ids  # Only red team controllable
+        all_ids = self.red_ids + self.blue_ids
+        self.ego_ids = [all_ids[i] for i in rl_index]
 
         self.spawn_manager = SpawnManager(config)
 
@@ -182,6 +184,7 @@ class BVR3DEnvCpp:
             ])
             init_spec[uid]["position"] = position.tolist()
             init_spec[uid]["velocity"] = velocity.tolist()
+            # init_spec[uid]["velocity"] = [300, 100, 0]
 
 
         # Build initialization spec for blue
@@ -198,6 +201,7 @@ class BVR3DEnvCpp:
             ])
             init_spec[uid]["position"] = position.tolist()
             init_spec[uid]["velocity"] = velocity.tolist()
+            # init_spec[uid]["velocity"] = [-300, 100, 0]
 
 
 

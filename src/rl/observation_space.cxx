@@ -7,13 +7,13 @@
 
 namespace bvr_sim {
 
-EntityObsSpace::EntityObsSpace(int max_team_missiles, int max_enemy_missiles)
+EntityObsSpace::EntityObsSpace()
     : ObservationSpace("entity"),
-      norm_pos_(50000.0f),
-      norm_vel_(600.0f),
+      norm_pos_(40000.0f),
+      norm_vel_(400.0f),
       norm_alt_(10000.0f),
-      max_team_missiles_(max_team_missiles),
-      max_enemy_missiles_(max_enemy_missiles),
+      max_team_missiles_(0),
+      max_enemy_missiles_(1),
       entity_dim_(35) {}
 
 int EntityObsSpace::get_obs_dim(int num_red, int num_blue) const {
@@ -156,6 +156,13 @@ std::vector<double> EntityObsSpace::extract_entity_features(
         auto self_aircraft = std::dynamic_pointer_cast<const Aircraft>(target);
         check(self_aircraft, "self_aircraft");
 
+        features[0] = self_aircraft->position[0] / norm_pos_;
+        features[1] = self_aircraft->position[1] / norm_pos_;
+        features[2] = self_aircraft->position[2] / norm_alt_;
+        features[3] = self_aircraft->velocity[0] / norm_vel_;
+        features[4] = self_aircraft->velocity[1] / norm_vel_;
+        features[5] = self_aircraft->velocity[2] / norm_vel_;
+
         double speed = c3utils::linalg_norm(
             std::array<double, 3>{self_aircraft->velocity[0],
                                  self_aircraft->velocity[1],
@@ -221,7 +228,8 @@ std::vector<double> EntityObsSpace::extract_entity_features(
 
     double distance = c3utils::linalg_norm(rel_pos);
     double range_nm = c3utils::meters_to_nm(distance);
-    features[6] = std::min(range_nm / 30.0, 2.0);
+    // features[6] = std::min(range_nm / 30.0, 2.0);
+    features[6] = range_nm / 30.0;
 
     double horizontal_range = c3utils::linalg_norm(std::array<double, 2>{rel_pos[0], rel_pos[1]});
     double azimuth_rad = 0.0f;

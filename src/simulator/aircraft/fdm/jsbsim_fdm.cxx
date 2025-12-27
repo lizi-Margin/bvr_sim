@@ -1,5 +1,6 @@
 #include "jsbsim_fdm.hxx"
 #include "c3utils/c3utils.hxx"
+#include "funcs.hxx"
 #include "rubbish_can/SL.hxx"
 #include "rubbish_can/colorful.hxx"
 #include "rubbish_can/set_env.hxx"
@@ -107,37 +108,40 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
     }
 
     fc = StdFlightController(jsbsim_inner_dt);
-    // fc_delta_heading_filter = SimpleScalarFilter(0.01);
-    // fc_delta_pitch_filter = SimpleScalarFilter(0.10);
-
-
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in COT
 }
 
 void JSBSimFDM::initialize_jsbsim() noexcept {
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in COT
 
-    jsbsim_exec = std::make_shared<JSBSim::FGFDMExec>(nullptr, nullptr);
-    const static std::string AircraftPath = "aircraft";
-    const static std::string EnginePath = "engine";
-    const static std::string SystemsPath = "systems";
-
-    jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
-    jsbsim_exec->SetDebugLevel(jsb_debug_level);
-    jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), aircraft_model, true);
-
-    std::string props = jsbsim_exec->QueryPropertyCatalog("");
-    std::vector<std::string> prop_list;
-    std::stringstream ss(props);
-    std::string line;
-    while (std::getline(ss, line)) {
-        prop_list.push_back(line);
+    if (jsbsim_exec != nullptr) {
+        jsbsim_exec->ResetToInitialConditions(0x2);
     }
-    Catalog::add_jsbsim_props(prop_list);
+    else {
+        jsbsim_exec = std::make_unique<JSBSim::FGFDMExec>(nullptr, nullptr);
 
-    // std::cout << "\033[31m" << "JSBSim dt: " << jsbsim_inner_dt << "\033[0m" << std::endl;
-    SL::get().print("JSBSim dt: " + std::to_string(jsbsim_inner_dt));
-    jsbsim_exec->Setdt(jsbsim_inner_dt);
+        const static std::string AircraftPath = "aircraft";
+        const static std::string EnginePath = "engine";
+        const static std::string SystemsPath = "systems";
+
+        jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
+        jsbsim_exec->SetDebugLevel(jsb_debug_level);
+        jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), aircraft_model, true);
+
+        std::string props = jsbsim_exec->QueryPropertyCatalog("");
+        std::vector<std::string> prop_list;
+        std::stringstream ss(props);
+        std::string line;
+        while (std::getline(ss, line)) {
+            prop_list.push_back(line);
+        }
+        Catalog::add_jsbsim_props(prop_list);
+
+        // std::cout << "\033[31m" << "JSBSim dt: " << jsbsim_inner_dt << "\033[0m" << std::endl;
+        SL::get().print("JSBSim dt: " + std::to_string(jsbsim_inner_dt));
+        jsbsim_exec->Setdt(jsbsim_inner_dt);
+    }
+    
 
     clear_default_condition();
 }
@@ -182,7 +186,7 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
 
     double yaw_val;
     if (c3u::linalg_norm(vel_arr) > 1e-6) {
-        yaw_val = std::atan2(-vel_arr[1], vel_arr[0]);
+        yaw_val = std::atan2(vel_arr[1], vel_arr[0]);
     } else {
         auto yaw_it = initial_state.find("yaw");
         if (yaw_it != initial_state.end()) {
@@ -259,13 +263,20 @@ double JSBSimFDM::get_mach() const noexcept {
 }
 
 void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noexcept {
-    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(100);
+    // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(100);
+    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(80);
     double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw);
     delta_heading = delta_heading_filt;
 
-    double delta_pitch_raw = -norm(action.at("delta_altitude"), -1, 1) * deg2rad(50);
+    double delta_pitch_raw = -norm(action.at("delta_altitude"), -1, 1) * deg2rad(80);
     double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw);
     delta_pitch = delta_pitch_filt;
+
+    // if (position[2] < c3utils::feet_to_meters(20000)) {
+    //     if (delta_pitch > 0) {
+    //         delta_pitch = -deg2rad(80);
+    //     }
+    // }
 
     Vector3 fix_vec = get_heading_vec();
     fix_vec[2] = 0;

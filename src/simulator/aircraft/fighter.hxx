@@ -16,7 +16,7 @@ class Missile;
 class Fighter : public Aircraft {
 private:
     double _t;
-    std::shared_ptr<BaseFDM> fdm;
+    std::unique_ptr<BaseFDM> fdm;
 
 public:
     double min_shoot_interval;

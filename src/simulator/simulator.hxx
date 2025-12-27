@@ -111,6 +111,11 @@ public:
         std::cout << "altitude: " << get_altitude() << std::endl;
         colorful::printHUANG("=========================");
     }
+
+    virtual void clean_up() noexcept {
+        enemies.clear();
+        partners.clear();
+    }
 };
 
 }

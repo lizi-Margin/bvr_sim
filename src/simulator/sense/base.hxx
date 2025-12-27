@@ -26,6 +26,11 @@ public:
     const std::map<std::string, std::shared_ptr<DataObj>>& get_data() const noexcept { return data_dict; }
 
     const std::shared_ptr<Aircraft>& get_parent() const noexcept { return parent; }
+
+    virtual void clean_up() noexcept {
+        parent = nullptr;
+        data_dict.clear();
+    }
 };
 
 }

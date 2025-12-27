@@ -44,14 +44,14 @@ Fighter::Fighter(
 
 void Fighter::initialize_fdm(const std::string& fdm_type) noexcept {
     if (fdm_type == "simple") {
-        fdm = std::make_shared<SimpleFDM>(dt);
+        fdm = std::make_unique<SimpleFDM>(dt);
     } else if (fdm_type == "jsbsim") {
         std::map<std::string, std::string> kwargs;
         kwargs["aircraft_model"] = aircraft_model;
-        fdm = std::make_shared<JSBSimFDM>(dt, kwargs);
+        fdm = std::make_unique<JSBSimFDM>(dt, kwargs);
     } else {
         std::cerr << "Warning: Unknown FDM type '" << fdm_type << "', defaulting to SimpleFDM" << std::endl;
-        fdm = std::make_shared<SimpleFDM>(dt);
+        fdm = std::make_unique<SimpleFDM>(dt);
     }
 }
 

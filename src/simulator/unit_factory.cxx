@@ -73,7 +73,7 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
 
     try {
         std::array<double, 3> position = {0.0, 0.0, 5000.0};
-        std::array<double, 3> velocity = {250.0, 0.0, 0.0};
+        std::array<double, 3> velocity = {0.0, 1.0, 250};
 
         if (!get_array3_from_json("position", spec_json, position)) {
             std::cout << "Failed to get position from JSON" << std::endl;

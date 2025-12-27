@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../simulator.hxx"
+#include "simulator/sense/base.hxx"
 #include "simulator/pylon_manager.hxx"
+#include "rubbish_can/check.hxx"
 #include <string>
 #include <array>
 #include <vector>
@@ -73,6 +75,22 @@ public:
 
 
     virtual void write_register() noexcept override;
+
+    virtual void clean_up() noexcept override {
+        SimulatedObject::clean_up();
+        enemies_lock.clear();
+        launched_missiles.clear();
+        under_missiles.clear();
+        for (auto& [name, sensor] : sensors) {
+            check(sensor, "sensor");
+            sensor->clean_up();
+        }
+        sensors.clear();
+        sa_datalink = nullptr;
+        radar = nullptr;
+        rws = nullptr;
+        mws = nullptr;
+    }
 
 protected:
     void maintain_missile_lists() noexcept;

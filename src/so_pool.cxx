@@ -51,7 +51,14 @@ void SOPool::trash_out(const std::string& uid) {
 
 void SOPool::clear() {
     std::unique_lock lock(mutex_);
+    for (auto& [uid, obj] : objects_) {
+        obj->clean_up();
+    }
     objects_.clear();
+
+    for (auto& [uid, obj] : trashed_objects_) {
+        obj->clean_up();
+    }
     trashed_objects_.clear();
 }
 

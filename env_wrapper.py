@@ -177,7 +177,11 @@ class BVR3DWrapper(BaseEnv):
         if ScenarioConfig.cpp_env_init_file is not None:
             from .bvr_env_cpp import BVR3DEnvCpp
             env_config['cpp_env_init_file'] = ScenarioConfig.cpp_env_init_file
-            self._env = BVR3DEnvCpp(env_config)
+            rl_controll_ids = []
+            for team in self.id_each_team:
+                rl_controll_ids.extend(team)
+            print(f"[BVR3D] RL controll ids: {rl_controll_ids}")
+            self._env = BVR3DEnvCpp(env_config, rl_controll_ids)
             self.is_cpp = True
         else:
             self._env = BVR3DEnv(env_config, cfg.logdir)
