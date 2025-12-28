@@ -1,6 +1,7 @@
 #include "fc_old.hxx"
 #include "c3utils/c3utils.hxx"
 #include "funcs.hxx"
+#include "io.hxx"
 #include "vector.hxx"
 
 namespace bvr_sim {
@@ -70,8 +71,11 @@ std::array<double, 4> StdFlightController::direct_LU_flight_controler(
 
     if (crashing) {
         intent_heading[2] = 0;
+        c3utils::print(fighter.height);
         if (fighter.height < c3u::feet_to_meters(2000)) {
-            intent_heading[2] = Vector3(intent_heading).get_module()/5;
+            intent_heading = fighter.heading.get_list();
+            intent_heading[2] = 0;
+            intent_heading[2] = Vector3(intent_heading).get_module()/3;
         }
 
         // intent_heading[2] = std::tan(20) * Vector3(intent_heading).get_module();
