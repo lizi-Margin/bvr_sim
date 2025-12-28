@@ -44,10 +44,10 @@
 
         "reward_config" :{
             // Dense rewards
-            "engage_enemy_weight": 0.01,         // Reward for closing rate
+            "engage_enemy_weight": 0.005,         // Reward for closing rate
             "enemy_distance_weight": 0.0,       // Reward for closing distance to enemy
-            "enemy_tracking_weight": 0.01,     // radar tracking reward
-            "altitude_advantage_weight": 0.02,  // 3D-specific: altitude advantage
+            "enemy_tracking_weight": 0.02,     // radar tracking reward
+            "altitude_advantage_weight": 0.04,  // 3D-specific: altitude advantage
             "safe_altitude_weight": 0.000,        // 3D-specific: stay in safe altitude
             "missile_evasion_weight": 0.05,     // Reward for evading missiles
             "speed_weight": 0.00,             // Reward for maintaining speed
