@@ -12,7 +12,7 @@ def main():
     with open(os.path.join(get_root_dir(), "demo_config_cpp.jsonc"), "r") as fin:
         env_config = commentjson.load(fin)
 
-    sim = BVR3DEnvCpp(env_config)
+    sim = BVR3DEnvCpp(env_config, [])
     obs, info = sim.reset(seed=None)
 
     

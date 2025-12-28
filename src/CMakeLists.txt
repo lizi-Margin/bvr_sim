@@ -317,11 +317,12 @@ install(TARGETS bvr_sim_cpp
 )
 
 # Install PDB files for bvr_sim_cpp (MSVC debug symbols)
-# if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
-if(MSVC)
-    install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bvr_sim_cpp.pdb"
-        DESTINATION lib
-    )
+if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
+    if(MSVC)
+        install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bvr_sim_cpp.pdb"
+            DESTINATION lib
+        )
+    endif()
 endif()
 
 

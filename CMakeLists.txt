@@ -22,7 +22,7 @@ endif()
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     if (MSVC)
         set(CMAKE_CXX_FLAGS_RELEASE
-            "/O2 /Ob2 /Oi /Ot /GL /fp:fast /arch:AVX2"
+            "/Zi /O2 /Ob2 /Oi /Ot /GL /fp:fast /arch:AVX2"
         )
     else ()
         set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -march=native")
