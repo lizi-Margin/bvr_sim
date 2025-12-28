@@ -9,9 +9,9 @@
         "env_name": "bvr_sim",
         "logdir": "RESULT/bvr_sim-ppo_ma-2v2-entity",
         "seed": 0,
-        "num_threads": 64,
+        "num_threads": 80,
         "fold": 1,
-        "report_reward_interval": 64,
+        "report_reward_interval": 80,
         "max_n_episode": 500000
     },
 
@@ -23,13 +23,13 @@
         ],
         "interested_team": 0,
 
-        "MaxEpisodeStep": 800,
+        "MaxEpisodeStep": 600,
         "dt": 0.4,
 
         "field_size": 100000.0,
 
-        "initial_separation_nm": 37.2,
-        "formation_max_spread_nm": 2.0,
+        "initial_separation_nm": 20.0,
+        "formation_max_spread_nm": 6.0,
 
         // "cpp_env_init_file": "MISSION/bvr_sim/conf_system/cpp/init/2v2-simple_fdm.jsonc",
         "cpp_env_init_file": "MISSION/bvr_sim/conf_system/cpp/init/2v2.jsonc",
@@ -47,7 +47,7 @@
             "engage_enemy_weight": 0.01,         // Reward for closing rate
             "enemy_distance_weight": 0.0,       // Reward for closing distance to enemy
             "enemy_tracking_weight": 0.01,     // radar tracking reward
-            "altitude_advantage_weight": 0.04,  // 3D-specific: altitude advantage
+            "altitude_advantage_weight": 0.02,  // 3D-specific: altitude advantage
             "safe_altitude_weight": 0.000,        // 3D-specific: stay in safe altitude
             "missile_evasion_weight": 0.05,     // Reward for evading missiles
             "speed_weight": 0.00,             // Reward for maintaining speed
@@ -86,7 +86,7 @@
 
     // --- config ALGORITHM 1/2 ---
     "ALGORITHM.ppo_ma.foundation->AlgorithmConfig": {
-        "train_traj_needed": 64,
+        "train_traj_needed": 80,
         // "use_bc_update_actor": false,
         "use_normalization": true,
         "load_checkpoint": true,
@@ -96,7 +96,8 @@
         
         "gamma": 0.99,
         "lr": 3e-4,
-        "ppo_epoch": 16,
+        // "ppo_epoch": 16,
+        "ppo_epoch": 26,
         "net_hdim": 128,
         "entity_emb_dim": 16,
 
