@@ -71,7 +71,6 @@ std::array<double, 4> StdFlightController::direct_LU_flight_controler(
 
     if (crashing) {
         intent_heading[2] = 0;
-        c3utils::print(fighter.height);
         if (fighter.height < c3u::feet_to_meters(2000)) {
             intent_heading = fighter.heading.get_list();
             intent_heading[2] = 0;
