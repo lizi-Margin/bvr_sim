@@ -50,6 +50,8 @@ public:
     double get_roll() const noexcept override;
     std::array<double, 3> get_rpy() const noexcept;
 
+    virtual std::string log() noexcept override { return Aircraft::log() + fdm->log();}
+
 private:
     void initialize_fdm(const std::string& fdm_type) noexcept;
 };

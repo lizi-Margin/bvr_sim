@@ -166,11 +166,12 @@ double AltitudeAdvantageReward::compute(
     double total_alt_advantage = 0.0;
     for (const auto& enemy : alive_enemies) {
         double alt_diff = agent->position[2] - enemy->position[2];
+        // total_alt_advantage += alt_diff / 1000.0;
         total_alt_advantage += alt_diff / 10000.0;   // fix: norm by 1万 meter, ~32000ft
     }
 
     double avg_alt_advantage = total_alt_advantage / alive_enemies.size();
-    // return avg_alt_advantage;//std::min(std::max(avg_alt_advantage, -1.0), 1.0);
+    // return avg_alt_advantage;
     return c3u::norm(avg_alt_advantage, -1.0, 1.0);  // 现在用1万米做norm, 加上这个clip应该没事了, 相当于reward大小除了10, reward权重可以乘10
 }
 

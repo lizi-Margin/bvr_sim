@@ -89,7 +89,7 @@ public:
         const std::optional<std::array<double, 3>>& velocity_ = std::nullopt
     ) noexcept;
 
-    std::string get_new_uuid() const noexcept;
+    static std::string get_new_uuid() noexcept;
 
     std::optional<json::JSON> get(const std::string& key) const noexcept;
     bool set(const std::string& key, const json::JSON& value) noexcept;

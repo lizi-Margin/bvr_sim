@@ -6,6 +6,7 @@
 #include "extern/jsbsim/src/FGFDMExec.h"
 #include "extern/jsbsim/src/models/FGPropulsion.h"
 #include "extern/jsbsim/src/simgear/misc/sg_path.hxx"
+#include "vector.hxx"
 #include <string>
 #include <memory>
 #include <tuple>
@@ -93,12 +94,15 @@ private:
     int jsbsim_inner_steps;
 
     StdFlightController fc;
-    SimpleScalarFilter fc_delta_heading_filter;
-    SimpleScalarFilter fc_delta_pitch_filter;
+    TimeScalarFilter fc_delta_heading_filter;
+    TimeScalarFilter fc_delta_pitch_filter;
 
     double mach;
     double delta_heading;
     double delta_pitch;
+
+    c3utils::Vector3 fix_vec;
+    std::string _nav_point_uuid;
 
 public:
     explicit JSBSimFDM(double dt = 0.1, const std::map<std::string, std::string>& kwargs = {}) noexcept;
@@ -116,6 +120,8 @@ public:
     double get_property_value(const Property& prop) noexcept;
 
     std::vector<double> get_property_values(const std::vector<Property*>& props) noexcept;
+
+    virtual std::string log() const noexcept override;
 
 private:
     void initialize_jsbsim() noexcept;

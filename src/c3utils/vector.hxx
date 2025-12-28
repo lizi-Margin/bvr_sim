@@ -87,6 +87,10 @@ namespace c3utils {
 			return Vector3(vec - other.vec);
 		}
 
+		Vector3 operator*(float64_t x) const noexcept {
+			return Vector3(vec * x);
+		}
+
         bool operator==(const Vector3& other) const noexcept {
             if (vec == other.vec) return true;
             

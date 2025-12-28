@@ -128,7 +128,7 @@ void SimulatedObject::update_state(
     }
 }
 
-std::string SimulatedObject::get_new_uuid() const noexcept {
+std::string SimulatedObject::get_new_uuid() noexcept {
     static std::random_device rd;
     static std::mt19937_64 gen(rd());
     static std::uniform_int_distribution<uint64_t> dis;

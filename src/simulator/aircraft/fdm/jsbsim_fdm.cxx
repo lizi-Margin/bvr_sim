@@ -4,12 +4,16 @@
 #include "rubbish_can/SL.hxx"
 #include "rubbish_can/colorful.hxx"
 #include "rubbish_can/set_env.hxx"
+#include "simulator.hxx"
+#include "vector.hxx"
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <any>
 #include <stdlib.h>
+#include <string>
 
 
 namespace bvr_sim {
@@ -88,11 +92,13 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
       jsbsim_inner_dt(dt),
       jsbsim_inner_steps(1),
       fc(dt),
-      fc_delta_heading_filter({0.10, 0.0}),
-      fc_delta_pitch_filter({0.10, 0.0}),
+      fc_delta_heading_filter({0.05, 0.0}),
+      fc_delta_pitch_filter({0.05, 0.0}),
       mach(0.0),
       delta_heading(0.0),
-      delta_pitch(0.0) {
+      delta_pitch(0.0),
+      fix_vec(std::array<double, 3>{1.0, 0.0, 0.0}),
+      _nav_point_uuid(SimulatedObject::get_new_uuid()) {
 
     auto it = kwargs.find("aircraft_model");
     if (it != kwargs.end()) {
@@ -263,14 +269,16 @@ double JSBSimFDM::get_mach() const noexcept {
 }
 
 void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noexcept {
-    // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(100);
-    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(80);
+    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(100);
+    // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(40);
     double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw);
     delta_heading = delta_heading_filt;
 
-    double delta_pitch_raw = -norm(action.at("delta_altitude"), -1, 1) * deg2rad(80);
+    double delta_pitch_raw = -norm(action.at("delta_altitude"), -1, 1) * deg2rad(45);
     double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw);
     delta_pitch = delta_pitch_filt;
+    // delta_pitch = -deg2rad(20);
+    // delta_pitch = 0;
 
     // if (position[2] < c3utils::feet_to_meters(20000)) {
     //     if (delta_pitch > 0) {
@@ -278,9 +286,8 @@ void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noe
     //     }
     // }
 
-    Vector3 fix_vec = get_heading_vec();
-    fix_vec[2] = 0;
-    fix_vec.rotate_zyx_self(0, delta_pitch, delta_heading);
+    fix_vec = c3u::Vector3(1, 0, 0);
+    fix_vec.rotate_zyx_self(0, delta_pitch, delta_heading + yaw);
 
     double mach_current = get_mach();
     double intent_mach = mach_current + action.at("delta_speed");
@@ -311,7 +318,8 @@ void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noe
             fake_fighter,
             fix_vec_neu,
             intent_mach,
-            -1
+            // -1
+            -0.75
         );
 
         set_jsbsim_controls(control_commands);
@@ -499,6 +507,17 @@ void JSBSimFDM::update_properties() noexcept {
             if (terminate) break;
         }
     }
+}
+
+std::string JSBSimFDM::log() const noexcept {
+    auto nav_point_pos = c3u::Vector3(position) + fix_vec.normalize() * c3u::nm_to_meters(5.0);
+    auto [block_lon, block_lat, block_alt] = NWU2LLA(nav_point_pos[0], nav_point_pos[1], nav_point_pos[2]);
+    std::string color_str = "White";
+    std::stringstream ss;
+    ss << _nav_point_uuid << ",T=" << block_lon << "|" << block_lat << "|" << block_alt << ","
+    << "Name=fc_target, Type=Navaid + Static, Radius=5, Color=" << color_str << ","
+    << "Visible=" << 1 << "\n";
+    return ss.str();
 }
 
 }

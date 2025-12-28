@@ -1,5 +1,7 @@
 #include "fc_old.hxx"
 #include "c3utils/c3utils.hxx"
+#include "funcs.hxx"
+#include "vector.hxx"
 
 namespace bvr_sim {
 
@@ -54,12 +56,12 @@ std::array<double, 4> StdFlightController::direct_LU_flight_controler(
 
     bool crashing = false;
 
+    double ttg = (std::max(fighter.height, 0.) / std::max(fighter.vd, 1e-3));
     if (
-        (std::max(fighter.height, 0.) / std::max(fighter.vd, 1e-3)) < 25 ||
-        fighter.pitch < deg2rad(-45) ||
-        fighter.height < feet_to_meters(800)
+        (ttg < 25 || fighter.pitch < deg2rad(-45))
+        || fighter.height < feet_to_meters(800)
     ) {
-        if (fighter.height < feet_to_meters(12000) || fighter.mach > 0.6) {
+        if (fighter.height < feet_to_meters(4000)) {
             crashing = true;
         }
     }
@@ -68,14 +70,21 @@ std::array<double, 4> StdFlightController::direct_LU_flight_controler(
 
     if (crashing) {
         intent_heading[2] = 0;
-        intent_heading[2] = Vector3(intent_heading).get_module();
+        if (fighter.height < c3u::feet_to_meters(2000)) {
+            intent_heading[2] = Vector3(intent_heading).get_module()/5;
+        }
+
+        // intent_heading[2] = std::tan(20) * Vector3(intent_heading).get_module();
+        // auto rot = Vector3(intent_heading).normalize();
+        // rot.rotate_zyx_self(0., -c3u::deg2rad(45), 0.);
+        // intent_heading = rot.normalize().get_list();
     }
 
     intent_heading[2] = -intent_heading[2];
     Vector3 intent_heading_vec(intent_heading);
     intent_heading_vec.rev_rotate_zyx_self(fighter.roll, fighter.pitch, fighter.yaw);
     intent_heading_vec[2] = -1 * intent_heading_vec[2];
-    intent_heading_vec.prod(1 / intent_heading_vec.get_module());
+    intent_heading_vec = intent_heading_vec.normalize();
 
     Vector3 intent_heading_saver(intent_heading_vec.get_list());
 
@@ -88,29 +97,42 @@ std::array<double, 4> StdFlightController::direct_LU_flight_controler(
     }
     err_pitch *= 1.5 / 2;
 
-    // double gain = 1. * std::tanh(-(fighter.vd - 50 * (fighter.height - 6000) / 11500) * 1e-2);
+    double gain = 1. * std::tanh(-(fighter.vd - 50 * (fighter.height - 6000) / 11500) * 1e-2);
 
-    // double intent_location_angle = fighter.heading.get_angle(intent_heading_vec_fix_origin);
+    double intent_location_angle = fighter.heading.get_angle(intent_heading_vec_fix_origin);
     // double low_alt_thre = feet_to_meters(8000);
 
     double err_roll = 0;
 
-    if (false && crashing) {
-        err_roll = Vector3(0, 0, 1).get_angle(intent_heading_vec, 0);
-        right_turn = 0;
+    if (crashing) {
+        // if (intent_location_angle > deg2rad(15)) {
+        //     err_roll = 0;
+
+        //     if (intent_heading_vec[1] > 0) right_turn = 1;
+        //     if (intent_heading_vec[1] < 0) right_turn = -1;
+
+        //     double deg_turn = deg2rad(55);
+        //     err_roll += (-1.4 * (fighter.roll + right_turn * deg_turn));
+        //     // if (fighter.roll > 0) err_roll += 1 * gain;
+        //     // else err_roll += -1 * gain;
+        // }
+        // else {
+            err_roll = Vector3(0, 0, 1).get_angle(intent_heading_vec, 0);
+            right_turn = 0;
+        // }
     }
-    // else if (intent_location_angle > deg2rad(99)) {
-    //     err_roll = 0;
+    else if (intent_location_angle > deg2rad(99)) {
+        err_roll = 0;
 
-    //     if (intent_heading_vec[1] > 0 && right_turn == 0) right_turn = 1;
-    //     if (intent_heading_vec[1] < 0 && right_turn == 0) right_turn = -1;
+        if (intent_heading_vec[1] > 0 && right_turn == 0) right_turn = 1;
+        if (intent_heading_vec[1] < 0 && right_turn == 0) right_turn = -1;
 
-    //     double deg_turn = deg2rad(85);
-    //     if (right_turn == 1) err_roll += (-1.4 * (fighter.roll - deg_turn));
-    //     if (right_turn == -1) err_roll += (-1.4 * (fighter.roll + deg_turn));
-    //     if (fighter.roll > 0) err_roll += 1 * gain;
-    //     else err_roll += -1 * gain;
-    // }
+        double deg_turn = deg2rad(90);
+        if (right_turn == 1) err_roll += (-1.4 * (fighter.roll - deg_turn));
+        if (right_turn == -1) err_roll += (-1.4 * (fighter.roll + deg_turn));
+        if (fighter.roll > 0) err_roll += 1 * gain;
+        else err_roll += -1 * gain;
+    }
     else {
         if (err_pitch < 0 && err_pitch > deg2rad(-15)) {
             err_roll = Vector3(0, 0, -1).get_angle(intent_heading_vec, 0);

@@ -69,7 +69,7 @@ public:
 
     virtual void hit(double damage = -1.0) noexcept;
 
-    std::string log() noexcept override;
+    virtual std::string log() noexcept override;
 
     const std::map<std::string, std::shared_ptr<SensorBase>>& get_sensors() const noexcept { return sensors; }
 

@@ -45,6 +45,8 @@ public:
 
     bool is_terminated() const noexcept { return terminate; };
 
+    virtual std::string log() const noexcept { return  "";}
+
 protected:
     double normalize_angle(double angle) const noexcept;
 };

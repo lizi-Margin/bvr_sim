@@ -222,9 +222,6 @@ void TacticalOpponent3D::evade_missiles(
     double speed_diff = target_speed - agent->get_speed();
     delta_speed = speed_diff;
 
-    // Temporary override as was in Python
-    delta_altitude = 0.0;
-
     shoot = false;
     fire = json::JSON();
 }
@@ -261,7 +258,7 @@ void TacticalOpponent3D::guide_missiles(
 
     // Switch crank direction periodically
     // Convert 20 seconds to steps based on agent's dt
-    if (time_counter - crank_switch_time > static_cast<int>(20.0 / agent->dt)) {
+    if (time_counter - crank_switch_time > static_cast<int>(30.0 / agent->dt)) {
         crank_direction *= -1;
         crank_switch_time = time_counter;
     }

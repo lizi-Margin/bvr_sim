@@ -32,10 +32,14 @@ std::map<std::string, double> BaseOpponent3D::build_action_from_rates(
     bool shoot,
     const std::map<std::string, double>& other_commands
 ) const noexcept {
+
+    const double max_delta_heading = c3u::deg2rad(45.);
+    const double max_delta_altitude = 80;
+    const double max_delta_speed = 80;
     std::map<std::string, double> action = {
-        {"delta_heading", delta_heading},
-        {"delta_altitude", delta_altitude},
-        {"delta_speed", delta_speed},
+        {"delta_heading", c3u::norm(delta_heading / max_delta_heading, -1.0, 1.0)},
+        {"delta_altitude", c3u::norm(delta_altitude / max_delta_altitude, -1.0, 1.0)},
+        {"delta_speed", c3u::norm(delta_speed / max_delta_speed, -1.0, 1.0)},
         {"shoot", shoot ? 1.0 : 0.0}
     };
 
