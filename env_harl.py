@@ -24,9 +24,9 @@ scenario_config_dict = {
     'render_interval': 1,  # Render every N steps (ACMI is fast, can render more frequently)
     'dt': 0.4,
     'field_size': 100000.0,
-    
-    # cpp_env_init_file = 'MISSION/bvr_sim/conf_system/cpp/init/1v1.jsonc'
-    'cpp_env_init_file': None,
+
+    "cpp_env_init_file": "harl/envs/bvr_sim/conf_system/cpp/init/2v2.jsonc",
+    # 'cpp_env_init_file': None,
     'red_meta': {
         'A01': {'model': 'F16', 'record': False},
     },
@@ -101,7 +101,7 @@ scenario_config_dict = {
 from harl.common.base_logger import BaseLogger
 class HARLLogger(BaseLogger):
     def get_task_name(self):
-        return f"{self.env_args['cpp_env_init_file']}"
+        return f"{self.env_args['task']}"
 
 
 class BVRSimEnv:
@@ -117,8 +117,8 @@ class BVRSimEnv:
         self.interested_team = 0
 
         self.n_each_team = env_args['N_EACH_TEAM']
-
-        assert len(self.n_each_team) == 0, "self play is not supported when using HARL"
+        self.n_agents = self.n_each_team[0]
+        assert len(self.n_each_team) == 1, "self play is not supported when using HARL"
         # assert self.n_each_team[0] == self.n_each_team[1], "the shared obs concat assume the same num of agents for each team"
         # for n_agent in self.n_each_team:
         #     assert n_agent == self.n_each_team[0], 'all teams must have the same num of agents'
@@ -159,7 +159,7 @@ class BVRSimEnv:
         from gymnasium.spaces import Box
         assert len(self.observation_space.shape) == 1
         agent_obs_dim = self.observation_space.shape[0]
-        self.share_observation_space = Box(low=-np.inf, high=np.inf, shape=(agent_obs_dim * self.n_each_team[self.interested_team],), dtype=np.float32)
+        self.share_observation_space_simple = Box(low=-np.inf, high=np.inf, shape=(agent_obs_dim * self.n_each_team[self.interested_team],), dtype=np.float32)
 
         # Action converter for MultiDiscrete space
         # from uhtk.spaces.xxx2D import MD2D
@@ -175,7 +175,10 @@ class BVRSimEnv:
             self.reward_tracking_enabled = True
         self.episode_counter = 0  # Track episode number for plotting
 
-    
+        self.share_observation_space = self.repeat(self.share_observation_space_simple)
+        self.observation_space = self.repeat(self.observation_space)
+        self.action_space = self.repeat(self.action_space)
+
     def reset_render(self):
         # Enable ACMI rendering
         if self.render:
@@ -214,8 +217,8 @@ class BVRSimEnv:
         # act = self.convert_actions(act)
         assert isinstance(act, np.ndarray)
         # assert act.shape[-1] == len(ScenarioConfig.n_actions)
-        assert self.action_space.__class__.__name__ == 'MultiDiscrete'
-        assert act.shape[-1] == len(self.action_space.nvec)
+        assert self.action_space[0].__class__.__name__ == 'MultiDiscrete'
+        assert act.shape[-1] == len(self.action_space[0].nvec)
 
         obs, rewards, dones, info = self._env.step(act)
         shared_obs = self._get_share_obs(obs)
@@ -291,8 +294,8 @@ class BVRSimEnv:
             dones = np.array(dones.copy(), dtype=np.float32)
             # dones = self._get_dones(False)
             pass
-
-        return (obs, shared_obs, rewards, dones, self.repeat(info))
+        rewards = np.expand_dims(rewards, -1)
+        return (obs, shared_obs, rewards, dones, self.repeat(info), None)
 
     def reset(self):
         """Reset environment"""
@@ -319,7 +322,7 @@ class BVRSimEnv:
         #     info['avail_act'] = next_avail_act
         #     info['Avail-Act'] = next_avail_act
 
-        return obs, shared_obs, self.repeat(info)
+        return obs, shared_obs, None
 
     def _get_dones(self, env_done: bool):
         """Get done flags"""
@@ -334,12 +337,13 @@ class BVRSimEnv:
 
 
 
-
+    def seed(self, seed):
+        pass
 
     def _get_share_obs(self, obs):
         # obs: (n_agents, obs_dim)
         shared_obs = np.concatenate(obs, axis=0)
-        assert shared_obs.shape == self.share_observation_space.shape, str(shared_obs.shape) + str(self.share_observation_space.shape)
+        assert shared_obs.shape == self.share_observation_space_simple.shape, str(shared_obs.shape) + str(self.share_observation_space.shape)
 
         return np.array([shared_obs.copy() for _ in range(self.n_each_team[self.interested_team])])
 
