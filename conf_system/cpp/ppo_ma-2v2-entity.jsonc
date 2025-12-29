@@ -50,14 +50,14 @@
             "enemy_tracking_weight": 0.05,     // radar tracking reward
             "altitude_advantage_weight": 0.02,  // 3D-specific: altitude advantage
             "safe_altitude_weight": 0.000,        // 3D-specific: stay in safe altitude
-            "missile_evasion_weight": 0.05,     // Reward for evading missiles
+            "missile_evasion_weight": 0.03,     // Reward for evading missiles
             "speed_weight": 0.00,             // Reward for maintaining speed
             "target_speed": 450.0,              // 3D: lower target speed
             "survival_weight": 0.0,            // Reward for staying alive
             // TODO 导弹开机奖励
 
             // Sparse rewards
-            "missile_launch_weight": 0.1,       // Reward for launching missiles
+            "missile_launch_weight": 0.2,       // Reward for launching missiles
             "missile_launch_reward": 0.5,
             "missile_duplicated_launch_penalty": -5.0,
             "missile_result_weight": 0.1,      // Reward for hits, penalty for misses
