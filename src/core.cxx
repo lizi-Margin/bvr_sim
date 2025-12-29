@@ -85,9 +85,9 @@ void SimCore::step(int steps) {
     for (int i = 0; i < steps; i++){
         update_physics();
         cfg::sim_time += cfg::dt;
+        log();
     }
     BaselinePool::instance().step();
-    log();
 }
 
 json::JSON SimCore::handle(const std::string& cmd) {
