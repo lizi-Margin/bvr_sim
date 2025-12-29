@@ -238,7 +238,7 @@ double MissileLaunchReward::compute(
 
             if (current_count > last_count) {
                 if (current_count >= 2) {
-                    reward = duplicated_launch_penalty_;
+                    reward = duplicated_launch_penalty_ * (current_count - 1);
                 } else {
                     reward = launch_reward_;
                 }
