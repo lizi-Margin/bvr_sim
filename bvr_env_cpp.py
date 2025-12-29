@@ -61,6 +61,7 @@ class BVR3DEnvCpp:
     def __init__(self, config: Dict, rl_index: list):
         self.config = config
         self.dt = config.get("dt", 0.4)
+        self.cpp_steps = config.get('cpp_steps', 1)
         self.core = bvr_sim_cpp.SimCore(dt=self.dt)
 
         self.max_steps = config.get('max_steps', 1200)
@@ -275,7 +276,8 @@ class BVR3DEnvCpp:
             self._step_profiler.mark("step_sync")
 
         # Step simulation
-        self.core.step_sync(1)
+        assert isinstance(self.cpp_steps, int)
+        self.core.step_sync(self.cpp_steps)
 
         if self._step_profiler:
             self._step_profiler.mark("get ordi")

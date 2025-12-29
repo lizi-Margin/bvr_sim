@@ -133,6 +133,7 @@ class BVR3DEnv(gymnasium.Env):
 
     def _setup_dt(self, config: dict):
         self.dt =config.get('dt', 0.4)
+        self.cpp_steps = config.get('cpp_steps', 1)
         dt_clipped = np.clip(self.dt, 0.05, 0.5)
         if self.dt != dt_clipped:
             print_bold_red(f"Warnning: dt clipped from {self.dt} to {dt_clipped}")

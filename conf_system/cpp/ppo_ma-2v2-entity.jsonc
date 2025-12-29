@@ -23,12 +23,13 @@
         ],
         "interested_team": 0,
 
-        "MaxEpisodeStep": 600,
+        "MaxEpisodeStep": 200,
         "dt": 0.4,
+        "cpp_steps": 3,
 
         "field_size": 100000.0,
 
-        "initial_separation_nm": 20.0,
+        "initial_separation_nm": 25.0,
         "formation_max_spread_nm": 6.0,
 
         // "cpp_env_init_file": "MISSION/bvr_sim/conf_system/cpp/init/2v2-simple_fdm.jsonc",
@@ -46,8 +47,8 @@
             // Dense rewards
             "engage_enemy_weight": 0.005,         // Reward for closing rate
             "enemy_distance_weight": 0.0,       // Reward for closing distance to enemy
-            "enemy_tracking_weight": 0.02,     // radar tracking reward
-            "altitude_advantage_weight": 0.04,  // 3D-specific: altitude advantage
+            "enemy_tracking_weight": 0.05,     // radar tracking reward
+            "altitude_advantage_weight": 0.02,  // 3D-specific: altitude advantage
             "safe_altitude_weight": 0.000,        // 3D-specific: stay in safe altitude
             "missile_evasion_weight": 0.05,     // Reward for evading missiles
             "speed_weight": 0.00,             // Reward for maintaining speed
@@ -62,7 +63,7 @@
             "missile_result_weight": 0.1,      // Reward for hits, penalty for misses
             "missile_hit_reward": 50.0,
             "missile_miss_penalty": -0.5,
-            "win_loss_weight": 0.2,             // Episode outcome
+            "win_loss_weight": 0.0,             // Episode outcome
             "win_reward": 100.0,
             "loss_penalty": -80.0,
 

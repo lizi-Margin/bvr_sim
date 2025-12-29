@@ -33,6 +33,7 @@ class ScenarioConfig:
     render = True
     render_interval = 1  # Render every N steps (ACMI is fast, can render more frequently)
     dt = 0.1
+    cpp_steps = 1
     field_size = 100000.0
 
     # cpp_env_init_file = 'MISSION/bvr_sim/conf_system/cpp/init/1v1.jsonc'
@@ -159,6 +160,7 @@ class BVR3DWrapper(BaseEnv):
         # Create environment config
         env_config = {
             'dt': ScenarioConfig.dt,
+            'cpp_steps': ScenarioConfig.cpp_steps,
             'max_steps': ScenarioConfig.MaxEpisodeStep,
             'red_fighters': ScenarioConfig.red_meta,
             'blue_fighters': ScenarioConfig.blue_meta,
