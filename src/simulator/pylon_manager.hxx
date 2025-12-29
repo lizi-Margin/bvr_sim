@@ -24,6 +24,7 @@ public:
     void add_weapon(const std::string& pylon_name, const std::string& weapon_name) noexcept;
     // Freeze pylon mounts
     void freeze() noexcept;
+    bool is_frozen() const noexcept { return frozen; }
 
     // Count frozen max weapons of specific type (with prefix matching)
     int num_frozen_weapons(const std::string& weapon_query) const noexcept;

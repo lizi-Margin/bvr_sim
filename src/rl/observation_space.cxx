@@ -14,7 +14,7 @@ EntityObsSpace::EntityObsSpace()
       norm_alt_(10000.0f),
       max_team_missiles_(0),
       max_enemy_missiles_(1),
-      entity_dim_(35) {}
+      entity_dim_(40) {}
 
 int EntityObsSpace::get_obs_dim(int num_red, int num_blue) const {
     int n_enemies = num_blue;
@@ -148,6 +148,7 @@ std::vector<double> EntityObsSpace::extract_entity_features(
     bool is_missile) const {
 
     std::vector<double> features(entity_dim_, 0.0f);
+    const int MAX_MISSILE_NUM = 6.0;
 
     check(target, "target");
     if (is_self) {
@@ -190,6 +191,10 @@ std::vector<double> EntityObsSpace::extract_entity_features(
         features[29] = std::min(static_cast<float>(agent->launched_missiles.size()) / 4.0f, 10.0f);  // num missiles fired Special For Ego
 
         features[31] = self_aircraft->can_shoot() ? 1.0f : 0.0f;
+
+        check(self_aircraft->pylon_manager.is_frozen(), "pylon not frozen");
+        features[35] = self_aircraft->pylon_manager.num_left_weapons("") / MAX_MISSILE_NUM;
+        features[36] = self_aircraft->pylon_manager.num_left_weapons("AIM-120") / MAX_MISSILE_NUM;
         return features;
     }
 
@@ -359,6 +364,16 @@ std::vector<double> EntityObsSpace::extract_entity_features(
     features[34] = if_you_shoot__you_shoot_this ? 1.0f : 0.0f;
 
 
+    if (!is_missile) {
+        auto target_aircraft = std::dynamic_pointer_cast<const Aircraft>(target);
+        check(target_aircraft, "target_aircraft");
+        features[35] = target_aircraft->pylon_manager.num_left_weapons("") / MAX_MISSILE_NUM;
+        features[36] = target_aircraft->pylon_manager.num_left_weapons("AIM-120") / MAX_MISSILE_NUM;
+    }
+    else {
+        features[35] = 0.0f;
+        features[36] = 0.0f;
+    }
     return features;
 }
 
