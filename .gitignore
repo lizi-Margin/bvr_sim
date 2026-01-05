@@ -1,21 +1,3 @@
-/doc/doc.html
-/doc/doc.jpeg
-/doc/doc.png
-/doc/doc.pdf
-
-/doc/paper*.pdf
-/doc/paper*.txt
-
-
-/doc/*arxiv.pdf
-/doc/*arxiv.out
-/doc/*arxiv.log
-
-
-/doc/*.pdf
-/doc/*.out
-/doc/*.log
-
 /build
 /install
 
