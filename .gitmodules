@@ -4,9 +4,6 @@
 [submodule "src/extern/eigen"]
 	path = src/extern/eigen
 	url = https://gitlab.com/libeigen/eigen.git
-[submodule "src/extern/jsbsim"]
-	path = src/extern/jsbsim
-	url = https://github.com/JSBSim-Team/jsbsim.git
 [submodule "src/extern/cpptrace"]
 	path = src/extern/cpptrace
 	url = https://github.com/jeremy-rifkin/cpptrace.git
