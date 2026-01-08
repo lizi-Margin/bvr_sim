@@ -1,5 +1,5 @@
 """
-BVR 3D - 3D Beyond Visual Range Air Combat Environment
+BVR Sim - 3D Beyond Visual Range Air Combat Environment
 
 Clean, modular 3D BVR environment with:
 - Full 3D aircraft physics with altitude dynamics
@@ -9,82 +9,24 @@ Clean, modular 3D BVR environment with:
 - Modular reward components
 """
 
-from .env_wrapper import ScenarioConfig, make_env, BVR3DWrapper
 from .bvr_env import BVR3DEnv, make_bvr3d_env
-from .simulator import Aircraft, Missile, Radar
-from .observation_space import (
-    ObservationSpace,
-    CompactObsSpace,
-    ExtendedObsSpace,
-    create_observation_space
-)
-from .reward.reward_components import (
-    RewardComponent,
-    RewardManager,
-    EngageEnemyReward,
-    AltitudeAdvantageReward,
-    SafeAltitudeReward,
-    MissileLaunchReward,
-    MissileResultReward,
-    MissileEvasionReward,
-    SpeedReward,
-    SurvivalReward,
-    WinLossReward,
-    create_default_reward_manager
-)
-from .reward.reward_visualization import RewardVisualizer
-from .baseline_opponents import (
-    BaseOpponent3D,
-    RandomOpponent3D,
-    SimpleOpponent3D,
-    TacticalOpponent3D,
-    create_opponent,
-    create_random_opponent,
-    create_tactical_opponent
-)
+from .bvr_env_cpp import BVR3DEnvCpp  ## C++ version for faster training and more features
 
-__all__ = [
-    # Environment
-    'ScenarioConfig',
-    'make_env',
-    'BVR3DWrapper',
-    'BVR3DEnv',
-    'make_bvr3d_env',
+all_envs = [BVR3DEnv, BVR3DEnvCpp]
 
-    # Simulator
-    'Aircraft',
-    'Missile',
-    'Radar',
 
-    # Observation spaces
-    'ObservationSpace',
-    'CompactObsSpace',
-    'ExtendedObsSpace',
-    'create_observation_space',
+"""
+Wrappers for RL frameworks
+"""
+# for MARLBenchmark (on-policy, off-policy):
+# compatible fork: https://github.com/lizi-Margin/off-policy
+# original: https://github.com/marlbenchmark
+# from .env_marlbenchmark import BVRSimEnvMarlBenchmark, MultiAgentEnvWrapper
 
-    # Reward components
-    'RewardComponent',
-    'RewardManager',
-    'EngageEnemyReward',
-    'AltitudeAdvantageReward',
-    'SafeAltitudeReward',
-    'MissileLaunchReward',
-    'MissileResultReward',
-    'MissileEvasionReward',
-    'SpeedReward',
-    'SurvivalReward',
-    'WinLossReward',
-    'create_default_reward_manager',
+# for HARL
+# compatible fork: https://github.com/lizi-Margin/HARL4BVRSim
+# original: https://github.com/PKU-MARL/HARL
+# from .env_harl import BVRSimEnv, HARLLogger
 
-    # Reward visualization
-    'RewardVisualizer',
-
-    # Opponents
-    'BaseOpponent3D',
-    'RandomOpponent3D',
-    'SimpleOpponent3D',
-    'TacticalOpponent3D',
-    'create_opponent',
-    'create_random_opponent',
-    'create_tactical_opponent'
-]
+# for UHRL: https://github.com/lizi-Margin/UHRL
+# from .env_wrapper import BVR3DWrapper, make_env, ScenarioConfig

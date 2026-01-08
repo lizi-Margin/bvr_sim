@@ -1,11 +1,6 @@
 """
-BVR 3D Environment Wrapper
-Compatible with UHRL framework
-
-Integrates BVR3DEnv with:
-- Pluggable observation spaces
-- ACMI Tacview rendering
-- 3D action space (heading, altitude, speed, shoot)
+BVR Sim Environment Wrapper
+Compatible with HARL framework
 """
 
 import numpy as np

@@ -1,11 +1,11 @@
 import numpy as np
 from typing import List, Optional, Tuple, TYPE_CHECKING, Type
-from abc import ABC, abstractmethod
+# from abc import ABC, abstractmethod
 from ..simulator import TeamColors, NWU2LLA, velocity_to_euler
 from .base import Aircraft
 from .fdm import SimpleFDM
-from uhtk.c3utils.i3utils import norm, feet_to_meters, nm_to_meters, Vector3, norm_pi
-from MISSION.bvr_3d_v3.performance import StepProfiler
+# from uhtk.c3utils.i3utils import norm, feet_to_meters, nm_to_meters, Vector3, norm_pi
+from ...performance import StepProfiler
 
 if TYPE_CHECKING:
     from ..missile.base import Missile

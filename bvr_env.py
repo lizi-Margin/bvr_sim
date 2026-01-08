@@ -31,7 +31,7 @@ from .observation_space import ObservationSpace, create_observation_space
 from .spawn_manager import SpawnManager
 from .simulator.aircraft.recorder import AircraftRecorderManager
 from .performance import StepProfiler
-from config import GlobalConfig as cfg
+# from config import GlobalConfig as cfg
 
 ENABLE_MADDOG_MISSILE = False
 # RED_BASELINE_TYPES = ['random', 'simple', 'mad', 'tactical']

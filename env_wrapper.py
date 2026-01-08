@@ -10,12 +10,8 @@ Integrates BVR3DEnv with:
 
 import numpy as np
 import os, time
-from config import GlobalConfig as cfg
 from ..example import BaseEnv, get_N_AGENT_EACH_TEAM, get_N_TEAM
-from .bvr_env import BVR3DEnv, make_bvr3d_env
-from .observation_space import create_observation_space
 from .reward.reward_visualization import RewardVisualizer
-from uhtk.print_pack import print_blue
 
 
 # Register this ScenarioConfig into MISSION/env_router.py
@@ -174,6 +170,8 @@ class BVR3DWrapper(BaseEnv):
             'formation_max_spread_nm': ScenarioConfig.formation_max_spread_nm,
         }
 
+
+        from config import GlobalConfig as cfg
         self.reset_cnt = 0
         self.is_cpp = False
         if ScenarioConfig.cpp_env_init_file is not None:
@@ -186,6 +184,7 @@ class BVR3DWrapper(BaseEnv):
             self._env = BVR3DEnvCpp(env_config, rl_controll_ids)
             self.is_cpp = True
         else:
+            from .bvr_env import BVR3DEnv
             self._env = BVR3DEnv(env_config, cfg.logdir)
 
         self.observation_space = self._env.observation_space
@@ -209,6 +208,7 @@ class BVR3DWrapper(BaseEnv):
     def reset_render(self):
         # Enable ACMI rendering
         if self.render:
+            from config import GlobalConfig as cfg
             # render_interval = getattr(ScenarioConfig, 'render_interval', 10)
             acmi_dir = os.path.join(cfg.logdir, "acmi_recordings")
             os.makedirs(acmi_dir, exist_ok=True)

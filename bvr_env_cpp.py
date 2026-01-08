@@ -11,27 +11,27 @@ PRINT_STEP_TIME = False
 
 
 import importlib
-
-auto_import = False
-# _bvr_sim_path = os.path.dirname(os.path.abspath(__file__))
-# _cpp_binary_path = os.path.join(_bvr_sim_path, "install/lib/")
-
+# I know this is ugly, but...
 try_list = [
     "MISSION.bvr_sim",
-    "harl.envs.bvr_sim"
+    "harl.envs.bvr_sim",
+    "offpolicy.envs.bvr_sim",
+    "onpolicy.envs.bvr_sim",
 ]
+bvr_sim_cpp = None
+_import_success = False
 for package in try_list:
-    e = None
-    bvr_sim_cpp = None
     try:
         bvr_sim_cpp = importlib.import_module(".install.lib.bvr_sim_cpp", package=package)
         print(f"Successfully imported bvr_sim_cpp")
+        _import_success = True
         break
     except ImportError as e:
-        pass
-if bvr_sim_cpp is None:
-    # raise ImportError("Failed to import bvr_sim_cpp from any package")
-    raise e
+        print(f"Failed to import bvr_sim_cpp from package {package}: {e}")
+        continue
+
+if not _import_success:
+    print("Warning: Failed to import bvr_sim_cpp from any package")
 
 # if auto_import:
 #     lib_dir = "MISSION/bvr_sim/install/lib"
@@ -331,7 +331,6 @@ class BVR3DEnvCpp:
         obs = {}
         for uid in self.ego_ids:
             obs[uid] = self.rl_manager.get_observation(uid)
-
         return obs
 
     # ============================================================

@@ -4,7 +4,7 @@ import numpy as np
 import math
 from .base import BaseFDM
 from uhtk.c3utils.i3utils import norm_pi, NWU_to_LLA_deg, LLA_to_NWU_deg, feet_to_meters, meters_to_feet, get_mps, get_mach, Vector3
-from MISSION.bvr_sim.simulator.simulator import NWU2LLA, LLA2NWU
+from ...simulator import NWU2LLA, LLA2NWU
 from ..fc.fc_old import StdFlightController
 from uhtk.print_pack import print_green, print_red, print_blue, print_dict
 from .catalog import Catalog, JsbsimCatalog, ExtraCatalog, Property
