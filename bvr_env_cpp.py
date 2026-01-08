@@ -8,6 +8,7 @@ from .performance import StepProfiler
 
 
 PRINT_STEP_TIME = False
+PRINT_DONE_REASON = False
 
 
 import importlib
@@ -53,6 +54,8 @@ if not _import_success:
 #                 pass
 # import MISSION.bvr_sim.install.bvr_sim_cpp_native as bvr_sim_cpp
 
+# set jsbsim debug level to mute the debug log
+# the cpp code will also set this
 os.environ["JSBSIM_DEBUG"] = "0"
 
 class BVR3DEnvCpp:
@@ -383,7 +386,7 @@ class BVR3DEnvCpp:
         if episode_done:
             dones = {uid: True for uid in self.ego_ids}
 
-        if episode_done:
+        if episode_done and PRINT_DONE_REASON:
             if RL_controlled_all_dead:
                 print(f"\nepsiode done, done reason = RL_controlled_all_dead, red_alive = {red_alive}, blue_alive = {blue_alive}")
             elif time_limit_reached:
