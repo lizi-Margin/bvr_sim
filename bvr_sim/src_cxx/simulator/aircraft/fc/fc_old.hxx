@@ -1,7 +1,9 @@
 #pragma once
 
 #include <array>
+#include <string>
 #include "c3utils/c3utils.hxx"
+#include "flight_controller_params.hxx"
 
 namespace bvr_sim {
 
@@ -55,7 +57,7 @@ private:
     CrashingCounter crashing_counter;
 
 public:
-    explicit StdFlightController(double dt) noexcept;
+    explicit StdFlightController(double dt, const std::string& aircraft_model = "F16") noexcept;
 
     void reset() noexcept;
 

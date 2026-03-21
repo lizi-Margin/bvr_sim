@@ -63,4 +63,4 @@ public:
     const FlightControllerParams& getParams(const std::string& aircraft_key) const noexcept;
 };
 
-}
+}  // namespace bvr_sim

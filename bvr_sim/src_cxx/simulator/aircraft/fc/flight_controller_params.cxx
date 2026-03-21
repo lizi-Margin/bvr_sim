@@ -9,6 +9,8 @@ FlightControllerParamsManager* FlightControllerParamsManager::instance_ = nullpt
 
 FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     // F16 参数 - 从fc_old.cxx硬编码值提取
+    // PID系数来自: StdFlightController::StdFlightController() 构造函数
+    // 阈值来自: direct_LU_flight_controler() 算法
     FlightControllerParams f16_params;
 
     // PID系数
@@ -25,12 +27,12 @@ FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     f16_params.kthrottle_d = 500;
 
     // 高度阈值 (转换为米)
-    f16_params.crash_height_threshold = 1219.0;
-    f16_params.severe_crash_height = 610.0;
-    f16_params.low_alt_threshold = 244.0;
-    f16_params.altitude_loss_threshold = 11000.0;
-    f16_params.pitch_loss_threshold = 20000.0;
-    f16_params.roll_loss_threshold = 16000.0;
+    f16_params.crash_height_threshold = 1219.0;         // 4000 ft
+    f16_params.severe_crash_height = 610.0;             // 2000 ft
+    f16_params.low_alt_threshold = 244.0;               // 800 ft
+    f16_params.altitude_loss_threshold = 11000.0;       // 已是米
+    f16_params.pitch_loss_threshold = 20000.0;          // 已是米
+    f16_params.roll_loss_threshold = 16000.0;           // 已是米
 
     // 速度阈值
     f16_params.stall_speed = 0.18;
@@ -39,15 +41,19 @@ FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     f16_params.high_speed_threshold = 1.2;
 
     // 角度阈值
-    f16_params.max_roll_angle = M_PI / 3.0;
-    f16_params.max_pitch_angle = M_PI / 6.0;
-    f16_params.turn_angle_90deg = M_PI / 2.0;
-    f16_params.turn_angle_99deg = 99.0 * M_PI / 180.0;
+    f16_params.max_roll_angle = M_PI / 3.0;             // π/3 rad = 60°
+    f16_params.max_pitch_angle = M_PI / 6.0;            // π/6 rad = 30°
+    f16_params.turn_angle_90deg = M_PI / 2.0;           // π/2 rad = 90°
+    f16_params.turn_angle_99deg = 99.0 * M_PI / 180.0;  // 99°
 
-    // 注册飞机参数
+    // F16 注册
     params_map_["F16"] = f16_params;
-    params_map_["F15"] = f16_params;  // 初值同F16，后期可调整
-    params_map_["F18"] = f16_params;  // 初值同F16，后期可调整
+
+    // F15 - 初值同F16，后期可调整
+    params_map_["F15"] = f16_params;
+
+    // F18 - 初值同F16，后期可调整
+    params_map_["F18"] = f16_params;
 }
 
 FlightControllerParamsManager& FlightControllerParamsManager::getInstance() noexcept {

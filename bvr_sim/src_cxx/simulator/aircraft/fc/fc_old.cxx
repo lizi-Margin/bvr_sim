@@ -23,16 +23,31 @@ bool CrashingCounter::update(bool crashing) noexcept {
     return timer < max_time;
 }
 
-StdFlightController::StdFlightController(double dt) noexcept
-    : kroll_p_(1.2), kroll_i_(0.2), kroll_d_(-0.),
-      kpitch_p_(-3.4), kpitch_i_(-0.0), kpitch_d_(-0.5),
-      kthrottle_p_(0.03), kthrottle_i_(0.06), kthrottle_d_(500),
-      dt(dt),
+StdFlightController::StdFlightController(double dt, const std::string& aircraft_model) noexcept
+    : dt(dt),
       sum_err_roll(0), last_err_roll(0),
       sum_err_pitch(0), last_err_pitch(0),
       sum_err_throttle(0), last_err_throttle(0),
       right_turn(0),
-      crashing_counter(dt, 5.) {}
+      crashing_counter(dt, 5.) {
+
+    // 从Manager获取参数
+    auto& manager = FlightControllerParamsManager::getInstance();
+    const auto& params = manager.getParams(aircraft_model);
+
+    // 设置PID系数
+    kroll_p_ = params.kroll_p;
+    kroll_i_ = params.kroll_i;
+    kroll_d_ = params.kroll_d;
+
+    kpitch_p_ = params.kpitch_p;
+    kpitch_i_ = params.kpitch_i;
+    kpitch_d_ = params.kpitch_d;
+
+    kthrottle_p_ = params.kthrottle_p;
+    kthrottle_i_ = params.kthrottle_i;
+    kthrottle_d_ = params.kthrottle_d;
+}
 
 void StdFlightController::reset() noexcept {
 }
