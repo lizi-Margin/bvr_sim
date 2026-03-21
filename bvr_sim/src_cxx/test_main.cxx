@@ -6,7 +6,7 @@
 #include "rubbish_can/json.hpp"
 #include "test_main.hxx"
 
-// Example tests (can be moved to separate files later)
+// Example tests
 TEST(Example, BasicAssertion) {
     ASSERT(true);
 }

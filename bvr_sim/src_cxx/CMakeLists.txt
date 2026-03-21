@@ -339,11 +339,11 @@ target_link_libraries(bvr_sim_unit_tests PRIVATE c3utils)
 target_link_libraries(bvr_sim_unit_tests PRIVATE cpptrace::cpptrace)
 target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim)
 
-# Set output directory to install/bin
-set_target_properties(bvr_sim_unit_tests PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/install/bin"
+install(TARGETS bvr_sim_unit_tests
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
 )
-
 # Apply compiler settings
 set_compiler_params(bvr_sim_unit_tests)
 
