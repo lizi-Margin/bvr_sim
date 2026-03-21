@@ -1,4 +1,4 @@
-#include "../../test_main.cxx"
+#include "../../test_main.hxx"
 #include <cmath>
 #include <map>
 #include <string>
@@ -20,7 +20,7 @@ TEST(Reward, EngagementRewardScaling) {
     double close_reward = 1.0 / (1.0 + close_range / 1000.0);
     double far_reward = 1.0 / (1.0 + far_range / 1000.0);
 
-    ASSERT(close_reward > far_reward, "Close range should have higher engagement reward");
+    ASSERT(close_reward > far_reward);
 }
 
 TEST(Reward, AltitudeAdvantageCalculation) {
@@ -29,7 +29,7 @@ TEST(Reward, AltitudeAdvantageCalculation) {
     double enemy_alt = 5000.0;
 
     double alt_diff = own_alt - enemy_alt;
-    ASSERT(alt_diff > 0, "Should calculate positive altitude advantage");
+    ASSERT(alt_diff > 0);
     ASSERT_NEAR(alt_diff, 1000.0, 1.0);
 }
 
@@ -39,17 +39,17 @@ TEST(Reward, SpeedAdvantageScaling) {
     double enemy_speed = 250.0;  // m/s
 
     double speed_diff = own_speed - enemy_speed;
-    ASSERT(speed_diff > 0, "Should calculate positive speed advantage");
+    ASSERT(speed_diff > 0);
     ASSERT_NEAR(speed_diff, 50.0, 1.0);
 }
 
 TEST(Reward, SurvivalReward) {
     // Test survival reward (non-negative)
     double survival = 1.0;  // Alive
-    ASSERT(survival > 0, "Survival reward should be positive");
+    ASSERT(survival > 0);
 
     double dead = 0.0;  // Dead
-    ASSERT(dead == 0, "Dead state should have zero reward");
+    ASSERT_EQ(dead, 0.0);
 }
 
 TEST(Reward, ComponentWeighting) {
@@ -71,13 +71,10 @@ TEST(Reward, ComponentWeighting) {
 
 TEST(Reward, DistillationPenalty) {
     // Test distillation penalty calculation
-    int rl_action = 5;
-    int baseline_action = 5;
-
     double penalty_match = 0.0;
     double penalty_mismatch = 1.0;
 
-    ASSERT(penalty_match < penalty_mismatch, "Matching actions should have lower penalty");
+    ASSERT(penalty_match < penalty_mismatch);
 }
 
 TEST(Reward, MissileHitReward) {
@@ -85,9 +82,9 @@ TEST(Reward, MissileHitReward) {
     double hit_reward = 10.0;
     double miss_penalty = -1.0;
 
-    ASSERT(hit_reward > 0, "Hit should have positive reward");
-    ASSERT(miss_penalty < 0, "Miss should have negative penalty");
-    ASSERT(hit_reward > miss_penalty, "Hit reward should exceed miss penalty");
+    ASSERT(hit_reward > 0);
+    ASSERT(miss_penalty < 0);
+    ASSERT(hit_reward > miss_penalty);
 }
 
 TEST(Reward, EdgeCaseZeroValues) {
@@ -95,8 +92,8 @@ TEST(Reward, EdgeCaseZeroValues) {
     double zero_range = 0.0;
     double reward = 1.0 / (1.0 + std::max(zero_range, 1.0) / 1000.0);
 
-    ASSERT(reward > 0, "Should handle zero range without division by zero");
-    ASSERT(reward <= 1.0, "Reward should be bounded by 1.0");
+    ASSERT(reward > 0);
+    ASSERT_NEAR(reward, 1.0, 0.01);
 }
 
 TEST(Reward, LargeValueHandling) {
@@ -104,8 +101,6 @@ TEST(Reward, LargeValueHandling) {
     double large_range = 1000000.0;
     double reward = 1.0 / (1.0 + large_range / 1000.0);
 
-    ASSERT(reward >= 0, "Should handle large values gracefully");
-    ASSERT(reward < 0.01, "Large range should result in very small reward");
+    ASSERT(reward >= 0);
+    ASSERT(reward < 0.01);
 }
-
-} // namespace bvr_sim

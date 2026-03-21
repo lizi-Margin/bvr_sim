@@ -108,7 +108,7 @@ private:
 
 // Macro for test registration
 #define TEST(ModuleName, TestName) \
-    void test_##ModuleName##_##TestName(); \
+    static void test_##ModuleName##_##TestName(); \
     namespace { \
         struct ModuleName##_##TestName##_Register { \
             ModuleName##_##TestName##_Register() { \
@@ -117,7 +117,7 @@ private:
         }; \
         static ModuleName##_##TestName##_Register ModuleName##_##TestName##_registrar; \
     } \
-    void test_##ModuleName##_##TestName()
+    static void test_##ModuleName##_##TestName()
 
 // Assert macros
 #define ASSERT(condition) \
