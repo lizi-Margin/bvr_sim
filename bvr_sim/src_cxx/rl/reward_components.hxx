@@ -124,6 +124,30 @@ public:
     double safe_max_;
 };
 
+class AdvantageReward : public RewardComponent {
+public:
+    AdvantageReward(double weight = 0.1, double enm_adv_coef = 0.1, double six_punishment_coef = 0.5, const std::string& name = "advantage");
+
+    double compute(
+        const std::shared_ptr<Aircraft>& agent,
+        const std::vector<std::shared_ptr<Aircraft>>& all_agents,
+        const std::vector<std::shared_ptr<Missile>>& all_missiles,
+        const RewardInfo& info) override;
+
+    void reset() override {}
+
+private:
+    // Helper functions - static for pure calculations
+    static double calc_ego_advantage(double target_angle, double factor_r);
+    static double calc_enm_advantage(double enm_target_angle, double factor_r);
+    static double calc_six_punishment(double target_angle, double enm_target_angle, double factor_r);
+    static double compute_factor_r(double r, double thresh, double exp_coef, double exp_lower_bound);
+
+    // Hardcoded parameters matching Python implementation
+    double enm_adv_coef;
+    double six_punishment_coef;
+};
+
 class MissileLaunchReward : public RewardComponent {
 public:
     MissileLaunchReward(double weight = 1.0, double launch_reward = 1.0,

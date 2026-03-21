@@ -65,6 +65,10 @@ void RewardManager::initialize_components() {
         get_config("safe_altitude_max", 12000.0),
         "safe_altitude"));
 
+    add_component(std::make_shared<AdvantageReward>(
+        get_config("advantage_weight", 0.1),
+        "advantage"));
+
     add_component(std::make_shared<MissileEvasionReward>(
         get_config("missile_evasion_weight", 0.2),
         "missile_evasion"));

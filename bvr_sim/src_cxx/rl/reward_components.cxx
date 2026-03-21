@@ -201,6 +201,159 @@ double SafeAltitudeReward::compute(
     }
 }
 
+AdvantageReward::AdvantageReward(double weight, double enm_adv_coef, double six_punishment_coef, const std::string& name)
+    : RewardComponent(weight, name), enm_adv_coef(enm_adv_coef), six_punishment_coef(six_punishment_coef) {}
+
+double AdvantageReward::compute(
+    const std::shared_ptr<Aircraft>& agent,
+    const std::vector<std::shared_ptr<Aircraft>>& all_agents,
+    const std::vector<std::shared_ptr<Missile>>& all_missiles,
+    const RewardInfo& info) {
+
+    check(agent, "Agent is null");
+    if (!agent->is_alive) return 0.0;
+
+    // Collect alive enemies
+    std::vector<std::shared_ptr<const Aircraft>> alive_enemies;
+    for (const auto& a : all_agents) {
+        check(a, "Agent is null");
+        if (a->color != agent->color && a->is_alive) {
+            alive_enemies.push_back(a);
+        }
+    }
+
+    if (alive_enemies.empty()) return 0.0;
+
+    double total_advantage = 0.0;
+
+    for (const auto& enemy : alive_enemies) {
+        // Compute relative position
+        c3u::Vector3 to_enm{
+            enemy->position[0] - agent->position[0],
+            enemy->position[1] - agent->position[1],
+            enemy->position[2] - agent->position[2]
+        };
+        c3u::Vector3 to_ego{-to_enm[0], -to_enm[1], -to_enm[2]};
+
+        double r = c3utils::linalg_norm(to_enm.get_list());
+
+        c3u::Vector3 ego_vec = agent->velocity;
+        c3u::Vector3 enm_vec = enemy->velocity;
+    
+        double target_angle = ego_vec.get_angle(to_enm);
+        double enm_target_angle = enm_vec.get_angle(to_ego);
+
+        // Compute distance decay factors
+        double adv_factor_r = compute_factor_r(r, c3u::nm_to_meters(15), 0.1, 0.15);
+        double six_factor_r = compute_factor_r(r, c3u::nm_to_meters(7), 0.5, 0.05);
+
+        // Compute advantage components
+        double ego_advantage = calc_ego_advantage(target_angle, adv_factor_r);
+        double enm_advantage = calc_enm_advantage(enm_target_angle, adv_factor_r);
+        double six_punishment = calc_six_punishment(target_angle, enm_target_angle, six_factor_r);
+
+        // Combine components
+        double advantage = ego_advantage
+                         - (enm_adv_coef * enm_advantage)
+                         - (six_punishment_coef * six_punishment);
+
+        total_advantage += advantage;
+    }
+
+    return total_advantage;
+}
+
+double AdvantageReward::compute_factor_r(double r, double thresh, double exp_coef, double exp_lower_bound) {
+    if (r > thresh) {
+        double exp_val = std::exp(1.0 - exp_coef * r / thresh);
+        return std::min(std::max(exp_val, exp_lower_bound), 1.0);
+    }
+    return 1.0;
+}
+
+double AdvantageReward::calc_ego_advantage(double target_angle, double factor_r) {
+    constexpr double K0 = c3u::deg2rad(4.0);  // 4°
+    constexpr double K1 = c3u::deg2rad(15.0);  // 15°
+    constexpr double K2 = c3u::deg2rad(35.0);  // 35°
+    constexpr double NORM = 21.0;
+
+    double factor_ta = 0.0;
+    if (target_angle < K0) {
+        factor_ta = 1.0 + 20.0;
+    } else if (target_angle < K1) {
+        factor_ta = 1.0 + 2.0 * ((K1 - target_angle) / K1);
+    } else if (target_angle < K2) {
+        factor_ta = 1.0 - ((target_angle - K1) / (K2 - K1));
+    } else {
+        factor_ta = 0.0;
+    }
+
+    factor_ta = factor_ta / NORM;
+    return factor_r * factor_ta;
+}
+
+double AdvantageReward::calc_enm_advantage(double enm_target_angle, double factor_r) {
+    constexpr double K0 = c3u::deg2rad(4.0);  // 4°
+    constexpr double K1 = c3u::deg2rad(30.0);  // 30°
+    constexpr double K2 = c3u::deg2rad(90.0);  // 90°
+    constexpr double NORM = 2.0;
+
+    double enm_factor_ta = 0.0;
+    if (enm_target_angle < K0) {
+        enm_factor_ta = 1.0 + 1.0;
+    } else if (enm_target_angle < K1) {
+        enm_factor_ta = 1.0 + 1.0 * ((K1 - enm_target_angle) / K1);
+    } else if (enm_target_angle < K2) {
+        enm_factor_ta = 1.0 - ((enm_target_angle - K1) / (K2 - K1));
+    } else {
+        enm_factor_ta = 0.0;
+    }
+
+    enm_factor_ta = enm_factor_ta / NORM;
+    return factor_r * enm_factor_ta;
+}
+
+double AdvantageReward::calc_six_punishment(
+    double target_angle, double enm_target_angle, double factor_r) {
+
+
+    // Part 1: Enemy on our six (behind us)
+    double six_angle = c3u::pi - target_angle;
+    constexpr double K1_SIX = c3u::deg2rad(35.0);  // 35°
+    constexpr double K2_SIX = c3u::deg2rad(60.0);  // 60°
+    
+    double enm_on_six_factor = 0.0;
+    if (six_angle < K1_SIX) {
+        enm_on_six_factor = 1.0;
+    } else if (six_angle < K2_SIX) {
+        enm_on_six_factor = 1.0 - ((six_angle - K1_SIX) / (K2_SIX - K1_SIX));
+    } else {
+        enm_on_six_factor = 0.0;
+    }
+
+    // Part 2: Enemy aspect angle favorable
+    constexpr double K0_ENM = c3u::deg2rad(5.0);  // 5°
+    constexpr double K1_ENM = c3u::deg2rad(20.0);  // 20°
+    constexpr double K2_ENM = c3u::deg2rad(35.0);  // 35°
+    constexpr double NORM_ENM = 6.0;
+
+    double enm_ta_factor = 0.0;
+    if (enm_target_angle < K0_ENM) {
+        enm_ta_factor = 1.0 + 5.0;
+    } else if (enm_target_angle < K1_ENM) {
+        enm_ta_factor = 1.0 + 5.0 * ((K1_ENM - enm_target_angle) / K1_ENM);
+    } else if (enm_target_angle < K2_ENM) {
+        enm_ta_factor = 1.0 - ((enm_target_angle - K1_ENM) / (K2_ENM - K1_ENM));
+    } else {
+        enm_ta_factor = 0.0;
+    }
+
+    enm_ta_factor = enm_ta_factor / NORM_ENM;
+
+    double six_punishment = factor_r * enm_on_six_factor * enm_ta_factor;
+    return six_punishment;
+}
+
 MissileLaunchReward::MissileLaunchReward(double weight, double launch_reward,
                                          double duplicated_launch_penalty, const std::string& name)
     : RewardComponent(weight, name), launch_reward_(launch_reward),
