@@ -32,6 +32,7 @@ public:
 
 class StdFlightController {
 private:
+    // PID系数 (来自params)
     double kroll_p_;
     double kroll_i_;
     double kroll_d_;
@@ -43,6 +44,10 @@ private:
     double kthrottle_p_;
     double kthrottle_i_;
     double kthrottle_d_;
+
+    // 飞行控制参数集合（包含所有阈值）
+    FlightControllerParams params_;
+
     double dt;
 
     double sum_err_roll;
@@ -77,7 +82,7 @@ public:
         double throttle_base = 0.5
     ) noexcept;
 
-    static double get_throttle_base(const FighterState& fighter, double intent_mach) noexcept;
+    double get_throttle_base(const FighterState& fighter, double intent_mach) noexcept;
 };
 
 }

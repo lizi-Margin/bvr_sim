@@ -40,6 +40,25 @@ struct FlightControllerParams {
     double max_pitch_angle;                // π/6 rad
     double turn_angle_90deg;               // π/2 rad
     double turn_angle_99deg;               // 99° ≈ 1.728 rad
+
+    // PID 积分作用阈值和限制
+    double roll_integral_threshold;        // Roll integral action threshold (0.32 rad)
+    double roll_integral_clamp;            // Roll integral clamping limit (2.5)
+    double pitch_integral_threshold;       // Pitch integral action threshold (π/6 rad)
+    double pitch_integral_deadband;        // Pitch integral deadband (π/90 rad)
+    double pitch_integral_clamp;           // Pitch integral clamping limit (8.0)
+    double throttle_integral_clamp;        // Throttle integral clamping limit (10.0)
+
+    // 油门基值计算参数
+    double throttle_base_value;            // Initial throttle base (0.5)
+    double throttle_altitude_threshold;    // Altitude for throttle adjustment (7500 m)
+    double throttle_altitude_coefficient;  // Coefficient for altitude-based adjustment (0.5)
+    double throttle_mach_threshold;        // Mach threshold for throttle boost (1.0)
+    double throttle_altitude_limit;        // Altitude limit for pitch-based adjustment (10000 m)
+    double throttle_pitch_coefficient;     // Coefficient for pitch-based adjustment (0.4)
+    double throttle_pitch_divisor;         // Divisor for pitch angle (π/2 rad)
+    double low_mach_throttle_threshold;    // Low mach threshold (0.7)
+    double max_throttle;                   // Maximum throttle value (1.0)
 };
 
 class FlightControllerParamsManager {

@@ -27,9 +27,9 @@ FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     f16_params.kthrottle_d = 500;
 
     // 高度阈值 (转换为米)
-    f16_params.crash_height_threshold = 1219.0;         // 4000 ft
-    f16_params.severe_crash_height = 610.0;             // 2000 ft
-    f16_params.low_alt_threshold = 244.0;               // 800 ft
+    f16_params.crash_height_threshold = c3u::feet_to_meters(4000.0);         // 4000 ft
+    f16_params.severe_crash_height = c3u::feet_to_meters(2000.0);             // 2000 ft
+    f16_params.low_alt_threshold = c3u::feet_to_meters(800.0);               // 800 ft
     f16_params.altitude_loss_threshold = 11000.0;       // 已是米
     f16_params.pitch_loss_threshold = 20000.0;          // 已是米
     f16_params.roll_loss_threshold = 16000.0;           // 已是米
@@ -41,10 +41,29 @@ FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     f16_params.high_speed_threshold = 1.2;
 
     // 角度阈值
-    f16_params.max_roll_angle = M_PI / 3.0;             // π/3 rad = 60°
-    f16_params.max_pitch_angle = M_PI / 6.0;            // π/6 rad = 30°
-    f16_params.turn_angle_90deg = M_PI / 2.0;           // π/2 rad = 90°
-    f16_params.turn_angle_99deg = 99.0 * M_PI / 180.0;  // 99°
+    f16_params.max_roll_angle = c3u::deg2rad(60.0);             // π/3 rad = 60°
+    f16_params.max_pitch_angle = c3u::deg2rad(30.0);            // π/6 rad = 30°
+    f16_params.turn_angle_90deg = c3u::deg2rad(90.0);           // π/2 rad = 90°
+    f16_params.turn_angle_99deg = c3u::deg2rad(99.0);           // 99°
+
+    // PID 积分作用阈值和限制
+    f16_params.roll_integral_threshold = 0.32;                  // Roll integral threshold
+    f16_params.roll_integral_clamp = 2.5;                       // Roll integral clamp
+    f16_params.pitch_integral_threshold = c3u::deg2rad(30.0);   // π/6 rad = 30°
+    f16_params.pitch_integral_deadband = c3u::deg2rad(2.0);     // π/90 rad ≈ 2°
+    f16_params.pitch_integral_clamp = 8.0;                      // Pitch integral clamp
+    f16_params.throttle_integral_clamp = 10.0;                  // Throttle integral clamp
+
+    // 油门基值计算参数
+    f16_params.throttle_base_value = 0.5;                       // Initial throttle base
+    f16_params.throttle_altitude_threshold = 7500.0;            // Altitude threshold (m)
+    f16_params.throttle_altitude_coefficient = 0.5;             // Coefficient for altitude
+    f16_params.throttle_mach_threshold = 1.0;                   // Mach threshold
+    f16_params.throttle_altitude_limit = 10000.0;               // Altitude limit (m)
+    f16_params.throttle_pitch_coefficient = 0.4;                // Pitch coefficient
+    f16_params.throttle_pitch_divisor = c3u::deg2rad(90.0);     // π/2 rad = 90°
+    f16_params.low_mach_throttle_threshold = 0.7;               // Low mach threshold
+    f16_params.max_throttle = 1.0;                              // Maximum throttle
 
     // F16 注册
     params_map_["F16"] = f16_params;
