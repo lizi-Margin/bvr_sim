@@ -11,6 +11,7 @@ def main():
     # Load environment config
     with open(os.path.join(get_root_dir(), "demo_config_cpp.jsonc"), "r") as fin:
         env_config = commentjson.load(fin)
+    print(env_config)
 
     sim = BVR3DEnvCpp(env_config, [])
     obs, info = sim.reset(seed=None)
@@ -23,11 +24,12 @@ def main():
             sim.core.set_acmi_file_path(f"replay_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             i = 0
-            done = np.array([False])
-            while not done.all():
+            episode_done = False
+            while not episode_done:
                 t0 = time.time()
                 obs, reward, done, info = sim.step({})
                 t1 = time.time()
+                episode_done = info["episode_done"]
                 mean_step_time = 0.999 * mean_step_time + 0.001 * (t1 - t0) if mean_step_time > 0 else (t1 - t0)
                 print(f"\rfps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s", end="")
                 i += 1

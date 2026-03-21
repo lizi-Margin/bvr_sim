@@ -59,7 +59,7 @@ if not _import_success:
 os.environ["JSBSIM_DEBUG"] = "0"
 
 class BVR3DEnvCpp:
-    """BVR 3D environment adapter for C++ simulation core (new 3-segment protocol)"""
+    """BVR 3D environment adapter for C++ simulation core"""
 
     def __init__(self, config: Dict, rl_index: list):
         self.config = config
