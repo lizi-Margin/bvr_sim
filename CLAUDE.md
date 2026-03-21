@@ -283,6 +283,41 @@ for _ in range(10):
 "
 ```
 
+### Running Unit Tests
+
+C++ unit tests catch regressions in core modules (physics, missiles, sensors, rewards) during development.
+
+**Build and run (Windows):**
+```bash
+cd bvr_sim && build_windows.bat
+python tests/run_unit_tests.py
+```
+
+**Build and run (Linux):**
+```bash
+cd bvr_sim && bash build_linux.sh
+python tests/run_unit_tests.py
+```
+
+**Framework:** Custom lightweight C++ test framework with macros:
+- `ASSERT(condition, "message")` — Basic assertion
+- `ASSERT_EQ(actual, expected)` — Equality check
+- `ASSERT_NEAR(actual, expected, tolerance)` — Floating-point with tolerance
+- `ASSERT_RANGE(value, min, max)` — Range validation
+
+**To add a new test:**
+1. Edit relevant test file (e.g., `src_cxx/simulator/aircraft/test_f16.cxx`)
+2. Write test using `TEST(ModuleName, TestName) { ... }` macro
+3. Rebuild: `build_windows.bat` or `bash build_linux.sh`
+4. Run: `python tests/run_unit_tests.py`
+
+**Test files (colocated with source):**
+- `src_cxx/test_main.cxx` — Test framework (~150 lines)
+- `src_cxx/simulator/aircraft/test_f16.cxx` — F16 physics (7 tests)
+- `src_cxx/simulator/missile/test_aim120c.cxx` — AIM-120C guidance (7 tests)
+- `src_cxx/simulator/sense/test_radar.cxx` — Radar sensors (9 tests)
+- `src_cxx/c3utils/test_c3utils.cxx` — C3 utilities (3 tests)
+
 ### C++ Build Troubleshooting
 
 **Build fails on Linux/Windows:**
