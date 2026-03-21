@@ -4,11 +4,11 @@
 #include <map>
 #include <memory>
 #include "rubbish_can/check.hxx"
+#include "c3utils/c3utils.hxx"
 
 namespace bvr_sim {
 
 struct FlightControllerParams {
-    // PID 系数
     double kroll_p;
     double kroll_i;
     double kroll_d;
@@ -21,44 +21,43 @@ struct FlightControllerParams {
     double kthrottle_i;
     double kthrottle_d;
 
-    // 高度阈值（米）
-    double crash_height_threshold;         // 4000 ft ≈ 1219 m
-    double severe_crash_height;            // 2000 ft ≈ 610 m
-    double low_alt_threshold;              // 800 ft ≈ 244 m
-    double altitude_loss_threshold;        // 11000 m
-    double pitch_loss_threshold;           // 20000 m
-    double roll_loss_threshold;            // 16000 m
+    double crash_height_threshold_B; 
+    double severe_crash_height;      
+    double crash_height_threshold_A; 
+    double pi_decay_start;     
+    double pitch_pi_decay_end;       
+    double roll_pi_decay_end;        
 
-    // 速度阈值 (Mach)
-    double stall_speed;                    // 0.18 M
-    double min_controlled_speed;           // 0.3 M
-    double low_speed_threshold;            // 0.5 M
-    double high_speed_threshold;           // 1.2 M
+    double minimum_speed_B;          
+    double maximum_speed_A;          
 
-    // 角度阈值 (弧度)
-    double max_roll_angle;                 // π/3 rad
-    double max_pitch_angle;                // π/6 rad
-    double turn_angle_90deg;               // π/2 rad
-    double turn_angle_99deg;               // 99° ≈ 1.728 rad
+    static FlightControllerParams get_f16_params() noexcept {
+        FlightControllerParams f16_params;
 
-    // PID 积分作用阈值和限制
-    double roll_integral_threshold;        // Roll integral action threshold (0.32 rad)
-    double roll_integral_clamp;            // Roll integral clamping limit (2.5)
-    double pitch_integral_threshold;       // Pitch integral action threshold (π/6 rad)
-    double pitch_integral_deadband;        // Pitch integral deadband (π/90 rad)
-    double pitch_integral_clamp;           // Pitch integral clamping limit (8.0)
-    double throttle_integral_clamp;        // Throttle integral clamping limit (10.0)
+        f16_params.kroll_p = 1.2;
+        f16_params.kroll_i = 0.2;
+        f16_params.kroll_d = 0.0;
 
-    // 油门基值计算参数
-    double throttle_base_value;            // Initial throttle base (0.5)
-    double throttle_altitude_threshold;    // Altitude for throttle adjustment (7500 m)
-    double throttle_altitude_coefficient;  // Coefficient for altitude-based adjustment (0.5)
-    double throttle_mach_threshold;        // Mach threshold for throttle boost (1.0)
-    double throttle_altitude_limit;        // Altitude limit for pitch-based adjustment (10000 m)
-    double throttle_pitch_coefficient;     // Coefficient for pitch-based adjustment (0.4)
-    double throttle_pitch_divisor;         // Divisor for pitch angle (π/2 rad)
-    double low_mach_throttle_threshold;    // Low mach threshold (0.7)
-    double max_throttle;                   // Maximum throttle value (1.0)
+        f16_params.kpitch_p = -3.4;
+        f16_params.kpitch_i = -0.0;
+        f16_params.kpitch_d = -0.5;
+
+        f16_params.kthrottle_p = 0.03;
+        f16_params.kthrottle_i = 0.06;
+        f16_params.kthrottle_d = 500;
+
+        f16_params.crash_height_threshold_B = c3u::feet_to_meters(4000.0);         // 4000 ft
+        f16_params.severe_crash_height = c3u::feet_to_meters(2000.0);             // 2000 ft
+        f16_params.crash_height_threshold_A = c3u::feet_to_meters(800.0);               // 800 ft
+        f16_params.pi_decay_start = 11000.0;       
+        f16_params.pitch_pi_decay_end = 20000.0; 
+        f16_params.roll_pi_decay_end = 16000.0;    
+
+        f16_params.minimum_speed_B = 0.18;
+        f16_params.maximum_speed_A = 0.5;
+
+        return f16_params;
+    }
 };
 
 class FlightControllerParamsManager {
