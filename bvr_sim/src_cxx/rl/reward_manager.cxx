@@ -67,6 +67,8 @@ void RewardManager::initialize_components() {
 
     add_component(std::make_shared<AdvantageReward>(
         get_config("advantage_weight", 0.1),
+        get_config("advantage_enm_adv_coef", 0.1),
+        get_config("advantage_six_punishment_coef", 0.5),
         "advantage"));
 
     add_component(std::make_shared<MissileEvasionReward>(
