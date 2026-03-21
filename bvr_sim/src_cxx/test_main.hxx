@@ -94,7 +94,7 @@ private:
     size_t current_test_idx = 0;
 
     void print_summary() {
-        int passed = 0, total = tests.size();
+        size_t passed = 0, total = tests.size();
         for (const auto& test : tests) {
             if (test.passed) passed++;
         }

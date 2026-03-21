@@ -34,18 +34,18 @@ public:
             try {
                 test_funcs[i]();
                 tests[i].passed = true;
-                std::cout << "✓ " << tests[i].test_name << std::endl;
+                std::cout << "Passed: " << tests[i].test_name << std::endl;
             } catch (const std::string& msg) {
                 tests[i].passed = false;
                 tests[i].error_msg = msg;
-                std::cout << "✗ " << tests[i].test_name << std::endl;
+                std::cout << "Failed: " << tests[i].test_name << std::endl;
                 if (!msg.empty()) {
                     std::cout << "  → " << msg << std::endl;
                 }
             } catch (const std::exception& e) {
                 tests[i].passed = false;
                 tests[i].error_msg = e.what();
-                std::cout << "✗ " << tests[i].test_name << std::endl;
+                std::cout << "Failed: " << tests[i].test_name << std::endl;
                 std::cout << "  → " << e.what() << std::endl;
             }
         }
@@ -92,7 +92,7 @@ private:
     size_t current_test_idx = 0;
 
     void print_summary() {
-        int passed = 0, total = tests.size();
+        size_t passed = 0, total = tests.size();
         for (const auto& test : tests) {
             if (test.passed) passed++;
         }
