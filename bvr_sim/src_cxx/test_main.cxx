@@ -3,6 +3,7 @@
 #include <string>
 #include <cmath>
 #include <functional>
+#include "rubbish_can/json.hpp"
 
 // Test result tracking
 struct TestResult {
