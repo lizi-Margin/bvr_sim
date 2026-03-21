@@ -50,9 +50,9 @@ def main():
 
     # Return exit code from test exe
     if result.returncode == 0:
-        print("[PASSED] All tests PASSED")
+        print("✓ All tests PASSED")
     else:
-        print("[FAILED] Some tests FAILED")
+        print("✗ Some tests FAILED")
 
     return result.returncode
 
