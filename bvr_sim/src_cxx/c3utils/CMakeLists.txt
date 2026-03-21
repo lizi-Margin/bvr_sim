@@ -71,7 +71,7 @@ install(TARGETS c3utils
 # Install PDB files for c3utils (MSVC debug symbols)
 # if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
 if(MSVC)
-    install(FILES "${CMAKE_BINARY_DIR}/src/c3utils/${CMAKE_BUILD_TYPE}/c3utils.pdb"
+    install(FILES "${CMAKE_BINARY_DIR}/src_cxx/c3utils/${CMAKE_BUILD_TYPE}/c3utils.pdb"
         DESTINATION lib
     )
 endif()

@@ -1,9 +1,6 @@
 /build
 /install
-
-/.cache
-
-/.marscode
-
 __pycache__
 *.pyc
+
+/src_cxx/extern/*

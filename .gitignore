@@ -1,3 +1,10 @@
 __pycache__
 *.pyc
 *.egg-info
+
+/build
+
+/.cache
+/.marscode
+/*.acmi
+/*.log
