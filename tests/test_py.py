@@ -17,6 +17,7 @@ def main():
 
     mean_step_time = 0.0
     try:
+        print(end="\n")
         episode_done = False
         sim.enable_render(filepath="./test_logs/replay.acmi")
         while not episode_done:
@@ -26,11 +27,12 @@ def main():
             t1 = time.time()
             episode_done = info["episode_done"]
             mean_step_time = 0.9 * mean_step_time + 0.1 * (t1 - t0)
-            print(f"fps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s")
+            print(f"\rfps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s", end="")
     except KeyboardInterrupt:
         pass
     del sim
     # input("单局推演结束，按Enter退出。")
+    return 0
 
 if __name__ == "__main__":
     main()

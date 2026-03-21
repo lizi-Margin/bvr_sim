@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ..missile.base import Missile
     from .fdm.base import BaseFDM
 
-PRINT_STEP_TIME = True
+PRINT_STEP_TIME = False
 
 class F16(Aircraft):
     """Aircraft simulator with pluggable flight dynamics model"""

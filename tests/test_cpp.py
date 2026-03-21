@@ -20,7 +20,7 @@ def main():
     try:
         turn = 0
         mean_step_time = 0.0
-        while turn < 10:
+        while turn < 2:
             sim.core.set_acmi_file_path(f"./test_logs/replay_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             i = 0
@@ -38,6 +38,7 @@ def main():
         pass
     del sim
     # input("推演结束，按Enter退出。")
+    return 0
         
 
     
