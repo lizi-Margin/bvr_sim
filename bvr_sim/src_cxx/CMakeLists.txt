@@ -325,6 +325,31 @@ if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
     endif()
 endif()
 
+# ============================================================================
+# Unit Tests Executable
+# ============================================================================
+
+add_executable(bvr_sim_unit_tests
+    test_main.cxx
+    simulator/aircraft/test_f16.cxx
+    simulator/missile/test_aim120c.cxx
+    simulator/sense/test_radar.cxx
+    simulator/reward/test_reward.cxx
+)
+
+# Link with main library dependencies
+target_include_directories(bvr_sim_unit_tests PRIVATE ${BVR_SIM_INCLUDE_DIRS})
+target_link_libraries(bvr_sim_unit_tests PRIVATE c3utils)
+target_link_libraries(bvr_sim_unit_tests PRIVATE cpptrace::cpptrace)
+target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim)
+
+# Set output directory to install/bin
+set_target_properties(bvr_sim_unit_tests PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/install/bin"
+)
+
+# Apply compiler settings
+set_compiler_params(bvr_sim_unit_tests)
 
 # setup_pybind_proj_linux("/home/hulc/.conda/envs/hmp" "312" "3.12")
 # setup_pybind_proj_linux("/home/hulc/.conda/envs/label" "311" "3.11")
