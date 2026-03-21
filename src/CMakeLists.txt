@@ -279,9 +279,9 @@ endfunction()
 
 # if is linux
 if(UNIX)
-    set(Python3_EXECUTABLE "/usr/bin/python3.13")
-    set(Python3_INCLUDE_DIR "/usr/include/python3.13")
-    set(Python3_LIBRARY "/usr/lib/libpython3.13.so")
+    set(Python3_EXECUTABLE "/usr/bin/python3.14")
+    set(Python3_INCLUDE_DIR "/usr/include/python3.14")
+    set(Python3_LIBRARY "/usr/lib/libpython3.14.so")
     find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
     message(STATUS "Python3 Version: ${Python3_VERSION}")
     message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
