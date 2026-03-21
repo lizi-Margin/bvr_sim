@@ -20,13 +20,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest",
-    "pytest-cov",
-]
 
 [tool.setuptools]
 packages = ["bvr_sim"]
 
 [tool.setuptools.package-data]
-bvr_sim = ["**/*.py", "**/*.json", "**/*.jsonc"]
+bvr_sim = [
+    "**/*.py",
+    "**/*.json",
+    "**/*.jsonc",
+    "install/lib/*.so",
+    "install/lib/*.pyd",
+    "install/lib/*.so.*",
+]

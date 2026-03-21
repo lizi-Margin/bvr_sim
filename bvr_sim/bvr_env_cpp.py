@@ -67,7 +67,7 @@ class BVR3DEnvCpp:
         self.dt = config.get("dt", 0.4)
         self.cpp_steps = config.get('cpp_steps', 1)
 
-        if bvr_sim_cpp is None: 
+        if bvr_sim_cpp is None:
             raise RuntimeError(
                 "Cannot start c++ SimCore, bvr_sim_cpp is not imported"
             )

@@ -36,4 +36,4 @@ message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 
 
 
-add_subdirectory("src")
+add_subdirectory("src_cxx")
