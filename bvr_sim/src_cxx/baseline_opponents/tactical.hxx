@@ -14,12 +14,26 @@ private:
     int crank_direction;
     int crank_switch_time;
 
+    enum class EvadeTactic {
+        TurnCold = 0,
+        CrankSlow,
+        BeamRight,
+        BeamLeft,
+        EvadeTacticMax
+    };
+    EvadeTactic evade_tactic;
+public:
+    void randomize_tactic() noexcept {
+        int tactic_num = rand() % static_cast<int>(EvadeTactic::EvadeTacticMax);
+        evade_tactic = static_cast<EvadeTactic>(tactic_num);
+    }
+
 public:
     TacticalOpponent3D() noexcept;
 
     ~TacticalOpponent3D() noexcept override = default;
 
-    void take_action(
+    virtual void take_action(
         std::shared_ptr<Aircraft> agent,
         const std::vector<std::shared_ptr<SimulatedObject>>& enemies,
         const std::vector<std::shared_ptr<SimulatedObject>>& partners,

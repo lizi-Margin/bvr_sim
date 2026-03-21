@@ -14,7 +14,8 @@ TacticalOpponent3D::TacticalOpponent3D() noexcept
     : BaseOpponent3D("Tactical3D"),
       last_shoot_time(-static_cast<int>(30.0 / cfg::dt)), // Convert 30 seconds to steps (assuming default dt=0.1)
       crank_direction(1),
-      crank_switch_time(0) {
+      crank_switch_time(0),
+      evade_tactic(EvadeTactic::TurnCold) {
 }
 
 void TacticalOpponent3D::take_action(
@@ -197,30 +198,51 @@ void TacticalOpponent3D::evade_missiles(
     // Calculate missile bearing
     double missile_heading = std::atan2(rel_pos[1], rel_pos[0]);
 
-    // Turn away (opposite direction)
-    double desired_heading = missile_heading + c3u::pi;
-    delta_heading = get_heading_action(agent, desired_heading);
+    if (evade_tactic == EvadeTactic::TurnCold) {
+        // Turn away (opposite direction)
+        double desired_heading = missile_heading + c3u::pi;
+        delta_heading = get_heading_action(agent, desired_heading);
+        double target_speed = c3u::get_mps(1.2, agent->get_altitude());
+        double speed_diff = target_speed - agent->get_speed();
+        delta_speed = speed_diff;
+    // } else if (evade_tactic == EvadeTactic::CrankSlow) {
+    //     double crank_offset = c3u::deg2rad(40.0) * crank_direction;
+    //     double desired_heading = missile_heading + crank_offset;
+    //     delta_heading = get_heading_action(agent, desired_heading);
+    //     double target_speed = c3u::get_mps(0.5, agent->get_altitude());
+    //     double speed_diff = target_speed - agent->get_speed();
+    //     delta_speed = speed_diff;
+    } else if (evade_tactic == EvadeTactic::BeamRight) {
+        double desired_heading = missile_heading + c3u::deg2rad(-90.0);
+        delta_heading = get_heading_action(agent, desired_heading);
+        double target_speed = c3u::get_mps(1.0, agent->get_altitude());
+        double speed_diff = target_speed - agent->get_speed();
+        delta_speed = speed_diff;
+    } else if (evade_tactic == EvadeTactic::BeamLeft) {
+        double desired_heading = missile_heading + c3u::deg2rad(90.0);
+        delta_heading = get_heading_action(agent, desired_heading);
+        double target_speed = c3u::get_mps(1.0, agent->get_altitude());
+        double speed_diff = target_speed - agent->get_speed();
+        delta_speed = speed_diff;
+    } else {
+        check(false, "Invalid evade tactic");
+    }
+    
 
-    // Dive if high, maintain if low (to reduce radar lock and increase distance)
-    double target_speed;
+    // Dive if high, maintain if low 
     if (distance < 15000.0) {  // Close range: aggressive maneuver
         if (agent->get_altitude() > 4000.0) {
             delta_altitude = -125.0;  // Dive
         } else {
             delta_altitude = 20.0;    // Climb
         }
-        target_speed = c3u::get_mps(1.2, agent->get_altitude());
-    } else {  // Far range: crank maneuver
+    } else { 
         if (agent->get_altitude() > 4000.0) {
             delta_altitude = -30.0;  // Gentle dive
         } else {
             delta_altitude = 0.0;
         }
-        target_speed = c3u::get_mps(1.1, agent->get_altitude());
     }
-
-    double speed_diff = target_speed - agent->get_speed();
-    delta_speed = speed_diff;
 
     shoot = false;
     fire = json::JSON();

@@ -1,4 +1,5 @@
 import json, os
+import random
 import numpy as np
 from typing import Dict, Tuple, Optional
 from gymnasium import spaces
@@ -99,11 +100,8 @@ class BVR3DEnvCpp:
         self.agent_uids = list(self.red_meta.keys()) + list(self.blue_meta.keys())
 
         # Determine controllable teams (ego_ids)
-        self.blue_opponent_type = config.get('blue_opponent_type', 'tactical')
-        # if self.blue_opponent_type is None:
-        #     self.ego_ids = self.red_ids + self.blue_ids  # Both teams controllable
-        # else:
-        #     self.ego_ids = self.red_ids  # Only red team controllable
+        self.opponent_type = config.get('blue_opponent_type', None)
+
         all_ids = self.red_ids + self.blue_ids
         self.ego_ids = [all_ids[i] for i in rl_index]
 
@@ -201,6 +199,10 @@ class BVR3DEnvCpp:
             init_spec[uid]["position"] = position.tolist()
             init_spec[uid]["velocity"] = velocity.tolist()
             # init_spec[uid]["velocity"] = [300, 100, 0]
+            
+            if self.opponent_type is not None:
+                init_spec[uid]["opponent_type"] = self.opponent_type if isinstance(self.opponent_type, str) \
+                                                  else random.choice(self.opponent_type)
 
 
         # Build initialization spec for blue
@@ -219,6 +221,9 @@ class BVR3DEnvCpp:
             init_spec[uid]["velocity"] = velocity.tolist()
             # init_spec[uid]["velocity"] = [-300, 100, 0]
 
+            if self.opponent_type is not None:
+                init_spec[uid]["opponent_type"] = self.opponent_type if isinstance(self.opponent_type, str) \
+                                                  else random.choice(self.opponent_type)
 
 
         for uid, config in init_spec.items():

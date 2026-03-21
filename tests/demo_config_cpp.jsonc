@@ -18,7 +18,7 @@
                 "L02": "AIM-120C7",
                 "L03": "AIM-120C7"
             },
-            "opponent_type": "tactical"
+            "opponent_type": "tactical_random"
         }
     },
     "blue_meta": {

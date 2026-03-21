@@ -166,12 +166,21 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
                 if (opponent_type == "tactical") {
                     BaselinePool::instance().add(fighter, std::make_shared<TacticalOpponent3D>());
                     SL::get().print("[UnitFactory] add fighter, tactical to baseline pool with uid: " + uid + " success");
+                } else if (opponent_type == "tactical_random" || opponent_type == "tactical-random") {
+                    auto tac_bsl = std::make_shared<TacticalOpponent3D>();
+                    tac_bsl->randomize_tactic();
+                    BaselinePool::instance().add(fighter, tac_bsl);
+                    SL::get().print("[UnitFactory] add fighter, tactical_random to baseline pool with uid: " + uid + " success");
                 } else if (opponent_type == "mad") {
                     BaselinePool::instance().add(fighter, std::make_shared<MadOpponent3D>());
                     SL::get().print("[UnitFactory] add fighter, mad to baseline pool with uid: " + uid + " success");
                 } else {
-                    // do nothing
-                    SL::get().print("[UnitFactory] no opponent with uid: " + uid);
+                    if (opponent_type.empty()) {
+                        SL::get().print("[UnitFactory] no opponent with uid: " + uid);
+                    } else {
+                        colorful::printHONG("Error: Unknown opponent type '" + opponent_type + "' for fighter with uid: " + uid);
+                        SL::get().print("[UnitFactory] Error: unknown opponent type '" + opponent_type + "' for fighter with uid: " + uid);
+                    }
                 }
                 
                 unit = fighter;
