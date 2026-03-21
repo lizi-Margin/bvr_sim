@@ -16,7 +16,7 @@ private:
 
     enum class EvadeTactic {
         TurnCold = 0,
-        CrankSlow,
+        // CrankSlow,
         BeamRight,
         BeamLeft,
         EvadeTacticMax
