@@ -8,7 +8,6 @@ setlocal
 set BUILD_DIR=build
 @REM set BUILD_TYPE=Debug
 set BUILD_TYPE=Release
-set CMAKE_GENERATOR="Visual Studio 17 2022"
 set CMAKE_ARCH=x64
 
 echo ========================================
@@ -92,7 +91,7 @@ cd %BUILD_DIR%
 
 REM Configure CMake
 echo Configuring CMake...
-cmake .. -G %CMAKE_GENERATOR% -A %CMAKE_ARCH%
+cmake .. -A %CMAKE_ARCH%
 if %ERRORLEVEL% neq 0 (
     echo CMake configuration failed!
     cd ..
