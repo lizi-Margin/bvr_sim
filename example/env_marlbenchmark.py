@@ -2,8 +2,7 @@ import numpy as np
 import os
 import gym
 from gym.spaces import Box, MultiDiscrete, Discrete
-from .bvr_env import BVR3DEnv
-from .bvr_env_cpp import BVR3DEnvCpp
+from bvr_sim import BVR3DEnv, BVR3DEnvCpp
 
 
 env_config_defaults = {
