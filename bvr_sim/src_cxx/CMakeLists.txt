@@ -334,7 +334,44 @@ add_executable(bvr_sim_unit_tests
     simulator/aircraft/test_f16.cxx
     simulator/missile/test_aim120c.cxx
     simulator/sense/test_radar.cxx
-    simulator/reward/test_reward.cxx
+    # Include all BVR_SIM sources for unit testing
+    so_pool.cxx
+    bsl_pool.cxx
+    core.cxx
+    global_config.cxx
+    cmd_handler.cxx
+    trace.cxx
+    simulator/simulator.cxx
+    simulator/register.cxx
+    simulator/unit_factory.cxx
+    simulator/aircraft/fighter.cxx
+    simulator/aircraft/base.cxx
+    simulator/aircraft/fdm/base.cxx
+    simulator/aircraft/fdm/jsbsim_fdm.cxx
+    simulator/aircraft/fdm/simple_fdm.cxx
+    simulator/aircraft/fc/fc_old.cxx
+    simulator/data_obj.cxx
+    simulator/weapon_factory.cxx
+    simulator/pylon_manager.cxx
+    simulator/ground/base.cxx
+    simulator/ground/aa.cxx
+    simulator/ground/ground_static_target.cxx
+    simulator/ground/slamraam.cxx
+    simulator/missile/base.cxx
+    simulator/missile/aim120c.cxx
+    simulator/missile/missile_aerodynamics.cxx
+    simulator/sense/base.cxx
+    simulator/sense/awacs.cxx
+    simulator/sense/rws.cxx
+    simulator/sense/radar.cxx
+    baseline_opponents/base.cxx
+    baseline_opponents/mad.cxx
+    baseline_opponents/tactical.cxx
+    rl/observation_space.cxx
+    rl/reward_components.cxx
+    rl/reward_manager.cxx
+    rl/rl_manager.cxx
+    rubbish_can/set_env.cxx
 )
 
 # Link with main library dependencies
