@@ -1,7 +1,7 @@
 import json, time
 import numpy as np
 import os
-from ..bvr_env import BVR3DEnv
+from ...bvr_env import BVR3DEnv
 
 def get_root_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))
@@ -27,6 +27,9 @@ def main():
         pass
     del sim
     input("单局推演结束，按Enter退出。")
+
+if __name__ == "__main__":
+    main()
         
 
     

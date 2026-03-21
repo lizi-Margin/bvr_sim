@@ -1,9 +1,2 @@
-/build
-/install
-
-/.cache
-
-/.marscode
-
 __pycache__
 *.pyc
