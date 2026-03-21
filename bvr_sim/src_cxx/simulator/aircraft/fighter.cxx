@@ -91,7 +91,7 @@ void Fighter::step() {
     if (BYPASS_THROTTLE_CONTROL) {
         action["delta_speed"] = 1.0;
     }
-    action_space_check::wipe_out_action(register_);
+    // action_space_check::wipe_out_action(register_);
 
     fdm->step(action);
     if (fdm->is_terminated()) {
