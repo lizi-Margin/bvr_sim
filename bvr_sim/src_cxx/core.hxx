@@ -11,7 +11,11 @@ namespace bvr_sim {
 
 class SimCore {
 public:
-    SimCore(double dt = 0.4);
+    SimCore(
+        double dt,
+        const std::string& log_file_path,
+        const std::string& acmi_file_path
+    );
     ~SimCore();
 
     SimCore(const SimCore&) = delete;

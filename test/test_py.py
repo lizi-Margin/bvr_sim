@@ -12,21 +12,25 @@ def main():
     with open(os.path.join(get_root_dir(), "demo_config.json"), "r") as fin:
         env_config = json.load(fin)
 
-    sim = BVR3DEnv(env_config)
+    sim = BVR3DEnv(env_config, logdir="./test_logs/")
     obs, info = sim.reset(seed=None)
 
     mean_step_time = 0.0
     try:
-        while True:
+        episode_done = False
+        sim.enable_render(filepath="./test_logs/replay.acmi")
+        while not episode_done:
             t0 = time.time()
-            sim.step({})
+            obs, reward, done, info = sim.step({})
+            sim.render()
             t1 = time.time()
+            episode_done = info["episode_done"]
             mean_step_time = 0.9 * mean_step_time + 0.1 * (t1 - t0)
             print(f"fps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s")
     except KeyboardInterrupt:
         pass
     del sim
-    input("单局推演结束，按Enter退出。")
+    # input("单局推演结束，按Enter退出。")
 
 if __name__ == "__main__":
     main()

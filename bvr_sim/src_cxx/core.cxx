@@ -12,11 +12,11 @@
 
 namespace bvr_sim {
 
-SimCore::SimCore(double dt)
+SimCore::SimCore(double dt, const std::string& log_file_path, const std::string& acmi_file_path)
     : running_(false),
       paused_(false),
       should_exit_(false),
-      acmi_file_path_("./replay.acmi") 
+      acmi_file_path_(acmi_file_path) 
 {
     cfg::dt = dt;
     cfg::sim_time = 0.0;
@@ -25,7 +25,7 @@ SimCore::SimCore(double dt)
     register_trace();
 
     // init log
-    SL::get("bvr_sim.log", false);
+    SL::init_instance(log_file_path, false);
 
     // truncate acmi file
     truncate_acmi_file();

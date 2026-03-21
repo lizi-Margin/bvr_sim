@@ -8,3 +8,4 @@ __pycache__
 /.marscode
 /*.acmi
 /*.log
+/test_logs/

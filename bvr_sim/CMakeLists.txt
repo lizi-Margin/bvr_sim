@@ -21,11 +21,9 @@ endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     if (MSVC)
-        set(CMAKE_CXX_FLAGS_RELEASE
-            "/Zi /O2 /Ob2 /Oi /Ot /GL /fp:fast /arch:AVX2"
-        )
+        set(CMAKE_CXX_FLAGS_RELEASE "/Zi /O2 /Ob2 /Oi /Ot /GL /fp:fast /arch:AVX2 /wd4100")
     else ()
-        set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -march=native")
+        set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -march=native           -Wno-unused-parameter")
     endif()
 endif()
 

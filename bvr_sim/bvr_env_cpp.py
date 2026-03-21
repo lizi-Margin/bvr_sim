@@ -62,7 +62,12 @@ os.environ["JSBSIM_DEBUG"] = "0"
 class BVR3DEnvCpp:
     """BVR 3D environment adapter for C++ simulation core"""
 
-    def __init__(self, config: Dict, rl_index: list):
+    def __init__(
+      self, config: Dict,
+      rl_index: list,
+      log_file_path: str = "./bvr_sim.log",
+      acmi_file_path: str = "./replay.acmi"
+    ):
         self.config = config
         self.dt = config.get("dt", 0.4)
         self.cpp_steps = config.get('cpp_steps', 1)
@@ -71,7 +76,9 @@ class BVR3DEnvCpp:
             raise RuntimeError(
                 "Cannot start c++ SimCore, bvr_sim_cpp is not imported"
             )
-        self.core = bvr_sim_cpp.SimCore(dt=self.dt)
+        self.core = bvr_sim_cpp.SimCore(dt=self.dt,
+                                        log_file_path=log_file_path,
+                                        acmi_file_path=acmi_file_path)
 
         self.max_steps = config.get('max_steps', 1200)
 

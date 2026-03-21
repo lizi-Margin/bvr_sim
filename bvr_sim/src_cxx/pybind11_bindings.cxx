@@ -99,7 +99,7 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .export_values();
 
     py::class_<SimCore, std::shared_ptr<SimCore>>(m, "SimCore")
-        .def(py::init<double>(), py::arg("dt") = 0.4)
+        .def(py::init<double, const std::string&, const std::string&>(), py::arg("dt"), py::arg("log_file_path"), py::arg("acmi_file_path"))
         .def("start", &SimCore::start)
         .def("stop", &SimCore::stop)
         .def("pause", &SimCore::pause)

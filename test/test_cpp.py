@@ -12,15 +12,16 @@ def main():
     with open(os.path.join(get_root_dir(), "demo_config_cpp.jsonc"), "r") as fin:
         env_config = commentjson.load(fin)
 
-    sim = BVR3DEnvCpp(env_config, [])
+    os.makedirs("./test_logs/", exist_ok=True)
+    sim = BVR3DEnvCpp(env_config, [], log_file_path="./test_logs/bvr_sim.log", acmi_file_path="./test_logs/replay.acmi")
     obs, info = sim.reset(seed=None)
 
     
     try:
         turn = 0
         mean_step_time = 0.0
-        while turn < 1000:
-            sim.core.set_acmi_file_path(f"replay_{turn}.acmi")
+        while turn < 10:
+            sim.core.set_acmi_file_path(f"./test_logs/replay_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             i = 0
             episode_done = False
@@ -36,7 +37,7 @@ def main():
     except KeyboardInterrupt:
         pass
     del sim
-    input("推演结束，按Enter退出。")
+    # input("推演结束，按Enter退出。")
         
 
     

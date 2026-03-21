@@ -10,15 +10,25 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+#include "check.hxx"
 
-#define DISABLE 1
+// #define DISABLE 1
 
 class SL {
+private:
+    inline static SL* instance_ = nullptr;
+
 public:
-    static SL& get(const std::string& file_path = "log.txt", bool append = true)
+    static SL& init_instance(const std::string& file_path, bool append)
     {
-        static SL instance(file_path, append);
-        return instance;
+        instance_ = new SL(file_path, append);
+        return *instance_;
+    }
+
+    static SL& get()
+    {
+        check(instance_, "SL::get() before init_instance()");
+        return *instance_;
     }
 
     SL(const SL&) = delete;
@@ -31,7 +41,7 @@ public:
         }
     }
 
-    void print(const std::string& msg)
+    void print([[maybe_unused]] const std::string& msg)
     {
 #ifndef DISABLE
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -40,7 +50,7 @@ public:
 #endif
     }
 
-    void printf(const char* format, ...)
+    void printf([[maybe_unused]] const char* format, ...)
     {
 #ifndef DISABLE
         std::lock_guard<std::mutex> lock(m_mutex);

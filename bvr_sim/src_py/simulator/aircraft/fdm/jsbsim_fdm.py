@@ -36,7 +36,7 @@ class JSBSimFDM(BaseFDM):
 
     def __init__(self, dt: float = 0.1, **kwargs):
         super().__init__(dt, **kwargs)
-        self.JSBSim_dir: str = os.path.join(get_root_dir(), "..", "..", "..", 'src', 'simulator', 'aircraft', 'fdm', 'jsbsim')
+        self.JSBSim_dir: str = os.path.join(get_root_dir(), "..", "..", "..", "..", 'src_cxx', 'simulator', 'aircraft', 'fdm', 'jsbsim')
         self.aircraft_model: str = kwargs.get('aircraft_model', "F16").lower()
 
         self._jsbsim_exec: Union['jsbsim.FGFDMExec', None] = None
