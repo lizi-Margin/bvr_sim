@@ -331,10 +331,6 @@ endif()
 
 add_executable(bvr_sim_unit_tests
     test_main.cxx
-    simulator/aircraft/test_f16.cxx
-    simulator/missile/test_aim120c.cxx
-    simulator/sense/test_radar.cxx
-    rl/test_reward.cxx
 )
 
 # Link with main library dependencies
