@@ -1,7 +1,7 @@
 import json, time
 import numpy as np
 import os
-from ...bvr_env import BVR3DEnv
+from bvr_sim.bvr_env import BVR3DEnv
 
 def get_root_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))

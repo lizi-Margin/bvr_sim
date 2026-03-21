@@ -2,7 +2,7 @@
 import numpy as np
 from typing import Optional, TYPE_CHECKING
 from .base import GroundUnit, TeamColors
-from uhtk.c3utils.i3utils import nm_to_meters, get_mps, feet_to_meters
+from bvr_sim.uhtk.c3utils.i3utils import nm_to_meters, get_mps, feet_to_meters
 from .aa import AA
 if TYPE_CHECKING:
     from ..simulator import SimulatedObject

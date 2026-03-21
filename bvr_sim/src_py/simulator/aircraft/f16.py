@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple, TYPE_CHECKING, Type
 from ..simulator import TeamColors, NWU2LLA, velocity_to_euler
 from .base import Aircraft
 from .fdm import SimpleFDM
-# from uhtk.c3utils.i3utils import norm, feet_to_meters, nm_to_meters, Vector3, norm_pi
+# from bvr_sim.uhtk.c3utils.i3utils import norm, feet_to_meters, nm_to_meters, Vector3, norm_pi
 from ....performance import StepProfiler
 
 if TYPE_CHECKING:

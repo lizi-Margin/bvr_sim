@@ -15,7 +15,7 @@ swapped without changing the rest of the simulation.
 import os
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Tuple
-from uhtk.c3utils.i3utils import norm_pi, Vector3
+from bvr_sim.uhtk.c3utils.i3utils import norm_pi, Vector3
 import numpy as np
 
 class BaseFDM(ABC):

@@ -1,8 +1,8 @@
 import json
 import numpy as np
 import os
-from ...bvr_env import BVR3DEnv
-from ..agents.agent import Agent as RedAgent
+from bvr_sim.bvr_env import BVR3DEnv
+from bvr_sim.agents.agent import Agent as RedAgent
 
 # Load environment config
 with open("demo_config.json", "r") as fin:

@@ -8,7 +8,7 @@ Each component can be weighted independently for reward shaping.
 import numpy as np
 from typing import Dict, List, Any, TYPE_CHECKING
 from abc import ABC, abstractmethod
-from uhtk.c3utils.i3utils import nm_to_meters
+from bvr_sim.uhtk.c3utils.i3utils import nm_to_meters
 if TYPE_CHECKING:
     from ...bvr_env import BVR3DEnv
     from ..baseline_opponents.simple_opponents import BaseOpponent3D

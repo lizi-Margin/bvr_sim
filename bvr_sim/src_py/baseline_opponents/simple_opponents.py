@@ -2,7 +2,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from ..simulator import Aircraft, Missile
-from uhtk.c3utils.i3utils import feet_to_meters, nm_to_meters, Vector3
+from bvr_sim.uhtk.c3utils.i3utils import feet_to_meters, nm_to_meters, Vector3
 
 
 class BaseOpponent3D(ABC):

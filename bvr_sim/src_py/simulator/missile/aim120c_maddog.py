@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from ..simulator import TeamColors, NWU2LLA, velocity_to_euler
 from .base import Missile
 from collections import deque
-from uhtk.c3utils.i3utils import feet_to_meters, get_mps
+from bvr_sim.uhtk.c3utils.i3utils import feet_to_meters, get_mps
 if TYPE_CHECKING:
     from .base import Aircraft
     from ..data_obj import DataObj

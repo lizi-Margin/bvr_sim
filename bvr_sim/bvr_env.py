@@ -16,7 +16,7 @@ import gymnasium
 from gymnasium import spaces
 from typing import Dict, Any, List, Optional
 import os
-from uhtk.print_pack import *
+from bvr_sim.uhtk.print_pack import *
 
 from .src_py.simulator import (
     F16, AIM120C, Missile, Aircraft,

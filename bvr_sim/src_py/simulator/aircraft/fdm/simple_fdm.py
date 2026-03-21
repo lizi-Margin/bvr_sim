@@ -12,11 +12,11 @@ from typing import Dict, Any
 import numpy as np
 try:
     from .base import BaseFDM
-    from uhtk.c3utils.i3utils import norm, feet_to_meters
+    from bvr_sim.uhtk.c3utils.i3utils import norm, feet_to_meters
 except ImportError:
     # Handle direct import case
     from base import BaseFDM
-    # Simple fallback functions if uhtk is not available
+    # Simple fallback functions if bvr_sim.uhtk is not available
     def norm(value, lower_side, upper_side):
         return max(lower_side, min(upper_side, value))
 

@@ -2,8 +2,8 @@
 import math
 import numpy as np
 
-import uhtk.c3utils.i3utils as utils 
-from uhtk.c3utils.i3utils import norm, Vector3, feet_to_meters
+import bvr_sim.uhtk.c3utils.i3utils as utils 
+from bvr_sim.uhtk.c3utils.i3utils import norm, Vector3, feet_to_meters
 
 class SimpleScalarFilter:
     def __init__(self, alpha: float, initial_value: float = 0.0):

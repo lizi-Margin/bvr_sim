@@ -14,6 +14,7 @@ PRINT_DONE_REASON = False
 import importlib
 # I know this is ugly, but...
 try_list = [
+    "bvr_sim",
     "MISSION.bvr_sim",
     "harl.envs.bvr_sim",
     "offpolicy.envs.bvr_sim",
@@ -65,6 +66,11 @@ class BVR3DEnvCpp:
         self.config = config
         self.dt = config.get("dt", 0.4)
         self.cpp_steps = config.get('cpp_steps', 1)
+
+        if bvr_sim_cpp is None: 
+            raise RuntimeError(
+                "Cannot start c++ SimCore, bvr_sim_cpp is not imported"
+            )
         self.core = bvr_sim_cpp.SimCore(dt=self.dt)
 
         self.max_steps = config.get('max_steps', 1200)

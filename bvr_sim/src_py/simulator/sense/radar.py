@@ -9,7 +9,7 @@ import numpy as np
 from typing import TYPE_CHECKING, List, Dict
 from .base import SensorBase
 from ..data_obj import DataObj
-from uhtk.c3utils.i3utils import Vector3, norm
+from bvr_sim.uhtk.c3utils.i3utils import Vector3, norm
 
 if TYPE_CHECKING:
     from ..aircraft.base import Aircraft

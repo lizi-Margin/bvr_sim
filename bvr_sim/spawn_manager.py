@@ -5,7 +5,7 @@ Handles randomized spawn position generation for teams.
 """
 
 import numpy as np
-from uhtk.c3utils.i3utils import nm_to_meters
+from bvr_sim.uhtk.c3utils.i3utils import nm_to_meters
 
 
 class SpawnManager:

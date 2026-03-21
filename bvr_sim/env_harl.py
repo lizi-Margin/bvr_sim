@@ -7,7 +7,7 @@ import numpy as np
 import os, time
 from .src_py.observation_space import create_observation_space
 from .src_py.reward.reward_visualization import RewardVisualizer
-from uhtk.print_pack import print_blue
+from bvr_sim.uhtk.print_pack import print_blue
 
 
 scenario_config_dict = {
@@ -157,7 +157,7 @@ class BVRSimEnv:
         self.share_observation_space_simple = Box(low=-np.inf, high=np.inf, shape=(agent_obs_dim * self.n_each_team[self.interested_team],), dtype=np.float32)
 
         # Action converter for MultiDiscrete space
-        # from uhtk.spaces.xxx2D import MD2D
+        # from bvr_sim.uhtk.spaces.xxx2D import MD2D
         # self.action_converter = MD2D(self.action_space)
 
         self.reset_render()

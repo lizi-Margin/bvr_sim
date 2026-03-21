@@ -1,5 +1,5 @@
 import numpy as np
-from uhtk.c3utils.i3utils import get_mps
+from bvr_sim.uhtk.c3utils.i3utils import get_mps
 import math
 
 # --- Mach table and coefficient tables ---

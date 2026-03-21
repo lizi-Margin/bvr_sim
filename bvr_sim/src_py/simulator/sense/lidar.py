@@ -82,7 +82,7 @@ class PolarLiDAR:
         horizontal_range = np.linalg.norm(relative_position[:2])
         elevation_rad = np.arctan2(relative_up, horizontal_range)
 
-        from uhtk.c3utils.i3utils import meters_to_nm
+        from bvr_sim.uhtk.c3utils.i3utils import meters_to_nm
         range_nm = meters_to_nm(range_m)
 
         return np.degrees(relative_azimuth_rad), np.degrees(elevation_rad), range_nm
@@ -127,7 +127,7 @@ class PolarLiDAR:
 
             normalized_range = range_nm / self.max_range_nm
 
-            from uhtk.c3utils.i3utils import meters_to_feet
+            from bvr_sim.uhtk.c3utils.i3utils import meters_to_feet
             altitude_ft = meters_to_feet(data_obj.position[2])
             normalized_altitude = altitude_ft / 40000.0
 

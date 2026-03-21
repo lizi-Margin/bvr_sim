@@ -1,15 +1,15 @@
 import os, uuid
 import numpy as np
 from typing import List, Optional, Tuple, TYPE_CHECKING, Dict
-from uhtk.UTIL.colorful import print亮绿, print亮蓝, print_red, print_green
-from uhtk.imitation.utils import safe_dump_traj_pool
+from bvr_sim.uhtk.UTIL.colorful import print亮绿, print亮蓝, print_red, print_green
+from bvr_sim.uhtk.imitation.utils import safe_dump_traj_pool
 from .base import Aircraft
 
 
 
 class AircraftRecorder:
     def __init__(self, aircraft: Aircraft, traj_limit: int = 2000):
-        from uhtk.imitation.traj import trajectory
+        from bvr_sim.uhtk.imitation.traj import trajectory
         self.uid = aircraft.uid
         self.aircraft = aircraft
         self.traj = trajectory(traj_limit=traj_limit, env_id=0)

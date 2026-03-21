@@ -828,7 +828,7 @@ class EntityObsSpace(ObservationSpace):
         is_self: bool = False,
         is_missile: bool = False
     ) -> np.ndarray:
-        from uhtk.c3utils.i3utils import get_mach, meters_to_nm
+        from bvr_sim.uhtk.c3utils.i3utils import get_mach, meters_to_nm
 
         features = np.zeros(26, dtype=np.float32)
 
@@ -1019,7 +1019,7 @@ class TextObsSpace(ObservationSpace):
         is_self: bool = False,
         is_missile: bool = False
     ) -> np.ndarray:
-        from uhtk.c3utils.i3utils import get_mach, meters_to_nm
+        from bvr_sim.uhtk.c3utils.i3utils import get_mach, meters_to_nm
 
         features = np.zeros(26, dtype=np.float32)
 

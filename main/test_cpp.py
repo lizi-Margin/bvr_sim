@@ -1,7 +1,7 @@
 import json, time, commentjson
 import numpy as np
 import os
-from ..bvr_env_cpp import BVR3DEnvCpp
+from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
 
 def get_root_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))

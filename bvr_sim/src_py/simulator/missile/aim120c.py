@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from ..simulator import TeamColors, NWU2LLA, velocity_to_euler
 from .base import Missile
 from collections import deque
-from uhtk.c3utils.i3utils import feet_to_meters, get_mps, nm_to_meters, meters_to_nm, Vector3, norm_pi
+from bvr_sim.uhtk.c3utils.i3utils import feet_to_meters, get_mps, nm_to_meters, meters_to_nm, Vector3, norm_pi
 from .aim120c_adv_sim import air_density, compute_drag
 if TYPE_CHECKING:
     from ..simulator import SimulatedObject

@@ -191,7 +191,7 @@ class BVR3DWrapper(BaseEnv):
         self.action_space = self._env.action_space
 
         # Action converter for MultiDiscrete space
-        # from uhtk.spaces.xxx2D import MD2D
+        # from bvr_sim.uhtk.spaces.xxx2D import MD2D
         # self.action_converter = MD2D(self.action_space)
 
         self.reset_render()

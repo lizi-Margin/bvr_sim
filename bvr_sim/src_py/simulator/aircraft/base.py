@@ -3,7 +3,7 @@ import numpy as np
 from typing import List, Optional, Tuple, TYPE_CHECKING, Dict
 from abc import ABC, abstractmethod
 from ..simulator import SimulatedObject, TeamColors, NWU2LLA, velocity_to_euler
-from uhtk.c3utils.i3utils import norm_pi, Vector3
+from bvr_sim.uhtk.c3utils.i3utils import norm_pi, Vector3
 
 if TYPE_CHECKING:
     from ..missile.base import Missile

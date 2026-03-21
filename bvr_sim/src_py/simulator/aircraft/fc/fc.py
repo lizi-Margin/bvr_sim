@@ -1,6 +1,6 @@
 import math
 from typing import Tuple
-from uhtk.c3utils.i3utils import norm, Vector3, get_mps
+from bvr_sim.uhtk.c3utils.i3utils import norm, Vector3, get_mps
 
 
 class StdFlightController:

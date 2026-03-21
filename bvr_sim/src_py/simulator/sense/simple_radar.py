@@ -2,7 +2,7 @@ import numpy as np
 from typing import TYPE_CHECKING, Dict
 from .base import SensorBase
 from ..data_obj import DataObj
-from uhtk.c3utils.i3utils import norm_pi, meters_to_nm
+from bvr_sim.uhtk.c3utils.i3utils import norm_pi, meters_to_nm
 
 if TYPE_CHECKING:
     from ..aircraft.base import Aircraft

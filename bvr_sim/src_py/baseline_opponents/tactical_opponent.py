@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 from ..simulator import Aircraft, Missile
 from .simple_opponents import BaseOpponent3D
-from uhtk.c3utils.i3utils import nm_to_meters, meters_to_nm, get_mps, feet_to_meters
+from bvr_sim.uhtk.c3utils.i3utils import nm_to_meters, meters_to_nm, get_mps, feet_to_meters
 
 class TacticalOpponent3D(BaseOpponent3D):
     """

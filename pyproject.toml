@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bvr-sim"
+version = "0.1.0"
+description = "3D Beyond Visual Range (BVR) air combat environment for multi-agent reinforcement learning"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy",
+    "scipy",
+    "gymnasium",
+    "gym",
+    "opencv-python",
+    "commentjson",
+    "tqdm",
+    "colorama",
+    "JSBSim==1.1.14"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.setuptools]
+packages = ["bvr_sim"]
+
+[tool.setuptools.package-data]
+bvr_sim = ["**/*.py", "**/*.json", "**/*.jsonc"]

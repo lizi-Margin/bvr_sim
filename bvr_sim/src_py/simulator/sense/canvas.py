@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 from typing import Dict, Tuple, TYPE_CHECKING
-from uhtk.c3utils.i3utils import feet_to_meters, meters_to_feet, nm_to_meters, meters_to_nm
+from bvr_sim.uhtk.c3utils.i3utils import feet_to_meters, meters_to_feet, nm_to_meters, meters_to_nm
 
 if TYPE_CHECKING:
     from ..data_obj import DataObj

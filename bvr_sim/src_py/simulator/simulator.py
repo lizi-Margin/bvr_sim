@@ -2,10 +2,10 @@ import uuid
 import numpy as np
 from typing import List, Optional, Tuple, TYPE_CHECKING
 from abc import ABC, abstractmethod
-# from uhtk.c3utils.i3utils import NWU_to_LLA_deg, LLA_to_NWU_deg
-from uhtk.c3utils.i3utils import NWU_to_LLA_deg_lowacc as NWU_to_LLA_deg, LLA_to_NWU_deg_lowacc as LLA_to_NWU_deg
-from uhtk.c3utils.i3utils import get_mach
-from uhtk.c3utils.i3utils import velocity_to_euler_NWU
+# from bvr_sim.uhtk.c3utils.i3utils import NWU_to_LLA_deg, LLA_to_NWU_deg
+from bvr_sim.uhtk.c3utils.i3utils import NWU_to_LLA_deg_lowacc as NWU_to_LLA_deg, LLA_to_NWU_deg_lowacc as LLA_to_NWU_deg
+from bvr_sim.uhtk.c3utils.i3utils import get_mach
+from bvr_sim.uhtk.c3utils.i3utils import velocity_to_euler_NWU
 
 if TYPE_CHECKING:
     from typing import Literal
