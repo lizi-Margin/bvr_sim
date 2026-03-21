@@ -103,8 +103,9 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
     auto it = kwargs.find("aircraft_model");
     if (it != kwargs.end()) {
         aircraft_model = it->second;
+        // 转换为大写以匹配FlightControllerParamsManager的keys
         for (auto& c : aircraft_model) {
-            c = std::tolower(c);
+            c = std::toupper(c);
         }
     }
 
@@ -113,7 +114,7 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
         jsbsim_inner_dt = this->dt / jsbsim_inner_steps;
     }
 
-    fc = StdFlightController(jsbsim_inner_dt);
+    fc = StdFlightController(jsbsim_inner_dt, aircraft_model);
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
 }
 
