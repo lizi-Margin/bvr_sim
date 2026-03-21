@@ -83,7 +83,6 @@ namespace Catalog {
 
 class JSBSimFDM : public BaseFDM {
 private:
-    std::string JSBSim_dir;
     std::string aircraft_model;
 
     std::unique_ptr<JSBSim::FGFDMExec> jsbsim_exec;

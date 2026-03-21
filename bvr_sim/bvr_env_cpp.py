@@ -55,9 +55,8 @@ if not _import_success:
 #                 pass
 # import MISSION.bvr_sim.install.bvr_sim_cpp_native as bvr_sim_cpp
 
-# set jsbsim debug level to mute the debug log
-# the cpp code will also set this
 os.environ["JSBSIM_DEBUG"] = "0"
+os.environ["JSBSIM_DIR"] = os.path.join(os.path.dirname(__file__), "src_cxx/simulator/aircraft/fdm/jsbsim/")
 
 class BVR3DEnvCpp:
     """BVR 3D environment adapter for C++ simulation core"""

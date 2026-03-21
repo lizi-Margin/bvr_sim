@@ -14,6 +14,7 @@
 #include <any>
 #include <stdlib.h>
 #include <string>
+#include <filesystem>
 
 
 namespace bvr_sim {
@@ -84,7 +85,6 @@ static std::string get_root_dir() noexcept {
 
 JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs) noexcept
     : BaseFDM(dt),
-      JSBSim_dir(get_root_dir() + "/jsbsim"),
       aircraft_model("f16"),
       jsbsim_exec(nullptr),
       initialized(false),
@@ -114,11 +114,11 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
     }
 
     fc = StdFlightController(jsbsim_inner_dt);
-    set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in COT
+    set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
 }
 
 void JSBSimFDM::initialize_jsbsim() noexcept {
-    set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in COT
+    set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
 
     if (jsbsim_exec != nullptr) {
         jsbsim_exec->ResetToInitialConditions(0x2);
@@ -129,6 +129,22 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         const static std::string AircraftPath = "aircraft";
         const static std::string EnginePath = "engine";
         const static std::string SystemsPath = "systems";
+
+        std::filesystem::path JSBSim_dir = get_root_dir() + "/jsbsim";
+        // check if it exists
+        if (!std::filesystem::exists(JSBSim_dir) || !std::filesystem::is_directory(JSBSim_dir)) {
+            //get env variable JSBSIM_DIR
+            const char* env_p = std::getenv("JSBSIM_DIR");
+            if (env_p != nullptr)
+            {
+                JSBSim_dir = std::filesystem::path(env_p);
+            }
+            else
+            {
+                SL::get().print("Error: JSBSIM_DIR environment variable is not set.");
+                return;
+            }
+        }
 
         jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
         jsbsim_exec->SetDebugLevel(jsb_debug_level);

@@ -14,7 +14,7 @@ BVR Sim currently has smoke tests (`test_py.py`, `test_cpp.py`) that validate en
 - Tests C++ modules **in isolation** (physics, missile guidance, sensors, rewards)
 - Uses **Python bindings** to invoke C++ code (validates actual interface)
 - Compiles to a **single unified executable** with custom lightweight testing framework
-- Runs via **Python orchestrator script** in `/test/run_unit_tests.py`
+- Runs via **Python orchestrator script** in `/tests/run_unit_tests.py`
 
 **Key principle:** Tests live **colocated with source code** (e.g., `src_cxx/simulator/aircraft/test_f16.cxx` next to `f16.cxx`), following source tree conventions.
 
@@ -28,7 +28,7 @@ BVR Sim currently has smoke tests (`test_py.py`, `test_cpp.py`) that validate en
 bvr_sim/
 ├── docs/superpowers/specs/
 │   └── 2026-03-21-cpp-unit-test-system-design.md    (this file)
-├── test/
+├── tests/
 │   ├── test_py.py                                     (existing smoke test)
 │   ├── test_cpp.py                                    (existing smoke test)
 │   └── run_unit_tests.py                              (NEW: orchestrator)
@@ -178,7 +178,7 @@ TEST(F16, PitchControlIncreasesPitchRate) {
 
 ## 4. Python Orchestration
 
-**File:** `test/run_unit_tests.py`
+**File:** `tests/run_unit_tests.py`
 
 Simple wrapper that:
 1. Locates compiled exe
@@ -219,9 +219,9 @@ if __name__ == "__main__":
 **Usage:**
 ```bash
 # From repo root
-python test/run_unit_tests.py          # Run C++ unit tests
-python test/test_py.py                 # Run Python smoke test
-python test/test_cpp.py                # Run C++ smoke test
+python tests/run_unit_tests.py          # Run C++ unit tests
+python tests/test_py.py                 # Run Python smoke test
+python tests/test_cpp.py                # Run C++ smoke test
 ```
 
 ---
@@ -246,7 +246,7 @@ python test/test_cpp.py                # Run C++ smoke test
    }
    ```
 3. Rebuild: `bash build_linux.sh` or `build_windows.bat`
-4. Run: `python test/run_unit_tests.py`
+4. Run: `python tests/run_unit_tests.py`
 
 ### 5.2 Interpreting Test Output
 
@@ -323,8 +323,8 @@ Phase 2 (not in this design):
 | **Test location** | Colocated with source (`src_cxx/.../test_*.cxx`) |
 | **Framework** | Custom lightweight (no external deps) |
 | **Exe** | Single unified (`bvr_sim_unit_tests.exe`) |
-| **Orchestration** | Python script in `/test/run_unit_tests.py` |
-| **Invocation** | `python test/run_unit_tests.py` |
+| **Orchestration** | Python script in `/tests/run_unit_tests.py` |
+| **Invocation** | `python tests/run_unit_tests.py` |
 | **Phase 1 coverage** | Physics, missiles, sensors, rewards |
 | **Runtime** | <1 second |
 | **Exit code** | 0 = pass, 1 = fail |
