@@ -44,7 +44,7 @@
     "ground_units": {},
     "field_size": 100000.0,
     "obs_type": "text",
-    "blue_opponent_type": "tactical",
+    "blue_opponent_type": "tactical_random",
     "reward_config": {
         "engage_enemy_weight": 0.15,
         "enemy_distance_weight": 0.15,

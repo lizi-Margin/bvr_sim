@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <random>
 
 namespace bvr_sim {
 
@@ -24,8 +25,10 @@ private:
     EvadeTactic evade_tactic;
 public:
     void randomize_tactic() noexcept {
-        int tactic_num = rand() % static_cast<int>(EvadeTactic::EvadeTacticMax);
-        evade_tactic = static_cast<EvadeTactic>(tactic_num);
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution<int> dist(0, static_cast<int>(EvadeTactic::EvadeTacticMax) - 1);;
+        evade_tactic = static_cast<EvadeTactic>(dist(gen));
     }
 
 public:

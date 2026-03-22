@@ -8,11 +8,9 @@ namespace bvr_sim {
 FlightControllerParamsManager* FlightControllerParamsManager::instance_ = nullptr;
 
 FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
-    FlightControllerParams f16_params = FlightControllerParams::get_f16_params();
-  
-    params_map_["F16"] = f16_params;
-    params_map_["F15"] = f16_params;
-    params_map_["F18"] = f16_params;
+    params_map_["F16"] = FlightControllerParams::get_f16_params();
+    params_map_["F15"] = FlightControllerParams::get_f16_params();
+    params_map_["F18"] = FlightControllerParams::get_f18_params();
 }
 
 FlightControllerParamsManager& FlightControllerParamsManager::getInstance() noexcept {

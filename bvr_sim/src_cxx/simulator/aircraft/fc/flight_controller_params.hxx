@@ -58,6 +58,33 @@ struct FlightControllerParams {
 
         return f16_params;
     }
+
+    static FlightControllerParams get_f18_params() noexcept {
+        FlightControllerParams f18_params;
+
+        f18_params.kroll_p = 1.2;
+        f18_params.kroll_i = 0.2;
+        f18_params.kroll_d = 0.0;
+        f18_params.kpitch_p = -3.4;
+        f18_params.kpitch_i = -0.0;
+        f18_params.kpitch_d = -0.5;
+
+        f18_params.kthrottle_p = 0.03;
+        f18_params.kthrottle_i = 0.06;
+        f18_params.kthrottle_d = 500;
+
+        f18_params.crash_height_threshold_B = c3u::feet_to_meters(4000.0); 
+        f18_params.severe_crash_height = c3u::feet_to_meters(2000.0); 
+        f18_params.crash_height_threshold_A = c3u::feet_to_meters(800.0);    
+        f18_params.pi_decay_start = 11000.0;       
+        f18_params.pitch_pi_decay_end = 20000.0; 
+        f18_params.roll_pi_decay_end = 16000.0;    
+
+        f18_params.minimum_speed_B = 0.18;
+        f18_params.maximum_speed_A = 0.5;
+
+        return f18_params;
+    }
 };
 
 class FlightControllerParamsManager {
@@ -65,19 +92,12 @@ private:
     static FlightControllerParamsManager* instance_;
     std::map<std::string, FlightControllerParams> params_map_;
 
-    // 私有构造，初始化所有预设
     FlightControllerParamsManager() noexcept;
 
 public:
-    // 禁用拷贝
     FlightControllerParamsManager(const FlightControllerParamsManager&) = delete;
     FlightControllerParamsManager& operator=(const FlightControllerParamsManager&) = delete;
-
-    // 获取单例
     static FlightControllerParamsManager& getInstance() noexcept;
-
-    // 根据飞机key获取参数
-    // 如果key不存在，会触发 check(false, "wrong aircraft key")
     const FlightControllerParams& getParams(const std::string& aircraft_key) const noexcept;
 };
 

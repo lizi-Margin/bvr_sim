@@ -9,7 +9,7 @@ from .performance import StepProfiler
 
 
 PRINT_STEP_TIME = False
-PRINT_DONE_REASON = False
+PRINT_DONE_REASON = True
 
 
 import importlib
@@ -384,21 +384,26 @@ class BVR3DEnvCpp:
         red_alive = self.red_ids.__len__()
         blue_alive = self.blue_ids.__len__()
 
-        dones = self._get_dones()
-        # RL_controlled_all_dead = bool(np.all(list(dones.values()), axis=None))
-        RL_controlled_all_dead = False
-        time_limit_reached = self.current_step >= self.max_steps
-        episode_done = self.rl_manager.get_episode_done() or RL_controlled_all_dead or time_limit_reached
-
+        
+        dones = {}
         for uid in self.red_ids:
             this_done = self.rl_manager.get_done(uid)
             if this_done:
                 red_alive -= 1
+            if uid in self.ego_ids:
+                dones[uid] = this_done
 
         for uid in self.blue_ids:
             this_done = self.rl_manager.get_done(uid)
             if this_done:
                 blue_alive -= 1
+            if uid in self.ego_ids:
+                dones[uid] = this_done
+
+        RL_controlled_all_dead = bool(np.all(list(dones.values()), axis=None)) if len(dones) > 0 else False
+        # RL_controlled_all_dead = False
+        time_limit_reached = self.current_step >= self.max_steps
+        episode_done = self.rl_manager.get_episode_done() or RL_controlled_all_dead or time_limit_reached
         
         if episode_done:
             dones = {uid: True for uid in self.ego_ids}
@@ -407,7 +412,7 @@ class BVR3DEnvCpp:
             if RL_controlled_all_dead:
                 print(f"\nepsiode done, done reason = RL_controlled_all_dead, red_alive = {red_alive}, blue_alive = {blue_alive}")
             elif time_limit_reached:
-                print(f"\nepsiode done, done reason = time_limit_reached, red_alive = {red_alive}, blue_alive = {blue_alive}")
+                print(f"\nepsiode done, done reason = time_limit_reached({self.current_step}/{self.max_steps}), red_alive = {red_alive}, blue_alive = {blue_alive}")
             else:
                 print(f"\nepsiode done, done reason = (cpp), red_alive = {red_alive}, blue_alive = {blue_alive}")
 
