@@ -364,9 +364,9 @@ public:
   void SetLineNumber(int line) { line_number = line; }
 
   /** Set the name of the file in which the element has been read.
-   *  @param name file name
+   *  @param name_ file name
    */
-  void SetFileName(const std::string& name) { file_name = name; }
+  void SetFileName(const std::string& name_) { file_name = name_; }
 
   /** Return a string that contains a description of the location where the
    *  current XML element was read from.

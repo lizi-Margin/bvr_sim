@@ -104,6 +104,7 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
                 SL::get().print("[UnitFactory] start create fighter shared ptr with uid: " + uid);
                 auto fighter = std::make_shared<Fighter>(
                     uid,
+                    unit_spec,
                     color,
                     position,
                     velocity,

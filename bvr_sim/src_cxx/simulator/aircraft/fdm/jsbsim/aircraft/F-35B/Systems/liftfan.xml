@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<!-- # ENGINE system for F-35 #
+     # by Gijs de Rooy		  # -->
+
+<system name="liftfan">
+    
+    <channel name="engine">
+
+        <switch name="fcs/liftfan-throttle">
+          <default value="0"/>
+            <test  logic="AND" value="/controls/engines/engine[0]/throttle">
+                /orientation/pitch-deg LT 1
+            </test>
+		<output>/controls/engines/engine[1]/throttle</output>
+       </switch>
+
+    </channel>
+
+</system>

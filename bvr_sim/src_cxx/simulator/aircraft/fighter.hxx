@@ -25,6 +25,7 @@ public:
 public:
     Fighter(
         const std::string& uid_,
+        const std::string& model_,
         TeamColor color_,
         const std::array<double, 3>& position_,
         const std::array<double, 3>& velocity_,

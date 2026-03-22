@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string>
 #include <filesystem>
+#include <algorithm>
 
 
 namespace bvr_sim {
@@ -85,40 +86,36 @@ static std::string get_root_dir() noexcept {
 
 JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs) noexcept
     : BaseFDM(dt),
-      aircraft_model("f16"),
+      aircraft_model("F16"),
       jsbsim_exec(nullptr),
       initialized(false),
       jsbsim_dt_max(0.025),
       jsbsim_inner_dt(dt),
       jsbsim_inner_steps(1),
-      fc(dt),
+      fc(dt, aircraft_model),
       fc_delta_heading_filter({0.05, 0.0}),
       fc_delta_pitch_filter({0.05, 0.0}),
       mach(0.0),
       delta_heading(0.0),
       delta_pitch(0.0),
       fix_vec(std::array<double, 3>{1.0, 0.0, 0.0}),
-      _nav_point_uuid(SimulatedObject::get_new_uuid()) {
-
+      _nav_point_uuid(SimulatedObject::get_new_uuid())
+{
     auto it = kwargs.find("aircraft_model");
     if (it != kwargs.end()) {
         aircraft_model = it->second;
-        for (auto& c : aircraft_model) {
-            c = std::tolower(c);
-        }
+        fc = StdFlightController(jsbsim_inner_dt, aircraft_model);
     }
 
     if (this->dt > jsbsim_dt_max) {
         jsbsim_inner_steps = static_cast<int>(this->dt / jsbsim_dt_max) + 1;
         jsbsim_inner_dt = this->dt / jsbsim_inner_steps;
     }
-
-    fc = StdFlightController(jsbsim_inner_dt, it->second);
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
 }
 
 void JSBSimFDM::initialize_jsbsim() noexcept {
-    set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
+    set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));
 
     if (jsbsim_exec != nullptr) {
         jsbsim_exec->ResetToInitialConditions(0x2);
@@ -146,9 +143,14 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
             }
         }
 
+        std::string jsbsim_aircraft_model = aircraft_model;
+        std::transform(
+            jsbsim_aircraft_model.begin(), jsbsim_aircraft_model.end(),
+            jsbsim_aircraft_model.begin(), [](unsigned char c){ return std::tolower(c); }
+        );
         jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
         jsbsim_exec->SetDebugLevel(jsb_debug_level);
-        jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), aircraft_model, true);
+        jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), jsbsim_aircraft_model, true);
 
         std::string props = jsbsim_exec->QueryPropertyCatalog("");
         std::vector<std::string> prop_list;

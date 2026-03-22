@@ -18,13 +18,14 @@ const static std::string AGM_SPEC = "JSOW";
 
 Fighter::Fighter(
     const std::string& uid_,
+    const std::string& model_,
     TeamColor color_,
     const std::array<double, 3>& position_,
     const std::array<double, 3>& velocity_,
     double dt_,
     const std::string& fdm_type
 ) noexcept
-    : Aircraft(uid_, "F16", color_, position_, velocity_, dt_),
+    : Aircraft(uid_, model_, color_, position_, velocity_, dt_),
       _t(0.0),
       min_shoot_interval(5.0),
       last_shoot_time(-100.0) {
@@ -50,7 +51,7 @@ void Fighter::initialize_fdm(const std::string& fdm_type) noexcept {
         kwargs["aircraft_model"] = aircraft_model;
         fdm = std::make_unique<JSBSimFDM>(dt, kwargs);
     } else {
-        std::cerr << "Warning: Unknown FDM type '" << fdm_type << "', defaulting to SimpleFDM" << std::endl;
+        colorful::printHONG("Warning: Unknown FDM type '" + fdm_type + "', defaulting to SimpleFDM");
         fdm = std::make_unique<SimpleFDM>(dt);
     }
 }
