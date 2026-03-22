@@ -232,7 +232,7 @@
                 <z> 5.0 </z>
             </location>
             <capacity unit="LBS"> 3486 </capacity>
-            <contents unit="LBS"> 1500 </contents>
+            <contents unit="LBS"> 3486 </contents>
         </tank>
         <tank type="FUEL">    <!-- Tank number 1 -->
             <location unit="IN">
@@ -241,7 +241,7 @@
                 <z> 5.0 </z>
             </location>
             <capacity unit="LBS"> 3486 </capacity>
-            <contents unit="LBS"> 1500 </contents>
+            <contents unit="LBS"> 3486 </contents>
         </tank>
         <tank type="FUEL">    <!-- External Tank number 0  (station 4) -->
             <location unit="IN">

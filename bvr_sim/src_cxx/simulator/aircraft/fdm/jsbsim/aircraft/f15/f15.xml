@@ -246,7 +246,7 @@
                 <z> 4.5 </z>
             </location>
             <capacity unit="LBS"> 6561.5 </capacity>
-            <contents unit="LBS"> 2500 </contents>
+            <contents unit="LBS"> 6561.5 </contents>
         </tank>
         <tank type="FUEL">    <!-- Tank number 1 -->
             <location unit="IN">
@@ -255,7 +255,7 @@
                 <z> 4.5 </z>
             </location>
             <capacity unit="LBS"> 6561.5 </capacity>
-            <contents unit="LBS"> 2500 </contents>
+            <contents unit="LBS"> 6561.5 </contents>
         </tank>
     </propulsion>
     <flight_control name="FCS: f15">
