@@ -37,6 +37,38 @@
                 "L03": "AIM-120C7"
             },
             "opponent_type": "tactical_random"
+        },
+        "A03": {
+            "unit_spec": "F4N",
+            "color": "Red",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7"
+            },
+            "opponent_type": "tactical_random"
+        },
+        "A04": {
+            "unit_spec": "F22",
+            "color": "Red",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7"
+            },
+            "opponent_type": "tactical_random"
         }
     },
     "blue_meta": {

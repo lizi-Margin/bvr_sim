@@ -4,6 +4,7 @@
 #include "missile_aerodynamics.hxx"
 #include <deque>
 #include <optional>
+#include "rubbish_can/interp_table.hxx"
 
 namespace bvr_sim {
 
@@ -85,6 +86,17 @@ private:
     std::optional<double> _dbeta_filtered;
 
     std::array<double, 3> _before_loss_real_last_known_target_pos;
+
+public:
+    const InterpTable alpha_est_mach_table{
+        {0.8, 1.0, 1.3, 1.6, 2.0 , 4.0},
+        {3.0, 2.0, 1.3, 1.1, 0.8, 0.5}
+    };
+
+    // const InterpTable alpha_est_angle_table{
+    //     {c3u::deg2rad(0.0), c3u::deg2rad(3.0), c3u::deg2rad(5.0), c3u::deg2rad(8.0), c3u::deg2rad(10.0)},
+    //     {1.0,               1.2,               1.5,               2.0,               3.0}
+    // };
 
 public:
     AIM120C(

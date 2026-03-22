@@ -23,8 +23,8 @@ bool CrashingCounter::update(bool crashing) noexcept {
     return timer < max_time;
 }
 
-StdFlightController::StdFlightController(double dt, const std::string& aircraft_model) noexcept
-    : dt(dt),
+StdFlightController::StdFlightController(double dt, const std::string& aircraft_model_) noexcept
+    : dt(dt), aircraft_model(aircraft_model_),
       sum_err_roll(0), last_err_roll(0),
       sum_err_pitch(0), last_err_pitch(0),
       sum_err_throttle(0), last_err_throttle(0),
@@ -33,7 +33,7 @@ StdFlightController::StdFlightController(double dt, const std::string& aircraft_
 
     // 从Manager获取参数
     auto& manager = FlightControllerParamsManager::getInstance();
-    params_ = manager.getParams(aircraft_model);
+    params_ = manager.getParams(aircraft_model_);
 
     // 设置PID系数
     kroll_p_ = params_.kroll_p;
@@ -227,6 +227,16 @@ std::array<double, 4> StdFlightController::direct_LU_flight_controler(
         action[3] = 0;
     }
 
+
+    if (action[1] > std::abs(params_.pitch_push_down_cutoff)) {
+        action[1] = std::abs(params_.pitch_push_down_cutoff);
+    }
+
+    // action[0] = 0;
+    // action[1] = 0;
+    // if (aircraft_model == "F18") {
+    //     std::cout << action[0] << " " << action[1] << " " << action[2] << " " << action[3] << std::endl;
+    // }
     return norm_fc_output(action);
 }
 

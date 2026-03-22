@@ -278,9 +278,7 @@ void TacticalOpponent3D::guide_missiles(
     double crank_offset = c3u::deg2rad(30.0) * crank_direction;
     double desired_heading = target_heading + crank_offset;
 
-    // Switch crank direction periodically
-    // Convert 20 seconds to steps based on agent's dt
-    if (time_counter - crank_switch_time > static_cast<int>(30.0 / agent->dt)) {
+    if ((time_counter - crank_switch_time) * cfg::dt > 30.0) {
         crank_direction *= -1;
         crank_switch_time = time_counter;
     }

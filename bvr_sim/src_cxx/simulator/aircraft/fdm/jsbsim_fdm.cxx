@@ -16,7 +16,7 @@
 #include <string>
 #include <filesystem>
 #include <algorithm>
-
+#include "FGFCS.h"
 
 namespace bvr_sim {
 
@@ -63,9 +63,12 @@ namespace Catalog {
 
     Property fcs_aileron_cmd_norm("fcs/aileron-cmd-norm", "", -1, 1);
     Property fcs_elevator_cmd_norm("fcs/elevator-cmd-norm", "", -1, 1);
+    // Property fcs_g_load_command("fcs/g-load-command", "", -2.0, 8.0);
     Property fcs_rudder_cmd_norm("fcs/rudder-cmd-norm", "", -1, 1);
     Property fcs_throttle_cmd_norm("fcs/throttle-cmd-norm", "", 0, 1.0);
     Property fcs_mixture_cmd_norm("fcs/mixture-cmd-norm", "", 0, 1);
+
+    Property propulsion_set_running("propulsion/set-running", "", -1.0, 10.0, "W", false);
 
     void add_jsbsim_props(const std::vector<std::string>& props) noexcept {
         // for (const std::string& prop : props) {
@@ -143,14 +146,23 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
             }
         }
 
-        std::string jsbsim_aircraft_model = aircraft_model;
-        std::transform(
-            jsbsim_aircraft_model.begin(), jsbsim_aircraft_model.end(),
-            jsbsim_aircraft_model.begin(), [](unsigned char c){ return std::tolower(c); }
-        );
+        // std::string jsbsim_aircraft_model = aircraft_model;
+        // std::transform(
+        //     jsbsim_aircraft_model.begin(), jsbsim_aircraft_model.end(),
+        //     jsbsim_aircraft_model.begin(), [](unsigned char c){ return std::tolower(c); }
+        // );
+        const static std::map<std::string, std::string> jsbsim_model_mapping = {
+            {"F16", "f16"},
+            {"F15", "f15"},
+            {"F18", "f18"},
+            {"F4N", "F4N"},
+            {"AJ37", "AJ37"},
+            {"JA37", "JA37"},
+            {"F22", "f22"},
+        };
         jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
         jsbsim_exec->SetDebugLevel(jsb_debug_level);
-        jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), jsbsim_aircraft_model, true);
+        jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), jsbsim_model_mapping.at(aircraft_model), true);
 
         std::string props = jsbsim_exec->QueryPropertyCatalog("");
         std::vector<std::string> prop_list;
@@ -255,6 +267,11 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
 
     auto propulsion = jsbsim_exec->GetPropulsion();
     int n_engines = propulsion->GetNumEngines();
+
+    // set_property_value(Catalog::propulsion_set_running, -1.0);
+    // for (int i = 0; i < n_engines; ++i) {
+    //     jsbsim_exec->SetPropertyValue("propulsion/engine[" + std::to_string(i) + "]/set-running", 1.0);   
+    // }
     for (int i = 0; i < n_engines; ++i) {
         propulsion->GetEngine(i)->InitRunning();
     }
@@ -399,6 +416,11 @@ void JSBSimFDM::set_jsbsim_controls(const std::array<double, 4>& controls) noexc
     set_property_value(Catalog::fcs_rudder_cmd_norm, controls[2]);
     set_property_value(Catalog::fcs_throttle_cmd_norm, controls[3]);
     set_property_value(Catalog::fcs_mixture_cmd_norm, controls[3]);
+    auto propulsion = jsbsim_exec->GetPropulsion();
+    int n_engines = propulsion->GetNumEngines();
+    for (int i = 0; i < n_engines; ++i) {
+        jsbsim_exec->SetPropertyValue("fcs/throttle-cmd-norm[" + std::to_string(i) + "]", controls[3]);   
+    }
 }
 
 void JSBSimFDM::set_jsbsim_initial_conditions(double lon, double lat, double alt,

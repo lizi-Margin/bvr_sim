@@ -78,6 +78,8 @@ namespace Catalog {
     extern Property fcs_throttle_cmd_norm;
     extern Property fcs_mixture_cmd_norm;
 
+    extern Property propulsion_set_running;
+
     void add_jsbsim_props(const std::vector<std::string>& props) noexcept;
 }
 

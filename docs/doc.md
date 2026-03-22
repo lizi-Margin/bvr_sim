@@ -11,7 +11,7 @@
 | **General Motion Model**| × | √ | √ | × | × | × | × |
 | **BVRGym**              | √ | √ | √ | × | × | × | √ |
 | **LAG (Light Air Game)**| √ | √ | × | × | × | × | × |
-| **BVR Sim (Ours)**             | √ | √ | √ | √ | √ | √ | √ |
+| **BVR Sim (Ours)**      | √ | √ | √ | √ | √ | √ | √ |
 
 
 ### 其他特点

@@ -9,3 +9,5 @@ __pycache__
 /*.acmi
 /*.log
 /test_logs/
+/.vscode
+/docs

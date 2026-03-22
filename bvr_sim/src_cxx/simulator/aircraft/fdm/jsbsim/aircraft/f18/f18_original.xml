@@ -268,8 +268,8 @@
 
         <property>fcs/alpha-norm</property>
 
-        <!-- <channel name="Pitch">
-            <summer name="fcs/elevator-cmd-limiter">
+        <channel name="Pitch">
+            <summer name="elevator cmd limiter">
                 <input>fcs/elevator-cmd-norm</input>
                 <input>fcs/pitch-trim-cmd-norm</input>
                 <bias>-0.1</bias>
@@ -279,33 +279,33 @@
                 </clipto>
             </summer>
 
-            <pure_gain name="fcs/g-load-norm">
+            <pure_gain name="g load norm">
                 <input>-accelerations/n-pilot-z-norm</input>
                 <gain>0.125</gain>
             </pure_gain>
 
-            <pure_gain name="fcs/alpha-limiter">
+            <pure_gain name="alpha limiter">
                 <input>aero/alpha-rad</input>
                 <gain>1.0472</gain>
             </pure_gain>
 
-            <summer name="fcs/g-load-error">
+            <summer name="g load error">
                 <input>fcs/elevator-cmd-limiter</input>
                 <input>fcs/g-load-norm</input>
                 <input>fcs/alpha-limiter</input>
             </summer>
 
-            <pure_gain name="fcs/g-load-p">
+            <pure_gain name="g load p">
                 <input>fcs/g-load-error</input>
                 <gain>0.66</gain>
             </pure_gain>
 
-            <integrator name="fcs/g-load-i">
+            <integrator name="g load i">
                 <input>fcs/g-load-error</input>
                 <c1>0.005</c1>
             </integrator>
 
-            <lead_lag_filter name="fcs/g-load-d">
+            <lead_lag_filter name="g load d">
                 <input>fcs/g-load-error</input>
                 <c1>-0.000125</c1>
                 <c2>0.0</c2>
@@ -313,7 +313,7 @@
                 <c4>1</c4>
             </lead_lag_filter>
 
-            <summer name="fcs/g-load-command">
+            <summer name="g load command">
                 <input>fcs/g-load-p</input>
                 <input>fcs/g-load-i</input>
                 <input>fcs/g-load-d</input>
@@ -333,194 +333,9 @@
                 <output>fcs/elevator-pos-rad</output>
             </aerosurface_scale>
 
-        </channel> -->
-
-
-        <property>fcs/fbw-override</property>
-
-        <channel name="Pitch">
-        <!--
-            - accelerations/n-pilot-z-norm has the disadvantage that it
-            - has an offset of 1G when positioned horizontal (and -1G
-            - when upside down). To calculate the difference between the
-            - commanded pitch-rate and actual pitch-rate this offset has
-            - to be eliminated. The following function calculates an offset
-            - to compensate for the earth's gravity.
-            -->
-        <fcs_function name="fcs/n-pilot-z-correction">
-            <function>
-            <product>
-            <cos><property>attitude/pitch-rad</property></cos>
-            <cos><property>attitude/roll-rad</property></cos>
-            </product>
-            </function>
-        </fcs_function>
-
-        <summer name="fcs/g-load-corrected">
-            <input>accelerations/n-pilot-z-norm</input>
-            <input>-fcs/n-pilot-z-correction</input>
-        </summer>
-
-        <!--
-            - The F-16 has a G limit of 9G positive and 4G negative (44.44%
-            - of 9G). This section limits the stick output to 100% up and 44%
-            - down.
-            -->
-        <summer name="fcs/elevator-cmd-limiter">
-            <input>fcs/elevator-cmd-norm</input>
-            <input>fcs/pitch-trim-cmd-norm</input>
-            <clipto>
-            <min>-1</min>
-            <max>0.44</max>
-            </clipto>
-        </summer>
-
-        <!--
-            - If alpha (the difference between the pitch vector and the
-            - thrust vector) approaches 30 degrees the Flight Computer will
-            - command full down elevator deflection to prevent stalling.
-            - This section reduces pilot command to zero when alpha
-            - exceeds 28 degrees and approaches 30 degrees.
-            - (note: JSBSim doesn't extrapolate, so no need to specify
-            - beyond 30 degrees)
-            -->
-        <scheduled_gain name="fcs/elevator-scheduler">
-            <input>fcs/elevator-cmd-limiter</input>
-            <table>
-            <independentVar>aero/alpha-rad</independentVar>
-            <tableData>
-            -0.5236    0.0
-            -0.5       0.11
-            0.0       1.0
-            0.5       0.11
-            0.5236    0.0
-            </tableData>
-            </table>
-        </scheduled_gain>
-
-        <!-- Command full pitch down when approaching 30 degrees alpha -->
-        <pure_gain name="fcs/alpha-limiter-norm">
-            <input>aero/alpha-rad</input>
-            <gain>1.0472</gain>
-        </pure_gain>
-
-        <!-- Calculate the normalized current pitch-rate -->
-        <pure_gain name="fcs/pitch-rate-norm">
-            <input>velocities/q-aero-rad_sec</input>
-            <gain>6.2</gain>
-        </pure_gain>
-
-        <!-- Calculate the normalized current pilot g-load -->
-        <pure_gain name="fcs/g-load-norm">
-            <input>fcs/g-load-corrected</input>
-            <gain>0.020</gain>
-        </pure_gain>
-
-        <!--
-            - Calculated the difference between the commanded pitch-rate
-            - (elevator-scheduler) and the current pitch-rate and g-load.
-            - The difference has to be compensated for straight flight.
-            -->
-        <summer name="fcs/pitch-trim-error">
-            <input>fcs/elevator-scheduler</input>
-            <input>fcs/pitch-rate-norm</input>
-            <input>-fcs/g-load-norm</input>
-        </summer>
-
-        <!--
-            - Make sure the PID controller is only active when the aircraft
-            - has gained some speed. This will prevent bad behaviour when the
-            - aircraft has been parked for a while.
-            -->
-        <switch name="fcs/elevator-pid-trigger">
-            <default value="1"/>
-            <test value="0">
-            velocities/vc-kts lt 5.0
-            </test>
-        </switch>
-
-        <pid name="fcs/g-load-pid">
-            <trigger>fcs/elevator-pid-trigger</trigger>
-            <input>fcs/pitch-trim-error</input>
-            <kp> 0.3000 </kp>
-            <ki> 0.0250 </ki>
-            <kd> 0.0000 </kd>
-            <clipto>
-            <min>-1</min>
-            <max>1</max>
-            </clipto>
-        </pid>
-
-        <!--
-            - Calculate the difference between the current pitch-rate and
-            - the one requested for. Compensate for too high alpha values.
-            -->
-        <summer name="fcs/pitch-scheduler">
-            <input>fcs/elevator-scheduler</input>
-            <input>fcs/alpha-limiter-norm</input>
-            <input>fcs/g-load-pid</input>
-            <clipto>
-            <min>-1</min>
-            <max>1</max>
-            </clipto>
-        </summer>
-
-        <!--
-            - FBW override swich
-            -->
-            <switch name="fcs/pitch-scheduler-switch">
-            <default value="fcs/pitch-scheduler"/>
-            <test value="fcs/elevator-cmd-limiter">
-            fcs/fbw-override == 1
-            </test>
-        </switch>
-
-        <kinematic name="fcs/elevator-position-normalized">
-            <input>fcs/pitch-scheduler-switch</input>
-            <traverse>
-            <setting>
-            <position>-1</position>
-            <time>0.3</time>
-            </setting>
-            <setting>
-            <position>1</position>
-            <time>0.3</time>
-            </setting>
-            </traverse>
-            <output>fcs/elevator-pos-norm</output>
-        </kinematic>
-
-        <aerosurface_scale name="fcs/elevator-position">
-            <input>fcs/elevator-pos-norm</input>
-            <range>
-            <min>-0.436</min>
-            <max>0.436</max>
-            </range>
-            <output>fcs/elevator-pos-rad</output>
-        </aerosurface_scale>
-
-        <summer name="fcs/dht-left-pos-rad">
-            <input>-fcs/elevator-pos-rad</input>
-            <input>-fcs/left-aileron-pos-rad</input>
-            <clipto>
-            <min>-0.436</min>
-            <max>0.436</max>
-            </clipto>
-            </summer>
-
-            <summer name="fcs/dht-right-pos-rad">
-            <input>fcs/elevator-pos-rad</input>
-            <input>fcs/right-aileron-pos-rad</input>
-            <clipto>
-            <min>-0.436</min>
-            <max>0.436</max>
-            </clipto>
-            </summer>
-
         </channel>
 
-
-        <!-- <channel name="Roll">
+        <channel name="Roll">
 
             <pure_gain name="roll rate norm">
                 <input>velocities/p-aero-rad_sec</input>
@@ -529,6 +344,7 @@
 
             <summer name="roll trim error">
                 <input>fcs/aileron-cmd-norm</input>
+                <!-- input>fcs/roll-trim-cmd-norm</input -->
                 <input>-fcs/roll-rate-norm</input>
             </summer>
 
@@ -579,7 +395,7 @@
                 <output>fcs/right-aileron-pos-rad</output>
             </aerosurface_scale>
 
-        </channel> -->
+        </channel>
 
         <channel name="Yaw">
 
@@ -633,152 +449,6 @@
             </aerosurface_scale>
 
         </channel>
-
-
-
-  <channel name="Roll">
-
-   <!-- Calculate the normalized roll-rate -->
-   <pure_gain name="fcs/roll-rate-norm">
-    <input>velocities/p-aero-rad_sec</input>
-    <gain>0.31821</gain>
-   </pure_gain>
-
-   <!--
-     - Calculate the difference between actual roll-rate and
-     - commanded roll-rate.
-     -->
-   <summer name="fcs/roll-trim-error">
-    <input>fcs/aileron-cmd-norm</input>
-    <input>-fcs/roll-rate-norm</input>
-   </summer>
-
-   <!--
-     - Make sure the PID controller is only active when the aircraft
-     - has gained some speed. This will prevent bad behaviour when the
-     - aircraft has been parked for a while.
-     -->
-   <switch name="fcs/aileron-pid-trigger">
-    <default value="1"/>
-    <test value="0">
-     velocities/vc-kts lt 20.0
-    </test>
-   </switch>
-
-   <pid name="fcs/roll-rate-pid">
-     <trigger>fcs/aileron-pid-trigger</trigger>
-     <input>fcs/roll-trim-error</input>
-     <kp> 3.00000 </kp>
-     <ki> 0.00050 </ki>
-     <kd> -0.00125 </kd>
-   </pid>
-
-   <summer name="fcs/roll-rate-command">
-    <input>fcs/roll-rate-pid</input>
-    <input>fcs/aileron-cmd-norm</input>
-    <clipto>
-     <min>-1</min>
-     <max>1</max>
-    </clipto>
-   </summer>
-
-   <aerosurface_scale name="fcs/aileron-control">
-    <input>fcs/roll-rate-command</input>
-    <range>
-     <min>-0.375</min>
-     <max>0.375</max>
-    </range>
-    <output>fcs/aileron-pos-rad</output>
-   </aerosurface_scale>
-
-   <!--
-     - FBW override swich
-     -->
-   <switch name="fcs/roll-rate-command-switch">
-    <default value="fcs/roll-rate-command"/>
-    <test value="fcs/aileron-cmd-norm">
-     fcs/fbw-override == 1
-    </test>
-   </switch>
-
-   <kinematic name="fcs/aileron-position">
-    <input>fcs/roll-rate-command-switch</input>
-    <traverse>
-     <setting>
-      <position>-1</position>
-      <time>0.3</time>
-     </setting>
-     <setting>
-      <position>1</position>
-      <time>0.3</time>
-     </setting>
-    </traverse>
-    <output>fcs/left-aileron-pos-norm</output>
-   </kinematic>
-
-   <scheduled_gain name="fcs/aileron-speed-compensated">
-    <input>fcs/left-aileron-pos-norm</input>
-    <table>
-     <independentVar>velocities/mach</independentVar>
-     <tableData>
-      0.0  1.0
-      1.0  0.15
-     </tableData>
-    </table>
-   </scheduled_gain>
-
-   <summer name="fcs/left-flaperon-norm">
-    <input>-fcs/aileron-speed-compensated</input>
-    <clipto>
-     <min>-1.0</min>
-     <max>1.0</max>
-    </clipto>
-   </summer>
-
-   <summer name="fcs/right-flaperon-norm">
-    <input>-fcs/aileron-speed-compensated</input>
-    <clipto>
-     <min>-1.0</min>
-     <max>1.0</max>
-    </clipto>
-   </summer>
-
-   <summer name="fcs/flaperon-summer">
-    <input>fcs/left-flaperon-norm</input>
-    <input>fcs/right-flaperon-norm</input>
-   </summer>
-
-   <pure_gain name="fcs/flaperon-mix-rad">
-    <input>fcs/flaperon-summer</input>
-    <gain>1.4324</gain>
-   </pure_gain>
-
-   <aerosurface_scale name="fcs/left-aileron-control">
-    <input>fcs/aileron-speed-compensated</input>
-    <range>
-     <min>-0.375</min>
-     <max>0.375</max>
-    </range>
-    <output>fcs/left-aileron-pos-rad</output>
-   </aerosurface_scale>
-
-   <aerosurface_scale name="fcs/right-aileron-control">
-    <input>-fcs/aileron-speed-compensated</input>
-    <range>
-     <min>-0.375</min>
-     <max>0.375</max>
-    </range>
-    <output>fcs/right-aileron-pos-rad</output>
-   </aerosurface_scale>
-
-  </channel>
-
-
-
-
-
-
-
 
         <channel name="Leading Edge Flap">
 

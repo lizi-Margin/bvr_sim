@@ -5,6 +5,7 @@
 #include "../ground/aa.hxx"
 #include "rubbish_can/rubbish_can.hxx"
 #include "c3utils/c3utils.hxx"
+#include "rubbish_can/interp_table.hxx"
 #include <cmath>
 #include <algorithm>
 
@@ -375,9 +376,12 @@ void AIM120C::_state_trans_eula(const std::array<double, 2>& action) noexcept {
     double phi = posture[2];
 
     Vector3 body_x(1.0, 0.0, 0.0);
-    body_x.rotate_zyx_self(0.0, _dtheta * dt, _dphi * dt);
+    body_x.rotate_zyx_self(0.0, _dtheta, _dphi);
     Vector3 ref_x(1.0, 0.0, 0.0);
     double alpha_est = body_x.get_angle(ref_x);
+    // alpha_est *= alpha_est_angle_table.interpolate(alpha_est);
+    alpha_est *= alpha_est_mach_table.interpolate(c3u::get_mach(v, position[2]));
+    alpha_est = std::clamp(alpha_est, 0.0, deg2rad(80.0));
 
     auto [drag, cx] = aero.compute_drag(v, alpha_est, position[2]);
 
@@ -435,6 +439,7 @@ void AIM120C::_state_trans(const std::array<double, 2>& action) noexcept {
         body_x.rotate_zyx_self(0.0, dtheta_prev * dt, dphi_prev * dt);
         Vector3 ref_x(1.0, 0.0, 0.0);
         double alpha_est = body_x.get_angle(ref_x) * 2.0;
+        check(false, "Not implemented: alpha_estimation");
 
         auto [drag, cx] = aero.compute_drag(vel_mag, alpha_est, pos[2]);
 

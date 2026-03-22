@@ -72,9 +72,9 @@ std::string Missile::log() noexcept {
         << "Visible=" << 1 << "\n";
             
     } else if (!render_explosion) {
+        // ss << "0,Event=Destroyed|" << uid << "|" << '\n';
+        ss << "-" + uid + "\n";
         if (is_success) {
-            // ss << "0,Event=Destroyed|" << uid << "|" << '\n';
-            ss << "-" + uid + "\n";
             auto explosion_id = uid + "0" + get_new_uuid();
             auto explosion_type = "Small";
             ss << explosion_id << ",T=" << lon << "|" << lat << "|" << alt << ","

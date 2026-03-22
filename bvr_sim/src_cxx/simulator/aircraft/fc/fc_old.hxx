@@ -32,6 +32,12 @@ public:
 
 class StdFlightController {
 private:
+    // 飞行控制参数集合（包含所有阈值）
+    FlightControllerParams params_;
+
+    double dt;
+    std::string aircraft_model;
+
     // PID系数 (来自params)
     double kroll_p_;
     double kroll_i_;
@@ -44,11 +50,6 @@ private:
     double kthrottle_p_;
     double kthrottle_i_;
     double kthrottle_d_;
-
-    // 飞行控制参数集合（包含所有阈值）
-    FlightControllerParams params_;
-
-    double dt;
 
     double sum_err_roll;
     double last_err_roll;
