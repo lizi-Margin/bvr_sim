@@ -85,6 +85,34 @@ struct FlightControllerParams {
 
         return f18_params;
     }
+
+    static FlightControllerParams get_f15_params() noexcept {
+        FlightControllerParams f15_params;
+
+        f15_params.kroll_p = 1.2;
+        f15_params.kroll_i = 0.2;
+        f15_params.kroll_d = 0.0;
+        f15_params.kpitch_p = -3.4;
+        f15_params.kpitch_i = -0.0;
+        f15_params.kpitch_d = -0.5;
+
+        f15_params.kthrottle_p = 0.03;
+        f15_params.kthrottle_i = 0.06;
+        f15_params.kthrottle_d = 500;
+
+        f15_params.crash_height_threshold_B = c3u::feet_to_meters(4000.0); 
+        f15_params.severe_crash_height = c3u::feet_to_meters(2000.0); 
+        f15_params.crash_height_threshold_A = c3u::feet_to_meters(800.0);    
+        f15_params.pi_decay_start = 11000.0;       
+        f15_params.pitch_pi_decay_end = 20000.0; 
+        f15_params.roll_pi_decay_end = 16000.0;    
+
+        f15_params.minimum_speed_B = 0.18;
+        f15_params.maximum_speed_A = 0.5;
+
+        return f15_params;
+    }
+
 };
 
 class FlightControllerParamsManager {

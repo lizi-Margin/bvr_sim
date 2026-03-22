@@ -3,7 +3,25 @@
     "max_steps": 1000,
     "red_meta": {
         "A01": {
-            "unit_spec": "F16",
+            "unit_spec": "F18",
+            "color": "Red",
+            "position": null,
+            "velocity": null,
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "R03": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7",
+                "L03": "AIM-120C7"
+            },
+            "opponent_type": "tactical_random"
+        },
+        "A02": {
+            "unit_spec": "F15",
             "color": "Red",
             "position": null,
             "velocity": null,
@@ -44,7 +62,7 @@
     "ground_units": {},
     "field_size": 100000.0,
     "obs_type": "text",
-    "blue_opponent_type": "tactical_random",
+    "blue_opponent_type": null,
     "reward_config": {
         "engage_enemy_weight": 0.15,
         "enemy_distance_weight": 0.15,

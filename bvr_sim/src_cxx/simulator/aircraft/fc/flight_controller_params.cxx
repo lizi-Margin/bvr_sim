@@ -9,7 +9,7 @@ FlightControllerParamsManager* FlightControllerParamsManager::instance_ = nullpt
 
 FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     params_map_["F16"] = FlightControllerParams::get_f16_params();
-    params_map_["F15"] = FlightControllerParams::get_f16_params();
+    params_map_["F15"] = FlightControllerParams::get_f15_params();
     params_map_["F18"] = FlightControllerParams::get_f18_params();
 }
 
