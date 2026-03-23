@@ -89,7 +89,8 @@
                 // "L03": "AIM-120C7"
             },
             // "opponent_type": "tactical"
-            "opponent_type": "mad"
+            // "opponent_type": "mad"
+            "opponent_type": "straight_line"
         }
     },
     "ground_units": {},

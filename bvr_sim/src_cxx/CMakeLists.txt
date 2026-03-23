@@ -91,6 +91,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/baseline_opponents/base.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/baseline_opponents/mad.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/baseline_opponents/tactical.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/baseline_opponents/straight_line.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl/observation_space.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl/reward_components.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl/reward_manager.cxx"

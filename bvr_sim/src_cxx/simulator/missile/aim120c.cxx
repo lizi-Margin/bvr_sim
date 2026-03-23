@@ -303,7 +303,7 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
         desired_dbeta_from_angle = angle_gain * -1 * angle_error;
         desired_dbeta_from_angle = std::clamp(desired_dbeta_from_angle, -max_cmd_rate, max_cmd_rate);
         desired_dbeta = blend * desired_dbeta_from_angle + (1.0 - blend) * dbeta;
-        desired_dbeta = dbeta;
+        // desired_dbeta = dbeta;
     } else {
         desired_dbeta = dbeta;
     }

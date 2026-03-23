@@ -16,6 +16,7 @@
 #include "rubbish_can/rubbish_can.hxx"
 #include "baseline_opponents/mad.hxx"
 #include "baseline_opponents/tactical.hxx"
+#include "baseline_opponents/straight_line.hxx"
 #include <iostream>
 
 namespace bvr_sim {
@@ -179,6 +180,9 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
                 } else if (opponent_type == "mad") {
                     BaselinePool::instance().add(fighter, std::make_shared<MadOpponent3D>());
                     SL::get().print("[UnitFactory] add fighter, mad to baseline pool with uid: " + uid + " success");
+                } else if (opponent_type == "straight_line") {
+                    BaselinePool::instance().add(fighter, std::make_shared<StraightLineOpponent3D>());
+                    SL::get().print("[UnitFactory] add fighter, straight_line to baseline pool with uid: " + uid + " success");
                 } else {
                     if (opponent_type.empty()) {
                         SL::get().print("[UnitFactory] no opponent with uid: " + uid);
