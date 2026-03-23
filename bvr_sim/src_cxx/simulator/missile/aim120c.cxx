@@ -66,7 +66,7 @@ AIM120C::AIM120C(
       _dm(default_missile_parameter.dm),
       _K(default_missile_parameter.K),
       _nyz_max(default_missile_parameter.nyz_max),
-      _Rc(feet_to_meters(1000.0)),
+      _Rc(feet_to_meters(500.0)),
       _mach_min(0.8),
       _v_min(get_mps(_mach_min, position[2])),
       _t(0.0),
@@ -248,12 +248,13 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
     double z_t = last_known_target_pos[2];
 
     double Rxyz = linalg_norm({x_m - x_t, y_m - y_t, z_t - z_m});
-    double beta = std::atan2(y_m - y_t, x_m - x_t);
+    // double beta = std::atan2(y_m - y_t, x_m - x_t);
+    double beta = std::atan2(y_t - y_m, x_t - x_m);
     double eps = std::atan2(z_m - z_t, linalg_norm(std::array<double, 2>{x_m - x_t, y_m - y_t}));
 
-    double dbeta_measured = 0.0;
+    double dbeta = 0.0;
     if (L_beta.has_value()) {
-        dbeta_measured = -(beta - L_beta.value()) / dt;
+        dbeta = -(beta - L_beta.value()) / dt;
     }
     L_beta = beta;
 
@@ -273,26 +274,46 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
     double phi = std::atan2(dy_m, dx_m);
     double angle_error = norm_pi(phi - norm_pi(beta - pi));
 
-    double angle_gain = 0.1;
-    double max_cmd_rate = 1.0;
-    double angle_lend_min = 0.0;
-    double angleGuideTime = _t_thrust;
 
-    double blend = 0.0;
-    if (_t < angleGuideTime) {
-        blend = std::max((angleGuideTime - _t) / angleGuideTime, angle_lend_min);
+
+
+
+
+    double desired_dbeta;
+    
+    if (radar_on && Rxyz < feet_to_meters(5000.0)) {
+        // double desired_dbeta_from_angle;
+        // double angle_gain = 5.0;
+        // // desired_dbeta_from_angle = angle_gain * angle_error;
+        // // if (desired_dbeta_from_angle * dbeta < 0) {
+        // //     desired_dbeta = desired_dbeta_from_angle;
+        // // } else {
+        // //     desired_dbeta = std::max(std::abs(desired_dbeta_from_angle), std::abs(dbeta)) * std::copysign(1.0, desired_dbeta_from_angle);
+        // // }
+        // // desired_dbeta = dbeta;
+        // desired_dbeta_from_angle = angle_gain * -1 * angle_error;
+        // desired_dbeta = desired_dbeta_from_angle;
+        desired_dbeta = dbeta;
+    } else if (_t < _t_thrust) {
+        double desired_dbeta_from_angle;
+        double angle_lend_min = 0.0;
+        double angle_gain = 0.1;
+        double max_cmd_rate = 0.5;
+        double blend = std::max((_t_thrust - _t) / _t_thrust, angle_lend_min);
+        desired_dbeta_from_angle = angle_gain * -1 * angle_error;
+        desired_dbeta_from_angle = std::clamp(desired_dbeta_from_angle, -max_cmd_rate, max_cmd_rate);
+        desired_dbeta = blend * desired_dbeta_from_angle + (1.0 - blend) * dbeta;
+        desired_dbeta = dbeta;
     } else {
-        blend = angle_lend_min;
+        desired_dbeta = dbeta;
     }
 
-    double desired_dbeta_from_angle = angle_gain * angle_error;
-    desired_dbeta_from_angle = std::clamp(desired_dbeta_from_angle, -max_cmd_rate, max_cmd_rate);
 
-    double desired_dbeta = blend * desired_dbeta_from_angle + (1.0 - blend) * dbeta_measured;
-    double dbeta_cmd = desired_dbeta;
-
-    double ny = K_func(Rxyz) * v_m / _g * std::cos(theta_m) * dbeta_cmd;
+    double ny = K_func(Rxyz) * v_m / _g * std::cos(theta_m) * desired_dbeta;
     double nz = K_func(Rxyz) * v_m / _g * deps + std::cos(theta_m);
+
+    // ny = std::clamp(ny, ny_filter.get_value() - 2.0 * dt, ny_filter.get_value() + 2.0 * dt);
+    // ny_filter.update(ny, dt);
 
     ny = std::clamp(ny, -_nyz_max, _nyz_max);
     nz = std::clamp(nz, -_nyz_max, _nyz_max);
@@ -303,19 +324,22 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
 }
 
 double AIM120C::K_func(double Rxyz) const noexcept {
+    double base_K = std::max(_K * (_t_max - _t) / _t_max, 0.5);
+    if (radar_on) {
+        // double R_min = nm_to_meters(1.0);
+        // double K_MAX = 5.0 * _K;
+        // if (Rxyz < R_min) {
+        //     return K_MAX;
+        // }
+        // double mix = R_min / Rxyz;
+        // return K_MAX * _K * mix + base_K * (1.0 - mix);
+        return _K;
+    }
+
     if (_t < _t_thrust) {
         return _K;
     }
-    double base_K = std::max(_K * (_t_max - _t) / _t_max, 0.5);
-    if (radar_on) {
-        double R_min = nm_to_meters(1.0);
-        double K_MAX = 2.0 * _K;
-        if (Rxyz < R_min) {
-            return K_MAX;
-        }
-        double mix = R_min / Rxyz;
-        return K_MAX * _K * mix + base_K * (1.0 - mix);
-    }
+
     return base_K;
 }
 
@@ -357,59 +381,59 @@ double AIM120C::calculate_min_distance(
     return std::sqrt(std::max(distance_sq, 0.0));
 }
 
-void AIM120C::_state_trans_eula(const std::array<double, 2>& action) noexcept {
-    double ny = action[0];
-    double nz = action[1];
+// void AIM120C::_state_trans_eula(const std::array<double, 2>& action) noexcept {
+//     double ny = action[0];
+//     double nz = action[1];
 
-    position[0] += dt * velocity[0];
-    position[1] += dt * velocity[1];
-    position[2] += dt * velocity[2];
+//     position[0] += dt * velocity[0];
+//     position[1] += dt * velocity[1];
+//     position[2] += dt * velocity[2];
 
-    double v = linalg_norm(velocity);
-    if (v < 1e-6) {
-        return;
-    }
+//     double v = linalg_norm(velocity);
+//     if (v < 1e-6) {
+//         return;
+//     }
 
-    double angle = deg2rad(-std::copysign(1.0, velocity[2]) *
-                           signed_angle(velocity, {velocity[0], velocity[1], 0.0}));
-    double theta = posture[1];
-    double phi = posture[2];
+//     double angle = deg2rad(-std::copysign(1.0, velocity[2]) *
+//                            signed_angle(velocity, {velocity[0], velocity[1], 0.0}));
+//     double theta = posture[1];
+//     double phi = posture[2];
 
-    Vector3 body_x(1.0, 0.0, 0.0);
-    body_x.rotate_zyx_self(0.0, _dtheta, _dphi);
-    Vector3 ref_x(1.0, 0.0, 0.0);
-    double alpha_est = body_x.get_angle(ref_x);
-    // alpha_est *= alpha_est_angle_table.interpolate(alpha_est);
-    alpha_est *= alpha_est_mach_table.interpolate(c3u::get_mach(v, position[2]));
-    alpha_est = std::clamp(alpha_est, 0.0, deg2rad(80.0));
+//     Vector3 body_x(1.0, 0.0, 0.0);
+//     body_x.rotate_zyx_self(0.0, _dtheta, _dphi);
+//     Vector3 ref_x(1.0, 0.0, 0.0);
+//     double alpha_est = body_x.get_angle(ref_x);
+//     // alpha_est *= alpha_est_angle_table.interpolate(alpha_est);
+//     alpha_est *= alpha_est_mach_table.interpolate(c3u::get_mach(v, position[2]));
+//     alpha_est = std::clamp(alpha_est, 0.0, deg2rad(80.0));
 
-    auto [drag, cx] = aero.compute_drag(v, alpha_est, position[2]);
+//     auto [drag, cx] = aero.compute_drag(v, alpha_est, position[2]);
 
-    double thrust = (_t < _t_thrust) ? _thrust : 0.0;
-    double gravity = _m * _g * std::sin(angle);
+//     double thrust = (_t < _t_thrust) ? _thrust : 0.0;
+//     double gravity = _m * _g * std::sin(angle);
 
-    double nx = (thrust - drag + gravity) / (_m * _g);
-    double dv = _g * (nx - std::sin(theta));
+//     double nx = (thrust - drag + gravity) / (_m * _g);
+//     double dv = _g * (nx - std::sin(theta));
 
-    _dphi = _g / v * (ny / std::cos(theta));
-    _dtheta = _g / v * (nz - std::cos(theta));
+//     _dphi = _g / v * (ny / std::cos(theta));
+//     _dtheta = _g / v * (nz - std::cos(theta));
 
-    v += dt * dv;
-    phi += dt * _dphi;
-    theta += dt * _dtheta;
+//     v += dt * dv;
+//     phi += dt * _dphi;
+//     theta += dt * _dtheta;
 
-    velocity[0] = v * std::cos(theta) * std::cos(phi);
-    velocity[1] = -v * std::cos(theta) * std::sin(phi);
-    velocity[2] = v * std::sin(theta);
+//     velocity[0] = v * std::cos(theta) * std::cos(phi);
+//     velocity[1] = -v * std::cos(theta) * std::sin(phi);
+//     velocity[2] = v * std::sin(theta);
 
-    posture[0] = 0.0;
-    posture[1] = theta;
-    posture[2] = phi;
+//     posture[0] = 0.0;
+//     posture[1] = theta;
+//     posture[2] = phi;
 
-    if (_t < _t_thrust) {
-        _m -= dt * _dm;
-    }
-}
+//     if (_t < _t_thrust) {
+//         _m -= dt * _dm;
+//     }
+// }
 
 void AIM120C::_state_trans(const std::array<double, 2>& action) noexcept {
     double ny = action[0];
@@ -439,7 +463,9 @@ void AIM120C::_state_trans(const std::array<double, 2>& action) noexcept {
         body_x.rotate_zyx_self(0.0, dtheta_prev * dt, dphi_prev * dt);
         Vector3 ref_x(1.0, 0.0, 0.0);
         double alpha_est = body_x.get_angle(ref_x) * 2.0;
-        check(false, "Not implemented: alpha_estimation");
+        // alpha_est *= alpha_est_angle_table.interpolate(alpha_est);
+        alpha_est *= alpha_est_mach_table.interpolate(c3u::get_mach(vel_mag, pos[2]));
+        alpha_est = std::clamp(alpha_est, 0.0, deg2rad(80.0));
 
         auto [drag, cx] = aero.compute_drag(vel_mag, alpha_est, pos[2]);
 
@@ -587,7 +613,8 @@ void AIM120C::step() noexcept {
         }
     } else {
         auto [action, distance_that_missile_knows] = _guidance();
-        _state_trans_eula(action);
+        // _state_trans_eula(action);
+        _state_trans(action);
     }
 
     if (is_done) {

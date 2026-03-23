@@ -96,8 +96,8 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
       jsbsim_inner_dt(dt),
       jsbsim_inner_steps(1),
       fc(dt, aircraft_model),
-      fc_delta_heading_filter({0.05, 0.0}),
-      fc_delta_pitch_filter({0.05, 0.0}),
+      fc_delta_heading_filter({0.25, 0.0}),
+      fc_delta_pitch_filter({0.25, 0.0}),
       mach(0.0),
       delta_heading(0.0),
       delta_pitch(0.0),
@@ -306,11 +306,11 @@ double JSBSimFDM::get_mach() const noexcept {
 void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noexcept {
     double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(100);
     // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(40);
-    double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw);
+    double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw, jsbsim_inner_dt);
     delta_heading = delta_heading_filt;
 
     double delta_pitch_raw = -norm(action.at("delta_altitude"), -1, 1) * deg2rad(45);
-    double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw);
+    double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw, jsbsim_inner_dt);
     delta_pitch = delta_pitch_filt;
     // delta_pitch = -deg2rad(20);
     // delta_pitch = 0;

@@ -5,6 +5,7 @@
 #include <deque>
 #include <optional>
 #include "rubbish_can/interp_table.hxx"
+#include "rubbish_can/filter.hxx"
 
 namespace bvr_sim {
 
@@ -32,7 +33,7 @@ constexpr MissileParameter default_missile_parameter = {
     161.48,
     6.41,
     3.0,
-    10.0
+    100.0
 };
 
 double signed_angle(const std::array<double, 3>& from_direction, const std::array<double, 3>& to_direction) noexcept;
@@ -87,6 +88,8 @@ private:
 
     std::array<double, 3> _before_loss_real_last_known_target_pos;
 
+    TimeScalarFilter ny_filter{0.1};
+
 public:
     const InterpTable alpha_est_mach_table{
         {0.8, 1.0, 1.3, 1.6, 2.0 , 4.0},
@@ -132,7 +135,7 @@ private:
 
     std::pair<std::array<double, 2>, double> _guidance() noexcept;
 
-    void _state_trans_eula(const std::array<double, 2>& action) noexcept;
+    // void _state_trans_eula(const std::array<double, 2>& action) noexcept;
 
     void _state_trans(const std::array<double, 2>& action) noexcept;
 

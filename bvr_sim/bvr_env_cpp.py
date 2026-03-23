@@ -196,8 +196,10 @@ class BVR3DEnvCpp:
                 speed * np.sin(heading),
                 0.0  # Initially level flight
             ])
-            init_spec[uid]["position"] = position.tolist()
-            init_spec[uid]["velocity"] = velocity.tolist()
+            if init_spec[uid].get("position", None) is None:
+                init_spec[uid]["position"] = position.tolist()
+            if init_spec[uid].get("velocity", None) is None:
+                init_spec[uid]["velocity"] = velocity.tolist()
             # init_spec[uid]["velocity"] = [300, 100, 0]
 
             # Handle unit_spec randomization
@@ -221,8 +223,10 @@ class BVR3DEnvCpp:
                 speed * np.sin(heading),
                 0.0  # Initially level flight
             ])
-            init_spec[uid]["position"] = position.tolist()
-            init_spec[uid]["velocity"] = velocity.tolist()
+            if init_spec[uid].get("position", None) is None:
+                init_spec[uid]["position"] = position.tolist()
+            if init_spec[uid].get("velocity", None) is None:
+                init_spec[uid]["velocity"] = velocity.tolist()
             # init_spec[uid]["velocity"] = [-300, 100, 0]
 
             # Handle unit_spec randomization
