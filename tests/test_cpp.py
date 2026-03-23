@@ -13,7 +13,7 @@ def main():
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)
-    sim = BVR3DEnvCpp(env_config, [], log_file_path="./test_logs/bvr_sim.log", acmi_file_path="./test_logs/replay.acmi")
+    sim = BVR3DEnvCpp(env_config, [], log_file_path=os.path.join(get_root_dir(), "../test_logs/bvr_sim.log"), acmi_file_path=os.path.join(get_root_dir(), "../test_logs/replay.acmi"))
     obs, info = sim.reset(seed=None)
 
     

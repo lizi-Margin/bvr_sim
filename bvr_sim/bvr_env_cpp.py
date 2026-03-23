@@ -199,7 +199,11 @@ class BVR3DEnvCpp:
             init_spec[uid]["position"] = position.tolist()
             init_spec[uid]["velocity"] = velocity.tolist()
             # init_spec[uid]["velocity"] = [300, 100, 0]
-            
+
+            # Handle unit_spec randomization
+            if isinstance(init_spec[uid].get("unit_spec"), list):
+                init_spec[uid]["unit_spec"] = random.choice(init_spec[uid]["unit_spec"])
+
             if self.opponent_type is not None:
                 init_spec[uid]["opponent_type"] = self.opponent_type if isinstance(self.opponent_type, str) \
                                                   else random.choice(self.opponent_type)
@@ -220,6 +224,10 @@ class BVR3DEnvCpp:
             init_spec[uid]["position"] = position.tolist()
             init_spec[uid]["velocity"] = velocity.tolist()
             # init_spec[uid]["velocity"] = [-300, 100, 0]
+
+            # Handle unit_spec randomization
+            if isinstance(init_spec[uid].get("unit_spec"), list):
+                init_spec[uid]["unit_spec"] = random.choice(init_spec[uid]["unit_spec"])
 
             if self.opponent_type is not None:
                 init_spec[uid]["opponent_type"] = self.opponent_type if isinstance(self.opponent_type, str) \
