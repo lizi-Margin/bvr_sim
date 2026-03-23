@@ -154,11 +154,14 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         const static std::map<std::string, std::string> jsbsim_model_mapping = {
             {"F16", "f16"},
             {"F15", "f15"},
+            {"F15_original", "f15_original"},
             {"F18", "f18"},
+            {"F18_original", "f18_original"},
             {"F4N", "F4N"},
             {"AJ37", "AJ37"},
             {"JA37", "JA37"},
             {"F22", "f22"},
+            {"F22_original", "f22_original"},
         };
         jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
         jsbsim_exec->SetDebugLevel(jsb_debug_level);

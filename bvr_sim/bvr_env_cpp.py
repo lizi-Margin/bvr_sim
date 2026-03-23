@@ -11,6 +11,8 @@ from .performance import StepProfiler
 PRINT_STEP_TIME = False
 PRINT_DONE_REASON = True
 
+BY_PASS_RL_ACTION = False
+
 
 import importlib
 # I know this is ugly, but...
@@ -165,6 +167,10 @@ class BVR3DEnvCpp:
 
         if seed is not None:
             np.random.seed(seed)
+            random.seed(seed)
+        else:
+            np.random.seed(None)
+            random.seed(None)
 
         self.current_step = 0
         result = self.core.handle("clear all {}")
@@ -205,6 +211,7 @@ class BVR3DEnvCpp:
             # Handle unit_spec randomization
             if isinstance(init_spec[uid].get("unit_spec"), list):
                 init_spec[uid]["unit_spec"] = random.choice(init_spec[uid]["unit_spec"])
+                print(f"Randomized unit_spec for {uid}: {init_spec[uid]['unit_spec']}")
 
             if self.opponent_type is not None:
                 init_spec[uid]["opponent_type"] = self.opponent_type if isinstance(self.opponent_type, str) \
@@ -294,14 +301,15 @@ class BVR3DEnvCpp:
                 "delta_altitude": float(action_dict['delta_altitude']),
                 "delta_speed": float(action_dict['delta_speed'])
             }
-            self.core.handle(f"set {uid} {json.dumps(control_action)}")
-            # print(action_dict['shoot'])
+            if not BY_PASS_RL_ACTION:
+                self.core.handle(f"set {uid} {json.dumps(control_action)}")
+                # print(action_dict['shoot'])
 
-            # Handle shooting
-            if action_dict['shoot'] > 0.5:
-                self._handle_shoot_action(uid, shoot=True)
-            else:
-                self._handle_shoot_action(uid, shoot=False)
+                # Handle shooting
+                if action_dict['shoot'] > 0.5:
+                    self._handle_shoot_action(uid, shoot=True)
+                else:
+                    self._handle_shoot_action(uid, shoot=False)
              
 
         if self._step_profiler:
@@ -334,10 +342,13 @@ class BVR3DEnvCpp:
         if episode_done:
             if red_alive > blue_alive:
                 info["team_ranking"] = [0, 1]  # Red wins
+                info["win_team"] = "red"
             elif blue_alive > red_alive:
                 info["team_ranking"] = [1, 0]  # Blue wins
+                info["win_team"] = "blue"
             else:
                 info["team_ranking"] = [-1, -1]  # Draw
+                info["win_team"] = "draw"
 
         # Pack results for ego_ids (red only, or red+blue for self-play)
         ego_obs = {uid: obs[uid] for uid in self.ego_ids}

@@ -20,7 +20,10 @@ def main():
     try:
         turn = 0
         mean_step_time = 0.0
-        while turn < 2:
+        red_wins = 0
+        blue_wins = 0
+        draw = 0
+        while turn < 10:
             sim.core.set_acmi_file_path(f"./test_logs/replay_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             i = 0
@@ -33,10 +36,19 @@ def main():
                 mean_step_time = 0.999 * mean_step_time + 0.001 * (t1 - t0) if mean_step_time > 0 else (t1 - t0)
                 print(f"\rfps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s", end="")
                 i += 1
+                if episode_done:
+                    if info["win_team"] == "red":
+                        red_wins += 1
+                    elif info["win_team"] == "blue":
+                        blue_wins += 1
+                    else:
+                        draw += 1
             turn += 1
     except KeyboardInterrupt:
         pass
     del sim
+    print(f"\nRed wins: {red_wins}, Blue wins: {blue_wins}, Draws: {draw}")
+    print(f"Red win rate: {red_wins / turn:.2%}, Blue win rate: {blue_wins / turn:.2%}, Draw rate: {draw / turn:.2%}")
     # input("推演结束，按Enter退出。")
     return 0
         

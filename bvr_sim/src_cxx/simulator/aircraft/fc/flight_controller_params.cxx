@@ -10,11 +10,14 @@ FlightControllerParamsManager* FlightControllerParamsManager::instance_ = nullpt
 FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     params_map_["F16"] = FlightControllerParams::get_f16_params();
     params_map_["F15"] = FlightControllerParams::get_f15_params();
+    params_map_["F15_original"] = FlightControllerParams::get_f16_params();
     params_map_["F18"] = FlightControllerParams::get_f18_params();
+    params_map_["F18_original"] = FlightControllerParams::get_f16_params();
     params_map_["F4N"] = FlightControllerParams::get_f16_params();
     params_map_["AJ37"] = FlightControllerParams::get_f16_params();
     params_map_["JA37"] = FlightControllerParams::get_f16_params();
     params_map_["F22"] = FlightControllerParams::get_f16_params();
+    params_map_["F22_original"] = FlightControllerParams::get_f16_params();
 }
 
 FlightControllerParamsManager& FlightControllerParamsManager::getInstance() noexcept {

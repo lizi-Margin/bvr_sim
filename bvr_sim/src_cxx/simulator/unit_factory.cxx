@@ -24,11 +24,14 @@ namespace bvr_sim {
 const std::map<std::string, UnitFactory::UnitType> UnitFactory::UNIT_MAP = {
     {"F16", UnitType::Fighter},
     {"F15", UnitType::Fighter},
+    {"F15_original", UnitType::Fighter},
     {"F18", UnitType::Fighter},
+    {"F18_original", UnitType::Fighter},
     {"F4N", UnitType::Fighter},
     {"AJ37", UnitType::Fighter},
     {"JA37", UnitType::Fighter},
     {"F22", UnitType::Fighter},
+    {"F22_original", UnitType::Fighter},
     {"SLAMRAAM", UnitType::SLAMRAM},
     {"GroundStaticTarget", UnitType::GroundStaticTarget},
     {"Ground", UnitType::GroundStaticTarget},
@@ -161,8 +164,6 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
 
                 SL::get().print("[UnitFactory] freeze pylon manager with uid: " + uid);
                 fighter->pylon_manager.freeze();
-
-                SL::get().print("[UnitFactory] add fighter to baseline pool with uid: " + uid);
 
                 std::string opponent_type = "";
                 if (spec_json.hasKey("opponent_type")) {

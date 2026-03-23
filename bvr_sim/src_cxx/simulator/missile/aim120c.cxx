@@ -264,7 +264,7 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
     }
     L_eps = eps;
 
-    if (_t < 4.0) {
+    if (!radar_on && _t < 4.0) {
         double min_val = std::min(meters_to_nm(Rxyz), 10.0);
         if (rad2deg(posture[1]) < min_val) {
             deps = std::max(deps, 0.1);
