@@ -10,6 +10,9 @@
 #include <initializer_list>
 #include <ostream>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <limits>
 #include <cpptrace/cpptrace.hpp>
 #include "colorful.hxx"
 
@@ -441,8 +444,11 @@ class JSON
                 }
                 case Class::String:
                     return "\"" + json_escape( *Internal.String ) + "\"";
-                case Class::Floating:
-                    return std::to_string( Internal.Float );
+                case Class::Floating: {
+                    std::ostringstream oss;
+                    oss << std::setprecision( std::numeric_limits<double>::max_digits10 ) << Internal.Float;
+                    return oss.str();
+                }
                 case Class::Integral:
                     return std::to_string( Internal.Int );
                 case Class::Boolean:

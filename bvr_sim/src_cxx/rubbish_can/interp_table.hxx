@@ -66,6 +66,7 @@ public:
     }
 
     static InterpTable from_json(const json::JSON& j) {
+        check(j.hasKey("x") && j.hasKey("y"), "InterpTable::from_json: missing 'x' or 'y' key");
         std::vector<double> x, y;
         for (auto& v : j.at("x").ArrayRange())
             x.push_back(v.IsFloating() ? v.ToFloat() : static_cast<double>(v.ToInt()));
