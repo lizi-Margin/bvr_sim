@@ -154,10 +154,11 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         const static std::map<std::string, std::string> jsbsim_model_mapping = {
             {"F16", "f16"},
             {"F15", "f15"},
-            {"F15_original", "f15_original"},
+            {"F15_original", "f15"},
             {"F18", "f18"},
             {"F18_original", "f18_original"},
             {"F4N", "F4N"},
+            {"F4N_original", "F4N"},
             {"AJ37", "AJ37"},
             {"JA37", "JA37"},
             {"F22", "f22"},

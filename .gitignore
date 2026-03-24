@@ -11,3 +11,7 @@ __pycache__
 /test_logs/
 /.vscode
 /docs
+
+/*.png
+/*.csv
+/benchmark_logs/

@@ -28,6 +28,7 @@ const std::map<std::string, UnitFactory::UnitType> UnitFactory::UNIT_MAP = {
     {"F18", UnitType::Fighter},
     {"F18_original", UnitType::Fighter},
     {"F4N", UnitType::Fighter},
+    {"F4N_original", UnitType::Fighter},
     {"AJ37", UnitType::Fighter},
     {"JA37", UnitType::Fighter},
     {"F22", UnitType::Fighter},
