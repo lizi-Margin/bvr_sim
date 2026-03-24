@@ -53,7 +53,7 @@ public:
     const std::vector<double>& getY() const { return y_; }
 
     json::JSON to_json() const {
-        json::JSON j;
+        json::JSON j = json::JSON::Make(json::JSON::Class::Object);
         json::JSON x_arr = json::JSON::Make(json::JSON::Class::Array);
         json::JSON y_arr = json::JSON::Make(json::JSON::Class::Array);
         for (size_t i = 0; i < x_.size(); ++i) {

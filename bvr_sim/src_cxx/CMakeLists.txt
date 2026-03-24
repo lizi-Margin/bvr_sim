@@ -86,6 +86,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/mmodelA.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/missile_aerodynamics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/missile_params.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/base.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/awacs.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/rws.cxx"
@@ -335,6 +336,8 @@ endif()
 
 add_executable(bvr_sim_unit_tests
     test_main.cxx
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test_param_store.cxx"
 )
 
 # Link with main library dependencies
