@@ -6,6 +6,9 @@
 
 namespace bvr_sim {
 
+/// Generic missile parameter container for multi-model missile framework.
+/// Replaces hardcoded MissileParameter in AIM120C.
+/// Factory method get_missile_params() loads params from hardcoded tables or future config.
 struct MissileParams {
     // ===== 物理参数 =====
     double m0;              // 初始质量 (kg)
@@ -13,13 +16,13 @@ struct MissileParams {
     double thrust;          // 推力 (N)
     double t_max;           // 推力最大时间 (s)
     double t_thrust;        // 实际推力工作时间 (s)
-    double Length;          // 导弹长度 (m)
-    double Diameter;        // 导弹直径 (m)
+    double length;          // 导弹长度 (m)
+    double diameter;        // 导弹直径 (m)
     double nyz_max;         // 最大法向过载 (g)
     double g;               // 重力加速度 (m/s^2)
 
     // ===== 空气动力学参数 =====
-    std::shared_ptr<InterpTable> cx_total_table;  // Mach -> Cx_total (无迎角补偿)
+    std::shared_ptr<const InterpTable> cx_total_table;  // Mach -> Cx_total (无迎角补偿)
     double S_ref;           // 参考面积 (m^2)
     double Rc;              // 最小爬升半径 (m, SI单位)
     double mach_min;        // 最小Mach数
