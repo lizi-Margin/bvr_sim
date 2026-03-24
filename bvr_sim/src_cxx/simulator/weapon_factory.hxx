@@ -1,6 +1,8 @@
 #pragma once
 
 #include "simulator/missile/base.hxx"
+#include "simulator/missile/aim120c.hxx"
+#include "simulator/missile/mmodelA.hxx"
 #include <string>
 #include <memory>
 #include <cctype>

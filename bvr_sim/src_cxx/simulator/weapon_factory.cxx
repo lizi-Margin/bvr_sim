@@ -1,5 +1,6 @@
 #include "weapon_factory.hxx"
 #include "simulator/missile/aim120c.hxx"
+#include "simulator/missile/mmodelA.hxx"
 #include <stdexcept>
 
 namespace bvr_sim {
@@ -48,14 +49,14 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
 
     switch (type) {
         case WeaponType::AIM120C:
-            return std::make_shared<AIM120C>(
+            return std::make_shared<MModelA>(
                 uid,
                 color,
                 parent,
                 friend_obj,
                 target,
                 dt,
-                t_thrust_override
+                weapon_name
             );
 
         case WeaponType::Unknown:

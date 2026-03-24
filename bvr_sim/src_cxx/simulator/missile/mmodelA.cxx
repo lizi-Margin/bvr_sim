@@ -2,6 +2,7 @@
 #include "../aircraft/base.hxx"
 #include "../ground/base.hxx"
 #include "../ground/aa.hxx"
+#include "../simulator.hxx"
 #include "rubbish_can/rubbish_can.hxx"
 #include "c3utils/c3utils.hxx"
 #include <cmath>
@@ -18,7 +19,6 @@ using c3utils::get_mps;
 using c3utils::get_mach;
 using c3utils::feet_to_meters;
 using c3utils::nm_to_meters;
-using c3utils::velocity_to_euler;
 
 MModelA::MModelA(
     const std::string& uid,

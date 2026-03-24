@@ -83,6 +83,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/slamraam.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/base.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/aim120c.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/mmodelA.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/missile_aerodynamics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/missile_params.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/base.cxx"
