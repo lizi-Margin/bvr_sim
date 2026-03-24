@@ -15,7 +15,7 @@ MissileParams MissileParams::get_missile_params(const std::string& missile_model
 
         MissileParams params;
 
-        // ===== 物理参数（从aim120c.hxx的default_missile_parameter，第27-37行）=====
+        // Physical parameters from aim120c.hxx default_missile_parameter (lines 27-37)
         // default_missile_parameter = {
         //     16325.0,  // thrust
         //     300.0,    // t_max
@@ -27,20 +27,20 @@ MissileParams MissileParams::get_missile_params(const std::string& missile_model
         //     3.0,      // K
         //     100.0     // nyz_max
         // };
-        params.m0 = 161.48;             // kg (default_missile_parameter.m0)
-        params.dm = 6.41;               // kg/s (default_missile_parameter.dm)
-        params.thrust = 16325.0;        // N (default_missile_parameter.thrust)
-        params.t_max = 300.0;           // s (default_missile_parameter.t_max)
-        params.t_thrust = 8.0;          // s (default_missile_parameter.t_thrust)
-        params.length = 3.65;           // m (default_missile_parameter.Length)
-        params.diameter = 0.178;        // m (default_missile_parameter.Diameter)
-        params.nyz_max = 100.0;         // g (default_missile_parameter.nyz_max)
-        params.K = 3.0;                 // 比例导航系数 (default_missile_parameter.K)
-        params.g = 9.81;                // m/s^2
+        params.m0 = 161.48;             // kg (initial mass)
+        params.dm = 6.41;               // kg/s (mass flow rate)
+        params.thrust = 16325.0;        // N (thrust)
+        params.t_max = 300.0;           // s (max time)
+        params.t_thrust = 8.0;          // s (thrust duration)
+        params.length = 3.65;           // m (length)
+        params.diameter = 0.178;        // m (diameter)
+        params.nyz_max = 100.0;         // g (max lateral acceleration)
+        params.K = 3.0;                 // proportional navigation gain
+        params.g = 9.81;                // m/s^2 (gravity)
 
-        // ===== 空气动力学参数（来自aim120c_adv_sim.py）=====
-        // Mach表：26个点（0.0 到 5.0）
-        // Cx0表：简化为仅Mach依赖，不含迎角和波阻补偿
+        // Aerodynamic parameters from aim120c_adv_sim.py
+        // Mach table: 26 points from 0.0 to 5.0
+        // Cx0 table: Mach-dependent only, no angle of attack compensation
         std::vector<double> mach_points = {
             0.0,  0.2,    0.4,     0.6,    0.8,     1.0,    1.2,    1.4,
             1.6,  1.8,    2.0,     2.2,    2.4,     2.6,    2.8,    3.0,
@@ -55,31 +55,31 @@ MissileParams MissileParams::get_missile_params(const std::string& missile_model
         };
         params.cx_total_table = std::make_shared<const InterpTable>(mach_points, cx_values);
 
-        params.S_ref = 0.0248719;                    // m^2 (参考面积，来自aim120c_adv_sim.py)
-        params.Rc = feet_to_meters(500.0);           // 转换feet到meter: 500 feet
-        params.mach_min = 0.8;                       // 最小Mach
+        params.S_ref = 0.0248719;                    // m^2 (reference area)
+        params.Rc = feet_to_meters(500.0);           // convert feet to meters: 500 feet
+        params.mach_min = 0.8;                       // minimum Mach
 
-        // ===== 导引参数（从aim120c.cxx第54-58行的CTOR初始化）=====
+        // Guidance parameters from aim120c.cxx CTOR initialization (lines 54-58)
         // _search_fov(deg2rad(20.0)),
         // _search_range(nm_to_meters(15.0)),
         // _search_start_range(nm_to_meters(10.0)),
         // _search_started(false),
         // _track_gimbal_limit(deg2rad(90.0)),
-        params.search_fov = deg2rad(20.0);                  // 搜索FOV
-        params.search_range = nm_to_meters(15.0);           // 搜索范围
-        params.search_start_range = nm_to_meters(10.0);     // 搜索起始距离
-        params.track_gimbal_limit = deg2rad(90.0);          // 跟踪万向节限制
+        params.search_fov = deg2rad(20.0);                  // search field of view
+        params.search_range = nm_to_meters(15.0);           // search range
+        params.search_start_range = nm_to_meters(10.0);     // search start range
+        params.track_gimbal_limit = deg2rad(90.0);          // track gimbal limit
 
-        // ===== 状态机参数 =====
+        // State machine parameters
         params.enable_search = true;
         params.enable_track = true;
-        params.enable_loft = false;                  // MModelA简化版不支持爬升机动
-        params.loss_time_threshold = 1.0;            // 信号丢失1秒后切换回搜索（aim120c.cxx第221行）
+        params.enable_loft = false;                  // MModelA simplified version does not support loft
+        params.loss_time_threshold = 1.0;            // signal loss threshold (seconds)
 
         return params;
     }
 
-    // 未知导弹型号，抛出异常
+    // Unknown missile model, throw exception
     throw std::runtime_error("Unknown missile model: " + missile_model);
 }
 
