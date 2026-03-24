@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "check.hxx"
 #include "colorful.hxx"
+#include "json.hpp"
 
 class InterpTable {
 public:
@@ -50,6 +51,28 @@ public:
 
     const std::vector<double>& getX() const { return x_; }
     const std::vector<double>& getY() const { return y_; }
+
+    json::JSON to_json() const {
+        json::JSON j;
+        json::JSON x_arr = json::JSON::Make(json::JSON::Class::Array);
+        json::JSON y_arr = json::JSON::Make(json::JSON::Class::Array);
+        for (size_t i = 0; i < x_.size(); ++i) {
+            x_arr.append(x_[i]);
+            y_arr.append(y_[i]);
+        }
+        j["x"] = x_arr;
+        j["y"] = y_arr;
+        return j;
+    }
+
+    static InterpTable from_json(const json::JSON& j) {
+        std::vector<double> x, y;
+        for (auto& v : j.at("x").ArrayRange())
+            x.push_back(v.IsFloating() ? v.ToFloat() : static_cast<double>(v.ToInt()));
+        for (auto& v : j.at("y").ArrayRange())
+            y.push_back(v.IsFloating() ? v.ToFloat() : static_cast<double>(v.ToInt()));
+        return InterpTable(x, y);
+    }
 
 private:
     std::vector<double> x_; 
