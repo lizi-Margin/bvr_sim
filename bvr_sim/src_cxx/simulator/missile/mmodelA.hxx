@@ -1,19 +1,16 @@
 #pragma once
 
 #include "base.hxx"
-#include "missile_params.hxx"
+#include "simulator/param_store.hxx"
+#include "simulator/missile/fdm/generic_missile_fdm.hxx"
 #include <array>
 #include <optional>
 #include <deque>
-#include <memory>
 
 namespace bvr_sim {
 
-/// Generic parametric missile model (Model A).
-/// Inherits from Missile, uses MissileParams for all configuration.
 class MModelA : public Missile {
 public:
-    // ===== CTOR =====
     MModelA(
         const std::string& uid,
         const std::string& missile_model,
@@ -24,17 +21,11 @@ public:
         double dt
     ) noexcept;
 
-    // ===== Virtual overrides =====
     void step() noexcept override;
 
-    // ===== Public accessors =====
-    const MissileParams& get_params() const noexcept { return params_; }
+    const ParamStore& get_params() const noexcept { return params_; }
 
 public:
-    // ===== Motion state =====
-    double speed;
-    std::array<double, 3> posture;  // pitch, yaw, roll
-
     // ===== Seeker state =====
     double radar_pitch, radar_yaw;
     bool guide_cmd_valid;
@@ -44,37 +35,25 @@ public:
     bool loss;
     std::array<double, 3> _before_loss_real_last_known_target_pos;
 
-    // ===== Guidance commands =====
-    std::optional<double> L_beta;  // lateral guidance command
-    std::optional<double> L_eps;   // longitudinal guidance command
+    // ===== Guidance commands (outputs from update_guidance) =====
+    std::optional<double> L_beta;
+    std::optional<double> L_eps;
     std::optional<double> _dbeta_filtered;
 
 private:
-    // ===== Parameters =====
-    MissileParams params_;
+    // params_ MUST be declared before fdm_ — initializer list order matters
+    ParamStore         params_;   // owned by MModelA
+    GenericMissileFDM  fdm_;      // holds const ref to params_
 
-    // ===== Propulsion state =====
-    double _t;      // thrust elapsed time
-    double _m;      // current mass
+    // ===== Mission state =====
+    bool              _search_started;
+    double            _distance_pre;
+    std::deque<bool>  _distance_increment;
+    int               _left_t;
 
-    // ===== Control surfaces =====
-    double _dtheta; // longitudinal rudder angle rate
-    double _dphi;   // lateral rudder angle rate
-
-    // ===== Distance tracking =====
-    bool _search_started;
-    double _distance_pre;
-    std::deque<bool> _distance_increment;
-    int _left_t;
-
-    // ===== Filter =====
-    // TimeScalarFilter ny_filter{0.1};  // TODO: add if needed
-
-    // ===== Private methods (to be implemented in .cxx) =====
     std::pair<double, double> update_guidance() noexcept;
-    void _state_trans(const std::array<double, 2>& action) noexcept;
-    void update_aerodynamics() noexcept;
-    void update_kinematics() noexcept;
+
+    static ParamStore _make_params(const std::string& missile_model) noexcept;
 };
 
 } // namespace bvr_sim
