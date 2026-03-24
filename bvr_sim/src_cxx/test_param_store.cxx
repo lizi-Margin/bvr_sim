@@ -79,3 +79,27 @@ TEST(ParamStore, JsonRoundtripIntegerValuesInJson) {
     ASSERT_NEAR(ps.get_double("t_thrust").value(), 8.0, 1e-9);
     ASSERT_NEAR(ps.get_double("K").value(), 3.0, 1e-9);
 }
+
+TEST(ParamStore, SetInterpTableNonNullWorks) {
+    // Note: nullptr table would trigger check() -> abort(). Cannot test in-process.
+    bvr_sim::ParamStore ps;
+    ps.set_interp_table("cx", std::make_shared<InterpTable>(
+        std::vector<double>{0.5, 1.0}, std::vector<double>{0.3, 0.6}
+    ));
+    ASSERT(ps.has_key("cx"));
+    ASSERT(ps.get_key_type("cx") == "table");
+    ASSERT(ps.get_interp_table("cx").has_value());
+}
+
+TEST(ParamStore, KeyTypeForAllTypes) {
+    bvr_sim::ParamStore ps;
+    ps.set_double("d", 1.0);
+    ps.set_string("s", "val");
+    ps.set_interp_table("t", std::make_shared<InterpTable>(
+        std::vector<double>{0.5, 1.0}, std::vector<double>{0.3, 0.6}
+    ));
+    ASSERT(ps.get_key_type("d") == "double");
+    ASSERT(ps.get_key_type("s") == "string");
+    ASSERT(ps.get_key_type("t") == "table");
+    ASSERT(ps.get_key_type("nonexistent") == "");
+}

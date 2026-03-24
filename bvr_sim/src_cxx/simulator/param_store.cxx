@@ -1,4 +1,5 @@
 #include "param_store.hxx"
+#include "rubbish_can/check.hxx"
 #include <stdexcept>
 
 namespace bvr_sim {
@@ -43,6 +44,7 @@ void ParamStore::set_string(const std::string& key, const std::string& value) {
 }
 
 void ParamStore::set_interp_table(const std::string& key, std::shared_ptr<InterpTable> table) {
+    check(table != nullptr, "ParamStore::set_interp_table: table must not be null");
     _register_key(key, "table");
     tables_[key] = std::move(table);
 }
@@ -89,6 +91,9 @@ ParamStore ParamStore::from_string(const std::string& json_str) {
     }
     if (root.hasKey("strings")) {
         for (auto& [k, v] : root["strings"].ObjectRange())
+            // Note: SimpleJSON's ToString() returns the escaped form of strings.
+            // Strings containing backslashes, quotes, or control chars may not round-trip cleanly.
+            // This is acceptable for the intended use case (missile model names, parameter names).
             store.set_string(k, v.ToString());
     }
     if (root.hasKey("tables")) {
