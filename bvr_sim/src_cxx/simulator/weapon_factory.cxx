@@ -51,6 +51,7 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
         case WeaponType::AIM120C:
             return std::make_shared<AIM120C>(
                 uid,
+                weapon_name,
                 color,
                 parent,
                 friend_obj,

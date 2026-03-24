@@ -22,14 +22,14 @@ using c3utils::nm_to_meters;
 
 MModelA::MModelA(
     const std::string& uid,
+    const std::string& missile_model,
     TeamColor color,
     const std::shared_ptr<SimulatedObject>& parent,
     const std::shared_ptr<SimulatedObject>& friend_obj,
     const std::shared_ptr<SimulatedObject>& target,
-    double dt,
-    const std::string& missile_model
+    double dt
 ) noexcept
-    : Missile(uid, "MModelA", color, parent, friend_obj, target, dt),
+    : Missile(uid, missile_model, color, parent, friend_obj, target, dt),
       params_(MissileParams::get_missile_params(missile_model)),
       speed(linalg_norm(velocity)),
       posture{0.0, 0.0, 0.0},
@@ -76,8 +76,7 @@ MModelA::MModelA(
         posture = {0.0, -pitch, -heading};
         velocity = vel;
     } else {
-        ::colorful::printHONG("MModelA must be parented by an Aircraft or AA");
-        std::abort();
+        check(false, "MModelA must be parented by an Aircraft or AA");
     }
 }
 

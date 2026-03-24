@@ -33,6 +33,7 @@ double signed_angle(const std::array<double, 3>& from_direction, const std::arra
 
 AIM120C::AIM120C(
     const std::string& uid,
+    const std::string& missile_model,
     TeamColor color,
     const std::shared_ptr<SimulatedObject>& parent,
     const std::shared_ptr<SimulatedObject>& friend_obj,
@@ -40,7 +41,7 @@ AIM120C::AIM120C(
     double dt,
     std::optional<double> t_thrust_override
 ) noexcept
-    : Missile(uid, "AIM-120C7", color, parent, friend_obj, target, dt),
+    : Missile(uid, missile_model, color, parent, friend_obj, target, dt),
       speed(linalg_norm(velocity)),
       posture{0.0, 0.0, 0.0},
       guide_cmd_valid(true),

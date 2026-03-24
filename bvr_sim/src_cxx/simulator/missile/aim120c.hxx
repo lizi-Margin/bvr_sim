@@ -104,6 +104,7 @@ public:
 public:
     AIM120C(
         const std::string& uid,
+        const std::string& missile_model,
         TeamColor color,
         const std::shared_ptr<SimulatedObject>& parent,
         const std::shared_ptr<SimulatedObject>& friend_obj,
