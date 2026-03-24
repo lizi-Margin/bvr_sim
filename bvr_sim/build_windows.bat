@@ -6,8 +6,8 @@ REM This script automatically clones C++ dependencies before building
 setlocal
 
 set BUILD_DIR=build
-@REM set BUILD_TYPE=Debug
-set BUILD_TYPE=Release
+set BUILD_TYPE=Debug
+@REM set BUILD_TYPE=Release
 set CMAKE_ARCH=x64
 
 echo ========================================

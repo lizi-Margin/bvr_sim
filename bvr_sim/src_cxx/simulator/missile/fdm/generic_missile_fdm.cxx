@@ -19,14 +19,14 @@ GenericMissileFDM::GenericMissileFDM(const ParamStore& params, double dt) noexce
 }
 
 void GenericMissileFDM::_cache_params() noexcept {
-    m0_             = params_.get_double("m0").value_or(161.48);
-    dm_             = params_.get_double("dm").value_or(6.41);
-    thrust_         = params_.get_double("thrust").value_or(16325.0);
-    t_thrust_cached_= params_.get_double("t_thrust").value_or(8.0);
-    S_ref_          = params_.get_double("S_ref").value_or(0.0248719);
-    mach_min_       = params_.get_double("mach_min").value_or(0.8);
-    nyz_max_        = params_.get_double("nyz_max").value_or(100.0);
-    g_              = params_.get_double("g").value_or(9.81);
+    m0_             = params_.get_double_("m0");
+    dm_             = params_.get_double_("dm");
+    thrust_         = params_.get_double_("thrust");
+    t_thrust_cached_= params_.get_double_("t_thrust");
+    S_ref_          = params_.get_double_("S_ref");
+    mach_min_       = params_.get_double_("mach_min");
+    nyz_max_        = params_.get_double_("nyz_max");
+    g_              = params_.get_double_("g");
 }
 
 void GenericMissileFDM::reset(const std::map<std::string, std::any>& initial_state) {
@@ -75,8 +75,7 @@ double GenericMissileFDM::_compute_drag_accel() const noexcept {
     double mach = speed / sound_speed;
     mach = std::max(mach, mach_min_);
 
-    auto cx_opt = params_.get_interp_table("cx_total_table");
-    double cx = cx_opt ? (*cx_opt)->interpolate(mach) : 0.3;
+    double cx = params_.get_interp_table_("cx_total_table")->interpolate(mach);
 
     double rho = 1.225 * std::exp(-alt / 9300.0);
     double drag_force = 0.5 * rho * speed * speed * cx * S_ref_;

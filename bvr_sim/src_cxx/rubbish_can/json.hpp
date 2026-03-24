@@ -444,11 +444,13 @@ class JSON
                 }
                 case Class::String:
                     return "\"" + json_escape( *Internal.String ) + "\"";
-                case Class::Floating: {
-                    std::ostringstream oss;
-                    oss << std::setprecision( std::numeric_limits<double>::max_digits10 ) << Internal.Float;
-                    return oss.str();
-                }
+                // case Class::Floating: {
+                //     std::ostringstream oss;
+                //     oss << std::setprecision( std::numeric_limits<double>::max_digits10 ) << Internal.Float;
+                //     return oss.str();
+                // }
+                case Class::Floating:
+                    return std::to_string( Internal.Float );
                 case Class::Integral:
                     return std::to_string( Internal.Int );
                 case Class::Boolean:
@@ -702,7 +704,7 @@ namespace {
                     std::cerr << "ERROR: Number: Expected a number for exponent, found '" << c << "'\n";
                     cpptrace::generate_trace().print();
                     std::abort();
-                    return JSON::Make( JSON::Class::Null );
+                    // return JSON::Make( JSON::Class::Null );
                 }
                 else
                     break;
@@ -713,7 +715,7 @@ namespace {
             std::cerr << "ERROR: Number: unexpected character '" << c << "'\n";
             cpptrace::generate_trace().print();
             std::abort();
-            return JSON::Make( JSON::Class::Null );
+            // return JSON::Make( JSON::Class::Null );
         }
         --offset;
         

@@ -10,6 +10,7 @@ TEST(ParamStore, SetAndGetDouble) {
     auto v = ps.get_double("mass");
     ASSERT(v.has_value());
     ASSERT_NEAR(v.value(), 161.48, 1e-9);
+    ASSERT_NEAR(ps.get_double_("mass"), 161.48, 1e-9);
 }
 
 TEST(ParamStore, SetAndGetString) {
@@ -18,6 +19,7 @@ TEST(ParamStore, SetAndGetString) {
     auto v = ps.get_string("model");
     ASSERT(v.has_value());
     ASSERT(v.value() == "AIM-120C");
+    ASSERT(ps.get_string_("model") == "AIM-120C");
 }
 
 TEST(ParamStore, MissingKeyReturnsNullopt) {
@@ -40,7 +42,7 @@ TEST(ParamStore, HasKey) {
     ASSERT(!ps.has_key("x"));
     ps.set_double("x", 1.0);
     ASSERT(ps.has_key("x"));
-    ASSERT(ps.get_key_type("x") == "double");
+    ASSERT(ps.get_key_type("x") == bvr_sim::ParamStore::ValueType::Double);
 }
 
 TEST(ParamStore, JsonRoundtripDoublesAndStrings) {
@@ -70,6 +72,7 @@ TEST(ParamStore, JsonRoundtripInterpTable) {
     auto tbl = ps2.get_interp_table("cx");
     ASSERT(tbl.has_value());
     ASSERT_NEAR((*tbl)->interpolate(1.0), 0.6, 1e-9);
+    ASSERT_NEAR(ps2.get_interp_table_("cx")->interpolate(1.0), 0.6, 1e-9);
 }
 
 TEST(ParamStore, JsonRoundtripIntegerValuesInJson) {
@@ -87,8 +90,9 @@ TEST(ParamStore, SetInterpTableNonNullWorks) {
         std::vector<double>{0.5, 1.0}, std::vector<double>{0.3, 0.6}
     ));
     ASSERT(ps.has_key("cx"));
-    ASSERT(ps.get_key_type("cx") == "table");
+    ASSERT(ps.get_key_type("cx") == bvr_sim::ParamStore::ValueType::InterpTable);
     ASSERT(ps.get_interp_table("cx").has_value());
+    ASSERT(ps.get_interp_table_("cx") != nullptr);
 }
 
 TEST(ParamStore, KeyTypeForAllTypes) {
@@ -98,8 +102,8 @@ TEST(ParamStore, KeyTypeForAllTypes) {
     ps.set_interp_table("t", std::make_shared<InterpTable>(
         std::vector<double>{0.5, 1.0}, std::vector<double>{0.3, 0.6}
     ));
-    ASSERT(ps.get_key_type("d") == "double");
-    ASSERT(ps.get_key_type("s") == "string");
-    ASSERT(ps.get_key_type("t") == "table");
-    ASSERT(ps.get_key_type("nonexistent") == "");
+    ASSERT(ps.get_key_type("d") == bvr_sim::ParamStore::ValueType::Double);
+    ASSERT(ps.get_key_type("s") == bvr_sim::ParamStore::ValueType::String);
+    ASSERT(ps.get_key_type("t") == bvr_sim::ParamStore::ValueType::InterpTable);
+    ASSERT(ps.get_key_type("nonexistent") == bvr_sim::ParamStore::ValueType::None);
 }

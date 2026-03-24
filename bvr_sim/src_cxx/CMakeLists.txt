@@ -338,8 +338,10 @@ endif()
 
 add_executable(bvr_sim_unit_tests
     test_main.cxx
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/test_param_store.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test_action_space.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/base.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"

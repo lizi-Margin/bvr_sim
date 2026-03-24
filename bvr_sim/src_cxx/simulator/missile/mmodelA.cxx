@@ -141,10 +141,10 @@ void MModelA::step() noexcept {
 
     double elapsed  = fdm_.get_elapsed_time();
     double speed    = fdm_.get_speed();
-    double t_max    = params_.get_double("t_max").value_or(300.0);
-    double t_thrust = params_.get_double("t_thrust").value_or(8.0);
-    double v_min    = get_mps(params_.get_double("mach_min").value_or(0.8), position[2]);
-    double Rc       = params_.get_double("Rc").value_or(152.4);
+    double t_max    = params_.get_double_("t_max");
+    double t_thrust = params_.get_double_("t_thrust");
+    double v_min    = get_mps(params_.get_double_("mach_min"), position[2]);
+    double Rc       = params_.get_double_("Rc");
 
     bool timeout             = elapsed > t_max;
     bool crash               = position[2] < 0.0;

@@ -70,7 +70,7 @@ std::optional<std::vector<double>> Register::get_vector(const std::string& key) 
     try {
         std::vector<double> result;
         for (size_t i = 0; i < val->size(); ++i) {
-            auto elem = val->at(i);
+            auto elem = val->at(static_cast<int>(i));
             if (elem.JSONType() == json::JSON::Class::Floating) {
                 result.push_back(elem.ToFloat());
             } else if (elem.JSONType() == json::JSON::Class::Integral) {

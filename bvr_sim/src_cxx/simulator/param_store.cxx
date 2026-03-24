@@ -4,12 +4,30 @@
 
 namespace bvr_sim {
 
-void ParamStore::_register_key(const std::string& key, const std::string& type) {
+namespace {
+
+const char* value_type_name(ParamStore::ValueType type) noexcept {
+    switch (type) {
+    case ParamStore::ValueType::None:
+        return "none";
+    case ParamStore::ValueType::Double:
+        return "double";
+    case ParamStore::ValueType::String:
+        return "string";
+    case ParamStore::ValueType::InterpTable:
+        return "interp_table";
+    }
+    return "unknown";
+}
+
+} // namespace
+
+void ParamStore::_register_key(const std::string& key, ValueType type) {
     auto it = key_types_.find(key);
     if (it != key_types_.end() && it->second != type) {
         throw std::runtime_error(
             "ParamStore: key '" + key + "' already registered as '" +
-            it->second + "', cannot re-register as '" + type + "'"
+            value_type_name(it->second) + "', cannot re-register as '" + value_type_name(type) + "'"
         );
     }
     key_types_[key] = type;
@@ -33,19 +51,38 @@ std::optional<std::shared_ptr<InterpTable>> ParamStore::get_interp_table(const s
     return it->second;
 }
 
+double ParamStore::get_double_(const std::string& key) const {
+    const auto value = get_double(key);
+    check(value.has_value(), "ParamStore::get_double_: missing or type-mismatched key '" + key + "'");
+    return *value;
+}
+
+const std::string& ParamStore::get_string_(const std::string& key) const {
+    auto it = strings_.find(key);
+    check(it != strings_.end(), "ParamStore::get_string_: missing or type-mismatched key '" + key + "'");
+    return it->second;
+}
+
+std::shared_ptr<InterpTable> ParamStore::get_interp_table_(const std::string& key) const {
+    const auto value = get_interp_table(key);
+    check(value.has_value(), "ParamStore::get_interp_table_: missing or type-mismatched key '" + key + "'");
+    check(*value != nullptr, "ParamStore::get_interp_table_: null table for key '" + key + "'");
+    return *value;
+}
+
 void ParamStore::set_double(const std::string& key, double value) {
-    _register_key(key, "double");
+    _register_key(key, ValueType::Double);
     doubles_[key] = value;
 }
 
 void ParamStore::set_string(const std::string& key, const std::string& value) {
-    _register_key(key, "string");
+    _register_key(key, ValueType::String);
     strings_[key] = value;
 }
 
 void ParamStore::set_interp_table(const std::string& key, std::shared_ptr<InterpTable> table) {
     check(table != nullptr, "ParamStore::set_interp_table: table must not be null");
-    _register_key(key, "table");
+    _register_key(key, ValueType::InterpTable);
     tables_[key] = std::move(table);
 }
 
@@ -53,9 +90,9 @@ bool ParamStore::has_key(const std::string& key) const noexcept {
     return key_types_.find(key) != key_types_.end();
 }
 
-std::string ParamStore::get_key_type(const std::string& key) const noexcept {
+ParamStore::ValueType ParamStore::get_key_type(const std::string& key) const noexcept {
     auto it = key_types_.find(key);
-    if (it == key_types_.end()) return "";
+    if (it == key_types_.end()) return ValueType::None;
     return it->second;
 }
 

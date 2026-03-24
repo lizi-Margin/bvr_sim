@@ -78,15 +78,27 @@ public:
         auto delta_heading = register_.get("delta_heading");
         auto delta_altitude = register_.get("delta_altitude");
         auto delta_speed = register_.get("delta_speed");
-        if (delta_heading.has_value() && delta_heading.value().JSONType() == json::JSON::Class::Floating) {
-            action_json["delta_heading"] = delta_heading.value();
-        }
-        if (delta_altitude.has_value() && delta_altitude.value().JSONType() == json::JSON::Class::Floating) {
-            action_json["delta_altitude"] = delta_altitude.value();
-        }
-        if (delta_speed.has_value() && delta_speed.value().JSONType() == json::JSON::Class::Floating) {
-            action_json["delta_speed"] = delta_speed.value();
-        }
+        
+
+        // lambda to retrieve the float value from the register, with error checking
+        auto get_float_from_register = [&](const std::optional<json::JSON>& value_opt, const std::string& key) -> void {
+            if (!value_opt.has_value()) {
+                return;
+            }
+            const auto& value = value_opt.value();
+            if (value.JSONType() == json::JSON::Class::Floating) {
+                action_json[key] = value;
+            } else if (value.JSONType() == json::JSON::Class::Integral) {
+                action_json[key] = json::Float(value.ToInt());
+            } else {
+                colorful::printHONG(std::sprintf("Expected a numeric type for action component, but got type %s", json::JSON::ClassString(value.JSONType()).c_str()));
+            }
+            return;
+        };
+
+        get_float_from_register(delta_heading, "delta_heading");
+        get_float_from_register(delta_altitude, "delta_altitude");
+        get_float_from_register(delta_speed, "delta_speed");
 
         auto fire = register_.get("fire");
         if (fire.has_value()) {
