@@ -87,6 +87,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/missile_aerodynamics.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/missile_params.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/base.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/awacs.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/rws.cxx"
@@ -112,6 +113,7 @@ set(BVR_SIM_INCLUDE_DIRS
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fc"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl"
     "${CMAKE_CURRENT_SOURCE_DIR}/extern/SimpleJSON"
@@ -338,6 +340,9 @@ add_executable(bvr_sim_unit_tests
     test_main.cxx
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/test_param_store.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/base.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"
 )
 
 # Link with main library dependencies
