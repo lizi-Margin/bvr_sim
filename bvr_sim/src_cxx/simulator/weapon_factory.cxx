@@ -49,14 +49,14 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
 
     switch (type) {
         case WeaponType::AIM120C:
-            return std::make_shared<MModelA>(
+            return std::make_shared<AIM120C>(
                 uid,
                 color,
                 parent,
                 friend_obj,
                 target,
                 dt,
-                weapon_name
+                t_thrust_override
             );
 
         case WeaponType::Unknown:
