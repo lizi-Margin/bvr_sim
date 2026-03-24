@@ -444,7 +444,7 @@ class JSON
                 }
                 case Class::String:
                     return "\"" + json_escape( *Internal.String ) + "\"";
-                // case Class::Floating: {
+                // case Class::Floating: {  // this will convert 1.0f to 1, make the type from floating to integral, which is not what we want. 
                 //     std::ostringstream oss;
                 //     oss << std::setprecision( std::numeric_limits<double>::max_digits10 ) << Internal.Float;
                 //     return oss.str();
