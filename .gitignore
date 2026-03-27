@@ -10,7 +10,10 @@ __pycache__
 /*.log
 /test_logs/
 /.vscode
-/docs
+/docs/*
+!/docs/.gitignore
+!/docs/doc.md
+!/docs/getting_started.md
 
 /*.png
 /*.csv
