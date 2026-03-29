@@ -60,6 +60,40 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
         })";
         return ParamStore::from_string(json_str);
     }
+    if (missile_model == "AIM-9M" || missile_model == "AIM9M") {
+        const std::string json_str = R"({
+            "doubles": {
+                "m0":                    84.0,
+                "dm":                    6.0,
+                "thrust":                7063.2,
+                "t_thrust":              5.0,
+                "t_max":                 180.0,
+                "S_ref":                 0.0126677,
+                "mach_min":              0.8,
+                "nyz_max":               60.0,
+                "g":                     9.81,
+                "Rc":                    152.4,
+                "K":                     5.0,
+                "search_fov":            0.349066,
+                "search_range":          27780.0,
+                "search_start_range":    18520.0,
+                "track_gimbal_limit":    1.5708,
+                "loss_time_threshold":   1.0
+            },
+            "strings": {
+                "enable_search": "true",
+                "enable_track":  "true",
+                "enable_loft":   "false"
+            },
+            "tables": {
+                "cx_total_table": {
+                    "x": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0],
+                    "y": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+                }
+            }
+        })";
+        return ParamStore::from_string(json_str);
+    }
     colorful::printHONG("[MModelA] Unknown missile model: " + missile_model + ", returning empty ParamStore");
     return ParamStore{};
 }
