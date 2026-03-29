@@ -12,6 +12,8 @@ const char* value_type_name(ParamStore::ValueType type) noexcept {
         return "none";
     case ParamStore::ValueType::Double:
         return "double";
+    case ParamStore::ValueType::Bool:
+        return "bool";
     case ParamStore::ValueType::String:
         return "string";
     case ParamStore::ValueType::InterpTable:
@@ -39,6 +41,12 @@ std::optional<double> ParamStore::get_double(const std::string& key) const noexc
     return it->second;
 }
 
+std::optional<bool> ParamStore::get_bool(const std::string& key) const noexcept {
+    auto it = bools_.find(key);
+    if (it == bools_.end()) return std::nullopt;
+    return it->second;
+}
+
 std::optional<std::string> ParamStore::get_string(const std::string& key) const noexcept {
     auto it = strings_.find(key);
     if (it == strings_.end()) return std::nullopt;
@@ -54,6 +62,12 @@ std::optional<std::shared_ptr<InterpTable>> ParamStore::get_interp_table(const s
 double ParamStore::get_double_(const std::string& key) const {
     const auto value = get_double(key);
     check(value.has_value(), "ParamStore::get_double_: missing or type-mismatched key '" + key + "'");
+    return *value;
+}
+
+bool ParamStore::get_bool_(const std::string& key) const {
+    const auto value = get_bool(key);
+    check(value.has_value(), "ParamStore::get_bool_: missing or type-mismatched key '" + key + "'");
     return *value;
 }
 
@@ -73,6 +87,11 @@ std::shared_ptr<InterpTable> ParamStore::get_interp_table_(const std::string& ke
 void ParamStore::set_double(const std::string& key, double value) {
     _register_key(key, ValueType::Double);
     doubles_[key] = value;
+}
+
+void ParamStore::set_bool(const std::string& key, bool value) {
+    _register_key(key, ValueType::Bool);
+    bools_[key] = value;
 }
 
 void ParamStore::set_string(const std::string& key, const std::string& value) {
@@ -99,17 +118,21 @@ ParamStore::ValueType ParamStore::get_key_type(const std::string& key) const noe
 std::string ParamStore::to_string() const {
     json::JSON root    = json::JSON::Make(json::JSON::Class::Object);
     json::JSON doubles_j = json::JSON::Make(json::JSON::Class::Object);
+    json::JSON bools_j   = json::JSON::Make(json::JSON::Class::Object);
     json::JSON strings_j = json::JSON::Make(json::JSON::Class::Object);
     json::JSON tables_j  = json::JSON::Make(json::JSON::Class::Object);
 
     for (const auto& [k, v] : doubles_)
         doubles_j[k] = json::JSON(v);
+    for (const auto& [k, v] : bools_)
+        bools_j[k] = json::JSON(v);
     for (const auto& [k, v] : strings_)
         strings_j[k] = json::JSON(v);
     for (const auto& [k, v] : tables_)
         tables_j[k] = v->to_json();
 
     root["doubles"] = doubles_j;
+    root["bools"]   = bools_j;
     root["strings"] = strings_j;
     root["tables"]  = tables_j;
     return root.dump();
@@ -125,6 +148,10 @@ ParamStore ParamStore::from_string(const std::string& json_str) {
             double val = v.IsFloating() ? v.ToFloat() : static_cast<double>(v.ToInt());
             store.set_double(k, val);
         }
+    }
+    if (root.hasKey("bools")) {
+        for (auto& [k, v] : root["bools"].ObjectRange())
+            store.set_bool(k, v.ToBool());
     }
     if (root.hasKey("strings")) {
         for (auto& [k, v] : root["strings"].ObjectRange())

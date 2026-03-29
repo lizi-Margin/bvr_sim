@@ -22,6 +22,7 @@ public:
     enum class ValueType {
         None,
         Double,
+        Bool,
         String,
         InterpTable,
     };
@@ -29,15 +30,21 @@ public:
     ParamStore() = default;
 
     // ===== Getters =====
+    // Do not use these getters that can cover up the absence of a key
     std::optional<double>                       get_double(const std::string& key) const noexcept;
+    std::optional<bool>                         get_bool(const std::string& key) const noexcept;
     std::optional<std::string>                  get_string(const std::string& key) const noexcept;
     std::optional<std::shared_ptr<InterpTable>> get_interp_table(const std::string& key) const noexcept;
+
+    // Use these getters that crash if the key is missing, to avoid silent bugs from typos or missing parameters
     double                                      get_double_(const std::string& key) const;
+    bool                                        get_bool_(const std::string& key) const;
     const std::string&                          get_string_(const std::string& key) const;
     std::shared_ptr<InterpTable>                get_interp_table_(const std::string& key) const;
 
     // ===== Setters (throw if key already exists with different type) =====
     void set_double(const std::string& key, double value);
+    void set_bool(const std::string& key, bool value);
     void set_string(const std::string& key, const std::string& value);
     void set_interp_table(const std::string& key, std::shared_ptr<InterpTable> table);
 
@@ -51,6 +58,7 @@ public:
 
 private:
     std::map<std::string, double>                       doubles_;
+    std::map<std::string, bool>                         bools_;
     std::map<std::string, std::string>                  strings_;
     std::map<std::string, std::shared_ptr<InterpTable>> tables_;
     std::map<std::string, ValueType>                    key_types_;

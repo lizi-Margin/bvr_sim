@@ -26,6 +26,8 @@ WeaponFactory::WeaponType WeaponFactory::parse_weapon_name(const std::string& we
         {"AIM-120C", WeaponType::AIM120C},
         {"AIM-120C5", WeaponType::AIM120C},
         {"AIM-120C7", WeaponType::AIM120C},
+        {"AIM-9", WeaponType::AIM9M},
+        {"AIM-9M", WeaponType::AIM9M},
     };
 
     auto it = MAP.find(weapon_name);
@@ -58,6 +60,17 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
                 target,
                 dt,
                 t_thrust_override
+            );
+
+        case WeaponType::AIM9M:
+            return std::make_shared<MModelA>(
+                uid,
+                weapon_name,
+                color,
+                parent,
+                friend_obj,
+                target,
+                dt
             );
 
         case WeaponType::Unknown:

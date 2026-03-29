@@ -17,6 +17,7 @@ public:
     enum class WeaponType {
         Unknown,
         AIM120C,
+        AIM9M,
         // Future weapons can be added here
         // AGM154,
         // etc.

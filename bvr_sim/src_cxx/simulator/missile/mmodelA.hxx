@@ -22,6 +22,7 @@ public:
     ) noexcept;
 
     void step() noexcept override;
+    bool can_track_target() noexcept override;
 
     const ParamStore& get_params() const noexcept { return params_; }
 
@@ -51,6 +52,16 @@ private:
     std::deque<bool>  _distance_increment;
     int               _left_t;
 
+    bool _can_track_from(const std::shared_ptr<SimulatedObject>& friend_) const noexcept;
+    void _loss_update_target_info() noexcept;
+    double K_func(double range_to_target) const noexcept;
+    double calculate_min_distance(
+        const std::array<double, 3>& missile_pos,
+        const std::array<double, 3>& missile_vel,
+        const std::array<double, 3>& aircraft_pos,
+        const std::array<double, 3>& aircraft_vel,
+        double delta_t
+    ) const noexcept;
     std::pair<double, double> update_guidance() noexcept;
 
     static ParamStore _make_params(const std::string& missile_model) noexcept;
