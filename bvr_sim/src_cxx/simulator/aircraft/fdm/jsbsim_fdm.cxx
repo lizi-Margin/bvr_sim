@@ -35,7 +35,7 @@ namespace Catalog {
     Property ic_long_gc_deg("ic/long-gc-deg", "", -180, 180);
     Property ic_lat_geod_deg("ic/lat-geod-deg", "", -90, 90);
     Property ic_h_sl_ft("ic/h-sl-ft", "", -1400, 85000);
-    Property ic_psi_true_deg("ic/psi-true-deg", "", 0, 360);
+    Property ic_psi_true_deg("ic/psi-true-deg", "", -36000, 36000);
     Property ic_u_fps("ic/u-fps", "", -2200, 2200);
     Property ic_v_fps("ic/v-fps", "", -2200, 2200);
     Property ic_w_fps("ic/w-fps", "", -2200, 2200);
@@ -183,23 +183,23 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
     }
     
 
-    clear_default_condition();
+    // clear_default_condition();
 }
 
-void JSBSimFDM::clear_default_condition() noexcept {
-    set_property_value(Catalog::ic_long_gc_deg, 120.0);
-    set_property_value(Catalog::ic_lat_geod_deg, 60.0);
-    set_property_value(Catalog::ic_h_sl_ft, 20000);
-    set_property_value(Catalog::ic_psi_true_deg, 0.0);
-    set_property_value(Catalog::ic_u_fps, 800.0);
-    set_property_value(Catalog::ic_v_fps, 0.0);
-    set_property_value(Catalog::ic_w_fps, 0.0);
-    // set_property_value(Catalog::ic_p_rad_sec, 0.0);
-    // set_property_value(Catalog::ic_q_rad_sec, 0.0);
-    // set_property_value(Catalog::ic_r_rad_sec, 0.0);
-    // set_property_value(Catalog::ic_roc_fpm, 0.0);
-    // set_property_value(Catalog::ic_terrain_elevation_ft, 12000);
-}
+// void JSBSimFDM::clear_default_condition() noexcept {
+//     set_property_value(Catalog::ic_long_gc_deg, 120.0);
+//     set_property_value(Catalog::ic_lat_geod_deg, 60.0);
+//     set_property_value(Catalog::ic_h_sl_ft, 20000);
+//     set_property_value(Catalog::ic_psi_true_deg, 0.0);
+//     set_property_value(Catalog::ic_u_fps, 800.0);
+//     set_property_value(Catalog::ic_v_fps, 0.0);
+//     set_property_value(Catalog::ic_w_fps, 0.0);
+//     // set_property_value(Catalog::ic_p_rad_sec, 0.0);
+//     // set_property_value(Catalog::ic_q_rad_sec, 0.0);
+//     // set_property_value(Catalog::ic_r_rad_sec, 0.0);
+//     // set_property_value(Catalog::ic_roc_fpm, 0.0);
+//     // set_property_value(Catalog::ic_terrain_elevation_ft, 12000);
+// }
 
 void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
     auto pos_any = initial_state.at("position");
@@ -281,13 +281,14 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
     }
     propulsion->GetSteadyState();
 
-    // std::cout << "Before Update: " << std::endl;
-    // std::cout << "\033[32m" << "JSBSim " << aircraft_model
-    //           << " reset at (" << lon << " E, " << lat << " N, N" << position[0]
-    //           << ", W" << position[1] << ", U(true alt)" << alt << "m, "
-    //           << meters_to_feet(alt) << "ft, " << rad2deg(yaw) << " deg)"
-    //           << "\033[0m" << std::endl;
+    std::cout << "Before Update: " << std::endl;
+    std::cout << "\033[32m" << "JSBSim " << aircraft_model
+              << " reset at (" << lon << " E, " << lat << " N, N" << position[0]
+              << ", W" << position[1] << ", U(true alt)" << alt << "m, "
+              << meters_to_feet(alt) << "ft, " << rad2deg(yaw) << " deg)"
+              << "\033[0m" << std::endl;
 
+    jsbsim_exec->Run();
     update_properties();
     initialized = true;
 
@@ -301,6 +302,7 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
               << std::endl;
               
     SL::get().print(ss.str());
+    colorful::printLAN(ss.str());
 }
 
 double JSBSimFDM::get_mach() const noexcept {

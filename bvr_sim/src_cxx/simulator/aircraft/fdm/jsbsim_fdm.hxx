@@ -127,7 +127,7 @@ public:
 private:
     void initialize_jsbsim() noexcept;
 
-    void clear_default_condition() noexcept;
+    // void clear_default_condition() noexcept;
 
     void run_jsbsim_step(const std::map<std::string, double>& action) noexcept;
 
