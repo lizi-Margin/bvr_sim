@@ -281,12 +281,12 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
     }
     propulsion->GetSteadyState();
 
-    std::cout << "Before Update: " << std::endl;
-    std::cout << "\033[32m" << "JSBSim " << aircraft_model
-              << " reset at (" << lon << " E, " << lat << " N, N" << position[0]
-              << ", W" << position[1] << ", U(true alt)" << alt << "m, "
-              << meters_to_feet(alt) << "ft, " << rad2deg(yaw) << " deg)"
-              << "\033[0m" << std::endl;
+    // std::cout << "Before Update: " << std::endl;
+    // std::cout << "\033[32m" << "JSBSim " << aircraft_model
+    //           << " reset at (" << lon << " E, " << lat << " N, N" << position[0]
+    //           << ", W" << position[1] << ", U(true alt)" << alt << "m, "
+    //           << meters_to_feet(alt) << "ft, " << rad2deg(yaw) << " deg)"
+    //           << "\033[0m" << std::endl;
 
     jsbsim_exec->Run();
     update_properties();
@@ -302,7 +302,7 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
               << std::endl;
               
     SL::get().print(ss.str());
-    colorful::printLAN(ss.str());
+    // colorful::printLAN(ss.str());
 }
 
 double JSBSimFDM::get_mach() const noexcept {
