@@ -182,6 +182,9 @@ python tests/cpp_unit_tests.py
 更偏研究和设计材料的文档在 `docs/` 下，例如：
 
 - [`docs/doc.md`](G:\bvr_sim\docs\doc.md)
+- [`docs/installation.md`](G:\bvr_sim\docs\installation.md)
+- [`docs/configuration.md`](G:\bvr_sim\docs\configuration.md)
+- [`docs/integration.md`](G:\bvr_sim\docs\integration.md)
 - `docs/开发日志.md`
 - `docs/毕业设计中期报告.md`
 
