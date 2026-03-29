@@ -13,7 +13,7 @@ namespace bvr_sim {
 TacticalOpponent3D::TacticalOpponent3D() noexcept
     : BaseOpponent3D("Tactical3D"),
       last_shoot_time(-static_cast<int>(30.0 / cfg::dt)), // Convert 30 seconds to steps (assuming default dt=0.1)
-      crank_direction(1),
+      crank_direction(randomize_crank_direction()),
       crank_switch_time(0),
       evade_tactic(EvadeTactic::TurnCold) {
 }

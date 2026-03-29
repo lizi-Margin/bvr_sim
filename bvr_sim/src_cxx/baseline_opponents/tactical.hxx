@@ -24,9 +24,14 @@ private:
     };
     EvadeTactic evade_tactic;
 public:
+    static int randomize_crank_direction() noexcept {
+        static std::mt19937 gen(std::random_device{}());
+        static std::uniform_int_distribution<int> dist(0, 1);
+        return dist(gen) == 0 ? -1 : 1;
+    }
+
     void randomize_tactic() noexcept {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
+        static thread_local std::mt19937 gen(std::random_device{}());
         static std::uniform_int_distribution<int> dist(0, static_cast<int>(EvadeTactic::EvadeTacticMax) - 1);;
         evade_tactic = static_cast<EvadeTactic>(dist(gen));
     }
