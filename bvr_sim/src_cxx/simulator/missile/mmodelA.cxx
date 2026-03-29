@@ -92,6 +92,7 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
             "bools": {
                 "enable_search": true,
                 "enable_guide_cmd": false,
+                "enable_INS_guide": false,
                 "enable_loft":   false
             },
             "tables": {
@@ -195,13 +196,16 @@ bool MModelA::can_track_target() noexcept {
 
     const bool enable_search = params_.get_bool_("enable_search");
     const bool enable_guide_cmd = params_.get_bool_("enable_guide_cmd");
+    const bool enable_INS_guide = params_.get_bool_("enable_INS_guide");
 
     if (losstime > 0.1 && !radar_on) {
         if (!loss) {
             _before_loss_real_last_known_target_pos = last_known_target_pos;
             loss = true;
         }
-        _loss_update_target_info();
+        if (enable_INS_guide) {
+            _loss_update_target_info();
+        }
     } else {
         loss = false;
     }
@@ -420,6 +424,15 @@ void MModelA::step() noexcept {
 }
 
 std::pair<double, double> MModelA::update_guidance() noexcept {
+    const bool enable_INS_guide = params_.get_bool_("enable_INS_guide");
+    if (loss && !enable_INS_guide) {
+        return {0.0, 0.0};
+    }
+
+    const double x_t = last_known_target_pos[0];
+    const double y_t = last_known_target_pos[1];
+    const double z_t = last_known_target_pos[2];
+
     const double x_m = position[0];
     const double y_m = position[1];
     const double z_m = position[2];
@@ -440,9 +453,6 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     const double nyz_max = params_.get_double_("nyz_max");
 
     const double theta_m = std::asin(std::clamp(dz_m / v_m, -1.0, 1.0));
-    const double x_t = last_known_target_pos[0];
-    const double y_t = last_known_target_pos[1];
-    const double z_t = last_known_target_pos[2];
 
     const double range_to_target = linalg_norm({x_m - x_t, y_m - y_t, z_t - z_m});
     const double beta = std::atan2(y_t - y_m, x_t - x_m);
