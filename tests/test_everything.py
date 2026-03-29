@@ -1,7 +1,8 @@
 import platform, subprocess, os
 from test_py import main as python_core_full_test
 from test_cpp import main as cpp_core_full_test
-from cpp_unit_tests import main as cxx_unit_tests
+from cpp_unit_tests import bvr_sim_unit_tests as cxx_unit_tests
+from cpp_unit_tests import c3u_unit_tests
 
 def main():
     if platform.system() == "Windows":
@@ -16,6 +17,9 @@ def main():
 
     print("\nRunning C++ unit tests...")
     unit_test_result = cxx_unit_tests()
+    
+    print("\nRunning C3Utils unit tests...")
+    c3u_test_result = c3u_unit_tests()
 
     print("\nRunning C++ core full test...")
     cpp_result = cpp_core_full_test()
@@ -23,7 +27,7 @@ def main():
     print("\nRunning Python core full test...")
     python_result = python_core_full_test()
 
-    if python_result == 0 and cpp_result == 0 and unit_test_result == 0:
+    if python_result == 0 and cpp_result == 0 and unit_test_result == 0 and c3u_test_result == 0:
         print("\nAll tests PASSED")
         return 0
     else:

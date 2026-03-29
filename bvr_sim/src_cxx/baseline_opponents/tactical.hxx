@@ -80,6 +80,17 @@ private:
         json::JSON& fire
     ) noexcept;
 
+    void tactical_short_range_attack(
+        std::shared_ptr<Aircraft> agent,
+        std::shared_ptr<Aircraft> target,
+        std::vector<std::shared_ptr<Missile>> missiles_in_flight,
+        double& delta_heading,
+        double& delta_altitude,
+        double& delta_speed,
+        bool& shoot,
+        json::JSON& fire
+    ) noexcept;
+
     void get_default_action(
         std::shared_ptr<Aircraft> agent,
         double& delta_heading,

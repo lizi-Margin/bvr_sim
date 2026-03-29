@@ -72,19 +72,23 @@ namespace c3utils {
         return mach * local_ss;
 	}
 
-	inline float64_t get_mps(float64_t mach,float64_t alt) noexcept
-	{
-		return mach_to_mps(mach, estimate_temperature_C(alt));
-	}
-
-	inline float64_t get_mach(float64_t mps, float64_t alt) noexcept
+	inline float64_t get_local_speed_of_sound(float64_t alt) noexcept
 	{
 		const double gamma = 1.4;
 		const double R = 287.05;
 		double temperature_C = estimate_temperature_C(alt);
 		double temperature_K = C_to_K(temperature_C);
-		double local_ss = std::sqrt(gamma * R * temperature_K);
-		return mps / local_ss;
+		return std::sqrt(gamma * R * temperature_K);
+	}
+
+	inline float64_t get_mps(float64_t mach,float64_t alt) noexcept
+	{
+		return mach * get_local_speed_of_sound(alt);
+	}
+
+	inline float64_t get_mach(float64_t mps, float64_t alt) noexcept
+	{
+		return mps / get_local_speed_of_sound(alt);
 	}
 
     constexpr inline float64_t meters_to_feet(float64_t meters) noexcept 
@@ -96,6 +100,72 @@ namespace c3utils {
 	{
         return feet / 3.28084;
     }
+
+	inline float64_t get_standard_atmosphere_density(float64_t alt_m) noexcept
+	{
+		constexpr std::array<float64_t, 9> geopotential_altitudes_ft = {
+			0.0000, 36089.2388, 65616.7979, 104986.8766, 154199.4751,
+			167322.8346, 232939.6325, 278385.8268, 298556.4304
+		};
+		constexpr std::array<float64_t, 9> temperatures_rankine = {
+			518.67, 389.97, 389.97, 411.57, 487.17,
+			487.17, 386.37, 336.5028, 336.5028
+		};
+
+		const float64_t earth_radius_ft = meters_to_feet(ISA_EARTH_RADIUS);
+		const float64_t g0_ft_s2 = meters_to_feet(ISA_G0);
+		const float64_t altitude_ft = meters_to_feet(alt_m);
+		const float64_t geopotential_altitude_ft =
+			(altitude_ft * earth_radius_ft) / (earth_radius_ft + altitude_ft);
+
+		std::array<float64_t, 8> lapse_rates {};
+		for (size_t i = 0; i < lapse_rates.size(); ++i) {
+			lapse_rates[i] =
+				(temperatures_rankine[i + 1] - temperatures_rankine[i]) /
+				(geopotential_altitudes_ft[i + 1] - geopotential_altitudes_ft[i]);
+		}
+
+		std::array<float64_t, 9> pressure_breakpoints {};
+		pressure_breakpoints[0] = ISA_STD_SL_PRESSURE_PSF;
+		for (size_t i = 0; i < lapse_rates.size(); ++i) {
+			const float64_t base_temp = temperatures_rankine[i];
+			const float64_t delta_h = geopotential_altitudes_ft[i + 1] - geopotential_altitudes_ft[i];
+			if (lapse_rates[i] != 0.0) {
+				const float64_t exponent = g0_ft_s2 / (ISA_RDRY_FT_LBF_SLUG_R * lapse_rates[i]);
+				const float64_t factor = base_temp / (base_temp + lapse_rates[i] * delta_h);
+				pressure_breakpoints[i + 1] = pressure_breakpoints[i] * std::pow(factor, exponent);
+			} else {
+				pressure_breakpoints[i + 1] =
+					pressure_breakpoints[i] * std::exp(-g0_ft_s2 * delta_h / (ISA_RDRY_FT_LBF_SLUG_R * base_temp));
+			}
+		}
+
+		size_t b = 0;
+		for (; b < lapse_rates.size() - 1; ++b) {
+			if (geopotential_altitude_ft < geopotential_altitudes_ft[b + 1]) {
+				break;
+			}
+		}
+
+		const float64_t base_alt = geopotential_altitudes_ft[b];
+		const float64_t base_temp = temperatures_rankine[b];
+		const float64_t delta_h = geopotential_altitude_ft - base_alt;
+		const float64_t lapse_rate = lapse_rates[b];
+
+		float64_t pressure_psf = 0.0;
+		if (lapse_rate != 0.0) {
+			const float64_t exponent = g0_ft_s2 / (ISA_RDRY_FT_LBF_SLUG_R * lapse_rate);
+			const float64_t factor = base_temp / (base_temp + lapse_rate * delta_h);
+			pressure_psf = pressure_breakpoints[b] * std::pow(factor, exponent);
+		} else {
+			pressure_psf =
+				pressure_breakpoints[b] * std::exp(-g0_ft_s2 * delta_h / (ISA_RDRY_FT_LBF_SLUG_R * base_temp));
+		}
+
+		const float64_t temperature_rankine = base_temp + lapse_rate * delta_h;
+		const float64_t density_slug_per_ft3 = pressure_psf / (ISA_RDRY_FT_LBF_SLUG_R * temperature_rankine);
+		return density_slug_per_ft3 * SLUG_PER_FT3_TO_KG_PER_M3;
+	}
 
 
     inline float64_t abs(float64_t num) noexcept 

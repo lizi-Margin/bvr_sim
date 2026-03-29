@@ -11,10 +11,7 @@ double MissileAerodynamics::speed_of_sound(double alt_m) const noexcept {
 }
 
 double MissileAerodynamics::air_density(double alt_m) const noexcept {
-    // 指数近似：rho = 1.225 * exp(-z/9300)
-    // BUG OverflowError: math range error
-    alt_m = std::clamp(alt_m, 0.0, 10000.0);
-    return 1.225 * std::exp(-alt_m / 9300.0);
+    return get_standard_atmosphere_density(alt_m);
 }
 
 double MissileAerodynamics::linear_interp(

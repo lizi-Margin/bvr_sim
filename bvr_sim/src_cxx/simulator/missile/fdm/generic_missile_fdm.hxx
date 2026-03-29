@@ -10,14 +10,6 @@ namespace bvr_sim {
 
 // ParamStore already brings in ::InterpTable via using ::InterpTable
 
-/// Generic missile flight dynamics model.
-/// Handles aerodynamics (Mach-indexed drag), kinematics (Euler integration),
-/// and propulsion (thrust + mass burn).
-/// Receives ny/nz acceleration commands via step() — applied directly.
-///
-/// Gravity convention: nz is the aerodynamic normal load factor (g-units).
-/// Gravity (-g in NWU Z) is applied separately as a world-frame constant.
-///
 /// Lifetime contract: the ParamStore reference must outlive this object.
 /// Satisfied when both are owned by the same Missile class.
 class GenericMissileFDM : public BaseFDM {
@@ -46,9 +38,12 @@ private:
     // Cached params (extracted once in _cache_params for hot path)
     double m0_, dm_, thrust_, S_ref_, mach_min_, nyz_max_, g_;
 
+    double dtheta_;
+    double dphi_;
+
     void   _cache_params() noexcept;
     void   _update_propulsion(double dt_step) noexcept;
-    double _compute_drag_accel() const noexcept;
+    double _compute_drag_force(double speed, double altitude) const noexcept;
     void   _integrate(double ny, double nz) noexcept;
 };
 

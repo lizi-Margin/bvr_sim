@@ -9,7 +9,8 @@ def get_root_dir() -> str:
 
 def main():
     # Load environment config
-    with open(os.path.join(get_root_dir(), "./tests/demo_config_cpp.jsonc"), "r") as fin:
+    # with open(os.path.join(get_root_dir(), "./tests/demo_config_cpp.jsonc"), "r") as fin:
+    with open(os.path.join(get_root_dir(), "./example/custom_5v5_f22_f16.jsonc"), "r") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)
@@ -23,7 +24,7 @@ def main():
         red_wins = 0
         blue_wins = 0
         draw = 0
-        while turn < 10:
+        while turn < 4:
             sim.core.set_acmi_file_path(f"./test_logs/replay_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             i = 0

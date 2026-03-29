@@ -14,6 +14,11 @@ __pycache__
 !/docs/.gitignore
 !/docs/doc.md
 !/docs/getting_started.md
+!/docs/installation.md
+!/docs/configuration.md
+!/docs/integration.md
+!/docs/developer/
+!/docs/developer/architecture.md
 
 /*.png
 /*.csv

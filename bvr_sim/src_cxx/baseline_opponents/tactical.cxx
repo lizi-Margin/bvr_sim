@@ -137,7 +137,18 @@ void TacticalOpponent3D::take_action(
         return;
     }
 
-    // Priority 4: No enemies - maintain course
+    // Priority 4: Short-range attack with AIM-9 when AIM-120 is exhausted
+    if (!alive_enemies.empty() && agent->pylon_manager.num_left_weapons("AIM-9") > 0) {
+        double delta_heading, delta_altitude, delta_speed;
+        bool shoot;
+        json::JSON fire_action_json = json::JSON::Make(json::JSON::Class::Object);
+        tactical_short_range_attack(agent, nearest_enemy, missiles_in_flight, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
+        auto final_action = build_action_from_rates(delta_heading, delta_altitude, delta_speed, shoot);
+        apply_action(agent, final_action, fire_action_json);
+        return;
+    }
+
+    // Priority 5: No usable weapons - maintain course
     double delta_heading, delta_altitude, delta_speed;
     bool shoot;
     json::JSON fire_action_json = json::JSON::Make(json::JSON::Class::Object);
@@ -387,6 +398,67 @@ void TacticalOpponent3D::tactical_attack(
             fire = get_fire_action(agent, target->uid, "AIM-120");
             last_shoot_time = time_counter;
         }
+    }
+}
+
+void TacticalOpponent3D::tactical_short_range_attack(
+    std::shared_ptr<Aircraft> agent,
+    std::shared_ptr<Aircraft> target,
+    std::vector<std::shared_ptr<Missile>> missiles_in_flight,
+    double& delta_heading,
+    double& delta_altitude,
+    double& delta_speed,
+    bool& shoot,
+    json::JSON& fire
+) noexcept {
+    c3utils::Vector3 rel_pos(
+        target->position[0] - agent->position[0],
+        target->position[1] - agent->position[1],
+        target->position[2] - agent->position[2]
+    );
+    const double distance = c3utils::linalg_norm_vec(rel_pos);
+    const double distance_nm = c3u::meters_to_nm(distance);
+
+    const double target_heading = calculate_heading_to_target(agent, target->position);
+    double desired_heading = target_heading;
+
+    if (distance_nm > 5.0) {
+        double crank_offset = c3u::deg2rad(30.0) * crank_direction;
+        desired_heading = target_heading + crank_offset;
+
+        if ((time_counter - crank_switch_time) * cfg::dt > 20.0) {
+            crank_direction *= -1;
+            crank_switch_time = time_counter;
+        }
+    }
+
+    delta_heading = get_heading_action(agent, desired_heading);
+
+    const double altitude_diff = target->get_altitude() - agent->get_altitude();
+    if (distance_nm <= 5.0) {
+        delta_altitude = altitude_diff;
+    } else {
+        delta_altitude = altitude_diff * 0.5;
+    }
+
+    const double target_speed = distance_nm <= 5.0
+        ? c3u::get_mps(1.0, agent->get_altitude())
+        : c3u::get_mps(1.2, agent->get_altitude());
+    delta_speed = (target_speed - agent->get_speed()) * 0.5;
+
+    shoot = false;
+    fire = json::JSON();
+
+    const bool enemy_locked = std::find_if(agent->enemies_lock.begin(), agent->enemies_lock.end(),
+        [&target](const std::shared_ptr<Aircraft>& locked) { return locked->uid == target->uid; }) != agent->enemies_lock.end();
+
+    if (distance_nm < 4.0 &&
+        missiles_in_flight.empty() &&
+        enemy_locked &&
+        agent->pylon_manager.num_left_weapons("AIM-9") > 0) {
+        shoot = true;
+        fire = get_fire_action(agent, target->uid, "AIM-9M");
+        last_shoot_time = time_counter;
     }
 }
 

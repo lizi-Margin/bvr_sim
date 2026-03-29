@@ -207,8 +207,11 @@ while not done:
 
 1. 本页 README
 2. [`docs/getting_started.md`](G:\bvr_sim\docs\getting_started.md)
-3. [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json) 或 [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
-4. [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
+3. [`docs/installation.md`](G:\bvr_sim\docs\installation.md)
+4. [`docs/configuration.md`](G:\bvr_sim\docs\configuration.md)
+5. [`docs/integration.md`](G:\bvr_sim\docs\integration.md)
+6. [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json) 或 [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
+7. [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
 
 已有研究/设计材料：
 
@@ -237,6 +240,12 @@ python tests/cpp_unit_tests.py
 ### Tacview 没有回放文件
 
 确认测试或脚本是否显式启用了 render，输出通常在 `test_logs/` 下。
+
+## 开发者文档
+
+如果你要改环境逻辑，而不是只做试用：
+
+- [`docs/developer/architecture.md`](G:\bvr_sim\docs\developer\architecture.md)
 
 ## 许可证
 

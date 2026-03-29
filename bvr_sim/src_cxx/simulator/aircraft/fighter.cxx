@@ -89,7 +89,7 @@ void Fighter::step() {
         action["delta_altitude"] = 0.0;
         action["delta_speed"] = 0.0;
     }
-    if (BYPASS_THROTTLE_CONTROL) {
+    if (BYPASS_THROTTLE_CONTROL && get_mach() < 1.0) {
         action["delta_speed"] = 1.0;
     }
     // action_space_check::wipe_out_action(register_);

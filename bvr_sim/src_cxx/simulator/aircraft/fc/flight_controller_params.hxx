@@ -125,8 +125,8 @@ struct FlightControllerParams {
         f22_params.kroll_p = 1.2;
         f22_params.kroll_i = 0.2;
         f22_params.kroll_d = 0.0;
-        f22_params.kpitch_p = -0.05;
-        f22_params.kpitch_i = -0.1;
+        f22_params.kpitch_p = -0.02;
+        f22_params.kpitch_i = -0.01;
         f22_params.kpitch_d = -0.01;
 
         f22_params.kthrottle_p = 0.03;
@@ -136,8 +136,8 @@ struct FlightControllerParams {
         f22_params.crash_height_threshold_B = c3u::feet_to_meters(4000.0); 
         f22_params.severe_crash_height = c3u::feet_to_meters(2000.0); 
         f22_params.crash_height_threshold_A = c3u::feet_to_meters(800.0);    
-        f22_params.pi_decay_start = 11000.0;       
-        f22_params.pitch_pi_decay_end = 20000.0; 
+        f22_params.pi_decay_start = 7000.0;       
+        f22_params.pitch_pi_decay_end = 12000.0; 
         f22_params.roll_pi_decay_end = 16000.0;    
 
         f22_params.minimum_speed_B = 0.18;

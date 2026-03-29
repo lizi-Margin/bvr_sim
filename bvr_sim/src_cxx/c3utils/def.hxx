@@ -24,6 +24,12 @@ namespace c3utils {
 	constexpr float64_t WGS84_e2 = WGS84_f * (2.0 - WGS84_f);
 
 	constexpr float64_t EARTH_RADIUS_MEAN = 6371000.0;
+
+	constexpr float64_t ISA_EARTH_RADIUS = 6356766.0;
+	constexpr float64_t ISA_G0 = 9.80665;
+	constexpr float64_t ISA_STD_SL_PRESSURE_PSF = 2116.228;
+	constexpr float64_t ISA_RDRY_FT_LBF_SLUG_R = 1716.0;
+	constexpr float64_t SLUG_PER_FT3_TO_KG_PER_M3 = 14.5939029372 / 0.028316846592;
 }
 
 // #define FOR_PYTHON
