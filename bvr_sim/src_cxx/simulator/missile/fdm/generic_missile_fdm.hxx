@@ -29,6 +29,8 @@ public:
 
 private:
     const ParamStore& params_;
+    std::shared_ptr<InterpTable> n_available_table_;
+    std::shared_ptr<InterpTable> n_cmd_rate_limit_table_;
 
     // Propulsion state
     double t_;               // elapsed time (s) — incremented at end of step()
@@ -36,8 +38,10 @@ private:
     double t_thrust_cached_; // cached from params (hot path)
 
     // Cached params (extracted once in _cache_params for hot path)
-    double m0_, dm_, thrust_, S_ref_, mach_min_, nyz_max_, g_;
+    double m0_, dm_, thrust_, S_ref_, mach_min_, g_;
 
+    double ny_actual_;
+    double nz_actual_;
     double dtheta_;
     double dphi_;
 

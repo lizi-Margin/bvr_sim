@@ -7,12 +7,20 @@ static bvr_sim::ParamStore make_test_params() {
         "doubles": {
             "m0": 161.48, "dm": 6.41, "thrust": 16325.0,
             "t_thrust": 8.0, "S_ref": 0.0248719, "mach_min": 0.8,
-            "nyz_max": 100.0, "g": 9.81
+            "g": 9.81
         },
         "tables": {
             "cx_total_table": {
                 "x": [0.5, 1.0, 2.0, 3.0],
                 "y": [0.47, 0.75, 0.72, 0.55]
+            },
+            "n_available_table": {
+                "x": [0.0, 5.0],
+                "y": [30.0, 30.0]
+            },
+            "n_cmd_rate_limit_table": {
+                "x": [0.0, 5.0],
+                "y": [120.0, 120.0]
             }
         }
     })";

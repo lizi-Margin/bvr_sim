@@ -27,48 +27,6 @@ constexpr bool prevent_low_loft = false;
 // ─── Parameter factory ────────────────────────────────────────────────────────
 
 ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
-    // if (missile_model == "AIM-120C7" || missile_model == "AIM-120C" ||
-    //     missile_model == "AIM-120C5" || missile_model == "AIM-120") {
-
-    //     const std::string json_str = R"({
-    //         "doubles": {
-    //             "m0":                    161.48,
-    //             "dm":                    6.41,
-    //             "thrust":                16325.0,
-    //             "t_thrust":              8.0,
-    //             "t_max":                 300.0,
-    //             "S_ref":                 0.0248719,
-    //             "mach_min":              0.8,
-    //             "nyz_max":               100.0,
-    //             "g":                     9.81,
-    //             "Rc":                    152.4,
-    //             "K":                     3.0,
-    //             "search_fov":            0.349066,
-    //             "search_range":          27780.0,
-    //             "search_start_range":    18520.0,
-    //             "track_gimbal_limit":    1.5708,
-    //             "loss_time_threshold":   1.0
-    //         },
-    //         "bools": {
-    //             "enable_search": true,
-    //             "enable_guide_cmd": true,
-    //             "enable_loft":   false
-    //         },
-    //         "tables": {
-    //             "cx_total_table": {
-    //                 "x": [0.0,  0.2,   0.4,   0.6,   0.8,   1.0,   1.2,   1.4,
-    //                       1.6,  1.8,   2.0,   2.2,   2.4,   2.6,   2.8,   3.0,
-    //                       3.2,  3.4,   3.6,   3.8,   4.0,   4.2,   4.4,   4.6,
-    //                       4.8,  5.0],
-    //                 "y": [0.468, 0.468, 0.468, 0.468, 0.479, 0.751, 0.88,  0.8572,
-    //                       0.8132,0.7645,0.7205,0.6808,0.6447,0.6119,0.582, 0.5545,
-    //                       0.5292,0.5057,0.4838,0.4633,0.4439,0.4256,0.4083,0.3921,
-    //                       0.377, 0.364]
-    //             }
-    //         }
-    //     })";
-    //     return ParamStore::from_string(json_str);
-    // }
     if (missile_model == "AIM-9M" || missile_model == "AIM-9") {
         const std::string json_str = R"({
             "doubles": {
@@ -83,10 +41,10 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "g":                     9.81,
                 "Rc":                    152.4,
                 "K":                     5.0,
-                "search_fov":            0.349066,
+                "search_fov":            0.02618,
                 "search_range":          9260.0,
                 "search_start_range":    18520.0,
-                "track_gimbal_limit":    1.5708,
+                "track_gimbal_limit":    0.698132,
                 "loss_time_threshold":   1.0
             },
             "bools": {
@@ -99,11 +57,21 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "cx_total_table": {
                     "x": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0],
                     "y": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+                },
+                "n_available_table": {
+                    "x": [0.0, 5.0],
+                    "y": [30.0, 30.0]
+                },
+                "n_cmd_rate_limit_table": {
+                    "x": [0.0, 5.0],
+                    "y": [10.0, 10.0]
                 }
             }
         })";
         return ParamStore::from_string(json_str);
     }
+
+
     colorful::printHONG("[MModelA] Unknown missile model: " + missile_model + ", returning empty ParamStore");
     return ParamStore{};
 }
