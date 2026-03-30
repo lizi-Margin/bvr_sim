@@ -131,10 +131,18 @@ C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py
 `pylon_mounts`
 
 - 挂点与武器配置
+- 当前仓库内可直接参考的武器名包括：
+  - `AIM-120C7`
+  - `AIM-9M`
 
 `opponent_type`
 
 - 为单个单位指定规则对手类型
+- 当前代码里能看到的常见值包括：
+  - `tactical`
+  - `tactical_random`
+  - `mad`
+  - `straight_line`
 
 `blue_opponent_type`
 
@@ -182,6 +190,8 @@ Python 侧规则对手实现在：
 - [`bvr_sim/src_py/baseline_opponents/slamraam_policy.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\slamraam_policy.py)
 
 如果你要给试用者一个稳定入口，优先使用仓库现有 demo config 里的默认策略组合，不要一开始就暴露太多实验性选项。
+
+最近一轮更新里，C++ `tactical` 对手已支持 `AIM-9M`，并且初始左右展开方向不再固定。
 
 ## 观测与动作
 

@@ -83,6 +83,14 @@ python tests/cpp_unit_tests.py
 python tests/test_cpp.py
 ```
 
+如果你要做完整回归，再执行：
+
+```bash
+python tests/test_everything.py
+```
+
+它还会额外检查 `test_c3utils` 可执行文件。
+
 ## Linux: 构建 C++ 后端
 
 在仓库根目录执行：
@@ -105,6 +113,12 @@ python tests/cpp_unit_tests.py
 python tests/test_cpp.py
 ```
 
+如果你要做完整回归，再执行：
+
+```bash
+python tests/test_everything.py
+```
+
 ## 完整验证
 
 如果你想一次性重建并跑完主要测试：
@@ -117,9 +131,10 @@ python tests/test_everything.py
 
 1. 重建 C++ 后端
 2. 重新安装包
-3. 跑 C++ unit tests
-4. 跑 C++ smoke test
-5. 跑 Python smoke test
+3. 跑 `bvr_sim_unit_tests`
+4. 跑 `test_c3utils`
+5. 跑 C++ smoke test
+6. 跑 Python smoke test
 
 ## 目录说明
 
@@ -153,6 +168,7 @@ python tests/cpp_unit_tests.py
 ```
 
 如果提示 `bvr_sim/install/bin/bvr_sim_unit_tests(.exe)` 不存在，说明 C++ 构建没有完成。
+如果是 `test_c3utils(.exe)` 不存在，说明底层工具库测试目标没有被成功构建。
 
 ### Windows 下 CMake 配置失败
 

@@ -9,10 +9,29 @@
 
 - 3D 飞机动力学与高度控制
 - 空空导弹与地面防空单位仿真
+- C++ `MModelA` 导弹模型，支持 `AIM-120C7` 与 `AIM-9M`
+- ISA 大气与更严格的 C++ 参数/动作校验
 - 多种 observation space
 - 可配置 reward shaping
 - 基于 ACMI 的 Tacview 回放输出
 - 规则对手与外部 RL 框架适配入口
+
+## 最近更新
+
+最近几次 `git` 提交里，和使用方式直接相关的变化主要有：
+
+- `2026-03-30` 的 `d723ddf` 对应版本 `0.3.0`
+  - 新版 `MModelA`
+  - 新的 ISA Atmosphere
+  - 新增 `AIM-9M`
+  - C++ tactical strategy 开始支持 `AIM-9M`
+  - 新增 `example/run_custom_5v5_acmi.py` 与 `example/custom_5v5_f22_f16.jsonc`
+- `2026-03-30` 的 `8beb51a`
+  - `MModelA` 新增 `enable_INS_guide` 开关
+- `2026-03-30` 的 `0e7929d`
+  - `tactical` 对手的初始侧向机动不再固定，首次进入交战时会随机左右展开
+- `2026-03-25` 的 `4bb4e98`
+  - C++ 参数读取、动作字段校验更严格，不合法字段更容易在初始化或 `step` 时直接报错
 
 ## 仓库结构
 
@@ -109,9 +128,10 @@ python tests/test_everything.py
 
 1. 重建 C++ 后端
 2. 安装当前包
-3. 运行 C++ unit tests
-4. 运行 C++ smoke test
-5. 运行 Python smoke test
+3. 运行 `bvr_sim_unit_tests`
+4. 运行 `test_c3utils`
+5. 运行 C++ smoke test
+6. 运行 Python smoke test
 
 ## 最小使用示例
 
@@ -162,6 +182,7 @@ while not done:
 
 - [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json)
 - [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
+- [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc)
 
 常见字段：
 
@@ -173,8 +194,16 @@ while not done:
 - `obs_type`: 观测空间类型，当前代码支持 `compact`、`extended`、`shadow`、`canvas`、`lidar`、`entity`、`text`
 - `blue_opponent_type`: 蓝方规则对手类型；设为 `null` 时可改成双边可控
 - `reward_config`: 奖励项权重
+- `pylon_mounts`: C++ 单位挂点与武器配置，当前仓库样例已使用 `AIM-120C7` 和 `AIM-9M`
+- `opponent_type`: 单机规则对手类型，当前样例常见值为 `tactical`
 - `initial_separation_nm`: 初始交战距离
 - `formation_max_spread_nm`: 编队横向散布
+
+关于最近新增能力：
+
+- `AIM-9M` 已可直接写入 C++ 配置的 `pylon_mounts`
+- `tactical` 对手会在合适距离尝试使用 `AIM-9M`
+- `MModelA` 内部新增 `enable_INS_guide` 开关；这是导弹模型参数，不是顶层环境配置项
 
 ## 输出结果
 
@@ -198,8 +227,10 @@ while not done:
 - [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
 - [`example/env_harl.py`](G:\bvr_sim\example\env_harl.py)
 - [`example/env_marlbenchmark.py`](G:\bvr_sim\example\env_marlbenchmark.py)
+- [`example/run_custom_5v5_acmi.py`](G:\bvr_sim\example\run_custom_5v5_acmi.py)
 
 其中 [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py) 展示了如何把环境包装成外部 MARL 框架可用的接口。
+如果你想直接看一个较新的 C++ 推演样例，可以先运行 [`example/run_custom_5v5_acmi.py`](G:\bvr_sim\example\run_custom_5v5_acmi.py)。
 
 ## 文档导航
 
@@ -235,7 +266,8 @@ while not done:
 python tests/cpp_unit_tests.py
 ```
 
-该脚本依赖 `bvr_sim/install/bin/bvr_sim_unit_tests(.exe)`。
+该脚本默认运行 `bvr_sim/install/bin/bvr_sim_unit_tests(.exe)`。
+如果你在排查底层数学/工具库，也可以参考 [`tests/test_everything.py`](G:\bvr_sim\tests\test_everything.py) 里额外执行的 `test_c3utils`。
 
 ### Tacview 没有回放文件
 
