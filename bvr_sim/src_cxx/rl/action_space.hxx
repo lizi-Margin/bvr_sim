@@ -91,7 +91,10 @@ public:
             } else if (value.JSONType() == json::JSON::Class::Integral) {
                 action_json[key] = json::Float(value.ToInt());
             } else {
-                colorful::printHONG(std::sprintf("Expected a numeric type for action component, but got type %s", json::JSON::ClassString(value.JSONType()).c_str()));
+                colorful::printHONG(
+                    "Expected a numeric type for action component, but got type %s",
+                    json::JSON::ClassString(value.JSONType()).c_str()
+                );
             }
             return;
         };

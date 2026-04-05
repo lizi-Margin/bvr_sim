@@ -88,17 +88,20 @@ MModelA::MModelA(
     double dt
 ) noexcept
     : Missile(uid, missile_model, color, parent, friend_obj, target, dt),
-      params_(_make_params(missile_model)),   // params_ first
-      fdm_(params_, dt),                      // fdm_ second (holds ref to params_)
       radar_pitch(0.0),
       radar_yaw(0.0),
       guide_cmd_valid(true),
       losstime(0.0),
       loss(false),
+      _before_loss_real_last_known_target_pos{0.0, 0.0, 0.0},
+      L_beta(std::nullopt),
+      L_eps(std::nullopt),
+      _dbeta_filtered(std::nullopt),
+      params_(_make_params(missile_model)),   // params_ first
+      fdm_(params_, dt),                      // fdm_ second (holds ref to params_)
       _search_started(false),
       _distance_pre(std::numeric_limits<double>::infinity()),
-      _left_t(static_cast<int>(1.0 / dt)),
-      _before_loss_real_last_known_target_pos{0.0, 0.0, 0.0}
+      _left_t(static_cast<int>(1.0 / dt))
 {
     for (int i = 0; i < 20; ++i) _distance_increment.push_back(false);
 
