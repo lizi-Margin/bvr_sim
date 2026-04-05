@@ -5,9 +5,10 @@
 
 set -e
 
-BUILD_DIR="build"
-CMAKE_BUILD_TYPE="Release"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUILD_DIR="${SCRIPT_DIR}/build"
+INSTALL_DIR="${SCRIPT_DIR}/install"
+CMAKE_BUILD_TYPE="Release"
 
 echo "========================================"
 echo "BVR Sim C++ Build Script (Linux)"
@@ -61,7 +62,7 @@ cd "$BUILD_DIR"
 
 # Configure CMake
 echo "Configuring CMake..."
-cmake .. -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
+cmake "$SCRIPT_DIR" -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE"
 
 echo ""
 
@@ -71,7 +72,7 @@ cmake --build . -- -j$(nproc)
 
 echo ""
 
-cmake --install . --prefix ../install --config $CMAKE_BUILD_TYPE
+cmake --install . --prefix "$INSTALL_DIR" --config "$CMAKE_BUILD_TYPE"
 
 # Navigate back
 cd ..
