@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-// #include <cstdarg>
+#include <cstdarg>
 #include <vector>
 // #include <memory>
 #include <mutex>
@@ -98,6 +98,7 @@ public:
 
 private:
     explicit SL(const std::string& file_path, bool append)
+        : m_buffer(5 * 1024 * 1024)
     {
         std::ios_base::openmode mode = std::ios::out;
         if (append) {
@@ -107,9 +108,7 @@ private:
             mode |= std::ios::trunc;
         }
 
-        const static size_t bufferSize = 5 * 1024 * 1024;  // 5MB
-        std::vector<char> buffer(bufferSize);
-        m_file.rdbuf()->pubsetbuf(buffer.data(), buffer.size());
+        m_file.rdbuf()->pubsetbuf(m_buffer.data(), m_buffer.size());
         m_file.open(file_path, mode);
         if (!m_file.is_open()) {
             throw std::runtime_error("Failed to open log file: " + file_path);
@@ -117,5 +116,6 @@ private:
     }
 
     std::ofstream m_file;
+    std::vector<char> m_buffer;
     std::mutex m_mutex;
 };
