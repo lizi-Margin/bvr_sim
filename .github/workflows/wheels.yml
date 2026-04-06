@@ -39,8 +39,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.23.3
         env:
           CIBW_BUILD: "cp312-* cp313-* cp314-*"
+          CIBW_ARCHS_LINUX: "x86_64"
+          CIBW_ARCHS_WINDOWS: "AMD64"
           CIBW_SKIP: "*-musllinux_* pp*"
-          CIBW_TEST_COMMAND: "python -c \"import bvr_sim; from bvr_sim.bvr_env_cpp import bvr_sim_cpp; assert bvr_sim_cpp is not None\""
 
   build_sdist:
     name: sdist

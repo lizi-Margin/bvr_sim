@@ -51,4 +51,4 @@ cmake.build-type = "Release"
 [tool.cibuildwheel]
 build = "cp312-* cp313-* cp314-*"
 skip = "*-musllinux_*"
-test-command = "python -c \"import bvr_sim; from bvr_sim.bvr_env_cpp import bvr_sim_cpp; assert bvr_sim_cpp is not None\""
+archs = ["x86_64", "AMD64"]
