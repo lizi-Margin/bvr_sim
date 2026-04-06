@@ -1,0 +1,9 @@
+[submodule "bvr_sim/src_cxx/extern/eigen"]
+	path = bvr_sim/src_cxx/extern/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+[submodule "bvr_sim/src_cxx/extern/pybind11"]
+	path = bvr_sim/src_cxx/extern/pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "bvr_sim/src_cxx/extern/cpptrace"]
+	path = bvr_sim/src_cxx/extern/cpptrace
+	url = https://github.com/jeremy-rifkin/cpptrace.git

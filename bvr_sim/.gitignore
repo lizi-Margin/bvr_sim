@@ -7,3 +7,6 @@ __pycache__
 /src_cxx/extern/cpp_trace
 /src_cxx/extern/eigen
 /src_cxx/extern/pybind11
+!/src_cxx/extern/cpptrace
+!/src_cxx/extern/eigen
+!/src_cxx/extern/pybind11
