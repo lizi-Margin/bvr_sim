@@ -166,9 +166,12 @@ function(set_compiler_params target_name)
 
         # Add debug symbols for Debug builds
         if(CMAKE_BUILD_TYPE MATCHES Debug)
-            target_compile_options(${target_name} PRIVATE -g -O2 -march=native)
+            target_compile_options(${target_name} PRIVATE -g -O2)
         endif()
-        target_compile_options(${target_name} PRIVATE -g -march=native)
+        target_compile_options(${target_name} PRIVATE -g)
+        if(BVR_SIM_ENABLE_NATIVE_OPTIMIZATIONS)
+            target_compile_options(${target_name} PRIVATE -march=native)
+        endif()
 
         set_target_properties(${target_name} PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
@@ -196,137 +199,31 @@ endfunction(set_compiler_params target_name)
 # ============================================================================
 # Create PyBind11 Module
 # ============================================================================
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+message(STATUS "Python3 Version: ${Python3_VERSION}")
+message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
+message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
 
-
-function(setup_pybind_proj_linux conda_env_path conda_env_python_version conda_env_python_version_dot)
-    if(NOT EXISTS "${conda_env_path}/bin/python${conda_env_python_version_dot}")
-        message(FATAL_ERROR "Python executable not found at ${conda_env_path}/bin/python${conda_env_python_version_dot}")
-    endif()
-    set(Python3_EXECUTABLE "${conda_env_path}/bin/python${conda_env_python_version_dot}")
-	set(Python3_INCLUDE_DIR "${conda_env_path}/include/python${conda_env_python_version_dot}/")
-	set(Python3_LIBRARY "${conda_env_path}/lib/libpython${conda_env_python_version_dot}.so.1.0")
-	find_package(Python3 REQUIRED  COMPONENTS Interpreter Development)
-    if(NOT Python3_FOUND)
-        message(FATAL_ERROR "Python3 development files not found")
-    endif()
-    message(STATUS "Python3 Version: ${Python3_VERSION}")
-    message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
-    message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
-
-	set(pybind_proj_name_ "bvr_sim_cpp.cpython-${conda_env_python_version}-x86_64-linux-gnu")
-    pybind11_add_module(${pybind_proj_name_} ${BVR_SIM_SOURCES})
-    target_include_directories(${pybind_proj_name_} PRIVATE ${BVR_SIM_INCLUDE_DIRS})
-    target_include_directories(${pybind_proj_name_} PRIVATE ${Python3_INCLUDE_DIRS})
-    target_include_directories(${pybind_proj_name_} PRIVATE ${EIGEN3_INCLUDE_DIR})
-
-    # target_link_directories(${pybind_proj_name_} BEFORE PRIVATE "${conda_env_path}/lib")
-    target_link_libraries(${pybind_proj_name_} PRIVATE c3utils)
-    target_link_libraries(${pybind_proj_name_} PRIVATE cpptrace::cpptrace)
-    target_link_libraries(${pybind_proj_name_} PRIVATE libJSBSim)
-    target_link_libraries(${pybind_proj_name_} PRIVATE ${Python3_LIBRARIES})
-	
-	set_target_properties(${pybind_proj_name_} PROPERTIES
-		PREFIX ""  
-		SUFFIX ".so"      
-		LINKER_LANGUAGE CXX  
-    	# RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-	)
-    set_compiler_params(${pybind_proj_name_})
-    install(TARGETS ${pybind_proj_name_}
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
-        ARCHIVE DESTINATION lib
-    )
-endfunction()
-
-
-
-function(setup_pybind_proj_win conda_env_path conda_env_python_version)
-    if(NOT EXISTS "${conda_env_path}/python.exe")
-        message(FATAL_ERROR "Python executable not found at ${conda_env_path}/python.exe")
-    endif()
-    set(Python3_EXECUTABLE "${conda_env_path}/python.exe")
-	set(Python3_INCLUDE_DIR "${conda_env_path}/include")
-	set(Python3_LIBRARY "${conda_env_path}/libs/python${conda_env_python_version}.lib")
-	find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-    if(NOT Python3_FOUND)
-        message(FATAL_ERROR "Python3 development files not found")
-    endif()
-    message(STATUS "Python3 Version: ${Python3_VERSION}")
-    message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
-    message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
-    
-
-	set(pybind_proj_name_ "bvr_sim_cpp.cp${conda_env_python_version}-win_amd64")
-    pybind11_add_module(${pybind_proj_name_} ${BVR_SIM_SOURCES})
-    target_include_directories(${pybind_proj_name_} PRIVATE ${BVR_SIM_INCLUDE_DIRS})
-    target_include_directories(${pybind_proj_name_} PRIVATE ${Python3_INCLUDE_DIRS})
-    target_include_directories(${pybind_proj_name_} PRIVATE ${EIGEN3_INCLUDE_DIR})
-
-    # target_link_directories(${pybind_proj_name_} BEFORE PRIVATE "${conda_env_path}/libs")
-    target_link_libraries(${pybind_proj_name_} PRIVATE c3utils)
-    target_link_libraries(${pybind_proj_name_} PRIVATE cpptrace::cpptrace)
-    target_link_libraries(${pybind_proj_name_} PRIVATE libJSBSim)
-    target_link_libraries(${pybind_proj_name_} PRIVATE ${Python3_LIBRARIES})
-	
-	set_target_properties(${pybind_proj_name_} PROPERTIES
-		PREFIX ""  
-		SUFFIX ".pyd"      
-		LINKER_LANGUAGE CXX  
-    	# RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-	)
-    set_compiler_params(${pybind_proj_name_})
-    install(TARGETS ${pybind_proj_name_}
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
-        ARCHIVE DESTINATION lib
-    )
-endfunction()
-
-# if is linux
-if(UNIX)
-    set(Python3_EXECUTABLE "/usr/bin/python3.14")
-    set(Python3_INCLUDE_DIR "/usr/include/python3.14")
-    set(Python3_LIBRARY "/usr/lib/libpython3.14.so")
-    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-    message(STATUS "Python3 Version: ${Python3_VERSION}")
-    message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
-    message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
-    pybind11_add_module(bvr_sim_cpp ${BVR_SIM_SOURCES})
-    target_include_directories(bvr_sim_cpp PRIVATE ${BVR_SIM_INCLUDE_DIRS})
-    target_include_directories(bvr_sim_cpp PRIVATE ${Python3_INCLUDE_DIRS})
-    target_include_directories(bvr_sim_cpp PRIVATE ${EIGEN3_INCLUDE_DIR})
-    target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
-    target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
-    target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
-    target_link_libraries(bvr_sim_cpp PRIVATE ${Python3_LIBRARIES})
-endif()
-if(MSVC)
-    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-    message(STATUS "Python3 Version: ${Python3_VERSION}")
-    message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
-    message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
-    pybind11_add_module(bvr_sim_cpp ${BVR_SIM_SOURCES})
-    target_include_directories(bvr_sim_cpp PRIVATE ${BVR_SIM_INCLUDE_DIRS})
-    target_include_directories(bvr_sim_cpp PRIVATE ${Python3_INCLUDE_DIRS})
-    target_include_directories(bvr_sim_cpp PRIVATE ${EIGEN3_INCLUDE_DIR})
-    target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
-    target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
-    target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
-    target_link_libraries(bvr_sim_cpp PRIVATE ${Python3_LIBRARIES})
-endif()
+pybind11_add_module(bvr_sim_cpp ${BVR_SIM_SOURCES})
+target_include_directories(bvr_sim_cpp PRIVATE ${BVR_SIM_INCLUDE_DIRS})
+target_include_directories(bvr_sim_cpp PRIVATE ${Python3_INCLUDE_DIRS})
+target_include_directories(bvr_sim_cpp PRIVATE ${EIGEN3_INCLUDE_DIR})
+target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
+target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
+target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
+target_link_libraries(bvr_sim_cpp PRIVATE ${Python3_LIBRARIES})
 set_compiler_params(bvr_sim_cpp)
 install(TARGETS bvr_sim_cpp
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION ${BVR_SIM_PYTHON_MODULE_DESTINATION}
+    RUNTIME DESTINATION ${BVR_SIM_PYTHON_MODULE_DESTINATION}
+    ARCHIVE DESTINATION ${BVR_SIM_PYTHON_MODULE_DESTINATION}
 )
 
 # Install PDB files for bvr_sim_cpp (MSVC debug symbols)
 if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
     if(MSVC)
         install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bvr_sim_cpp.pdb"
-            DESTINATION lib
+            DESTINATION ${BVR_SIM_PYTHON_MODULE_DESTINATION}
         )
     endif()
 endif()
@@ -335,42 +232,35 @@ endif()
 # Unit Tests Executable
 # ============================================================================
 
-add_executable(bvr_sim_unit_tests
-    test_main.cxx
-    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/test_param_store.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/test_action_space.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/base.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"
-)
+if(BVR_SIM_BUILD_TESTS)
+    add_executable(bvr_sim_unit_tests
+        test_main.cxx
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_param_store.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_action_space.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/base.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"
+    )
 
-# Link with main library dependencies
-target_include_directories(bvr_sim_unit_tests PRIVATE ${BVR_SIM_INCLUDE_DIRS})
-target_link_libraries(bvr_sim_unit_tests PRIVATE c3utils)
-target_link_libraries(bvr_sim_unit_tests PRIVATE cpptrace::cpptrace)
-target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim)
+    # Link with main library dependencies
+    target_include_directories(bvr_sim_unit_tests PRIVATE ${BVR_SIM_INCLUDE_DIRS})
+    target_link_libraries(bvr_sim_unit_tests PRIVATE c3utils)
+    target_link_libraries(bvr_sim_unit_tests PRIVATE cpptrace::cpptrace)
+    target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim)
 
-install(TARGETS bvr_sim_unit_tests
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-)
-# Apply compiler settings
-set_compiler_params(bvr_sim_unit_tests)
+    if(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)
+        install(TARGETS bvr_sim_unit_tests
+            LIBRARY DESTINATION lib
+            RUNTIME DESTINATION bin
+            ARCHIVE DESTINATION lib
+        )
+    endif()
 
-# setup_pybind_proj_linux("/home/hulc/.conda/envs/hmp" "312" "3.12")
-# setup_pybind_proj_linux("/home/hulc/.conda/envs/label" "311" "3.11")
-# setup_pybind_proj_linux("/home/hulc/.conda/envs/RVC" "39" "3.9")
-# setup_pybind_proj_linux("/home/hulc/.local/share/mamba/envs/cp38" "38" "3.8")
-# setup_pybind_proj_linux("/home/hulc/.conda/envs/old" "37" "3.7m")
-
-# setup_pybind_proj_win("H:/.conda/envs/hmp" "37")
-# setup_pybind_proj_win("H:/.conda/envs/hmp-neo" "313")
-# setup_pybind_proj_win("H:/.conda/envs/cp312" "312")
-# setup_pybind_proj_win("H:/.conda/envs/cp311" "311")
-# setup_pybind_proj_win("H:/.conda/envs/cp38" "38")
+    # Apply compiler settings
+    set_compiler_params(bvr_sim_unit_tests)
+endif()
 
 
 

@@ -27,12 +27,18 @@ bvr_sim_cpp = None
 _import_success = False
 for package in try_list:
     try:
-        bvr_sim_cpp = importlib.import_module(".install.lib.bvr_sim_cpp", package=package)
-        print(f"Successfully imported bvr_sim_cpp")
-        _import_success = True
-        break
-    except ImportError as e:
-        print(f"Failed to import bvr_sim_cpp from package {package}: {e}")
+        for module_name in (".bvr_sim_cpp", ".install.lib.bvr_sim_cpp"):
+            try:
+                bvr_sim_cpp = importlib.import_module(module_name, package=package)
+                print(f"Successfully imported bvr_sim_cpp from {package}{module_name}")
+                _import_success = True
+                break
+            except ImportError as e:
+                print(f"Failed to import bvr_sim_cpp from package {package}{module_name}: {e}")
+                continue
+        if _import_success:
+            break
+    except ImportError:
         continue
 
 if not _import_success:

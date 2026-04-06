@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core>=0.10", "pybind11>=2.11"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "bvr-sim"
@@ -16,21 +16,45 @@ dependencies = [
     "commentjson",
     "tqdm",
     "colorama",
-    "JSBSim==1.1.14"
+    "JSBSim==1.1.14",
 ]
 
-[project.optional-dependencies]
-
-[tool.setuptools]
-packages = ["bvr_sim"]
-
-[tool.setuptools.package-data]
-bvr_sim = [
-    "**/*.py",
-    "**/*.json",
-    "**/*.jsonc",
-    "**/*.xml",
-    "install/lib/*.so",
-    "install/lib/*.pyd",
-    "install/lib/*.so.*",
+[tool.scikit-build]
+cmake.source-dir = "bvr_sim"
+cmake.build-type = "Release"
+build.targets = ["bvr_sim_cpp"]
+wheel.packages = ["bvr_sim"]
+sdist.exclude = [
+    ".git/**",
+    ".github/**",
+    "benchmark_logs/**",
+    "build/**",
+    "dist/**",
+    "test_logs/**",
+    "bvr_sim/build/**",
+    "bvr_sim/install/**",
 ]
+
+[tool.scikit-build.cmake.define]
+BVR_SIM_PYTHON_MODULE_DESTINATION = "bvr_sim"
+
+[[tool.scikit-build.overrides]]
+if.platform-system = "windows"
+inherit.cmake.define = "append"
+cmake.build-type = "RelWithDebInfo"
+
+[[tool.scikit-build.overrides]]
+if.platform-system = "linux"
+inherit.cmake.define = "append"
+cmake.build-type = "Release"
+
+[[tool.scikit-build.overrides]]
+if.platform-system = "darwin"
+inherit.cmake.define = "append"
+cmake.build-type = "Release"
+cmake.define.CMAKE_OSX_ARCHITECTURES = "arm64;x86_64"
+
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux_*"
+test-command = "python -c \"import bvr_sim; from bvr_sim.bvr_env_cpp import bvr_sim_cpp; assert bvr_sim_cpp is not None\""

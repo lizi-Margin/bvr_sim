@@ -4,6 +4,21 @@ project(bvr_sim_cpp CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(DEFINED SKBUILD)
+    set(_bvr_sim_native_opt_default OFF)
+    set(_bvr_sim_build_tests_default OFF)
+    set(_bvr_sim_install_dev_artifacts_default OFF)
+else()
+    set(_bvr_sim_native_opt_default ON)
+    set(_bvr_sim_build_tests_default ON)
+    set(_bvr_sim_install_dev_artifacts_default ON)
+endif()
+
+option(BVR_SIM_ENABLE_NATIVE_OPTIMIZATIONS "Enable CPU-specific compiler optimizations" ${_bvr_sim_native_opt_default})
+option(BVR_SIM_BUILD_TESTS "Build native test executables" ${_bvr_sim_build_tests_default})
+option(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS "Install static libraries and native test executables" ${_bvr_sim_install_dev_artifacts_default})
+set(BVR_SIM_PYTHON_MODULE_DESTINATION "lib" CACHE STRING "Install destination for the Python extension module")
+
 # # Set Debug mode for debugging symbols and cpptrace output
 # set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 # if(NOT CMAKE_BUILD_TYPE)
@@ -23,7 +38,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     if (MSVC)
         set(CMAKE_CXX_FLAGS_RELEASE "/Zi /O2 /Ob2 /Oi /Ot /GL /fp:fast /arch:AVX2 /wd4100")
     else ()
-        set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -march=native           -Wno-unused-parameter")
+        set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -Wno-unused-parameter")
     endif()
 endif()
 
@@ -31,6 +46,10 @@ endif()
 message(STATUS "Building bvr_sim_cpp for ${CMAKE_SYSTEM_NAME}")
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Python module install destination: ${BVR_SIM_PYTHON_MODULE_DESTINATION}")
+message(STATUS "Native optimizations enabled: ${BVR_SIM_ENABLE_NATIVE_OPTIMIZATIONS}")
+message(STATUS "Build native tests: ${BVR_SIM_BUILD_TESTS}")
+message(STATUS "Install development artifacts: ${BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS}")
 
 
 

@@ -62,37 +62,47 @@ target_include_directories(c3utils PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(c3utils PUBLIC "${Eigen3_DIR}")
 set_target_properties(c3utils PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_compiler_params(c3utils)
-install(TARGETS c3utils
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-)
+if(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)
+    install(TARGETS c3utils
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+        ARCHIVE DESTINATION lib
+    )
+endif()
 
 # Install PDB files for c3utils (MSVC debug symbols)
 # if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
 if(MSVC)
-    install(FILES "${CMAKE_BINARY_DIR}/src_cxx/c3utils/${CMAKE_BUILD_TYPE}/c3utils.pdb"
-        DESTINATION lib
-    )
+    if(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)
+        install(FILES "${CMAKE_BINARY_DIR}/src_cxx/c3utils/${CMAKE_BUILD_TYPE}/c3utils.pdb"
+            DESTINATION lib
+        )
+    endif()
 endif()
 
-# Build test executable
-add_executable(test_c3utils "test_c3utils.cxx" "vector.hxx" "funcs.hxx" "c3utils.hxx" "def.hxx" "io.hxx")
-target_link_libraries(test_c3utils PRIVATE c3utils)
-set_compiler_params(test_c3utils)
-install(TARGETS test_c3utils
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-)
+if(BVR_SIM_BUILD_TESTS)
+    add_executable(test_c3utils "test_c3utils.cxx" "vector.hxx" "funcs.hxx" "c3utils.hxx" "def.hxx" "io.hxx")
+    target_link_libraries(test_c3utils PRIVATE c3utils)
+    set_compiler_params(test_c3utils)
+
+    if(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)
+        install(TARGETS test_c3utils
+            LIBRARY DESTINATION lib
+            RUNTIME DESTINATION bin
+            ARCHIVE DESTINATION lib
+        )
+    endif()
+endif()
 
 # Install PDB files for test_c3utils (MSVC debug symbols)
 # if(MSVC AND CMAKE_BUILD_TYPE MATCHES Debug)
 if(MSVC)
-    install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_c3utils.pdb"
-        DESTINATION bin
-        OPTIONAL
-    )
+    if(BVR_SIM_BUILD_TESTS AND BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)
+        install(FILES "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/test_c3utils.pdb"
+            DESTINATION bin
+            OPTIONAL
+        )
+    endif()
 endif()
 
 
