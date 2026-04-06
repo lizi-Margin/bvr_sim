@@ -199,10 +199,12 @@ endfunction(set_compiler_params target_name)
 # ============================================================================
 # Create PyBind11 Module
 # ============================================================================
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
 message(STATUS "Python3 Version: ${Python3_VERSION}")
 message(STATUS "Python3 Include: ${Python3_INCLUDE_DIRS}")
-message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
+if(DEFINED Python3_LIBRARIES)
+    message(STATUS "Python3 Library: ${Python3_LIBRARIES}")
+endif()
 
 pybind11_add_module(bvr_sim_cpp ${BVR_SIM_SOURCES})
 target_include_directories(bvr_sim_cpp PRIVATE ${BVR_SIM_INCLUDE_DIRS})
@@ -211,7 +213,6 @@ target_include_directories(bvr_sim_cpp PRIVATE ${EIGEN3_INCLUDE_DIR})
 target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
 target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
 target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
-target_link_libraries(bvr_sim_cpp PRIVATE ${Python3_LIBRARIES})
 set_compiler_params(bvr_sim_cpp)
 install(TARGETS bvr_sim_cpp
     LIBRARY DESTINATION ${BVR_SIM_PYTHON_MODULE_DESTINATION}
