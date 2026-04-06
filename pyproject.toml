@@ -48,13 +48,7 @@ if.platform-system = "linux"
 inherit.cmake.define = "append"
 cmake.build-type = "Release"
 
-[[tool.scikit-build.overrides]]
-if.platform-system = "darwin"
-inherit.cmake.define = "append"
-cmake.build-type = "Release"
-cmake.define.CMAKE_OSX_ARCHITECTURES = "arm64;x86_64"
-
 [tool.cibuildwheel]
-build = "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+build = "cp312-* cp313-* cp314-*"
 skip = "*-musllinux_*"
 test-command = "python -c \"import bvr_sim; from bvr_sim.bvr_env_cpp import bvr_sim_cpp; assert bvr_sim_cpp is not None\""
