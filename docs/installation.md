@@ -47,6 +47,16 @@ pip install -e .
 ```
 
 这一步会安装 [`pyproject.toml`](G:\bvr_sim\pyproject.toml) 中声明的依赖，并把当前仓库以 editable mode 安装。
+当前仓库的 Python 打包后端已经切到 `scikit-build-core`，因此 `pip install -e .` 不再只是纯 Python 安装流程，也兼容原生扩展的标准 Python 构建链路。
+
+如果你想直接验证 wheel 构建，可以执行：
+
+```bash
+python -m pip install build
+python -m build --wheel
+```
+
+产物会输出到 `dist/`。当前仓库内的 CI workflow 是 [`.github/workflows/wheels.yml`](G:\bvr_sim\.github\workflows\wheels.yml)，目标平台是 Linux / Windows 64-bit，CPython `3.12` 到 `3.14`。
 
 安装完成后建议立即执行：
 
@@ -90,6 +100,26 @@ python tests/test_everything.py
 ```
 
 它还会额外检查 `test_c3utils` 可执行文件。
+
+## Wheel / sdist 打包
+
+如果你是维护者，想确认发布产物是否能生成，可以在仓库根目录执行：
+
+```bash
+python -m pip install build
+python -m build
+```
+
+这会同时生成：
+
+- `dist/*.tar.gz`：sdist
+- `dist/*.whl`：本地平台对应的 wheel
+
+说明：
+
+- wheel 构建依赖 `pyproject.toml` 里的 `scikit-build-core` 配置
+- GitHub Actions 里的 wheels workflow 会递归检出 submodules，因此发布链路默认假设原生依赖以 submodule 形式存在
+- 本地 `build_linux.sh` / `build_windows.bat` 仍然保留了缺失依赖时自动 clone 的逻辑，适合开发机直接构建
 
 ## Linux: 构建 C++ 后端
 

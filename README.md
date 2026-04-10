@@ -20,6 +20,12 @@
 
 最近几次 `git` 提交里，和使用方式直接相关的变化主要有：
 
+- `2026-04-10` 的 `080f546`
+  - 新增 C++ `standoff` baseline opponent
+  - `example/custom_5v5_f22_f16.jsonc` 已改用 `standoff` + `tactical` 的混合编组
+- `2026-04-06` 的 `2261257`
+  - 增加基于 `scikit-build-core` 的 wheel / sdist 构建路径
+  - 仓库已包含 `.github/workflows/wheels.yml`，用于 Linux / Windows 64-bit wheel 构建
 - `2026-03-30` 的 `d723ddf` 对应版本 `0.3.0`
   - 新版 `MModelA`
   - 新的 ISA Atmosphere
@@ -75,6 +81,15 @@ pip install -e .
 ```
 
 这会安装 Python 版本环境所需依赖，并以 editable mode 暴露 `bvr_sim` 包。
+
+如果你想验证当前仓库的 Python 打包路径，也可以执行：
+
+```bash
+python -m pip install build
+python -m build --wheel
+```
+
+生成的 wheel 会出现在 `dist/` 下。当前 `pyproject.toml` 使用 `scikit-build-core`，wheel 会尝试同时构建 `bvr_sim_cpp` 原生扩展。
 
 ### 2. 运行纯 Python smoke test
 
@@ -195,7 +210,7 @@ while not done:
 - `blue_opponent_type`: 蓝方规则对手类型；设为 `null` 时可改成双边可控
 - `reward_config`: 奖励项权重
 - `pylon_mounts`: C++ 单位挂点与武器配置，当前仓库样例已使用 `AIM-120C7` 和 `AIM-9M`
-- `opponent_type`: 单机规则对手类型，当前样例常见值为 `tactical`
+- `opponent_type`: 单机规则对手类型，当前样例常见值为 `tactical` 和 `standoff`
 - `initial_separation_nm`: 初始交战距离
 - `formation_max_spread_nm`: 编队横向散布
 
@@ -203,6 +218,7 @@ while not done:
 
 - `AIM-9M` 已可直接写入 C++ 配置的 `pylon_mounts`
 - `tactical` 对手会在合适距离尝试使用 `AIM-9M`
+- `standoff` 对手会优先控制距离，具备 approach / AIM-120 发射后 crank / support / defensive abort / orbit 等行为切换
 - `MModelA` 内部新增 `enable_INS_guide` 开关；这是导弹模型参数，不是顶层环境配置项
 
 ## 输出结果

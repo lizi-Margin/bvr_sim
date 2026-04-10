@@ -100,6 +100,7 @@ python example/run_custom_5v5_acmi.py
 - `F22` / `F16` 混编
 - `AIM-120C7` 与 `AIM-9M` 混合挂载
 - 单机级别 `opponent_type`
+- `standoff` + `tactical` 的混合规则对手编组
 
 ## 4. 配置文件先看什么
 
@@ -129,6 +130,8 @@ python example/run_custom_5v5_acmi.py
 如果你想看最近新增的武器与编组配置，再看：
 
 - [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc)
+
+这个示例里，`F22` 默认使用 `standoff`，`F16` 默认使用 `tactical`，适合直接观察两类规则对手的职责分工。
 
 ## 5. 先理解哪些代码文件
 

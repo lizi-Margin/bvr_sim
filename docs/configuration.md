@@ -140,9 +140,15 @@ C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py
 - 为单个单位指定规则对手类型
 - 当前代码里能看到的常见值包括：
   - `tactical`
+  - `standoff`
   - `tactical_random`
   - `mad`
   - `straight_line`
+
+其中：
+
+- `tactical` 更偏通用近中距交战策略
+- `standoff` 更偏保持距离、使用 `AIM-120` 发射后 crank，并在威胁出现时做 defensive abort
 
 `blue_opponent_type`
 
@@ -192,6 +198,7 @@ Python 侧规则对手实现在：
 如果你要给试用者一个稳定入口，优先使用仓库现有 demo config 里的默认策略组合，不要一开始就暴露太多实验性选项。
 
 最近一轮更新里，C++ `tactical` 对手已支持 `AIM-9M`，并且初始左右展开方向不再固定。
+最新一轮提交又新增了 C++ `standoff` 对手；可以直接参考 [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc) 里的混编写法。
 
 ## 观测与动作
 
