@@ -15,6 +15,7 @@
 #include "rubbish_can/colorful.hxx"
 #include "rubbish_can/rubbish_can.hxx"
 #include "baseline_opponents/mad.hxx"
+#include "baseline_opponents/standoff.hxx"
 #include "baseline_opponents/tactical.hxx"
 #include "baseline_opponents/straight_line.hxx"
 #include <iostream>
@@ -174,6 +175,9 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
                 if (opponent_type == "tactical") {
                     BaselinePool::instance().add(fighter, std::make_shared<TacticalOpponent3D>());
                     SL::get().print("[UnitFactory] add fighter, tactical to baseline pool with uid: " + uid + " success");
+                } else if (opponent_type == "standoff") {
+                    BaselinePool::instance().add(fighter, std::make_shared<StandoffOpponent3D>());
+                    SL::get().print("[UnitFactory] add fighter, standoff to baseline pool with uid: " + uid + " success");
                 } else if (opponent_type == "tactical_random" || opponent_type == "tactical-random") {
                     auto tac_bsl = std::make_shared<TacticalOpponent3D>();
                     tac_bsl->randomize_tactic();

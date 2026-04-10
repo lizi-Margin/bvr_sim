@@ -15,7 +15,7 @@
         "L01": "AIM-120C7",
         "L02": "AIM-9M",
       },
-      "opponent_type": "tactical"
+      "opponent_type": "standoff"
     },
     "A01": {
       "unit_spec": "F22",
@@ -30,7 +30,7 @@
         "L01": "AIM-120C7",
         "L02": "AIM-9M",
       },
-      "opponent_type": "tactical"
+      "opponent_type": "standoff"
     },
     "A02": {
       "unit_spec": "F16",
@@ -107,7 +107,7 @@
         "L01": "AIM-120C7",
         "L02": "AIM-9M",
       },
-      "opponent_type": "tactical"
+      "opponent_type": "standoff"
     },
     "B01": {
       "unit_spec": "F22",
@@ -122,7 +122,7 @@
         "L01": "AIM-120C7",
         "L02": "AIM-9M",
       },
-      "opponent_type": "tactical"
+      "opponent_type": "standoff"
     },
     "B02": {
       "unit_spec": "F16",
