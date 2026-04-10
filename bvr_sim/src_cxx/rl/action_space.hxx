@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <map>
+#include <utility>
 #include "rubbish_can/json.hpp"
 #include "rubbish_can/check.hxx"
 #include "simulator/register.hxx"
@@ -68,6 +69,9 @@ public:
     ActionSpace(const json::JSON &action_json) : action_json(action_json) {
         action_space_check::check_action_json(action_json);
     }
+    ActionSpace(json::JSON &&action_json) : action_json(std::move(action_json)) {
+        action_space_check::check_action_json(this->action_json);
+    }
     ActionSpace(const std::map<std::string, json::JSON> &action_json) : action_json(json::Object()) {
         for (auto& [key, value] : action_json) {
             this->action_json[key] = value;
@@ -81,13 +85,13 @@ public:
         
 
         // lambda to retrieve the float value from the register, with error checking
-        auto get_float_from_register = [&](const std::optional<json::JSON>& value_opt, const std::string& key) -> void {
+        auto get_float_from_register = [&](std::optional<json::JSON>& value_opt, const std::string& key) -> void {
             if (!value_opt.has_value()) {
                 return;
             }
-            const auto& value = value_opt.value();
+            auto& value = value_opt.value();
             if (value.JSONType() == json::JSON::Class::Floating) {
-                action_json[key] = value;
+                action_json[key] = std::move(value);
             } else if (value.JSONType() == json::JSON::Class::Integral) {
                 action_json[key] = json::Float(value.ToInt());
             } else {
@@ -105,7 +109,7 @@ public:
 
         auto fire = register_.get("fire");
         if (fire.has_value()) {
-            action_json["fire"] = fire.value();
+            action_json["fire"] = std::move(fire.value());
         }
 
         action_space_check::check_action_json(this->action_json);

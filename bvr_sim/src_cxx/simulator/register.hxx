@@ -18,8 +18,8 @@ public:
     Register& operator=(const Register&) = delete;
 
     std::optional<json::JSON> get(const std::string& key) const noexcept;
-
     bool set(const std::string& key, const json::JSON& value) noexcept;
+    bool set(const std::string& key, json::JSON&& value) noexcept;
 
     std::optional<json::JSON> pop(const std::string& key) noexcept;
 

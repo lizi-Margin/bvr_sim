@@ -1,5 +1,6 @@
 #include "register.hxx"
 #include <mutex>
+#include <utility>
 
 namespace bvr_sim {
 
@@ -18,11 +19,17 @@ bool Register::set(const std::string& key, const json::JSON& value) noexcept {
     return true;
 }
 
+bool Register::set(const std::string& key, json::JSON&& value) noexcept {
+    std::unique_lock lock(mutex_);
+    data_[key] = std::move(value);
+    return true;
+}
+
 std::optional<json::JSON> Register::pop(const std::string& key) noexcept {
     std::unique_lock lock(mutex_);
     auto it = data_.find(key);
     if (it != data_.end()) {
-        json::JSON value = it->second;
+        json::JSON value = std::move(it->second);
         data_.erase(it);
         return value;
     }
