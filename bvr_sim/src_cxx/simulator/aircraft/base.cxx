@@ -298,6 +298,18 @@ void Aircraft::write_register() noexcept {
     SimulatedObject::write_register();
     maintain_missile_lists();
 
+    register_.set("aircraft_model", json::String(aircraft_model));
+    register_.set("speed", json::Float(get_speed()));
+    register_.set("roll", json::Float(get_roll()));
+    register_.set("pitch", json::Float(get_pitch()));
+    register_.set("yaw", json::Float(get_heading()));
+
+    auto rpy = json::Array();
+    rpy.append(get_roll());
+    rpy.append(get_pitch());
+    rpy.append(get_heading());
+    register_.set("rpy", rpy);
+
     json::JSON under_missiles_size = json::Integral(static_cast<int>(under_missiles.size()));
     json::JSON launched_missiles_size = json::Integral(static_cast<int>(launched_missiles.size()));
     register_.set("under_missiles.size()", under_missiles_size);

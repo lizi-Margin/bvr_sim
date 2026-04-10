@@ -27,8 +27,8 @@ private:
 
 
     struct ParsedCommand {
-        enum Type { GET, SET, INIT, CLEAR, INVALID } type = INVALID;
-        std::string cmd; // "get" | "set" | "init"
+        enum Type { GET, SET, INIT, CLEAR, LIST, INVALID } type = INVALID;
+        std::string cmd; // "get" | "set" | "init" | "clear" | "list"
         std::string uid;
         json::JSON value; // present for SET and INIT when JSON provided
     };
@@ -45,6 +45,7 @@ private:
     json::JSON handle_set(const ParsedCommand& parsed) noexcept;
     json::JSON handle_init(const ParsedCommand& parsed) noexcept;
     json::JSON handle_clear(const ParsedCommand& parsed) noexcept;
+    json::JSON handle_list(const ParsedCommand& parsed) noexcept;
 };
 
 

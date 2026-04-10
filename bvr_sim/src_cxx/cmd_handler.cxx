@@ -49,6 +49,8 @@ json::JSON CmdHandler::_handle(const std::string& cmd) noexcept {
             return handle_init(parsed);
         case ParsedCommand::CLEAR:
             return handle_clear(parsed);
+        case ParsedCommand::LIST:
+            return handle_list(parsed);
         default: {
             json::JSON err = json::JSON::Make( json::JSON::Class::Object );
             err["status"] = "error";
@@ -156,6 +158,30 @@ json::JSON CmdHandler::handle_clear(const ParsedCommand& parsed) noexcept {
     return res;
 }
 
+json::JSON CmdHandler::handle_list(const ParsedCommand& parsed) noexcept {
+    json::JSON res = json::JSON::Make(json::JSON::Class::Object);
+
+    if (parsed.uid != "uid" && parsed.uid != "uids") {
+        res["status"] = json::String("error");
+        res["message"] = json::String("unsupported list target");
+        return res;
+    }
+
+    auto objects = SOPool::instance().get_all();
+    auto uids = json::JSON::Make(json::JSON::Class::Array);
+    for (const auto& obj : objects) {
+        if (!obj) {
+            continue;
+        }
+        uids.append(obj->uid);
+    }
+
+    res["status"] = json::String("ok");
+    res["uids"] = uids;
+    res["count"] = json::Integral(static_cast<int>(objects.size()));
+    return res;
+}
+
 CmdHandler::ParsedCommand CmdHandler::parse_command(const std::string& input)
 {
     // 强制三段格式：cmd uid json
@@ -195,6 +221,8 @@ void CmdHandler::process_command_type(ParsedCommand& parsed) {
         parsed.type = ParsedCommand::INIT;
     } else if (parsed.cmd == "clear") {
         parsed.type = ParsedCommand::CLEAR;
+    } else if (parsed.cmd == "list") {
+        parsed.type = ParsedCommand::LIST;
     } else {
         parsed.type = ParsedCommand::INVALID;
     }
