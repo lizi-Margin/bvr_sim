@@ -2,14 +2,14 @@ name: Build Wheels
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - ".github/workflows/wheels.yml"
-      - "pyproject.toml"
-      - "bvr_sim/**"
-      - "tests/**"
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - ".github/workflows/wheels.yml"
+  #     - "pyproject.toml"
+  #     - "bvr_sim/**"
+  #     - "tests/**"
   pull_request:
     paths:
       - ".github/workflows/wheels.yml"
