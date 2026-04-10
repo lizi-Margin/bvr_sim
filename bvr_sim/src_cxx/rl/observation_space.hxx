@@ -59,7 +59,7 @@ private:
     int max_team_missiles_;
     int max_enemy_missiles_;
 
-    size_t entity_dim_;
+    int entity_dim_;
 };
 
 }

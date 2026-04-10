@@ -148,7 +148,7 @@ std::vector<double> EntityObsSpace::extract_entity_features(
     bool is_missile) const {
 
     std::vector<double> features(entity_dim_, 0.0f);
-    const int MAX_MISSILE_NUM = 6.0;
+    constexpr double MAX_MISSILE_NUM = 6.0;
 
     check(target, "target");
     if (is_self) {
