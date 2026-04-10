@@ -7,7 +7,7 @@ Recommended environment:
 
 Assumptions:
 1. `import unrealcv` works in the active Python environment.
-2. Aircraft assets are spawnable from `/Game/Fighters/<UnitSpec>.<UnitSpec>_C`.
+2. Aircraft assets are available either via `UE_ASSET_PATHS` or a full `/Game/...` asset path in config.
 3. Spawned UE object names are the same as sim uids, e.g. `A01`, `B01`.
 """
 
@@ -32,6 +32,14 @@ UE_PORT = 9000
 FOLLOW_UID = "A01"
 CAMERA_DISTANCE_M = 900.0
 CAMERA_HEIGHT_M = 180.0
+
+UE_ASSET_PATHS = {
+    "F16": "/Game/F_16/Art/Pawn/FJ/BP_F16.BP_F16",
+    "F15": "/Game/Aircraft_f15c/blueprint/BP_F15C.BP_F15C",
+    "Typhoon": "/Game/VigilanteContent/Vehicles/West_Fighter_Typhoon/BP_West_Fighter_Typhoon.BP_West_Fighter_Typhoon",
+    "F18C": "/Game/VigilanteContent/Vehicles/West_Fighter_F18C/BP_West_Fighter_F18C.BP_West_Fighter_F18C",
+    "Su33": "/Game/VigilanteContent/Vehicles/East_Fighter_Su33/BP_East_Fighter_Su33.BP_East_Fighter_Su33",
+}
 
 
 def nwu_m_to_ue_cm(position: List[float]) -> List[float]:
@@ -83,7 +91,16 @@ def get_active_uids(core) -> List[str]:
 
 
 def unit_asset_path(unit_spec: str) -> str:
-    return f"/Game/Fighters/{unit_spec}.{unit_spec}_C"
+    if unit_spec.startswith("/Game/"):
+        return unit_spec
+    if unit_spec in UE_ASSET_PATHS:
+        return UE_ASSET_PATHS[unit_spec]
+    supported_specs = ", ".join(sorted(UE_ASSET_PATHS))
+    raise KeyError(
+        f"Unsupported unit_spec '{unit_spec}' for Unreal spawn. "
+        f"Add it to UE_ASSET_PATHS or provide a full /Game/... asset path. "
+        f"Supported short names: {supported_specs}"
+    )
 
 
 def ensure_ue_objects(client, uid_to_unit_spec: Dict[str, str]) -> None:
