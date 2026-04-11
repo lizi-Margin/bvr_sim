@@ -8,7 +8,8 @@ Recommended environment:
 Assumptions:
 1. `import unrealcv` works in the active Python environment.
 2. Aircraft assets are available either via `UE_ASSET_PATHS` or a full `/Game/...` asset path in config.
-3. Spawned UE object names are the same as sim uids, e.g. `A01`, `B01`.
+3. Missile assets are available via `UE_MISSILE_ASSET_PATHS`.
+4. Spawned UE object names are the same as sim uids, e.g. `A01`, `B01`.
 """
 
 from __future__ import annotations
@@ -34,14 +35,25 @@ UE_PORT = 9000
 FOLLOW_UID = "A01"
 CAMERA_DISTANCE_M = 30.0
 CAMERA_HEIGHT_M = 10.0
-SYNC_HZ = 80.0  # Use 0 to disable wall-clock sync rate limiting.
+SYNC_HZ = 100.0  # Use 0 to disable wall-clock sync rate limiting.
+OBJECT_SCALE = 100.0
+DEFAULT_MISSILE_SPEC = "AIM-120C7"
 
 UE_ASSET_PATHS = {
     "F16": "/Game/F_16/Art/Pawn/FJ/BP_F16.BP_F16",
     "F15": "/Game/Aircraft_f15c/blueprint/BP_F15C.BP_F15C",
+    "F18": "/Game/VigilanteContent/Vehicles/West_Fighter_F18C/BP_West_Fighter_F18C.BP_West_Fighter_F18C",
     "Typhoon": "/Game/VigilanteContent/Vehicles/West_Fighter_Typhoon/BP_West_Fighter_Typhoon.BP_West_Fighter_Typhoon",
-    "F18C": "/Game/VigilanteContent/Vehicles/West_Fighter_F18C/BP_West_Fighter_F18C.BP_West_Fighter_F18C",
     "Su33": "/Game/VigilanteContent/Vehicles/East_Fighter_Su33/BP_East_Fighter_Su33.BP_East_Fighter_Su33",
+}
+
+UE_MISSILE_ASSET_PATHS = {
+    "AIM-120": "/Game/AIM120/BP_AIM_120C.BP_AIM_120C",
+    "AIM-120C": "/Game/AIM120/BP_AIM_120C.BP_AIM_120C",
+    "AIM-120C5": "/Game/AIM120/BP_AIM_120C.BP_AIM_120C",
+    "AIM-120C7": "/Game/AIM120/BP_AIM_120C.BP_AIM_120C",
+    "AIM-9": "/Game/AIM120/BP_AIM_120C.BP_AIM_120C",
+    "AIM-9M": "/Game/AIM120/BP_AIM_120C.BP_AIM_120C",
 }
 
 
@@ -121,6 +133,15 @@ def sim_rpy_rad_to_ue_deg(roll: float, pitch: float, yaw: float) -> List[float]:
     return [math.degrees(roll), -math.degrees(yaw), -math.degrees(pitch)]
 
 
+def velocity_to_sim_rpy_rad(velocity: List[float]) -> tuple[float, float, float]:
+    north_speed, west_speed, up_speed = velocity
+    horizontal_speed = math.hypot(north_speed, west_speed)
+    roll = 0.0
+    pitch = math.atan2(-up_speed, horizontal_speed)
+    yaw = math.atan2(west_speed, north_speed)
+    return roll, pitch, yaw
+
+
 def follow_camera_pose(position: List[float], yaw: float, distance_m: float, height_m: float) -> tuple[List[float], List[float]]:
     cam_north = position[0] - math.cos(yaw) * distance_m
     cam_west = position[1] - math.sin(yaw) * distance_m
@@ -174,7 +195,7 @@ def fetch_state(core, uid: str) -> Dict:
         print(f"Warning: get {uid} failed with '{message}'; treating it as dead/removed")
         return {
             "uid": uid,
-            "Type": "Aircraft",
+            "Type": "Unknown",
             "is_alive": False,
             "position": [0.0, 0.0, 0.0],
             "velocity": [0.0, 0.0, 0.0],
@@ -187,7 +208,7 @@ def fetch_state(core, uid: str) -> Dict:
     print(f"Warning: get {uid} failed unexpectedly: {state}")
     return {
         "uid": uid,
-        "Type": "Aircraft",
+        "Type": "Unknown",
         "is_alive": False,
         "position": [0.0, 0.0, 0.0],
         "velocity": [0.0, 0.0, 0.0],
@@ -204,7 +225,11 @@ def collect_states(core, uids: Iterable[str]) -> Dict[str, Dict]:
 
 
 def get_active_uids(sim: BVR3DEnvCpp) -> List[str]:
-    # Do not depend on optional/unstable C++ "list" command support.
+    listed = sim.core.handle("list uids {}")
+    if listed.get("status") == "ok":
+        return [str(uid) for uid in listed.get("uids", [])]
+
+    print(f"Warning: list uids failed: {listed}; falling back to aircraft ids only")
     return list(sim.red_ids) + list(sim.blue_ids)
 
 
@@ -221,28 +246,81 @@ def unit_asset_path(unit_spec: str) -> str:
     )
 
 
-def ensure_ue_objects(client, uid_to_unit_spec: Dict[str, str]) -> None:
+def missile_asset_path(missile_spec: str) -> str:
+    if missile_spec.startswith("/Game/"):
+        return missile_spec
+    if missile_spec in UE_MISSILE_ASSET_PATHS:
+        return UE_MISSILE_ASSET_PATHS[missile_spec]
+    supported_specs = ", ".join(sorted(UE_MISSILE_ASSET_PATHS))
+    raise KeyError(
+        f"Unsupported missile_spec '{missile_spec}' for Unreal spawn. "
+        f"Add it to UE_MISSILE_ASSET_PATHS or provide a full /Game/... asset path. "
+        f"Supported short names: {supported_specs}"
+    )
+
+
+def asset_path_for_state(uid: str, state: Dict, uid_to_unit_spec: Dict[str, str]) -> str | None:
+    if state.get("Type") == "Aircraft":
+        unit_spec = uid_to_unit_spec.get(uid)
+        return unit_asset_path(unit_spec) if unit_spec else None
+    if state.get("Type") == "Missile":
+        return missile_asset_path(str(state.get("missile_model", DEFAULT_MISSILE_SPEC)))
+    return None
+
+
+def ensure_ue_objects(
+    client,
+    uid_to_asset_path: Dict[str, str],
+    replace_existing: bool,
+    follow_uid: str | None,
+) -> None:
     existing = set((client.request("vget /objects") or "").split())
     commands: List[str] = []
-    for uid, unit_spec in uid_to_unit_spec.items():
+    for uid, asset_path in uid_to_asset_path.items():
         if uid in existing:
+            if not replace_existing:
+                continue
             commands.append(f"vset /object/{uid}/destroy")
-        commands.append(f"vset /objects/spawn_from_path_wo_annotation {unit_asset_path(unit_spec)} {uid}")
+        commands.append(f"vset /objects/spawn_from_path_wo_annotation {asset_path} {uid}")
+        if uid != follow_uid:
+            commands.append(f"vset /object/{uid}/scale {OBJECT_SCALE:.3f} {OBJECT_SCALE:.3f} {OBJECT_SCALE:.3f}")
     if commands:
         client.request(commands, -1)
         time.sleep(0.2)
+
+
+def ensure_dynamic_ue_objects(
+    client,
+    frame_states: Dict[str, Dict],
+    uid_to_unit_spec: Dict[str, str],
+    spawned_uids: set[str],
+    follow_uid: str,
+) -> None:
+    uid_to_asset_path: Dict[str, str] = {}
+    for uid, state in frame_states.items():
+        if uid in spawned_uids:
+            continue
+        asset_path = asset_path_for_state(uid, state, uid_to_unit_spec)
+        if asset_path:
+            uid_to_asset_path[uid] = asset_path
+
+    if uid_to_asset_path:
+        ensure_ue_objects(client, uid_to_asset_path, replace_existing=False, follow_uid=follow_uid)
+        spawned_uids.update(uid_to_asset_path)
 
 
 def build_sync_commands(
     frame_states: Dict[str, Dict],
     follow_uid: str,
     hidden_uids: set[str],
+    known_uids: set[str],
     camera_distance_m: float,
     camera_height_m: float,
 ) -> List[str]:
     commands: List[str] = []
+    active_uids = set(frame_states)
     for uid, state in frame_states.items():
-        if state.get("Type") != "Aircraft":
+        if state.get("Type") not in {"Aircraft", "Missile"}:
             continue
 
         is_alive = bool(state.get("is_alive", False))
@@ -259,12 +337,19 @@ def build_sync_commands(
         x, y, z = nwu_m_to_ue_cm(state["position"])
         commands.append(f"vset /object/{uid}/location {x:.3f} {y:.3f} {z:.3f}")
 
-        roll, yaw, pitch = sim_rpy_rad_to_ue_deg(
-            float(state.get("roll", 0.0)),
-            float(state.get("pitch", 0.0)),
-            float(state.get("yaw", 0.0)),
-        )
+        if all(key in state for key in ("roll", "pitch", "yaw")):
+            sim_roll = float(state.get("roll", 0.0))
+            sim_pitch = float(state.get("pitch", 0.0))
+            sim_yaw = float(state.get("yaw", 0.0))
+        else:
+            sim_roll, sim_pitch, sim_yaw = velocity_to_sim_rpy_rad(state.get("velocity", [1.0, 0.0, 0.0]))
+        roll, yaw, pitch = sim_rpy_rad_to_ue_deg(sim_roll, sim_pitch, sim_yaw)
         commands.append(f"vset /object/{uid}/rotation {pitch:.3f} {yaw:.3f} {roll:.3f}")
+
+    for uid in known_uids - active_uids:
+        if uid not in hidden_uids:
+            commands.append(f"vset /object/{uid}/hide")
+            hidden_uids.add(uid)
 
     follow_state = frame_states.get(follow_uid)
     if follow_state and follow_state.get("is_alive", False):
@@ -302,13 +387,15 @@ def main() -> int:
 
     config_path = Path(args.config).resolve()
     env_config = load_config(config_path)
+    acmi_file_path = REPO_ROOT / "test_logs" / "bvr_sim_unrealcv.acmi"
 
     sim = BVR3DEnvCpp(
         env_config,
         [],
         log_file_path=str(REPO_ROOT / "test_logs" / "bvr_sim_unrealcv.log"),
-        acmi_file_path=str(REPO_ROOT / "test_logs" / "bvr_sim_unrealcv.acmi"),
+        acmi_file_path=str(acmi_file_path),
     )
+    sim.enable_render(str(acmi_file_path))
 
     client = connect_unrealcv(UE_IP, UE_PORT)
     client.request([f"vrun setres {FIXED_RESOLUTION}w", "DisableAllScreenMessages"], -1)
@@ -317,9 +404,10 @@ def main() -> int:
         **{uid: cfg["unit_spec"] for uid, cfg in env_config["red_meta"].items()},
         **{uid: cfg["unit_spec"] for uid, cfg in env_config["blue_meta"].items()},
     }
-    ensure_ue_objects(client, uid_to_unit_spec)
+    aircraft_uid_to_asset_path = {uid: unit_asset_path(unit_spec) for uid, unit_spec in uid_to_unit_spec.items()}
 
     hidden_uids: set[str] = set()
+    spawned_uids: set[str] = set()
     mean_step_time = 0.0
 
     try:
@@ -327,12 +415,16 @@ def main() -> int:
             obs, info = sim.reset(seed=None)
             uids = get_active_uids(sim)
             follow_uid = FOLLOW_UID if FOLLOW_UID in uids else (sim.red_ids[0] if sim.red_ids else uids[0])
+            ensure_ue_objects(client, aircraft_uid_to_asset_path, replace_existing=True, follow_uid=follow_uid)
+            spawned_uids.update(aircraft_uid_to_asset_path)
 
             initial_states = collect_states(sim.core, uids)
+            ensure_dynamic_ue_objects(client, initial_states, uid_to_unit_spec, spawned_uids, follow_uid)
             initial_commands = build_sync_commands(
                 initial_states,
                 follow_uid,
                 hidden_uids,
+                spawned_uids,
                 CAMERA_DISTANCE_M,
                 CAMERA_HEIGHT_M,
             )
@@ -349,11 +441,14 @@ def main() -> int:
                 mean_step_time = 0.999 * mean_step_time + 0.001 * (t1 - t0) if mean_step_time > 0 else (t1 - t0)
 
                 if sim.current_step % args.sync_every == 0 and sync_rate_limiter.should_run():
+                    uids = get_active_uids(sim)
                     states = collect_states(sim.core, uids)
+                    ensure_dynamic_ue_objects(client, states, uid_to_unit_spec, spawned_uids, follow_uid)
                     commands = build_sync_commands(
                         states,
                         follow_uid,
                         hidden_uids,
+                        spawned_uids,
                         CAMERA_DISTANCE_M,
                         CAMERA_HEIGHT_M,
                     )
@@ -370,6 +465,7 @@ def main() -> int:
                         flush=True,
                     )
     finally:
+        sim.disable_render()
         client.disconnect()
 
     return 0

@@ -93,12 +93,12 @@ struct FlightControllerParams {
     static FlightControllerParams get_f15_params() noexcept {
         FlightControllerParams f15_params;
 
-        f15_params.kroll_p = 1.2;
-        f15_params.kroll_i = 0.2;
+        f15_params.kroll_p = 2.2;
+        f15_params.kroll_i = 0.1;
         f15_params.kroll_d = 0.0;
-        f15_params.kpitch_p = -1.7;
-        f15_params.kpitch_i = -0.0;
-        f15_params.kpitch_d = -0.25;
+        f15_params.kpitch_p = -1.2;
+        f15_params.kpitch_i = -0.1;
+        f15_params.kpitch_d = -0.0;
 
         f15_params.kthrottle_p = 0.03;
         f15_params.kthrottle_i = 0.06;

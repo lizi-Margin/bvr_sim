@@ -21,24 +21,24 @@
             "opponent_type": "tactical"
             // "opponent_type": "tactical_random"
         },
-        // "A02": {
-        //     "unit_spec": "F15",
-        //     "color": "Red",
-        //     "position": null,
-        //     "velocity": null,
-        //     "fdm_type": "jsbsim",
-        //     // "fdm_type": "simple",
-        //     "record": false,
-        //     "pylon_mounts": {
-        //         "R01": "AIM-120C7",
-        //         "R02": "AIM-120C7",
-        //         "R03": "AIM-120C7",
-        //         "L01": "AIM-120C7",
-        //         "L02": "AIM-120C7",
-        //         "L03": "AIM-120C7"
-        //     },
-        //     "opponent_type": "tactical_random"
-        // },
+        "A02": {
+            "unit_spec": "F18",
+            "color": "Red",
+            "position": [80000.0, 0.0, 5000.0],
+            "velocity": [-50.0, 200.0, 0.0],
+            "fdm_type": "jsbsim",
+            // "fdm_type": "simple",
+            "record": false,
+            "pylon_mounts": {
+                "R01": "AIM-120C7",
+                "R02": "AIM-120C7",
+                "R03": "AIM-120C7",
+                "L01": "AIM-120C7",
+                "L02": "AIM-120C7",
+                "L03": "AIM-120C7"
+            },
+            "opponent_type": "tactical_random"
+        },
         // "A03": {
         //     "unit_spec": "F4N",
         //     "color": "Red",

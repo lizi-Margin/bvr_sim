@@ -310,7 +310,7 @@ double JSBSimFDM::get_mach() const noexcept {
 }
 
 void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noexcept {
-    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(100);
+    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(85);
     // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(40);
     double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw, jsbsim_inner_dt);
     delta_heading = delta_heading_filt;
