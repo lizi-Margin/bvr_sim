@@ -32,8 +32,9 @@ FIXED_RESOLUTION = "960x960"
 UE_IP = "127.0.0.1"
 UE_PORT = 9000
 FOLLOW_UID = "A01"
-CAMERA_DISTANCE_M = 900.0
-CAMERA_HEIGHT_M = 180.0
+CAMERA_DISTANCE_M = 30.0
+CAMERA_HEIGHT_M = 10.0
+SYNC_HZ = 80.0  # Use 0 to disable wall-clock sync rate limiting.
 
 UE_ASSET_PATHS = {
     "F16": "/Game/F_16/Art/Pawn/FJ/BP_F16.BP_F16",
@@ -141,11 +142,61 @@ def connect_unrealcv(ip: str, port: int):
     return client
 
 
+class WallClockRateLimiter:
+    def __init__(self, hz: float):
+        if hz < 0:
+            raise ValueError("hz must be non-negative")
+        self.min_interval = 1.0 / hz if hz > 0 else 0.0
+        self.next_time = time.monotonic()
+
+    def should_run(self) -> bool:
+        if self.min_interval == 0.0:
+            return True
+
+        now = time.monotonic()
+        if now < self.next_time:
+            return False
+
+        self.next_time = now + self.min_interval
+        return True
+
+
 def fetch_state(core, uid: str) -> Dict:
     state = core.handle(f"get {uid} {{}}")
-    if state.get("status") != "ok":
-        raise RuntimeError(f"get {uid} failed: {state}")
-    return state
+    if state.get("status") == "ok":
+        return state
+    message = str(state.get("message", ""))
+    if message in {
+        "uid not found",
+        "uid is in trash bin (object is dead and removed from active pool)",
+        "uid not found in active pool or trash bin",
+    }:
+        print(f"Warning: get {uid} failed with '{message}'; treating it as dead/removed")
+        return {
+            "uid": uid,
+            "Type": "Aircraft",
+            "is_alive": False,
+            "position": [0.0, 0.0, 0.0],
+            "velocity": [0.0, 0.0, 0.0],
+            "roll": 0.0,
+            "pitch": 0.0,
+            "yaw": 0.0,
+            "enemies_lock": [],
+            "under_missiles.size()": 0,
+        }
+    print(f"Warning: get {uid} failed unexpectedly: {state}")
+    return {
+        "uid": uid,
+        "Type": "Aircraft",
+        "is_alive": False,
+        "position": [0.0, 0.0, 0.0],
+        "velocity": [0.0, 0.0, 0.0],
+        "roll": 0.0,
+        "pitch": 0.0,
+        "yaw": 0.0,
+        "enemies_lock": [],
+        "under_missiles.size()": 0,
+    }
 
 
 def collect_states(core, uids: Iterable[str]) -> Dict[str, Dict]:
@@ -235,7 +286,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Sync BVR C++ env state into UnrealCV.")
     parser.add_argument(
         "--config",
-        default=str(REPO_ROOT / "tests" / "demo_config_cpp.jsonc"),
+        default=str(REPO_ROOT / "example" / "unreal.jsonc"),
         help="Scenario config JSONC path.",
     )
     parser.add_argument("--sync-every", type=int, default=1, help="Push transforms to UE every N sim steps.")
@@ -245,6 +296,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    if args.sync_every <= 0:
+        raise ValueError("--sync-every must be greater than 0")
+    sync_rate_limiter = WallClockRateLimiter(SYNC_HZ)
+
     config_path = Path(args.config).resolve()
     env_config = load_config(config_path)
 
@@ -293,7 +348,7 @@ def main() -> int:
                 episode_done = info["episode_done"]
                 mean_step_time = 0.999 * mean_step_time + 0.001 * (t1 - t0) if mean_step_time > 0 else (t1 - t0)
 
-                if sim.current_step % args.sync_every == 0:
+                if sim.current_step % args.sync_every == 0 and sync_rate_limiter.should_run():
                     states = collect_states(sim.core, uids)
                     commands = build_sync_commands(
                         states,

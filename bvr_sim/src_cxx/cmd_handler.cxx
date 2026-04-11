@@ -10,6 +10,21 @@
 
 namespace bvr_sim {
 
+namespace {
+
+json::JSON make_missing_uid_error(const std::string& uid) {
+    json::JSON err = json::JSON::Make(json::JSON::Class::Object);
+    err["status"] = json::String("error");
+    if (SOPool::instance().in_trash_bin(uid)) {
+        err["message"] = json::String("uid is in trash bin (object is dead and removed from active pool)");
+    } else {
+        err["message"] = json::String("uid not found in active pool or trash bin");
+    }
+    return err;
+}
+
+}
+
 CmdHandler& CmdHandler::instance() {
     static CmdHandler h;
     return h;
@@ -63,10 +78,7 @@ json::JSON CmdHandler::_handle(const std::string& cmd) noexcept {
 json::JSON CmdHandler::handle_get(const ParsedCommand& parsed) noexcept {
     auto obj = SOPool::instance().get(parsed.uid);
     if (!obj) {
-        json::JSON err = json::JSON::Make( json::JSON::Class::Object );
-        err["status"] = json::String("error");
-        err["message"] = json::String("uid not found");
-        return err;
+        return make_missing_uid_error(parsed.uid);
     }
 
     // return full object representation (assumes to_json exists)
@@ -91,10 +103,7 @@ json::JSON CmdHandler::handle_set(const ParsedCommand& parsed) noexcept {
 
     auto obj = SOPool::instance().get(parsed.uid);
     if (!obj) {
-        json::JSON err = json::JSON::Make( json::JSON::Class::Object );
-        err["status"] = json::String("error");
-        err["message"] = json::String("uid not found");
-        return err;
+        return make_missing_uid_error(parsed.uid);
     }
 
     json::JSON kv = parsed.value;
