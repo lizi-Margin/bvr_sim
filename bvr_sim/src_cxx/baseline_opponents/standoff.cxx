@@ -11,26 +11,16 @@
 namespace bvr_sim {
 
 namespace {
-constexpr double kAbortRangeNm = 15.0;
-constexpr double kOrbitRangeNm = 30.0;
-constexpr double kCrankAngleDeg = 60.0;
+constexpr double kCrankAngleDeg = 80.0;
 constexpr double kSupportSpeedMach = 0.8;
-constexpr double kApproachSpeedMach = 0.95;
 constexpr double kDefensiveSpeedMach = 1.0;
-constexpr double kExtendSpeedMach = 0.95;
-constexpr double kOrbitSpeedMach = 0.85;
-constexpr double kSupportFloorFt = 28000.0;
-constexpr double kApproachFloorFt = 30000.0;
-constexpr double kExtendFloorFt = 25000.0;
-constexpr double kAbortFloorFt = 22000.0;
-constexpr double kCrankSwitchSec = 20.0;
-constexpr double kOrbitSwitchSec = 25.0;
+constexpr double kCrankSwitchSec = 100.0;
 }
 
 StandoffOpponent3D::StandoffOpponent3D() noexcept
     : BaseOpponent3D("Standoff3D"),
       last_shoot_time(-static_cast<int>(30.0 / cfg::dt)),
-      crank_direction(1),
+      crank_direction(randomize_crank_direction()),
       crank_switch_time(0) {
 }
 
@@ -89,13 +79,6 @@ void StandoffOpponent3D::take_action(
     }
 
     auto target = alive_enemies.front();
-    c3utils::Vector3 rel_pos(
-        target->position[0] - agent->position[0],
-        target->position[1] - agent->position[1],
-        target->position[2] - agent->position[2]
-    );
-    const double distance = c3utils::linalg_norm_vec(rel_pos);
-
     std::vector<std::shared_ptr<Missile>> missiles_in_flight;
     for (const auto& missile : agent->launched_missiles) {
         if (missile->is_alive && missile->target && missile->target->uid == target->uid) {
@@ -111,20 +94,10 @@ void StandoffOpponent3D::take_action(
 
     if (!active_missiles.empty()) {
         defensive_abort(agent, active_missiles, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
-    } else if (distance < c3u::nm_to_meters(kAbortRangeNm)) {
-        extend(agent, target, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
-    } else if (std::find_if(agent->enemies_lock.begin(), agent->enemies_lock.end(),
-                   [&target](const std::shared_ptr<Aircraft>& locked) { return locked->uid == target->uid; }) != agent->enemies_lock.end() &&
-               agent->pylon_manager.num_left_weapons("AIM-120") > 0 &&
-               agent->can_shoot()) {
-        shoot_and_crank(agent, target, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
     } else if (!missiles_in_flight.empty()) {
         support_crank(agent, target, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
-    } else if (std::find_if(agent->enemies_lock.begin(), agent->enemies_lock.end(),
-                   [&target](const std::shared_ptr<Aircraft>& locked) { return locked->uid == target->uid; }) == agent->enemies_lock.end()) {
-        controlled_approach(agent, target, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
     } else {
-        orbit_outside(agent, target, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
+        shoot_and_crank(agent, target, delta_heading, delta_altitude, delta_speed, shoot, fire_action_json);
     }
 
     auto final_action = build_action_from_rates(delta_heading, delta_altitude, delta_speed, shoot);
@@ -179,34 +152,10 @@ void StandoffOpponent3D::defensive_abort(
     const double desired_heading = missile_heading + c3u::pi;
     delta_heading = get_heading_action(agent, desired_heading);
 
-    const double target_altitude = std::max(c3u::feet_to_meters(kAbortFloorFt), agent->get_altitude() - 100.0);
-    delta_altitude = target_altitude - agent->get_altitude();
+    delta_altitude = 0.0;
 
     const double target_speed = c3u::get_mps(kDefensiveSpeedMach, agent->get_altitude());
     delta_speed = (target_speed - agent->get_speed()) * 0.7;
-
-    shoot = false;
-    fire = json::JSON();
-}
-
-void StandoffOpponent3D::extend(
-    std::shared_ptr<Aircraft> agent,
-    std::shared_ptr<Aircraft> target,
-    double& delta_heading,
-    double& delta_altitude,
-    double& delta_speed,
-    bool& shoot,
-    json::JSON& fire
-) const noexcept {
-    const double target_heading = calculate_heading_to_target(agent, target->position);
-    const double desired_heading = target_heading + c3u::pi;
-    delta_heading = get_heading_action(agent, desired_heading);
-
-    const double target_altitude = std::max(c3u::feet_to_meters(kExtendFloorFt), agent->get_altitude() - 50.0);
-    delta_altitude = target_altitude - agent->get_altitude();
-
-    const double target_speed = c3u::get_mps(kExtendSpeedMach, agent->get_altitude());
-    delta_speed = (target_speed - agent->get_speed()) * 0.6;
 
     shoot = false;
     fire = json::JSON();
@@ -224,8 +173,7 @@ void StandoffOpponent3D::shoot_and_crank(
     const double desired_heading = get_crank_heading(agent, target);
     delta_heading = get_heading_action(agent, desired_heading);
 
-    const double target_altitude = std::max(c3u::feet_to_meters(kApproachFloorFt), agent->get_altitude());
-    delta_altitude = target_altitude - agent->get_altitude();
+    delta_altitude = 0.0;
 
     const double target_speed = c3u::get_mps(kSupportSpeedMach, agent->get_altitude());
     delta_speed = (target_speed - agent->get_speed()) * 0.6;
@@ -247,72 +195,9 @@ void StandoffOpponent3D::support_crank(
     const double desired_heading = get_crank_heading(agent, target);
     delta_heading = get_heading_action(agent, desired_heading);
 
-    const double target_altitude = std::max(c3u::feet_to_meters(kSupportFloorFt), agent->get_altitude() - 20.0);
-    delta_altitude = target_altitude - agent->get_altitude();
+    delta_altitude = 0.0;
 
     const double target_speed = c3u::get_mps(kSupportSpeedMach, agent->get_altitude());
-    delta_speed = (target_speed - agent->get_speed()) * 0.5;
-
-    shoot = false;
-    fire = json::JSON();
-}
-
-void StandoffOpponent3D::controlled_approach(
-    std::shared_ptr<Aircraft> agent,
-    std::shared_ptr<Aircraft> target,
-    double& delta_heading,
-    double& delta_altitude,
-    double& delta_speed,
-    bool& shoot,
-    json::JSON& fire
-) const noexcept {
-    const double desired_heading = calculate_heading_to_target(agent, target->position);
-    delta_heading = get_heading_action(agent, desired_heading);
-
-    const double target_altitude = std::max(c3u::feet_to_meters(kApproachFloorFt), agent->get_altitude());
-    delta_altitude = target_altitude - agent->get_altitude();
-
-    const double target_speed = c3u::get_mps(kApproachSpeedMach, agent->get_altitude());
-    delta_speed = (target_speed - agent->get_speed()) * 0.6;
-
-    shoot = false;
-    fire = json::JSON();
-}
-
-void StandoffOpponent3D::orbit_outside(
-    std::shared_ptr<Aircraft> agent,
-    std::shared_ptr<Aircraft> target,
-    double& delta_heading,
-    double& delta_altitude,
-    double& delta_speed,
-    bool& shoot,
-    json::JSON& fire
-) noexcept {
-    c3utils::Vector3 rel_pos(
-        target->position[0] - agent->position[0],
-        target->position[1] - agent->position[1],
-        target->position[2] - agent->position[2]
-    );
-    const double distance = c3utils::linalg_norm_vec(rel_pos);
-    const double target_heading = std::atan2(rel_pos[1], rel_pos[0]);
-
-    if ((time_counter - crank_switch_time) * cfg::dt > kOrbitSwitchSec) {
-        crank_direction *= -1;
-        crank_switch_time = time_counter;
-    }
-
-    double desired_heading = target_heading + c3u::deg2rad(90.0) * crank_direction;
-    if (distance > c3u::nm_to_meters(kOrbitRangeNm * 1.15)) {
-        desired_heading = target_heading + c3u::deg2rad(45.0) * crank_direction;
-    } else if (distance < c3u::nm_to_meters(kOrbitRangeNm * 0.85)) {
-        desired_heading = target_heading + c3u::pi;
-    }
-    delta_heading = get_heading_action(agent, desired_heading);
-
-    const double target_altitude = std::max(c3u::feet_to_meters(kApproachFloorFt), agent->get_altitude());
-    delta_altitude = target_altitude - agent->get_altitude();
-
-    const double target_speed = c3u::get_mps(kOrbitSpeedMach, agent->get_altitude());
     delta_speed = (target_speed - agent->get_speed()) * 0.5;
 
     shoot = false;

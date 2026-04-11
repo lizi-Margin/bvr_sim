@@ -3,6 +3,7 @@
 #include "base.hxx"
 #include "rubbish_can/json.hpp"
 #include <memory>
+#include <random>
 #include <vector>
 
 namespace bvr_sim {
@@ -14,6 +15,12 @@ private:
     int crank_switch_time;
 
 public:
+    static int randomize_crank_direction() noexcept {
+        static std::mt19937 gen(std::random_device{}());
+        static std::uniform_int_distribution<int> dist(0, 1);
+        return dist(gen) == 0 ? -1 : 1;
+    }
+
     StandoffOpponent3D() noexcept;
 
     ~StandoffOpponent3D() noexcept override = default;
@@ -40,16 +47,6 @@ private:
         json::JSON& fire
     ) const noexcept;
 
-    void extend(
-        std::shared_ptr<Aircraft> agent,
-        std::shared_ptr<Aircraft> target,
-        double& delta_heading,
-        double& delta_altitude,
-        double& delta_speed,
-        bool& shoot,
-        json::JSON& fire
-    ) const noexcept;
-
     void shoot_and_crank(
         std::shared_ptr<Aircraft> agent,
         std::shared_ptr<Aircraft> target,
@@ -61,26 +58,6 @@ private:
     ) noexcept;
 
     void support_crank(
-        std::shared_ptr<Aircraft> agent,
-        std::shared_ptr<Aircraft> target,
-        double& delta_heading,
-        double& delta_altitude,
-        double& delta_speed,
-        bool& shoot,
-        json::JSON& fire
-    ) noexcept;
-
-    void controlled_approach(
-        std::shared_ptr<Aircraft> agent,
-        std::shared_ptr<Aircraft> target,
-        double& delta_heading,
-        double& delta_altitude,
-        double& delta_speed,
-        bool& shoot,
-        json::JSON& fire
-    ) const noexcept;
-
-    void orbit_outside(
         std::shared_ptr<Aircraft> agent,
         std::shared_ptr<Aircraft> target,
         double& delta_heading,

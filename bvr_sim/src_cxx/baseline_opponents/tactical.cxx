@@ -10,6 +10,12 @@
 
 namespace bvr_sim {
 
+namespace {
+constexpr double kGuideCrankAngleDeg = 30.0;
+constexpr double kShortRangeCrankAngleDeg = 30.0;
+constexpr double kCrankSwitchSec = 70.0;
+}
+
 TacticalOpponent3D::TacticalOpponent3D() noexcept
     : BaseOpponent3D("Tactical3D"),
       last_shoot_time(-static_cast<int>(30.0 / cfg::dt)), // Convert 30 seconds to steps (assuming default dt=0.1)
@@ -285,14 +291,11 @@ void TacticalOpponent3D::guide_missiles(
     double distance = c3utils::linalg_norm_vec(rel_pos);
     double target_heading = std::atan2(rel_pos[1], rel_pos[0]);
 
-    // Crank maneuver: offset heading by ±30 degrees
-    double crank_offset = c3u::deg2rad(30.0) * crank_direction;
-    double desired_heading = target_heading + crank_offset;
+    update_crank_direction_if_needed(kCrankSwitchSec);
 
-    if ((time_counter - crank_switch_time) * cfg::dt > 30.0) {
-        crank_direction *= -1;
-        crank_switch_time = time_counter;
-    }
+    // Crank maneuver: offset heading by +/- 30 degrees
+    double crank_offset = c3u::deg2rad(kGuideCrankAngleDeg) * crank_direction;
+    double desired_heading = target_heading + crank_offset;
 
     delta_heading = get_heading_action(agent, desired_heading);
 
@@ -423,13 +426,10 @@ void TacticalOpponent3D::tactical_short_range_attack(
     double desired_heading = target_heading;
 
     if (distance_nm > 5.0) {
-        double crank_offset = c3u::deg2rad(30.0) * crank_direction;
-        desired_heading = target_heading + crank_offset;
+        update_crank_direction_if_needed(kCrankSwitchSec);
 
-        if ((time_counter - crank_switch_time) * cfg::dt > 20.0) {
-            crank_direction *= -1;
-            crank_switch_time = time_counter;
-        }
+        double crank_offset = c3u::deg2rad(kShortRangeCrankAngleDeg) * crank_direction;
+        desired_heading = target_heading + crank_offset;
     }
 
     delta_heading = get_heading_action(agent, desired_heading);
@@ -475,6 +475,13 @@ void TacticalOpponent3D::get_default_action(
     delta_speed = 0.0;
     shoot = false;
     fire = json::JSON();    
+}
+
+void TacticalOpponent3D::update_crank_direction_if_needed(double switch_sec) noexcept {
+    if ((time_counter - crank_switch_time) * cfg::dt > switch_sec) {
+        crank_direction *= -1;
+        crank_switch_time = time_counter;
+    }
 }
 
 }

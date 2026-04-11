@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import argparse
 import math
+import socket
+import threading
 import time
 from pathlib import Path
 from typing import Dict, Iterable, List
@@ -42,6 +44,73 @@ UE_ASSET_PATHS = {
 }
 
 
+class SafeUnrealCvClient(unrealcv.Client):
+    """Local compatibility wrapper for UnrealCV's fragile disconnect path."""
+
+    def receive(self):
+        if self.isconnected():
+            message = unrealcv.SocketMessage.ReceivePayload(self.sock)
+            if not message:
+                print("BaseClient: remote disconnected, no more message")
+                self.disconnect()
+                return None
+            return message
+        return None
+
+    def receive_loop_queue(self):
+        while True:
+            num = self.recv_num_q.get()
+            if num is None:
+                break
+
+            if num < 0:
+                disconnected = False
+                for _ in range(-num):
+                    raw_message = self.receive()
+                    if raw_message is None:
+                        disconnected = True
+                        break
+                    message = self.raw_message_handler(raw_message)
+                    self.recv_message_id += 1
+                    self.recv_data_q.put(message)
+                if disconnected:
+                    self.recv_data_q.put(None)
+                    break
+            else:
+                for _ in range(num):
+                    raw_message = self.receive()
+                    if raw_message is None:
+                        return
+                    self.recv_message_id += 1
+
+    def request(self, message, timeout=5):
+        result = super().request(message, timeout)
+        if timeout >= 0 and result is None:
+            raise ConnectionError("UnrealCV connection closed while waiting for a response")
+        return result
+
+    def disconnect(self):
+        if self.isconnected():
+            try:
+                self.sock.shutdown(socket.SHUT_RD)
+            except OSError:
+                pass
+
+            if self.sock:
+                try:
+                    self.sock.close()
+                except OSError:
+                    pass
+                self.sock = None
+            time.sleep(0.1)
+
+        receiver_thread = getattr(self, "t", None)
+        if receiver_thread and receiver_thread.is_alive():
+            self.recv_num_q.put(None)
+            if receiver_thread is not threading.current_thread():
+                receiver_thread.join()
+
+
 def nwu_m_to_ue_cm(position: List[float]) -> List[float]:
     north, west, up = position
     return [north * 100.0, -west * 100.0, up * 100.0]
@@ -66,7 +135,7 @@ def load_config(config_path: Path) -> Dict:
 
 
 def connect_unrealcv(ip: str, port: int):
-    client = unrealcv.Client((ip, port))
+    client = SafeUnrealCvClient((ip, port))
     if not client.connect():
         raise RuntimeError(f"Failed to connect UnrealCV at {ip}:{port}")
     return client
@@ -83,11 +152,9 @@ def collect_states(core, uids: Iterable[str]) -> Dict[str, Dict]:
     return {uid: fetch_state(core, uid) for uid in uids}
 
 
-def get_active_uids(core) -> List[str]:
-    result = core.handle("list uid {}")
-    if result.get("status") != "ok":
-        raise RuntimeError(f"list uid failed: {result}")
-    return result.get("uids", [])
+def get_active_uids(sim: BVR3DEnvCpp) -> List[str]:
+    # Do not depend on optional/unstable C++ "list" command support.
+    return list(sim.red_ids) + list(sim.blue_ids)
 
 
 def unit_asset_path(unit_spec: str) -> str:
@@ -109,7 +176,7 @@ def ensure_ue_objects(client, uid_to_unit_spec: Dict[str, str]) -> None:
     for uid, unit_spec in uid_to_unit_spec.items():
         if uid in existing:
             commands.append(f"vset /object/{uid}/destroy")
-        commands.append(f"vset /objects/spawn_from_path {unit_asset_path(unit_spec)} {uid}")
+        commands.append(f"vset /objects/spawn_from_path_wo_annotation {unit_asset_path(unit_spec)} {uid}")
     if commands:
         client.request(commands, -1)
         time.sleep(0.2)
@@ -203,7 +270,7 @@ def main() -> int:
     try:
         for episode in range(args.max_episodes):
             obs, info = sim.reset(seed=None)
-            uids = get_active_uids(sim.core)
+            uids = get_active_uids(sim)
             follow_uid = FOLLOW_UID if FOLLOW_UID in uids else (sim.red_ids[0] if sim.red_ids else uids[0])
 
             initial_states = collect_states(sim.core, uids)

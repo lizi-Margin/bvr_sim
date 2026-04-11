@@ -33,7 +33,7 @@ std::map<std::string, double> BaseOpponent3D::build_action_from_rates(
     const std::map<std::string, double>& other_commands
 ) const noexcept {
 
-    const double max_delta_heading = c3u::deg2rad(45.);
+    const double max_delta_heading = c3u::deg2rad(100.0f);
     const double max_delta_altitude = 80;
     const double max_delta_speed = 80;
     std::map<std::string, double> action = {
@@ -125,8 +125,8 @@ double BaseOpponent3D::get_heading_action(
     double current_heading = agent->get_heading();
     double angle_diff = normalize_angle(desired_heading - current_heading);
 
-    // Proportional control with P-gain = 2.0
-    double heading_rate = angle_diff * 2.0;
+    // Proportional control with P-gain = 1.0
+    double heading_rate = angle_diff;
 
     return heading_rate;
 }

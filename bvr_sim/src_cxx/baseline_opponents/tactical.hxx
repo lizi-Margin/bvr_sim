@@ -104,6 +104,8 @@ private:
         bool& shoot,
         json::JSON& fire
     ) const noexcept;
+
+    void update_crank_direction_if_needed(double switch_sec) noexcept;
 };
 
 }

@@ -123,11 +123,11 @@ struct FlightControllerParams {
         FlightControllerParams f22_params;
 
         f22_params.kroll_p = 1.2;
-        f22_params.kroll_i = 0.2;
+        f22_params.kroll_i = 0.4;
         f22_params.kroll_d = 0.0;
-        f22_params.kpitch_p = -0.02;
-        f22_params.kpitch_i = -0.01;
-        f22_params.kpitch_d = -0.01;
+        f22_params.kpitch_p = -0.01;
+        f22_params.kpitch_i = -0.005;
+        f22_params.kpitch_d = -0.000;
 
         f22_params.kthrottle_p = 0.03;
         f22_params.kthrottle_i = 0.06;
