@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "bvr-sim"
-version = "0.3.0"
+dynamic = ["version"]
 description = "3D Beyond Visual Range (BVR) air combat environment for multi-agent reinforcement learning"
 requires-python = ">=3.8"
 dependencies = [
@@ -34,6 +34,10 @@ sdist.exclude = [
     "bvr_sim/build/**",
     "bvr_sim/install/**",
 ]
+
+[tool.scikit-build.metadata.version]
+provider = "scikit_build_core.metadata.regex"
+input = "bvr_sim/__init__.py"
 
 [tool.scikit-build.cmake.define]
 BVR_SIM_PYTHON_MODULE_DESTINATION = "bvr_sim"
