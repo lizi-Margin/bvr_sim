@@ -81,7 +81,7 @@ void StandoffOpponent3D::take_action(
     auto target = alive_enemies.front();
     std::vector<std::shared_ptr<Missile>> missiles_in_flight;
     for (const auto& missile : agent->launched_missiles) {
-        if (missile->is_alive && missile->target && missile->target->uid == target->uid) {
+        if (missile->is_alive && missile->target /* && missile->target->uid == target->uid */) {
             missiles_in_flight.push_back(missile);
         }
     }
