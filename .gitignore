@@ -20,6 +20,13 @@ __pycache__
 !/docs/integration.md
 !/docs/developer/
 !/docs/developer/architecture.md
+!/docs/superpowers/
+!/docs/superpowers/specs/
+!/docs/superpowers/specs/*.md
+!/docs/superpowers/plans/
+!/docs/superpowers/plans/*.md
+
+/.worktrees/
 
 /*.png
 /*.csv
