@@ -86,7 +86,7 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "g":                     9.81,
                 "Rc":                    152.4,
                 "K":                     5.0,
-                "search_fov":            0.02618,
+                "search_fov":            0.0523599,
                 "search_range":          9260.0,
                 "search_start_range":    18520.0,
                 "track_gimbal_limit":    0.698132,
