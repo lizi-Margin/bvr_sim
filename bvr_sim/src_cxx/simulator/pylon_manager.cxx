@@ -17,6 +17,16 @@ bool PylonManager::weapon_matches(const std::string& weapon_name, const std::str
     return weapon_name.substr(0, query.length()) == query;
 }
 
+bool PylonManager::weapon_matches_exact(const std::string& weapon_name, const std::string& query) const noexcept {
+    if (weapon_name.empty()) {
+        return false;
+    }
+    if (query.empty()) {
+        return true; // make empty query get all weapon num (except "")
+    }
+    return weapon_name == query;
+}
+
 void PylonManager::add_weapon(const std::string& pylon_name, const std::string& weapon_name) noexcept {
     if (frozen) {
         std::cout << "[PylonManager] Warning: PylonManager is frozen, cannot add weapon" << std::endl;
@@ -69,10 +79,36 @@ int PylonManager::num_frozen_weapons(const std::string& weapon_query) const noex
     return count;
 }
 
+int PylonManager::num_frozen_weapons_exact(const std::string& weapon_query) const noexcept {
+    if (!frozen) {
+        std::cout << "[PylonManager] Error: PylonManager is not frozen, cannot count frozen weapons" << std::endl;
+        SL::get().print("[PylonManager] Error: PylonManager is not frozen, cannot count frozen weapons");
+        return 0;
+    }
+
+    int count = 0;
+    for (const auto& [pylon, weapon] : pylon_mounts_frozen) {
+        if (weapon_matches_exact(weapon, weapon_query)) {
+            count++;
+        }
+    }
+    return count;
+}
+
 int PylonManager::num_left_weapons(const std::string& weapon_query) const noexcept {
     int count = 0;
     for (const auto& [pylon, weapon] : pylon_mounts) {
         if (weapon_matches(weapon, weapon_query)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+int PylonManager::num_left_weapons_exact(const std::string& weapon_query) const noexcept {
+    int count = 0;
+    for (const auto& [pylon, weapon] : pylon_mounts) {
+        if (weapon_matches_exact(weapon, weapon_query)) {
             count++;
         }
     }

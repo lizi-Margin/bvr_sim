@@ -25,8 +25,12 @@ public:
 
     // Count frozen max weapons of specific type (with prefix matching)
     int num_frozen_weapons(const std::string& weapon_query) const noexcept;
+    // Count frozen max weapons of specific type (with exact matching)
+    int num_frozen_weapons_exact(const std::string& weapon_query) const noexcept;
     // Count remaining weapons of specific type (with prefix matching)
     int num_left_weapons(const std::string& weapon_query) const noexcept;
+    // Count remaining weapons of specific type (with exact matching)
+    int num_left_weapons_exact(const std::string& weapon_query) const noexcept;
 
     // Release weapon of specific type (with prefix matching)
     bool release_weapon(const std::string& weapon_query) noexcept;
@@ -36,6 +40,7 @@ public:
 
     // Test function: Check if weapon_name matches query (public for testing)
     bool weapon_matches(const std::string& weapon_name, const std::string& query) const noexcept;
+    bool weapon_matches_exact(const std::string& weapon_name, const std::string& query) const noexcept;
 };
 
 }
