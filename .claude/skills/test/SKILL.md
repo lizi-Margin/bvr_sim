@@ -11,7 +11,7 @@ Run comprehensive tests automatically from the project root.
 
 | Command | Description |
 |---------|-------------|
-| `/test` | Run full test suite (build + all tests) |
+| `python run_tests.py` | Run full test suite (build + all tests) |
 
 ## What Gets Run
 
@@ -41,12 +41,22 @@ The unified test suite (`run_tests.py`) does:
 ```bash
 # From project root, run all tests
 python run_tests.py
-
-# Or use the Claude Code /test skill
-/test
 ```
 
 ## Troubleshooting
+Use **linux bash** param style (-d), rather than dos style (/d).
+
+**Incorrect:**
+```bash
+cd /d G:/bvr_sim && python run_tests.py  # Wrong - bash error cd: too many arguments
+```
+
+**Correct (relative path):**
+```bash
+python run_tests.py  # Right - works anywhere
+```
+
+### Common Issues
 
 - **Build fails**: Check compiler is installed and in PATH
 - **Import errors**: Ensure `build_windows.bat` completed successfully (looks for `bvr_sim_cpp.pyd` in `bvr_sim/`)

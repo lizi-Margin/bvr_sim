@@ -7,6 +7,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
+from .test_utils import is_running_in_claude_code, FpsMonitor
+
 
 def get_root_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))
@@ -18,31 +20,31 @@ def main():
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)
+    is_agent = is_running_in_claude_code()
+    fps_monitor = FpsMonitor(is_agent=is_agent)
     sim = BVR3DEnvCpp(env_config, [], log_file_path=os.path.join(get_root_dir(), "../test_logs/bvr_sim.log"), acmi_file_path=os.path.join(get_root_dir(), "../test_logs/replay.acmi"))
     obs, info = sim.reset(seed=None)
 
-    
     try:
         turn = 0
-        mean_step_time = 0.0
         while turn < 2:
             sim.core.set_acmi_file_path(f"./test_logs/replay_{turn}.acmi")
             obs, info = sim.reset(seed=None)
-            i = 0
             episode_done = False
             while not episode_done:
                 t0 = time.time()
                 obs, reward, done, info = sim.step({})
                 t1 = time.time()
                 episode_done = info["episode_done"]
-                mean_step_time = 0.999 * mean_step_time + 0.001 * (t1 - t0) if mean_step_time > 0 else (t1 - t0)
-                print(f"\rfps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s", end="")
-                i += 1
+                step_time = t1 - t0
+                fps_monitor.step(step_time)
+                fps_monitor.print_progress()
             turn += 1
     except KeyboardInterrupt:
         pass
     del sim
-    # input("推演结束，按Enter退出。")
+
+    fps_monitor.print_summary()
     return 0
         
 
