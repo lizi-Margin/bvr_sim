@@ -1,8 +1,8 @@
 from typing import Dict, Any, Union, List, TYPE_CHECKING
-import os
 import numpy as np
 import math
 from .base import BaseFDM
+from bvr_sim.resource_paths import get_jsbsim_dir
 from bvr_sim.uhtk.c3utils.i3utils import norm_pi, NWU_to_LLA_deg, LLA_to_NWU_deg, feet_to_meters, meters_to_feet, get_mps, get_mach, Vector3
 from ...simulator import NWU2LLA, LLA2NWU
 from ..fc.fc_old import StdFlightController
@@ -11,9 +11,6 @@ from .catalog import Catalog, JsbsimCatalog, ExtraCatalog, Property
 
 if TYPE_CHECKING:
     import jsbsim
-
-def get_root_dir() -> str:
-    return os.path.dirname(os.path.realpath(__file__))
 
 class SimpleScalarFilter:
     def __init__(self, alpha: float, initial_value: float = 0.0):
@@ -36,7 +33,7 @@ class JSBSimFDM(BaseFDM):
 
     def __init__(self, dt: float = 0.1, **kwargs):
         super().__init__(dt, **kwargs)
-        self.JSBSim_dir: str = os.path.join(get_root_dir(), "..", "..", "..", "..", 'src_cxx', 'simulator', 'aircraft', 'fdm', 'jsbsim')
+        self.JSBSim_dir: str = str(get_jsbsim_dir())
         self.aircraft_model: str = kwargs.get('aircraft_model', "F16").lower()
 
         self._jsbsim_exec: Union['jsbsim.FGFDMExec', None] = None

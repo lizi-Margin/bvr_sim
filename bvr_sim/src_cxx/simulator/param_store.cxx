@@ -1,5 +1,7 @@
 #include "param_store.hxx"
 #include "rubbish_can/check.hxx"
+#include <fstream>
+#include <sstream>
 #include <stdexcept>
 
 namespace bvr_sim {
@@ -165,6 +167,15 @@ ParamStore ParamStore::from_string(const std::string& json_str) {
             store.set_interp_table(k, std::make_shared<InterpTable>(InterpTable::from_json(v)));
     }
     return store;
+}
+
+ParamStore ParamStore::from_file(const std::string& file_path) {
+    std::ifstream file(file_path, std::ios::in | std::ios::binary);
+    check(file.is_open(), "ParamStore::from_file: failed to open '" + file_path + "'");
+
+    std::ostringstream buffer;
+    buffer << file.rdbuf();
+    return from_string(buffer.str());
 }
 
 } // namespace bvr_sim

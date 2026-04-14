@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <algorithm>
 #include "FGFCS.h"
+#include "resource_paths.hxx"
 
 namespace bvr_sim {
 
@@ -77,16 +78,6 @@ namespace Catalog {
     }
 }
 
-static std::string get_root_dir() noexcept {
-    std::string root_dir = std::string(__FILE__).substr(0, std::string(__FILE__).find_last_of("\\/"));
-    for (auto& c : root_dir) {
-        if (c == '\\') {
-            c = '/';
-        }
-    }
-    return root_dir;
-}
-
 JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs) noexcept
     : BaseFDM(dt),
       aircraft_model("F16"),
@@ -130,20 +121,12 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         const static std::string EnginePath = "engine";
         const static std::string SystemsPath = "systems";
 
-        std::filesystem::path JSBSim_dir = get_root_dir() + "/jsbsim";
-        // check if it exists
-        if (!std::filesystem::exists(JSBSim_dir) || !std::filesystem::is_directory(JSBSim_dir)) {
-            //get env variable JSBSIM_DIR
-            const char* env_p = std::getenv("JSBSIM_DIR");
-            if (env_p != nullptr)
-            {
-                JSBSim_dir = std::filesystem::path(env_p);
-            }
-            else
-            {
-                SL::get().print("Error: JSBSIM_DIR environment variable is not set.");
-                return;
-            }
+        std::filesystem::path JSBSim_dir;
+        try {
+            JSBSim_dir = resource_paths::get_jsbsim_dir();
+        } catch (const std::exception& e) {
+            SL::get().print(std::string("Error: ") + e.what());
+            return;
         }
 
         // std::string jsbsim_aircraft_model = aircraft_model;

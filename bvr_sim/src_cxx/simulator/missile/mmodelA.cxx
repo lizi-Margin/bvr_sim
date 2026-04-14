@@ -6,9 +6,11 @@
 #include "../simulator.hxx"
 #include "rubbish_can/rubbish_can.hxx"
 #include "c3utils/c3utils.hxx"
+#include "resource_paths.hxx"
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include <map>
 
 namespace bvr_sim {
 
@@ -27,196 +29,28 @@ constexpr bool prevent_low_loft = false;
 // ─── Parameter factory ────────────────────────────────────────────────────────
 
 ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
-    // ─── AIM-9M (infrared homing, short range) ────────────────────────────────
-    if (missile_model == "AIM-9M" || missile_model == "AIM-9") {
-        const std::string json_str = R"({
-            "doubles": {
-                "m0":                    84.0,
-                "dm":                    6.0,
-                "thrust":                7063.2,
-                "t_thrust":              5.0,
-                "t_max":                 180.0,
-                "S_ref":                 0.0126677,
-                "mach_min":              0.8,
-                "nyz_max":               100.0,
-                "g":                     9.81,
-                "Rc":                    152.4,
-                "K":                     5.0,
-                "search_fov":            0.02618,
-                "search_range":          9260.0,
-                "search_start_range":    18520.0,
-                "track_gimbal_limit":    0.698132,
-                "loss_time_threshold":   1.0
-            },
-            "bools": {
-                "enable_precise_cue": false,
-                "enable_search": true,
-                "enable_guide_cmd": false,
-                "enable_INS_guide": false,
-                "enable_angle_navigation": false,
-                "enable_loft":   false
-            },
-            "tables": {
-                "cx_total_table": {
-                    "x": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0],
-                    "y": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-                },
-                "n_available_table": {
-                    "x": [0.0, 5.0],
-                    "y": [30.0, 30.0]
-                },
-                "n_cmd_rate_limit_table": {
-                    "x": [0.0, 5.0],
-                    "y": [10.0, 10.0]
-                }
-            }
-        })";
-        return ParamStore::from_string(json_str);
+    static const std::map<std::string, std::string> config_mapping = {
+        {"AIM-9", "aim9m.json"},
+        {"AIM-9M", "aim9m.json"},
+        {"AIM-9M-Omni", "aim9m_omni.json"},
+        {"AIM-120C", "aim120c_mmodela.json"},
+        {"AIM-120C-MModelA", "aim120c_mmodela.json"},
+        {"AIM-120C-MModelA-Poor", "aim120c_mmodela_poor.json"},
+    };
+
+    auto it = config_mapping.find(missile_model);
+    if (it == config_mapping.end()) {
+        colorful::printHONG("[MModelA] Unknown missile model: " + missile_model + ", returning empty ParamStore");
+        return ParamStore{};
     }
 
-    if (missile_model == "AIM-9M-Omni") {
-        const std::string json_str = R"({
-            "doubles": {
-                "m0":                    84.0,
-                "dm":                    6.0,
-                "thrust":                7063.2,
-                "t_thrust":              5.0,
-                "t_max":                 180.0,
-                "S_ref":                 0.0126677,
-                "mach_min":              0.8,
-                "nyz_max":               100.0,
-                "g":                     9.81,
-                "Rc":                    152.4,
-                "K":                     5.0,
-                "search_fov":            1.570796,
-                "search_range":          9260.0,
-                "search_start_range":    18520.0,
-                "track_gimbal_limit":    1.570796,
-                "loss_time_threshold":   1.0
-            },
-            "bools": {
-                "enable_precise_cue": true,
-                "enable_search": true,
-                "enable_guide_cmd": false,
-                "enable_INS_guide": false,
-                "enable_angle_navigation": false,
-                "enable_loft":   false
-            },
-            "tables": {
-                "cx_total_table": {
-                    "x": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0],
-                    "y": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
-                },
-                "n_available_table": {
-                    "x": [0.0, 5.0],
-                    "y": [30.0, 30.0]
-                },
-                "n_cmd_rate_limit_table": {
-                    "x": [0.0, 5.0],
-                    "y": [10.0, 10.0]
-                }
-            }
-        })";
-        return ParamStore::from_string(json_str);
+    try {
+        const auto path = resource_paths::get_resource_path("missile/mmodelA/" + it->second);
+        return ParamStore::from_file(path.string());
+    } catch (const std::exception& e) {
+        colorful::printHONG("[MModelA] Failed to load params for " + missile_model + ": " + e.what());
+        return ParamStore{};
     }
-
-    // ─── AIM-120C (radar homing, medium range) ────────────────────────────────
-    // Standard version with accurate aerodynamics from aim120c_adv_sim.py
-    if (missile_model == "AIM-120C-MModelA" || missile_model == "AIM-120C") {
-        const std::string json_str = R"({
-            "doubles": {
-                "m0":                    158.8,
-                "dm":                    1.5,
-                "thrust":                16325.0,
-                "t_thrust":              8.0,
-                "t_max":                 300.0,
-                "S_ref":                 0.0248719,
-                "mach_min":              0.8,
-                "nyz_max":               100.0,
-                "g":                     9.81,
-                "Rc":                    500.0,
-                "K":                     5.0,
-                "search_fov":            0.02618,
-                "search_range":          9260.0,
-                "search_start_range":    18520.0,
-                "track_gimbal_limit":    0.698132,
-                "loss_time_threshold":   1.0
-            },
-            "bools": {
-                "enable_precise_cue": false,
-                "enable_search": true,
-                "enable_guide_cmd": false,
-                "enable_INS_guide": false,
-                "enable_angle_navigation": true,
-                "enable_loft":   false
-            },
-            "tables": {
-                "cx_total_table": {
-                    "x": [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0],
-                    "y": [0.489000, 0.694500, 0.949000, 0.734750, 0.601995, 0.500091, 0.425369, 0.372005, 0.332977, 0.304983, 0.286000]
-                },
-                "n_available_table": {
-                    "x": [0.0, 5.0],
-                    "y": [30.0, 30.0]
-                },
-                "n_cmd_rate_limit_table": {
-                    "x": [0.0, 5.0],
-                    "y": [10.0, 10.0]
-                }
-            }
-        })";
-        return ParamStore::from_string(json_str);
-    }
-
-    // ─── AIM-120C-Poor (weakened version, higher drag, lower performance) ─────
-    if (missile_model == "AIM-120C-MModelA-Poor") {
-        const std::string json_str = R"({
-            "doubles": {
-                "m0":                    158.8,
-                "dm":                    1.5,
-                "thrust":                16325.0,
-                "t_thrust":              8.0,
-                "t_max":                 300.0,
-                "S_ref":                 0.0248719,
-                "mach_min":              0.8,
-                "nyz_max":               80.0,
-                "g":                     9.81,
-                "Rc":                    500.0,
-                "K":                     4.0,
-                "search_fov":            0.02618,
-                "search_range":          7000.0,
-                "search_start_range":    14000.0,
-                "track_gimbal_limit":    0.698132,
-                "loss_time_threshold":   1.0
-            },
-            "bools": {
-                "enable_precise_cue": false,
-                "enable_search": true,
-                "enable_guide_cmd": false,
-                "enable_INS_guide": false,
-                "enable_angle_navigation": true,
-                "enable_loft":   false
-            },
-            "tables": {
-                "cx_total_table": {
-                    "x": [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0],
-                    "y": [0.562350, 0.798675, 1.118350, 0.881345, 0.727575, 0.608556, 0.520094, 0.455555, 0.406987, 0.370788, 0.344890]
-                },
-                "n_available_table": {
-                    "x": [0.0, 5.0],
-                    "y": [25.0, 25.0]
-                },
-                "n_cmd_rate_limit_table": {
-                    "x": [0.0, 5.0],
-                    "y": [8.0, 8.0]
-                }
-            }
-        })";
-        return ParamStore::from_string(json_str);
-    }
-
-    colorful::printHONG("[MModelA] Unknown missile model: " + missile_model + ", returning empty ParamStore");
-    return ParamStore{};
 }
 
 // ─── Constructor ──────────────────────────────────────────────────────────────

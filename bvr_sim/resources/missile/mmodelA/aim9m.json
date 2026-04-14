@@ -1,0 +1,42 @@
+{
+  "doubles": {
+    "m0": 84.0,
+    "dm": 6.0,
+    "thrust": 7063.2,
+    "t_thrust": 5.0,
+    "t_max": 180.0,
+    "S_ref": 0.0126677,
+    "mach_min": 0.8,
+    "nyz_max": 100.0,
+    "g": 9.81,
+    "Rc": 152.4,
+    "K": 5.0,
+    "search_fov": 0.02618,
+    "search_range": 9260.0,
+    "search_start_range": 18520.0,
+    "track_gimbal_limit": 0.698132,
+    "loss_time_threshold": 1.0
+  },
+  "bools": {
+    "enable_precise_cue": false,
+    "enable_search": true,
+    "enable_guide_cmd": false,
+    "enable_INS_guide": false,
+    "enable_angle_navigation": false,
+    "enable_loft": false
+  },
+  "tables": {
+    "cx_total_table": {
+      "x": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0, 4.2, 4.4, 4.6, 4.8, 5.0],
+      "y": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    },
+    "n_available_table": {
+      "x": [0.0, 5.0],
+      "y": [30.0, 30.0]
+    },
+    "n_cmd_rate_limit_table": {
+      "x": [0.0, 5.0],
+      "y": [10.0, 10.0]
+    }
+  }
+}

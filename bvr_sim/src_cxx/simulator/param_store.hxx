@@ -55,6 +55,7 @@ public:
     // ===== Serialization (JSON internally) =====
     std::string         to_string() const;
     static ParamStore   from_string(const std::string& json_str);
+    static ParamStore   from_file(const std::string& file_path);
 
 private:
     std::map<std::string, double>                       doubles_;

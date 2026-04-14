@@ -3,6 +3,7 @@ import random
 import numpy as np
 from typing import Dict, Tuple, Optional
 from gymnasium import spaces
+from .resource_paths import configure_runtime_environment, get_jsbsim_dir
 from .spawn_manager import SpawnManager
 from .action_space import CampusActionSpace
 from .performance import StepProfiler
@@ -12,6 +13,8 @@ PRINT_STEP_TIME = False
 PRINT_DONE_REASON = True
 
 BY_PASS_RL_ACTION = False
+
+configure_runtime_environment()
 
 
 import importlib
@@ -65,7 +68,7 @@ if not _import_success:
 # import MISSION.bvr_sim.install.bvr_sim_cpp_native as bvr_sim_cpp
 
 os.environ["JSBSIM_DEBUG"] = "0"
-os.environ["JSBSIM_DIR"] = os.path.join(os.path.dirname(__file__), "src_cxx/simulator/aircraft/fdm/jsbsim/")
+os.environ["JSBSIM_DIR"] = str(get_jsbsim_dir())
 
 class BVR3DEnvCpp:
     """BVR 3D environment adapter for C++ simulation core"""
