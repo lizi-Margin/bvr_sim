@@ -11,7 +11,7 @@
 namespace bvr_sim {
 
 namespace {
-constexpr double kCrankAngleDeg = 80.0;
+constexpr double kCrankAngleDeg = 50.0;
 constexpr double kSupportSpeedMach = 0.8;
 constexpr double kDefensiveSpeedMach = 1.0;
 constexpr double kCrankSwitchSec = 100.0;

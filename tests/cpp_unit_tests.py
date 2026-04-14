@@ -3,7 +3,8 @@
 Run C++ unit tests compiled from bvr_sim/src_cxx/
 
 Usage:
-    python tests/run_unit_tests.py
+    python tests/cpp_unit_tests.py      (from project root)
+    python run_tests.py                 (from project root)
 """
 
 import subprocess
@@ -12,8 +13,10 @@ import os
 
 
 def bvr_sim_unit_tests():
-    # Get repo root (two directories up from this script)
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Get repo root (parent directory of tests/ folder)
+    # This script is always in tests/, so repo root is parent of parent
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(script_dir)  # tests/ parent = project root
 
     # Locate test executable
     exe_path = os.path.join(repo_root, "bvr_sim", "install", "bin", "bvr_sim_unit_tests")
@@ -59,8 +62,9 @@ def bvr_sim_unit_tests():
 
 
 def c3u_unit_tests():
-    # Get repo root (two directories up from this script)
-    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Get repo root (parent directory of tests/ folder)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.dirname(script_dir)  # tests/ parent = project root
 
     # Locate test executable
     exe_path = os.path.join(repo_root, "bvr_sim", "install", "bin", "test_c3utils")

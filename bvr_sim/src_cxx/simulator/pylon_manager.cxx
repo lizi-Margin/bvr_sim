@@ -115,24 +115,26 @@ int PylonManager::num_left_weapons_exact(const std::string& weapon_query) const 
     return count;
 }
 
-bool PylonManager::release_weapon(const std::string& weapon_query) noexcept {
+std::string PylonManager::release_weapon(const std::string& weapon_query) noexcept {
     if (weapon_query.empty()) {
         std::cout << "[PylonManager] Warning: Cannot release weapon '" << weapon_query
                 << "' - no such weapon mounted on any pylon" << std::endl;
-        return false;
+        return "";
     }
 
     // Find first pylon with the specified weapon (using prefix matching)
     for (auto& [pylon, weapon] : pylon_mounts) {
         if (weapon_matches(weapon, weapon_query)) {
+            std::string released_weapon = std::move(weapon);
             weapon = "";  // Clear the pylon
-            return true;
+            check(!released_weapon.empty(), "released_weapon.empty() == true");
+            return released_weapon;
         }
     }
 
     std::cout << "[PylonManager] Warning: Cannot release weapon '" << weapon_query
               << "' - no such weapon mounted on any pylon" << std::endl;
-    return false;
+    return "";
 }
 
 }

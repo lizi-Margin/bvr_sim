@@ -74,12 +74,12 @@ std::string Missile::log() noexcept {
     } else if (!render_explosion) {
         // ss << "0,Event=Destroyed|" << uid << "|" << '\n';
         ss << "-" + uid + "\n";
-        if (is_success) {
-            auto explosion_id = uid + "0" + get_new_uuid();
-            auto explosion_type = "Small";
-            ss << explosion_id << ",T=" << lon << "|" << lat << "|" << alt << ","
-            << "Type=Explosion + " << explosion_type << "\n";
-        }
+        // if (is_success) {
+        //     auto explosion_id = uid + "0" + get_new_uuid();
+        //     auto explosion_type = "Small";
+        //     ss << explosion_id << ",T=" << lon << "|" << lat << "|" << alt << ","
+        //     << "Type=Explosion + " << explosion_type << "\n";
+        // }
         ss << "-" + last_known_target_pos_vis_id + "\n";
         ss << "0,Event=Message|" << uid + get_new_uuid() << "|is_done=" << is_done << "-is_alive=" << is_alive << "-is_success=" << is_success << "-target_uid=" << target->uid << "-done_reason=" << log_done_reason << "\n";
 

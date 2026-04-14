@@ -1,5 +1,5 @@
 {
-  "dt": 0.1,
+  "dt": 0.05,
   "max_steps": 4800,
   "red_meta": {
     "A00": {
@@ -16,6 +16,7 @@
         "L02": "AIM-9M-Omni",
       },
       "opponent_type": "standoff"
+      // "opponent_type": "tactical"
     },
     "A01": {
       "unit_spec": "F22",
@@ -30,6 +31,7 @@
         "L01": "AIM-120C7",
         "L02": "AIM-9M-Omni",
       },
+      // "opponent_type": "tactical"
       "opponent_type": "standoff"
     },
     "A02": {
@@ -42,8 +44,10 @@
       "pylon_mounts": {
         "R01": "AIM-9M-Omni",
         "R02": "AIM-9M-Omni",
+        "R03": "AIM-9M-Omni",
         "L01": "AIM-9M-Omni",
         "L02": "AIM-9M-Omni",
+        "L03": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     },
@@ -57,8 +61,10 @@
       "pylon_mounts": {
         "R01": "AIM-9M-Omni",
         "R02": "AIM-9M-Omni",
+        "R03": "AIM-9M-Omni",
         "L01": "AIM-9M-Omni",
         "L02": "AIM-9M-Omni",
+        "L03": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     },
@@ -72,8 +78,10 @@
       "pylon_mounts": {
         "R01": "AIM-9M-Omni",
         "R02": "AIM-9M-Omni",
+        "R03": "AIM-9M-Omni",
         "L01": "AIM-9M-Omni",
         "L02": "AIM-9M-Omni",
+        "L03": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     },
@@ -87,8 +95,10 @@
       "pylon_mounts": {
         "R01": "AIM-9M-Omni",
         "R02": "AIM-9M-Omni",
+        "R03": "AIM-9M-Omni",
         "L01": "AIM-9M-Omni",
         "L02": "AIM-9M-Omni",
+        "L03": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     }
@@ -107,7 +117,8 @@
         "L01": "AIM-120C-MModelA-Poor",
         "L02": "AIM-9M",
       },
-      "opponent_type": "standoff"
+      // "opponent_type": "standoff"
+      "opponent_type": "tactical"
     },
     "B01": {
       "unit_spec": "F22",
@@ -122,7 +133,8 @@
         "L01": "AIM-120C-MModelA-Poor",
         "L02": "AIM-9M",
       },
-      "opponent_type": "standoff"
+      // "opponent_type": "standoff"
+      "opponent_type": "tactical"
     },
     "B02": {
       "unit_spec": "F16",

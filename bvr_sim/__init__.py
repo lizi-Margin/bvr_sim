@@ -9,7 +9,7 @@ Clean, modular 3D BVR environment with:
 - Modular reward components
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 from .bvr_env import BVR3DEnv, make_bvr3d_env
 from .bvr_env_cpp import BVR3DEnvCpp  ## C++ version for faster training and more features

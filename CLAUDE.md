@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Install (editable) | `pip install -e .` |
 | Python smoke test | `python tests/test_py.py` |
 | C++ smoke test | `python tests/test_cpp.py` |
-| Full test suite | `python tests/test_everything.py` |
+| Full test suite | `python run_tests.py` |
 | Run 5v5 ACMI | `python example/run_custom_5v5_acmi.py` |
 
 ## Project Overview

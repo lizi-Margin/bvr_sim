@@ -118,13 +118,15 @@ bool Aircraft::shoot(
         return false;
     }
 
-    auto missile = WeaponFactory::create_missile(missile_spec, self, target);
+    const auto missile_name = pylon_manager.release_weapon(missile_spec);
+    check(!missile_name.empty(), "missile_name.empty() == true");
+
+    auto missile = WeaponFactory::create_missile(missile_name, self, target);
     if (!missile) {
-        std::cout << "Warning: Aircraft::shoot: failed to create missile " << missile_spec << std::endl;
+        std::cout << "Warning: Aircraft::shoot: failed to create missile " << missile_name << std::endl;
         return false;
     }
 
-    pylon_manager.release_weapon(missile_spec);
     launched_missiles.push_back(missile);
     SOPool::instance().add(missile);
 

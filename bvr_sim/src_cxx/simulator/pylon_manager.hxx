@@ -33,7 +33,7 @@ public:
     int num_left_weapons_exact(const std::string& weapon_query) const noexcept;
 
     // Release weapon of specific type (with prefix matching)
-    bool release_weapon(const std::string& weapon_query) noexcept;
+    std::string release_weapon(const std::string& weapon_query) noexcept;
 
     // Get all pylon mounts
     const std::map<std::string, std::string>& get_all_mounts() const noexcept { return pylon_mounts; }

@@ -49,9 +49,11 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "loss_time_threshold":   1.0
             },
             "bools": {
+                "enable_precise_cue": false,
                 "enable_search": true,
                 "enable_guide_cmd": false,
                 "enable_INS_guide": false,
+                "enable_angle_navigation": false,
                 "enable_loft":   false
             },
             "tables": {
@@ -86,16 +88,18 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "g":                     9.81,
                 "Rc":                    152.4,
                 "K":                     5.0,
-                "search_fov":            0.0523599,
+                "search_fov":            1.570796,
                 "search_range":          9260.0,
                 "search_start_range":    18520.0,
-                "track_gimbal_limit":    0.698132,
+                "track_gimbal_limit":    1.570796,
                 "loss_time_threshold":   1.0
             },
             "bools": {
+                "enable_precise_cue": true,
                 "enable_search": true,
                 "enable_guide_cmd": false,
                 "enable_INS_guide": false,
+                "enable_angle_navigation": false,
                 "enable_loft":   false
             },
             "tables": {
@@ -139,9 +143,11 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "loss_time_threshold":   1.0
             },
             "bools": {
+                "enable_precise_cue": false,
                 "enable_search": true,
                 "enable_guide_cmd": false,
                 "enable_INS_guide": false,
+                "enable_angle_navigation": true,
                 "enable_loft":   false
             },
             "tables": {
@@ -168,7 +174,7 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
             "doubles": {
                 "m0":                    158.8,
                 "dm":                    1.5,
-                "thrust":                13000.0,
+                "thrust":                16325.0,
                 "t_thrust":              8.0,
                 "t_max":                 300.0,
                 "S_ref":                 0.0248719,
@@ -184,9 +190,11 @@ ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
                 "loss_time_threshold":   1.0
             },
             "bools": {
+                "enable_precise_cue": false,
                 "enable_search": true,
                 "enable_guide_cmd": false,
                 "enable_INS_guide": false,
+                "enable_angle_navigation": true,
                 "enable_loft":   false
             },
             "tables": {
@@ -300,9 +308,17 @@ bool MModelA::can_track_target() noexcept {
         return false;
     }
 
+    const bool enable_precise_cue = params_.get_bool_("enable_precise_cue");
     const bool enable_search = params_.get_bool_("enable_search");
     const bool enable_guide_cmd = params_.get_bool_("enable_guide_cmd");
     const bool enable_INS_guide = params_.get_bool_("enable_INS_guide");
+
+    bool precise_cue = false;
+    double elapsed = fdm_.get_elapsed_time();
+    check(elapsed >= 0.0f, "get_elapsed_time() < 0.0f");
+    if (enable_precise_cue && elapsed < 2 * dt) {
+        precise_cue = true;
+    }
 
     if (losstime > 0.1 && !radar_on) {
         if (!loss) {
@@ -366,6 +382,8 @@ bool MModelA::can_track_target() noexcept {
 
         if (attack_angle < params_.get_double_("track_gimbal_limit")) {
             if (guide_cmd_valid) {
+                radar_on = true;
+            } else if (precise_cue) {
                 radar_on = true;
             } else if (attack_angle < params_.get_double_("search_fov")) {
                 radar_on = true;
@@ -535,6 +553,8 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
         return {0.0, 0.0};
     }
 
+    const bool enable_angle_navigation = params_.get_bool_("enable_angle_navigation");
+
     const double x_t = last_known_target_pos[0];
     const double y_t = last_known_target_pos[1];
     const double z_t = last_known_target_pos[2];
@@ -589,7 +609,7 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     double desired_dbeta = dbeta;
     if (radar_on && range_to_target < feet_to_meters(5000.0)) {
         desired_dbeta = dbeta;
-    } else if (elapsed < t_thrust) {
+    } else if (enable_angle_navigation && elapsed < t_thrust) {
         const double angle_blend_min = 0.0;
         const double angle_gain = 0.1;
         const double max_cmd_rate = 0.5;
@@ -597,6 +617,8 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
         double desired_dbeta_from_angle = angle_gain * -1.0 * angle_error;
         desired_dbeta_from_angle = std::clamp(desired_dbeta_from_angle, -max_cmd_rate, max_cmd_rate);
         desired_dbeta = blend * desired_dbeta_from_angle + (1.0 - blend) * dbeta;
+    } else {
+        desired_dbeta = dbeta;
     }
 
     double ny = K_func(range_to_target) * v_m / g * std::cos(theta_m) * desired_dbeta;
