@@ -91,6 +91,51 @@ python -m build --wheel
 
 生成的 wheel 会出现在 `dist/` 下。当前 `pyproject.toml` 使用 `scikit-build-core`，wheel 会尝试同时构建 `bvr_sim_cpp` 原生扩展。
 
+### 安装后的运行时资源
+
+从当前版本开始，`bvr-sim` 的运行时资源已经统一收敛到包内目录：
+
+```text
+bvr_sim/resources/
+  jsbsim/
+  missile/mmodelA/
+```
+
+其中：
+
+- `bvr_sim/resources/jsbsim/` 保存 JSBSim 所需的 XML 机型、发动机和系统定义
+- `bvr_sim/resources/missile/mmodelA/` 保存 C++ `MModelA` 的 JSON 参数文件
+
+这意味着：
+
+- `pip install bvr-sim` 后，Python 环境和 C++ 环境都会默认从已安装包内的 `bvr_sim/resources/` 查找资源
+- 运行时不再依赖源码目录 `bvr_sim/src_cxx/simulator/aircraft/fdm/jsbsim/`
+
+如果你需要覆盖默认资源目录，可以设置环境变量：
+
+```bash
+export BVR_SIM_RESOURCE_DIR=/path/to/custom/resources
+```
+
+Windows PowerShell:
+
+```powershell
+$env:BVR_SIM_RESOURCE_DIR="C:\path\to\custom\resources"
+```
+
+如果你只想单独覆盖 JSBSim 资源目录，可以设置：
+
+```bash
+export JSBSIM_DIR=/path/to/custom/jsbsim
+```
+
+默认查找顺序是：
+
+1. `BVR_SIM_RESOURCE_DIR` 指向的资源根目录
+2. 已安装包内的 `bvr_sim/resources`
+
+对 JSBSim 来说，还会优先尊重单独设置的 `JSBSIM_DIR`。
+
 ### 2. 运行纯 Python smoke test
 
 ```bash
@@ -213,6 +258,11 @@ while not done:
 - `opponent_type`: 单机规则对手类型，当前样例常见值为 `tactical` 和 `standoff`
 - `initial_separation_nm`: 初始交战距离
 - `formation_max_spread_nm`: 编队横向散布
+
+关于运行时资源：
+
+- `fdm_type: "jsbsim"` 时，Python 和 C++ 仿真核心都会从 `bvr_sim/resources/jsbsim/` 加载 XML
+- C++ `MModelA` 会从 `bvr_sim/resources/missile/mmodelA/` 加载导弹参数 JSON
 
 关于最近新增能力：
 

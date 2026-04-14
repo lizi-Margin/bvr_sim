@@ -14,6 +14,38 @@
 - 要快速试用，就改 `demo_config.json`
 - 要验证原生后端或更复杂单位定义，就改 `demo_config_cpp.jsonc`
 
+## 运行时资源目录
+
+从当前版本开始，默认运行时资源不再放在源码树的 `src_cxx/.../jsbsim` 下，而是统一放在：
+
+```text
+bvr_sim/resources/
+```
+
+当前已经纳入统一资源目录的内容包括：
+
+- `bvr_sim/resources/jsbsim/`
+- `bvr_sim/resources/missile/mmodelA/`
+
+默认行为：
+
+- Python `JSBSimFDM` 从 `bvr_sim/resources/jsbsim/` 读取 XML
+- C++ `JSBSimFDM` 从 `bvr_sim/resources/jsbsim/` 读取 XML
+- C++ `MModelA` 从 `bvr_sim/resources/missile/mmodelA/*.json` 读取参数
+
+环境变量覆盖规则：
+
+- `BVR_SIM_RESOURCE_DIR`: 覆盖整个资源根目录
+- `JSBSIM_DIR`: 只覆盖 JSBSim 目录
+
+查找顺序：
+
+1. 如果设置了 `BVR_SIM_RESOURCE_DIR`，使用它作为资源根目录
+2. 否则使用已安装包内的 `bvr_sim/resources`
+3. 对 JSBSim 而言，如果单独设置了 `JSBSIM_DIR`，则优先使用它
+
+因此，对 `pip` 安装用户来说，只要 wheel 正常安装，默认资源路径也是稳定可用的，不需要保留源码仓库。
+
 ## Python 环境配置
 
 Python 环境入口是 [`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py) 中的 `BVR3DEnv`。
@@ -122,6 +154,7 @@ C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py
 
 - 飞行动力学模型类型
 - 示例里常见值包括 `jsbsim`
+- 当值为 `jsbsim` 时，机型 XML 不是在配置里直接写绝对路径，而是通过机型名映射到 `bvr_sim/resources/jsbsim/aircraft/...`
 
 `position` / `velocity`
 
@@ -134,6 +167,7 @@ C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py
 - 当前仓库内可直接参考的武器名包括：
   - `AIM-120C7`
   - `AIM-9M`
+- 对于 C++ `MModelA` 路径，具体参数文件由武器名映射到 `bvr_sim/resources/missile/mmodelA/*.json`
 
 `opponent_type`
 
