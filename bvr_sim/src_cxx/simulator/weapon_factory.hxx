@@ -14,16 +14,13 @@ class SimulatedObject;
 
 class WeaponFactory {
 public:
-    enum class WeaponType {
+    enum class WeaponModelType {
         Unknown,
         AIM120C,
-        AIM9M,
-        // Future weapons can be added here
-        // AGM154,
-        // etc.
+        MModelA
     };
 
-    static WeaponType parse_weapon_name(const std::string& weapon_name) noexcept;
+    static WeaponModelType parse_weapon_name(const std::string& weapon_name) noexcept;
 
     static std::shared_ptr<Missile> create_missile(
         const std::string& weapon_name,

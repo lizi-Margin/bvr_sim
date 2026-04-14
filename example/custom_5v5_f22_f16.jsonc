@@ -11,9 +11,9 @@
       "record": false,
       "pylon_mounts": {
         "R01": "AIM-120C7",
-        "R02": "AIM-9M",
+        "R02": "AIM-9M-Omni",
         "L01": "AIM-120C7",
-        "L02": "AIM-9M",
+        "L02": "AIM-9M-Omni",
       },
       "opponent_type": "standoff"
     },
@@ -26,9 +26,9 @@
       "record": false,
       "pylon_mounts": {
         "R01": "AIM-120C7",
-        "R02": "AIM-9M",
+        "R02": "AIM-9M-Omni",
         "L01": "AIM-120C7",
-        "L02": "AIM-9M",
+        "L02": "AIM-9M-Omni",
       },
       "opponent_type": "standoff"
     },
@@ -40,10 +40,10 @@
       "fdm_type": "jsbsim",
       "record": false,
       "pylon_mounts": {
-        "R01": "AIM-9M",
-        "R02": "AIM-9M",
-        "L01": "AIM-9M",
-        "L02": "AIM-9M",
+        "R01": "AIM-9M-Omni",
+        "R02": "AIM-9M-Omni",
+        "L01": "AIM-9M-Omni",
+        "L02": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     },
@@ -55,10 +55,10 @@
       "fdm_type": "jsbsim",
       "record": false,
       "pylon_mounts": {
-        "R01": "AIM-9M",
-        "R02": "AIM-9M",
-        "L01": "AIM-9M",
-        "L02": "AIM-9M",
+        "R01": "AIM-9M-Omni",
+        "R02": "AIM-9M-Omni",
+        "L01": "AIM-9M-Omni",
+        "L02": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     },
@@ -70,10 +70,10 @@
       "fdm_type": "jsbsim",
       "record": false,
       "pylon_mounts": {
-        "R01": "AIM-9M",
-        "R02": "AIM-9M",
-        "L01": "AIM-9M",
-        "L02": "AIM-9M",
+        "R01": "AIM-9M-Omni",
+        "R02": "AIM-9M-Omni",
+        "L01": "AIM-9M-Omni",
+        "L02": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     },
@@ -85,10 +85,10 @@
       "fdm_type": "jsbsim",
       "record": false,
       "pylon_mounts": {
-        "R01": "AIM-9M",
-        "R02": "AIM-9M",
-        "L01": "AIM-9M",
-        "L02": "AIM-9M",
+        "R01": "AIM-9M-Omni",
+        "R02": "AIM-9M-Omni",
+        "L01": "AIM-9M-Omni",
+        "L02": "AIM-9M-Omni",
       },
       "opponent_type": "tactical"
     }
@@ -102,9 +102,9 @@
       "fdm_type": "jsbsim",
       "record": false,
       "pylon_mounts": {
-        "R01": "AIM-120C7",
+        "R01": "AIM-120C-MModelA-Poor",
         "R02": "AIM-9M",
-        "L01": "AIM-120C7",
+        "L01": "AIM-120C-MModelA-Poor",
         "L02": "AIM-9M",
       },
       "opponent_type": "standoff"
@@ -117,9 +117,9 @@
       "fdm_type": "jsbsim",
       "record": false,
       "pylon_mounts": {
-        "R01": "AIM-120C7",
+        "R01": "AIM-120C-MModelA-Poor",
         "R02": "AIM-9M",
-        "L01": "AIM-120C7",
+        "L01": "AIM-120C-MModelA-Poor",
         "L02": "AIM-9M",
       },
       "opponent_type": "standoff"

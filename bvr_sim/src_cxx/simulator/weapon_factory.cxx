@@ -17,22 +17,25 @@ namespace bvr_sim {
 //     return normalized;
 // }
 
-WeaponFactory::WeaponType WeaponFactory::parse_weapon_name(const std::string& weapon_name) noexcept {
+WeaponFactory::WeaponModelType WeaponFactory::parse_weapon_name(const std::string& weapon_name) noexcept {
     if (weapon_name.empty()) {
-        return WeaponType::Unknown;
+        return WeaponModelType::Unknown;
     }
-    const static std::map<std::string, WeaponType> MAP = {
-        {"AIM-120", WeaponType::AIM120C},
-        {"AIM-120C", WeaponType::AIM120C},
-        {"AIM-120C5", WeaponType::AIM120C},
-        {"AIM-120C7", WeaponType::AIM120C},
-        {"AIM-9", WeaponType::AIM9M},
-        {"AIM-9M", WeaponType::AIM9M},
+    const static std::map<std::string, WeaponModelType> MAP = {
+        {"AIM-120", WeaponModelType::AIM120C},
+        {"AIM-120C", WeaponModelType::AIM120C},
+        {"AIM-120C5", WeaponModelType::AIM120C},
+        {"AIM-120C7", WeaponModelType::AIM120C},
+        {"AIM-120C-MModelA", WeaponModelType::MModelA},
+        {"AIM-120C-MModelA-Poor", WeaponModelType::MModelA},
+        {"AIM-9", WeaponModelType::MModelA},
+        {"AIM-9M", WeaponModelType::MModelA},
+        {"AIM-9M-Omni", WeaponModelType::MModelA},
     };
 
     auto it = MAP.find(weapon_name);
     if (it == MAP.end()) {
-        return WeaponType::Unknown;
+        return WeaponModelType::Unknown;
     }
     return it->second;
 }
@@ -42,7 +45,7 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
     const std::shared_ptr<SimulatedObject>& parent,
     const std::shared_ptr<SimulatedObject>& target
 ) noexcept {
-    WeaponType type = parse_weapon_name(weapon_name);
+    WeaponModelType type = parse_weapon_name(weapon_name);
     const std::string& uid = parent->uid + parent->get_new_uuid();
     TeamColor color = parent->color;
     std::shared_ptr<SimulatedObject> friend_obj = parent->partners.size() > 0 ? parent->partners[0] : nullptr;
@@ -50,7 +53,7 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
     std::optional<double> t_thrust_override = std::nullopt;
 
     switch (type) {
-        case WeaponType::AIM120C:
+        case WeaponModelType::AIM120C:
             return std::make_shared<AIM120C>(
                 uid,
                 weapon_name,
@@ -62,7 +65,7 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
                 t_thrust_override
             );
 
-        case WeaponType::AIM9M:
+        case WeaponModelType::MModelA:
             return std::make_shared<MModelA>(
                 uid,
                 weapon_name,
@@ -73,7 +76,7 @@ std::shared_ptr<Missile> WeaponFactory::create_missile(
                 dt
             );
 
-        case WeaponType::Unknown:
+        case WeaponModelType::Unknown:
         default:
             return nullptr;
     }

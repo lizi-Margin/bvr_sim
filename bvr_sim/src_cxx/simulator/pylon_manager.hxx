@@ -13,9 +13,6 @@ private:
     bool frozen;
     std::map<std::string, std::string> pylon_mounts_frozen;
 
-    // Check if weapon_name matches query prefix
-    bool weapon_matches(const std::string& weapon_name, const std::string& query) const noexcept;
-
 public:
     PylonManager() : frozen(false) {}
     ~PylonManager() noexcept = default;
@@ -36,6 +33,9 @@ public:
 
     // Get all pylon mounts
     const std::map<std::string, std::string>& get_all_mounts() const noexcept { return pylon_mounts; }
+
+    // Test function: Check if weapon_name matches query (public for testing)
+    bool weapon_matches(const std::string& weapon_name, const std::string& query) const noexcept;
 };
 
 }

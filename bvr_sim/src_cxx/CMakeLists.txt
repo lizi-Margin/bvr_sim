@@ -244,6 +244,8 @@ if(BVR_SIM_BUILD_TESTS)
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/base.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/pylon_manager.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_pylon_manager.cxx"
     )
 
     # Link with main library dependencies

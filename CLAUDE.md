@@ -2,14 +2,30 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Quick Start
+
+| Task | Command |
+|------|---------|
+| Install (editable) | `pip install -e .` |
+| Python smoke test | `python tests/test_py.py` |
+| C++ smoke test | `python tests/test_cpp.py` |
+| Full test suite | `python tests/test_everything.py` |
+| Run 5v5 ACMI | `python example/run_custom_5v5_acmi.py` |
+
 ## Project Overview
 
 **BVR Sim** is a 3D Beyond Visual Range (BVR) air combat simulation environment for multi-agent reinforcement learning. It combines a Python control layer with high-performance C++ physics simulation (aircraft flight dynamics, missile guidance, radar sensors).
 
 - **Main entry point for RL training:** `example/env_wrapper.py` → exposes `ScenarioConfig` and `make_env()`
 - **Core environment:** `bvr_sim/bvr_env.py` (Gymnasium-style interface)
-- **Configuration:** JSONC files in `conf_system/` directory (see AGENTS.bac.md for config details)
+- **C++ backend:** `bvr_sim/bvr_env_cpp.py` (high-performance variant)
+- **Configuration:** JSONC files in `conf_system/` directory (see `docs/configuration.md`)
 - **Rendering:** Tacview `.txt.acmi` format recordings automatically generated when `ScenarioConfig.render=True`
+
+### Two Backend Variants
+
+- **Python backend** (`BVR3DEnv`): Easier to debug, faster iteration, no compilation required
+- **C++ backend** (`BVR3DEnvCpp`): Higher performance, requires `build_windows.bat` or `build_linux.sh`
 
 ## Build & Setup Commands
 
@@ -86,6 +102,8 @@ for _ in range(100):
   - Episode termination logic (waits for all missiles to resolve before declaring winner)
 
 - **`bvr_env_cpp.py`**: Alternative C++ backend wrapper (for performance-critical deployments)
+  - Requires building with `bvr_sim/build_windows.bat` (Windows) or `bvr_sim/build_linux.sh` (Linux)
+  - Outputs `bvr_sim_cpp.pyd` (Windows) or `bvr_sim_cpp.so` (Linux) native extensions
 
 - **`src_py/simulator/`**: Physics simulation stack
   - `aircraft/`: Aircraft models (F-16, etc.) with pluggable FDM systems
@@ -113,10 +131,11 @@ for _ in range(100):
   - `RewardVisualizer`: Plots per-component curves to `<logdir>/reward_plot_path/`
 
 - **`baseline_opponents/`**: Scripted AI opponents
+  - Types: `random`, `simple`, `tactical`, `standoff`
   - Usable for blue-team adversaries or imitation learning (distillation)
-  - See `tactical_opponent.py` for tactical baseline policy
+  - See `tactical_opponent.py` and `standoff_opponent.py`
 
-- **`spawn_manager.py`**: Randomized spawn geometry (default: 37.2 NM separation)
+- **`spawn_manager.py`**: Randomized spawn geometry (default: 37.2 NM separation, 2 NM formation spread)
 
 #### C++ Backend (`bvr_sim/src_cxx/`)
 
@@ -130,12 +149,16 @@ for _ in range(100):
 
 #### Examples & Wrappers (`example/`)
 
-- **`env_wrapper.py`**: Standard integration for RL frameworks
+- **`env_wrapper.py`**: Standard integration for UHRL-style frameworks
   - Gymnasium-compatible interface
   - Handles action/observation spec definitions
   - Automatic trajectory recording to `<logdir>/aircraft_records/`
 
-- **`env_harl.py`**, **`env_marlbenchmark.py`**: Specialized wrappers for other frameworks
+- **`env_harl.py`**: HARL framework integration (shared observation space)
+
+- **`env_marlbenchmark.py`**: MARLBenchmark framework integration
+
+- **`run_custom_5v5_acmi.py`**: C++ multi-agent scenario runner (F-22/F-16 mixed formation)
 
 ### Key Design Patterns
 
@@ -216,10 +239,12 @@ Set `distill_reward_weight > 0` in config and optionally `USE_DISTILL_REWARD_ACT
 | `example/env_wrapper.py` | Standard RL integration point |
 | `conf_system/` | Training scenario configurations (JSONC format) |
 | `tests/` | Test suites (Python, C++, unit tests) |
-| `docs/` | Documentation (development logs, design specs) |
+| `docs/` | User guides (getting_started.md, configuration.md, etc.) |
 
 ## Related References
 
-- **AGENTS.bac.md**: Comprehensive guide covering observation/action encoding, reward shaping, distillation, and debugging tips
+- **AGENTS.bac.md**: Comprehensive guide covering observation/action encoding, reward shaping, distillation, and debugging tips (for MISSION/bvr_sim)
+- **`docs/getting_started.md`**: Step-by-step installation and first-run guide
+- **`docs/configuration.md`**: Configuration file format and common parameters
 - **docs/开发日志.md**: Development progress and architectural notes (Chinese)
 - **Upstream BVR-Gym** (arXiv:2403.17533): Comparison reference
