@@ -70,7 +70,7 @@ bool Aircraft::can_shoot_enm(const std::shared_ptr<SimulatedObject>& enemy) cons
             return true;
         }
         SL::get().printf("Warning: Aircraft::can_shoot_enm: %s cannot shoot %s, not locked\n", uid.c_str(), enemy->uid.c_str());
-        colorful::print("Warning: Aircraft::can_shoot_enm: %s cannot shoot %s, not locked\n", uid.c_str(), enemy->uid.c_str());
+        // colorful::print("Warning: Aircraft::can_shoot_enm: %s cannot shoot %s, not locked\n", uid.c_str(), enemy->uid.c_str());
         for (const auto& enm : enemies_lock) {
             std::cout << "Warning: Aircraft::can_shoot_enm: " << uid << " in enemies_lock: " << enm->uid << std::endl;
         }
