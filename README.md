@@ -345,6 +345,97 @@ python tests/cpp_unit_tests.py
 
 - [`docs/developer/architecture.md`](G:\bvr_sim\docs\developer\architecture.md)
 
+## 实时 Web 可视化
+
+当前仓库已经包含 phase-1 的实时 Web 可视化与调试系统，用于渲染当前 C++ `SimCore` 的实时状态，不包含录像回放链路。
+
+### 设计边界
+
+- `SimCore` 负责仿真
+- `TelemetryBridge` 在独立线程采样状态
+- 状态提取来自对象 `Register`
+- `EmbeddedWebServer` 只暴露快照和命令协议
+- `web/` 前端只消费 HTTP / WebSocket 协议
+- 调试交互同样走命令通道，不直接修改仿真对象
+
+这意味着渲染和仿真保持解耦，后续如果扩展对象级调试命令，也应该继续沿着寄存器 / 命令邮箱模式推进。
+
+### 启动步骤
+
+1. 先构建原生扩展
+
+Windows:
+
+```powershell
+bvr_sim\build_windows.bat
+```
+
+Linux:
+
+```bash
+bash bvr_sim/build_linux.sh
+```
+
+2. 安装前端依赖
+
+```bash
+npm --prefix web install
+```
+
+3. 启动仿真和可视化服务
+
+```python
+from bvr_sim import bvr_sim_cpp
+
+core = bvr_sim_cpp.SimCore(
+    dt=0.2,
+    log_file_path="./test_logs/telemetry.log",
+    acmi_file_path=""
+)
+
+core.set_visualization_static_root("./web/dist")
+core.start_telemetry_bridge()
+core.start_visualization_server(8765)
+core.start()
+```
+
+如果 `./web/dist` 已存在，内嵌服务器会直接托管打包后的前端，浏览器可以直接访问：
+
+```text
+http://127.0.0.1:8765/
+```
+
+4. 启动前端开发服务器
+
+```bash
+npm --prefix web run dev -- --host 127.0.0.1 --port 5173
+```
+
+5. 如果你需要前端热更新，浏览器打开：
+
+```text
+http://127.0.0.1:5173/?server=http://127.0.0.1:8765
+```
+
+### 当前能力
+
+- Three.js 实时场景
+- 飞机 / 导弹 / 地面对象占位渲染
+- HUD / Inspector / Diagnostics 面板
+- `pause` / `resume` / `step`
+- 焦点选择
+- `set_subscription_filter` 对象筛选
+- `object_debug` 对象寄存器写入命令
+- `last_command_result` 调试命令回执诊断
+
+### 验证命令
+
+```bash
+python tests/cpp_unit_tests.py
+python tests/test_web_bridge_smoke.py
+npm --prefix web run build
+```
+
 ## 许可证
 
 见 [`LICENSE`](G:\bvr_sim\LICENSE) 和 [`LICENSE.GPL`](G:\bvr_sim\LICENSE.GPL)。

@@ -17,7 +17,9 @@ BY_PASS_RL_ACTION = False
 configure_runtime_environment()
 
 
+import glob
 import importlib
+import importlib.util
 # I know this is ugly, but...
 try_list = [
     "bvr_sim",
@@ -28,7 +30,44 @@ try_list = [
 ]
 bvr_sim_cpp = None
 _import_success = False
+
+
+def _load_local_bvr_sim_cpp():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    candidate_patterns = [
+        os.path.join(base_dir, "build", "Release", "bvr_sim_cpp*.pyd"),
+        os.path.join(base_dir, "build", "bvr_sim_cpp*.so"),
+        os.path.join(base_dir, "install", "lib", "bvr_sim_cpp*.pyd"),
+        os.path.join(base_dir, "install", "lib", "bvr_sim_cpp*.so"),
+    ]
+
+    for pattern in candidate_patterns:
+        matches = sorted(glob.glob(pattern))
+        if not matches:
+            continue
+
+        module_path = matches[0]
+        spec = importlib.util.spec_from_file_location("bvr_sim.bvr_sim_cpp", module_path)
+        if spec is None or spec.loader is None:
+            print(f"Failed to create import spec for local bvr_sim_cpp: {module_path}")
+            continue
+
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        print(f"Successfully loaded local bvr_sim_cpp from {module_path}")
+        return module
+
+    return None
+
+
+local_bvr_sim_cpp = _load_local_bvr_sim_cpp()
+if local_bvr_sim_cpp is not None:
+    bvr_sim_cpp = local_bvr_sim_cpp
+    _import_success = True
+
 for package in try_list:
+    if _import_success:
+        break
     try:
         for module_name in (".bvr_sim_cpp", ".install.lib.bvr_sim_cpp"):
             try:

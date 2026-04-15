@@ -101,7 +101,7 @@ echo.
 
 REM Build project
 echo Building project (%BUILD_TYPE%)...
-cmake --build . --config %BUILD_TYPE%
+cmake --build . --config %BUILD_TYPE% -- /m:1
 if %ERRORLEVEL% neq 0 (
     echo Build failed!
     cd ..
