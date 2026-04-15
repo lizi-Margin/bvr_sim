@@ -69,6 +69,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_snapshot_builder.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_command_queue.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/embedded_web_server.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/unit_factory.cxx"
@@ -122,6 +123,8 @@ set(BVR_SIM_INCLUDE_DIRS
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fc"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl"
     "${CMAKE_CURRENT_SOURCE_DIR}/extern/SimpleJSON"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extern/websocketpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extern/asio/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/extern/cpptrace/include"
     "${Eigen3_DIR}"
     "${JSBSIM_SRC_DIR}"
@@ -219,6 +222,10 @@ target_include_directories(bvr_sim_cpp PRIVATE ${EIGEN3_INCLUDE_DIR})
 target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
 target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
 target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
+target_compile_definitions(bvr_sim_cpp PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
+if(MSVC)
+    target_link_libraries(bvr_sim_cpp PRIVATE ws2_32 wsock32)
+endif()
 set_compiler_params(bvr_sim_cpp)
 install(TARGETS bvr_sim_cpp
     LIBRARY DESTINATION ${BVR_SIM_PYTHON_MODULE_DESTINATION}
@@ -250,6 +257,7 @@ if(BVR_SIM_BUILD_TESTS)
         "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_snapshot_builder.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_command_queue.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/embedded_web_server.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/so_pool.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/global_config.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
@@ -272,6 +280,10 @@ if(BVR_SIM_BUILD_TESTS)
     target_link_libraries(bvr_sim_unit_tests PRIVATE c3utils)
     target_link_libraries(bvr_sim_unit_tests PRIVATE cpptrace::cpptrace)
     target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim)
+    target_compile_definitions(bvr_sim_unit_tests PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
+    if(MSVC)
+        target_link_libraries(bvr_sim_unit_tests PRIVATE ws2_32 wsock32)
+    endif()
 
     if(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)
         install(TARGETS bvr_sim_unit_tests

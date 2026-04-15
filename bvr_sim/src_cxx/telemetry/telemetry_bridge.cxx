@@ -62,10 +62,62 @@ std::optional<TelemetryCommand> TelemetryBridge::try_pop_command() {
     return command_queue_.try_pop();
 }
 
+void TelemetryBridge::set_command_handler(std::function<void(const TelemetryCommand&)> handler) {
+    std::lock_guard<std::mutex> lock(command_handler_mutex_);
+    command_handler_ = std::move(handler);
+}
+
+json::JSON TelemetryBridge::get_diagnostics() const {
+    json::JSON diagnostics = json::JSON::Make(json::JSON::Class::Object);
+    diagnostics["running"] = json::Boolean(is_running());
+    diagnostics["queue_size"] = json::Integral(static_cast<long>(command_queue_.size()));
+
+    auto snapshot = get_latest_snapshot();
+    diagnostics["has_snapshot"] = json::Boolean(snapshot != nullptr);
+    diagnostics["snapshot_object_count"] = json::Integral(snapshot ? static_cast<long>(snapshot->objects.size()) : 0L);
+    diagnostics["snapshot_sim_time"] = json::Float(snapshot ? snapshot->sim_time : 0.0);
+
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    diagnostics["focus_uid"] = json::String(focus_uid_);
+    diagnostics["subscription_filter"] = subscription_filter_;
+    return diagnostics;
+}
+
 void TelemetryBridge::run_loop() noexcept {
     while (running_.load()) {
+        process_commands();
         sample_once();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+void TelemetryBridge::process_commands() noexcept {
+    while (true) {
+        auto command = try_pop_command();
+        if (!command.has_value()) {
+            return;
+        }
+
+        if (command->kind == TelemetryCommandKind::SetFocusUid) {
+            std::lock_guard<std::mutex> lock(state_mutex_);
+            focus_uid_ = command->target_uid;
+            continue;
+        }
+
+        if (command->kind == TelemetryCommandKind::SetSubscriptionFilter) {
+            std::lock_guard<std::mutex> lock(state_mutex_);
+            subscription_filter_ = command->payload;
+            continue;
+        }
+
+        std::function<void(const TelemetryCommand&)> handler;
+        {
+            std::lock_guard<std::mutex> lock(command_handler_mutex_);
+            handler = command_handler_;
+        }
+        if (handler) {
+            handler(*command);
+        }
     }
 }
 

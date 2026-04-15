@@ -18,7 +18,8 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
       paused_(false),
       should_exit_(false),
       acmi_file_path_(acmi_file_path),
-      telemetry_bridge_(std::make_shared<TelemetryBridge>()) 
+      telemetry_bridge_(std::make_shared<TelemetryBridge>()),
+      visualization_server_(std::make_shared<EmbeddedWebServer>())
 {
     cfg::dt = dt;
     cfg::sim_time = 0.0;
@@ -31,6 +32,21 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
 
     // truncate acmi file
     truncate_acmi_file();
+
+    telemetry_bridge_->set_command_handler([this](const TelemetryCommand& command) {
+        handle_telemetry_command(command);
+    });
+
+    visualization_server_->set_snapshot_provider([this]() {
+        return get_telemetry_snapshot();
+    });
+    visualization_server_->set_diagnostics_provider([this]() {
+        return get_visualization_status();
+    });
+    visualization_server_->set_command_submitter([this](const TelemetryCommand& command) {
+        start_telemetry_bridge();
+        telemetry_bridge_->submit_command(command);
+    });
 }
 
 SimCore::~SimCore() {
@@ -53,6 +69,7 @@ void SimCore::start() {
 
 void SimCore::stop() {
     if (!running_) {
+        stop_visualization_server();
         stop_telemetry_bridge();
         return;
     }
@@ -66,6 +83,7 @@ void SimCore::stop() {
     }
 
     running_ = false;
+    stop_visualization_server();
     stop_telemetry_bridge();
     cfg::sim_time = 0.0;
     if (acmi_file_.is_open()) {
@@ -242,6 +260,58 @@ void SimCore::stop_telemetry_bridge() {
 void SimCore::refresh_telemetry_snapshot() {
     if (telemetry_bridge_) {
         telemetry_bridge_->refresh_once();
+    }
+}
+
+bool SimCore::is_visualization_server_running() const noexcept {
+    return visualization_server_ && visualization_server_->is_running();
+}
+
+void SimCore::start_visualization_server(int port) {
+    if (!visualization_server_) {
+        visualization_server_ = std::make_shared<EmbeddedWebServer>();
+    }
+    start_telemetry_bridge();
+    visualization_server_->start(port);
+}
+
+void SimCore::stop_visualization_server() {
+    if (visualization_server_) {
+        visualization_server_->stop();
+    }
+}
+
+json::JSON SimCore::get_visualization_status() const {
+    json::JSON status = json::JSON::Make(json::JSON::Class::Object);
+    status["server_running"] = json::Boolean(is_visualization_server_running());
+    status["telemetry_running"] = json::Boolean(is_telemetry_running());
+    status["port"] = json::Integral(visualization_server_ ? visualization_server_->get_port() : 0L);
+    status["base_url"] = json::String(visualization_server_ ? visualization_server_->get_base_url() : "");
+    status["client_count"] = json::Integral(visualization_server_ ? static_cast<long>(visualization_server_->get_client_count()) : 0L);
+    status["telemetry"] = telemetry_bridge_ ? telemetry_bridge_->get_diagnostics() : json::JSON::Make(json::JSON::Class::Object);
+    return status;
+}
+
+void SimCore::handle_telemetry_command(const TelemetryCommand& command) {
+    if (command.kind == TelemetryCommandKind::Pause) {
+        pause();
+        return;
+    }
+    if (command.kind == TelemetryCommandKind::Resume) {
+        resume();
+        return;
+    }
+    if (command.kind == TelemetryCommandKind::Step) {
+        int step_count = 1;
+        if (command.payload.JSONType() == json::JSON::Class::Integral) {
+            step_count = static_cast<int>(command.payload.ToInt());
+        } else if (command.payload.JSONType() == json::JSON::Class::Object
+            && command.payload.hasKey("steps", json::JSON::Class::Integral)) {
+            step_count = static_cast<int>(command.payload.at("steps").ToInt());
+        }
+        format_check(step_count > 0, "Telemetry step command requires positive steps");
+        step(step_count);
+        return;
     }
 }
 

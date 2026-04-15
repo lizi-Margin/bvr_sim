@@ -126,6 +126,12 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         })
         .def("get_telemetry_snapshot", [](SimCore& self) -> py::object {
             return json_to_python(self.get_telemetry_snapshot());
+        })
+        .def("start_visualization_server", &SimCore::start_visualization_server, py::arg("port") = 8765)
+        .def("stop_visualization_server", &SimCore::stop_visualization_server)
+        .def("is_visualization_server_running", &SimCore::is_visualization_server_running)
+        .def("get_visualization_status", [](SimCore& self) -> py::object {
+            return json_to_python(self.get_visualization_status());
         });
 
     py::class_<RLManager, std::shared_ptr<RLManager>>(m, "RLManager")

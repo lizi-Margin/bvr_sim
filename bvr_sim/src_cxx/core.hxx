@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rubbish_can/json.hpp"
+#include "telemetry/embedded_web_server.hxx"
 #include "telemetry/telemetry_bridge.hxx"
 #include <thread>
 #include <atomic>
@@ -44,11 +45,16 @@ public:
     void start_telemetry_bridge();
     void stop_telemetry_bridge();
     void refresh_telemetry_snapshot();
+    bool is_visualization_server_running() const noexcept;
+    void start_visualization_server(int port = 8765);
+    void stop_visualization_server();
+    json::JSON get_visualization_status() const;
 
 private:
     void run_loop();
     void update_physics();
     void log();
+    void handle_telemetry_command(const TelemetryCommand& command);
     
     std::atomic<bool> running_;
     std::atomic<bool> paused_;
@@ -63,6 +69,7 @@ private:
     std::string acmi_file_path_;
     std::ofstream acmi_file_;
     std::shared_ptr<TelemetryBridge> telemetry_bridge_;
+    std::shared_ptr<EmbeddedWebServer> visualization_server_;
 
 };
 
