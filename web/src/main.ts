@@ -47,6 +47,7 @@ let snapshotRateHz = 0;
 let lastSnapshotAt = 0;
 
 const renderPanels = (): void => {
+  const effectiveCommandResult = diagnosticsStatus?.telemetry?.last_command_result ?? lastCommandResult;
   hud.render({
     snapshot: store.getSnapshot(),
     status: diagnosticsStatus,
@@ -56,7 +57,7 @@ const renderPanels = (): void => {
   });
   inspector.render(store.getSelectedObject());
   diagnostics.render(diagnosticsStatus);
-  diagnostics.renderCommandResult(lastCommandResult);
+  diagnostics.renderCommandResult(effectiveCommandResult);
 };
 
 const client = new TelemetryClient({

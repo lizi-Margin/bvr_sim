@@ -7,7 +7,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bvr_sim.bvr_env import BVR3DEnv
-from .test_utils import is_running_in_claude_code, FpsMonitor
+try:
+    from .test_utils import is_running_in_claude_code, FpsMonitor
+except ImportError:
+    from test_utils import is_running_in_claude_code, FpsMonitor
 
 
 def get_root_dir() -> str:

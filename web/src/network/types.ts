@@ -23,7 +23,10 @@ export type VisualizationStatus = {
   port: number;
   base_url: string;
   client_count: number;
-  telemetry: Record<string, unknown>;
+  telemetry: {
+    last_command_result?: CommandResult;
+    [key: string]: unknown;
+  };
 };
 
 export type ConnectionState = "connecting" | "open" | "closed" | "error";
