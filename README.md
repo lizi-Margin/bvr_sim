@@ -366,6 +366,7 @@ python tests/cpp_unit_tests.py
 ### 当前状态
 
 - 当前实现优先支持 Windows
+- Linux / 其他平台当前只保证编译通过，运行时会返回 unsupported
 - 使用 Win32 + WGL 最小窗口方案
 - 已集成到 `bvr_sim_cpp`
 - 当前渲染为占位几何体，不含模型、地形、shader 资源链路

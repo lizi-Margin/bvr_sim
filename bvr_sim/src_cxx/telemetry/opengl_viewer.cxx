@@ -24,6 +24,8 @@ OpenGLViewer::OpenGLViewer()
       supported_(false) {
 #ifdef _WIN32
     supported_ = true;
+#else
+    supported_ = false;
 #endif
 }
 
@@ -72,6 +74,13 @@ json::JSON OpenGLViewer::get_status() const {
     json::JSON status = json::JSON::Make(json::JSON::Class::Object);
     status["running"] = json::Boolean(is_running());
     status["supported"] = json::Boolean(is_supported());
+#ifdef _WIN32
+    status["platform"] = json::String("windows");
+    status["backend"] = json::String("win32_wgl");
+#else
+    status["platform"] = json::String("linux_or_other");
+    status["backend"] = json::String("stub");
+#endif
 
     std::lock_guard<std::mutex> lock(state_mutex_);
     status["last_error"] = json::String(last_error_);
@@ -93,6 +102,9 @@ void OpenGLViewer::run_loop() noexcept {
     {
         std::lock_guard<std::mutex> lock(state_mutex_);
         last_error_ = "OpenGL viewer is currently implemented for Windows only";
+        focus_uid_.clear();
+        last_sim_time_ = 0.0;
+        last_object_count_ = 0;
     }
     running_ = false;
 }
