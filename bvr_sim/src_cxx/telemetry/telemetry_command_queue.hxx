@@ -23,6 +23,8 @@ struct TelemetryCommand {
     json::JSON payload = json::JSON::Make(json::JSON::Class::Object);
 };
 
+std::optional<TelemetryCommandKind> telemetry_command_kind_from_string(const std::string& command_name) noexcept;
+
 class TelemetryCommandQueue {
 public:
     void push(const TelemetryCommand& command);
