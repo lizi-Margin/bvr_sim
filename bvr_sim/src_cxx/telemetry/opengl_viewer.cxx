@@ -1,5 +1,6 @@
 #include "opengl_viewer.hxx"
 
+#include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
 #include "rubbish_can/SL.hxx"
 
@@ -121,7 +122,8 @@ void OpenGLViewer::run_loop() noexcept {
 
 namespace {
 
-constexpr float kPi = 3.14159265358979323846f;
+using c3u::deg2rad;
+using c3u::rad2deg;
 
 struct ViewerState {
     enum class CameraMode {
@@ -155,6 +157,9 @@ struct ViewerState {
     int last_mouse_x = 0;
     int last_mouse_y = 0;
     GLuint font_base = 0;
+    double render_fps = 0.0;
+    int fps_frame_counter = 0;
+    std::chrono::steady_clock::time_point fps_window_start = std::chrono::steady_clock::now();
     std::string selected_uid;
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;
@@ -196,7 +201,7 @@ std::array<float, 3> team_color(const TelemetryObjectState& object) {
 }
 
 void perspective_gl(double fov_y_degrees, double aspect, double z_near, double z_far) {
-    const double fH = std::tan(fov_y_degrees * kPi / 360.0) * z_near;
+    const double fH = std::tan(deg2rad(fov_y_degrees) * 0.5) * z_near;
     const double fW = fH * aspect;
     glFrustum(-fW, fW, -fH, fH, z_near, z_far);
 }
@@ -597,6 +602,16 @@ std::string format_vec3(float x, float y, float z) {
     return oss.str();
 }
 
+std::string shorten_text(const std::string& text, size_t max_length) {
+    if (text.size() <= max_length) {
+        return text;
+    }
+    if (max_length <= 3) {
+        return text.substr(0, max_length);
+    }
+    return text.substr(0, max_length - 3) + "...";
+}
+
 void render_hud(
     const ViewerState& view_state,
     int width,
@@ -613,12 +628,12 @@ void render_hud(
 
     std::ostringstream line1;
     line1 << std::fixed << std::setprecision(1)
+          << "RenderFPS " << view_state.render_fps
+          << "  "
           << "FOV " << view_state.camera_fov_y
           << "  Dist " << view_state.camera_distance
-          << "  Pitch " << (view_state.camera_pitch * 57.2957795f)
-          << "  Yaw " << (view_state.camera_yaw * 57.2957795f)
-          << "  Camera " << format_vec3(eye_x, eye_y, eye_z)
-          << "  Target " << format_vec3(view_state.camera_target_x, view_state.camera_target_y, view_state.camera_target_z);
+          << "  Pitch " << rad2deg(view_state.camera_pitch)
+          << "  Yaw " << rad2deg(view_state.camera_yaw);
     render_text_2d(view_state, 14, 24, line1.str());
 
     std::ostringstream line2;
@@ -629,8 +644,39 @@ void render_hud(
           << "  Focus " << (view_state.focus_uid.empty() ? "<none>" : view_state.focus_uid);
     render_text_2d(view_state, 14, 46, line2.str());
 
+    std::ostringstream line3;
+    line3 << std::fixed << std::setprecision(0)
+          << "Camera " << format_vec3(eye_x, eye_y, eye_z)
+          << "  Target " << format_vec3(view_state.camera_target_x, view_state.camera_target_y, view_state.camera_target_z);
+    render_text_2d(view_state, 14, 68, line3.str());
+
     render_text_2d(view_state, 14, height - 74, "Move: W A S D  Vertical: Q/E  Look: mouse in window");
     render_text_2d(view_state, 14, height - 52, "View: arrows pitch/yaw  FOV: +/-  Pause: Space  Step: N  F1 free  F2 follow/next");
+
+    const int panel_x = std::max(420, width - 620);
+    render_text_2d(view_state, panel_x, 24, "UID                       Model            Roll    Pitch   Yaw");
+
+    int row = 0;
+    const int row_height = 18;
+    const int max_rows = std::max(0, (height - 90) / row_height);
+    for (const auto& object : snapshot ? snapshot->objects : std::vector<TelemetryObjectState>{}) {
+        if (row >= max_rows) {
+            break;
+        }
+
+        const double roll_deg = rad2deg(object.orientation[0]);
+        const double pitch_deg = rad2deg(object.orientation[1]);
+        const double yaw_deg = rad2deg(object.orientation[2]);
+
+        std::ostringstream item_line;
+        item_line << std::left << std::setw(24) << shorten_text(object.uid, 24)
+                  << std::setw(17) << shorten_text(object.mesh_name.empty() ? object.type : object.mesh_name, 17)
+                  << std::right << std::setw(7) << std::fixed << std::setprecision(1) << roll_deg
+                  << std::setw(9) << pitch_deg
+                  << std::setw(8) << yaw_deg;
+        render_text_2d(view_state, panel_x, 44 + row * row_height, item_line.str());
+        ++row;
+    }
 
     end_2d_overlay();
 }
@@ -969,9 +1015,9 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
                 static_cast<float>(object.position[1]));
 
             const auto& orientation = object.orientation;
-            glRotatef(static_cast<float>(orientation[2] * 57.2957795), 0.0f, 1.0f, 0.0f);
-            glRotatef(static_cast<float>(orientation[1] * 57.2957795), 0.0f, 0.0f, 1.0f);
-            glRotatef(static_cast<float>(orientation[0] * 57.2957795), 1.0f, 0.0f, 0.0f);
+            glRotatef(static_cast<float>(rad2deg(orientation[2])), 0.0f, 1.0f, 0.0f);
+            glRotatef(static_cast<float>(rad2deg(orientation[1])), 0.0f, 0.0f, 1.0f);
+            glRotatef(static_cast<float>(rad2deg(orientation[0])), 1.0f, 0.0f, 0.0f);
 
             const float alpha_scale = object.alive ? 1.0f : 0.35f;
             glColor3f(color[0] * alpha_scale, color[1] * alpha_scale, color[2] * alpha_scale);
@@ -1077,6 +1123,17 @@ void update_camera_motion(ViewerState& view_state) {
     view_state.camera_target_z += move_z * speed;
 }
 
+void update_render_fps(ViewerState& view_state) {
+    ++view_state.fps_frame_counter;
+    const auto now = std::chrono::steady_clock::now();
+    const auto elapsed = std::chrono::duration<double>(now - view_state.fps_window_start).count();
+    if (elapsed >= 0.5) {
+        view_state.render_fps = static_cast<double>(view_state.fps_frame_counter) / elapsed;
+        view_state.fps_frame_counter = 0;
+        view_state.fps_window_start = now;
+    }
+}
+
 }
 
 void OpenGLViewer::run_loop() noexcept {
@@ -1129,6 +1186,7 @@ void OpenGLViewer::run_loop() noexcept {
             view_state.snapshot_uids.clear();
         }
         update_camera_motion(view_state);
+        update_render_fps(view_state);
         {
             std::lock_guard<std::mutex> lock(state_mutex_);
             last_sim_time_ = snapshot ? snapshot->sim_time : 0.0;
