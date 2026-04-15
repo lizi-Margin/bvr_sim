@@ -159,3 +159,104 @@ python tests/test_cpp.py
 ```bash
 python tests/test_everything.py
 ```
+
+## 实时 Web 可视化与调试架构
+
+phase-1 的实时可视化链路由四层组成：
+
+1. `SimCore`
+2. `TelemetryBridge`
+3. `EmbeddedWebServer`
+4. `web/` 前端
+
+关键入口：
+
+- [`core.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\core.cxx)
+- [`telemetry_bridge.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\telemetry\telemetry_bridge.cxx)
+- [`embedded_web_server.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\telemetry\embedded_web_server.cxx)
+- [`main.ts`](G:\bvr_sim\.worktrees\web-visualization-phase1\web\src\main.ts)
+
+### 职责边界
+
+`SimCore`
+
+- 负责仿真生命周期和步进
+- 处理 `pause` / `resume` / `step`
+- 不向浏览器直接暴露对象实例
+
+`TelemetryBridge`
+
+- 运行在独立守护线程
+- 从 `SOPool` 读取当前对象
+- 通过 [`register.hxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\simulator\register.hxx) 构建严格 `WorldSnapshot`
+- 保存最新快照
+- 处理 `focus_uid` 和 `subscription_filter`
+
+`EmbeddedWebServer`
+
+- 暴露 `GET /health`
+- 暴露 `GET /diagnostics`
+- 暴露 WebSocket `/ws`
+- 转发浏览器命令到桥接层
+
+`web/`
+
+- 只读 `WorldSnapshot`
+- 只写结构化命令
+- 不依赖 C++ 内部对象模型
+
+### 为什么必须经过 Register
+
+渲染与仿真解耦的核心做法是：
+
+1. 仿真对象把调试所需状态写入 `Register`
+2. `TelemetrySnapshotBuilder` 从 `Register` 严格取值
+3. `TelemetryBridge` 发布标准化快照
+4. 浏览器只消费该快照
+
+这样做可以避免：
+
+- 前端与仿真内部类结构强耦合
+- 调试代码侵入 `SimCore`
+- 后续渲染器切换时重复绑定内部对象
+
+### 快照契约
+
+当前桥接层要求至少有这些字段：
+
+- `uid`
+- `Type`
+- `color`
+- `is_alive`
+- `position`
+- `velocity`
+
+字段缺失或类型错误时，桥接层会直接失败，而不是跳过对象或偷偷填默认值。
+
+### 命令模型
+
+当前命令集合包括：
+
+- `pause`
+- `resume`
+- `step`
+- `set_focus_uid`
+- `set_subscription_filter`
+
+这条模型意味着前端交互同样解耦。未来如果要支持对象级调试命令，应继续扩展命令队列，而不是让前端直接写对象。
+
+### 当前验证
+
+```bash
+python tests/cpp_unit_tests.py
+python tests/test_web_bridge_smoke.py
+npm --prefix web run build
+```
+
+`test_web_bridge_smoke.py` 当前会验证：
+
+- 可视化服务可启动
+- HTTP `health` / `diagnostics` 正常
+- WebSocket 首帧快照正常
+- WebSocket 命令回执正常
+- `focus_uid` / `subscription_filter` 会反映到桥接诊断状态
