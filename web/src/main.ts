@@ -93,7 +93,8 @@ const controls = new ControlsPanel({
   onStep: () => client.sendCommand({ kind: "step", payload: { steps: 1 } }),
   onFilter: (filter) => client.sendCommand({ kind: "set_subscription_filter", payload: filter }),
   onTagSelected: () => sendObjectDebug(true),
-  onClearSelectedTag: () => sendObjectDebug(false)
+  onClearSelectedTag: () => sendObjectDebug(false),
+  onWriteSelectedRegister: (registerKey, rawValue) => sendRawObjectDebug(registerKey, rawValue)
 });
 
 sideRail.append(hud.element, controls.element, diagnostics.element, inspector.element);
@@ -142,6 +143,33 @@ function resolveBaseUrl(): string {
 }
 
 function sendObjectDebug(value: boolean): void {
+  sendStructuredObjectDebug("telemetry.web.selected", value);
+}
+
+function sendRawObjectDebug(registerKey: string, rawValue: string): void {
+  if (!registerKey.trim()) {
+    lastCommandResult = {
+      status: "error",
+      message: "register key is empty",
+      kind: "object_debug"
+    };
+    renderPanels();
+    return;
+  }
+  try {
+    const parsedValue = JSON.parse(rawValue);
+    sendStructuredObjectDebug(registerKey, parsedValue);
+  } catch {
+    lastCommandResult = {
+      status: "error",
+      message: "JSON value parse failed",
+      kind: "object_debug"
+    };
+    renderPanels();
+  }
+}
+
+function sendStructuredObjectDebug(registerKey: string, value: unknown): void {
   const targetUid = store.getSelectedUid();
   if (!targetUid) {
     lastCommandResult = {
@@ -156,7 +184,7 @@ function sendObjectDebug(value: boolean): void {
     kind: "object_debug",
     target_uid: targetUid,
     payload: {
-      register_key: "telemetry.web.selected",
+      register_key: registerKey,
       value
     }
   });

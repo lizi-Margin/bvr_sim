@@ -156,6 +156,21 @@ button {
   margin-top: 16px;
 }
 
+.object-debug-wrap {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.object-debug-wrap input {
+  width: 100%;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
 .filter-wrap select {
   width: 100%;
   border: 1px solid var(--panel-border);
@@ -172,6 +187,10 @@ button {
   background: rgba(255, 255, 255, 0.04);
   color: var(--accent);
   font-size: 0.82rem;
+}
+
+.wide-button {
+  width: 100%;
 }
 
 .code-panel {
