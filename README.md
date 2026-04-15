@@ -393,9 +393,16 @@ core = bvr_sim_cpp.SimCore(
     acmi_file_path=""
 )
 
+core.set_visualization_static_root("./web/dist")
 core.start_telemetry_bridge()
 core.start_visualization_server(8765)
 core.start()
+```
+
+如果 `./web/dist` 已存在，内嵌服务器会直接托管打包后的前端，浏览器可以直接访问：
+
+```text
+http://127.0.0.1:8765/
 ```
 
 4. 启动前端开发服务器
@@ -404,7 +411,7 @@ core.start()
 npm --prefix web run dev -- --host 127.0.0.1 --port 5173
 ```
 
-5. 浏览器打开：
+5. 如果你需要前端热更新，浏览器打开：
 
 ```text
 http://127.0.0.1:5173/?server=http://127.0.0.1:8765

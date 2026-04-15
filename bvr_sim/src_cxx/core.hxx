@@ -46,6 +46,7 @@ public:
     void stop_telemetry_bridge();
     void refresh_telemetry_snapshot();
     bool is_visualization_server_running() const noexcept;
+    void set_visualization_static_root(const std::string& static_root);
     void start_visualization_server(int port = 8765);
     void stop_visualization_server();
     json::JSON get_visualization_status() const;

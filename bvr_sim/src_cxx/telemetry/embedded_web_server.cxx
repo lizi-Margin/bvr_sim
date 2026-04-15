@@ -7,6 +7,8 @@
 #include <array>
 #include <chrono>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <map>
 #include <set>
@@ -403,6 +405,121 @@ std::string make_http_response(int status_code, const std::string& status_text, 
     return oss.str();
 }
 
+std::string make_http_response_with_content_type(
+    int status_code,
+    const std::string& status_text,
+    const std::string& content_type,
+    const std::string& body) {
+    std::ostringstream oss;
+    oss << "HTTP/1.1 " << status_code << " " << status_text << "\r\n";
+    oss << "Content-Type: " << content_type << "\r\n";
+    oss << "Content-Length: " << body.size() << "\r\n";
+    oss << "Connection: close\r\n";
+    oss << "\r\n";
+    oss << body;
+    return oss.str();
+}
+
+std::string guess_content_type(const std::filesystem::path& path) {
+    const auto extension = path.extension().string();
+    if (extension == ".html") {
+        return "text/html; charset=utf-8";
+    }
+    if (extension == ".js") {
+        return "application/javascript; charset=utf-8";
+    }
+    if (extension == ".css") {
+        return "text/css; charset=utf-8";
+    }
+    if (extension == ".json") {
+        return "application/json; charset=utf-8";
+    }
+    if (extension == ".svg") {
+        return "image/svg+xml";
+    }
+    if (extension == ".png") {
+        return "image/png";
+    }
+    if (extension == ".jpg" || extension == ".jpeg") {
+        return "image/jpeg";
+    }
+    if (extension == ".ico") {
+        return "image/x-icon";
+    }
+    return "application/octet-stream";
+}
+
+std::string read_file_to_string(const std::filesystem::path& path) {
+    std::ifstream input(path, std::ios::binary);
+    format_check(input.good(), "EmbeddedWebServer failed to open static asset");
+    std::ostringstream buffer;
+    buffer << input.rdbuf();
+    return buffer.str();
+}
+
+std::filesystem::path normalize_static_root(const std::string& raw_root) {
+    if (raw_root.empty()) {
+        return {};
+    }
+    std::error_code ec;
+    auto root = std::filesystem::weakly_canonical(std::filesystem::path(raw_root), ec);
+    if (ec) {
+        return {};
+    }
+    return root;
+}
+
+std::filesystem::path find_default_static_root() {
+    const std::vector<std::filesystem::path> candidates = {
+        std::filesystem::current_path() / "web" / "dist",
+        std::filesystem::current_path().parent_path() / "web" / "dist",
+        std::filesystem::current_path().parent_path().parent_path() / "web" / "dist"
+    };
+
+    for (const auto& candidate : candidates) {
+        std::error_code ec;
+        if (std::filesystem::exists(candidate, ec) && std::filesystem::is_directory(candidate, ec)) {
+            return std::filesystem::weakly_canonical(candidate, ec);
+        }
+    }
+    return {};
+}
+
+std::filesystem::path resolve_static_request_path(
+    const std::filesystem::path& static_root,
+    const std::string& request_path) {
+    if (static_root.empty()) {
+        return {};
+    }
+
+    std::string relative_path = request_path;
+    const auto query_pos = relative_path.find('?');
+    if (query_pos != std::string::npos) {
+        relative_path = relative_path.substr(0, query_pos);
+    }
+    if (relative_path.empty() || relative_path == "/") {
+        relative_path = "/index.html";
+    }
+
+    format_check(relative_path.front() == '/', "EmbeddedWebServer request path must start with /");
+    auto candidate = static_root / relative_path.substr(1);
+
+    std::error_code ec;
+    candidate = std::filesystem::weakly_canonical(candidate, ec);
+    if (ec) {
+        return {};
+    }
+
+    const auto root_string = static_root.generic_string();
+    const auto candidate_string = candidate.generic_string();
+    if (candidate_string.rfind(root_string, 0) != 0) {
+        colorful::printHONG("[EmbeddedWebServer] blocked static path traversal");
+        SL::get().print("[EmbeddedWebServer] blocked static path traversal");
+        check(false, "EmbeddedWebServer detected static path traversal");
+    }
+    return candidate;
+}
+
 }
 
 class EmbeddedWebServer::Impl {
@@ -555,8 +672,38 @@ private:
             return;
         }
 
+        if (serve_static_asset(client, request.path)) {
+            return;
+        }
+
         auto body = json_compact_dump(make_server_error("endpoint not found"));
         send_all(client, make_http_response(404, "Not Found", body));
+    }
+
+    bool serve_static_asset(SocketHandle client, const std::string& request_path) {
+        std::filesystem::path static_root;
+        {
+            std::lock_guard<std::mutex> lock(owner_.callback_mutex_);
+            static_root = normalize_static_root(owner_.static_root_);
+        }
+        if (static_root.empty()) {
+            return false;
+        }
+
+        const auto target_path = resolve_static_request_path(static_root, request_path);
+        if (target_path.empty()) {
+            return false;
+        }
+
+        std::error_code ec;
+        if (!std::filesystem::exists(target_path, ec) || !std::filesystem::is_regular_file(target_path, ec)) {
+            return false;
+        }
+
+        const auto body = read_file_to_string(target_path);
+        return send_all(
+            client,
+            make_http_response_with_content_type(200, "OK", guess_content_type(target_path), body));
     }
 
     void handle_websocket_client(SocketHandle client, const HttpRequest& request) {
@@ -710,9 +857,20 @@ void EmbeddedWebServer::set_command_submitter(CommandSubmitter submitter) {
     command_submitter_ = std::move(submitter);
 }
 
+void EmbeddedWebServer::set_static_root(const std::string& static_root) {
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    static_root_ = static_root;
+}
+
 void EmbeddedWebServer::start(int port) {
     if (running_.load()) {
         return;
+    }
+    {
+        std::lock_guard<std::mutex> lock(callback_mutex_);
+        if (static_root_.empty()) {
+            static_root_ = find_default_static_root().string();
+        }
     }
     impl_->start(port);
     port_ = impl_->bound_port();
@@ -745,8 +903,34 @@ std::string EmbeddedWebServer::get_base_url() const {
     return oss.str();
 }
 
+std::string EmbeddedWebServer::get_frontend_url() const {
+    if (!is_running() || !is_static_frontend_available()) {
+        return "";
+    }
+    std::ostringstream oss;
+    oss << get_base_url() << "/";
+    return oss.str();
+}
+
 size_t EmbeddedWebServer::get_client_count() const noexcept {
     return impl_->client_count();
+}
+
+std::string EmbeddedWebServer::get_static_root() const {
+    std::lock_guard<std::mutex> lock(callback_mutex_);
+    return static_root_;
+}
+
+bool EmbeddedWebServer::is_static_frontend_available() const {
+    std::filesystem::path static_root;
+    {
+        std::lock_guard<std::mutex> lock(callback_mutex_);
+        static_root = normalize_static_root(static_root_);
+    }
+    std::error_code ec;
+    return !static_root.empty()
+        && std::filesystem::exists(static_root / "index.html", ec)
+        && std::filesystem::is_regular_file(static_root / "index.html", ec);
 }
 
 }

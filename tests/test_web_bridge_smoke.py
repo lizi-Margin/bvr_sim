@@ -38,6 +38,18 @@ def main() -> int:
     os.makedirs("./test_logs", exist_ok=True)
     module_path = os.path.abspath(bvr_sim_cpp.__file__)
     assert "web-visualization-phase1" in module_path.replace("\\", "/"), module_path
+    npm_executable = "npm.cmd" if os.name == "nt" else "npm"
+    subprocess.run(
+        [npm_executable, "--prefix", "web", "run", "build"],
+        check=True,
+    )
+    dist_dir = os.path.join(REPO_ROOT, "web", "dist")
+    assert os.path.isdir(dist_dir), dist_dir
+    assert os.path.isfile(os.path.join(dist_dir, "index.html"))
+    assets_dir = os.path.join(dist_dir, "assets")
+    assert os.path.isdir(assets_dir), assets_dir
+    asset_files = os.listdir(assets_dir)
+    assert any(name.endswith(".js") for name in asset_files), asset_files
 
     core = bvr_sim_cpp.SimCore(
         dt=0.2,
@@ -63,10 +75,14 @@ def main() -> int:
     status = core.get_telemetry_status()
     assert status["telemetry_running"] is False
 
+    core.set_visualization_static_root(dist_dir)
     core.start_visualization_server(8765)
     viz_status = core.get_visualization_status()
     assert viz_status["server_running"] is True
     assert viz_status["port"] == 8765
+    assert viz_status["frontend_available"] is True
+    assert os.path.normpath(viz_status["static_root"]) == os.path.normpath(dist_dir)
+    assert viz_status["frontend_url"] == "http://127.0.0.1:8765/"
 
     with urllib.request.urlopen("http://127.0.0.1:8765/health", timeout=5) as response:
         health = json.loads(response.read().decode("utf-8"))
@@ -75,6 +91,21 @@ def main() -> int:
     with urllib.request.urlopen("http://127.0.0.1:8765/diagnostics", timeout=5) as response:
         diagnostics = json.loads(response.read().decode("utf-8"))
     assert diagnostics["server_running"] is True
+
+    with urllib.request.urlopen("http://127.0.0.1:8765/", timeout=5) as response:
+        html = response.read().decode("utf-8")
+        content_type = response.headers.get("Content-Type", "")
+    assert "BVR Sim Live Debug View" in html
+    assert '<div id="app"></div>' in html
+    assert "text/html" in content_type
+
+    first_asset = next(name for name in asset_files if name.endswith(".js"))
+    with urllib.request.urlopen(f"http://127.0.0.1:8765/assets/{first_asset}", timeout=5) as response:
+        asset_body = response.read().decode("utf-8")
+        asset_content_type = response.headers.get("Content-Type", "")
+    assert "modulepreload" in asset_body
+    assert len(asset_body) > 1000
+    assert "application/javascript" in asset_content_type
 
     key = base64.b64encode(os.urandom(16)).decode("ascii")
     request = (
@@ -145,18 +176,6 @@ def main() -> int:
     core.stop_visualization_server()
     viz_status = core.get_visualization_status()
     assert viz_status["server_running"] is False
-
-    npm_executable = "npm.cmd" if os.name == "nt" else "npm"
-    subprocess.run(
-        [npm_executable, "--prefix", "web", "run", "build"],
-        check=True,
-    )
-    dist_dir = os.path.join(REPO_ROOT, "web", "dist")
-    assert os.path.isdir(dist_dir), dist_dir
-    assert os.path.isfile(os.path.join(dist_dir, "index.html"))
-    assets_dir = os.path.join(dist_dir, "assets")
-    assert os.path.isdir(assets_dir), assets_dir
-    assert any(name.endswith(".js") for name in os.listdir(assets_dir)), os.listdir(assets_dir)
 
     return 0
 

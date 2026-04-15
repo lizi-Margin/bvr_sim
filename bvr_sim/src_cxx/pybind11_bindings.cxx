@@ -127,6 +127,7 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("get_telemetry_snapshot", [](SimCore& self) -> py::object {
             return json_to_python(self.get_telemetry_snapshot());
         })
+        .def("set_visualization_static_root", &SimCore::set_visualization_static_root, py::arg("static_root"))
         .def("start_visualization_server", &SimCore::start_visualization_server, py::arg("port") = 8765)
         .def("stop_visualization_server", &SimCore::stop_visualization_server)
         .def("is_visualization_server_running", &SimCore::is_visualization_server_running)

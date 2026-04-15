@@ -198,6 +198,7 @@ phase-1 的实时可视化链路由四层组成：
 - 暴露 `GET /diagnostics`
 - 暴露 WebSocket `/ws`
 - 转发浏览器命令到桥接层
+- 可选直接托管 `web/dist` 下的静态前端入口
 
 `web/`
 
@@ -255,6 +256,7 @@ npm --prefix web run build
 
 `test_web_bridge_smoke.py` 当前会验证：
 
+- 打包后的前端入口可由内嵌服务器直接托管
 - 可视化服务可启动
 - HTTP `health` / `diagnostics` 正常
 - WebSocket 首帧快照正常

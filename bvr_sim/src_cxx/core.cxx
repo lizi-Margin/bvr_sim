@@ -263,6 +263,13 @@ void SimCore::refresh_telemetry_snapshot() {
     }
 }
 
+void SimCore::set_visualization_static_root(const std::string& static_root) {
+    if (!visualization_server_) {
+        visualization_server_ = std::make_shared<EmbeddedWebServer>();
+    }
+    visualization_server_->set_static_root(static_root);
+}
+
 bool SimCore::is_visualization_server_running() const noexcept {
     return visualization_server_ && visualization_server_->is_running();
 }
@@ -287,6 +294,9 @@ json::JSON SimCore::get_visualization_status() const {
     status["telemetry_running"] = json::Boolean(is_telemetry_running());
     status["port"] = json::Integral(visualization_server_ ? visualization_server_->get_port() : 0L);
     status["base_url"] = json::String(visualization_server_ ? visualization_server_->get_base_url() : "");
+    status["frontend_url"] = json::String(visualization_server_ ? visualization_server_->get_frontend_url() : "");
+    status["static_root"] = json::String(visualization_server_ ? visualization_server_->get_static_root() : "");
+    status["frontend_available"] = json::Boolean(visualization_server_ && visualization_server_->is_static_frontend_available());
     status["client_count"] = json::Integral(visualization_server_ ? static_cast<long>(visualization_server_->get_client_count()) : 0L);
     status["telemetry"] = telemetry_bridge_ ? telemetry_bridge_->get_diagnostics() : json::JSON::Make(json::JSON::Class::Object);
     return status;
