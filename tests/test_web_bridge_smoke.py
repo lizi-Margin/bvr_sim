@@ -6,7 +6,10 @@ import json
 import socket
 import base64
 import hashlib
+import subprocess
 import urllib.request
+import struct
+import time
 
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -105,13 +108,100 @@ def main() -> int:
     first_message = json.loads(payload)
     assert first_message["dt"] == 0.2
     assert "objects" in first_message
+
+    send_ws_text(
+        sock,
+        json.dumps({
+            "kind": "set_focus_uid",
+            "target_uid": "focus:test"
+        })
+    )
+    command_message = json.loads(recv_ws_text(sock))
+    assert command_message["status"] == "ok"
+
+    diagnostics = wait_for_diagnostics(
+        "http://127.0.0.1:8765/diagnostics",
+        lambda data: data["telemetry"]["focus_uid"] == "focus:test"
+    )
+    assert diagnostics["telemetry"]["focus_uid"] == "focus:test"
+
+    send_ws_text(
+        sock,
+        json.dumps({
+            "kind": "set_subscription_filter",
+            "payload": {"type": "Aircraft"}
+        })
+    )
+    filter_message = json.loads(recv_ws_text(sock))
+    assert filter_message["status"] == "ok"
+
+    diagnostics = wait_for_diagnostics(
+        "http://127.0.0.1:8765/diagnostics",
+        lambda data: data["telemetry"]["subscription_filter"]["type"] == "Aircraft"
+    )
+    assert diagnostics["telemetry"]["subscription_filter"]["type"] == "Aircraft"
     sock.close()
 
     core.stop_visualization_server()
     viz_status = core.get_visualization_status()
     assert viz_status["server_running"] is False
 
+    npm_executable = "npm.cmd" if os.name == "nt" else "npm"
+    subprocess.run(
+        [npm_executable, "--prefix", "web", "run", "build"],
+        check=True,
+    )
+    dist_dir = os.path.join(REPO_ROOT, "web", "dist")
+    assert os.path.isdir(dist_dir), dist_dir
+    assert os.path.isfile(os.path.join(dist_dir, "index.html"))
+    assets_dir = os.path.join(dist_dir, "assets")
+    assert os.path.isdir(assets_dir), assets_dir
+    assert any(name.endswith(".js") for name in os.listdir(assets_dir)), os.listdir(assets_dir)
+
     return 0
+
+
+def send_ws_text(sock: socket.socket, payload: str) -> None:
+    payload_bytes = payload.encode("utf-8")
+    frame = bytearray()
+    frame.append(0x81)
+    if len(payload_bytes) < 126:
+        frame.append(0x80 | len(payload_bytes))
+    elif len(payload_bytes) <= 0xFFFF:
+        frame.append(0x80 | 126)
+        frame.extend(struct.pack("!H", len(payload_bytes)))
+    else:
+        frame.append(0x80 | 127)
+        frame.extend(struct.pack("!Q", len(payload_bytes)))
+
+    mask = os.urandom(4)
+    frame.extend(mask)
+    frame.extend(byte ^ mask[index % 4] for index, byte in enumerate(payload_bytes))
+    sock.sendall(frame)
+
+
+def recv_ws_text(sock: socket.socket) -> str:
+    header = sock.recv(2)
+    assert len(header) == 2
+    assert header[0] & 0x0F == 1
+    payload_length = header[1] & 0x7F
+    if payload_length == 126:
+        payload_length = int.from_bytes(sock.recv(2), "big")
+    elif payload_length == 127:
+        payload_length = int.from_bytes(sock.recv(8), "big")
+    return sock.recv(payload_length).decode("utf-8")
+
+
+def wait_for_diagnostics(url: str, predicate, timeout_sec: float = 2.0) -> dict:
+    deadline = time.time() + timeout_sec
+    last_data = None
+    while time.time() < deadline:
+        with urllib.request.urlopen(url, timeout=5) as response:
+            last_data = json.loads(response.read().decode("utf-8"))
+        if predicate(last_data):
+            return last_data
+        time.sleep(0.02)
+    raise AssertionError(last_data)
 
 
 if __name__ == "__main__":

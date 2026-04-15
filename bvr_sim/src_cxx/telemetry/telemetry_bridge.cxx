@@ -8,6 +8,41 @@
 
 namespace bvr_sim {
 
+namespace {
+
+bool snapshot_matches_filter(const TelemetryObjectState& object_state, const json::JSON& filter) {
+    if (filter.JSONType() == json::JSON::Class::Null) {
+        return true;
+    }
+    format_check(
+        filter.JSONType() == json::JSON::Class::Object,
+        "TelemetryBridge subscription_filter must be a JSON object");
+
+    if (filter.hasKey("type")) {
+        format_check(
+            filter.at("type").JSONType() == json::JSON::Class::String,
+            "TelemetryBridge subscription_filter.type must be string");
+        const auto required_type = filter.at("type").ToString();
+        if (object_state.type.find(required_type) == std::string::npos) {
+            return false;
+        }
+    }
+
+    if (filter.hasKey("team")) {
+        format_check(
+            filter.at("team").JSONType() == json::JSON::Class::String,
+            "TelemetryBridge subscription_filter.team must be string");
+        const auto required_team = filter.at("team").ToString();
+        if (object_state.team != required_team) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+}
+
 TelemetryBridge::TelemetryBridge()
     : running_(false),
       latest_snapshot_(std::make_shared<WorldSnapshot>()) {
@@ -124,6 +159,11 @@ void TelemetryBridge::process_commands() noexcept {
 void TelemetryBridge::sample_once() noexcept {
     auto snapshot = std::make_shared<WorldSnapshot>(
         TelemetrySnapshotBuilder::make_empty_snapshot(cfg::sim_time, cfg::dt, running_.load(), false));
+    json::JSON subscription_filter = json::JSON::Make(json::JSON::Class::Object);
+    {
+        std::lock_guard<std::mutex> lock(state_mutex_);
+        subscription_filter = subscription_filter_;
+    }
 
     for (const auto& object : SOPool::instance().get_all()) {
         if (!object) {
@@ -131,7 +171,10 @@ void TelemetryBridge::sample_once() noexcept {
             SL::get().print("[TelemetryBridge] null object found in SOPool during sampling");
             check(false, "TelemetryBridge::sample_once encountered null object in SOPool");
         }
-        snapshot->objects.push_back(TelemetrySnapshotBuilder::build_object_state(object->get_register()));
+        auto object_state = TelemetrySnapshotBuilder::build_object_state(object->get_register());
+        if (snapshot_matches_filter(object_state, subscription_filter)) {
+            snapshot->objects.push_back(std::move(object_state));
+        }
     }
 
     set_latest_snapshot(snapshot);
