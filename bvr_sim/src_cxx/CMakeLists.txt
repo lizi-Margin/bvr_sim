@@ -65,6 +65,10 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/global_config.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmd_handler.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/trace.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_types.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_snapshot_builder.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_command_queue.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/unit_factory.cxx"
@@ -242,10 +246,16 @@ endif()
 if(BVR_SIM_BUILD_TESTS)
     add_executable(bvr_sim_unit_tests
         test_main.cxx
+        "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_types.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_snapshot_builder.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_command_queue.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_param_store.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_action_space.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_telemetry_snapshot.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_telemetry_command_queue.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/base.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"
