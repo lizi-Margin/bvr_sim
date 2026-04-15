@@ -125,6 +125,9 @@ namespace {
 using c3u::deg2rad;
 using c3u::rad2deg;
 
+bool is_aircraft_object(const TelemetryObjectState& object);
+bool is_missile_object(const TelemetryObjectState& object);
+
 struct ViewerState {
     enum class CameraMode {
         Free,
@@ -258,6 +261,96 @@ void cross(
     rx = ay * bz - az * by;
     ry = az * bx - ax * bz;
     rz = ax * by - ay * bx;
+}
+
+using Mat3 = std::array<float, 9>;
+
+Mat3 mat3_identity() {
+    return {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+}
+
+Mat3 mat3_mul(const Mat3& a, const Mat3& b) {
+    Mat3 result{};
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            float value = 0.0f;
+            for (int k = 0; k < 3; ++k) {
+                value += a[row * 3 + k] * b[k * 3 + col];
+            }
+            result[row * 3 + col] = value;
+        }
+    }
+    return result;
+}
+
+Mat3 mat3_rotation_x(float angle_rad) {
+    const float c = std::cos(angle_rad);
+    const float s = std::sin(angle_rad);
+    return {
+        1.0f, 0.0f, 0.0f,
+        0.0f, c, -s,
+        0.0f, s, c
+    };
+}
+
+Mat3 mat3_rotation_y(float angle_rad) {
+    const float c = std::cos(angle_rad);
+    const float s = std::sin(angle_rad);
+    return {
+        c, 0.0f, s,
+        0.0f, 1.0f, 0.0f,
+        -s, 0.0f, c
+    };
+}
+
+Mat3 mat3_rotation_z(float angle_rad) {
+    const float c = std::cos(angle_rad);
+    const float s = std::sin(angle_rad);
+    return {
+        c, -s, 0.0f,
+        s, c, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+}
+
+Mat3 build_sim_orientation_matrix(const std::array<double, 3>& orientation) {
+    const Mat3 rx = mat3_rotation_x(static_cast<float>(orientation[0]));
+    const Mat3 ry = mat3_rotation_y(static_cast<float>(orientation[1]));
+    const Mat3 rz = mat3_rotation_z(static_cast<float>(orientation[2]));
+    return mat3_mul(rz, mat3_mul(ry, rx));
+}
+
+Mat3 convert_nwu_matrix_to_viewer(const Mat3& nwu_matrix) {
+    // Viewer world axes are [North, Up, West] while simulation uses [North, West, Up].
+    static const Mat3 basis_change = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f
+    };
+    return mat3_mul(basis_change, mat3_mul(nwu_matrix, basis_change));
+}
+
+std::array<float, 16> mat3_to_gl_matrix(const Mat3& m) {
+    return {
+        m[0], m[3], m[6], 0.0f,
+        m[1], m[4], m[7], 0.0f,
+        m[2], m[5], m[8], 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+}
+
+std::array<float, 16> build_object_rotation_gl_matrix(const std::array<double, 3>& orientation) {
+    const Mat3 sim_matrix = build_sim_orientation_matrix(orientation);
+    const Mat3 viewer_matrix = convert_nwu_matrix_to_viewer(sim_matrix);
+    return mat3_to_gl_matrix(viewer_matrix);
+}
+
+std::array<float, 16> build_object_rotation_gl_matrix(const TelemetryObjectState& object) {
+    return build_object_rotation_gl_matrix(object.orientation);
 }
 
 void look_at_gl(
@@ -1299,7 +1392,7 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (const auto& object : snapshot->objects) {
             const auto color = team_color(object);
-            const auto& orientation = object.orientation;
+            const auto rotation_matrix = build_object_rotation_gl_matrix(object);
             const float pos_x = static_cast<float>(object.position[0]);
             const float pos_y = static_cast<float>(object.position[2]);
             const float pos_z = static_cast<float>(object.position[1]);
@@ -1308,9 +1401,7 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
             glPushMatrix();
             glMultMatrixf(shadow_matrix.data());
             glTranslatef(pos_x, pos_y + 2.0f, pos_z);
-            glRotatef(static_cast<float>(rad2deg(orientation[2])), 0.0f, 1.0f, 0.0f);
-            glRotatef(static_cast<float>(rad2deg(orientation[1])), 0.0f, 0.0f, 1.0f);
-            glRotatef(static_cast<float>(rad2deg(orientation[0])), 1.0f, 0.0f, 0.0f);
+            glMultMatrixf(rotation_matrix.data());
             glDisable(GL_LIGHTING);
             glDepthMask(GL_FALSE);
             glColor4f(0.0f, 0.0f, 0.0f, 0.22f * alpha_scale);
@@ -1321,9 +1412,7 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
 
             glPushMatrix();
             glTranslatef(pos_x, pos_y, pos_z);
-            glRotatef(static_cast<float>(rad2deg(orientation[2])), 0.0f, 1.0f, 0.0f);
-            glRotatef(static_cast<float>(rad2deg(orientation[1])), 0.0f, 0.0f, 1.0f);
-            glRotatef(static_cast<float>(rad2deg(orientation[0])), 1.0f, 0.0f, 0.0f);
+            glMultMatrixf(rotation_matrix.data());
             set_object_material(color, alpha_scale);
             draw_object_geometry(object, false);
 
