@@ -7,11 +7,14 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
+#include <sstream>
+#include <iomanip>
 #include <vector>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <windowsx.h>
 #include <GL/gl.h>
 #pragma comment(lib, "opengl32.lib")
 #endif
@@ -116,6 +119,11 @@ namespace {
 constexpr float kPi = 3.14159265358979323846f;
 
 struct ViewerState {
+    enum class CameraMode {
+        Free,
+        FollowObject,
+    };
+
     HINSTANCE instance = nullptr;
     HWND hwnd = nullptr;
     HDC dc = nullptr;
@@ -123,7 +131,7 @@ struct ViewerState {
     OpenGLViewer* owner = nullptr;
     bool should_close = false;
     bool paused = false;
-    bool follow_focus = false;
+    CameraMode camera_mode = CameraMode::Free;
     float camera_yaw = 0.65f;
     float camera_pitch = 0.55f;
     float camera_distance = 22000.0f;
@@ -137,8 +145,14 @@ struct ViewerState {
     bool move_right = false;
     bool move_up = false;
     bool move_down = false;
+    bool mouse_in_window = false;
+    bool has_mouse_reference = false;
+    int last_mouse_x = 0;
+    int last_mouse_y = 0;
+    GLuint font_base = 0;
     std::string selected_uid;
     std::string focus_uid;
+    std::vector<std::string> snapshot_uids;
 };
 
 ViewerState* get_viewer_state(HWND hwnd) {
@@ -276,14 +290,178 @@ void draw_ground_unit() {
     draw_box(180.0f, 90.0f, 180.0f);
 }
 
-void draw_selection_ring(float radius, bool focused) {
-    glColor3f(focused ? 0.35f : 0.84f, focused ? 0.82f : 0.95f, focused ? 1.0f : 0.58f);
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 48; ++i) {
-        const float a = static_cast<float>(i) / 48.0f * 2.0f * kPi;
-        glVertex3f(std::cos(a) * radius, 0.0f, std::sin(a) * radius);
-    }
+void draw_local_axes_marker(float axis_length) {
+    glLineWidth(3.0f);
+    glBegin(GL_LINES);
+    glColor3f(1.0f, 0.22f, 0.22f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(axis_length, 0.0f, 0.0f);
+
+    glColor3f(0.25f, 1.0f, 0.25f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, axis_length, 0.0f);
+
+    glColor3f(0.3f, 0.65f, 1.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, axis_length);
     glEnd();
+
+    glBegin(GL_LINES);
+    glColor3f(1.0f, 0.22f, 0.22f);
+    glVertex3f(axis_length, 0.0f, 0.0f);
+    glVertex3f(axis_length - 45.0f, 18.0f, 0.0f);
+    glVertex3f(axis_length, 0.0f, 0.0f);
+    glVertex3f(axis_length - 45.0f, -18.0f, 0.0f);
+
+    glColor3f(0.25f, 1.0f, 0.25f);
+    glVertex3f(0.0f, axis_length, 0.0f);
+    glVertex3f(18.0f, axis_length - 45.0f, 0.0f);
+    glVertex3f(0.0f, axis_length, 0.0f);
+    glVertex3f(-18.0f, axis_length - 45.0f, 0.0f);
+
+    glColor3f(0.3f, 0.65f, 1.0f);
+    glVertex3f(0.0f, 0.0f, axis_length);
+    glVertex3f(0.0f, 18.0f, axis_length - 45.0f);
+    glVertex3f(0.0f, 0.0f, axis_length);
+    glVertex3f(0.0f, -18.0f, axis_length - 45.0f);
+    glEnd();
+    glLineWidth(1.0f);
+}
+
+bool initialize_font_display_lists(ViewerState& state) {
+    state.font_base = glGenLists(96);
+    if (state.font_base == 0) {
+        return false;
+    }
+
+    HFONT font = CreateFontA(
+        -16,
+        0,
+        0,
+        0,
+        FW_MEDIUM,
+        FALSE,
+        FALSE,
+        FALSE,
+        ANSI_CHARSET,
+        OUT_TT_PRECIS,
+        CLIP_DEFAULT_PRECIS,
+        ANTIALIASED_QUALITY,
+        FF_DONTCARE | DEFAULT_PITCH,
+        "Consolas");
+    if (!font) {
+        return false;
+    }
+
+    HGDIOBJ previous = SelectObject(state.dc, font);
+    const BOOL ok = wglUseFontBitmapsA(state.dc, 32, 96, state.font_base);
+    SelectObject(state.dc, previous);
+    DeleteObject(font);
+    return ok == TRUE;
+}
+
+void destroy_font_display_lists(ViewerState& state) {
+    if (state.font_base != 0) {
+        glDeleteLists(state.font_base, 96);
+        state.font_base = 0;
+    }
+}
+
+void render_text_2d(const ViewerState& state, int x, int y, const std::string& text) {
+    if (state.font_base == 0 || text.empty()) {
+        return;
+    }
+    glRasterPos2i(x, y);
+    glListBase(state.font_base - 32);
+    glCallLists(static_cast<GLsizei>(text.size()), GL_UNSIGNED_BYTE, text.c_str());
+}
+
+void begin_2d_overlay(int width, int height) {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(0.0, static_cast<double>(width), static_cast<double>(height), 0.0, -1.0, 1.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+}
+
+void end_2d_overlay() {
+    glEnable(GL_DEPTH_TEST);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
+std::string format_vec3(float x, float y, float z) {
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(0) << "(" << x << ", " << y << ", " << z << ")";
+    return oss.str();
+}
+
+void render_hud(
+    const ViewerState& view_state,
+    int width,
+    int height,
+    float eye_x,
+    float eye_y,
+    float eye_z,
+    const std::shared_ptr<const WorldSnapshot>& snapshot) {
+    begin_2d_overlay(width, height);
+    glColor3f(0.88f, 0.94f, 0.98f);
+
+    const double sim_time = snapshot ? snapshot->sim_time : 0.0;
+    const long object_count = snapshot ? static_cast<long>(snapshot->objects.size()) : 0L;
+
+    std::ostringstream line1;
+    line1 << std::fixed << std::setprecision(1)
+          << "FOV " << view_state.camera_fov_y
+          << "  Dist " << view_state.camera_distance
+          << "  Pitch " << (view_state.camera_pitch * 57.2957795f)
+          << "  Yaw " << (view_state.camera_yaw * 57.2957795f)
+          << "  Camera " << format_vec3(eye_x, eye_y, eye_z)
+          << "  Target " << format_vec3(view_state.camera_target_x, view_state.camera_target_y, view_state.camera_target_z);
+    render_text_2d(view_state, 14, 24, line1.str());
+
+    std::ostringstream line2;
+    line2 << std::fixed << std::setprecision(2)
+          << "SimTime " << sim_time
+          << "  Objects " << object_count
+          << "  Mode " << (view_state.camera_mode == ViewerState::CameraMode::Free ? "free" : "follow")
+          << "  Focus " << (view_state.focus_uid.empty() ? "<none>" : view_state.focus_uid);
+    render_text_2d(view_state, 14, 46, line2.str());
+
+    render_text_2d(view_state, 14, height - 74, "Move: W A S D  Vertical: Q/E  Look: mouse in window");
+    render_text_2d(view_state, 14, height - 52, "View: arrows pitch/yaw  FOV: +/-  Pause: Space  Step: N  F1 free  F2 follow/next");
+
+    end_2d_overlay();
+}
+
+void cycle_follow_target(ViewerState& state) {
+    if (state.snapshot_uids.empty()) {
+        state.camera_mode = ViewerState::CameraMode::FollowObject;
+        state.focus_uid.clear();
+        return;
+    }
+
+    state.camera_mode = ViewerState::CameraMode::FollowObject;
+    if (state.focus_uid.empty()) {
+        state.focus_uid = state.snapshot_uids.front();
+        return;
+    }
+
+    auto current = std::find(state.snapshot_uids.begin(), state.snapshot_uids.end(), state.focus_uid);
+    if (current == state.snapshot_uids.end() || ++current == state.snapshot_uids.end()) {
+        state.focus_uid = state.snapshot_uids.front();
+        return;
+    }
+    state.focus_uid = *current;
 }
 
 LRESULT CALLBACK viewer_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
@@ -297,6 +475,47 @@ LRESULT CALLBACK viewer_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM 
         return 0;
     case WM_DESTROY:
         PostQuitMessage(0);
+        return 0;
+    case WM_MOUSEMOVE:
+        if (state) {
+            const int mouse_x = GET_X_LPARAM(l_param);
+            const int mouse_y = GET_Y_LPARAM(l_param);
+
+            if (!state->mouse_in_window) {
+                TRACKMOUSEEVENT tme = {};
+                tme.cbSize = sizeof(TRACKMOUSEEVENT);
+                tme.dwFlags = TME_LEAVE;
+                tme.hwndTrack = hwnd;
+                TrackMouseEvent(&tme);
+                state->mouse_in_window = true;
+                state->has_mouse_reference = false;
+            }
+
+            if (state->has_mouse_reference) {
+                const int dx = mouse_x - state->last_mouse_x;
+                const int dy = mouse_y - state->last_mouse_y;
+                state->camera_yaw += static_cast<float>(dx) * 0.006f;
+                state->camera_pitch += static_cast<float>(dy) * 0.0045f;
+                state->camera_pitch = std::clamp(state->camera_pitch, 0.05f, 1.5f);
+            }
+
+            state->last_mouse_x = mouse_x;
+            state->last_mouse_y = mouse_y;
+            state->has_mouse_reference = true;
+        }
+        return 0;
+    case WM_MOUSELEAVE:
+        if (state) {
+            state->mouse_in_window = false;
+            state->has_mouse_reference = false;
+        }
+        return 0;
+    case WM_MOUSEWHEEL:
+        if (state) {
+            const int delta = GET_WHEEL_DELTA_WPARAM(w_param);
+            state->camera_distance -= static_cast<float>(delta) * 0.8f;
+            state->camera_distance = std::clamp(state->camera_distance, 1500.0f, 160000.0f);
+        }
         return 0;
     case WM_KEYDOWN:
         if (!state || !state->owner) {
@@ -322,8 +541,13 @@ LRESULT CALLBACK viewer_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM 
             state->owner->submit_command(command);
             return 0;
         }
-        if (w_param == 'F') {
-            state->follow_focus = !state->follow_focus;
+        if (w_param == VK_F1) {
+            state->camera_mode = ViewerState::CameraMode::Free;
+            state->focus_uid.clear();
+            return 0;
+        }
+        if (w_param == VK_F2) {
+            cycle_follow_target(*state);
             return 0;
         }
         if (w_param == VK_OEM_PLUS || w_param == VK_ADD) {
@@ -473,12 +697,18 @@ bool create_gl_window(ViewerState& state, std::string& error) {
         return false;
     }
 
+    if (!initialize_font_display_lists(state)) {
+        error = "wglUseFontBitmaps failed";
+        return false;
+    }
+
     ShowWindow(state.hwnd, SW_SHOW);
     UpdateWindow(state.hwnd);
     return true;
 }
 
 void destroy_gl_window(ViewerState& state) {
+    destroy_font_display_lists(state);
     if (state.rc) {
         wglMakeCurrent(nullptr, nullptr);
         wglDeleteContext(state.rc);
@@ -512,7 +742,7 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
     glLoadIdentity();
     perspective_gl(view_state.camera_fov_y, static_cast<double>(width) / static_cast<double>(height), 10.0, 400000.0);
 
-    if (view_state.follow_focus && snapshot && !view_state.focus_uid.empty()) {
+    if (view_state.camera_mode == ViewerState::CameraMode::FollowObject && snapshot && !view_state.focus_uid.empty()) {
         for (const auto& object : snapshot->objects) {
             if (object.uid == view_state.focus_uid) {
                 view_state.camera_target_x = static_cast<float>(object.position[0]);
@@ -562,21 +792,20 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
                 draw_ground_unit();
             }
 
-            const bool selected = !view_state.selected_uid.empty() && view_state.selected_uid == object.uid;
             const bool focused = !view_state.focus_uid.empty() && view_state.focus_uid == object.uid;
-            if (selected || focused) {
-                glTranslatef(0.0f, -static_cast<float>(object.position[2]) + 8.0f, 0.0f);
-                draw_selection_ring(selected ? 260.0f : 340.0f, focused);
+            if (focused) {
+                draw_local_axes_marker(420.0f);
             }
             glPopMatrix();
         }
     }
 
+    render_hud(view_state, width, height, eye_x, eye_y, eye_z, snapshot);
     SwapBuffers(view_state.dc);
 }
 
 void update_camera_motion(ViewerState& view_state) {
-    if (view_state.follow_focus
+    if (view_state.camera_mode == ViewerState::CameraMode::FollowObject
         || (!view_state.move_forward
             && !view_state.move_backward
             && !view_state.move_left
@@ -666,6 +895,22 @@ void OpenGLViewer::run_loop() noexcept {
         auto snapshot = snapshot_provider_ ? snapshot_provider_() : std::shared_ptr<const WorldSnapshot>();
         if (snapshot) {
             view_state.paused = snapshot->paused;
+            view_state.snapshot_uids.clear();
+            view_state.snapshot_uids.reserve(snapshot->objects.size());
+            for (const auto& object : snapshot->objects) {
+                view_state.snapshot_uids.push_back(object.uid);
+            }
+            if (view_state.camera_mode == ViewerState::CameraMode::FollowObject
+                && !view_state.focus_uid.empty()
+                && std::find(view_state.snapshot_uids.begin(), view_state.snapshot_uids.end(), view_state.focus_uid) == view_state.snapshot_uids.end()) {
+                if (view_state.snapshot_uids.empty()) {
+                    view_state.focus_uid.clear();
+                } else {
+                    view_state.focus_uid = view_state.snapshot_uids.front();
+                }
+            }
+        } else {
+            view_state.snapshot_uids.clear();
         }
         update_camera_motion(view_state);
         {
