@@ -40,7 +40,7 @@ button {
 
 .shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 32vw);
   grid-template-rows: auto 1fr;
   min-height: 100vh;
   gap: 18px;
@@ -95,6 +95,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 0;
 }
 
 .panel {
@@ -195,13 +196,25 @@ button {
 
 .code-panel {
   margin: 12px 0 0;
-  max-height: 280px;
+  width: 100%;
+  min-height: 460px;
+  max-height: 64vh;
   overflow: auto;
   padding: 12px;
+  border: 1px solid rgba(124, 183, 197, 0.16);
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.3);
   color: #c8e4ed;
   font-size: 0.8rem;
+  font-family: "IBM Plex Sans", monospace;
+  line-height: 1.35;
+  resize: vertical;
+  white-space: pre;
+}
+
+.diagnostics-panel {
+  flex: 1;
+  min-height: 0;
 }
 
 @media (max-width: 1100px) {

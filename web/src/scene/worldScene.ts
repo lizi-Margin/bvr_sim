@@ -21,6 +21,8 @@ export class WorldScene {
   private focusUid: string | null = null;
   private selectionRing: any;
   private taggedRing: any;
+  private lastAutoFrameAt = 0;
+  private autoFrameEnabled = true;
 
   constructor(root: HTMLElement, store: EntityStore, hooks: SceneHooks) {
     this.root = root;
@@ -151,6 +153,10 @@ export class WorldScene {
       this.entities.delete(uid);
     }
 
+    if (this.autoFrameEnabled && !this.focusUid) {
+      this.frameObjects(snapshot?.objects ?? []);
+    }
+
     const selected = this.store.getSelectedUid() ? this.entities.get(this.store.getSelectedUid() as string) : null;
     if (selected) {
       this.selectionRing.visible = true;
@@ -200,6 +206,22 @@ export class WorldScene {
     } else {
       mesh = new THREE.Mesh(new THREE.BoxGeometry(180, 90, 180), common);
     }
+    const halo = new THREE.Mesh(
+      new THREE.TorusGeometry(320, 12, 10, 48),
+      new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.7,
+        depthTest: false
+      })
+    );
+    halo.rotation.x = Math.PI / 2;
+    mesh.add(halo);
+
+    const label = makeTextSprite(`${entity.team} ${entity.type}\n${entity.uid}`, color);
+    label.position.set(0, 520, 0);
+    mesh.add(label);
+
     mesh.userData.material = common;
     mesh.userData.baseColor = color;
     mesh.userData.tagged = false;
@@ -223,6 +245,30 @@ export class WorldScene {
     this.camera.lookAt(target);
   }
 
+  private frameObjects(objects: TelemetryObject[]): void {
+    const now = performance.now();
+    if (objects.length === 0 || now - this.lastAutoFrameAt < 1000) {
+      return;
+    }
+    this.lastAutoFrameAt = now;
+
+    const bounds = new THREE.Box3();
+    for (const object of this.entities.values()) {
+      bounds.expandByPoint(object.position);
+    }
+    if (bounds.isEmpty()) {
+      return;
+    }
+
+    const center = bounds.getCenter(new THREE.Vector3());
+    const size = bounds.getSize(new THREE.Vector3());
+    const radius = Math.max(size.x, size.y, size.z, 2500);
+    const distance = Math.min(Math.max(radius * 1.5, 9000), 120000);
+    const desired = center.clone().add(new THREE.Vector3(distance, distance * 0.7, distance));
+    this.camera.position.lerp(desired, 0.08);
+    this.camera.lookAt(center);
+  }
+
   private handleResize = (): void => {
     const width = this.root.clientWidth;
     const height = this.root.clientHeight;
@@ -239,10 +285,69 @@ export class WorldScene {
     this.pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const intersections = this.raycaster.intersectObjects([...this.entities.values()], false);
-    const uid = intersections[0]?.object.userData.uid ?? null;
+    const intersections = this.raycaster.intersectObjects([...this.entities.values()], true);
+    const uid = intersections[0] ? findEntityUid(intersections[0].object) : null;
     this.hooks.onSelect(uid);
+    this.autoFrameEnabled = uid === null;
   };
+}
+
+function findEntityUid(object: any): string | null {
+  let current: any = object;
+  while (current) {
+    if (typeof current.userData?.uid === "string") {
+      return current.userData.uid;
+    }
+    current = current.parent;
+  }
+  return null;
+}
+
+function makeTextSprite(text: string, color: number): any {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 160;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    return new THREE.Object3D();
+  }
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "rgba(2, 10, 16, 0.76)";
+  context.strokeStyle = `#${color.toString(16).padStart(6, "0")}`;
+  context.lineWidth = 4;
+  roundRect(context, 10, 10, 492, 140, 22);
+  context.fill();
+  context.stroke();
+  context.fillStyle = "#dfeff5";
+  context.font = "600 28px IBM Plex Sans, sans-serif";
+  const lines = text.split("\n");
+  lines.forEach((line, index) => {
+    context.fillText(line, 28, 58 + index * 42);
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(2200, 688, 1);
+  return sprite;
+}
+
+function roundRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number): void {
+  context.beginPath();
+  context.moveTo(x + radius, y);
+  context.lineTo(x + width - radius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + radius);
+  context.lineTo(x + width, y + height - radius);
+  context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  context.lineTo(x + radius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - radius);
+  context.lineTo(x, y + radius);
+  context.quadraticCurveTo(x, y, x + radius, y);
+  context.closePath();
 }
 
 function isTelemetryTagged(entity: TelemetryObject): boolean {

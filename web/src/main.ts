@@ -4,7 +4,6 @@ import type { CommandResult, ConnectionState, VisualizationStatus, WorldSnapshot
 import { EntityStore } from "./scene/entityStore";
 import { WorldScene } from "./scene/worldScene";
 import { HudPanel } from "./ui/hud";
-import { InspectorPanel } from "./ui/inspector";
 import { ControlsPanel } from "./ui/controls";
 import { DiagnosticsPanel } from "./ui/diagnostics";
 
@@ -36,7 +35,6 @@ const sideRail = document.createElement("aside");
 sideRail.className = "side-rail";
 
 const hud = new HudPanel();
-const inspector = new InspectorPanel();
 const diagnostics = new DiagnosticsPanel();
 
 let connectionState: ConnectionState = "connecting";
@@ -45,8 +43,14 @@ let activeScene: WorldScene | null = null;
 let lastCommandResult: CommandResult | null = null;
 let snapshotRateHz = 0;
 let lastSnapshotAt = 0;
+let lastPanelRenderAt = 0;
 
-const renderPanels = (): void => {
+const renderPanels = (force = false): void => {
+  const now = performance.now();
+  if (!force && now - lastPanelRenderAt < 250) {
+    return;
+  }
+  lastPanelRenderAt = now;
   const effectiveCommandResult = diagnosticsStatus?.telemetry?.last_command_result ?? lastCommandResult;
   hud.render({
     snapshot: store.getSnapshot(),
@@ -55,8 +59,12 @@ const renderPanels = (): void => {
     selectedObject: store.getSelectedObject(),
     snapshotRateHz
   });
-  inspector.render(store.getSelectedObject());
-  diagnostics.render(diagnosticsStatus);
+  diagnostics.render({
+    status: diagnosticsStatus,
+    snapshot: store.getSnapshot(),
+    selectedObject: store.getSelectedObject(),
+    snapshotRateHz
+  }, force);
   diagnostics.renderCommandResult(effectiveCommandResult);
 };
 
@@ -72,19 +80,19 @@ const client = new TelemetryClient({
     }
     lastSnapshotAt = now;
     store.setSnapshot(snapshot);
-    renderPanels();
+    renderPanels(false);
   },
   onDiagnostics: (status: VisualizationStatus) => {
     diagnosticsStatus = status;
-    renderPanels();
+    renderPanels(true);
   },
   onConnection: (state) => {
     connectionState = state;
-    renderPanels();
+    renderPanels(true);
   },
   onCommandResult: (result) => {
     lastCommandResult = result;
-    renderPanels();
+    renderPanels(true);
   }
 });
 
@@ -98,14 +106,13 @@ const controls = new ControlsPanel({
   onWriteSelectedRegister: (registerKey, rawValue) => sendRawObjectDebug(registerKey, rawValue)
 });
 
-sideRail.append(hud.element, controls.element, diagnostics.element, inspector.element);
+sideRail.append(hud.element, controls.element, diagnostics.element);
 shell.append(masthead, sceneRoot, sideRail);
 app.append(shell);
 
 const worldScene = new WorldScene(sceneRoot, store, {
   onSelect: (uid) => {
     store.setSelectedUid(uid);
-    inspector.render(store.getSelectedObject());
     activeScene?.setFocus(uid);
     if (uid) {
       client.sendCommand({ kind: "set_focus_uid", target_uid: uid });
@@ -115,10 +122,10 @@ const worldScene = new WorldScene(sceneRoot, store, {
 activeScene = worldScene;
 
 store.subscribe(() => {
-  renderPanels();
+  renderPanels(false);
 });
 
-renderPanels();
+renderPanels(true);
 
 client.fetchHealth().catch((error) => {
   console.error("Health request failed", error);

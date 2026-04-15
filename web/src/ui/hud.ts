@@ -32,21 +32,23 @@ export class HudPanel {
     const count = snapshot?.objects.length ?? 0;
     const simTime = snapshot?.sim_time ?? 0;
     const dt = snapshot?.dt ?? 0;
-    const speed = selectedObject ? magnitude(selectedObject.velocity).toFixed(1) : "-";
-    const altitude = selectedObject ? selectedObject.position[2].toFixed(1) : "-";
-    const heading = selectedObject ? toHeading(selectedObject.orientation) : "-";
+    const selectedRows = selectedObject
+      ? `
+        <div><span>Selected Speed</span><strong>${magnitude(selectedObject.velocity).toFixed(1)}</strong></div>
+        <div><span>Selected Alt</span><strong>${selectedObject.position[2].toFixed(1)}</strong></div>
+        <div><span>Selected Hdg</span><strong>${toHeading(selectedObject.orientation)}</strong></div>
+      `
+      : "";
     this.detail.innerHTML = `
       <div><span>Conn</span><strong>${connection}</strong></div>
       <div><span>Objects</span><strong>${count}</strong></div>
       <div><span>Sim Time</span><strong>${simTime.toFixed(2)}</strong></div>
-      <div><span>dt</span><strong>${dt.toFixed(2)}</strong></div>
+      <div><span>dt</span><strong>${dt.toFixed(4)}</strong></div>
       <div><span>Rate</span><strong>${snapshotRateHz.toFixed(1)} Hz</strong></div>
       <div><span>Sim State</span><strong>${snapshot?.paused ? "paused" : snapshot?.running ? "running" : "idle"}</strong></div>
-      <div><span>Focus Speed</span><strong>${speed}</strong></div>
-      <div><span>Focus Alt</span><strong>${altitude}</strong></div>
-      <div><span>Focus Hdg</span><strong>${heading}</strong></div>
       <div><span>Port</span><strong>${status?.port ?? "-"}</strong></div>
       <div><span>Clients</span><strong>${status?.client_count ?? "-"}</strong></div>
+      ${selectedRows}
     `;
   }
 }

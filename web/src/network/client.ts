@@ -12,6 +12,7 @@ export class TelemetryClient {
   private readonly options: ClientOptions;
   private socket: WebSocket | null = null;
   private reconnectTimer = 0;
+  private diagnosticsTimer = 0;
   private closedByUser = false;
 
   constructor(options: ClientOptions) {
@@ -31,9 +32,11 @@ export class TelemetryClient {
     this.socket = new WebSocket(url.toString());
     this.socket.addEventListener("open", () => {
       this.options.onConnection("open");
+      this.startDiagnosticsPolling();
     });
     this.socket.addEventListener("close", () => {
       this.options.onConnection("closed");
+      this.stopDiagnosticsPolling();
       if (!this.closedByUser) {
         this.scheduleReconnect();
       }
@@ -49,18 +52,19 @@ export class TelemetryClient {
       }
       if ("status" in data && "message" in data) {
         this.options.onCommandResult(data as unknown as CommandResult);
+        this.fetchDiagnostics().then((status) => {
+          this.options.onDiagnostics(status);
+        }).catch(() => {
+          this.options.onConnection("error");
+        });
       }
-      this.fetchDiagnostics().then((status) => {
-        this.options.onDiagnostics(status);
-      }).catch(() => {
-        this.options.onConnection("error");
-      });
     });
   }
 
   disconnect(): void {
     this.closedByUser = true;
     clearTimeout(this.reconnectTimer);
+    this.stopDiagnosticsPolling();
     this.socket?.close();
     this.socket = null;
   }
@@ -86,5 +90,21 @@ export class TelemetryClient {
         this.options.onConnection("error");
       });
     }, 1500);
+  }
+
+  private startDiagnosticsPolling(): void {
+    this.stopDiagnosticsPolling();
+    this.diagnosticsTimer = window.setInterval(() => {
+      this.fetchDiagnostics().then((status) => {
+        this.options.onDiagnostics(status);
+      }).catch(() => {
+        this.options.onConnection("error");
+      });
+    }, 1000);
+  }
+
+  private stopDiagnosticsPolling(): void {
+    clearInterval(this.diagnosticsTimer);
+    this.diagnosticsTimer = 0;
   }
 }
