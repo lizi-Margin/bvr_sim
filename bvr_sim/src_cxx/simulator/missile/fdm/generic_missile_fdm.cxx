@@ -9,23 +9,29 @@ namespace bvr_sim {
 using c3utils::get_mps;
 using c3utils::get_mach;
 using c3utils::linalg_norm;
-using c3utils::rad2deg;
+using c3utils::Vector3;
 namespace c3u = c3utils;
 
 namespace {
 
-double signed_angle(const std::array<double, 3>& from_direction, const std::array<double, 3>& to_direction) noexcept {
-    std::array<double, 3> cross = {
-        from_direction[1] * to_direction[2] - from_direction[2] * to_direction[1],
-        from_direction[2] * to_direction[0] - from_direction[0] * to_direction[2],
-        from_direction[0] * to_direction[1] - from_direction[1] * to_direction[0]
-    };
-    double cross_mag = linalg_norm(cross);
-    double dot_val = from_direction[0] * to_direction[0] +
-                     from_direction[1] * to_direction[1] +
-                     from_direction[2] * to_direction[2];
-    double angle = std::atan2(cross_mag, dot_val);
-    return rad2deg(angle);
+constexpr double kMinSpeed = 1e-6;
+constexpr std::array<double, 3> kGravityNwu = {0.0, 0.0, -1.0};
+
+std::array<double, 3> velocity_to_rpy_nwu(const std::array<double, 3>& vel) noexcept {
+    const auto angles = Vector3(vel).get_rotate_angle_fix();
+    return {angles[0], angles[1], angles[2]};
+}
+
+std::array<double, 3> scale_vec(const std::array<double, 3>& vec, double scale) noexcept {
+    return {vec[0] * scale, vec[1] * scale, vec[2] * scale};
+}
+
+std::array<double, 3> add_scaled_vec(
+    const std::array<double, 3>& lhs,
+    const std::array<double, 3>& rhs,
+    double scale
+) noexcept {
+    return {lhs[0] + rhs[0] * scale, lhs[1] + rhs[1] * scale, lhs[2] + rhs[2] * scale};
 }
 
 }
@@ -65,6 +71,13 @@ void GenericMissileFDM::reset(const std::map<std::string, std::any>& initial_sta
         yaw = std::any_cast<double>(initial_state.at("yaw"));
     if (initial_state.count("roll"))
         roll = std::any_cast<double>(initial_state.at("roll"));
+
+    if (linalg_norm(velocity) > kMinSpeed) {
+        auto rpy = velocity_to_rpy_nwu(velocity);
+        roll = rpy[0];
+        pitch = rpy[1];
+        yaw = rpy[2];
+    }
 
     t_ = 0.0;
     m_ = m0_;
@@ -135,91 +148,74 @@ double GenericMissileFDM::_compute_drag_force(double speed, double altitude) con
 
 void GenericMissileFDM::_integrate(double ny, double nz) noexcept {
     double v = get_speed();
-    if (v < 1e-6) {
+    if (v < kMinSpeed) {
         return;
     }
 
-    double theta_0 = pitch;
-    double phi_0 = yaw;
     auto pos_0 = position;
-    double v_0 = v;
+    auto vel_0 = velocity;
+    const auto rpy_0 = velocity_to_rpy_nwu(vel_0);
+    const double theta_0 = rpy_0[1];
+    const double phi_0 = rpy_0[2];
 
-    auto derivatives = [&](const std::array<double, 3>& pos, double vel_mag, double theta, double phi)
-        -> std::tuple<std::array<double, 3>, double, double, double> {
-        std::array<double, 3> vel_vec = {
-            vel_mag * std::cos(theta) * std::cos(phi),
-            -vel_mag * std::cos(theta) * std::sin(phi),
-            vel_mag * std::sin(theta)
-        };
+    auto derivatives = [&](const std::array<double, 3>& pos, const std::array<double, 3>& vel)
+        -> std::tuple<std::array<double, 3>, std::array<double, 3>> {
+        const double speed = linalg_norm(vel);
+        if (speed < kMinSpeed) {
+            return {vel, {0.0, 0.0, 0.0}};
+        }
 
-        double angle = c3u::deg2rad(-std::copysign(1.0, pos[2]) *
-                                    signed_angle(vel_vec, {vel_vec[0], vel_vec[1], 0.0}));
+        const std::array<double, 3> forward = scale_vec(vel, 1.0 / speed);
+        const auto rpy = velocity_to_rpy_nwu(vel);
+        const double theta = rpy[1];
+        const double phi = rpy[2];
 
-        double drag = _compute_drag_force(vel_mag, pos[2]);
+        auto side = Vector3(0.0, 1.0, 0.0).rotate_zyx_self(0.0, theta, phi).get_list();
+        auto normal_up = Vector3(0.0, 0.0, 1.0).rotate_zyx_self(0.0, theta, phi).get_list();
+
+        double drag = _compute_drag_force(speed, pos[2]);
         double thrust = (t_ < t_thrust_cached_) ? thrust_ : 0.0;
-        double gravity = m_ * g_ * std::sin(angle);
+        const double axial_accel = (thrust - drag) / m_;
 
-        double nx = (thrust - drag + gravity) / (m_ * g_);
-        double dv = g_ * (nx - std::sin(theta));
-        double dphi = g_ / vel_mag * (ny / std::cos(theta));
-        double dtheta = g_ / vel_mag * (nz - std::cos(theta));
+        std::array<double, 3> accel = scale_vec(forward, axial_accel);
+        accel = add_scaled_vec(accel, side, g_ * ny);
+        accel = add_scaled_vec(accel, normal_up, g_ * nz);
+        accel = add_scaled_vec(accel, kGravityNwu, g_);
 
-        return {vel_vec, dv, dphi, dtheta};
+        return {vel, accel};
     };
 
-    auto [vel_k1, dv_k1, dphi_k1, dtheta_k1] = derivatives(pos_0, v_0, theta_0, phi_0);
+    auto [dpos_k1, dvel_k1] = derivatives(pos_0, vel_0);
 
-    auto pos_k2 = std::array<double, 3>{
-        pos_0[0] + 0.5 * dt * vel_k1[0],
-        pos_0[1] + 0.5 * dt * vel_k1[1],
-        pos_0[2] + 0.5 * dt * vel_k1[2]
-    };
-    double v_k2 = v_0 + 0.5 * dt * dv_k1;
-    double theta_k2 = theta_0 + 0.5 * dt * dtheta_k1;
-    double phi_k2 = phi_0 + 0.5 * dt * dphi_k1;
+    auto pos_k2 = add_scaled_vec(pos_0, dpos_k1, 0.5 * dt);
+    auto vel_k2 = add_scaled_vec(vel_0, dvel_k1, 0.5 * dt);
 
-    auto [vel_k2, dv_k2, dphi_k2, dtheta_k2] = derivatives(pos_k2, v_k2, theta_k2, phi_k2);
+    auto [dpos_k2, dvel_k2] = derivatives(pos_k2, vel_k2);
 
-    auto pos_k3 = std::array<double, 3>{
-        pos_0[0] + 0.5 * dt * vel_k2[0],
-        pos_0[1] + 0.5 * dt * vel_k2[1],
-        pos_0[2] + 0.5 * dt * vel_k2[2]
-    };
-    double v_k3 = v_0 + 0.5 * dt * dv_k2;
-    double theta_k3 = theta_0 + 0.5 * dt * dtheta_k2;
-    double phi_k3 = phi_0 + 0.5 * dt * dphi_k2;
+    auto pos_k3 = add_scaled_vec(pos_0, dpos_k2, 0.5 * dt);
+    auto vel_k3 = add_scaled_vec(vel_0, dvel_k2, 0.5 * dt);
 
-    auto [vel_k3, dv_k3, dphi_k3, dtheta_k3] = derivatives(pos_k3, v_k3, theta_k3, phi_k3);
+    auto [dpos_k3, dvel_k3] = derivatives(pos_k3, vel_k3);
 
-    auto pos_k4 = std::array<double, 3>{
-        pos_0[0] + dt * vel_k3[0],
-        pos_0[1] + dt * vel_k3[1],
-        pos_0[2] + dt * vel_k3[2]
-    };
-    double v_k4 = v_0 + dt * dv_k3;
-    double theta_k4 = theta_0 + dt * dtheta_k3;
-    double phi_k4 = phi_0 + dt * dphi_k3;
+    auto pos_k4 = add_scaled_vec(pos_0, dpos_k3, dt);
+    auto vel_k4 = add_scaled_vec(vel_0, dvel_k3, dt);
 
-    auto [vel_k4, dv_k4, dphi_k4, dtheta_k4] = derivatives(pos_k4, v_k4, theta_k4, phi_k4);
+    auto [dpos_k4, dvel_k4] = derivatives(pos_k4, vel_k4);
 
-    position[0] = pos_0[0] + (dt / 6.0) * (vel_k1[0] + 2.0 * vel_k2[0] + 2.0 * vel_k3[0] + vel_k4[0]);
-    position[1] = pos_0[1] + (dt / 6.0) * (vel_k1[1] + 2.0 * vel_k2[1] + 2.0 * vel_k3[1] + vel_k4[1]);
-    position[2] = pos_0[2] + (dt / 6.0) * (vel_k1[2] + 2.0 * vel_k2[2] + 2.0 * vel_k3[2] + vel_k4[2]);
+    for (size_t i = 0; i < 3; ++i) {
+        position[i] = pos_0[i] + (dt / 6.0) *
+            (dpos_k1[i] + 2.0 * dpos_k2[i] + 2.0 * dpos_k3[i] + dpos_k4[i]);
+        velocity[i] = vel_0[i] + (dt / 6.0) *
+            (dvel_k1[i] + 2.0 * dvel_k2[i] + 2.0 * dvel_k3[i] + dvel_k4[i]);
+    }
 
-    double v_new = v_0 + (dt / 6.0) * (dv_k1 + 2.0 * dv_k2 + 2.0 * dv_k3 + dv_k4);
-    double theta_new = theta_0 + (dt / 6.0) * (dtheta_k1 + 2.0 * dtheta_k2 + 2.0 * dtheta_k3 + dtheta_k4);
-    double phi_new = phi_0 + (dt / 6.0) * (dphi_k1 + 2.0 * dphi_k2 + 2.0 * dphi_k3 + dphi_k4);
+    const auto rpy_new = velocity_to_rpy_nwu(velocity);
+    dphi_ = normalize_angle(rpy_new[2] - phi_0) / dt;
+    dtheta_ = normalize_angle(rpy_new[1] - theta_0) / dt;
 
-    dphi_ = (phi_new - phi_0) / dt;
-    dtheta_ = (theta_new - theta_0) / dt;
-
-    velocity[0] = v_new * std::cos(theta_new) * std::cos(phi_new);
-    velocity[1] = -v_new * std::cos(theta_new) * std::sin(phi_new);
-    velocity[2] = v_new * std::sin(theta_new);
-
-    roll = 0.0;
-    pitch = theta_new;
-    yaw = phi_new;
+    roll = rpy_new[0];
+    pitch = rpy_new[1];
+    yaw = rpy_new[2];
 }
 
 } // namespace bvr_sim

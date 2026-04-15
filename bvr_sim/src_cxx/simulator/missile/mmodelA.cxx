@@ -110,8 +110,8 @@ MModelA::MModelA(
     std::map<std::string, std::any> init_state;
     init_state["position"] = std::array<double,3>{position[0], position[1], position[2]};
     init_state["velocity"] = std::array<double,3>{velocity[0], velocity[1], velocity[2]};
-    init_state["pitch"]    = double(-init_pitch);
-    init_state["yaw"]      = double(-init_yaw);
+    init_state["pitch"]    = double(init_pitch);
+    init_state["yaw"]      = double(init_yaw);
     init_state["roll"]     = double(0.0);
     fdm_.reset(init_state);
 }
@@ -412,21 +412,22 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     const double g = params_.get_double_("g");
     const double nyz_max = params_.get_double_("nyz_max");
 
-    const double theta_m = std::asin(std::clamp(dz_m / v_m, -1.0, 1.0));
+    const double pitch_m = std::atan2(-dz_m, std::sqrt(dx_m * dx_m + dy_m * dy_m));
+    const double climb_angle_m = -pitch_m;
 
     const double range_to_target = linalg_norm({x_m - x_t, y_m - y_t, z_t - z_m});
     const double beta = std::atan2(y_t - y_m, x_t - x_m);
-    const double eps = std::atan2(z_m - z_t, linalg_norm(std::array<double, 2>{x_m - x_t, y_m - y_t}));
+    const double eps = std::atan2(z_t - z_m, linalg_norm(std::array<double, 2>{x_t - x_m, y_t - y_m}));
 
     double dbeta = 0.0;
     if (L_beta.has_value()) {
-        dbeta = -(beta - L_beta.value()) / dt;
+        dbeta = norm_pi(beta - L_beta.value()) / dt;
     }
     L_beta = beta;
 
     double deps = 0.0;
     if (L_eps.has_value()) {
-        deps = -(eps - L_eps.value()) / dt;
+        deps = norm_pi(eps - L_eps.value()) / dt;
     }
     L_eps = eps;
 
@@ -438,7 +439,8 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     }
 
     const double phi = std::atan2(dy_m, dx_m);
-    const double angle_error = norm_pi(phi - norm_pi(beta - pi));
+    // const double angle_error = norm_pi(phi - norm_pi(beta - pi));
+    const double angle_error = norm_pi(beta - phi);
 
     double desired_dbeta = dbeta;
     if (radar_on && range_to_target < feet_to_meters(5000.0)) {
@@ -455,8 +457,8 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
         desired_dbeta = dbeta;
     }
 
-    double ny = K_func(range_to_target) * v_m / g * std::cos(theta_m) * desired_dbeta;
-    double nz = K_func(range_to_target) * v_m / g * deps + std::cos(theta_m);
+    double ny = K_func(range_to_target) * v_m / g * std::cos(climb_angle_m) * desired_dbeta;
+    double nz = K_func(range_to_target) * v_m / g * deps + std::cos(climb_angle_m);
 
     ny = std::clamp(ny, -nyz_max, nyz_max);
     nz = std::clamp(nz, -nyz_max, nyz_max);
