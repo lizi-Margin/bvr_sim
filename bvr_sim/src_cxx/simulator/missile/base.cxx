@@ -1,5 +1,6 @@
 #include "base.hxx"
 #include "../aircraft/base.hxx"
+#include "c3utils.hxx"
 #include <sstream>
 #include <iomanip>
 
@@ -55,8 +56,10 @@ std::string Missile::log() noexcept {
     ss << std::fixed << std::setprecision(6);
     auto [lon, lat, alt] = NWU2LLA(position[0], position[1], position[2]);
     if (is_alive) {
-        
-        auto [roll_deg, pitch_deg, yaw_deg] = velocity_to_euler(velocity, true);
+        const auto rpy = get_rpy();
+        const double roll_deg = c3u::rad2deg(rpy[0]);
+        const double pitch_deg = c3u::rad2deg(rpy[1]);
+        const double yaw_deg = c3u::rad2deg(rpy[2]);
 
         std::string color_str = (color == TeamColor::Red) ? "Red" : "Blue";
 
