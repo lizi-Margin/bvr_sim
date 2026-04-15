@@ -20,6 +20,7 @@ export class WorldScene {
   private atmosphere: any;
   private focusUid: string | null = null;
   private selectionRing: any;
+  private taggedRing: any;
 
   constructor(root: HTMLElement, store: EntityStore, hooks: SceneHooks) {
     this.root = root;
@@ -81,6 +82,18 @@ export class WorldScene {
     this.selectionRing.visible = false;
     this.scene.add(this.selectionRing);
 
+    this.taggedRing = new THREE.Mesh(
+      new THREE.TorusGeometry(300, 10, 10, 48),
+      new THREE.MeshBasicMaterial({
+        color: 0x67d7ff,
+        transparent: true,
+        opacity: 0.45
+      })
+    );
+    this.taggedRing.rotation.x = Math.PI / 2;
+    this.taggedRing.visible = false;
+    this.scene.add(this.taggedRing);
+
     window.addEventListener("resize", this.handleResize);
     this.renderer.domElement.addEventListener("click", this.handleClick);
 
@@ -119,9 +132,14 @@ export class WorldScene {
       const orientation = entity.orientation ?? [0, 0, 0];
       object.rotation.set(orientation[1], -orientation[2], orientation[0]);
       const material = object.userData.material as any;
+      const tagged = isTelemetryTagged(entity);
+      object.userData.tagged = tagged;
       material.emissiveIntensity = entity.alive ? 0.25 : 0.02;
       material.opacity = entity.alive ? 1 : 0.25;
       material.transparent = !entity.alive;
+      material.color.setHex(tagged ? 0xd3f6b5 : object.userData.baseColor);
+      material.emissive.setHex(tagged ? 0xd3f6b5 : object.userData.baseColor);
+      object.scale.setScalar(tagged ? 1.18 : 1);
       object.visible = true;
     }
 
@@ -140,6 +158,15 @@ export class WorldScene {
       this.selectionRing.position.y += 60;
     } else {
       this.selectionRing.visible = false;
+    }
+
+    const taggedObject = [...this.entities.values()].find((object) => object.userData.tagged === true);
+    if (taggedObject) {
+      this.taggedRing.visible = true;
+      this.taggedRing.position.copy(taggedObject.position);
+      this.taggedRing.position.y += 120;
+    } else {
+      this.taggedRing.visible = false;
     }
   }
 
@@ -174,6 +201,8 @@ export class WorldScene {
       mesh = new THREE.Mesh(new THREE.BoxGeometry(180, 90, 180), common);
     }
     mesh.userData.material = common;
+    mesh.userData.baseColor = color;
+    mesh.userData.tagged = false;
     return mesh;
   }
 
@@ -214,4 +243,20 @@ export class WorldScene {
     const uid = intersections[0]?.object.userData.uid ?? null;
     this.hooks.onSelect(uid);
   };
+}
+
+function isTelemetryTagged(entity: TelemetryObject): boolean {
+  const registerValue = entity.debug_register;
+  if (!registerValue || typeof registerValue !== "object") {
+    return false;
+  }
+  const telemetryValue = registerValue["telemetry"];
+  if (!telemetryValue || typeof telemetryValue !== "object") {
+    return false;
+  }
+  const webValue = (telemetryValue as Record<string, unknown>)["web"];
+  if (!webValue || typeof webValue !== "object") {
+    return false;
+  }
+  return (webValue as Record<string, unknown>)["selected"] === true;
 }

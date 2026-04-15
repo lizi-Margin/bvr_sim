@@ -39,8 +39,21 @@ export class InspectorPanel {
       position: object.position,
       velocity: object.velocity,
       orientation: object.orientation ?? null,
+      telemetry_debug: extractTelemetryDebug(object.debug_register),
       debug_register: object.debug_register ?? null
     };
     this.content.textContent = JSON.stringify(view, null, 2);
   }
+}
+
+function extractTelemetryDebug(registerValue: TelemetryObject["debug_register"]): unknown {
+  if (!registerValue || typeof registerValue !== "object") {
+    return null;
+  }
+  const telemetryValue = registerValue["telemetry"];
+  if (!telemetryValue || typeof telemetryValue !== "object") {
+    return null;
+  }
+  const webValue = (telemetryValue as Record<string, unknown>)["web"];
+  return webValue ?? null;
 }
