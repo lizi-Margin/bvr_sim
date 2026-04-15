@@ -13,7 +13,7 @@ if (!app) {
   throw new Error("Missing #app root");
 }
 
-const baseUrl = new URLSearchParams(window.location.search).get("server") ?? "http://127.0.0.1:8765";
+const baseUrl = resolveBaseUrl();
 const store = new EntityStore();
 
 const shell = document.createElement("div");
@@ -127,3 +127,14 @@ window.addEventListener("beforeunload", () => {
   client.disconnect();
   worldScene.destroy();
 });
+
+function resolveBaseUrl(): string {
+  const explicit = new URLSearchParams(window.location.search).get("server");
+  if (explicit) {
+    return explicit;
+  }
+  if (window.location.port === "5173") {
+    return "http://127.0.0.1:8765";
+  }
+  return window.location.origin;
+}
