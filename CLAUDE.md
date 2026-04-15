@@ -55,9 +55,8 @@ pip install -e .
 
 ### Run All Tests
 ```bash
-# Full test suite: C++ unit tests, C++ core test, Python core test
-cd tests
-python test_everything.py
+# Full test suite: build + C++ unit tests + C3Utils + C++ core test + Python core test
+python run_tests.py
 ```
 
 ### Run Individual Test Suites

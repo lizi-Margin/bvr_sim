@@ -93,4 +93,21 @@ void Missile::write_register() noexcept {
     register_.set("missile_model", json::String(missile_model));
 }
 
+std::array<double, 3> Missile::get_rpy() const noexcept {
+    auto [roll, pitch, yaw] = velocity_to_euler(velocity);
+    return {roll, pitch, yaw};
+}
+
+double Missile::get_roll() const noexcept {
+    return get_rpy()[0];
+}
+
+double Missile::get_pitch() const noexcept {
+    return get_rpy()[1];
+}
+
+double Missile::get_yaw() const noexcept {
+    return get_rpy()[2];
+}
+
 }

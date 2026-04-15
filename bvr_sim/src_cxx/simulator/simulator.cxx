@@ -108,8 +108,25 @@ double SimulatedObject::get_mach() const noexcept {
     return c3utils::get_mach(speed_mps, altitude_m);
 }
 
-double SimulatedObject::get_heading() const noexcept {
+double SimulatedObject::get_roll() const noexcept {
+    return 0.0;
+}
+
+double SimulatedObject::get_pitch() const noexcept {
+    const double horizontal_speed = std::sqrt(velocity[0] * velocity[0] + velocity[1] * velocity[1]);
+    return std::atan2(-velocity[2], horizontal_speed);
+}
+
+double SimulatedObject::get_yaw() const noexcept {
     return std::atan2(velocity[1], velocity[0]);
+}
+
+std::array<double, 3> SimulatedObject::get_rpy() const noexcept {
+    return {get_roll(), get_pitch(), get_yaw()};
+}
+
+double SimulatedObject::get_heading() const noexcept {
+    return get_yaw();
 }
 
 double SimulatedObject::get_altitude() const noexcept {
@@ -179,6 +196,17 @@ void SimulatedObject::write_register() noexcept {
     velocity_json.append(velocity[1]);
     velocity_json.append(velocity[2]);
     register_.set("velocity", velocity_json);
+
+    const auto rpy = get_rpy();
+    register_.set("roll", json::Float(rpy[0]));
+    register_.set("pitch", json::Float(rpy[1]));
+    register_.set("yaw", json::Float(rpy[2]));
+
+    json::JSON rpy_json = json::JSON::Make(json::JSON::Class::Array);
+    rpy_json.append(rpy[0]);
+    rpy_json.append(rpy[1]);
+    rpy_json.append(rpy[2]);
+    register_.set("rpy", rpy_json);
 }
 
 }

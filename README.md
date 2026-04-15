@@ -181,7 +181,7 @@ python tests/test_cpp.py
 ### 5. 运行完整测试
 
 ```bash
-python tests/test_everything.py
+python run_tests.py
 ```
 
 该脚本会依次执行：
@@ -333,7 +333,7 @@ python tests/cpp_unit_tests.py
 ```
 
 该脚本默认运行 `bvr_sim/install/bin/bvr_sim_unit_tests(.exe)`。
-如果你在排查底层数学/工具库，也可以参考 [`tests/test_everything.py`](G:\bvr_sim\tests\test_everything.py) 里额外执行的 `test_c3utils`。
+如果你在排查底层数学/工具库，也可以直接运行 `python run_tests.py`，它也会额外执行 `test_c3utils`。
 
 ### Tacview 没有回放文件
 

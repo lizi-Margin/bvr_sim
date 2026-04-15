@@ -48,6 +48,10 @@ public:
     virtual bool can_track_target() noexcept { return true; };
 
     virtual void update_target_info() noexcept;
+    double get_roll() const noexcept override;
+    double get_pitch() const noexcept override;
+    double get_yaw() const noexcept override;
+    std::array<double, 3> get_rpy() const noexcept override;
 
     std::string log()noexcept override;
     void write_register() noexcept override;

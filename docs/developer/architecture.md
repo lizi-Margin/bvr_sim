@@ -157,7 +157,7 @@ python tests/test_cpp.py
 如果改动范围大，再跑：
 
 ```bash
-python tests/test_everything.py
+python run_tests.py
 ```
 
 ## 实时可视化与调试架构

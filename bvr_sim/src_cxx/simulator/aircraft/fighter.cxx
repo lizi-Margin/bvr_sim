@@ -126,6 +126,10 @@ double Fighter::get_heading() const noexcept {
     return fdm->get_heading();
 }
 
+double Fighter::get_yaw() const noexcept {
+    return fdm->get_heading();
+}
+
 double Fighter::get_pitch() const noexcept {
     return fdm->get_pitch();
 }

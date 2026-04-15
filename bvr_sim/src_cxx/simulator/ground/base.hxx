@@ -26,6 +26,7 @@ public:
 
     ~GroundUnit() noexcept override = default;
 
+    double get_yaw() const noexcept override;
     double get_heading() const noexcept override;
 
     virtual void step() override;

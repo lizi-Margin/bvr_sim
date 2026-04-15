@@ -96,7 +96,7 @@ python tests/test_cpp.py
 如果你要做完整回归，再执行：
 
 ```bash
-python tests/test_everything.py
+python run_tests.py
 ```
 
 它还会额外检查 `test_c3utils` 可执行文件。
@@ -146,7 +146,7 @@ python tests/test_cpp.py
 如果你要做完整回归，再执行：
 
 ```bash
-python tests/test_everything.py
+python run_tests.py
 ```
 
 ## 完整验证
@@ -154,7 +154,7 @@ python tests/test_everything.py
 如果你想一次性重建并跑完主要测试：
 
 ```bash
-python tests/test_everything.py
+python run_tests.py
 ```
 
 它会：

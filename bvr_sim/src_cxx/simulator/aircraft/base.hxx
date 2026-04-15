@@ -64,6 +64,7 @@ public:
 
     virtual double get_roll() const noexcept;
     virtual double get_pitch() const noexcept;
+    virtual std::array<double, 3> get_rpy() const noexcept override;
 
     virtual void step() override;
 

@@ -81,6 +81,10 @@ public:
 
     virtual double get_speed() const noexcept;
     virtual double get_mach() const noexcept;
+    virtual double get_roll() const noexcept;
+    virtual double get_pitch() const noexcept;
+    virtual double get_yaw() const noexcept;
+    virtual std::array<double, 3> get_rpy() const noexcept;
     virtual double get_heading() const noexcept;
     virtual double get_altitude() const noexcept;
 

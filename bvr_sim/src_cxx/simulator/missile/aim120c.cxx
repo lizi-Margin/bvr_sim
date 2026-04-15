@@ -624,4 +624,8 @@ void AIM120C::step() noexcept {
     // write_register();
 }
 
+std::array<double, 3> AIM120C::get_rpy() const noexcept {
+    return posture;
+}
+
 }

@@ -176,6 +176,12 @@ struct MeshLibrary {
     std::unordered_map<std::string, MeshData> meshes;
 };
 
+struct ModelOffset {
+    float yaw_deg = 0.0f;
+    float pitch_deg = 0.0f;
+    float roll_deg = 0.0f;
+};
+
 MeshLibrary& mesh_library() {
     static MeshLibrary library;
     return library;
@@ -184,6 +190,35 @@ MeshLibrary& mesh_library() {
 std::string canonicalize_mesh_name(std::string mesh_name) {
     std::replace(mesh_name.begin(), mesh_name.end(), '_', '-');
     return mesh_name;
+}
+
+std::string map_model_to_mesh_name(const std::string& model_name) {
+    static const std::unordered_map<std::string, std::string> kModelMeshMap = {
+        {"F15", "FixedWing.F-15"},
+        {"F15-original", "FixedWing.F-15"},
+        {"F16", "FixedWing.F-16"},
+        {"F16-original", "FixedWing.F-16"},
+        {"F18", "FixedWing.F-18C"},
+        {"F18-original", "FixedWing.F-18C"},
+        {"F22", "FixedWing.F-22"},
+        {"F22-original", "FixedWing.F-22"},
+        {"AIM-120", "Missile.AIM-120C"},
+        {"AIM-120C", "Missile.AIM-120C"},
+        {"AIM-120C5", "Missile.AIM-120C"},
+        {"AIM-120C7", "Missile.AIM-120C"},
+        {"AIM-120C-MModelA", "Missile.AIM-120C"},
+        {"AIM-120C-MModelA-Poor", "Missile.AIM-120C"},
+        {"AIM-9", "Missile.AIM-9M"},
+        {"AIM-9M", "Missile.AIM-9M"},
+        {"AIM-9M-Omni", "Missile.AIM-9M"},
+    };
+
+    const auto canonical_model = canonicalize_mesh_name(model_name);
+    const auto it = kModelMeshMap.find(canonical_model);
+    if (it != kModelMeshMap.end()) {
+        return it->second;
+    }
+    return "";
 }
 
 ViewerState* get_viewer_state(HWND hwnd) {
@@ -257,17 +292,90 @@ void look_at_gl(
     glTranslatef(-eye_x, -eye_y, -eye_z);
 }
 
+void draw_ground_plane(float size) {
+    glDisable(GL_LIGHTING);
+
+    glBegin(GL_QUADS);
+    glColor3f(0.11f, 0.15f, 0.11f);
+    glVertex3f(-size, -4.0f, -size);
+    glVertex3f(size, -4.0f, -size);
+    glColor3f(0.15f, 0.20f, 0.14f);
+    glVertex3f(size, -4.0f, size);
+    glVertex3f(-size, -4.0f, size);
+    glEnd();
+}
+
+void draw_ground_pattern(float size, float cell_size) {
+    if (cell_size <= 1.0f) {
+        return;
+    }
+
+    const int cell_count = static_cast<int>(std::ceil((size * 2.0f) / cell_size));
+    const float start = -0.5f * static_cast<float>(cell_count) * cell_size;
+
+    glBegin(GL_QUADS);
+    for (int ix = 0; ix < cell_count; ++ix) {
+        for (int iz = 0; iz < cell_count; ++iz) {
+            const float x0 = start + static_cast<float>(ix) * cell_size;
+            const float x1 = x0 + cell_size;
+            const float z0 = start + static_cast<float>(iz) * cell_size;
+            const float z1 = z0 + cell_size;
+            const bool even = ((ix + iz) % 2) == 0;
+            if (even) {
+                glColor4f(0.20f, 0.25f, 0.18f, 0.16f);
+            } else {
+                glColor4f(0.13f, 0.18f, 0.13f, 0.11f);
+            }
+            glVertex3f(x0, -3.9f, z0);
+            glVertex3f(x1, -3.9f, z0);
+            glVertex3f(x1, -3.9f, z1);
+            glVertex3f(x0, -3.9f, z1);
+        }
+    }
+    glEnd();
+}
+
 void draw_grid(float size, int half_count) {
-    glColor3f(0.18f, 0.25f, 0.28f);
+    draw_ground_plane(size);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    draw_ground_pattern(size, 4000.0f);
+
+    glLineWidth(1.0f);
+    glColor4f(0.22f, 0.30f, 0.24f, 0.35f);
+    glBegin(GL_LINES);
+    for (int i = -half_count * 4; i <= half_count * 4; ++i) {
+        const float value = size * static_cast<float>(i) / static_cast<float>(half_count * 4);
+        glVertex3f(value, -3.7f, -size);
+        glVertex3f(value, -3.7f, size);
+        glVertex3f(-size, -3.7f, value);
+        glVertex3f(size, -3.7f, value);
+    }
+    glEnd();
+
+    glLineWidth(1.6f);
+    glColor4f(0.34f, 0.44f, 0.36f, 0.62f);
     glBegin(GL_LINES);
     for (int i = -half_count; i <= half_count; ++i) {
         const float value = size * static_cast<float>(i) / static_cast<float>(half_count);
-        glVertex3f(value, 0.0f, -size);
-        glVertex3f(value, 0.0f, size);
-        glVertex3f(-size, 0.0f, value);
-        glVertex3f(size, 0.0f, value);
+        glVertex3f(value, -3.6f, -size);
+        glVertex3f(value, -3.6f, size);
+        glVertex3f(-size, -3.6f, value);
+        glVertex3f(size, -3.6f, value);
     }
     glEnd();
+
+    glLineWidth(2.4f);
+    glColor4f(0.58f, 0.66f, 0.56f, 0.85f);
+    glBegin(GL_LINES);
+    glVertex3f(0.0f, -3.5f, -size);
+    glVertex3f(0.0f, -3.5f, size);
+    glVertex3f(-size, -3.5f, 0.0f);
+    glVertex3f(size, -3.5f, 0.0f);
+    glEnd();
+
+    glDisable(GL_BLEND);
 }
 
 std::vector<std::string> split_whitespace(const std::string& line) {
@@ -402,7 +510,46 @@ MeshData* load_named_mesh(const std::string& mesh_name) {
     }
 }
 
+std::array<float, 3> compute_face_normal(
+    const std::array<float, 3>& a,
+    const std::array<float, 3>& b,
+    const std::array<float, 3>& c) {
+    const float ux = b[0] - a[0];
+    const float uy = b[1] - a[1];
+    const float uz = b[2] - a[2];
+    const float vx = c[0] - a[0];
+    const float vy = c[1] - a[1];
+    const float vz = c[2] - a[2];
+    float nx = uy * vz - uz * vy;
+    float ny = uz * vx - ux * vz;
+    float nz = ux * vy - uy * vx;
+    normalize(nx, ny, nz);
+    return {nx, ny, nz};
+}
+
 void draw_obj_mesh(const MeshData& mesh, float world_radius) {
+    if (!mesh.loaded || mesh.vertices.empty() || mesh.radius <= 1e-6f) {
+        return;
+    }
+
+    const float scale = world_radius / mesh.radius;
+    glPushMatrix();
+    glScalef(scale, scale, scale);
+    glTranslatef(-mesh.center[0], -mesh.center[1], -mesh.center[2]);
+
+    glBegin(GL_TRIANGLES);
+    for (size_t i = 0; i + 2 < mesh.vertices.size(); i += 3) {
+        const auto normal = compute_face_normal(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2]);
+        glNormal3f(normal[0], normal[1], normal[2]);
+        glVertex3f(mesh.vertices[i][0], mesh.vertices[i][1], mesh.vertices[i][2]);
+        glVertex3f(mesh.vertices[i + 1][0], mesh.vertices[i + 1][1], mesh.vertices[i + 1][2]);
+        glVertex3f(mesh.vertices[i + 2][0], mesh.vertices[i + 2][1], mesh.vertices[i + 2][2]);
+    }
+    glEnd();
+    glPopMatrix();
+}
+
+void draw_obj_mesh_unlit(const MeshData& mesh, float world_radius) {
     if (!mesh.loaded || mesh.vertices.empty() || mesh.radius <= 1e-6f) {
         return;
     }
@@ -425,23 +572,130 @@ void draw_box(float sx, float sy, float sz) {
     const float hy = sy * 0.5f;
     const float hz = sz * 0.5f;
     glBegin(GL_QUADS);
+    glNormal3f(0.0f, 0.0f, 1.0f);
     glVertex3f(-hx, -hy, hz); glVertex3f(hx, -hy, hz); glVertex3f(hx, hy, hz); glVertex3f(-hx, hy, hz);
+    glNormal3f(0.0f, 0.0f, -1.0f);
     glVertex3f(-hx, -hy, -hz); glVertex3f(-hx, hy, -hz); glVertex3f(hx, hy, -hz); glVertex3f(hx, -hy, -hz);
+    glNormal3f(-1.0f, 0.0f, 0.0f);
     glVertex3f(-hx, -hy, -hz); glVertex3f(-hx, -hy, hz); glVertex3f(-hx, hy, hz); glVertex3f(-hx, hy, -hz);
+    glNormal3f(1.0f, 0.0f, 0.0f);
     glVertex3f(hx, -hy, -hz); glVertex3f(hx, hy, -hz); glVertex3f(hx, hy, hz); glVertex3f(hx, -hy, hz);
+    glNormal3f(0.0f, 1.0f, 0.0f);
     glVertex3f(-hx, hy, -hz); glVertex3f(-hx, hy, hz); glVertex3f(hx, hy, hz); glVertex3f(hx, hy, -hz);
+    glNormal3f(0.0f, -1.0f, 0.0f);
     glVertex3f(-hx, -hy, -hz); glVertex3f(hx, -hy, -hz); glVertex3f(hx, -hy, hz); glVertex3f(-hx, -hy, hz);
     glEnd();
 }
 
-void draw_aircraft(const std::string& mesh_name) {
-    if (auto* mesh = load_named_mesh(mesh_name)) {
-        glPushMatrix();
-        glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        draw_obj_mesh(*mesh, 320.0f);
-        glPopMatrix();
-        return;
+void set_object_material(const std::array<float, 3>& color, float alpha_scale) {
+    const GLfloat specular[] = {0.55f, 0.55f, 0.55f, 1.0f};
+    const GLfloat shininess[] = {36.0f};
+    glColor4f(color[0] * alpha_scale, color[1] * alpha_scale, color[2] * alpha_scale, alpha_scale);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+}
+
+std::array<float, 16> build_shadow_matrix(
+    const std::array<float, 4>& plane,
+    const std::array<float, 4>& light) {
+    std::array<float, 16> matrix{};
+    const float dot = plane[0] * light[0] + plane[1] * light[1] + plane[2] * light[2] + plane[3] * light[3];
+
+    matrix[0] = dot - light[0] * plane[0];
+    matrix[4] = -light[0] * plane[1];
+    matrix[8] = -light[0] * plane[2];
+    matrix[12] = -light[0] * plane[3];
+
+    matrix[1] = -light[1] * plane[0];
+    matrix[5] = dot - light[1] * plane[1];
+    matrix[9] = -light[1] * plane[2];
+    matrix[13] = -light[1] * plane[3];
+
+    matrix[2] = -light[2] * plane[0];
+    matrix[6] = -light[2] * plane[1];
+    matrix[10] = dot - light[2] * plane[2];
+    matrix[14] = -light[2] * plane[3];
+
+    matrix[3] = -light[3] * plane[0];
+    matrix[7] = -light[3] * plane[1];
+    matrix[11] = -light[3] * plane[2];
+    matrix[15] = dot - light[3] * plane[3];
+    return matrix;
+}
+
+void configure_scene_lighting() {
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_NORMALIZE);
+
+    const GLfloat ambient[] = {0.20f, 0.22f, 0.26f, 1.0f};
+    const GLfloat diffuse[] = {0.95f, 0.92f, 0.84f, 1.0f};
+    const GLfloat specular[] = {0.75f, 0.75f, 0.75f, 1.0f};
+    const GLfloat position[] = {16000.0f, 24000.0f, 12000.0f, 1.0f};
+    const GLfloat global_ambient[] = {0.08f, 0.09f, 0.11f, 1.0f};
+
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+}
+
+bool is_aircraft_object(const TelemetryObjectState& object) {
+    return object.type.find("Aircraft") != std::string::npos;
+}
+
+bool is_missile_object(const TelemetryObjectState& object) {
+    return object.type.find("Missile") != std::string::npos;
+}
+
+float object_world_radius(const TelemetryObjectState& object) {
+    if (is_missile_object(object)) {
+        return 180.0f;
     }
+    if (is_aircraft_object(object)) {
+        return 320.0f;
+    }
+    return 180.0f;
+}
+
+ModelOffset get_model_offset(const TelemetryObjectState&) {
+    ModelOffset offset;
+    // Tacview OBJ assets are authored with +Y as up and +Z as left,
+    // but nose points opposite the viewer's local +X forward axis.
+    offset.yaw_deg = 270.0f;
+    return offset;
+}
+
+void apply_model_offset(const ModelOffset& offset) {
+    if (std::fabs(offset.yaw_deg) > 1e-4f) {
+        glRotatef(offset.yaw_deg, 0.0f, 1.0f, 0.0f);
+    }
+    if (std::fabs(offset.pitch_deg) > 1e-4f) {
+        glRotatef(offset.pitch_deg, 0.0f, 0.0f, 1.0f);
+    }
+    if (std::fabs(offset.roll_deg) > 1e-4f) {
+        glRotatef(offset.roll_deg, 1.0f, 0.0f, 0.0f);
+    }
+}
+
+std::string resolve_mesh_asset_name(const TelemetryObjectState& object) {
+    const std::string mapped_mesh = map_model_to_mesh_name(object.mesh_name);
+    if (!mapped_mesh.empty() && load_named_mesh(mapped_mesh) != nullptr) {
+        return mapped_mesh;
+    }
+    if (is_aircraft_object(object) && load_named_mesh("aircraft") != nullptr) {
+        return "aircraft";
+    }
+    if (is_missile_object(object) && load_named_mesh("missile") != nullptr) {
+        return "missile";
+    }
+    return "";
+}
+
+void draw_aircraft_primitive() {
 
     glBegin(GL_TRIANGLES);
     glVertex3f(180.0f, 0.0f, 0.0f);
@@ -466,15 +720,7 @@ void draw_aircraft(const std::string& mesh_name) {
     glEnd();
 }
 
-void draw_missile(const std::string& mesh_name) {
-    if (auto* mesh = load_named_mesh(mesh_name)) {
-        glPushMatrix();
-        glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        draw_obj_mesh(*mesh, 180.0f);
-        glPopMatrix();
-        return;
-    }
-
+void draw_missile_primitive() {
     draw_box(220.0f, 24.0f, 24.0f);
     glBegin(GL_TRIANGLES);
     glVertex3f(-20.0f, 0.0f, 0.0f);
@@ -485,6 +731,33 @@ void draw_missile(const std::string& mesh_name) {
 
 void draw_ground_unit() {
     draw_box(180.0f, 90.0f, 180.0f);
+}
+
+void draw_object_geometry(const TelemetryObjectState& object, bool unlit) {
+    const std::string mesh_asset = resolve_mesh_asset_name(object);
+    if (!mesh_asset.empty()) {
+        if (MeshData* mesh = load_named_mesh(mesh_asset)) {
+            glPushMatrix();
+            apply_model_offset(get_model_offset(object));
+            if (unlit) {
+                draw_obj_mesh_unlit(*mesh, object_world_radius(object));
+            } else {
+                draw_obj_mesh(*mesh, object_world_radius(object));
+            }
+            glPopMatrix();
+            return;
+        }
+    }
+
+    if (is_aircraft_object(object)) {
+        draw_aircraft_primitive();
+        return;
+    }
+    if (is_missile_object(object)) {
+        draw_missile_primitive();
+        return;
+    }
+    draw_ground_unit();
 }
 
 void draw_local_axes_marker(float axis_length) {
@@ -612,6 +885,14 @@ std::string shorten_text(const std::string& text, size_t max_length) {
     return text.substr(0, max_length - 3) + "...";
 }
 
+std::string resolve_mesh_file_name(const TelemetryObjectState& object) {
+    const std::string mesh_asset = resolve_mesh_asset_name(object);
+    if (!mesh_asset.empty()) {
+        return mesh_asset + ".obj";
+    }
+    return "<builtin>";
+}
+
 void render_hud(
     const ViewerState& view_state,
     int width,
@@ -654,7 +935,7 @@ void render_hud(
     render_text_2d(view_state, 14, height - 52, "View: arrows pitch/yaw  FOV: +/-  Pause: Space  Step: N  F1 free  F2 follow/next");
 
     const int panel_x = std::max(420, width - 620);
-    render_text_2d(view_state, panel_x, 24, "UID                       Model            Roll    Pitch   Yaw");
+    render_text_2d(view_state, panel_x, 24, "UID                  Model         Mesh File                 Roll   Pitch    Yaw");
 
     int row = 0;
     const int row_height = 18;
@@ -667,12 +948,15 @@ void render_hud(
         const double roll_deg = rad2deg(object.orientation[0]);
         const double pitch_deg = rad2deg(object.orientation[1]);
         const double yaw_deg = rad2deg(object.orientation[2]);
+        const std::string model_name = object.mesh_name.empty() ? object.type : object.mesh_name;
+        const std::string mesh_file_name = resolve_mesh_file_name(object);
 
         std::ostringstream item_line;
-        item_line << std::left << std::setw(24) << shorten_text(object.uid, 24)
-                  << std::setw(17) << shorten_text(object.mesh_name.empty() ? object.type : object.mesh_name, 17)
+        item_line << std::left << std::setw(21) << shorten_text(object.uid, 21)
+                  << std::setw(14) << shorten_text(model_name, 14)
+                  << std::setw(26) << shorten_text(mesh_file_name, 26)
                   << std::right << std::setw(7) << std::fixed << std::setprecision(1) << roll_deg
-                  << std::setw(9) << pitch_deg
+                  << std::setw(8) << pitch_deg
                   << std::setw(8) << yaw_deg;
         render_text_2d(view_state, panel_x, 44 + row * row_height, item_line.str());
         ++row;
@@ -751,7 +1035,7 @@ LRESULT CALLBACK viewer_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM 
     case WM_MOUSEWHEEL:
         if (state) {
             const int delta = GET_WHEEL_DELTA_WPARAM(w_param);
-            state->camera_distance -= static_cast<float>(delta) * 0.8f;
+            state->camera_distance -= static_cast<float>(delta) * 6.4f;
             state->camera_distance = std::clamp(state->camera_distance, 1500.0f, 160000.0f);
         }
         return 0;
@@ -975,6 +1259,7 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
+    configure_scene_lighting();
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -1003,65 +1288,60 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
     glLoadIdentity();
     look_at_gl(eye_x, eye_y, eye_z, target_x, target_y, target_z, 0.0f, 1.0f, 0.0f);
 
-    draw_grid(45000.0f, 18);
+    const std::array<float, 4> shadow_plane = {0.0f, 1.0f, 0.0f, 0.0f};
+    const std::array<float, 4> shadow_light = {16000.0f, 24000.0f, 12000.0f, 1.0f};
+    const auto shadow_matrix = build_shadow_matrix(shadow_plane, shadow_light);
+
+    draw_grid(320000.0f, 32);
 
     if (snapshot) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         for (const auto& object : snapshot->objects) {
             const auto color = team_color(object);
-            glPushMatrix();
-            glTranslatef(
-                static_cast<float>(object.position[0]),
-                static_cast<float>(object.position[2]),
-                static_cast<float>(object.position[1]));
-
             const auto& orientation = object.orientation;
+            const float pos_x = static_cast<float>(object.position[0]);
+            const float pos_y = static_cast<float>(object.position[2]);
+            const float pos_z = static_cast<float>(object.position[1]);
+            const float alpha_scale = object.alive ? 1.0f : 0.35f;
+
+            glPushMatrix();
+            glMultMatrixf(shadow_matrix.data());
+            glTranslatef(pos_x, pos_y + 2.0f, pos_z);
             glRotatef(static_cast<float>(rad2deg(orientation[2])), 0.0f, 1.0f, 0.0f);
             glRotatef(static_cast<float>(rad2deg(orientation[1])), 0.0f, 0.0f, 1.0f);
             glRotatef(static_cast<float>(rad2deg(orientation[0])), 1.0f, 0.0f, 0.0f);
+            glDisable(GL_LIGHTING);
+            glDepthMask(GL_FALSE);
+            glColor4f(0.0f, 0.0f, 0.0f, 0.22f * alpha_scale);
+            draw_object_geometry(object, true);
+            glDepthMask(GL_TRUE);
+            glEnable(GL_LIGHTING);
+            glPopMatrix();
 
-            const float alpha_scale = object.alive ? 1.0f : 0.35f;
-            glColor3f(color[0] * alpha_scale, color[1] * alpha_scale, color[2] * alpha_scale);
-
-            if (object.type.find("Aircraft") != std::string::npos) {
-                const std::string aircraft_mesh = object.mesh_name.empty() ? "FixedWing.F-22" : "FixedWing." + canonicalize_mesh_name(object.mesh_name);
-                MeshData* mesh = load_named_mesh(aircraft_mesh);
-                if (mesh == nullptr) {
-                    mesh = load_named_mesh("aircraft");
-                }
-                if (mesh != nullptr) {
-                    glPushMatrix();
-                    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-                    draw_obj_mesh(*mesh, 320.0f);
-                    glPopMatrix();
-                } else {
-                    draw_aircraft("aircraft");
-                }
-            } else if (object.type.find("Missile") != std::string::npos) {
-                const std::string missile_mesh = object.mesh_name.empty() ? "Missile.AIM-120C" : "Missile." + canonicalize_mesh_name(object.mesh_name);
-                MeshData* mesh = load_named_mesh(missile_mesh);
-                if (mesh == nullptr) {
-                    mesh = load_named_mesh("missile");
-                }
-                if (mesh != nullptr) {
-                    glPushMatrix();
-                    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-                    draw_obj_mesh(*mesh, 180.0f);
-                    glPopMatrix();
-                } else {
-                    draw_missile("missile");
-                }
-            } else {
-                draw_ground_unit();
-            }
+            glPushMatrix();
+            glTranslatef(pos_x, pos_y, pos_z);
+            glRotatef(static_cast<float>(rad2deg(orientation[2])), 0.0f, 1.0f, 0.0f);
+            glRotatef(static_cast<float>(rad2deg(orientation[1])), 0.0f, 0.0f, 1.0f);
+            glRotatef(static_cast<float>(rad2deg(orientation[0])), 1.0f, 0.0f, 0.0f);
+            set_object_material(color, alpha_scale);
+            draw_object_geometry(object, false);
 
             const bool focused = !view_state.focus_uid.empty() && view_state.focus_uid == object.uid;
             if (focused) {
+                glDisable(GL_LIGHTING);
                 draw_local_axes_marker(420.0f);
+                glEnable(GL_LIGHTING);
             }
             glPopMatrix();
         }
+        glDisable(GL_BLEND);
     }
 
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_COLOR_MATERIAL);
+    glDisable(GL_NORMALIZE);
     render_hud(view_state, width, height, eye_x, eye_y, eye_z, snapshot);
     SwapBuffers(view_state.dc);
 }
@@ -1195,7 +1475,7 @@ void OpenGLViewer::run_loop() noexcept {
         }
 
         render_scene(view_state, snapshot);
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
+        std::this_thread::sleep_for(std::chrono::milliseconds(0));
     }
 
     destroy_gl_window(view_state);

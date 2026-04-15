@@ -9,7 +9,7 @@ Clean, modular 3D BVR environment with:
 - Modular reward components
 """
 
-__version__ = "0.3.1"
+__version__ = "0.4.1"
 
 from .resource_paths import configure_runtime_environment
 

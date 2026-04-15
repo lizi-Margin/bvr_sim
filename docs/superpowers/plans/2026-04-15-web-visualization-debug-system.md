@@ -630,7 +630,7 @@ Expected: build succeeds.
 
 - [ ] **Step 4: Run the broad verification suite**
 
-Run: `python tests/test_everything.py`
+Run: `python run_tests.py`
 
 Expected: existing integration coverage still passes after telemetry/web changes.
 

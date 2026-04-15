@@ -116,6 +116,7 @@ public:
     virtual ~AIM120C() noexcept = default;
 
     void step() noexcept override;
+    std::array<double, 3> get_rpy() const noexcept override;
 
     bool can_track_target() noexcept override;
 

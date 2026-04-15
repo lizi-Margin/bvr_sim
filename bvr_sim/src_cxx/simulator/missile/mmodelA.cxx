@@ -465,4 +465,8 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     return {ny, nz};
 }
 
+std::array<double, 3> MModelA::get_rpy() const noexcept {
+    return fdm_.get_rpy();
+}
+
 } // namespace bvr_sim

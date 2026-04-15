@@ -34,8 +34,12 @@ GroundUnit::GroundUnit(
     _yaw_for_log = distribution(generator);
 }
 
-double GroundUnit::get_heading() const noexcept {
+double GroundUnit::get_yaw() const noexcept {
     return _yaw_for_log;
+}
+
+double GroundUnit::get_heading() const noexcept {
+    return get_yaw();
 }
 
 double GroundUnit::_get_terrain_height(double x, double y) const noexcept {

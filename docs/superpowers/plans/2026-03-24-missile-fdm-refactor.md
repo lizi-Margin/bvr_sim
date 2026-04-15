@@ -1077,7 +1077,7 @@ Expected: `Smoke test passed` without exception.
 - [ ] **Step 5: Run full test suite**
 
 ```bash
-cd tests && python test_everything.py
+python run_tests.py
 ```
 
 Expected: all tests pass.

@@ -179,7 +179,7 @@ python tests/cpp_unit_tests.py
 ```
 
 如果报可执行文件不存在，说明构建还没完成。
-完整回归时，[`tests/test_everything.py`](G:\bvr_sim\tests\test_everything.py) 还会额外执行 `test_c3utils`。
+完整回归时，`python run_tests.py` 还会额外执行 `test_c3utils`。
 
 ### 回放没有生成
 

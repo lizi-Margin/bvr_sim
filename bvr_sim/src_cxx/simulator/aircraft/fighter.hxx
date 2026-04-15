@@ -47,9 +47,10 @@ public:
 
     double get_speed() const noexcept override;
     double get_heading() const noexcept override;
+    double get_yaw() const noexcept override;
     double get_pitch() const noexcept override;
     double get_roll() const noexcept override;
-    std::array<double, 3> get_rpy() const noexcept;
+    std::array<double, 3> get_rpy() const noexcept override;
 
     virtual std::string log() noexcept override { return Aircraft::log() + fdm->log();}
 

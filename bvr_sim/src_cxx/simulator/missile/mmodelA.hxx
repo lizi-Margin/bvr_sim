@@ -23,6 +23,7 @@ public:
 
     void step() noexcept override;
     bool can_track_target() noexcept override;
+    std::array<double, 3> get_rpy() const noexcept override;
 
     const ParamStore& get_params() const noexcept { return params_; }
 

@@ -198,6 +198,10 @@ double Aircraft::get_pitch() const noexcept {
     return std::atan2(-velocity[2], v_horizontal);
 }
 
+std::array<double, 3> Aircraft::get_rpy() const noexcept {
+    return {get_roll(), get_pitch(), get_yaw()};
+}
+
 void Aircraft::step() {
     maintain_missile_lists();
 };
@@ -302,15 +306,6 @@ void Aircraft::write_register() noexcept {
 
     register_.set("aircraft_model", json::String(aircraft_model));
     register_.set("speed", json::Float(get_speed()));
-    register_.set("roll", json::Float(get_roll()));
-    register_.set("pitch", json::Float(get_pitch()));
-    register_.set("yaw", json::Float(get_heading()));
-
-    auto rpy = json::Array();
-    rpy.append(get_roll());
-    rpy.append(get_pitch());
-    rpy.append(get_heading());
-    register_.set("rpy", rpy);
 
     json::JSON under_missiles_size = json::Integral(static_cast<int>(under_missiles.size()));
     json::JSON launched_missiles_size = json::Integral(static_cast<int>(launched_missiles.size()));
