@@ -116,7 +116,7 @@ def main() -> int:
             "target_uid": "focus:test"
         })
     )
-    command_message = json.loads(recv_ws_text(sock))
+    command_message = recv_ws_command_result(sock)
     assert command_message["status"] == "ok"
 
     diagnostics = wait_for_diagnostics(
@@ -132,7 +132,7 @@ def main() -> int:
             "payload": {"type": "Aircraft"}
         })
     )
-    filter_message = json.loads(recv_ws_text(sock))
+    filter_message = recv_ws_command_result(sock)
     assert filter_message["status"] == "ok"
 
     diagnostics = wait_for_diagnostics(
@@ -192,13 +192,29 @@ def recv_ws_text(sock: socket.socket) -> str:
     return sock.recv(payload_length).decode("utf-8")
 
 
+def recv_ws_command_result(sock: socket.socket, timeout_sec: float = 2.0) -> dict:
+    previous_timeout = sock.gettimeout()
+    sock.settimeout(timeout_sec)
+    try:
+        while True:
+            message = json.loads(recv_ws_text(sock))
+            if "status" in message and "message" in message:
+                return message
+    finally:
+        sock.settimeout(previous_timeout)
+
+
 def wait_for_diagnostics(url: str, predicate, timeout_sec: float = 2.0) -> dict:
     deadline = time.time() + timeout_sec
     last_data = None
     while time.time() < deadline:
         with urllib.request.urlopen(url, timeout=5) as response:
             last_data = json.loads(response.read().decode("utf-8"))
-        if predicate(last_data):
+        try:
+            matched = predicate(last_data)
+        except (KeyError, IndexError, TypeError):
+            matched = False
+        if matched:
             return last_data
         time.sleep(0.02)
     raise AssertionError(last_data)
