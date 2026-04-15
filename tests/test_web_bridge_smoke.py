@@ -171,6 +171,27 @@ def main() -> int:
         lambda data: data["telemetry"]["subscription_filter"]["type"] == "Aircraft"
     )
     assert diagnostics["telemetry"]["subscription_filter"]["type"] == "Aircraft"
+
+    send_ws_text(
+        sock,
+        json.dumps({
+            "kind": "object_debug",
+            "target_uid": "missing:uid",
+            "payload": {
+                "register_key": "telemetry.web.selected",
+                "value": True
+            }
+        })
+    )
+    object_debug_message = recv_ws_command_result(sock)
+    assert object_debug_message["status"] == "ok"
+
+    diagnostics = wait_for_diagnostics(
+        "http://127.0.0.1:8765/diagnostics",
+        lambda data: data["telemetry"]["last_command_result"]["kind"] == "object_debug"
+        and data["telemetry"]["last_command_result"]["status"] == "error"
+    )
+    assert diagnostics["telemetry"]["last_command_result"]["message"] == "target object not found"
     sock.close()
 
     core.stop_visualization_server()

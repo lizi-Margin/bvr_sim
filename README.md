@@ -425,6 +425,8 @@ http://127.0.0.1:5173/?server=http://127.0.0.1:8765
 - `pause` / `resume` / `step`
 - 焦点选择
 - `set_subscription_filter` 对象筛选
+- `object_debug` 对象寄存器写入命令
+- `last_command_result` 调试命令回执诊断
 
 ### 验证命令
 

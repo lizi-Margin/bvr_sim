@@ -24,6 +24,25 @@ std::optional<TelemetryCommandKind> telemetry_command_kind_from_string(const std
     return std::nullopt;
 }
 
+std::string telemetry_command_kind_to_string(TelemetryCommandKind kind) noexcept {
+    switch (kind) {
+    case TelemetryCommandKind::Pause:
+        return "pause";
+    case TelemetryCommandKind::Resume:
+        return "resume";
+    case TelemetryCommandKind::Step:
+        return "step";
+    case TelemetryCommandKind::SetFocusUid:
+        return "set_focus_uid";
+    case TelemetryCommandKind::SetSubscriptionFilter:
+        return "set_subscription_filter";
+    case TelemetryCommandKind::ObjectDebug:
+        return "object_debug";
+    default:
+        return "unknown";
+    }
+}
+
 void TelemetryCommandQueue::push(const TelemetryCommand& command) {
     std::lock_guard<std::mutex> lock(mutex_);
     queue_.push_back(command);

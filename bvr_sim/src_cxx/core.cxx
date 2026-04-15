@@ -13,6 +13,22 @@
 
 namespace bvr_sim {
 
+namespace {
+
+TelemetryCommandResult make_command_result(
+    const std::string& status,
+    const std::string& message,
+    const TelemetryCommand& command) {
+    TelemetryCommandResult result;
+    result.status = status;
+    result.message = message;
+    result.kind = telemetry_command_kind_to_string(command.kind);
+    result.target_uid = command.target_uid;
+    return result;
+}
+
+}
+
 SimCore::SimCore(double dt, const std::string& log_file_path, const std::string& acmi_file_path)
     : running_(false),
       paused_(false),
@@ -34,7 +50,7 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
     truncate_acmi_file();
 
     telemetry_bridge_->set_command_handler([this](const TelemetryCommand& command) {
-        handle_telemetry_command(command);
+        return handle_telemetry_command(command);
     });
 
     visualization_server_->set_snapshot_provider([this]() {
@@ -302,14 +318,14 @@ json::JSON SimCore::get_visualization_status() const {
     return status;
 }
 
-void SimCore::handle_telemetry_command(const TelemetryCommand& command) {
+TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand& command) {
     if (command.kind == TelemetryCommandKind::Pause) {
         pause();
-        return;
+        return make_command_result("applied", "simulation paused", command);
     }
     if (command.kind == TelemetryCommandKind::Resume) {
         resume();
-        return;
+        return make_command_result("applied", "simulation resumed", command);
     }
     if (command.kind == TelemetryCommandKind::Step) {
         int step_count = 1;
@@ -321,8 +337,29 @@ void SimCore::handle_telemetry_command(const TelemetryCommand& command) {
         }
         format_check(step_count > 0, "Telemetry step command requires positive steps");
         step(step_count);
-        return;
+        return make_command_result("applied", "simulation advanced", command);
     }
+    if (command.kind == TelemetryCommandKind::ObjectDebug) {
+        format_check(!command.target_uid.empty(), "Telemetry object_debug command requires target_uid");
+        format_check(command.payload.JSONType() == json::JSON::Class::Object, "Telemetry object_debug payload must be object");
+        format_check(command.payload.hasKey("register_key", json::JSON::Class::String), "Telemetry object_debug payload requires string register_key");
+        format_check(command.payload.hasKey("value"), "Telemetry object_debug payload requires value");
+
+        auto object = SOPool::instance().get(command.target_uid);
+        if (!object) {
+            colorful::printHUANG("[SimCore] object_debug target not found");
+            SL::get().printf("[SimCore] object_debug target not found: %s\n", command.target_uid.c_str());
+            return make_command_result("error", "target object not found", command);
+        }
+
+        const auto register_key = command.payload.at("register_key").ToString();
+        format_check(!register_key.empty(), "Telemetry object_debug register_key must not be empty");
+        object->set(register_key, command.payload.at("value"));
+        SL::get().printf("[SimCore] object_debug wrote register key %s for uid %s\n", register_key.c_str(), command.target_uid.c_str());
+        return make_command_result("applied", "object register updated", command);
+    }
+
+    return make_command_result("error", "unsupported telemetry command", command);
 }
 
 }

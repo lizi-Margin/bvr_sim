@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rubbish_can/json.hpp"
+#include "telemetry_types.hxx"
 #include <deque>
 #include <mutex>
 #include <optional>
@@ -24,6 +25,7 @@ struct TelemetryCommand {
 };
 
 std::optional<TelemetryCommandKind> telemetry_command_kind_from_string(const std::string& command_name) noexcept;
+std::string telemetry_command_kind_to_string(TelemetryCommandKind kind) noexcept;
 
 class TelemetryCommandQueue {
 public:

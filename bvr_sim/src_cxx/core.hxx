@@ -55,7 +55,7 @@ private:
     void run_loop();
     void update_physics();
     void log();
-    void handle_telemetry_command(const TelemetryCommand& command);
+    TelemetryCommandResult handle_telemetry_command(const TelemetryCommand& command);
     
     std::atomic<bool> running_;
     std::atomic<bool> paused_;

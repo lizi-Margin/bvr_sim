@@ -91,7 +91,9 @@ const controls = new ControlsPanel({
   onPause: () => client.sendCommand({ kind: "pause" }),
   onResume: () => client.sendCommand({ kind: "resume" }),
   onStep: () => client.sendCommand({ kind: "step", payload: { steps: 1 } }),
-  onFilter: (filter) => client.sendCommand({ kind: "set_subscription_filter", payload: filter })
+  onFilter: (filter) => client.sendCommand({ kind: "set_subscription_filter", payload: filter }),
+  onTagSelected: () => sendObjectDebug(true),
+  onClearSelectedTag: () => sendObjectDebug(false)
 });
 
 sideRail.append(hud.element, controls.element, diagnostics.element, inspector.element);
@@ -137,4 +139,25 @@ function resolveBaseUrl(): string {
     return "http://127.0.0.1:8765";
   }
   return window.location.origin;
+}
+
+function sendObjectDebug(value: boolean): void {
+  const targetUid = store.getSelectedUid();
+  if (!targetUid) {
+    lastCommandResult = {
+      status: "error",
+      message: "no object selected",
+      kind: "object_debug"
+    };
+    renderPanels();
+    return;
+  }
+  client.sendCommand({
+    kind: "object_debug",
+    target_uid: targetUid,
+    payload: {
+      register_key: "telemetry.web.selected",
+      value
+    }
+  });
 }

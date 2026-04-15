@@ -31,6 +31,8 @@ export type ConnectionState = "connecting" | "open" | "closed" | "error";
 export type CommandResult = {
   status: string;
   message: string;
+  kind?: string;
+  target_uid?: string;
 };
 
 export type SubscriptionFilter = {

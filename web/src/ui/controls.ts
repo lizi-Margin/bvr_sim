@@ -5,6 +5,8 @@ type ControlHandlers = {
   onResume: () => void;
   onStep: () => void;
   onFilter: (filter: SubscriptionFilter) => void;
+  onTagSelected: () => void;
+  onClearSelectedTag: () => void;
 };
 
 export class ControlsPanel {
@@ -28,6 +30,13 @@ export class ControlsPanel {
       this.makeButton("Step +1", handlers.onStep)
     );
 
+    const objectRow = document.createElement("div");
+    objectRow.className = "controls-row";
+    objectRow.append(
+      this.makeButton("Tag Selected", handlers.onTagSelected),
+      this.makeButton("Clear Tag", handlers.onClearSelectedTag)
+    );
+
     const filterWrap = document.createElement("label");
     filterWrap.className = "filter-wrap";
     filterWrap.innerHTML = `<span class="panel-kicker">Render Filter</span>`;
@@ -47,7 +56,7 @@ export class ControlsPanel {
 
     filterWrap.append(this.filterSelect);
 
-    this.element.append(title, row, filterWrap);
+    this.element.append(title, row, objectRow, filterWrap);
   }
 
   private makeButton(label: string, onClick: () => void): HTMLButtonElement {

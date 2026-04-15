@@ -97,9 +97,14 @@ std::optional<TelemetryCommand> TelemetryBridge::try_pop_command() {
     return command_queue_.try_pop();
 }
 
-void TelemetryBridge::set_command_handler(std::function<void(const TelemetryCommand&)> handler) {
+void TelemetryBridge::set_command_handler(std::function<TelemetryCommandResult(const TelemetryCommand&)> handler) {
     std::lock_guard<std::mutex> lock(command_handler_mutex_);
     command_handler_ = std::move(handler);
+}
+
+void TelemetryBridge::set_last_command_result(const TelemetryCommandResult& result) {
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    last_command_result_ = result;
 }
 
 json::JSON TelemetryBridge::get_diagnostics() const {
@@ -115,6 +120,7 @@ json::JSON TelemetryBridge::get_diagnostics() const {
     std::lock_guard<std::mutex> lock(state_mutex_);
     diagnostics["focus_uid"] = json::String(focus_uid_);
     diagnostics["subscription_filter"] = subscription_filter_;
+    diagnostics["last_command_result"] = telemetry_command_result_to_json(last_command_result_);
     return diagnostics;
 }
 
@@ -134,25 +140,49 @@ void TelemetryBridge::process_commands() noexcept {
         }
 
         if (command->kind == TelemetryCommandKind::SetFocusUid) {
-            std::lock_guard<std::mutex> lock(state_mutex_);
-            focus_uid_ = command->target_uid;
+            TelemetryCommandResult result;
+            result.status = "applied";
+            result.message = "focus updated";
+            result.kind = telemetry_command_kind_to_string(command->kind);
+            result.target_uid = command->target_uid;
+            {
+                std::lock_guard<std::mutex> lock(state_mutex_);
+                focus_uid_ = command->target_uid;
+                last_command_result_ = result;
+            }
             continue;
         }
 
         if (command->kind == TelemetryCommandKind::SetSubscriptionFilter) {
-            std::lock_guard<std::mutex> lock(state_mutex_);
-            subscription_filter_ = command->payload;
+            TelemetryCommandResult result;
+            result.status = "applied";
+            result.message = "subscription filter updated";
+            result.kind = telemetry_command_kind_to_string(command->kind);
+            result.target_uid = command->target_uid;
+            {
+                std::lock_guard<std::mutex> lock(state_mutex_);
+                subscription_filter_ = command->payload;
+                last_command_result_ = result;
+            }
             continue;
         }
 
-        std::function<void(const TelemetryCommand&)> handler;
+        std::function<TelemetryCommandResult(const TelemetryCommand&)> handler;
         {
             std::lock_guard<std::mutex> lock(command_handler_mutex_);
             handler = command_handler_;
         }
         if (handler) {
-            handler(*command);
+            set_last_command_result(handler(*command));
+            continue;
         }
+
+        TelemetryCommandResult result;
+        result.status = "error";
+        result.message = "command handler unavailable";
+        result.kind = telemetry_command_kind_to_string(command->kind);
+        result.target_uid = command->target_uid;
+        set_last_command_result(result);
     }
 }
 

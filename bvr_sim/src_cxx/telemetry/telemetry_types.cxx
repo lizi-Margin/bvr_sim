@@ -45,4 +45,13 @@ json::JSON world_snapshot_to_json(const WorldSnapshot& snapshot) {
     return result;
 }
 
+json::JSON telemetry_command_result_to_json(const TelemetryCommandResult& result) {
+    json::JSON payload = json::JSON::Make(json::JSON::Class::Object);
+    payload["status"] = json::String(result.status);
+    payload["message"] = json::String(result.message);
+    payload["kind"] = json::String(result.kind);
+    payload["target_uid"] = json::String(result.target_uid);
+    return payload;
+}
+
 }

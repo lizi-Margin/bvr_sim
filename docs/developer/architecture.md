@@ -243,8 +243,23 @@ phase-1 的实时可视化链路由四层组成：
 - `step`
 - `set_focus_uid`
 - `set_subscription_filter`
+- `object_debug`
 
 这条模型意味着前端交互同样解耦。未来如果要支持对象级调试命令，应继续扩展命令队列，而不是让前端直接写对象。
+
+当前 `object_debug` 的 phase-1 语义是：
+
+- 浏览器发出 `target_uid`
+- 负载里携带 `register_key` 和 `value`
+- `SimCore` 找到目标对象后，把值写入该对象 `Register`
+
+也就是说，对象级调试仍然是“写寄存器”，而不是浏览器直接拿到对象引用。
+
+桥接层当前还会在诊断状态里暴露：
+
+- `last_command_result`
+
+这个字段用于给前端和自动化测试提供最近一次命令执行结果，区分 queued 之后到底是 applied 还是 error。
 
 ### 当前验证
 

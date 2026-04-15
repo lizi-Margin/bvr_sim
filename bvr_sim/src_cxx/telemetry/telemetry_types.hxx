@@ -26,7 +26,15 @@ struct WorldSnapshot {
     std::vector<TelemetryObjectState> objects;
 };
 
+struct TelemetryCommandResult {
+    std::string status;
+    std::string message;
+    std::string kind;
+    std::string target_uid;
+};
+
 json::JSON telemetry_object_state_to_json(const TelemetryObjectState& state);
 json::JSON world_snapshot_to_json(const WorldSnapshot& snapshot);
+json::JSON telemetry_command_result_to_json(const TelemetryCommandResult& result);
 
 }
