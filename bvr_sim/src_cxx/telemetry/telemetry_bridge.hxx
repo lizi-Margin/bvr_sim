@@ -13,11 +13,13 @@ namespace bvr_sim {
 class TelemetryBridge {
 public:
     TelemetryBridge();
+    ~TelemetryBridge();
 
     void start() noexcept;
     void stop() noexcept;
 
     bool is_running() const noexcept;
+    void refresh_once() noexcept;
 
     std::shared_ptr<const WorldSnapshot> get_latest_snapshot() const noexcept;
     void set_latest_snapshot(std::shared_ptr<const WorldSnapshot> snapshot) noexcept;

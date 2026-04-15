@@ -1,11 +1,13 @@
 #pragma once
 
 #include "rubbish_can/json.hpp"
+#include "telemetry/telemetry_bridge.hxx"
 #include <thread>
 #include <atomic>
 #include <fstream>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 
 namespace bvr_sim {
 
@@ -33,9 +35,15 @@ public:
 
     bool is_running() const noexcept { return running_; }
     bool is_paused() const noexcept { return paused_; }
+    bool is_telemetry_running() const noexcept;
 
     double get_sim_time() const noexcept;
     double get_dt() const noexcept;
+    json::JSON get_telemetry_snapshot() const;
+    json::JSON get_telemetry_status() const;
+    void start_telemetry_bridge();
+    void stop_telemetry_bridge();
+    void refresh_telemetry_snapshot();
 
 private:
     void run_loop();
@@ -54,6 +62,7 @@ private:
     void truncate_acmi_file();
     std::string acmi_file_path_;
     std::ofstream acmi_file_;
+    std::shared_ptr<TelemetryBridge> telemetry_bridge_;
 
 };
 

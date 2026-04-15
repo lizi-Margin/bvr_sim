@@ -115,8 +115,18 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("set_acmi_file_path", &SimCore::set_acmi_file_path)
         .def("is_running", &SimCore::is_running)
         .def("is_paused", &SimCore::is_paused)
+        .def("is_telemetry_running", &SimCore::is_telemetry_running)
         .def("get_sim_time", &SimCore::get_sim_time)
-        .def("get_dt", &SimCore::get_dt);
+        .def("get_dt", &SimCore::get_dt)
+        .def("start_telemetry_bridge", &SimCore::start_telemetry_bridge)
+        .def("stop_telemetry_bridge", &SimCore::stop_telemetry_bridge)
+        .def("refresh_telemetry_snapshot", &SimCore::refresh_telemetry_snapshot)
+        .def("get_telemetry_status", [](SimCore& self) -> py::object {
+            return json_to_python(self.get_telemetry_status());
+        })
+        .def("get_telemetry_snapshot", [](SimCore& self) -> py::object {
+            return json_to_python(self.get_telemetry_snapshot());
+        });
 
     py::class_<RLManager, std::shared_ptr<RLManager>>(m, "RLManager")
         .def(py::init<>())

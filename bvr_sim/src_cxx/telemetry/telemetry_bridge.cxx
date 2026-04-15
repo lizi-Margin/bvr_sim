@@ -1,5 +1,7 @@
 #include "telemetry_bridge.hxx"
 #include "global_config.hxx"
+#include "rubbish_can/SL.hxx"
+#include "rubbish_can/check.hxx"
 #include "so_pool.hxx"
 
 #include <chrono>
@@ -9,6 +11,10 @@ namespace bvr_sim {
 TelemetryBridge::TelemetryBridge()
     : running_(false),
       latest_snapshot_(std::make_shared<WorldSnapshot>()) {
+}
+
+TelemetryBridge::~TelemetryBridge() {
+    stop();
 }
 
 void TelemetryBridge::start() noexcept {
@@ -32,6 +38,10 @@ void TelemetryBridge::stop() noexcept {
 
 bool TelemetryBridge::is_running() const noexcept {
     return running_.load();
+}
+
+void TelemetryBridge::refresh_once() noexcept {
+    sample_once();
 }
 
 std::shared_ptr<const WorldSnapshot> TelemetryBridge::get_latest_snapshot() const noexcept {
@@ -65,7 +75,9 @@ void TelemetryBridge::sample_once() noexcept {
 
     for (const auto& object : SOPool::instance().get_all()) {
         if (!object) {
-            continue;
+            colorful::printHONG("[TelemetryBridge] null object found in SOPool during sampling");
+            SL::get().print("[TelemetryBridge] null object found in SOPool during sampling");
+            check(false, "TelemetryBridge::sample_once encountered null object in SOPool");
         }
         snapshot->objects.push_back(TelemetrySnapshotBuilder::build_object_state(object->get_register()));
     }

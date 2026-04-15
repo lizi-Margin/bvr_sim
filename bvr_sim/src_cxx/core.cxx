@@ -6,6 +6,7 @@
 #include "rubbish_can/rubbish_can.hxx"
 #include "rubbish_can/SL.hxx"
 #include "global_config.hxx"
+#include "telemetry/telemetry_types.hxx"
 #include <fstream>
 #include <unordered_set>
 #include "trace.hxx"
@@ -16,7 +17,8 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
     : running_(false),
       paused_(false),
       should_exit_(false),
-      acmi_file_path_(acmi_file_path) 
+      acmi_file_path_(acmi_file_path),
+      telemetry_bridge_(std::make_shared<TelemetryBridge>()) 
 {
     cfg::dt = dt;
     cfg::sim_time = 0.0;
@@ -42,6 +44,7 @@ void SimCore::start() {
 
     cfg::sim_time = 0.0;
     truncate_acmi_file();
+    start_telemetry_bridge();
 
     running_ = true;
     should_exit_ = false;
@@ -50,6 +53,7 @@ void SimCore::start() {
 
 void SimCore::stop() {
     if (!running_) {
+        stop_telemetry_bridge();
         return;
     }
 
@@ -62,6 +66,7 @@ void SimCore::stop() {
     }
 
     running_ = false;
+    stop_telemetry_bridge();
     cfg::sim_time = 0.0;
     if (acmi_file_.is_open()) {
         acmi_file_.flush();
@@ -88,6 +93,7 @@ void SimCore::step(int steps) {
         log();
     }
     BaselinePool::instance().step();
+    refresh_telemetry_snapshot();
 }
 
 json::JSON SimCore::handle(const std::string& cmd) {
@@ -194,5 +200,49 @@ void SimCore::truncate_acmi_file() {
 
 double SimCore::get_sim_time() const noexcept { return cfg::sim_time; }
 double SimCore::get_dt() const noexcept { return cfg::dt; }
+bool SimCore::is_telemetry_running() const noexcept {
+    return telemetry_bridge_ && telemetry_bridge_->is_running();
+}
+
+json::JSON SimCore::get_telemetry_snapshot() const {
+    if (!telemetry_bridge_) {
+        return json::JSON::Make(json::JSON::Class::Object);
+    }
+
+    auto snapshot = telemetry_bridge_->get_latest_snapshot();
+    if (!snapshot) {
+        return json::JSON::Make(json::JSON::Class::Object);
+    }
+    return world_snapshot_to_json(*snapshot);
+}
+
+json::JSON SimCore::get_telemetry_status() const {
+    json::JSON status = json::JSON::Make(json::JSON::Class::Object);
+    status["telemetry_running"] = json::Boolean(is_telemetry_running());
+    status["sim_running"] = json::Boolean(is_running());
+    status["sim_paused"] = json::Boolean(is_paused());
+    status["sim_time"] = json::Float(get_sim_time());
+    status["dt"] = json::Float(get_dt());
+    return status;
+}
+
+void SimCore::start_telemetry_bridge() {
+    if (!telemetry_bridge_) {
+        telemetry_bridge_ = std::make_shared<TelemetryBridge>();
+    }
+    telemetry_bridge_->start();
+}
+
+void SimCore::stop_telemetry_bridge() {
+    if (telemetry_bridge_) {
+        telemetry_bridge_->stop();
+    }
+}
+
+void SimCore::refresh_telemetry_snapshot() {
+    if (telemetry_bridge_) {
+        telemetry_bridge_->refresh_once();
+    }
+}
 
 }
