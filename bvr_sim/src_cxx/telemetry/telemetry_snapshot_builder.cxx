@@ -76,6 +76,13 @@ TelemetryObjectState TelemetrySnapshotBuilder::build_object_state(const Register
     state.uid = require_string(reg, "uid");
     state.type = require_string(reg, "Type");
     state.team = require_string(reg, "color");
+    if (reg.has("aircraft_model")) {
+        state.mesh_name = require_string(reg, "aircraft_model");
+    } else if (reg.has("missile_model")) {
+        state.mesh_name = require_string(reg, "missile_model");
+    } else {
+        state.mesh_name = state.type;
+    }
     state.alive = require_bool(reg, "is_alive");
     state.position = require_vec3(reg, "position");
     state.velocity = require_vec3(reg, "velocity");

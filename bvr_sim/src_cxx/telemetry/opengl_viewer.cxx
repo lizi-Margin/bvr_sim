@@ -1,5 +1,6 @@
 #include "opengl_viewer.hxx"
 
+#include "resource_paths.hxx"
 #include "rubbish_can/SL.hxx"
 
 #include <algorithm>
@@ -7,8 +8,12 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
-#include <sstream>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
+#include <sstream>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #ifdef _WIN32
@@ -155,6 +160,27 @@ struct ViewerState {
     std::vector<std::string> snapshot_uids;
 };
 
+struct MeshData {
+    std::vector<std::array<float, 3>> vertices;
+    std::array<float, 3> center{0.0f, 0.0f, 0.0f};
+    float radius = 1.0f;
+    bool loaded = false;
+};
+
+struct MeshLibrary {
+    std::unordered_map<std::string, MeshData> meshes;
+};
+
+MeshLibrary& mesh_library() {
+    static MeshLibrary library;
+    return library;
+}
+
+std::string canonicalize_mesh_name(std::string mesh_name) {
+    std::replace(mesh_name.begin(), mesh_name.end(), '_', '-');
+    return mesh_name;
+}
+
 ViewerState* get_viewer_state(HWND hwnd) {
     return reinterpret_cast<ViewerState*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 }
@@ -239,6 +265,156 @@ void draw_grid(float size, int half_count) {
     glEnd();
 }
 
+std::vector<std::string> split_whitespace(const std::string& line) {
+    std::istringstream iss(line);
+    std::vector<std::string> tokens;
+    std::string token;
+    while (iss >> token) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+int parse_obj_index(const std::string& token) {
+    if (token.empty()) {
+        return -1;
+    }
+    const auto slash_pos = token.find('/');
+    const auto index_token = slash_pos == std::string::npos ? token : token.substr(0, slash_pos);
+    if (index_token.empty()) {
+        return -1;
+    }
+    return std::stoi(index_token);
+}
+
+bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::string& error) {
+    std::ifstream input(path);
+    if (!input.is_open()) {
+        error = "failed to open " + path.string();
+        return false;
+    }
+
+    std::vector<std::array<float, 3>> positions;
+    mesh.vertices.clear();
+
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+        const auto tokens = split_whitespace(line);
+        if (tokens.empty()) {
+            continue;
+        }
+
+        if (tokens[0] == "v" && tokens.size() >= 4) {
+            positions.push_back({
+                std::stof(tokens[1]),
+                std::stof(tokens[2]),
+                std::stof(tokens[3])
+            });
+            continue;
+        }
+
+        if (tokens[0] == "f" && tokens.size() >= 4) {
+            std::vector<int> face_indices;
+            face_indices.reserve(tokens.size() - 1);
+            for (size_t i = 1; i < tokens.size(); ++i) {
+                const int obj_index = parse_obj_index(tokens[i]);
+                if (obj_index == 0) {
+                    continue;
+                }
+                int vertex_index = obj_index > 0 ? obj_index - 1 : static_cast<int>(positions.size()) + obj_index;
+                if (vertex_index < 0 || vertex_index >= static_cast<int>(positions.size())) {
+                    continue;
+                }
+                face_indices.push_back(vertex_index);
+            }
+
+            if (face_indices.size() < 3) {
+                continue;
+            }
+
+            for (size_t i = 1; i + 1 < face_indices.size(); ++i) {
+                mesh.vertices.push_back(positions[face_indices[0]]);
+                mesh.vertices.push_back(positions[face_indices[i]]);
+                mesh.vertices.push_back(positions[face_indices[i + 1]]);
+            }
+        }
+    }
+
+    if (mesh.vertices.empty()) {
+        error = "mesh has no triangle vertices: " + path.string();
+        return false;
+    }
+
+    std::array<float, 3> min_v = mesh.vertices.front();
+    std::array<float, 3> max_v = mesh.vertices.front();
+    for (const auto& vertex : mesh.vertices) {
+        for (int i = 0; i < 3; ++i) {
+            min_v[i] = std::min(min_v[i], vertex[i]);
+            max_v[i] = std::max(max_v[i], vertex[i]);
+        }
+    }
+    mesh.center = {
+        (min_v[0] + max_v[0]) * 0.5f,
+        (min_v[1] + max_v[1]) * 0.5f,
+        (min_v[2] + max_v[2]) * 0.5f
+    };
+    mesh.radius = 1.0f;
+    for (const auto& vertex : mesh.vertices) {
+        const float dx = vertex[0] - mesh.center[0];
+        const float dy = vertex[1] - mesh.center[1];
+        const float dz = vertex[2] - mesh.center[2];
+        mesh.radius = std::max(mesh.radius, std::sqrt(dx * dx + dy * dy + dz * dz));
+    }
+
+    mesh.loaded = true;
+    return true;
+}
+
+MeshData* load_named_mesh(const std::string& mesh_name) {
+    auto& library = mesh_library();
+    const auto canonical_name = canonicalize_mesh_name(mesh_name);
+    auto it = library.meshes.find(canonical_name);
+    if (it != library.meshes.end() && it->second.loaded) {
+        return &it->second;
+    }
+
+    try {
+        MeshData mesh;
+        std::string error;
+        const auto path = resource_paths::get_resource_path("visualization/meshes/" + canonical_name + ".obj");
+        if (!load_obj_mesh(path, mesh, error)) {
+            SL::get().printf("[OpenGLViewer] failed to load mesh %s: %s\n", canonical_name.c_str(), error.c_str());
+            return nullptr;
+        }
+        auto [inserted_it, _] = library.meshes.emplace(canonical_name, std::move(mesh));
+        return &inserted_it->second;
+    } catch (const std::exception& ex) {
+        SL::get().printf("[OpenGLViewer] mesh resource lookup failed for %s: %s\n", canonical_name.c_str(), ex.what());
+        return nullptr;
+    }
+}
+
+void draw_obj_mesh(const MeshData& mesh, float world_radius) {
+    if (!mesh.loaded || mesh.vertices.empty() || mesh.radius <= 1e-6f) {
+        return;
+    }
+
+    const float scale = world_radius / mesh.radius;
+    glPushMatrix();
+    glScalef(scale, scale, scale);
+    glTranslatef(-mesh.center[0], -mesh.center[1], -mesh.center[2]);
+
+    glBegin(GL_TRIANGLES);
+    for (const auto& vertex : mesh.vertices) {
+        glVertex3f(vertex[0], vertex[1], vertex[2]);
+    }
+    glEnd();
+    glPopMatrix();
+}
+
 void draw_box(float sx, float sy, float sz) {
     const float hx = sx * 0.5f;
     const float hy = sy * 0.5f;
@@ -253,7 +429,15 @@ void draw_box(float sx, float sy, float sz) {
     glEnd();
 }
 
-void draw_aircraft() {
+void draw_aircraft(const std::string& mesh_name) {
+    if (auto* mesh = load_named_mesh(mesh_name)) {
+        glPushMatrix();
+        glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+        draw_obj_mesh(*mesh, 320.0f);
+        glPopMatrix();
+        return;
+    }
+
     glBegin(GL_TRIANGLES);
     glVertex3f(180.0f, 0.0f, 0.0f);
     glVertex3f(-120.0f, 40.0f, 90.0f);
@@ -277,7 +461,15 @@ void draw_aircraft() {
     glEnd();
 }
 
-void draw_missile() {
+void draw_missile(const std::string& mesh_name) {
+    if (auto* mesh = load_named_mesh(mesh_name)) {
+        glPushMatrix();
+        glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+        draw_obj_mesh(*mesh, 180.0f);
+        glPopMatrix();
+        return;
+    }
+
     draw_box(220.0f, 24.0f, 24.0f);
     glBegin(GL_TRIANGLES);
     glVertex3f(-20.0f, 0.0f, 0.0f);
@@ -785,9 +977,33 @@ void render_scene(ViewerState& view_state, const std::shared_ptr<const WorldSnap
             glColor3f(color[0] * alpha_scale, color[1] * alpha_scale, color[2] * alpha_scale);
 
             if (object.type.find("Aircraft") != std::string::npos) {
-                draw_aircraft();
+                const std::string aircraft_mesh = object.mesh_name.empty() ? "FixedWing.F-22" : "FixedWing." + canonicalize_mesh_name(object.mesh_name);
+                MeshData* mesh = load_named_mesh(aircraft_mesh);
+                if (mesh == nullptr) {
+                    mesh = load_named_mesh("aircraft");
+                }
+                if (mesh != nullptr) {
+                    glPushMatrix();
+                    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+                    draw_obj_mesh(*mesh, 320.0f);
+                    glPopMatrix();
+                } else {
+                    draw_aircraft("aircraft");
+                }
             } else if (object.type.find("Missile") != std::string::npos) {
-                draw_missile();
+                const std::string missile_mesh = object.mesh_name.empty() ? "Missile.AIM-120C" : "Missile." + canonicalize_mesh_name(object.mesh_name);
+                MeshData* mesh = load_named_mesh(missile_mesh);
+                if (mesh == nullptr) {
+                    mesh = load_named_mesh("missile");
+                }
+                if (mesh != nullptr) {
+                    glPushMatrix();
+                    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+                    draw_obj_mesh(*mesh, 180.0f);
+                    glPopMatrix();
+                } else {
+                    draw_missile("missile");
+                }
             } else {
                 draw_ground_unit();
             }

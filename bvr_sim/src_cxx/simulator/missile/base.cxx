@@ -88,4 +88,9 @@ std::string Missile::log() noexcept {
     return ss.str();
 }
 
+void Missile::write_register() noexcept {
+    SimulatedObject::write_register();
+    register_.set("missile_model", json::String(missile_model));
+}
+
 }

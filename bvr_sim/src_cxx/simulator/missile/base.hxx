@@ -50,6 +50,7 @@ public:
     virtual void update_target_info() noexcept;
 
     std::string log()noexcept override;
+    void write_register() noexcept override;
 
     const std::array<double, 3>& get_last_known_target_pos() const noexcept { return last_known_target_pos; }
     const std::array<double, 3>& get_last_known_target_vel() const noexcept { return last_known_target_vel; }

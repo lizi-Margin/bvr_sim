@@ -7,6 +7,7 @@ json::JSON telemetry_object_state_to_json(const TelemetryObjectState& state) {
     result["uid"] = json::String(state.uid);
     result["type"] = json::String(state.type);
     result["team"] = json::String(state.team);
+    result["mesh_name"] = json::String(state.mesh_name);
     result["alive"] = json::Boolean(state.alive);
 
     json::JSON position = json::JSON::Make(json::JSON::Class::Array);

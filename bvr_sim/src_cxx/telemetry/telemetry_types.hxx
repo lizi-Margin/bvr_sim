@@ -11,6 +11,7 @@ struct TelemetryObjectState {
     std::string uid;
     std::string type;
     std::string team;
+    std::string mesh_name;
     bool alive = false;
     std::array<double, 3> position{0.0, 0.0, 0.0};
     std::array<double, 3> velocity{0.0, 0.0, 0.0};
