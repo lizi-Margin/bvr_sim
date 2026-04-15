@@ -2,6 +2,7 @@
 
 #include "rubbish_can/json.hpp"
 #include "telemetry/embedded_web_server.hxx"
+#include "telemetry/opengl_viewer.hxx"
 #include "telemetry/telemetry_bridge.hxx"
 #include <thread>
 #include <atomic>
@@ -50,6 +51,11 @@ public:
     void start_visualization_server(int port = 8765);
     void stop_visualization_server();
     json::JSON get_visualization_status() const;
+    bool is_opengl_viewer_running() const noexcept;
+    bool is_opengl_viewer_supported() const noexcept;
+    void start_opengl_viewer();
+    void stop_opengl_viewer();
+    json::JSON get_opengl_viewer_status() const;
 
 private:
     void run_loop();
@@ -71,6 +77,7 @@ private:
     std::ofstream acmi_file_;
     std::shared_ptr<TelemetryBridge> telemetry_bridge_;
     std::shared_ptr<EmbeddedWebServer> visualization_server_;
+    std::shared_ptr<OpenGLViewer> opengl_viewer_;
 
 };
 

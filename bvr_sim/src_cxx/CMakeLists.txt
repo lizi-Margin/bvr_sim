@@ -70,6 +70,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_command_queue.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/embedded_web_server.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/opengl_viewer.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/unit_factory.cxx"

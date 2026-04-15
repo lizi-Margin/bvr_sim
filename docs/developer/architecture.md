@@ -160,20 +160,21 @@ python tests/test_cpp.py
 python tests/test_everything.py
 ```
 
-## 实时 Web 可视化与调试架构
+## 实时可视化与调试架构
 
-phase-1 的实时可视化链路由四层组成：
+当前实时可视化链路有两个 viewer 后端，共享同一条 telemetry 契约：
 
 1. `SimCore`
 2. `TelemetryBridge`
-3. `EmbeddedWebServer`
-4. `web/` 前端
+3. `EmbeddedWebServer` 或 `OpenGLViewer`
+4. `web/` 前端 或 进程内原生 OpenGL 窗口
 
 关键入口：
 
 - [`core.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\core.cxx)
 - [`telemetry_bridge.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\telemetry\telemetry_bridge.cxx)
 - [`embedded_web_server.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\telemetry\embedded_web_server.cxx)
+- [`opengl_viewer.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\opengl_viewer.cxx)
 - [`main.ts`](G:\bvr_sim\.worktrees\web-visualization-phase1\web\src\main.ts)
 
 ### 职责边界
@@ -200,7 +201,20 @@ phase-1 的实时可视化链路由四层组成：
 - 转发浏览器命令到桥接层
 - 可选直接托管 `web/dist` 下的静态前端入口
 
+`OpenGLViewer`
+
+- 运行在进程内独立线程
+- 直接读取 `TelemetryBridge` 的最新 `WorldSnapshot`
+- 将原生窗口输入转换成 telemetry 命令
+- 不直接访问仿真对象实例
+
 `web/`
+
+- 只读 `WorldSnapshot`
+- 只写结构化命令
+- 不依赖 C++ 内部对象模型
+
+进程内 OpenGL viewer 也遵守同一原则：
 
 - 只读 `WorldSnapshot`
 - 只写结构化命令

@@ -133,6 +133,13 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("is_visualization_server_running", &SimCore::is_visualization_server_running)
         .def("get_visualization_status", [](SimCore& self) -> py::object {
             return json_to_python(self.get_visualization_status());
+        })
+        .def("start_opengl_viewer", &SimCore::start_opengl_viewer)
+        .def("stop_opengl_viewer", &SimCore::stop_opengl_viewer)
+        .def("is_opengl_viewer_running", &SimCore::is_opengl_viewer_running)
+        .def("is_opengl_viewer_supported", &SimCore::is_opengl_viewer_supported)
+        .def("get_opengl_viewer_status", [](SimCore& self) -> py::object {
+            return json_to_python(self.get_opengl_viewer_status());
         });
 
     py::class_<RLManager, std::shared_ptr<RLManager>>(m, "RLManager")

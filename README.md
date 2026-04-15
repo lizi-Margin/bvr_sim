@@ -349,6 +349,77 @@ python tests/cpp_unit_tests.py
 
 当前仓库已经包含 phase-1 的实时 Web 可视化与调试系统，用于渲染当前 C++ `SimCore` 的实时状态，不包含录像回放链路。
 
+## 原生 OpenGL 可视化
+
+当前仓库也包含一个 phase-0 的原生 OpenGL viewer。它和 `bvr_sim_cpp` 一起编译到同一个原生模块中，在进程内以独立线程运行。
+
+### 设计边界
+
+- `SimCore` 负责仿真
+- `TelemetryBridge` 在独立线程采样状态
+- 状态提取仍然来自对象 `Register`
+- `OpenGLViewer` 只消费 `WorldSnapshot`
+- 原生窗口输入仍然转成 telemetry 命令，不直接改仿真对象
+
+这意味着它是“进程内原生 viewer”，但仍然遵守和 Web 可视化相同的解耦边界。
+
+### 当前状态
+
+- 当前实现优先支持 Windows
+- 使用 Win32 + WGL 最小窗口方案
+- 已集成到 `bvr_sim_cpp`
+- 当前渲染为占位几何体，不含模型、地形、shader 资源链路
+
+### 启动步骤
+
+1. 先构建原生扩展
+
+Windows:
+
+```powershell
+bvr_sim\build_windows.bat
+```
+
+2. 运行示例
+
+```bash
+python example/run_opengl_viz.py
+```
+
+3. 或者直接从 Python 调用
+
+```python
+from bvr_sim import bvr_sim_cpp
+
+core = bvr_sim_cpp.SimCore(
+    dt=0.2,
+    log_file_path="./test_logs/opengl.log",
+    acmi_file_path=""
+)
+
+core.start_telemetry_bridge()
+core.start_opengl_viewer()
+core.start()
+```
+
+### 当前能力
+
+- 原生 OpenGL 窗口
+- 飞机 / 导弹 / 地面对象占位渲染
+- 跟随 `TelemetryBridge` 最新快照
+- `Space` 暂停 / 继续
+- `N` 单步
+- 方向键旋转相机
+- `+` / `-` 缩放
+
+### Python 接口
+
+- `core.start_opengl_viewer()`
+- `core.stop_opengl_viewer()`
+- `core.is_opengl_viewer_running()`
+- `core.is_opengl_viewer_supported()`
+- `core.get_opengl_viewer_status()`
+
 ### 设计边界
 
 - `SimCore` 负责仿真
@@ -356,6 +427,7 @@ python tests/cpp_unit_tests.py
 - 状态提取来自对象 `Register`
 - `EmbeddedWebServer` 只暴露快照和命令协议
 - `web/` 前端只消费 HTTP / WebSocket 协议
+- `OpenGLViewer` 也只消费 `WorldSnapshot`
 - 调试交互同样走命令通道，不直接修改仿真对象
 
 这意味着渲染和仿真保持解耦，后续如果扩展对象级调试命令，也应该继续沿着寄存器 / 命令邮箱模式推进。

@@ -35,7 +35,8 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
       should_exit_(false),
       acmi_file_path_(acmi_file_path),
       telemetry_bridge_(std::make_shared<TelemetryBridge>()),
-      visualization_server_(std::make_shared<EmbeddedWebServer>())
+      visualization_server_(std::make_shared<EmbeddedWebServer>()),
+      opengl_viewer_(std::make_shared<OpenGLViewer>())
 {
     cfg::dt = dt;
     cfg::sim_time = 0.0;
@@ -63,6 +64,17 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
         start_telemetry_bridge();
         telemetry_bridge_->submit_command(command);
     });
+
+    opengl_viewer_->set_snapshot_provider([this]() {
+        if (!telemetry_bridge_) {
+            return std::shared_ptr<const WorldSnapshot>();
+        }
+        return telemetry_bridge_->get_latest_snapshot();
+    });
+    opengl_viewer_->set_command_submitter([this](const TelemetryCommand& command) {
+        start_telemetry_bridge();
+        telemetry_bridge_->submit_command(command);
+    });
 }
 
 SimCore::~SimCore() {
@@ -85,6 +97,7 @@ void SimCore::start() {
 
 void SimCore::stop() {
     if (!running_) {
+        stop_opengl_viewer();
         stop_visualization_server();
         stop_telemetry_bridge();
         return;
@@ -99,6 +112,7 @@ void SimCore::stop() {
     }
 
     running_ = false;
+    stop_opengl_viewer();
     stop_visualization_server();
     stop_telemetry_bridge();
     cfg::sim_time = 0.0;
@@ -315,7 +329,47 @@ json::JSON SimCore::get_visualization_status() const {
     status["frontend_available"] = json::Boolean(visualization_server_ && visualization_server_->is_static_frontend_available());
     status["client_count"] = json::Integral(visualization_server_ ? static_cast<long>(visualization_server_->get_client_count()) : 0L);
     status["telemetry"] = telemetry_bridge_ ? telemetry_bridge_->get_diagnostics() : json::JSON::Make(json::JSON::Class::Object);
+    status["opengl_viewer"] = opengl_viewer_ ? opengl_viewer_->get_status() : json::JSON::Make(json::JSON::Class::Object);
     return status;
+}
+
+bool SimCore::is_opengl_viewer_running() const noexcept {
+    return opengl_viewer_ && opengl_viewer_->is_running();
+}
+
+bool SimCore::is_opengl_viewer_supported() const noexcept {
+    return opengl_viewer_ && opengl_viewer_->is_supported();
+}
+
+void SimCore::start_opengl_viewer() {
+    if (!opengl_viewer_) {
+        opengl_viewer_ = std::make_shared<OpenGLViewer>();
+        opengl_viewer_->set_snapshot_provider([this]() {
+            if (!telemetry_bridge_) {
+                return std::shared_ptr<const WorldSnapshot>();
+            }
+            return telemetry_bridge_->get_latest_snapshot();
+        });
+        opengl_viewer_->set_command_submitter([this](const TelemetryCommand& command) {
+            start_telemetry_bridge();
+            telemetry_bridge_->submit_command(command);
+        });
+    }
+    start_telemetry_bridge();
+    opengl_viewer_->start();
+}
+
+void SimCore::stop_opengl_viewer() {
+    if (opengl_viewer_) {
+        opengl_viewer_->stop();
+    }
+}
+
+json::JSON SimCore::get_opengl_viewer_status() const {
+    if (!opengl_viewer_) {
+        return json::JSON::Make(json::JSON::Class::Object);
+    }
+    return opengl_viewer_->get_status();
 }
 
 TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand& command) {
