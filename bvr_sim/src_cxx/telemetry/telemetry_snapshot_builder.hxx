@@ -1,5 +1,6 @@
 #pragma once
 
+#include "simulator/register.hxx"
 #include "telemetry_types.hxx"
 
 namespace bvr_sim {
@@ -7,6 +8,7 @@ namespace bvr_sim {
 class TelemetrySnapshotBuilder {
 public:
     static WorldSnapshot make_empty_snapshot(double sim_time, double dt, bool running, bool paused) noexcept;
+    static TelemetryObjectState build_object_state(const Register& reg) noexcept;
 };
 
 }
