@@ -34,10 +34,20 @@ struct Float4x4 {
 struct Vertex {
     float position[3];
     float color[3];
+    float normal[3];
+    float uv[2];
 };
 
 struct SceneConstants {
     Float4x4 world_view_proj;
+    Float4x4 world;
+    std::array<float, 4> light_direction_ambient{0.0f, 1.0f, 0.0f, 0.35f};
+    std::array<float, 4> light_color_intensity{1.0f, 0.96f, 0.88f, 0.85f};
+    std::array<float, 4> material_flags{1.0f, 0.0f, 0.0f, 0.0f};
+    std::array<float, 4> camera_position_fog_start{0.0f, 0.0f, 0.0f, 65000.0f};
+    std::array<float, 4> fog_color_density{0.72f, 0.80f, 0.84f, 0.000018f};
+    std::array<float, 4> ambient_sky_ground{0.44f, 0.18f, 0.0f, 0.0f};
+    std::array<float, 4> material_tint{1.0f, 0.0f, 0.0f, 0.0f};
 };
 
 enum class RenderCommandType {
@@ -50,7 +60,14 @@ struct RenderCommand {
     std::vector<Vertex> vertices;
     D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     Float4x4 world_view_proj{};
+    Float4x4 world{};
+    Float3 camera_position{};
     bool depth_enabled = true;
+    bool lighting_enabled = true;
+    bool terrain_material = false;
+    std::string material_key = "sky";
+    float specular_strength = 0.15f;
+    float specular_power = 32.0f;
     std::array<float, 4> clear_color{0.0f, 0.0f, 0.0f, 1.0f};
 };
 
@@ -68,6 +85,7 @@ struct RenderScene {
     Float4x4 view{};
     Float4x4 projection{};
     Float4x4 clip_space{};
+    Float3 camera_position{};
     std::vector<Vertex> sky_vertices;
     std::vector<Vertex> ground_vertices;
     std::vector<Vertex> grid_vertices;
@@ -75,6 +93,7 @@ struct RenderScene {
     struct ObjectBatch {
         std::vector<Vertex> vertices;
         Float4x4 world{};
+        std::string material_key = "aircraft_default";
     };
 
     std::vector<ObjectBatch> object_batches;
@@ -114,6 +133,32 @@ struct D3D11Context {
     ID3D11InputLayout* input_layout = nullptr;
     ID3D11Buffer* constant_buffer = nullptr;
     ID3D11Buffer* dynamic_vertex_buffer = nullptr;
+    ID3D11ShaderResourceView* white_texture_srv = nullptr;
+    ID3D11ShaderResourceView* flat_normal_texture_srv = nullptr;
+    ID3D11ShaderResourceView* black_texture_srv = nullptr;
+    ID3D11ShaderResourceView* terrain_texture_srv = nullptr;
+    ID3D11ShaderResourceView* object_texture_srv = nullptr;
+    ID3D11ShaderResourceView* object_normal_texture_srv = nullptr;
+    ID3D11ShaderResourceView* object_roughness_texture_srv = nullptr;
+    ID3D11ShaderResourceView* object_metallic_texture_srv = nullptr;
+    ID3D11SamplerState* texture_sampler = nullptr;
+    struct MaterialResource {
+        std::string key;
+        bool terrain = false;
+        float team_tint_strength = 1.0f;
+        float specular_strength = 0.15f;
+        float specular_power = 32.0f;
+        ID3D11ShaderResourceView* albedo_srv = nullptr;
+        ID3D11ShaderResourceView* normal_srv = nullptr;
+        ID3D11ShaderResourceView* roughness_srv = nullptr;
+        ID3D11ShaderResourceView* metallic_srv = nullptr;
+        bool owns_albedo = false;
+        bool owns_normal = false;
+        bool owns_roughness = false;
+        bool owns_metallic = false;
+    };
+    std::unordered_map<std::string, MaterialResource> materials;
+    std::unordered_map<std::string, ID3D11ShaderResourceView*> material_texture_cache;
     UINT dynamic_vertex_capacity = 0;
     ID3D11RasterizerState* rasterizer_state = nullptr;
     ID3D11DepthStencilState* depth_state = nullptr;
@@ -123,10 +168,19 @@ struct D3D11Context {
     bool common_pipeline_bound = false;
     D3D11_PRIMITIVE_TOPOLOGY current_topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
     ID3D11DepthStencilState* current_depth_state = nullptr;
+    std::string current_material_key;
+    bool material_textures_bound = false;
 };
 
 struct MeshData {
-    std::vector<std::array<float, 3>> vertices;
+    struct MeshVertex {
+        std::array<float, 3> position{0.0f, 0.0f, 0.0f};
+        std::array<float, 3> normal{0.0f, 1.0f, 0.0f};
+        std::array<float, 2> uv{0.0f, 0.0f};
+        bool has_normal = false;
+    };
+
+    std::vector<MeshVertex> vertices;
     std::array<float, 3> center{0.0f, 0.0f, 0.0f};
     float radius = 1.0f;
     bool loaded = false;

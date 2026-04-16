@@ -30,6 +30,88 @@ std::string canonicalize_mesh_name(std::string mesh_name) {
     return mesh_name;
 }
 
+std::string read_text_file(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input.is_open()) {
+        return "";
+    }
+    std::ostringstream buffer;
+    buffer << input.rdbuf();
+    return buffer.str();
+}
+
+std::string extract_json_object_block(const std::string& text, const std::string& key) {
+    const std::string marker = "\"" + key + "\"";
+    const size_t marker_pos = text.find(marker);
+    if (marker_pos == std::string::npos) {
+        return "";
+    }
+    const size_t open_pos = text.find('{', marker_pos + marker.size());
+    if (open_pos == std::string::npos) {
+        return "";
+    }
+
+    int depth = 0;
+    for (size_t i = open_pos; i < text.size(); ++i) {
+        if (text[i] == '{') {
+            ++depth;
+        } else if (text[i] == '}') {
+            --depth;
+            if (depth == 0) {
+                return text.substr(open_pos, i - open_pos + 1);
+            }
+        }
+    }
+    return "";
+}
+
+std::unordered_map<std::string, std::string> load_model_material_map() {
+    std::unordered_map<std::string, std::string> map;
+    try {
+        const std::string manifest = read_text_file(resource_paths::get_resource_path("visualization/materials/materials.json"));
+        const std::string block = extract_json_object_block(manifest, "model_materials");
+        if (block.empty()) {
+            return map;
+        }
+
+        size_t pos = 0;
+        while (true) {
+            const size_t key_start = block.find('"', pos);
+            if (key_start == std::string::npos) {
+                break;
+            }
+            const size_t key_end = block.find('"', key_start + 1);
+            if (key_end == std::string::npos) {
+                break;
+            }
+            const size_t colon = block.find(':', key_end + 1);
+            if (colon == std::string::npos) {
+                break;
+            }
+            const size_t value_start = block.find('"', colon + 1);
+            if (value_start == std::string::npos) {
+                break;
+            }
+            const size_t value_end = block.find('"', value_start + 1);
+            if (value_end == std::string::npos) {
+                break;
+            }
+
+            map[canonicalize_mesh_name(block.substr(key_start + 1, key_end - key_start - 1))] =
+                block.substr(value_start + 1, value_end - value_start - 1);
+            pos = value_end + 1;
+        }
+    } catch (...) {
+        map.clear();
+    }
+    return map;
+}
+
+const std::unordered_map<std::string, std::string>& model_material_map() {
+    static const std::unordered_map<std::string, std::string> map = load_model_material_map();
+    return map;
+}
+
 std::string map_model_to_mesh_name(const std::string& model_name) {
     static const std::unordered_map<std::string, std::string> k_model_mesh_map = {
         {"F15", "FixedWing.F-15"},
@@ -110,16 +192,44 @@ std::vector<std::string> split_whitespace(const std::string& line) {
     return tokens;
 }
 
-int parse_obj_index(const std::string& token) {
-    if (token.empty()) {
+struct ObjFaceVertex {
+    int position = -1;
+    int uv = -1;
+    int normal = -1;
+};
+
+int resolve_obj_index(int index, int count) {
+    if (index == 0) {
         return -1;
     }
-    const auto slash_pos = token.find('/');
-    const auto index_token = slash_pos == std::string::npos ? token : token.substr(0, slash_pos);
-    if (index_token.empty()) {
-        return -1;
+    const int resolved = index > 0 ? index - 1 : count + index;
+    return resolved >= 0 && resolved < count ? resolved : -1;
+}
+
+ObjFaceVertex parse_obj_face_vertex(const std::string& token, int position_count, int uv_count, int normal_count) {
+    ObjFaceVertex out;
+    std::array<std::string, 3> parts;
+    size_t part_index = 0;
+    size_t start = 0;
+    while (part_index < parts.size()) {
+        const size_t slash = token.find('/', start);
+        parts[part_index++] = token.substr(start, slash == std::string::npos ? std::string::npos : slash - start);
+        if (slash == std::string::npos) {
+            break;
+        }
+        start = slash + 1;
     }
-    return std::stoi(index_token);
+
+    if (!parts[0].empty()) {
+        out.position = resolve_obj_index(std::stoi(parts[0]), position_count);
+    }
+    if (!parts[1].empty()) {
+        out.uv = resolve_obj_index(std::stoi(parts[1]), uv_count);
+    }
+    if (!parts[2].empty()) {
+        out.normal = resolve_obj_index(std::stoi(parts[2]), normal_count);
+    }
+    return out;
 }
 
 bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::string& error) {
@@ -130,6 +240,8 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
     }
 
     std::vector<std::array<float, 3>> positions;
+    std::vector<std::array<float, 2>> uvs;
+    std::vector<std::array<float, 3>> normals;
     mesh.vertices.clear();
 
     std::string line;
@@ -152,29 +264,79 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
             continue;
         }
 
+        if (tokens[0] == "vt" && tokens.size() >= 3) {
+            uvs.push_back({
+                std::stof(tokens[1]),
+                1.0f - std::stof(tokens[2])
+            });
+            continue;
+        }
+
+        if (tokens[0] == "vn" && tokens.size() >= 4) {
+            normals.push_back({
+                std::stof(tokens[1]),
+                std::stof(tokens[2]),
+                std::stof(tokens[3])
+            });
+            continue;
+        }
+
         if (tokens[0] == "f" && tokens.size() >= 4) {
-            std::vector<int> face_indices;
-            face_indices.reserve(tokens.size() - 1);
+            std::vector<ObjFaceVertex> face_vertices;
+            face_vertices.reserve(tokens.size() - 1);
             for (size_t i = 1; i < tokens.size(); ++i) {
-                const int obj_index = parse_obj_index(tokens[i]);
-                if (obj_index == 0) {
+                const ObjFaceVertex vertex = parse_obj_face_vertex(
+                    tokens[i],
+                    static_cast<int>(positions.size()),
+                    static_cast<int>(uvs.size()),
+                    static_cast<int>(normals.size())
+                );
+                if (vertex.position < 0) {
                     continue;
                 }
-                const int vertex_index = obj_index > 0 ? obj_index - 1 : static_cast<int>(positions.size()) + obj_index;
-                if (vertex_index < 0 || vertex_index >= static_cast<int>(positions.size())) {
-                    continue;
-                }
-                face_indices.push_back(vertex_index);
+                face_vertices.push_back(vertex);
             }
 
-            if (face_indices.size() < 3) {
+            if (face_vertices.size() < 3) {
                 continue;
             }
 
-            for (size_t i = 1; i + 1 < face_indices.size(); ++i) {
-                mesh.vertices.push_back(positions[face_indices[0]]);
-                mesh.vertices.push_back(positions[face_indices[i]]);
-                mesh.vertices.push_back(positions[face_indices[i + 1]]);
+            auto make_mesh_vertex = [&](const ObjFaceVertex& source) {
+                MeshData::MeshVertex vertex;
+                vertex.position = positions[source.position];
+                if (source.uv >= 0) {
+                    vertex.uv = uvs[source.uv];
+                }
+                if (source.normal >= 0) {
+                    vertex.normal = normals[source.normal];
+                    vertex.has_normal = true;
+                }
+                return vertex;
+            };
+
+            for (size_t i = 1; i + 1 < face_vertices.size(); ++i) {
+                MeshData::MeshVertex a = make_mesh_vertex(face_vertices[0]);
+                MeshData::MeshVertex b = make_mesh_vertex(face_vertices[i]);
+                MeshData::MeshVertex c = make_mesh_vertex(face_vertices[i + 1]);
+                if (!a.has_normal || !b.has_normal || !c.has_normal) {
+                    const Float3 pa = make_float3(a.position[0], a.position[1], a.position[2]);
+                    const Float3 pb = make_float3(b.position[0], b.position[1], b.position[2]);
+                    const Float3 pc = make_float3(c.position[0], c.position[1], c.position[2]);
+                    const Float3 face_normal = normalize(cross(sub(pb, pa), sub(pc, pa)));
+                    const std::array<float, 3> normal = {face_normal.x, face_normal.y, face_normal.z};
+                    if (!a.has_normal) {
+                        a.normal = normal;
+                    }
+                    if (!b.has_normal) {
+                        b.normal = normal;
+                    }
+                    if (!c.has_normal) {
+                        c.normal = normal;
+                    }
+                }
+                mesh.vertices.push_back(a);
+                mesh.vertices.push_back(b);
+                mesh.vertices.push_back(c);
             }
         }
     }
@@ -184,12 +346,12 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
         return false;
     }
 
-    std::array<float, 3> min_v = mesh.vertices.front();
-    std::array<float, 3> max_v = mesh.vertices.front();
+    std::array<float, 3> min_v = mesh.vertices.front().position;
+    std::array<float, 3> max_v = mesh.vertices.front().position;
     for (const auto& vertex : mesh.vertices) {
         for (int i = 0; i < 3; ++i) {
-            min_v[i] = std::min(min_v[i], vertex[i]);
-            max_v[i] = std::max(max_v[i], vertex[i]);
+            min_v[i] = std::min(min_v[i], vertex.position[i]);
+            max_v[i] = std::max(max_v[i], vertex.position[i]);
         }
     }
 
@@ -201,9 +363,9 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
 
     mesh.radius = 1.0f;
     for (const auto& vertex : mesh.vertices) {
-        const float dx = vertex[0] - mesh.center[0];
-        const float dy = vertex[1] - mesh.center[1];
-        const float dz = vertex[2] - mesh.center[2];
+        const float dx = vertex.position[0] - mesh.center[0];
+        const float dy = vertex.position[1] - mesh.center[1];
+        const float dz = vertex.position[2] - mesh.center[2];
         mesh.radius = std::max(mesh.radius, std::sqrt(dx * dx + dy * dy + dz * dz));
     }
 
@@ -374,6 +536,23 @@ std::string resolve_mesh_asset_name(const TelemetryObjectState& object) {
     return "";
 }
 
+std::string resolve_material_key(const TelemetryObjectState& object) {
+    const auto canonical_model = canonicalize_mesh_name(object.mesh_name);
+    const auto& map = model_material_map();
+    const auto model_it = map.find(canonical_model);
+    if (model_it != map.end()) {
+        return model_it->second;
+    }
+
+    if (is_missile_object(object)) {
+        return "missile_default";
+    }
+    if (is_aircraft_object(object)) {
+        return "aircraft_default";
+    }
+    return "aircraft_default";
+}
+
 std::array<float, 3> team_color(const TelemetryObjectState& object) {
     if (object.team == "Blue") {
         return {0.34f, 0.73f, 1.0f};
@@ -384,18 +563,33 @@ std::array<float, 3> team_color(const TelemetryObjectState& object) {
     return {0.85f, 0.85f, 0.78f};
 }
 
+void push_vertex(
+    std::vector<Vertex>& vertices,
+    const Float3& position,
+    const std::array<float, 3>& color,
+    const Float3& normal,
+    const std::array<float, 2>& uv = {0.0f, 0.0f}) {
+    vertices.push_back({
+        {position.x, position.y, position.z},
+        {color[0], color[1], color[2]},
+        {normal.x, normal.y, normal.z},
+        {uv[0], uv[1]}
+    });
+}
+
+void push_lit_triangle(std::vector<Vertex>& vertices, Float3 a, Float3 c, Float3 d, const std::array<float, 3>& color) {
+    const Float3 normal = normalize(cross(sub(c, a), sub(d, a)));
+    push_vertex(vertices, a, color, normal);
+    push_vertex(vertices, c, color, normal);
+    push_vertex(vertices, d, color, normal);
+}
+
 void append_box(std::vector<Vertex>& vertices, float sx, float sy, float sz, const std::array<float, 3>& color) {
     const float hx = sx * 0.5f;
     const float hy = sy * 0.5f;
     const float hz = sz * 0.5f;
-    const float r = color[0];
-    const float g = color[1];
-    const float b = color[2];
-
     auto push_triangle = [&](Float3 a, Float3 c, Float3 d) {
-        vertices.push_back({{a.x, a.y, a.z}, {r, g, b}});
-        vertices.push_back({{c.x, c.y, c.z}, {r, g, b}});
-        vertices.push_back({{d.x, d.y, d.z}, {r, g, b}});
+        push_lit_triangle(vertices, a, c, d, color);
     };
     auto push_quad = [&](Float3 a, Float3 c, Float3 d, Float3 e) {
         push_triangle(a, c, d);
@@ -411,13 +605,8 @@ void append_box(std::vector<Vertex>& vertices, float sx, float sy, float sz, con
 }
 
 void append_aircraft_primitive(std::vector<Vertex>& vertices, const std::array<float, 3>& color) {
-    const float r = color[0];
-    const float g = color[1];
-    const float b = color[2];
     auto push_triangle = [&](Float3 a, Float3 c, Float3 d) {
-        vertices.push_back({{a.x, a.y, a.z}, {r, g, b}});
-        vertices.push_back({{c.x, c.y, c.z}, {r, g, b}});
-        vertices.push_back({{d.x, d.y, d.z}, {r, g, b}});
+        push_lit_triangle(vertices, a, c, d, color);
     };
 
     push_triangle(make_float3(180.0f, 0.0f, 0.0f), make_float3(-120.0f, 40.0f, 90.0f), make_float3(-120.0f, 40.0f, -90.0f));
@@ -440,50 +629,76 @@ void append_obj_mesh(std::vector<Vertex>& vertices, const MeshData& mesh, float 
     }
 
     const float scale_value = world_radius / mesh.radius;
-    for (const auto& vertex : mesh.vertices) {
-        vertices.push_back({
-            {
-                (vertex[0] - mesh.center[0]) * scale_value,
-                (vertex[1] - mesh.center[1]) * scale_value,
-                (vertex[2] - mesh.center[2]) * scale_value
-            },
-            {color[0], color[1], color[2]}
-        });
+    for (size_t i = 0; i + 2 < mesh.vertices.size(); i += 3) {
+        const auto make_position = [&](const MeshData::MeshVertex& vertex) {
+            return make_float3(
+                (vertex.position[0] - mesh.center[0]) * scale_value,
+                (vertex.position[1] - mesh.center[1]) * scale_value,
+                (vertex.position[2] - mesh.center[2]) * scale_value
+            );
+        };
+        const auto push_mesh_vertex = [&](const MeshData::MeshVertex& source) {
+            const Float3 normal = normalize(make_float3(source.normal[0], source.normal[1], source.normal[2]));
+            push_vertex(vertices, make_position(source), color, normal, source.uv);
+        };
+        push_mesh_vertex(mesh.vertices[i]);
+        push_mesh_vertex(mesh.vertices[i + 1]);
+        push_mesh_vertex(mesh.vertices[i + 2]);
     }
 }
 
 void append_ground_plane(std::vector<Vertex>& vertices, float size) {
-    const std::array<float, 3> near_color = {0.16f, 0.22f, 0.18f};
-    const std::array<float, 3> far_color = {0.22f, 0.28f, 0.21f};
+    constexpr int kSubdivisions = 28;
+    const std::array<float, 3> lowland = {0.17f, 0.24f, 0.17f};
+    const std::array<float, 3> highland = {0.28f, 0.31f, 0.22f};
+    const Float3 normal = make_float3(0.0f, 1.0f, 0.0f);
 
-    auto push_vertex = [&](float x, float y, float z, const std::array<float, 3>& color) {
-        vertices.push_back({{x, y, z}, {color[0], color[1], color[2]}});
+    auto color_at = [&](float x, float z) {
+        const float band = std::sin(x * 0.00012f + z * 0.00019f) * 0.5f + 0.5f;
+        std::array<float, 3> color{};
+        for (int i = 0; i < 3; ++i) {
+            color[i] = lowland[i] * (1.0f - band) + highland[i] * band;
+        }
+        return color;
     };
 
-    push_vertex(-size, 0.0f, -size, far_color);
-    push_vertex(size, 0.0f, -size, far_color);
-    push_vertex(size, 0.0f, size, near_color);
+    auto push_ground_vertex = [&](float x, float z) {
+        const float u = (x + size) / 18000.0f;
+        const float v = (z + size) / 18000.0f;
+        push_vertex(vertices, make_float3(x, 0.0f, z), color_at(x, z), normal, {u, v});
+    };
 
-    push_vertex(-size, 0.0f, -size, far_color);
-    push_vertex(size, 0.0f, size, near_color);
-    push_vertex(-size, 0.0f, size, near_color);
+    for (int z = 0; z < kSubdivisions; ++z) {
+        const float z0 = -size + 2.0f * size * static_cast<float>(z) / static_cast<float>(kSubdivisions);
+        const float z1 = -size + 2.0f * size * static_cast<float>(z + 1) / static_cast<float>(kSubdivisions);
+        for (int x = 0; x < kSubdivisions; ++x) {
+            const float x0 = -size + 2.0f * size * static_cast<float>(x) / static_cast<float>(kSubdivisions);
+            const float x1 = -size + 2.0f * size * static_cast<float>(x + 1) / static_cast<float>(kSubdivisions);
+            push_ground_vertex(x0, z0);
+            push_ground_vertex(x1, z0);
+            push_ground_vertex(x1, z1);
+            push_ground_vertex(x0, z0);
+            push_ground_vertex(x1, z1);
+            push_ground_vertex(x0, z1);
+        }
+    }
 }
 
 void append_sky_quad(std::vector<Vertex>& vertices) {
     const std::array<float, 3> top = {0.20f, 0.39f, 0.62f};
     const std::array<float, 3> horizon = {0.77f, 0.83f, 0.88f};
 
-    auto push_vertex = [&](float x, float y, const std::array<float, 3>& color) {
-        vertices.push_back({{x, y, 0.0f}, {color[0], color[1], color[2]}});
+    auto push_sky_vertex = [&](float x, float y, const std::array<float, 3>& color) {
+        push_vertex(vertices, make_float3(x, y, 0.0f), color, make_float3(0.0f, 0.0f, -1.0f));
     };
 
-    push_vertex(-1.0f, 1.0f, top);
-    push_vertex(1.0f, 1.0f, top);
-    push_vertex(1.0f, -1.0f, horizon);
+    push_sky_vertex(-1.0f, 1.0f, top);
+    push_sky_vertex(1.0f, 1.0f, top);
+    push_sky_vertex(1.0f, -1.0f, horizon);
 
-    push_vertex(-1.0f, 1.0f, top);
-    push_vertex(1.0f, -1.0f, horizon);
-    push_vertex(-1.0f, -1.0f, horizon);
+    push_sky_vertex(-1.0f, 1.0f, top);
+    push_sky_vertex(1.0f, -1.0f, horizon);
+    push_sky_vertex(-1.0f, -1.0f, horizon);
 }
 
 void append_grid(std::vector<Vertex>& vertices, float size, int half_count) {
@@ -492,10 +707,12 @@ void append_grid(std::vector<Vertex>& vertices, float size, int half_count) {
     const float b = 0.25f;
     for (int i = -half_count; i <= half_count; ++i) {
         const float value = size * static_cast<float>(i) / static_cast<float>(half_count);
-        vertices.push_back({{value, 0.0f, -size}, {r, g, b}});
-        vertices.push_back({{value, 0.0f, size}, {r, g, b}});
-        vertices.push_back({{-size, 0.0f, value}, {r, g, b}});
-        vertices.push_back({{size, 0.0f, value}, {r, g, b}});
+        const std::array<float, 3> color = {r, g, b};
+        const Float3 normal = make_float3(0.0f, 1.0f, 0.0f);
+        push_vertex(vertices, make_float3(value, 0.0f, -size), color, normal);
+        push_vertex(vertices, make_float3(value, 0.0f, size), color, normal);
+        push_vertex(vertices, make_float3(-size, 0.0f, value), color, normal);
+        push_vertex(vertices, make_float3(size, 0.0f, value), color, normal);
     }
 }
 
@@ -552,6 +769,7 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
     scene.view = look_at_matrix(eye, input.camera_target, make_float3(0.0f, 1.0f, 0.0f));
     scene.projection = perspective_matrix(50.0f * kPi / 180.0f, aspect, 10.0f, 500000.0f);
     scene.clip_space = orthographic_identity_clip_matrix();
+    scene.camera_position = eye;
 
     append_sky_quad(scene.sky_vertices);
     append_ground_plane(scene.ground_vertices, 140000.0f);
@@ -570,6 +788,7 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
         RenderScene::ObjectBatch batch;
         create_object_geometry(object, batch.vertices);
         batch.world = build_object_world_matrix(object);
+        batch.material_key = resolve_material_key(object);
         scene.object_batches.push_back(std::move(batch));
     }
 

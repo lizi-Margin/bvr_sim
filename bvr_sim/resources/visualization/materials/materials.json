@@ -1,0 +1,84 @@
+{
+  "materials": {
+    "sky": {
+      "albedo": "",
+      "normal": "",
+      "roughness": "",
+      "metallic": "",
+      "team_tint_strength": 0.0,
+      "specular_strength": 0.0,
+      "specular_power": 1.0,
+      "terrain": false
+    },
+    "terrain": {
+      "albedo": "",
+      "normal": "",
+      "roughness": "",
+      "metallic": "",
+      "team_tint_strength": 1.0,
+      "specular_strength": 0.04,
+      "specular_power": 12.0,
+      "terrain": true
+    },
+    "aircraft_default": {
+      "albedo": "visualization/textures/generic_metal_albedo.png",
+      "normal": "visualization/textures/generic_metal_normal.png",
+      "roughness": "visualization/textures/generic_metal_roughness.png",
+      "metallic": "visualization/textures/generic_metal_metallic.png",
+      "team_tint_strength": 0.48,
+      "specular_strength": 0.34,
+      "specular_power": 48.0,
+      "terrain": false
+    },
+    "missile_default": {
+      "albedo": "visualization/textures/generic_metal_albedo.png",
+      "normal": "visualization/textures/generic_metal_normal.png",
+      "roughness": "visualization/textures/generic_metal_roughness.png",
+      "metallic": "visualization/textures/generic_metal_metallic.png",
+      "team_tint_strength": 0.62,
+      "specular_strength": 0.42,
+      "specular_power": 64.0,
+      "terrain": false
+    },
+    "aircraft_dark_metal": {
+      "base": "aircraft_default",
+      "team_tint_strength": 0.42,
+      "specular_strength": 0.26,
+      "specular_power": 40.0,
+      "terrain": false
+    },
+    "aircraft_bright_metal": {
+      "base": "aircraft_default",
+      "team_tint_strength": 0.52,
+      "specular_strength": 0.40,
+      "specular_power": 56.0,
+      "terrain": false
+    },
+    "missile_bright_metal": {
+      "base": "missile_default",
+      "team_tint_strength": 0.70,
+      "specular_strength": 0.55,
+      "specular_power": 80.0,
+      "terrain": false
+    }
+  },
+  "model_materials": {
+    "F15": "aircraft_bright_metal",
+    "F15-original": "aircraft_bright_metal",
+    "F16": "aircraft_dark_metal",
+    "F16-original": "aircraft_dark_metal",
+    "F18": "aircraft_bright_metal",
+    "F18-original": "aircraft_bright_metal",
+    "F22": "aircraft_dark_metal",
+    "F22-original": "aircraft_dark_metal",
+    "AIM-120": "missile_bright_metal",
+    "AIM-120C": "missile_bright_metal",
+    "AIM-120C5": "missile_bright_metal",
+    "AIM-120C7": "missile_bright_metal",
+    "AIM-120C-MModelA": "missile_bright_metal",
+    "AIM-120C-MModelA-Poor": "missile_bright_metal",
+    "AIM-9": "missile_default",
+    "AIM-9M": "missile_default",
+    "AIM-9M-Omni": "missile_default"
+  }
+}
