@@ -84,16 +84,16 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             const int dy = mouse_y - window->input.last_mouse_y;
             window->input.last_mouse_x = mouse_x;
             window->input.last_mouse_y = mouse_y;
-            window->input.camera_yaw += static_cast<float>(dx) * 0.006f;
+            window->input.camera_yaw -= static_cast<float>(dx) * 0.006f;
             window->input.camera_pitch += static_cast<float>(dy) * 0.0045f;
-            window->input.camera_pitch = std::clamp(window->input.camera_pitch, 0.12f, 1.45f);
+            window->input.camera_pitch = std::clamp(window->input.camera_pitch, -1.45f, 1.45f);
         }
         return 0;
     case WM_MOUSEWHEEL:
         if (window) {
             const int delta = GET_WHEEL_DELTA_WPARAM(w_param);
             window->input.camera_distance -= static_cast<float>(delta) * 6.4f;
-            window->input.camera_distance = std::clamp(window->input.camera_distance, 3000.0f, 180000.0f);
+            window->input.camera_distance = std::clamp(window->input.camera_distance, 1000.0f, 180000.0f);
         }
         return 0;
     case WM_KEYDOWN:
@@ -107,6 +107,14 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         }
         if (w_param == VK_F2) {
             cycle_follow_target(window->input);
+            return 0;
+        }
+        if (w_param == VK_F3) {
+            window->input.shadows_enabled = !window->input.shadows_enabled;
+            return 0;
+        }
+        if (w_param == VK_F4) {
+            window->input.material_system_enabled = !window->input.material_system_enabled;
             return 0;
         }
         if (w_param == VK_OEM_PLUS || w_param == VK_ADD) {
@@ -160,8 +168,8 @@ void update_camera(ViewerInputState& input, float dt_seconds) {
 
     if (input.move_forward) move = add(move, scale(forward, -1.0f));
     if (input.move_backward) move = add(move, scale(forward, 1.0f));
-    if (input.move_left) move = add(move, right);
-    if (input.move_right) move = add(move, scale(right, -1.0f));
+    if (input.move_left) move = add(move, scale(right, -1.0f));
+    if (input.move_right) move = add(move, right);
     if (input.move_up) move.y += 1.0f;
     if (input.move_down) move.y -= 1.0f;
 
@@ -272,8 +280,13 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
           << "  Mode " << (input.camera_mode == ViewerInputState::CameraMode::Free ? "free" : "follow");
     draw_line(16, 40, line2.str());
 
+    std::ostringstream line3;
+    line3 << "Shadows " << (input.shadows_enabled ? "on" : "off")
+          << "  Materials " << (input.material_system_enabled ? "full" : "simple");
+    draw_line(16, 64, line3.str());
+
     draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
-    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 free  F2 follow/next");
+    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 free  F2 follow/next  F3 shadows  F4 materials");
 
     if (font && old_font) {
         SelectObject(dc, old_font);

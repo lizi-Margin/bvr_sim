@@ -89,13 +89,22 @@ bool upload_scene_constants(D3D11Context& d3d11, const RenderCommand& command) {
         SceneConstants constants{};
         constants.world_view_proj = command.world_view_proj;
         constants.world = command.world;
-        constants.light_direction_ambient = {-0.42f, 0.78f, -0.46f, 0.34f};
-        constants.light_color_intensity = {1.0f, 0.96f, 0.88f, 0.92f};
-        const D3D11Context::MaterialResource* material = find_material(d3d11, command.material_key);
+        constants.light_direction_ambient = {-0.40f, 0.82f, -0.40f, 0.40f};
+        constants.light_color_intensity = {1.05f, 1.00f, 0.94f, 1.08f};
+        const D3D11Context::MaterialResource* material = command.use_material_system ? find_material(d3d11, command.material_key) : nullptr;
         const bool terrain_material = material ? material->terrain : command.terrain_material;
-        const float team_tint_strength = material ? material->team_tint_strength : 1.0f;
-        const float specular_strength = material ? material->specular_strength : command.specular_strength;
-        const float specular_power = material ? material->specular_power : command.specular_power;
+        const float fog_start = material ? material->fog_start : 65000.0f;
+        const float fog_density = material ? material->fog_density : (terrain_material ? 0.000022f : 0.000010f);
+        const std::array<float, 3> fog_color = material ? material->fog_color : std::array<float, 3>{0.74f, 0.81f, 0.85f};
+        const float team_tint_strength = command.use_material_system
+            ? 0.0f
+            : (terrain_material ? 1.0f : 1.0f);
+        const float specular_strength = command.use_material_system
+            ? (material ? material->specular_strength : command.specular_strength)
+            : (terrain_material ? 0.02f : 0.18f);
+        const float specular_power = command.use_material_system
+            ? (material ? material->specular_power : command.specular_power)
+            : (terrain_material ? 10.0f : 24.0f);
         constants.material_flags = {
             command.lighting_enabled ? 1.0f : 0.0f,
             terrain_material ? 1.0f : 0.0f,
@@ -106,11 +115,11 @@ bool upload_scene_constants(D3D11Context& d3d11, const RenderCommand& command) {
             command.camera_position.x,
             command.camera_position.y,
             command.camera_position.z,
-            65000.0f
+            fog_start
         };
-        constants.fog_color_density = {0.72f, 0.80f, 0.84f, terrain_material ? 0.000026f : 0.000015f};
-        constants.ambient_sky_ground = {0.42f, 0.18f, 0.0f, 0.0f};
-        constants.material_tint = {team_tint_strength, 0.0f, 0.0f, 0.0f};
+        constants.fog_color_density = {fog_color[0], fog_color[1], fog_color[2], fog_density};
+        constants.ambient_sky_ground = {0.58f, 0.28f, 0.0f, 0.0f};
+        constants.material_tint = {team_tint_strength, command.opacity, 0.0f, 0.0f};
         std::memcpy(mapped.pData, &constants, sizeof(constants));
         d3d11.context->Unmap(d3d11.constant_buffer, 0);
     } else {
@@ -119,7 +128,7 @@ bool upload_scene_constants(D3D11Context& d3d11, const RenderCommand& command) {
     return true;
 }
 
-void bind_draw_state(D3D11Context& d3d11, D3D11_PRIMITIVE_TOPOLOGY topology, bool depth_enabled) {
+void bind_draw_state(D3D11Context& d3d11, D3D11_PRIMITIVE_TOPOLOGY topology, bool depth_enabled, bool depth_write_enabled, bool blend_enabled) {
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
     if (!d3d11.common_pipeline_bound) {
@@ -137,38 +146,56 @@ void bind_draw_state(D3D11Context& d3d11, D3D11_PRIMITIVE_TOPOLOGY topology, boo
         d3d11.context->IASetPrimitiveTopology(topology);
         d3d11.current_topology = topology;
     }
-    ID3D11DepthStencilState* depth_state = depth_enabled ? d3d11.depth_state : d3d11.depth_disabled_state;
+    ID3D11DepthStencilState* depth_state = d3d11.depth_disabled_state;
+    if (depth_enabled) {
+        depth_state = depth_write_enabled ? d3d11.depth_state : d3d11.depth_readonly_state;
+    }
     if (d3d11.current_depth_state != depth_state) {
         d3d11.context->OMSetDepthStencilState(depth_state, 0);
         d3d11.current_depth_state = depth_state;
     }
+    if (d3d11.blend_enabled != blend_enabled) {
+        const float blend_factor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        d3d11.context->OMSetBlendState(blend_enabled ? d3d11.alpha_blend_state : nullptr, blend_factor, 0xffffffff);
+        d3d11.blend_enabled = blend_enabled;
+    }
 }
 
-void bind_material_texture(D3D11Context& d3d11, const std::string& material_key) {
+void bind_material_texture(D3D11Context& d3d11, const RenderCommand& command) {
     d3d11.context->PSSetConstantBuffers(0, 1, &d3d11.constant_buffer);
     d3d11.context->PSSetSamplers(0, 1, &d3d11.texture_sampler);
 
-    if (d3d11.material_textures_bound && d3d11.current_material_key == material_key) {
+    const std::string cache_key = command.use_material_system ? command.material_key : "__simple__:" + command.material_key;
+    if (d3d11.material_textures_bound && d3d11.current_material_key == cache_key) {
         return;
     }
 
-    const D3D11Context::MaterialResource* material = find_material(d3d11, material_key);
+    const D3D11Context::MaterialResource* material = command.use_material_system ? find_material(d3d11, command.material_key) : nullptr;
     ID3D11ShaderResourceView* srvs[4] = {
         d3d11.white_texture_srv,
         d3d11.flat_normal_texture_srv,
         d3d11.white_texture_srv,
         d3d11.black_texture_srv,
     };
-    if (material) {
+    if (!command.use_material_system) {
+        if (command.terrain_material) {
+            srvs[0] = d3d11.terrain_texture_srv ? d3d11.terrain_texture_srv : d3d11.white_texture_srv;
+        } else {
+            srvs[0] = d3d11.object_texture_srv ? d3d11.object_texture_srv : d3d11.white_texture_srv;
+            srvs[1] = d3d11.flat_normal_texture_srv;
+            srvs[2] = d3d11.white_texture_srv;
+            srvs[3] = d3d11.black_texture_srv;
+        }
+    } else if (material) {
         srvs[0] = material->albedo_srv ? material->albedo_srv : srvs[0];
         srvs[1] = material->normal_srv ? material->normal_srv : srvs[1];
         srvs[2] = material->roughness_srv ? material->roughness_srv : srvs[2];
         srvs[3] = material->metallic_srv ? material->metallic_srv : srvs[3];
-    } else if (material_key == "terrain") {
+    } else if (command.material_key == "terrain") {
         srvs[0] = d3d11.terrain_texture_srv ? d3d11.terrain_texture_srv : d3d11.white_texture_srv;
     }
     d3d11.context->PSSetShaderResources(0, 4, srvs);
-    d3d11.current_material_key = material_key;
+    d3d11.current_material_key = cache_key;
     d3d11.material_textures_bound = true;
 }
 
@@ -183,8 +210,8 @@ bool upload_and_draw(
     if (!upload_vertices(d3d11, vertices) || !upload_scene_constants(d3d11, command)) {
         return false;
     }
-    bind_draw_state(d3d11, command.topology, command.depth_enabled);
-    bind_material_texture(d3d11, command.material_key);
+    bind_draw_state(d3d11, command.topology, command.depth_enabled, command.depth_write_enabled, command.blend_enabled);
+    bind_material_texture(d3d11, command);
     d3d11.context->Draw(static_cast<UINT>(vertices.size()), 0);
 
     ++stats.draw_calls;
@@ -546,6 +573,46 @@ bool extract_json_bool(const std::string& block, const std::string& field_name, 
     return fallback;
 }
 
+std::array<float, 3> extract_json_float3(
+    const std::string& block,
+    const std::string& field_name,
+    const std::array<float, 3>& fallback) {
+    const std::string marker = "\"" + field_name + "\"";
+    const size_t marker_pos = block.find(marker);
+    if (marker_pos == std::string::npos) {
+        return fallback;
+    }
+    const size_t colon_pos = block.find(':', marker_pos + marker.size());
+    if (colon_pos == std::string::npos) {
+        return fallback;
+    }
+    const size_t open_pos = block.find('[', colon_pos + 1);
+    const size_t close_pos = block.find(']', open_pos == std::string::npos ? colon_pos + 1 : open_pos + 1);
+    if (open_pos == std::string::npos || close_pos == std::string::npos) {
+        return fallback;
+    }
+
+    std::array<float, 3> values = fallback;
+    size_t value_pos = open_pos + 1;
+    for (int i = 0; i < 3; ++i) {
+        const size_t value_start = block.find_first_of("-0123456789.", value_pos);
+        if (value_start == std::string::npos || value_start > close_pos) {
+            return fallback;
+        }
+        const size_t value_end = block.find_first_not_of("-0123456789.eE+", value_start);
+        try {
+            values[i] = std::stof(block.substr(
+                value_start,
+                value_end == std::string::npos ? std::string::npos : value_end - value_start
+            ));
+        } catch (...) {
+            return fallback;
+        }
+        value_pos = value_end == std::string::npos ? close_pos : value_end;
+    }
+    return values;
+}
+
 std::string extract_json_object_block(const std::string& text, const std::string& key) {
     const std::string marker = "\"" + key + "\"";
     const size_t marker_pos = text.find(marker);
@@ -615,6 +682,9 @@ void load_material_resources(D3D11Context& d3d11) {
         material.team_tint_strength = key == "terrain" ? 1.0f : 0.55f;
         material.specular_strength = key == "terrain" ? 0.04f : 0.28f;
         material.specular_power = key == "missile_default" ? 64.0f : 48.0f;
+        material.fog_start = 65000.0f;
+        material.fog_density = key == "terrain" ? 0.000022f : 0.000010f;
+        material.fog_color = {0.74f, 0.81f, 0.85f};
         if (!block.empty()) {
             const std::string base_key = extract_json_string(block, "base");
             const D3D11Context::MaterialResource* base_material = base_key.empty() ? nullptr : find_material(d3d11, base_key);
@@ -623,6 +693,9 @@ void load_material_resources(D3D11Context& d3d11) {
                 material.team_tint_strength = base_material->team_tint_strength;
                 material.specular_strength = base_material->specular_strength;
                 material.specular_power = base_material->specular_power;
+                material.fog_start = base_material->fog_start;
+                material.fog_density = base_material->fog_density;
+                material.fog_color = base_material->fog_color;
                 material.albedo_srv = base_material->albedo_srv;
                 material.normal_srv = base_material->normal_srv;
                 material.roughness_srv = base_material->roughness_srv;
@@ -633,6 +706,9 @@ void load_material_resources(D3D11Context& d3d11) {
             material.team_tint_strength = extract_json_float(block, "team_tint_strength", material.team_tint_strength);
             material.specular_strength = extract_json_float(block, "specular_strength", material.specular_strength);
             material.specular_power = extract_json_float(block, "specular_power", material.specular_power);
+            material.fog_start = extract_json_float(block, "fog_start", material.fog_start);
+            material.fog_density = extract_json_float(block, "fog_density", material.fog_density);
+            material.fog_color = extract_json_float3(block, "fog_color", material.fog_color);
 
             std::string image_error;
             const std::string albedo = extract_json_string(block, "albedo");
@@ -713,7 +789,9 @@ void destroy_d3d11(D3D11Context& d3d11) {
     safe_release(d3d11.black_texture_srv);
     safe_release(d3d11.flat_normal_texture_srv);
     safe_release(d3d11.white_texture_srv);
+    safe_release(d3d11.alpha_blend_state);
     safe_release(d3d11.depth_disabled_state);
+    safe_release(d3d11.depth_readonly_state);
     safe_release(d3d11.depth_state);
     safe_release(d3d11.rasterizer_state);
     safe_release(d3d11.dynamic_vertex_buffer);
@@ -874,6 +952,14 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
         return false;
     }
 
+    D3D11_DEPTH_STENCIL_DESC depth_readonly_desc = depth_desc;
+    depth_readonly_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+    hr = d3d11.device->CreateDepthStencilState(&depth_readonly_desc, &d3d11.depth_readonly_state);
+    if (FAILED(hr) || !d3d11.depth_readonly_state) {
+        error = "CreateDepthStencilState(depth_readonly) failed";
+        return false;
+    }
+
     D3D11_DEPTH_STENCIL_DESC depth_disabled_desc = {};
     depth_disabled_desc.DepthEnable = FALSE;
     depth_disabled_desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -881,6 +967,21 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
     hr = d3d11.device->CreateDepthStencilState(&depth_disabled_desc, &d3d11.depth_disabled_state);
     if (FAILED(hr) || !d3d11.depth_disabled_state) {
         error = "CreateDepthStencilState(depth_disabled) failed";
+        return false;
+    }
+
+    D3D11_BLEND_DESC blend_desc = {};
+    blend_desc.RenderTarget[0].BlendEnable = TRUE;
+    blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    hr = d3d11.device->CreateBlendState(&blend_desc, &d3d11.alpha_blend_state);
+    if (FAILED(hr) || !d3d11.alpha_blend_state) {
+        error = "CreateBlendState(alpha) failed";
         return false;
     }
 

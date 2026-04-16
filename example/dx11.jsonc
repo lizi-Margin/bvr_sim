@@ -1,0 +1,205 @@
+{
+    "dt": 0.005,
+    "max_steps": 100000,
+    "red_meta": {
+        "A00": {
+        "unit_spec": "F22",
+        "color": "Red",
+        "position": [78000.0, -9000.0, 9000.0],
+        "velocity": [-290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-120C7",
+            "R02": "AIM-9M-Omni",
+            "L01": "AIM-120C7",
+            "L02": "AIM-9M-Omni",
+        },
+        "opponent_type": "standoff"
+        // "opponent_type": "tactical"
+        },
+        "A01": {
+        "unit_spec": "F22",
+        "color": "Red",
+        "position": [78000.0, 9000.0, 9000.0],
+        "velocity": [-290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-120C7",
+            "R02": "AIM-9M-Omni",
+            "L01": "AIM-120C7",
+            "L02": "AIM-9M-Omni",
+        },
+        // "opponent_type": "tactical"
+        "opponent_type": "standoff"
+        },
+        "A02": {
+        "unit_spec": "F16",
+        "color": "Red",
+        "position": [70000.0, 4500.0, 7000.0],
+        "velocity": [-290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M-Omni",
+            "R02": "AIM-9M-Omni",
+            "R03": "AIM-9M-Omni",
+            "L01": "AIM-9M-Omni",
+            "L02": "AIM-9M-Omni",
+            "L03": "AIM-9M-Omni",
+        },
+        "opponent_type": "tactical"
+        },
+        "A03": {
+        "unit_spec": "F16",
+        "color": "Red",
+        "position": [70000.0, 1500.0, 7000.0],
+        "velocity": [-290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M-Omni",
+            "R02": "AIM-9M-Omni",
+            "R03": "AIM-9M-Omni",
+            "L01": "AIM-9M-Omni",
+            "L02": "AIM-9M-Omni",
+            "L03": "AIM-9M-Omni",
+        },
+        "opponent_type": "tactical"
+        },
+        "A04": {
+        "unit_spec": "F16",
+        "color": "Red",
+        "position": [70000.0, -1500.0, 7000.0],
+        "velocity": [-290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M-Omni",
+            "R02": "AIM-9M-Omni",
+            "R03": "AIM-9M-Omni",
+            "L01": "AIM-9M-Omni",
+            "L02": "AIM-9M-Omni",
+            "L03": "AIM-9M-Omni",
+        },
+        "opponent_type": "tactical"
+        },
+        "A05": {
+        "unit_spec": "F16",
+        "color": "Red",
+        "position": [70000.0, -4500.0, 7000.0],
+        "velocity": [-290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M-Omni",
+            "R02": "AIM-9M-Omni",
+            "R03": "AIM-9M-Omni",
+            "L01": "AIM-9M-Omni",
+            "L02": "AIM-9M-Omni",
+            "L03": "AIM-9M-Omni",
+        },
+        "opponent_type": "tactical"
+        }
+    },
+    "blue_meta": {
+        "B00": {
+        "unit_spec": "F22",
+        "color": "Blue",
+        "position": [22000.0, 9000.0, 9000.0],
+        "velocity": [290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-120C-MModelA-Poor",
+            "R02": "AIM-9M",
+            "L01": "AIM-120C-MModelA-Poor",
+            "L02": "AIM-9M",
+        },
+        // "opponent_type": "standoff"
+        "opponent_type": "tactical"
+        },
+        "B01": {
+        "unit_spec": "F22",
+        "color": "Blue",
+        "position": [22000.0, -9000.0, 9000.0],
+        "velocity": [290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-120C-MModelA-Poor",
+            "R02": "AIM-9M",
+            "L01": "AIM-120C-MModelA-Poor",
+            "L02": "AIM-9M",
+        },
+        // "opponent_type": "standoff"
+        "opponent_type": "tactical"
+        },
+        "B02": {
+        "unit_spec": "F16",
+        "color": "Blue",
+        "position": [30000.0, -4500.0, 7000.0],
+        "velocity": [290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M",
+            "R02": "AIM-9M",
+            "L01": "AIM-9M",
+            "L02": "AIM-9M",
+        },
+        "opponent_type": "tactical"
+        },
+        "B03": {
+        "unit_spec": "F16",
+        "color": "Blue",
+        "position": [30000.0, -1500.0, 7000.0],
+        "velocity": [290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M",
+            "R02": "AIM-9M",
+            "L01": "AIM-9M",
+            "L02": "AIM-9M",
+        },
+        "opponent_type": "tactical"
+        },
+        "B04": {
+        "unit_spec": "F16",
+        "color": "Blue",
+        "position": [30000.0, 1500.0, 7000.0],
+        "velocity": [290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M",
+            "R02": "AIM-9M",
+            "L01": "AIM-9M",
+            "L02": "AIM-9M",
+        },
+        "opponent_type": "tactical"
+        },
+        "B05": {
+        "unit_spec": "F16",
+        "color": "Blue",
+        "position": [30000.0, 4500.0, 7000.0],
+        "velocity": [290.0, 0.0, 0.0],
+        "fdm_type": "jsbsim",
+        "record": false,
+        "pylon_mounts": {
+            "R01": "AIM-9M",
+            "R02": "AIM-9M",
+            "L01": "AIM-9M",
+            "L02": "AIM-9M",
+        },
+        "opponent_type": "tactical"
+        }
+    },
+    "ground_units": {},
+    "field_size": 140000.0,
+    "obs_type": "text",
+    "blue_opponent_type": null,
+    "reward_config": {}
+}

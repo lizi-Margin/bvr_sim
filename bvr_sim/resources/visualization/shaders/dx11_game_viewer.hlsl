@@ -73,14 +73,19 @@ float3 apply_normal_map(float3 geometric_normal, float3 world_position, float2 u
 }
 
 float4 ps_main(PSInput input) : SV_TARGET {
+    float opacity = saturate(u_material_tint.y);
     if (u_material_flags.x < 0.5) {
-        return float4(saturate(input.color), 1.0);
+        return float4(saturate(input.color), opacity);
     }
 
+    bool simple_material = (u_material_flags.z < 0.2 && u_material_flags.w < 30.0 && u_material_flags.y < 0.5);
     float3 texture_color = u_albedo_texture.Sample(u_albedo_sampler, input.uv).rgb;
     texture_color = max(texture_color, float3(0.18, 0.18, 0.18));
     float team_tint_strength = saturate(u_material_tint.x);
     float3 base_color = texture_color * lerp(float3(1.0, 1.0, 1.0), input.color, team_tint_strength);
+    if (simple_material) {
+        base_color = input.color;
+    }
     if (u_material_flags.y > 0.5) {
         base_color = input.color * texture_color;
         float terrain = terrain_noise(input.world_position.xz);
@@ -91,13 +96,14 @@ float4 ps_main(PSInput input) : SV_TARGET {
     }
 
     float3 normal = normalize(input.normal);
-    normal = apply_normal_map(normal, input.world_position, input.uv, u_material_flags.y < 0.5 ? 1.0 : 0.0);
+    normal = apply_normal_map(normal, input.world_position, input.uv, (u_material_flags.y < 0.5 && !simple_material) ? 1.0 : 0.0);
     float3 light_dir = normalize(u_light_direction_ambient.xyz);
     float ndotl = saturate(dot(normal, light_dir));
+    float rim = pow(1.0 - saturate(dot(normal, normalize(u_camera_position_fog_start.xyz - input.world_position))), 2.2);
 
     float hemisphere = normal.y * 0.5 + 0.5;
     float ambient = lerp(u_ambient_sky_ground.y, u_ambient_sky_ground.x, hemisphere);
-    float3 diffuse = base_color * max(0.22, ambient + ndotl * u_light_color_intensity.w) * u_light_color_intensity.rgb;
+    float3 diffuse = base_color * max(0.30, ambient + ndotl * u_light_color_intensity.w) * u_light_color_intensity.rgb;
 
     float3 view_dir = normalize(u_camera_position_fog_start.xyz - input.world_position);
     float3 half_dir = normalize(light_dir + view_dir);
@@ -106,19 +112,23 @@ float4 ps_main(PSInput input) : SV_TARGET {
     if (u_material_flags.y > 0.5) {
         roughness = 0.85;
         metallic = 0.0;
+    } else if (simple_material) {
+        roughness = 0.72;
+        metallic = 0.0;
     }
     float specular_strength = u_material_flags.z * lerp(0.55, 1.55, metallic);
     float specular_power = max(2.0, lerp(96.0, 12.0, roughness) + u_material_flags.w * 0.25);
     float specular = pow(saturate(dot(normal, half_dir)), specular_power) * specular_strength * (1.0 - roughness * 0.55);
 
-    float3 lit_color = diffuse + specular * u_light_color_intensity.rgb;
+    float self_shadow = lerp(0.78, 1.0, ndotl);
+    float3 lit_color = diffuse * self_shadow + specular * u_light_color_intensity.rgb + base_color * rim * 0.10;
     float3 final_color = lerp(base_color, lit_color, saturate(u_material_flags.x));
-    final_color = max(final_color, input.color * 0.18);
+    final_color = max(final_color, input.color * 0.28);
 
     float distance_to_camera = distance(u_camera_position_fog_start.xyz, input.world_position);
     float fog_distance = max(0.0, distance_to_camera - u_camera_position_fog_start.w);
     float fog_factor = saturate(1.0 - exp(-fog_distance * u_fog_color_density.w));
     final_color = lerp(final_color, u_fog_color_density.rgb, fog_factor);
 
-    return float4(saturate(final_color), 1.0);
+    return float4(saturate(final_color), opacity);
 }

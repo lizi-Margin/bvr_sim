@@ -1,4 +1,5 @@
 #include "dx11_game_viewer_internal.hxx"
+#include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
 
 #include <algorithm>
@@ -17,8 +18,6 @@ namespace bvr_sim {
 #ifdef _WIN32
 
 namespace {
-
-constexpr float kPi = 3.1415926535f;
 
 MeshLibrary& mesh_library() {
     static MeshLibrary library;
@@ -445,6 +444,22 @@ Float4x4 rotation_y_matrix(float angle) {
     return out;
 }
 
+Float4x4 shadow_projection_matrix(const std::array<float, 4>& plane, const std::array<float, 4>& light) {
+    Float4x4 out{};
+    const float dot_value =
+        plane[0] * light[0] +
+        plane[1] * light[1] +
+        plane[2] * light[2] +
+        plane[3] * light[3];
+
+    for (int row = 0; row < 4; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            out.m[row][col] = (row == col ? dot_value : 0.0f) - light[col] * plane[row];
+        }
+    }
+    return out;
+}
+
 using Mat3 = std::array<float, 9>;
 
 Mat3 mat3_mul(const Mat3& a, const Mat3& b) {
@@ -522,6 +537,14 @@ Float4x4 build_object_rotation_matrix(const TelemetryObjectState& object) {
     const Mat3 sim_matrix = build_sim_orientation_matrix(object.orientation);
     const Mat3 viewer_matrix = convert_nwu_matrix_to_viewer(sim_matrix);
     return row_vector_matrix_from_mat3(viewer_matrix);
+}
+
+Float3 transform_direction(const Mat3& matrix, const c3utils::Vector3& direction) {
+    return make_float3(
+        static_cast<float>(matrix[0] * direction[0] + matrix[1] * direction[1] + matrix[2] * direction[2]),
+        static_cast<float>(matrix[3] * direction[0] + matrix[4] * direction[1] + matrix[5] * direction[2]),
+        static_cast<float>(matrix[6] * direction[0] + matrix[7] * direction[1] + matrix[8] * direction[2])
+    );
 }
 
 Float4x4 perspective_matrix(float fov_y_radians, float aspect, float z_near, float z_far) {
@@ -612,12 +635,12 @@ std::string resolve_material_key(const TelemetryObjectState& object) {
 
 std::array<float, 3> team_color(const TelemetryObjectState& object) {
     if (object.team == "Blue") {
-        return {0.34f, 0.73f, 1.0f};
+        return {0.26f, 0.72f, 1.0f};
     }
     if (object.team == "Red") {
-        return {1.0f, 0.42f, 0.34f};
+        return {1.0f, 0.30f, 0.24f};
     }
-    return {0.85f, 0.85f, 0.78f};
+    return {0.92f, 0.92f, 0.84f};
 }
 
 void push_vertex(
@@ -732,11 +755,11 @@ void append_ground_plane(std::vector<Vertex>& vertices, float size) {
             const float x0 = -size + 2.0f * size * static_cast<float>(x) / static_cast<float>(kSubdivisions);
             const float x1 = -size + 2.0f * size * static_cast<float>(x + 1) / static_cast<float>(kSubdivisions);
             push_ground_vertex(x0, z0);
+            push_ground_vertex(x1, z1);
             push_ground_vertex(x1, z0);
-            push_ground_vertex(x1, z1);
             push_ground_vertex(x0, z0);
-            push_ground_vertex(x1, z1);
             push_ground_vertex(x0, z1);
+            push_ground_vertex(x1, z1);
         }
     }
 }
@@ -776,7 +799,7 @@ void append_grid(std::vector<Vertex>& vertices, float size, int half_count) {
 Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
     const float scale_value = object_world_radius(object) / 180.0f;
     const Float4x4 scale_m = scale_matrix(scale_value, scale_value, scale_value);
-    const Float4x4 model_offset = rotation_y_matrix(270.0f * kPi / 180.0f);
+    const Float4x4 model_offset = rotation_y_matrix(static_cast<float>(c3utils::deg2rad(270.0)));
     const Float4x4 rotation_m = build_object_rotation_matrix(object);
     const Float4x4 translation_m = translation_matrix(
         static_cast<float>(object.position[0]),
@@ -784,6 +807,18 @@ Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
         static_cast<float>(object.position[1])
     );
     return multiply(multiply(multiply(scale_m, model_offset), rotation_m), translation_m);
+}
+
+Float4x4 build_shadow_world_matrix(const TelemetryObjectState& object) {
+    static const std::array<float, 4> shadow_plane = {0.0f, 1.0f, 0.0f, 0.0f};
+    static const std::array<float, 4> shadow_light = {16000.0f, 24000.0f, 12000.0f, 1.0f};
+    static const Float4x4 shadow_projection = shadow_projection_matrix(shadow_plane, shadow_light);
+    const Float4x4 lift_translation = translation_matrix(
+        static_cast<float>(object.position[0]),
+        static_cast<float>(object.position[2]) + 2.0f,
+        static_cast<float>(object.position[1])
+    );
+    return multiply(build_object_world_matrix(object), multiply(lift_translation, shadow_projection));
 }
 
 void create_object_geometry(const TelemetryObjectState& object, std::vector<Vertex>& vertices) {
@@ -811,32 +846,56 @@ void create_object_geometry(const TelemetryObjectState& object, std::vector<Vert
 RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT height, const WorldSnapshot* snapshot) {
     RenderScene scene;
     ViewerInputState resolved_input = input;
+    bool use_aircraft_view = false;
+    Float3 aircraft_eye{};
+    Float3 aircraft_target{};
+    Float3 aircraft_up{};
 
     if (resolved_input.camera_mode == ViewerInputState::CameraMode::FollowObject && snapshot && !resolved_input.focus_uid.empty()) {
         for (const auto& object : snapshot->objects) {
             if (object.uid == resolved_input.focus_uid) {
-                resolved_input.camera_target = make_float3(
+                const Float3 object_position = make_float3(
                     static_cast<float>(object.position[0]),
                     static_cast<float>(object.position[2]),
                     static_cast<float>(object.position[1])
                 );
+                const Mat3 orientation = convert_nwu_matrix_to_viewer(build_sim_orientation_matrix(object.orientation));
+                const Float3 forward = normalize(make_float3(orientation[0], orientation[3], orientation[6]));
+                const Float3 up = normalize(make_float3(orientation[1], orientation[4], orientation[7]));
+                const float follow_distance = std::max(1000.0f, resolved_input.camera_distance);
+                const c3utils::Vector3 local_camera_offset(-follow_distance, follow_distance * 0.28f, 0.0);
+                const Float3 world_camera_offset = transform_direction(orientation, local_camera_offset);
+                aircraft_eye = add(object_position, world_camera_offset);
+                aircraft_target = add(aircraft_eye, scale(forward, std::max(10000.0f, follow_distance)));
+                aircraft_up = up;
+                use_aircraft_view = true;
                 break;
             }
         }
     }
 
     const float aspect = static_cast<float>(width) / static_cast<float>(std::max(1U, height));
-    const Float3 eye = add(
-        resolved_input.camera_target,
-        make_float3(
-            std::cos(resolved_input.camera_pitch) * std::cos(resolved_input.camera_yaw) * resolved_input.camera_distance,
-            std::sin(resolved_input.camera_pitch) * resolved_input.camera_distance,
-            std::cos(resolved_input.camera_pitch) * std::sin(resolved_input.camera_yaw) * resolved_input.camera_distance
-        )
-    );
+    Float3 eye{};
+    Float3 target{};
+    Float3 up = make_float3(0.0f, 1.0f, 0.0f);
+    if (use_aircraft_view) {
+        eye = aircraft_eye;
+        target = aircraft_target;
+        up = aircraft_up;
+    } else {
+        target = resolved_input.camera_target;
+        eye = add(
+            target,
+            make_float3(
+                std::cos(resolved_input.camera_pitch) * std::cos(resolved_input.camera_yaw) * resolved_input.camera_distance,
+                std::sin(resolved_input.camera_pitch) * resolved_input.camera_distance,
+                std::cos(resolved_input.camera_pitch) * std::sin(resolved_input.camera_yaw) * resolved_input.camera_distance
+            )
+        );
+    }
 
-    scene.view = look_at_matrix(eye, resolved_input.camera_target, make_float3(0.0f, 1.0f, 0.0f));
-    scene.projection = perspective_matrix(resolved_input.camera_fov_y * kPi / 180.0f, aspect, 10.0f, 500000.0f);
+    scene.view = look_at_matrix(eye, target, up);
+    scene.projection = perspective_matrix(static_cast<float>(c3utils::deg2rad(resolved_input.camera_fov_y)), aspect, 10.0f, 500000.0f);
     scene.clip_space = orthographic_identity_clip_matrix();
     scene.camera_position = eye;
 
@@ -848,16 +907,36 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
         return scene;
     }
 
+    if (resolved_input.shadows_enabled) {
+        scene.shadow_batches.reserve(snapshot->objects.size());
+    }
     scene.object_batches.reserve(snapshot->objects.size());
     for (const auto& object : snapshot->objects) {
         if (!object.alive) {
             continue;
         }
 
+        if (resolved_input.shadows_enabled) {
+            RenderScene::ObjectBatch shadow_batch;
+            create_object_geometry(object, shadow_batch.vertices);
+            for (auto& vertex : shadow_batch.vertices) {
+                vertex.color[0] = 0.0f;
+                vertex.color[1] = 0.0f;
+                vertex.color[2] = 0.0f;
+                vertex.uv[0] = 0.0f;
+                vertex.uv[1] = 0.0f;
+            }
+            shadow_batch.world = build_shadow_world_matrix(object);
+            shadow_batch.material_key = "sky";
+            shadow_batch.use_material_system = false;
+            scene.shadow_batches.push_back(std::move(shadow_batch));
+        }
+
         RenderScene::ObjectBatch batch;
         create_object_geometry(object, batch.vertices);
         batch.world = build_object_world_matrix(object);
-        batch.material_key = resolve_material_key(object);
+        batch.material_key = resolved_input.material_system_enabled ? resolve_material_key(object) : "aircraft_default";
+        batch.use_material_system = resolved_input.material_system_enabled;
         scene.object_batches.push_back(std::move(batch));
     }
 

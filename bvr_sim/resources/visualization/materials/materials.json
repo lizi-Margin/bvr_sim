@@ -8,6 +8,9 @@
       "team_tint_strength": 0.0,
       "specular_strength": 0.0,
       "specular_power": 1.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000010,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": false
     },
     "terrain": {
@@ -18,6 +21,9 @@
       "team_tint_strength": 1.0,
       "specular_strength": 0.04,
       "specular_power": 12.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000002,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": true
     },
     "aircraft_default": {
@@ -28,6 +34,9 @@
       "team_tint_strength": 0.48,
       "specular_strength": 0.34,
       "specular_power": 48.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000010,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": false
     },
     "missile_default": {
@@ -38,6 +47,9 @@
       "team_tint_strength": 0.62,
       "specular_strength": 0.42,
       "specular_power": 64.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000010,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": false
     },
     "aircraft_dark_metal": {
@@ -45,6 +57,9 @@
       "team_tint_strength": 0.42,
       "specular_strength": 0.26,
       "specular_power": 40.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000010,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": false
     },
     "aircraft_bright_metal": {
@@ -52,6 +67,9 @@
       "team_tint_strength": 0.52,
       "specular_strength": 0.40,
       "specular_power": 56.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000010,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": false
     },
     "missile_bright_metal": {
@@ -59,6 +77,9 @@
       "team_tint_strength": 0.70,
       "specular_strength": 0.55,
       "specular_power": 80.0,
+      "fog_start": 65000.0,
+      "fog_density": 0.000010,
+      "fog_color": [0.74, 0.81, 0.85],
       "terrain": false
     }
   },

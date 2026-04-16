@@ -47,11 +47,15 @@ RenderCommand make_draw_command(
     const Float4x4& world,
     const Float3& camera_position,
     bool depth_enabled,
+    bool depth_write_enabled,
     bool lighting_enabled,
+    bool blend_enabled,
+    bool use_material_system,
     bool terrain_material,
     std::string material_key,
     float specular_strength,
-    float specular_power) {
+    float specular_power,
+    float opacity) {
     RenderCommand command;
     command.type = RenderCommandType::Draw;
     command.vertices = std::move(vertices);
@@ -60,11 +64,15 @@ RenderCommand make_draw_command(
     command.world = world;
     command.camera_position = camera_position;
     command.depth_enabled = depth_enabled;
+    command.depth_write_enabled = depth_write_enabled;
     command.lighting_enabled = lighting_enabled;
+    command.blend_enabled = blend_enabled;
+    command.use_material_system = use_material_system;
     command.terrain_material = terrain_material;
     command.material_key = std::move(material_key);
     command.specular_strength = specular_strength;
     command.specular_power = specular_power;
+    command.opacity = opacity;
     return command;
 }
 
@@ -84,8 +92,12 @@ RenderCommandList record_render_commands(RenderScene scene) {
         false,
         false,
         false,
+        false,
+        false,
+        false,
         "sky",
         0.0f,
+        1.0f,
         1.0f
     ));
 
@@ -100,9 +112,13 @@ RenderCommandList record_render_commands(RenderScene scene) {
         true,
         true,
         true,
+        false,
+        true,
+        true,
         "terrain",
         0.04f,
-        12.0f
+        12.0f,
+        1.0f
     ));
     command_list.commands.push_back(make_draw_command(
         std::move(scene.grid_vertices),
@@ -111,12 +127,36 @@ RenderCommandList record_render_commands(RenderScene scene) {
         identity_world,
         scene.camera_position,
         true,
+        true,
+        false,
+        false,
         false,
         false,
         "sky",
         0.0f,
+        1.0f,
         1.0f
     ));
+
+    for (auto& batch : scene.shadow_batches) {
+        command_list.commands.push_back(make_draw_command(
+            std::move(batch.vertices),
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            multiply(batch.world, view_projection),
+            batch.world,
+            scene.camera_position,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            "sky",
+            0.0f,
+            1.0f,
+            0.22f
+        ));
+    }
 
     for (auto& batch : scene.object_batches) {
         command_list.commands.push_back(make_draw_command(
@@ -127,10 +167,14 @@ RenderCommandList record_render_commands(RenderScene scene) {
             scene.camera_position,
             true,
             true,
+            true,
+            false,
+            batch.use_material_system,
             false,
             batch.material_key,
             0.28f,
-            48.0f
+            48.0f,
+            1.0f
         ));
     }
 

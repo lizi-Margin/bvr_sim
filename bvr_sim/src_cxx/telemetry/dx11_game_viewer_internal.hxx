@@ -63,11 +63,15 @@ struct RenderCommand {
     Float4x4 world{};
     Float3 camera_position{};
     bool depth_enabled = true;
+    bool depth_write_enabled = true;
     bool lighting_enabled = true;
+    bool blend_enabled = false;
+    bool use_material_system = true;
     bool terrain_material = false;
     std::string material_key = "sky";
     float specular_strength = 0.15f;
     float specular_power = 32.0f;
+    float opacity = 1.0f;
     std::array<float, 4> clear_color{0.0f, 0.0f, 0.0f, 1.0f};
 };
 
@@ -94,8 +98,10 @@ struct RenderScene {
         std::vector<Vertex> vertices;
         Float4x4 world{};
         std::string material_key = "aircraft_default";
+        bool use_material_system = true;
     };
 
+    std::vector<ObjectBatch> shadow_batches;
     std::vector<ObjectBatch> object_batches;
 };
 
@@ -114,12 +120,14 @@ struct ViewerInputState {
     bool dragging = false;
     int last_mouse_x = 0;
     int last_mouse_y = 0;
-    CameraMode camera_mode = CameraMode::Free;
+    CameraMode camera_mode = CameraMode::FollowObject;
     float camera_yaw = 0.70f;
     float camera_pitch = 0.55f;
-    float camera_distance = 30000.0f;
+    float camera_distance = 1000.0f;
     Float3 camera_target{0.0f, 6000.0f, 0.0f};
-    float camera_fov_y = 50.0f;
+    float camera_fov_y = 100.0f;
+    bool shadows_enabled = true;
+    bool material_system_enabled = false;
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;
 };
@@ -157,6 +165,9 @@ struct D3D11Context {
         float team_tint_strength = 1.0f;
         float specular_strength = 0.15f;
         float specular_power = 32.0f;
+        float fog_start = 65000.0f;
+        float fog_density = 0.000010f;
+        std::array<float, 3> fog_color{0.74f, 0.81f, 0.85f};
         ID3D11ShaderResourceView* albedo_srv = nullptr;
         ID3D11ShaderResourceView* normal_srv = nullptr;
         ID3D11ShaderResourceView* roughness_srv = nullptr;
@@ -171,12 +182,15 @@ struct D3D11Context {
     UINT dynamic_vertex_capacity = 0;
     ID3D11RasterizerState* rasterizer_state = nullptr;
     ID3D11DepthStencilState* depth_state = nullptr;
+    ID3D11DepthStencilState* depth_readonly_state = nullptr;
     ID3D11DepthStencilState* depth_disabled_state = nullptr;
+    ID3D11BlendState* alpha_blend_state = nullptr;
     UINT back_buffer_width = 0;
     UINT back_buffer_height = 0;
     bool common_pipeline_bound = false;
     D3D11_PRIMITIVE_TOPOLOGY current_topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
     ID3D11DepthStencilState* current_depth_state = nullptr;
+    bool blend_enabled = false;
     std::string current_material_key;
     bool material_textures_bound = false;
 };

@@ -51,6 +51,8 @@ private:
     long last_command_count_ = 0;
     long last_draw_calls_ = 0;
     long last_vertex_count_ = 0;
+    bool shadows_enabled_ = true;
+    bool material_system_enabled_ = true;
 };
 
 } // namespace bvr_sim

@@ -8,7 +8,7 @@ def get_root_dir() -> str:
 
 
 def main():
-    with open(os.path.join(get_root_dir(), "../example/opengl.jsonc"), "r", encoding="utf-8") as fin:
+    with open(os.path.join(get_root_dir(), "../example/dx11.jsonc"), "r", encoding="utf-8") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)
@@ -26,7 +26,7 @@ def main():
 
     try:
         turn = 0
-        while turn < 2:
+        while turn < 1000:
             sim.core.set_acmi_file_path(f"./test_logs/replay_dx11_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             sim.core.step_sync(1)

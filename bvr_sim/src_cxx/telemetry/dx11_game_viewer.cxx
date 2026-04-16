@@ -80,6 +80,8 @@ json::JSON DX11GameViewer::get_status() const {
     status["last_command_count"] = json::Integral(last_command_count_);
     status["last_draw_calls"] = json::Integral(last_draw_calls_);
     status["last_vertex_count"] = json::Integral(last_vertex_count_);
+    status["shadows_enabled"] = json::Boolean(shadows_enabled_);
+    status["material_system_enabled"] = json::Boolean(material_system_enabled_);
     return status;
 }
 
@@ -184,6 +186,8 @@ void DX11GameViewer::run_loop() noexcept {
             std::lock_guard<std::mutex> lock(state_mutex_);
             last_sim_time_ = snapshot ? snapshot->sim_time : 0.0;
             last_object_count_ = snapshot ? static_cast<long>(snapshot->objects.size()) : 0L;
+            shadows_enabled_ = window.input.shadows_enabled;
+            material_system_enabled_ = window.input.material_system_enabled;
         }
 
         const RenderScene scene = build_render_scene(window.input, width, height, snapshot.get());
@@ -200,6 +204,8 @@ void DX11GameViewer::run_loop() noexcept {
             last_command_count_ = frame_stats.command_count;
             last_draw_calls_ = frame_stats.draw_calls;
             last_vertex_count_ = frame_stats.vertex_count;
+            shadows_enabled_ = window.input.shadows_enabled;
+            material_system_enabled_ = window.input.material_system_enabled;
         }
 
         d3d11.swap_chain->Present(1, 0);
