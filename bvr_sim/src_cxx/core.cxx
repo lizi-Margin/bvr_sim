@@ -36,7 +36,8 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
       acmi_file_path_(acmi_file_path),
       telemetry_bridge_(std::make_shared<TelemetryBridge>()),
       visualization_server_(std::make_shared<EmbeddedWebServer>()),
-      opengl_viewer_(std::make_shared<OpenGLViewer>())
+      opengl_viewer_(std::make_shared<OpenGLViewer>()),
+      dx11_game_viewer_(std::make_shared<DX11GameViewer>())
 {
     cfg::dt = dt;
     cfg::sim_time = 0.0;
@@ -75,6 +76,17 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
         start_telemetry_bridge();
         telemetry_bridge_->submit_command(command);
     });
+
+    dx11_game_viewer_->set_snapshot_provider([this]() {
+        if (!telemetry_bridge_) {
+            return std::shared_ptr<const WorldSnapshot>();
+        }
+        return telemetry_bridge_->get_latest_snapshot();
+    });
+    dx11_game_viewer_->set_command_submitter([this](const TelemetryCommand& command) {
+        start_telemetry_bridge();
+        telemetry_bridge_->submit_command(command);
+    });
 }
 
 SimCore::~SimCore() {
@@ -97,6 +109,7 @@ void SimCore::start() {
 
 void SimCore::stop() {
     if (!running_) {
+        stop_dx11_game_viewer();
         stop_opengl_viewer();
         stop_visualization_server();
         stop_telemetry_bridge();
@@ -112,6 +125,7 @@ void SimCore::stop() {
     }
 
     running_ = false;
+    stop_dx11_game_viewer();
     stop_opengl_viewer();
     stop_visualization_server();
     stop_telemetry_bridge();
@@ -330,6 +344,7 @@ json::JSON SimCore::get_visualization_status() const {
     status["client_count"] = json::Integral(visualization_server_ ? static_cast<long>(visualization_server_->get_client_count()) : 0L);
     status["telemetry"] = telemetry_bridge_ ? telemetry_bridge_->get_diagnostics() : json::JSON::Make(json::JSON::Class::Object);
     status["opengl_viewer"] = opengl_viewer_ ? opengl_viewer_->get_status() : json::JSON::Make(json::JSON::Class::Object);
+    status["dx11_game_viewer"] = dx11_game_viewer_ ? dx11_game_viewer_->get_status() : json::JSON::Make(json::JSON::Class::Object);
     return status;
 }
 
@@ -370,6 +385,45 @@ json::JSON SimCore::get_opengl_viewer_status() const {
         return json::JSON::Make(json::JSON::Class::Object);
     }
     return opengl_viewer_->get_status();
+}
+
+bool SimCore::is_dx11_game_viewer_running() const noexcept {
+    return dx11_game_viewer_ && dx11_game_viewer_->is_running();
+}
+
+bool SimCore::is_dx11_game_viewer_supported() const noexcept {
+    return dx11_game_viewer_ && dx11_game_viewer_->is_supported();
+}
+
+void SimCore::start_dx11_game_viewer() {
+    if (!dx11_game_viewer_) {
+        dx11_game_viewer_ = std::make_shared<DX11GameViewer>();
+        dx11_game_viewer_->set_snapshot_provider([this]() {
+            if (!telemetry_bridge_) {
+                return std::shared_ptr<const WorldSnapshot>();
+            }
+            return telemetry_bridge_->get_latest_snapshot();
+        });
+        dx11_game_viewer_->set_command_submitter([this](const TelemetryCommand& command) {
+            start_telemetry_bridge();
+            telemetry_bridge_->submit_command(command);
+        });
+    }
+    start_telemetry_bridge();
+    dx11_game_viewer_->start();
+}
+
+void SimCore::stop_dx11_game_viewer() {
+    if (dx11_game_viewer_) {
+        dx11_game_viewer_->stop();
+    }
+}
+
+json::JSON SimCore::get_dx11_game_viewer_status() const {
+    if (!dx11_game_viewer_) {
+        return json::JSON::Make(json::JSON::Class::Object);
+    }
+    return dx11_game_viewer_->get_status();
 }
 
 TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand& command) {

@@ -71,6 +71,8 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/embedded_web_server.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/opengl_viewer.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_viewer.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_viewer_render.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/unit_factory.cxx"
@@ -229,7 +231,7 @@ target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
 target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
 target_compile_definitions(bvr_sim_cpp PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
 if(MSVC)
-    target_link_libraries(bvr_sim_cpp PRIVATE ws2_32 wsock32)
+    target_link_libraries(bvr_sim_cpp PRIVATE ws2_32 wsock32 d3d11 dxgi)
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(bvr_sim_cpp PRIVATE OpenGL::GL X11::X11)
 endif()

@@ -162,20 +162,24 @@ python run_tests.py
 
 ## 实时可视化与调试架构
 
-当前实时可视化链路有两个 viewer 后端，共享同一条 telemetry 契约：
+当前实时可视化链路有三个 viewer 后端，共享同一条 telemetry 契约：
 
 1. `SimCore`
 2. `TelemetryBridge`
-3. `EmbeddedWebServer` 或 `OpenGLViewer`
-4. `web/` 前端 或 进程内原生 OpenGL 窗口
+3. `EmbeddedWebServer`、`OpenGLViewer` 或 `DX11GameViewer`
+4. `web/` 前端、进程内原生 OpenGL 窗口或进程内原生 DX11 窗口
+
+当前确定继续使用单一 `bvr_sim_cpp` 原生扩展架构。`DX11GameViewer` 是进程内 viewer，不规划独立 `game_app.exe`。
 
 关键入口：
 
-- [`core.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\core.cxx)
-- [`telemetry_bridge.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\telemetry\telemetry_bridge.cxx)
-- [`embedded_web_server.cxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\telemetry\embedded_web_server.cxx)
+- [`core.cxx`](G:\bvr_sim\bvr_sim\src_cxx\core.cxx)
+- [`telemetry_bridge.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\telemetry_bridge.cxx)
+- [`embedded_web_server.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\embedded_web_server.cxx)
 - [`opengl_viewer.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\opengl_viewer.cxx)
-- [`main.ts`](G:\bvr_sim\.worktrees\web-visualization-phase1\web\src\main.ts)
+- [`dx11_game_viewer.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_viewer.cxx)
+- [`dx11_game_viewer_render.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_viewer_render.cxx)
+- [`main.ts`](G:\bvr_sim\web\src\main.ts)
 
 ### 职责边界
 
@@ -189,7 +193,7 @@ python run_tests.py
 
 - 运行在独立守护线程
 - 从 `SOPool` 读取当前对象
-- 通过 [`register.hxx`](G:\bvr_sim\.worktrees\web-visualization-phase1\bvr_sim\src_cxx\simulator\register.hxx) 构建严格 `WorldSnapshot`
+- 通过 [`register.hxx`](G:\bvr_sim\bvr_sim\src_cxx\simulator\register.hxx) 构建严格 `WorldSnapshot`
 - 保存最新快照
 - 处理 `focus_uid` 和 `subscription_filter`
 
@@ -208,13 +212,22 @@ python run_tests.py
 - 将原生窗口输入转换成 telemetry 命令
 - 不直接访问仿真对象实例
 
+`DX11GameViewer`
+
+- 运行在进程内独立线程
+- 使用 Win32 + Direct3D 11 渲染当前实时快照
+- 直接读取 `TelemetryBridge` 的最新 `WorldSnapshot`
+- 将原生窗口输入转换成 viewer 状态或 telemetry 命令
+- 不直接访问仿真对象实例
+- 不要求或创建独立客户端进程
+
 `web/`
 
 - 只读 `WorldSnapshot`
 - 只写结构化命令
 - 不依赖 C++ 内部对象模型
 
-进程内 OpenGL viewer 也遵守同一原则：
+进程内 OpenGL viewer 和 DX11GameViewer 也遵守同一原则：
 
 - 只读 `WorldSnapshot`
 - 只写结构化命令
@@ -227,11 +240,11 @@ python run_tests.py
 1. 仿真对象把调试所需状态写入 `Register`
 2. `TelemetrySnapshotBuilder` 从 `Register` 严格取值
 3. `TelemetryBridge` 发布标准化快照
-4. 浏览器只消费该快照
+4. Web 前端或原生 viewer 只消费该快照
 
 这样做可以避免：
 
-- 前端与仿真内部类结构强耦合
+- 表现层与仿真内部类结构强耦合
 - 调试代码侵入 `SimCore`
 - 后续渲染器切换时重复绑定内部对象
 

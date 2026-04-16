@@ -2,6 +2,7 @@
 
 #include "rubbish_can/json.hpp"
 #include "telemetry/embedded_web_server.hxx"
+#include "telemetry/dx11_game_viewer.hxx"
 #include "telemetry/opengl_viewer.hxx"
 #include "telemetry/telemetry_bridge.hxx"
 #include <thread>
@@ -56,6 +57,11 @@ public:
     void start_opengl_viewer();
     void stop_opengl_viewer();
     json::JSON get_opengl_viewer_status() const;
+    bool is_dx11_game_viewer_running() const noexcept;
+    bool is_dx11_game_viewer_supported() const noexcept;
+    void start_dx11_game_viewer();
+    void stop_dx11_game_viewer();
+    json::JSON get_dx11_game_viewer_status() const;
 
 private:
     void run_loop();
@@ -78,6 +84,7 @@ private:
     std::shared_ptr<TelemetryBridge> telemetry_bridge_;
     std::shared_ptr<EmbeddedWebServer> visualization_server_;
     std::shared_ptr<OpenGLViewer> opengl_viewer_;
+    std::shared_ptr<DX11GameViewer> dx11_game_viewer_;
 
 };
 

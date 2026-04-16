@@ -41,6 +41,36 @@ bool snapshot_matches_filter(const TelemetryObjectState& object_state, const jso
     return true;
 }
 
+bool should_skip_object_for_snapshot(const std::shared_ptr<SimulatedObject>& object) {
+    if (!object) {
+        return true;
+    }
+
+    if (object->trashed()) {
+        return true;
+    }
+
+    const Register& reg = object->get_register();
+    if (reg.size() == 0) {
+        return true;
+    }
+
+    const auto uid = reg.get("uid");
+    if (!uid.has_value()) {
+        return true;
+    }
+
+    if (uid->JSONType() != json::JSON::Class::String) {
+        return true;
+    }
+
+    if (uid->ToString().empty()) {
+        return true;
+    }
+
+    return false;
+}
+
 }
 
 TelemetryBridge::TelemetryBridge()
@@ -200,6 +230,9 @@ void TelemetryBridge::sample_once() noexcept {
             colorful::printHONG("[TelemetryBridge] null object found in SOPool during sampling");
             SL::get().print("[TelemetryBridge] null object found in SOPool during sampling");
             check(false, "TelemetryBridge::sample_once encountered null object in SOPool");
+        }
+        if (should_skip_object_for_snapshot(object)) {
+            continue;
         }
         auto object_state = TelemetrySnapshotBuilder::build_object_state(object->get_register());
         if (snapshot_matches_filter(object_state, subscription_filter)) {

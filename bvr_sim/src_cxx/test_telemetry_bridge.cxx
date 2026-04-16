@@ -38,6 +38,33 @@ public:
     }
 };
 
+class BrokenRegisterObject : public bvr_sim::SimulatedObject {
+public:
+    BrokenRegisterObject()
+        : bvr_sim::SimulatedObject(
+            "broken_ground",
+            bvr_sim::TeamColor::Blue,
+            {0.0, 0.0, 0.0},
+            {0.0, 0.0, 0.0},
+            0.1,
+            bvr_sim::SOT::GroundUnit) {
+        write_register();
+        get_mutable_register().pop("uid");
+    }
+
+    void step() override {
+    }
+
+    std::string log() noexcept override {
+        return "";
+    }
+
+private:
+    bvr_sim::Register& get_mutable_register() {
+        return const_cast<bvr_sim::Register&>(get_register());
+    }
+};
+
 }
 
 TEST(TelemetryBridge, StartAndStopLifecycle) {
@@ -73,6 +100,28 @@ TEST(TelemetryBridge, PublishesSnapshotFromSOPool) {
     ASSERT(snapshot != nullptr);
     ASSERT_EQ(snapshot->sim_time, 1.5);
     ASSERT_EQ(snapshot->dt, 0.1);
+    ASSERT_EQ(static_cast<double>(snapshot->objects.size()), 1.0);
+    ASSERT(snapshot->objects[0].uid == "dummy_ground");
+}
+
+TEST(TelemetryBridge, SkipsObjectWhoseRegisterLostUidDuringCleanup) {
+    ensure_test_logger();
+    bvr_sim::SOPool::instance().clear();
+    bvr_sim::cfg::dt = 0.1;
+    bvr_sim::cfg::sim_time = 2.0;
+
+    auto valid_object = std::make_shared<DummyGroundObject>();
+    auto broken_object = std::make_shared<BrokenRegisterObject>();
+    bvr_sim::SOPool::instance().add(valid_object);
+    bvr_sim::SOPool::instance().add(broken_object);
+
+    bvr_sim::TelemetryBridge bridge;
+    bridge.refresh_once();
+    auto snapshot = bridge.get_latest_snapshot();
+
+    bvr_sim::SOPool::instance().clear();
+
+    ASSERT(snapshot != nullptr);
     ASSERT_EQ(static_cast<double>(snapshot->objects.size()), 1.0);
     ASSERT(snapshot->objects[0].uid == "dummy_ground");
 }
