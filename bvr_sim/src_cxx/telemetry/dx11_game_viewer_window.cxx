@@ -117,6 +117,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             window->input.material_system_enabled = !window->input.material_system_enabled;
             return 0;
         }
+        if (w_param == VK_F5) {
+            window->input.camera_roll_locked = !window->input.camera_roll_locked;
+            return 0;
+        }
         if (w_param == VK_OEM_PLUS || w_param == VK_ADD) {
             window->input.camera_fov_y = std::max(20.0f, window->input.camera_fov_y - 2.0f);
             return 0;
@@ -282,11 +286,12 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
 
     std::ostringstream line3;
     line3 << "Shadows " << (input.shadows_enabled ? "on" : "off")
-          << "  Materials " << (input.material_system_enabled ? "full" : "simple");
+          << "  Materials " << (input.material_system_enabled ? "full" : "simple")
+          << "  RollLock " << (input.camera_roll_locked ? "on" : "off");
     draw_line(16, 64, line3.str());
 
     draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
-    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 free  F2 follow/next  F3 shadows  F4 materials");
+    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 free  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
 
     if (font && old_font) {
         SelectObject(dc, old_font);

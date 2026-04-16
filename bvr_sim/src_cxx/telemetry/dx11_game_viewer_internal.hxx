@@ -128,6 +128,7 @@ struct ViewerInputState {
     float camera_fov_y = 100.0f;
     bool shadows_enabled = true;
     bool material_system_enabled = false;
+    bool camera_roll_locked = true;
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;
 };

@@ -861,7 +861,9 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                 );
                 const Mat3 orientation = convert_nwu_matrix_to_viewer(build_sim_orientation_matrix(object.orientation));
                 const Float3 forward = normalize(make_float3(orientation[0], orientation[3], orientation[6]));
-                const Float3 up = normalize(make_float3(orientation[1], orientation[4], orientation[7]));
+                const Float3 up = resolved_input.camera_roll_locked
+                    ? make_float3(0.0f, 1.0f, 0.0f)
+                    : normalize(make_float3(orientation[1], orientation[4], orientation[7]));
                 const float follow_distance = std::max(1000.0f, resolved_input.camera_distance);
                 const c3utils::Vector3 local_camera_offset(-follow_distance, follow_distance * 0.28f, 0.0);
                 const Float3 world_camera_offset = transform_direction(orientation, local_camera_offset);

@@ -174,10 +174,13 @@ void DX11GameViewer::run_loop() noexcept {
                     window.input.snapshot_uids.push_back(object.uid);
                 }
             }
-            if (!window.input.focus_uid.empty()
-                && std::find(window.input.snapshot_uids.begin(), window.input.snapshot_uids.end(), window.input.focus_uid)
-                       == window.input.snapshot_uids.end()) {
-                window.input.focus_uid.clear();
+            if (window.input.camera_mode == ViewerInputState::CameraMode::FollowObject) {
+                const bool focus_missing = window.input.focus_uid.empty()
+                    || std::find(window.input.snapshot_uids.begin(), window.input.snapshot_uids.end(), window.input.focus_uid)
+                           == window.input.snapshot_uids.end();
+                if (focus_missing) {
+                    window.input.focus_uid = window.input.snapshot_uids.empty() ? std::string{} : window.input.snapshot_uids.front();
+                }
             }
         } else {
             window.input.focus_uid.clear();
