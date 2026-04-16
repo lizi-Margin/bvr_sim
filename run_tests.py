@@ -36,11 +36,15 @@ def main():
     from tests.test_cpp import main as cpp_core_full_test
     cpp_result = cpp_core_full_test()
 
+    print("\nRunning DX11 game viewer smoke test...")
+    from tests.test_dx11_game_viewer_smoke import main as dx11_game_viewer_smoke_test
+    dx11_result = dx11_game_viewer_smoke_test()
+
     print("\nRunning Python core full test...")
     from tests.test_py import main as python_core_full_test
     python_result = python_core_full_test()
 
-    if python_result == 0 and cpp_result == 0 and unit_test_result == 0 and c3u_test_result == 0:
+    if python_result == 0 and cpp_result == 0 and dx11_result == 0 and unit_test_result == 0 and c3u_test_result == 0:
         print("\nAll tests PASSED")
         return 0
     else:
