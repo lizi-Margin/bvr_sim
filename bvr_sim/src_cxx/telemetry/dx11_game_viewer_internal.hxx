@@ -100,6 +100,11 @@ struct RenderScene {
 };
 
 struct ViewerInputState {
+    enum class CameraMode {
+        Free,
+        FollowObject,
+    };
+
     bool move_forward = false;
     bool move_backward = false;
     bool move_left = false;
@@ -109,10 +114,14 @@ struct ViewerInputState {
     bool dragging = false;
     int last_mouse_x = 0;
     int last_mouse_y = 0;
+    CameraMode camera_mode = CameraMode::Free;
     float camera_yaw = 0.70f;
     float camera_pitch = 0.55f;
     float camera_distance = 30000.0f;
     Float3 camera_target{0.0f, 6000.0f, 0.0f};
+    float camera_fov_y = 50.0f;
+    std::string focus_uid;
+    std::vector<std::string> snapshot_uids;
 };
 
 struct Win32Window {

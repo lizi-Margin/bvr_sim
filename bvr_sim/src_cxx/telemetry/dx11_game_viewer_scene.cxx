@@ -434,17 +434,6 @@ Float4x4 scale_matrix(float sx, float sy, float sz) {
     return out;
 }
 
-Float4x4 rotation_x_matrix(float angle) {
-    Float4x4 out = identity_matrix();
-    const float c = std::cos(angle);
-    const float s = std::sin(angle);
-    out.m[1][1] = c;
-    out.m[1][2] = s;
-    out.m[2][1] = -s;
-    out.m[2][2] = c;
-    return out;
-}
-
 Float4x4 rotation_y_matrix(float angle) {
     Float4x4 out = identity_matrix();
     const float c = std::cos(angle);
@@ -456,15 +445,83 @@ Float4x4 rotation_y_matrix(float angle) {
     return out;
 }
 
-Float4x4 rotation_z_matrix(float angle) {
+using Mat3 = std::array<float, 9>;
+
+Mat3 mat3_mul(const Mat3& a, const Mat3& b) {
+    Mat3 result{};
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            float value = 0.0f;
+            for (int k = 0; k < 3; ++k) {
+                value += a[row * 3 + k] * b[k * 3 + col];
+            }
+            result[row * 3 + col] = value;
+        }
+    }
+    return result;
+}
+
+Mat3 mat3_rotation_x(float angle_rad) {
+    const float c = std::cos(angle_rad);
+    const float s = std::sin(angle_rad);
+    return {
+        1.0f, 0.0f, 0.0f,
+        0.0f, c, -s,
+        0.0f, s, c
+    };
+}
+
+Mat3 mat3_rotation_y(float angle_rad) {
+    const float c = std::cos(angle_rad);
+    const float s = std::sin(angle_rad);
+    return {
+        c, 0.0f, s,
+        0.0f, 1.0f, 0.0f,
+        -s, 0.0f, c
+    };
+}
+
+Mat3 mat3_rotation_z(float angle_rad) {
+    const float c = std::cos(angle_rad);
+    const float s = std::sin(angle_rad);
+    return {
+        c, -s, 0.0f,
+        s, c, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+}
+
+Mat3 build_sim_orientation_matrix(const std::array<double, 3>& orientation) {
+    const Mat3 rx = mat3_rotation_x(static_cast<float>(orientation[0]));
+    const Mat3 ry = mat3_rotation_y(static_cast<float>(orientation[1]));
+    const Mat3 rz = mat3_rotation_z(static_cast<float>(orientation[2]));
+    return mat3_mul(rz, mat3_mul(ry, rx));
+}
+
+Mat3 convert_nwu_matrix_to_viewer(const Mat3& nwu_matrix) {
+    // Viewer world axes are [North, Up, West] while simulation uses [North, West, Up].
+    static const Mat3 basis_change = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f
+    };
+    return mat3_mul(basis_change, mat3_mul(nwu_matrix, basis_change));
+}
+
+Float4x4 row_vector_matrix_from_mat3(const Mat3& column_vector_matrix) {
     Float4x4 out = identity_matrix();
-    const float c = std::cos(angle);
-    const float s = std::sin(angle);
-    out.m[0][0] = c;
-    out.m[0][1] = s;
-    out.m[1][0] = -s;
-    out.m[1][1] = c;
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 3; ++col) {
+            out.m[row][col] = column_vector_matrix[col * 3 + row];
+        }
+    }
     return out;
+}
+
+Float4x4 build_object_rotation_matrix(const TelemetryObjectState& object) {
+    const Mat3 sim_matrix = build_sim_orientation_matrix(object.orientation);
+    const Mat3 viewer_matrix = convert_nwu_matrix_to_viewer(sim_matrix);
+    return row_vector_matrix_from_mat3(viewer_matrix);
 }
 
 Float4x4 perspective_matrix(float fov_y_radians, float aspect, float z_near, float z_far) {
@@ -720,15 +777,13 @@ Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
     const float scale_value = object_world_radius(object) / 180.0f;
     const Float4x4 scale_m = scale_matrix(scale_value, scale_value, scale_value);
     const Float4x4 model_offset = rotation_y_matrix(270.0f * kPi / 180.0f);
-    const Float4x4 roll_m = rotation_x_matrix(static_cast<float>(object.orientation[0]));
-    const Float4x4 pitch_m = rotation_z_matrix(static_cast<float>(object.orientation[1]));
-    const Float4x4 yaw_m = rotation_y_matrix(static_cast<float>(object.orientation[2]));
+    const Float4x4 rotation_m = build_object_rotation_matrix(object);
     const Float4x4 translation_m = translation_matrix(
         static_cast<float>(object.position[0]),
         static_cast<float>(object.position[2]),
         static_cast<float>(object.position[1])
     );
-    return multiply(multiply(multiply(multiply(scale_m, model_offset), roll_m), pitch_m), multiply(yaw_m, translation_m));
+    return multiply(multiply(multiply(scale_m, model_offset), rotation_m), translation_m);
 }
 
 void create_object_geometry(const TelemetryObjectState& object, std::vector<Vertex>& vertices) {
@@ -755,19 +810,33 @@ void create_object_geometry(const TelemetryObjectState& object, std::vector<Vert
 
 RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT height, const WorldSnapshot* snapshot) {
     RenderScene scene;
+    ViewerInputState resolved_input = input;
+
+    if (resolved_input.camera_mode == ViewerInputState::CameraMode::FollowObject && snapshot && !resolved_input.focus_uid.empty()) {
+        for (const auto& object : snapshot->objects) {
+            if (object.uid == resolved_input.focus_uid) {
+                resolved_input.camera_target = make_float3(
+                    static_cast<float>(object.position[0]),
+                    static_cast<float>(object.position[2]),
+                    static_cast<float>(object.position[1])
+                );
+                break;
+            }
+        }
+    }
 
     const float aspect = static_cast<float>(width) / static_cast<float>(std::max(1U, height));
     const Float3 eye = add(
-        input.camera_target,
+        resolved_input.camera_target,
         make_float3(
-            std::cos(input.camera_pitch) * std::cos(input.camera_yaw) * input.camera_distance,
-            std::sin(input.camera_pitch) * input.camera_distance,
-            std::cos(input.camera_pitch) * std::sin(input.camera_yaw) * input.camera_distance
+            std::cos(resolved_input.camera_pitch) * std::cos(resolved_input.camera_yaw) * resolved_input.camera_distance,
+            std::sin(resolved_input.camera_pitch) * resolved_input.camera_distance,
+            std::cos(resolved_input.camera_pitch) * std::sin(resolved_input.camera_yaw) * resolved_input.camera_distance
         )
     );
 
-    scene.view = look_at_matrix(eye, input.camera_target, make_float3(0.0f, 1.0f, 0.0f));
-    scene.projection = perspective_matrix(50.0f * kPi / 180.0f, aspect, 10.0f, 500000.0f);
+    scene.view = look_at_matrix(eye, resolved_input.camera_target, make_float3(0.0f, 1.0f, 0.0f));
+    scene.projection = perspective_matrix(resolved_input.camera_fov_y * kPi / 180.0f, aspect, 10.0f, 500000.0f);
     scene.clip_space = orthographic_identity_clip_matrix();
     scene.camera_position = eye;
 

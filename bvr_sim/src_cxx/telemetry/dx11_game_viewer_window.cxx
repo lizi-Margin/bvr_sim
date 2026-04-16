@@ -28,6 +28,26 @@ Float3 scale(const Float3& v, float s) {
     return make_float3(v.x * s, v.y * s, v.z * s);
 }
 
+void cycle_follow_target(ViewerInputState& input) {
+    input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+    if (input.snapshot_uids.empty()) {
+        input.focus_uid.clear();
+        return;
+    }
+
+    if (input.focus_uid.empty()) {
+        input.focus_uid = input.snapshot_uids.front();
+        return;
+    }
+
+    auto current = std::find(input.snapshot_uids.begin(), input.snapshot_uids.end(), input.focus_uid);
+    if (current == input.snapshot_uids.end() || ++current == input.snapshot_uids.end()) {
+        input.focus_uid = input.snapshot_uids.front();
+        return;
+    }
+    input.focus_uid = *current;
+}
+
 LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
     Win32Window* window = reinterpret_cast<Win32Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
     switch (msg) {
@@ -80,6 +100,23 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         if (!window) {
             break;
         }
+        if (w_param == VK_F1) {
+            window->input.camera_mode = ViewerInputState::CameraMode::Free;
+            window->input.focus_uid.clear();
+            return 0;
+        }
+        if (w_param == VK_F2) {
+            cycle_follow_target(window->input);
+            return 0;
+        }
+        if (w_param == VK_OEM_PLUS || w_param == VK_ADD) {
+            window->input.camera_fov_y = std::max(20.0f, window->input.camera_fov_y - 2.0f);
+            return 0;
+        }
+        if (w_param == VK_OEM_MINUS || w_param == VK_SUBTRACT) {
+            window->input.camera_fov_y = std::min(110.0f, window->input.camera_fov_y + 2.0f);
+            return 0;
+        }
         if (w_param == 'W') window->input.move_forward = true;
         if (w_param == 'S') window->input.move_backward = true;
         if (w_param == 'A') window->input.move_left = true;
@@ -107,16 +144,37 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
 } // namespace
 
 void update_camera(ViewerInputState& input, float dt_seconds) {
+    if (input.camera_mode == ViewerInputState::CameraMode::FollowObject
+        || (!input.move_forward
+            && !input.move_backward
+            && !input.move_left
+            && !input.move_right
+            && !input.move_up
+            && !input.move_down)) {
+        return;
+    }
+
     const Float3 forward = make_float3(std::cos(input.camera_yaw), 0.0f, std::sin(input.camera_yaw));
     const Float3 right = make_float3(-forward.z, 0.0f, forward.x);
-    const float move_speed = std::max(1200.0f, input.camera_distance * 0.40f) * dt_seconds;
+    Float3 move = make_float3(0.0f, 0.0f, 0.0f);
 
-    if (input.move_forward) input.camera_target = add(input.camera_target, scale(forward, move_speed));
-    if (input.move_backward) input.camera_target = add(input.camera_target, scale(forward, -move_speed));
-    if (input.move_left) input.camera_target = add(input.camera_target, scale(right, -move_speed));
-    if (input.move_right) input.camera_target = add(input.camera_target, scale(right, move_speed));
-    if (input.move_up) input.camera_target.y += move_speed;
-    if (input.move_down) input.camera_target.y -= move_speed;
+    if (input.move_forward) move = add(move, scale(forward, -1.0f));
+    if (input.move_backward) move = add(move, scale(forward, 1.0f));
+    if (input.move_left) move = add(move, right);
+    if (input.move_right) move = add(move, scale(right, -1.0f));
+    if (input.move_up) move.y += 1.0f;
+    if (input.move_down) move.y -= 1.0f;
+
+    const float move_length = std::sqrt(move.x * move.x + move.y * move.y + move.z * move.z);
+    if (move_length <= 1e-6f) {
+        return;
+    }
+
+    const float inv_length = 1.0f / move_length;
+    move = scale(move, inv_length);
+
+    const float move_speed = std::max(120.0f, input.camera_distance * 0.015f);
+    input.camera_target = add(input.camera_target, scale(move, move_speed));
 }
 
 bool create_window(Win32Window& window, std::string& error) {
@@ -209,10 +267,13 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
     std::ostringstream line2;
     line2 << std::fixed << std::setprecision(1)
           << "Camera Target (" << input.camera_target.x << ", " << input.camera_target.y << ", " << input.camera_target.z << ")"
-          << "  Dist " << input.camera_distance;
+          << "  FOV " << input.camera_fov_y
+          << "  Dist " << input.camera_distance
+          << "  Mode " << (input.camera_mode == ViewerInputState::CameraMode::Free ? "free" : "follow");
     draw_line(16, 40, line2.str());
 
-    draw_line(16, rect.bottom - 34, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
+    draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
+    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 free  F2 follow/next");
 
     if (font && old_font) {
         SelectObject(dc, old_font);

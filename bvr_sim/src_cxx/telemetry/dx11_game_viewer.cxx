@@ -164,6 +164,22 @@ void DX11GameViewer::run_loop() noexcept {
         }
 
         auto snapshot = snapshot_provider_ ? snapshot_provider_() : std::shared_ptr<const WorldSnapshot>();
+        window.input.snapshot_uids.clear();
+        if (snapshot) {
+            window.input.snapshot_uids.reserve(snapshot->objects.size());
+            for (const auto& object : snapshot->objects) {
+                if (object.alive) {
+                    window.input.snapshot_uids.push_back(object.uid);
+                }
+            }
+            if (!window.input.focus_uid.empty()
+                && std::find(window.input.snapshot_uids.begin(), window.input.snapshot_uids.end(), window.input.focus_uid)
+                       == window.input.snapshot_uids.end()) {
+                window.input.focus_uid.clear();
+            }
+        } else {
+            window.input.focus_uid.clear();
+        }
         {
             std::lock_guard<std::mutex> lock(state_mutex_);
             last_sim_time_ = snapshot ? snapshot->sim_time : 0.0;
