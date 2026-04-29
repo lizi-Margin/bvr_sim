@@ -9,7 +9,6 @@ Usage:
     python run_tests.py
 """
 
-import platform
 import subprocess
 import os
 import sys
@@ -17,12 +16,22 @@ import sys
 
 def main():
     # Build C++ components first
+    system = sys.platform
+    if system == "win32":
+        platform_name = "Windows"
+        build_cmd = [os.path.join(os.path.dirname(__file__), "bvr_sim", "build_windows.bat")]
+    elif system.startswith("linux"):
+        platform_name = "Linux"
+        build_cmd = ["bash", os.path.join(os.path.dirname(__file__), "bvr_sim", "build_linux.sh")]
+    else:
+        print(f"Unsupported platform for C++ build: {system}")
+        return 1
+
     print("=" * 60)
-    print("BVR Sim C++ Build Script (Windows)")
+    print(f"BVR Sim C++ Build Script ({platform_name})")
     print("=" * 60)
 
-    build_script = os.path.join(os.path.dirname(__file__), "bvr_sim", "build_windows.bat")
-    subprocess.run([build_script], check=True)
+    subprocess.run(build_cmd, check=True)
 
     print("\nRunning C++ unit tests...")
     from tests.cpp_unit_tests import bvr_sim_unit_tests as cxx_unit_tests
