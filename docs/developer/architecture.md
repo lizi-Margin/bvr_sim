@@ -177,8 +177,8 @@ python run_tests.py
 - [`telemetry_bridge.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\telemetry_bridge.cxx)
 - [`embedded_web_server.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\embedded_web_server.cxx)
 - [`opengl_viewer.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\opengl_viewer.cxx)
-- [`dx11_game_viewer.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_viewer.cxx)
-- [`dx11_game_viewer_render.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_viewer_render.cxx)
+- [`dx11_game_mode.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_mode.cxx)
+- [`dx11_game_mode_render.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_mode_render.cxx)
 - [`main.ts`](G:\bvr_sim\web\src\main.ts)
 
 ### 职责边界
@@ -304,3 +304,4 @@ npm --prefix web run build
 - WebSocket 首帧快照正常
 - WebSocket 命令回执正常
 - `focus_uid` / `subscription_filter` 会反映到桥接诊断状态
+

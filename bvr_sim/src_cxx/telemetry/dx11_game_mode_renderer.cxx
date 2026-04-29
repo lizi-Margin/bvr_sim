@@ -1,4 +1,4 @@
-#include "dx11_game_viewer_internal.hxx"
+#include "dx11_game_mode_internal.hxx"
 #include "resource_paths.hxx"
 
 #include <algorithm>
@@ -271,7 +271,7 @@ bool create_render_targets_from_swap_chain(D3D11Context& d3d11, HWND hwnd, std::
 
 std::string load_shader_source(std::string& error) {
     try {
-        const auto path = resource_paths::get_resource_path("visualization/shaders/dx11_game_viewer.hlsl");
+        const auto path = resource_paths::get_resource_path("visualization/shaders/dx11_game_mode.hlsl");
         std::ifstream input(path);
         if (!input.is_open()) {
             error = "failed to open shader: " + path.string();
@@ -1061,3 +1061,4 @@ bool execute_render_commands(D3D11Context& d3d11, const RenderCommandList& comma
 #endif
 
 } // namespace bvr_sim
+

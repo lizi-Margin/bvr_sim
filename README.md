@@ -360,7 +360,7 @@ python tests/cpp_unit_tests.py
 - `SimCore` 负责仿真
 - `TelemetryBridge` 在独立线程采样状态
 - 状态提取仍然来自对象 `Register`
-- `EmbeddedWebServer`、`OpenGLViewer`、`DX11GameViewer` 只消费 `WorldSnapshot`
+- `EmbeddedWebServer`、`OpenGLViewer`、`DX11GameMode` 只消费 `WorldSnapshot`
 - 原生窗口和浏览器输入仍然转成 telemetry 命令，不直接改仿真对象
 
 这意味着渲染和仿真保持解耦。后续如果扩展对象级调试命令，也应该继续沿着寄存器 / 命令邮箱模式推进。
@@ -369,8 +369,8 @@ python tests/cpp_unit_tests.py
 
 - Web 可视化支持 HTTP / WebSocket、HUD / Inspector / Diagnostics、对象筛选和调试命令回执
 - OpenGL viewer 优先支持 Windows，Linux / 其他平台当前只保证编译通过，运行时会返回 unsupported
-- DX11GameViewer 优先支持 Windows，使用 Win32 + Direct3D 11
-- DX11GameViewer 当前包含基础相机、HUD、天空、地面、网格、飞机 / 导弹 / 地面单位渲染、OBJ mesh 加载和 primitive fallback
+- DX11GameMode 优先支持 Windows，使用 Win32 + Direct3D 11
+- DX11GameMode 当前包含基础相机、HUD、天空、地面、网格、飞机 / 导弹 / 地面单位渲染、OBJ mesh 加载和 primitive fallback
 
 ### BVR Sim Game Mode 启动步骤
 
@@ -533,3 +533,4 @@ npm --prefix web run build
 ## 许可证
 
 见 [`LICENSE`](G:\bvr_sim\LICENSE) 和 [`LICENSE.GPL`](G:\bvr_sim\LICENSE.GPL)。
+

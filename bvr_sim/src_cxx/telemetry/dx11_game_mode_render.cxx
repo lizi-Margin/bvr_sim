@@ -1,4 +1,4 @@
-#include "dx11_game_viewer_internal.hxx"
+#include "dx11_game_mode_internal.hxx"
 
 #include <array>
 #include <string>
@@ -184,3 +184,4 @@ RenderCommandList record_render_commands(RenderScene scene) {
 #endif
 
 } // namespace bvr_sim
+

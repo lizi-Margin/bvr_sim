@@ -14,13 +14,13 @@
 
 namespace bvr_sim {
 
-class DX11GameViewer {
+class DX11GameMode {
 public:
-    DX11GameViewer();
-    ~DX11GameViewer();
+    DX11GameMode();
+    ~DX11GameMode();
 
-    DX11GameViewer(const DX11GameViewer&) = delete;
-    DX11GameViewer& operator=(const DX11GameViewer&) = delete;
+    DX11GameMode(const DX11GameMode&) = delete;
+    DX11GameMode& operator=(const DX11GameMode&) = delete;
 
     void set_snapshot_provider(std::function<std::shared_ptr<const WorldSnapshot>()> provider);
     void set_command_submitter(std::function<void(const TelemetryCommand&)> submitter);
@@ -56,3 +56,4 @@ private:
 };
 
 } // namespace bvr_sim
+
