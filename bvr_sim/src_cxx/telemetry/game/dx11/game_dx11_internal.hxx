@@ -1,6 +1,6 @@
 #pragma once
 
-#include "telemetry_types.hxx"
+#include "../../telemetry_types.hxx"
 
 #include <array>
 #include <string>
@@ -229,4 +229,5 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
 #endif
 
 } // namespace bvr_sim
+
 

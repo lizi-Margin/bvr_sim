@@ -2,7 +2,7 @@
 
 #include "rubbish_can/json.hpp"
 #include "telemetry/embedded_web_server.hxx"
-#include "telemetry/dx11_game_mode.hxx"
+#include "telemetry/game/game_mode.hxx"
 #include "telemetry/opengl_viewer.hxx"
 #include "telemetry/telemetry_bridge.hxx"
 #include <thread>
@@ -84,10 +84,11 @@ private:
     std::shared_ptr<TelemetryBridge> telemetry_bridge_;
     std::shared_ptr<EmbeddedWebServer> visualization_server_;
     std::shared_ptr<OpenGLViewer> opengl_viewer_;
-    std::shared_ptr<DX11GameMode> game_mode_;
+    std::shared_ptr<GameMode> game_mode_;
 
 };
 
 }
+
 
 

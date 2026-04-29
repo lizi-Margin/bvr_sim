@@ -1,5 +1,5 @@
-#include "dx11_game_mode.hxx"
-#include "dx11_game_mode_internal.hxx"
+#include "game_mode.hxx"
+#include "dx11/game_dx11_internal.hxx"
 
 #include <algorithm>
 #include <chrono>
@@ -9,7 +9,7 @@
 
 namespace bvr_sim {
 
-DX11GameMode::DX11GameMode()
+GameMode::GameMode()
     : running_(false),
       stop_requested_(false),
       supported_(false) {
@@ -20,19 +20,19 @@ DX11GameMode::DX11GameMode()
 #endif
 }
 
-DX11GameMode::~DX11GameMode() {
+GameMode::~GameMode() {
     stop();
 }
 
-void DX11GameMode::set_snapshot_provider(std::function<std::shared_ptr<const WorldSnapshot>()> provider) {
+void GameMode::set_snapshot_provider(std::function<std::shared_ptr<const WorldSnapshot>()> provider) {
     snapshot_provider_ = std::move(provider);
 }
 
-void DX11GameMode::set_command_submitter(std::function<void(const TelemetryCommand&)> submitter) {
+void GameMode::set_command_submitter(std::function<void(const TelemetryCommand&)> submitter) {
     command_submitter_ = std::move(submitter);
 }
 
-void DX11GameMode::start() {
+void GameMode::start() {
     if (running_.load()) {
         return;
     }
@@ -42,10 +42,10 @@ void DX11GameMode::start() {
         std::lock_guard<std::mutex> lock(state_mutex_);
         last_error_.clear();
     }
-    viewer_thread_ = std::thread(&DX11GameMode::run_loop, this);
+    viewer_thread_ = std::thread(&GameMode::run_loop, this);
 }
 
-void DX11GameMode::stop() noexcept {
+void GameMode::stop() noexcept {
     stop_requested_ = true;
     if (viewer_thread_.joinable()) {
         viewer_thread_.join();
@@ -53,15 +53,15 @@ void DX11GameMode::stop() noexcept {
     running_ = false;
 }
 
-bool DX11GameMode::is_running() const noexcept {
+bool GameMode::is_running() const noexcept {
     return running_.load();
 }
 
-bool DX11GameMode::is_supported() const noexcept {
+bool GameMode::is_supported() const noexcept {
     return supported_.load();
 }
 
-json::JSON DX11GameMode::get_status() const {
+json::JSON GameMode::get_status() const {
     json::JSON status = json::JSON::Make(json::JSON::Class::Object);
     status["running"] = json::Boolean(is_running());
     status["supported"] = json::Boolean(is_supported());
@@ -85,7 +85,7 @@ json::JSON DX11GameMode::get_status() const {
     return status;
 }
 
-void DX11GameMode::submit_command(const TelemetryCommand& command) const {
+void GameMode::submit_command(const TelemetryCommand& command) const {
     if (command_submitter_) {
         command_submitter_(command);
     }
@@ -93,7 +93,7 @@ void DX11GameMode::submit_command(const TelemetryCommand& command) const {
 
 #ifndef _WIN32
 
-void DX11GameMode::run_loop() noexcept {
+void GameMode::run_loop() noexcept {
     {
         std::lock_guard<std::mutex> lock(state_mutex_);
         last_error_ = "DX11 Game Mode is currently implemented for Windows only";
@@ -108,7 +108,7 @@ void DX11GameMode::run_loop() noexcept {
 
 #else
 
-void DX11GameMode::run_loop() noexcept {
+void GameMode::run_loop() noexcept {
     Win32Window window;
     D3D11Context d3d11;
 
@@ -224,4 +224,5 @@ void DX11GameMode::run_loop() noexcept {
 #endif
 
 } // namespace bvr_sim
+
 

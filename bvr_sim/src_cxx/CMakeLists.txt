@@ -71,11 +71,11 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_bridge.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/embedded_web_server.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/opengl_viewer.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_mode.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_mode_renderer.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_mode_render.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_mode_scene.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/dx11_game_mode_window.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_mode.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/dx11/game_dx11_renderer.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_render.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_scene.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/dx11/game_dx11_window.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/unit_factory.cxx"
@@ -319,4 +319,5 @@ endif()
 # ============================================================================
 # Output Information
 # ============================================================================
+
 

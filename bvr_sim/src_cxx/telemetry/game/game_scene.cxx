@@ -1,4 +1,4 @@
-#include "dx11_game_mode_internal.hxx"
+#include "dx11/game_dx11_internal.hxx"
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
 
@@ -948,4 +948,5 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
 #endif
 
 } // namespace bvr_sim
+
 

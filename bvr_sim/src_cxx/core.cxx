@@ -37,7 +37,7 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
       telemetry_bridge_(std::make_shared<TelemetryBridge>()),
       visualization_server_(std::make_shared<EmbeddedWebServer>()),
       opengl_viewer_(std::make_shared<OpenGLViewer>()),
-      game_mode_(std::make_shared<DX11GameMode>())
+      game_mode_(std::make_shared<GameMode>())
 {
     cfg::dt = dt;
     cfg::sim_time = 0.0;
@@ -397,7 +397,7 @@ bool SimCore::is_game_mode_supported() const noexcept {
 
 void SimCore::start_game_mode() {
     if (!game_mode_) {
-        game_mode_ = std::make_shared<DX11GameMode>();
+        game_mode_ = std::make_shared<GameMode>();
         game_mode_->set_snapshot_provider([this]() {
             if (!telemetry_bridge_) {
                 return std::shared_ptr<const WorldSnapshot>();
@@ -471,5 +471,6 @@ TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand&
 }
 
 }
+
 
 

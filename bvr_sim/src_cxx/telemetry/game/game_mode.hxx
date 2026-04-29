@@ -1,8 +1,8 @@
 #pragma once
 
-#include "telemetry_bridge.hxx"
-#include "telemetry_command_queue.hxx"
-#include "telemetry_types.hxx"
+#include "../telemetry_bridge.hxx"
+#include "../telemetry_command_queue.hxx"
+#include "../telemetry_types.hxx"
 #include "rubbish_can/json.hpp"
 
 #include <atomic>
@@ -14,13 +14,13 @@
 
 namespace bvr_sim {
 
-class DX11GameMode {
+class GameMode {
 public:
-    DX11GameMode();
-    ~DX11GameMode();
+    GameMode();
+    ~GameMode();
 
-    DX11GameMode(const DX11GameMode&) = delete;
-    DX11GameMode& operator=(const DX11GameMode&) = delete;
+    GameMode(const GameMode&) = delete;
+    GameMode& operator=(const GameMode&) = delete;
 
     void set_snapshot_provider(std::function<std::shared_ptr<const WorldSnapshot>()> provider);
     void set_command_submitter(std::function<void(const TelemetryCommand&)> submitter);
@@ -56,4 +56,7 @@ private:
 };
 
 } // namespace bvr_sim
+
+
+
 

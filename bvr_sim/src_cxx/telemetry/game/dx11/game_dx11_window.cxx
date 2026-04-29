@@ -1,4 +1,4 @@
-#include "dx11_game_mode_internal.hxx"
+#include "game_dx11_internal.hxx"
 
 #include <algorithm>
 #include <cmath>
@@ -191,7 +191,7 @@ void update_camera(ViewerInputState& input, float dt_seconds) {
 
 bool create_window(Win32Window& window, std::string& error) {
     window.instance = GetModuleHandle(nullptr);
-    const char* class_name = "BvrSimDX11GameModeWindow";
+    const char* class_name = "BvrSimGameModeWindow";
 
     WNDCLASS wc = {};
     wc.lpfnWndProc = dx11_window_proc;
@@ -305,4 +305,6 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
 #endif
 
 } // namespace bvr_sim
+
+
 
