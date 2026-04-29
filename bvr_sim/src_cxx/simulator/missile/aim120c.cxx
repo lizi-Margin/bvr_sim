@@ -290,10 +290,10 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
     }
     L_eps = eps;
 
-    if (!radar_on && _t < 4.0) {
+    if (!radar_on && _t < _t_thrust) {
         double min_val = std::min(meters_to_nm(Rxyz), 10.0);
         if (rad2deg(posture[1]) < min_val) {
-            deps = std::max(deps, 0.1);
+            deps = std::max(deps, 0.01);
         }
     }
 
@@ -326,7 +326,7 @@ std::pair<std::array<double, 2>, double> AIM120C::_guidance() noexcept {
         double angle_gain = 0.1;
         double max_cmd_rate = 0.5;
         double blend = std::max((_t_thrust - _t) / _t_thrust, angle_lend_min);
-        desired_dbeta_from_angle = angle_gain * -1 * angle_error;
+        desired_dbeta_from_angle = angle_gain * angle_error;
         desired_dbeta_from_angle = std::clamp(desired_dbeta_from_angle, -max_cmd_rate, max_cmd_rate);
         desired_dbeta = blend * desired_dbeta_from_angle + (1.0 - blend) * dbeta;
         // desired_dbeta = dbeta;

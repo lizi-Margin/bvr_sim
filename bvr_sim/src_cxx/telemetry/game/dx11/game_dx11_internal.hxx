@@ -196,6 +196,14 @@ bool resize_swap_chain_if_needed(D3D11Context& d3d11, HWND hwnd, UINT width, UIN
 void update_viewport_from_client_rect(HWND hwnd, ID3D11DeviceContext* context, UINT& out_width, UINT& out_height);
 RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT height, const WorldSnapshot* snapshot);
 RenderCommandList record_render_commands(RenderScene scene);
+void append_hud_render_commands(
+    RenderCommandList& command_list,
+    UINT width,
+    UINT height,
+    const ViewerInputState& input,
+    double sim_time,
+    long object_count,
+    const RenderFrameStats& stats);
 bool execute_render_commands(D3D11Context& d3d11, const RenderCommandList& command_list, RenderFrameStats& out_stats);
 void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, long object_count, const RenderFrameStats& stats);
 

@@ -401,14 +401,6 @@ Float4x4 build_object_rotation_matrix(const TelemetryObjectState& object) {
     return viewer_matrix.to_row_vector_mat4();
 }
 
-Float3 transform_direction(const Float3x3& matrix, const c3utils::Vector3& direction) {
-    return make_float3(
-        static_cast<float>(matrix.m[0][0] * direction[0] + matrix.m[0][1] * direction[1] + matrix.m[0][2] * direction[2]),
-        static_cast<float>(matrix.m[1][0] * direction[0] + matrix.m[1][1] * direction[1] + matrix.m[1][2] * direction[2]),
-        static_cast<float>(matrix.m[2][0] * direction[0] + matrix.m[2][1] * direction[1] + matrix.m[2][2] * direction[2])
-    );
-}
-
 Float4x4 perspective_matrix(float fov_y_radians, float aspect, float z_near, float z_far) {
     Float4x4 out{};
     const float y_scale = 1.0f / std::tan(fov_y_radians * 0.5f);
@@ -727,8 +719,10 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                     ? make_float3(0.0f, 1.0f, 0.0f)
                     : normalize(make_float3(orientation.m[0][1], orientation.m[1][1], orientation.m[2][1]));
                 const float follow_distance = std::max(1000.0f, resolved_input.camera_distance);
-                const c3utils::Vector3 local_camera_offset(-follow_distance, follow_distance * 0.28f, 0.0);
-                const Float3 world_camera_offset = transform_direction(orientation, local_camera_offset);
+                const Float3 world_camera_offset = add(
+                    scale(forward, -follow_distance),
+                    scale(up, follow_distance * 0.28f)
+                );
                 aircraft_eye = add(object_position, world_camera_offset);
                 aircraft_target = add(aircraft_eye, scale(forward, std::max(10000.0f, follow_distance)));
                 aircraft_up = up;

@@ -194,7 +194,22 @@ void GameMode::run_loop() noexcept {
         }
 
         const RenderScene scene = build_render_scene(window.input, width, height, snapshot.get());
-        const RenderCommandList command_list = record_render_commands(scene);
+        RenderCommandList command_list = record_render_commands(scene);
+        RenderFrameStats hud_stats;
+        for (const auto& command : command_list.commands) {
+            if (command.type == RenderCommandType::Draw && !command.vertices.empty()) {
+                ++hud_stats.draw_calls;
+                hud_stats.vertex_count += static_cast<long>(command.vertices.size());
+            }
+        }
+        append_hud_render_commands(
+            command_list,
+            width,
+            height,
+            window.input,
+            snapshot ? snapshot->sim_time : 0.0,
+            snapshot ? static_cast<long>(snapshot->objects.size()) : 0L,
+            hud_stats);
         RenderFrameStats frame_stats;
         if (!execute_render_commands(d3d11, command_list, frame_stats)) {
             std::lock_guard<std::mutex> lock(state_mutex_);
@@ -212,7 +227,6 @@ void GameMode::run_loop() noexcept {
         }
 
         d3d11.swap_chain->Present(1, 0);
-        draw_hud_text(window.hwnd, window.input, snapshot ? snapshot->sim_time : 0.0, snapshot ? static_cast<long>(snapshot->objects.size()) : 0L, frame_stats);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 

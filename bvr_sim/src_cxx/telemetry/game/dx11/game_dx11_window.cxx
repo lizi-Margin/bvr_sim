@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
+#include <mutex>
 #include <sstream>
 #include <string>
 
@@ -46,6 +47,45 @@ void cycle_follow_target(ViewerInputState& input) {
         return;
     }
     input.focus_uid = *current;
+}
+
+void flush_desktop_composition() {
+    GdiFlush();
+    using DwmFlushFn = HRESULT(WINAPI*)();
+    static DwmFlushFn dwm_flush = []() -> DwmFlushFn {
+        HMODULE dwmapi = LoadLibraryA("dwmapi.dll");
+        if (!dwmapi) {
+            return nullptr;
+        }
+        return reinterpret_cast<DwmFlushFn>(GetProcAddress(dwmapi, "DwmFlush"));
+    }();
+    if (dwm_flush) {
+        dwm_flush();
+    }
+}
+
+HFONT get_hud_font() {
+    static std::once_flag init_flag;
+    static HFONT font = nullptr;
+    std::call_once(init_flag, []() {
+        font = CreateFontA(
+            -18,
+            0,
+            0,
+            0,
+            FW_MEDIUM,
+            FALSE,
+            FALSE,
+            FALSE,
+            ANSI_CHARSET,
+            OUT_TT_PRECIS,
+            CLIP_DEFAULT_PRECIS,
+            ANTIALIASED_QUALITY,
+            FF_DONTCARE | DEFAULT_PITCH,
+            "Consolas"
+        );
+    });
+    return font;
 }
 
 LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_param) {
@@ -246,22 +286,7 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
     SetBkMode(dc, TRANSPARENT);
     SetTextColor(dc, RGB(230, 240, 248));
 
-    HFONT font = CreateFontA(
-        -18,
-        0,
-        0,
-        0,
-        FW_MEDIUM,
-        FALSE,
-        FALSE,
-        FALSE,
-        ANSI_CHARSET,
-        OUT_TT_PRECIS,
-        CLIP_DEFAULT_PRECIS,
-        ANTIALIASED_QUALITY,
-        FF_DONTCARE | DEFAULT_PITCH,
-        "Consolas"
-    );
+    HFONT font = get_hud_font();
     HFONT old_font = font ? static_cast<HFONT>(SelectObject(dc, font)) : nullptr;
 
     auto draw_line = [&](int x, int y, const std::string& text) {
@@ -296,9 +321,7 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
     if (font && old_font) {
         SelectObject(dc, old_font);
     }
-    if (font) {
-        DeleteObject(font);
-    }
+    flush_desktop_composition();
     ReleaseDC(hwnd, dc);
 }
 
