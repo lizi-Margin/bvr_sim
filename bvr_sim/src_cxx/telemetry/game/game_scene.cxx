@@ -285,16 +285,16 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
             std::vector<ObjFaceVertex> face_vertices;
             face_vertices.reserve(tokens.size() - 1);
             for (size_t i = 1; i < tokens.size(); ++i) {
-                const ObjFaceVertex vertex = parse_obj_face_vertex(
+                const ObjFaceVertex face_vertex = parse_obj_face_vertex(
                     tokens[i],
                     static_cast<int>(positions.size()),
                     static_cast<int>(uvs.size()),
                     static_cast<int>(normals.size())
                 );
-                if (vertex.position < 0) {
+                if (face_vertex.position < 0) {
                     continue;
                 }
-                face_vertices.push_back(vertex);
+                face_vertices.push_back(face_vertex);
             }
 
             if (face_vertices.size() < 3) {
@@ -302,16 +302,16 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
             }
 
             auto make_mesh_vertex = [&](const ObjFaceVertex& source) {
-                MeshData::MeshVertex vertex;
-                vertex.position = positions[source.position];
+                MeshData::MeshVertex mesh_vertex;
+                mesh_vertex.position = positions[source.position];
                 if (source.uv >= 0) {
-                    vertex.uv = uvs[source.uv];
+                    mesh_vertex.uv = uvs[source.uv];
                 }
                 if (source.normal >= 0) {
-                    vertex.normal = normals[source.normal];
-                    vertex.has_normal = true;
+                    mesh_vertex.normal = normals[source.normal];
+                    mesh_vertex.has_normal = true;
                 }
-                return vertex;
+                return mesh_vertex;
             };
 
             for (size_t i = 1; i + 1 < face_vertices.size(); ++i) {
@@ -348,10 +348,10 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
 
     std::array<float, 3> min_v = mesh.vertices.front().position;
     std::array<float, 3> max_v = mesh.vertices.front().position;
-    for (const auto& vertex : mesh.vertices) {
+    for (const auto& mesh_vertex : mesh.vertices) {
         for (int i = 0; i < 3; ++i) {
-            min_v[i] = std::min(min_v[i], vertex.position[i]);
-            max_v[i] = std::max(max_v[i], vertex.position[i]);
+            min_v[i] = std::min(min_v[i], mesh_vertex.position[i]);
+            max_v[i] = std::max(max_v[i], mesh_vertex.position[i]);
         }
     }
 
@@ -362,10 +362,10 @@ bool load_obj_mesh(const std::filesystem::path& path, MeshData& mesh, std::strin
     };
 
     mesh.radius = 1.0f;
-    for (const auto& vertex : mesh.vertices) {
-        const float dx = vertex.position[0] - mesh.center[0];
-        const float dy = vertex.position[1] - mesh.center[1];
-        const float dz = vertex.position[2] - mesh.center[2];
+    for (const auto& mesh_vertex : mesh.vertices) {
+        const float dx = mesh_vertex.position[0] - mesh.center[0];
+        const float dy = mesh_vertex.position[1] - mesh.center[1];
+        const float dz = mesh_vertex.position[2] - mesh.center[2];
         mesh.radius = std::max(mesh.radius, std::sqrt(dx * dx + dy * dy + dz * dz));
     }
 
@@ -397,8 +397,8 @@ MeshData* load_named_mesh(const std::string& mesh_name) {
 
 Float4x4 build_object_rotation_matrix(const TelemetryObjectState& object) {
     const Float3x3 sim_matrix = Float3x3::from_sim_orientation(object.orientation);
-    const Float3x3 viewer_matrix = Float3x3::convert_nwu_to_viewer(sim_matrix);
-    return Float4x4::from_row_vector_mat3(viewer_matrix);
+    const Float3x3 viewer_matrix = sim_matrix.convert_nwu_to_viewer();
+    return viewer_matrix.to_row_vector_mat4();
 }
 
 Float3 transform_direction(const Float3x3& matrix, const c3utils::Vector3& direction) {
@@ -506,7 +506,7 @@ std::array<float, 3> team_color(const TelemetryObjectState& object) {
 }
 
 void push_vertex(
-    std::vector<Vertex>& vertices,
+    std::vector<DX11Vertex>& vertices,
     const Float3& position,
     const std::array<float, 3>& color,
     const Float3& normal,
@@ -519,14 +519,14 @@ void push_vertex(
     });
 }
 
-void push_lit_triangle(std::vector<Vertex>& vertices, Float3 a, Float3 c, Float3 d, const std::array<float, 3>& color) {
+void push_lit_triangle(std::vector<DX11Vertex>& vertices, Float3 a, Float3 c, Float3 d, const std::array<float, 3>& color) {
     const Float3 normal = normalize(cross(sub(c, a), sub(d, a)));
     push_vertex(vertices, a, color, normal);
     push_vertex(vertices, c, color, normal);
     push_vertex(vertices, d, color, normal);
 }
 
-void append_box(std::vector<Vertex>& vertices, float sx, float sy, float sz, const std::array<float, 3>& color) {
+void append_box(std::vector<DX11Vertex>& vertices, float sx, float sy, float sz, const std::array<float, 3>& color) {
     const float hx = sx * 0.5f;
     const float hy = sy * 0.5f;
     const float hz = sz * 0.5f;
@@ -546,7 +546,7 @@ void append_box(std::vector<Vertex>& vertices, float sx, float sy, float sz, con
     push_quad(make_float3(-hx, -hy, -hz), make_float3(hx, -hy, -hz), make_float3(hx, -hy, hz), make_float3(-hx, -hy, hz));
 }
 
-void append_aircraft_primitive(std::vector<Vertex>& vertices, const std::array<float, 3>& color) {
+void append_aircraft_primitive(std::vector<DX11Vertex>& vertices, const std::array<float, 3>& color) {
     auto push_triangle = [&](Float3 a, Float3 c, Float3 d) {
         push_lit_triangle(vertices, a, c, d, color);
     };
@@ -557,26 +557,26 @@ void append_aircraft_primitive(std::vector<Vertex>& vertices, const std::array<f
     append_box(vertices, 150.0f, 16.0f, 520.0f, color);
 }
 
-void append_missile_primitive(std::vector<Vertex>& vertices, const std::array<float, 3>& color) {
+void append_missile_primitive(std::vector<DX11Vertex>& vertices, const std::array<float, 3>& color) {
     append_box(vertices, 220.0f, 24.0f, 24.0f, color);
 }
 
-void append_ground_primitive(std::vector<Vertex>& vertices, const std::array<float, 3>& color) {
+void append_ground_primitive(std::vector<DX11Vertex>& vertices, const std::array<float, 3>& color) {
     append_box(vertices, 180.0f, 90.0f, 180.0f, color);
 }
 
-void append_obj_mesh(std::vector<Vertex>& vertices, const MeshData& mesh, float world_radius, const std::array<float, 3>& color) {
+void append_obj_mesh(std::vector<DX11Vertex>& vertices, const MeshData& mesh, float world_radius, const std::array<float, 3>& color) {
     if (!mesh.loaded || mesh.vertices.empty() || mesh.radius <= 1e-6f) {
         return;
     }
 
     const float scale_value = world_radius / mesh.radius;
     for (size_t i = 0; i + 2 < mesh.vertices.size(); i += 3) {
-        const auto make_position = [&](const MeshData::MeshVertex& vertex) {
+        const auto make_position = [&](const MeshData::MeshVertex& mesh_vertex) {
             return make_float3(
-                (vertex.position[0] - mesh.center[0]) * scale_value,
-                (vertex.position[1] - mesh.center[1]) * scale_value,
-                (vertex.position[2] - mesh.center[2]) * scale_value
+                (mesh_vertex.position[0] - mesh.center[0]) * scale_value,
+                (mesh_vertex.position[1] - mesh.center[1]) * scale_value,
+                (mesh_vertex.position[2] - mesh.center[2]) * scale_value
             );
         };
         const auto push_mesh_vertex = [&](const MeshData::MeshVertex& source) {
@@ -589,7 +589,7 @@ void append_obj_mesh(std::vector<Vertex>& vertices, const MeshData& mesh, float 
     }
 }
 
-void append_ground_plane(std::vector<Vertex>& vertices, float size) {
+void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
     constexpr int kSubdivisions = 28;
     const std::array<float, 3> lowland = {0.17f, 0.24f, 0.17f};
     const std::array<float, 3> highland = {0.28f, 0.31f, 0.22f};
@@ -626,7 +626,7 @@ void append_ground_plane(std::vector<Vertex>& vertices, float size) {
     }
 }
 
-void append_sky_quad(std::vector<Vertex>& vertices) {
+void append_sky_quad(std::vector<DX11Vertex>& vertices) {
     const std::array<float, 3> top = {0.20f, 0.39f, 0.62f};
     const std::array<float, 3> horizon = {0.77f, 0.83f, 0.88f};
 
@@ -643,7 +643,7 @@ void append_sky_quad(std::vector<Vertex>& vertices) {
     push_sky_vertex(-1.0f, -1.0f, horizon);
 }
 
-void append_grid(std::vector<Vertex>& vertices, float size, int half_count) {
+void append_grid(std::vector<DX11Vertex>& vertices, float size, int half_count) {
     const float r = 0.24f;
     const float g = 0.29f;
     const float b = 0.25f;
@@ -668,7 +668,7 @@ Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
         static_cast<float>(object.position[2]),
         static_cast<float>(object.position[1])
     );
-    return Float4x4::multiply(Float4x4::multiply(Float4x4::multiply(scale_m, model_offset), rotation_m), translation_m);
+    return scale_m * model_offset * rotation_m * translation_m;
 }
 
 Float4x4 build_shadow_world_matrix(const TelemetryObjectState& object) {
@@ -680,10 +680,10 @@ Float4x4 build_shadow_world_matrix(const TelemetryObjectState& object) {
         static_cast<float>(object.position[2]) + 2.0f,
         static_cast<float>(object.position[1])
     );
-    return Float4x4::multiply(build_object_world_matrix(object), Float4x4::multiply(lift_translation, shadow_projection));
+    return build_object_world_matrix(object) * lift_translation * shadow_projection;
 }
 
-void create_object_geometry(const TelemetryObjectState& object, std::vector<Vertex>& vertices) {
+void create_object_geometry(const TelemetryObjectState& object, std::vector<DX11Vertex>& vertices) {
     const auto color = team_color(object);
     const std::string mesh_asset = resolve_mesh_asset_name(object);
     if (!mesh_asset.empty()) {
@@ -721,7 +721,7 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                     static_cast<float>(object.position[2]),
                     static_cast<float>(object.position[1])
                 );
-                const Float3x3 orientation = Float3x3::convert_nwu_to_viewer(Float3x3::from_sim_orientation(object.orientation));
+                const Float3x3 orientation = Float3x3::from_sim_orientation(object.orientation).convert_nwu_to_viewer();
                 const Float3 forward = normalize(make_float3(orientation.m[0][0], orientation.m[1][0], orientation.m[2][0]));
                 const Float3 up = resolved_input.camera_roll_locked
                     ? make_float3(0.0f, 1.0f, 0.0f)

@@ -16,6 +16,11 @@ struct Float3 {
 struct Float4x4 {
     float m[4][4]{};
 
+    Float4x4 multiplied(const Float4x4& rhs) const;
+    Float4x4& multiply_assign(const Float4x4& rhs);
+    Float4x4 operator*(const Float4x4& rhs) const;
+    Float4x4& operator*=(const Float4x4& rhs);
+
     static Float4x4 identity();
     static Float4x4 translation(float x, float y, float z);
     static Float4x4 scale(float sx, float sy, float sz);
@@ -28,19 +33,19 @@ struct Float4x4 {
 struct Float3x3 {
     float m[3][3]{};
 
+    Float3x3 multiplied(const Float3x3& rhs) const;
+    Float3x3& multiply_assign(const Float3x3& rhs);
+    Float3x3 operator*(const Float3x3& rhs) const;
+    Float3x3& operator*=(const Float3x3& rhs);
+    Float4x4 to_row_vector_mat4() const;
+    Float3x3 convert_nwu_to_viewer() const;
+
     static Float3x3 multiply(const Float3x3& a, const Float3x3& b);
     static Float3x3 rotation_x(float angle_rad);
     static Float3x3 rotation_y(float angle_rad);
     static Float3x3 rotation_z(float angle_rad);
     static Float3x3 from_sim_orientation(const std::array<double, 3>& orientation);
     static Float3x3 convert_nwu_to_viewer(const Float3x3& nwu_matrix);
-};
-
-struct Vertex {
-    float position[3];
-    float color[3];
-    float normal[3];
-    float uv[2];
 };
 
 struct MeshData {

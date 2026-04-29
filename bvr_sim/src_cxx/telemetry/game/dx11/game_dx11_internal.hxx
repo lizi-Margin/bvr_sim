@@ -22,6 +22,13 @@ namespace bvr_sim {
 
 #ifdef _WIN32
 
+struct DX11Vertex {
+    float position[3];
+    float color[3];
+    float normal[3];
+    float uv[2];
+};
+
 struct SceneConstants {
     Float4x4 world_view_proj;
     Float4x4 world;
@@ -41,7 +48,7 @@ enum class RenderCommandType {
 
 struct RenderCommand {
     RenderCommandType type = RenderCommandType::Clear;
-    std::vector<Vertex> vertices;
+    std::vector<DX11Vertex> vertices;
     D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
     Float4x4 world_view_proj{};
     Float4x4 world{};
@@ -74,12 +81,12 @@ struct RenderScene {
     Float4x4 projection{};
     Float4x4 clip_space{};
     Float3 camera_position{};
-    std::vector<Vertex> sky_vertices;
-    std::vector<Vertex> ground_vertices;
-    std::vector<Vertex> grid_vertices;
+    std::vector<DX11Vertex> sky_vertices;
+    std::vector<DX11Vertex> ground_vertices;
+    std::vector<DX11Vertex> grid_vertices;
 
     struct ObjectBatch {
-        std::vector<Vertex> vertices;
+        std::vector<DX11Vertex> vertices;
         Float4x4 world{};
         std::string material_key = "aircraft_default";
         bool use_material_system = true;

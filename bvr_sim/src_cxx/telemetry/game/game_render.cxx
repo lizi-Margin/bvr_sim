@@ -20,7 +20,7 @@ RenderCommand make_clear_command(const std::array<float, 4>& clear_color) {
 }
 
 RenderCommand make_draw_command(
-    std::vector<Vertex> vertices,
+    std::vector<DX11Vertex> vertices,
     D3D11_PRIMITIVE_TOPOLOGY topology,
     const Float4x4& world_view_proj,
     const Float4x4& world,
@@ -80,7 +80,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         1.0f
     ));
 
-    const Float4x4 view_projection = Float4x4::multiply(scene.view, scene.projection);
+    const Float4x4 view_projection = scene.view * scene.projection;
     const Float4x4 identity_world = Float4x4::identity();
     command_list.commands.push_back(make_draw_command(
         std::move(scene.ground_vertices),
@@ -121,7 +121,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         command_list.commands.push_back(make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            Float4x4::multiply(batch.world, view_projection),
+            batch.world * view_projection,
             batch.world,
             scene.camera_position,
             true,
@@ -141,7 +141,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         command_list.commands.push_back(make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            Float4x4::multiply(batch.world, view_projection),
+            batch.world * view_projection,
             batch.world,
             scene.camera_position,
             true,

@@ -42,7 +42,7 @@ bool ensure_dynamic_vertex_buffer(D3D11Context& d3d11, UINT required_capacity) {
         d3d11.dynamic_vertex_capacity = std::max<UINT>(required_capacity, std::max<UINT>(4096, d3d11.dynamic_vertex_capacity * 2));
 
         D3D11_BUFFER_DESC vb_desc = {};
-        vb_desc.ByteWidth = d3d11.dynamic_vertex_capacity * sizeof(Vertex);
+        vb_desc.ByteWidth = d3d11.dynamic_vertex_capacity * sizeof(DX11Vertex);
         vb_desc.Usage = D3D11_USAGE_DYNAMIC;
         vb_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
         vb_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -56,7 +56,7 @@ bool ensure_dynamic_vertex_buffer(D3D11Context& d3d11, UINT required_capacity) {
     return true;
 }
 
-bool upload_vertices(D3D11Context& d3d11, const std::vector<Vertex>& vertices) {
+bool upload_vertices(D3D11Context& d3d11, const std::vector<DX11Vertex>& vertices) {
     if (!ensure_dynamic_vertex_buffer(d3d11, static_cast<UINT>(vertices.size()))) {
         return false;
     }
@@ -65,7 +65,7 @@ bool upload_vertices(D3D11Context& d3d11, const std::vector<Vertex>& vertices) {
     if (FAILED(hr)) {
         return false;
     }
-    std::memcpy(mapped.pData, vertices.data(), vertices.size() * sizeof(Vertex));
+    std::memcpy(mapped.pData, vertices.data(), vertices.size() * sizeof(DX11Vertex));
     d3d11.context->Unmap(d3d11.dynamic_vertex_buffer, 0);
     return true;
 }
@@ -129,7 +129,7 @@ bool upload_scene_constants(D3D11Context& d3d11, const RenderCommand& command) {
 }
 
 void bind_draw_state(D3D11Context& d3d11, D3D11_PRIMITIVE_TOPOLOGY topology, bool depth_enabled, bool depth_write_enabled, bool blend_enabled) {
-    UINT stride = sizeof(Vertex);
+    UINT stride = sizeof(DX11Vertex);
     UINT offset = 0;
     if (!d3d11.common_pipeline_bound) {
         d3d11.context->IASetVertexBuffers(0, 1, &d3d11.dynamic_vertex_buffer, &stride, &offset);
@@ -203,7 +203,7 @@ bool upload_and_draw(
     D3D11Context& d3d11,
     const RenderCommand& command,
     RenderFrameStats& stats) {
-    const std::vector<Vertex>& vertices = command.vertices;
+    const std::vector<DX11Vertex>& vertices = command.vertices;
     if (vertices.empty()) {
         return true;
     }
@@ -902,10 +902,10 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
     }
 
     D3D11_INPUT_ELEMENT_DESC input_layout_desc[] = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, static_cast<UINT>(offsetof(Vertex, position)), D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, static_cast<UINT>(offsetof(Vertex, color)), D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, static_cast<UINT>(offsetof(Vertex, normal)), D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, static_cast<UINT>(offsetof(Vertex, uv)), D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, static_cast<UINT>(offsetof(DX11Vertex, position)), D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, static_cast<UINT>(offsetof(DX11Vertex, color)), D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, static_cast<UINT>(offsetof(DX11Vertex, normal)), D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, static_cast<UINT>(offsetof(DX11Vertex, uv)), D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
     hr = d3d11.device->CreateInputLayout(
         input_layout_desc,
