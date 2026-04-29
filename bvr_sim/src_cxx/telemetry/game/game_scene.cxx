@@ -1,7 +1,7 @@
 #include "dx11/game_dx11_internal.hxx"
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
-#include "game_math.hxx"
+
 
 #include <algorithm>
 #include <array>
@@ -396,9 +396,9 @@ MeshData* load_named_mesh(const std::string& mesh_name) {
 }
 
 Float4x4 build_object_rotation_matrix(const TelemetryObjectState& object) {
-    const Float3x3 sim_matrix = GameMath::build_sim_orientation_matrix(object.orientation);
-    const Float3x3 viewer_matrix = GameMath::convert_nwu_matrix_to_viewer(sim_matrix);
-    return GameMath::row_vector_matrix_from_mat3(viewer_matrix);
+    const Float3x3 sim_matrix = Float3x3::from_sim_orientation(object.orientation);
+    const Float3x3 viewer_matrix = Float3x3::convert_nwu_to_viewer(sim_matrix);
+    return Float4x4::from_row_vector_mat3(viewer_matrix);
 }
 
 Float3 transform_direction(const Float3x3& matrix, const c3utils::Vector3& direction) {
@@ -422,7 +422,7 @@ Float4x4 perspective_matrix(float fov_y_radians, float aspect, float z_near, flo
 }
 
 Float4x4 orthographic_identity_clip_matrix() {
-    return GameMath::identity_matrix();
+    return Float4x4::identity();
 }
 
 Float4x4 look_at_matrix(const Float3& eye, const Float3& target, const Float3& up_hint) {
@@ -430,7 +430,7 @@ Float4x4 look_at_matrix(const Float3& eye, const Float3& target, const Float3& u
     const Float3 right = normalize(cross(up_hint, forward));
     const Float3 up = cross(forward, right);
 
-    Float4x4 out = GameMath::identity_matrix();
+    Float4x4 out = Float4x4::identity();
     out.m[0][0] = right.x;
     out.m[1][0] = right.y;
     out.m[2][0] = right.z;
@@ -660,27 +660,27 @@ void append_grid(std::vector<Vertex>& vertices, float size, int half_count) {
 
 Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
     const float scale_value = object_world_radius(object) / 180.0f;
-    const Float4x4 scale_m = GameMath::scale_matrix(scale_value, scale_value, scale_value);
-    const Float4x4 model_offset = GameMath::rotation_y_matrix(static_cast<float>(c3utils::deg2rad(270.0)));
+    const Float4x4 scale_m = Float4x4::scale(scale_value, scale_value, scale_value);
+    const Float4x4 model_offset = Float4x4::rotation_y(static_cast<float>(c3utils::deg2rad(270.0)));
     const Float4x4 rotation_m = build_object_rotation_matrix(object);
-    const Float4x4 translation_m = GameMath::translation_matrix(
+    const Float4x4 translation_m = Float4x4::translation(
         static_cast<float>(object.position[0]),
         static_cast<float>(object.position[2]),
         static_cast<float>(object.position[1])
     );
-    return GameMath::multiply(GameMath::multiply(GameMath::multiply(scale_m, model_offset), rotation_m), translation_m);
+    return Float4x4::multiply(Float4x4::multiply(Float4x4::multiply(scale_m, model_offset), rotation_m), translation_m);
 }
 
 Float4x4 build_shadow_world_matrix(const TelemetryObjectState& object) {
     static const std::array<float, 4> shadow_plane = {0.0f, 1.0f, 0.0f, 0.0f};
     static const std::array<float, 4> shadow_light = {16000.0f, 24000.0f, 12000.0f, 1.0f};
-    static const Float4x4 shadow_projection = GameMath::shadow_projection_matrix(shadow_plane, shadow_light);
-    const Float4x4 lift_translation = GameMath::translation_matrix(
+    static const Float4x4 shadow_projection = Float4x4::shadow_projection(shadow_plane, shadow_light);
+    const Float4x4 lift_translation = Float4x4::translation(
         static_cast<float>(object.position[0]),
         static_cast<float>(object.position[2]) + 2.0f,
         static_cast<float>(object.position[1])
     );
-    return GameMath::multiply(build_object_world_matrix(object), GameMath::multiply(lift_translation, shadow_projection));
+    return Float4x4::multiply(build_object_world_matrix(object), Float4x4::multiply(lift_translation, shadow_projection));
 }
 
 void create_object_geometry(const TelemetryObjectState& object, std::vector<Vertex>& vertices) {
@@ -721,7 +721,7 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                     static_cast<float>(object.position[2]),
                     static_cast<float>(object.position[1])
                 );
-                const Float3x3 orientation = GameMath::convert_nwu_matrix_to_viewer(GameMath::build_sim_orientation_matrix(object.orientation));
+                const Float3x3 orientation = Float3x3::convert_nwu_to_viewer(Float3x3::from_sim_orientation(object.orientation));
                 const Float3 forward = normalize(make_float3(orientation.m[0][0], orientation.m[1][0], orientation.m[2][0]));
                 const Float3 up = resolved_input.camera_roll_locked
                     ? make_float3(0.0f, 1.0f, 0.0f)
@@ -810,6 +810,7 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
 #endif
 
 } // namespace bvr_sim
+
 
 
 

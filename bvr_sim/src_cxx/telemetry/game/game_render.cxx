@@ -1,5 +1,5 @@
 #include "dx11/game_dx11_internal.hxx"
-#include "game_math.hxx"
+
 
 #include <array>
 #include <string>
@@ -80,8 +80,8 @@ RenderCommandList record_render_commands(RenderScene scene) {
         1.0f
     ));
 
-    const Float4x4 view_projection = GameMath::multiply(scene.view, scene.projection);
-    const Float4x4 identity_world = GameMath::identity_matrix();
+    const Float4x4 view_projection = Float4x4::multiply(scene.view, scene.projection);
+    const Float4x4 identity_world = Float4x4::identity();
     command_list.commands.push_back(make_draw_command(
         std::move(scene.ground_vertices),
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
@@ -121,7 +121,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         command_list.commands.push_back(make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            GameMath::multiply(batch.world, view_projection),
+            Float4x4::multiply(batch.world, view_projection),
             batch.world,
             scene.camera_position,
             true,
@@ -141,7 +141,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         command_list.commands.push_back(make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            GameMath::multiply(batch.world, view_projection),
+            Float4x4::multiply(batch.world, view_projection),
             batch.world,
             scene.camera_position,
             true,
@@ -163,6 +163,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
 #endif
 
 } // namespace bvr_sim
+
 
 
 

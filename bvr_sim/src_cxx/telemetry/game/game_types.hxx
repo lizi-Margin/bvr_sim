@@ -15,10 +15,25 @@ struct Float3 {
 
 struct Float4x4 {
     float m[4][4]{};
+
+    static Float4x4 identity();
+    static Float4x4 translation(float x, float y, float z);
+    static Float4x4 scale(float sx, float sy, float sz);
+    static Float4x4 rotation_y(float angle);
+    static Float4x4 shadow_projection(const std::array<float, 4>& plane, const std::array<float, 4>& light);
+    static Float4x4 from_row_vector_mat3(const struct Float3x3& column_vector_matrix);
+    static Float4x4 multiply(const Float4x4& a, const Float4x4& b);
 };
 
 struct Float3x3 {
     float m[3][3]{};
+
+    static Float3x3 multiply(const Float3x3& a, const Float3x3& b);
+    static Float3x3 rotation_x(float angle_rad);
+    static Float3x3 rotation_y(float angle_rad);
+    static Float3x3 rotation_z(float angle_rad);
+    static Float3x3 from_sim_orientation(const std::array<double, 3>& orientation);
+    static Float3x3 convert_nwu_to_viewer(const Float3x3& nwu_matrix);
 };
 
 struct Vertex {
