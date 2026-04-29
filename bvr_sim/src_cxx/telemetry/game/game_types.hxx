@@ -17,6 +17,10 @@ struct Float4x4 {
     float m[4][4]{};
 };
 
+struct Float3x3 {
+    float m[3][3]{};
+};
+
 struct Vertex {
     float position[3];
     float color[3];

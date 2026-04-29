@@ -1,4 +1,5 @@
 #include "dx11/game_dx11_internal.hxx"
+#include "game_math.hxx"
 
 #include <array>
 #include <string>
@@ -10,28 +11,6 @@ namespace bvr_sim {
 #ifdef _WIN32
 
 namespace {
-
-Float4x4 multiply(const Float4x4& a, const Float4x4& b) {
-    Float4x4 out{};
-    for (int r = 0; r < 4; ++r) {
-        for (int c = 0; c < 4; ++c) {
-            out.m[r][c] = a.m[r][0] * b.m[0][c]
-                        + a.m[r][1] * b.m[1][c]
-                        + a.m[r][2] * b.m[2][c]
-                        + a.m[r][3] * b.m[3][c];
-        }
-    }
-    return out;
-}
-
-Float4x4 identity_matrix() {
-    Float4x4 out{};
-    out.m[0][0] = 1.0f;
-    out.m[1][1] = 1.0f;
-    out.m[2][2] = 1.0f;
-    out.m[3][3] = 1.0f;
-    return out;
-}
 
 RenderCommand make_clear_command(const std::array<float, 4>& clear_color) {
     RenderCommand command;
@@ -101,8 +80,8 @@ RenderCommandList record_render_commands(RenderScene scene) {
         1.0f
     ));
 
-    const Float4x4 view_projection = multiply(scene.view, scene.projection);
-    const Float4x4 identity_world = identity_matrix();
+    const Float4x4 view_projection = GameMath::multiply(scene.view, scene.projection);
+    const Float4x4 identity_world = GameMath::identity_matrix();
     command_list.commands.push_back(make_draw_command(
         std::move(scene.ground_vertices),
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
@@ -142,7 +121,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         command_list.commands.push_back(make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            multiply(batch.world, view_projection),
+            GameMath::multiply(batch.world, view_projection),
             batch.world,
             scene.camera_position,
             true,
@@ -162,7 +141,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
         command_list.commands.push_back(make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            multiply(batch.world, view_projection),
+            GameMath::multiply(batch.world, view_projection),
             batch.world,
             scene.camera_position,
             true,
@@ -184,5 +163,7 @@ RenderCommandList record_render_commands(RenderScene scene) {
 #endif
 
 } // namespace bvr_sim
+
+
 
 

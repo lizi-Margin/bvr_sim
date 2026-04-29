@@ -1,6 +1,7 @@
 #include "dx11/game_dx11_internal.hxx"
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
+#include "game_math.hxx"
 
 #include <algorithm>
 #include <array>
@@ -394,156 +395,17 @@ MeshData* load_named_mesh(const std::string& mesh_name) {
     }
 }
 
-Float4x4 identity_matrix() {
-    Float4x4 out{};
-    out.m[0][0] = 1.0f;
-    out.m[1][1] = 1.0f;
-    out.m[2][2] = 1.0f;
-    out.m[3][3] = 1.0f;
-    return out;
-}
-
-Float4x4 multiply(const Float4x4& a, const Float4x4& b) {
-    Float4x4 out{};
-    for (int r = 0; r < 4; ++r) {
-        for (int c = 0; c < 4; ++c) {
-            out.m[r][c] = a.m[r][0] * b.m[0][c]
-                        + a.m[r][1] * b.m[1][c]
-                        + a.m[r][2] * b.m[2][c]
-                        + a.m[r][3] * b.m[3][c];
-        }
-    }
-    return out;
-}
-
-Float4x4 translation_matrix(float x, float y, float z) {
-    Float4x4 out = identity_matrix();
-    out.m[3][0] = x;
-    out.m[3][1] = y;
-    out.m[3][2] = z;
-    return out;
-}
-
-Float4x4 scale_matrix(float sx, float sy, float sz) {
-    Float4x4 out{};
-    out.m[0][0] = sx;
-    out.m[1][1] = sy;
-    out.m[2][2] = sz;
-    out.m[3][3] = 1.0f;
-    return out;
-}
-
-Float4x4 rotation_y_matrix(float angle) {
-    Float4x4 out = identity_matrix();
-    const float c = std::cos(angle);
-    const float s = std::sin(angle);
-    out.m[0][0] = c;
-    out.m[0][2] = -s;
-    out.m[2][0] = s;
-    out.m[2][2] = c;
-    return out;
-}
-
-Float4x4 shadow_projection_matrix(const std::array<float, 4>& plane, const std::array<float, 4>& light) {
-    Float4x4 out{};
-    const float dot_value =
-        plane[0] * light[0] +
-        plane[1] * light[1] +
-        plane[2] * light[2] +
-        plane[3] * light[3];
-
-    for (int row = 0; row < 4; ++row) {
-        for (int col = 0; col < 4; ++col) {
-            out.m[row][col] = (row == col ? dot_value : 0.0f) - light[col] * plane[row];
-        }
-    }
-    return out;
-}
-
-using Mat3 = std::array<float, 9>;
-
-Mat3 mat3_mul(const Mat3& a, const Mat3& b) {
-    Mat3 result{};
-    for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
-            float value = 0.0f;
-            for (int k = 0; k < 3; ++k) {
-                value += a[row * 3 + k] * b[k * 3 + col];
-            }
-            result[row * 3 + col] = value;
-        }
-    }
-    return result;
-}
-
-Mat3 mat3_rotation_x(float angle_rad) {
-    const float c = std::cos(angle_rad);
-    const float s = std::sin(angle_rad);
-    return {
-        1.0f, 0.0f, 0.0f,
-        0.0f, c, -s,
-        0.0f, s, c
-    };
-}
-
-Mat3 mat3_rotation_y(float angle_rad) {
-    const float c = std::cos(angle_rad);
-    const float s = std::sin(angle_rad);
-    return {
-        c, 0.0f, s,
-        0.0f, 1.0f, 0.0f,
-        -s, 0.0f, c
-    };
-}
-
-Mat3 mat3_rotation_z(float angle_rad) {
-    const float c = std::cos(angle_rad);
-    const float s = std::sin(angle_rad);
-    return {
-        c, -s, 0.0f,
-        s, c, 0.0f,
-        0.0f, 0.0f, 1.0f
-    };
-}
-
-Mat3 build_sim_orientation_matrix(const std::array<double, 3>& orientation) {
-    const Mat3 rx = mat3_rotation_x(static_cast<float>(orientation[0]));
-    const Mat3 ry = mat3_rotation_y(static_cast<float>(orientation[1]));
-    const Mat3 rz = mat3_rotation_z(static_cast<float>(orientation[2]));
-    return mat3_mul(rz, mat3_mul(ry, rx));
-}
-
-Mat3 convert_nwu_matrix_to_viewer(const Mat3& nwu_matrix) {
-    // Viewer world axes are [North, Up, West] while simulation uses [North, West, Up].
-    static const Mat3 basis_change = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f
-    };
-    return mat3_mul(basis_change, mat3_mul(nwu_matrix, basis_change));
-}
-
-Float4x4 row_vector_matrix_from_mat3(const Mat3& column_vector_matrix) {
-    Float4x4 out = identity_matrix();
-    for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
-            out.m[row][col] = column_vector_matrix[col * 3 + row];
-        }
-    }
-    return out;
-}
-
 Float4x4 build_object_rotation_matrix(const TelemetryObjectState& object) {
-    const Mat3 sim_matrix = build_sim_orientation_matrix(object.orientation);
-    const Mat3 viewer_matrix = convert_nwu_matrix_to_viewer(sim_matrix);
-    return row_vector_matrix_from_mat3(viewer_matrix);
+    const Float3x3 sim_matrix = GameMath::build_sim_orientation_matrix(object.orientation);
+    const Float3x3 viewer_matrix = GameMath::convert_nwu_matrix_to_viewer(sim_matrix);
+    return GameMath::row_vector_matrix_from_mat3(viewer_matrix);
 }
 
-Float3 transform_direction(const Mat3& matrix, const c3utils::Vector3& direction) {
+Float3 transform_direction(const Float3x3& matrix, const c3utils::Vector3& direction) {
     return make_float3(
-        static_cast<float>(matrix[0] * direction[0] + matrix[1] * direction[1] + matrix[2] * direction[2]),
-        static_cast<float>(matrix[3] * direction[0] + matrix[4] * direction[1] + matrix[5] * direction[2]),
-        static_cast<float>(matrix[6] * direction[0] + matrix[7] * direction[1] + matrix[8] * direction[2])
+        static_cast<float>(matrix.m[0][0] * direction[0] + matrix.m[0][1] * direction[1] + matrix.m[0][2] * direction[2]),
+        static_cast<float>(matrix.m[1][0] * direction[0] + matrix.m[1][1] * direction[1] + matrix.m[1][2] * direction[2]),
+        static_cast<float>(matrix.m[2][0] * direction[0] + matrix.m[2][1] * direction[1] + matrix.m[2][2] * direction[2])
     );
 }
 
@@ -560,7 +422,7 @@ Float4x4 perspective_matrix(float fov_y_radians, float aspect, float z_near, flo
 }
 
 Float4x4 orthographic_identity_clip_matrix() {
-    return identity_matrix();
+    return GameMath::identity_matrix();
 }
 
 Float4x4 look_at_matrix(const Float3& eye, const Float3& target, const Float3& up_hint) {
@@ -568,7 +430,7 @@ Float4x4 look_at_matrix(const Float3& eye, const Float3& target, const Float3& u
     const Float3 right = normalize(cross(up_hint, forward));
     const Float3 up = cross(forward, right);
 
-    Float4x4 out = identity_matrix();
+    Float4x4 out = GameMath::identity_matrix();
     out.m[0][0] = right.x;
     out.m[1][0] = right.y;
     out.m[2][0] = right.z;
@@ -798,27 +660,27 @@ void append_grid(std::vector<Vertex>& vertices, float size, int half_count) {
 
 Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
     const float scale_value = object_world_radius(object) / 180.0f;
-    const Float4x4 scale_m = scale_matrix(scale_value, scale_value, scale_value);
-    const Float4x4 model_offset = rotation_y_matrix(static_cast<float>(c3utils::deg2rad(270.0)));
+    const Float4x4 scale_m = GameMath::scale_matrix(scale_value, scale_value, scale_value);
+    const Float4x4 model_offset = GameMath::rotation_y_matrix(static_cast<float>(c3utils::deg2rad(270.0)));
     const Float4x4 rotation_m = build_object_rotation_matrix(object);
-    const Float4x4 translation_m = translation_matrix(
+    const Float4x4 translation_m = GameMath::translation_matrix(
         static_cast<float>(object.position[0]),
         static_cast<float>(object.position[2]),
         static_cast<float>(object.position[1])
     );
-    return multiply(multiply(multiply(scale_m, model_offset), rotation_m), translation_m);
+    return GameMath::multiply(GameMath::multiply(GameMath::multiply(scale_m, model_offset), rotation_m), translation_m);
 }
 
 Float4x4 build_shadow_world_matrix(const TelemetryObjectState& object) {
     static const std::array<float, 4> shadow_plane = {0.0f, 1.0f, 0.0f, 0.0f};
     static const std::array<float, 4> shadow_light = {16000.0f, 24000.0f, 12000.0f, 1.0f};
-    static const Float4x4 shadow_projection = shadow_projection_matrix(shadow_plane, shadow_light);
-    const Float4x4 lift_translation = translation_matrix(
+    static const Float4x4 shadow_projection = GameMath::shadow_projection_matrix(shadow_plane, shadow_light);
+    const Float4x4 lift_translation = GameMath::translation_matrix(
         static_cast<float>(object.position[0]),
         static_cast<float>(object.position[2]) + 2.0f,
         static_cast<float>(object.position[1])
     );
-    return multiply(build_object_world_matrix(object), multiply(lift_translation, shadow_projection));
+    return GameMath::multiply(build_object_world_matrix(object), GameMath::multiply(lift_translation, shadow_projection));
 }
 
 void create_object_geometry(const TelemetryObjectState& object, std::vector<Vertex>& vertices) {
@@ -859,11 +721,11 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                     static_cast<float>(object.position[2]),
                     static_cast<float>(object.position[1])
                 );
-                const Mat3 orientation = convert_nwu_matrix_to_viewer(build_sim_orientation_matrix(object.orientation));
-                const Float3 forward = normalize(make_float3(orientation[0], orientation[3], orientation[6]));
+                const Float3x3 orientation = GameMath::convert_nwu_matrix_to_viewer(GameMath::build_sim_orientation_matrix(object.orientation));
+                const Float3 forward = normalize(make_float3(orientation.m[0][0], orientation.m[1][0], orientation.m[2][0]));
                 const Float3 up = resolved_input.camera_roll_locked
                     ? make_float3(0.0f, 1.0f, 0.0f)
-                    : normalize(make_float3(orientation[1], orientation[4], orientation[7]));
+                    : normalize(make_float3(orientation.m[0][1], orientation.m[1][1], orientation.m[2][1]));
                 const float follow_distance = std::max(1000.0f, resolved_input.camera_distance);
                 const c3utils::Vector3 local_camera_offset(-follow_distance, follow_distance * 0.28f, 0.0);
                 const Float3 world_camera_offset = transform_direction(orientation, local_camera_offset);
@@ -948,5 +810,8 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
 #endif
 
 } // namespace bvr_sim
+
+
+
 
 

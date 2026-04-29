@@ -72,6 +72,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/embedded_web_server.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/opengl_viewer.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_mode.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_math.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/dx11/game_dx11_renderer.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_render.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/game_scene.cxx"
@@ -319,5 +320,6 @@ endif()
 # ============================================================================
 # Output Information
 # ============================================================================
+
 
 
