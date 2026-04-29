@@ -47,13 +47,13 @@ def main():
 
     print("\nRunning BVR Sim Game Mode smoke test...")
     from tests.test_game_mode_smoke import main as game_mode_smoke_test
-    dx11_result = game_mode_smoke_test()
+    game_result = game_mode_smoke_test()
 
     print("\nRunning Python core full test...")
     from tests.test_py import main as python_core_full_test
     python_result = python_core_full_test()
 
-    if python_result == 0 and cpp_result == 0 and dx11_result == 0 and unit_test_result == 0 and c3u_test_result == 0:
+    if python_result == 0 and cpp_result == 0 and game_result == 0 and unit_test_result == 0 and c3u_test_result == 0:
         print("\nAll tests PASSED")
         return 0
     else:
