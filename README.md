@@ -351,7 +351,7 @@ python tests/cpp_unit_tests.py
 
 - Web 可视化：`EmbeddedWebServer` + `web/` 前端
 - 原生 OpenGL viewer：调试用抽象战场视图
-- 原生 DX11GameViewer：当前原生游戏画面方向
+- 原生 BVR Sim Game Mode（DX11 后端）：当前原生游戏模式方向
 
 三者都和 `bvr_sim_cpp` 一起编译到同一个原生模块中。当前确定不新增独立 `game_app.exe`，DX11 方向也继续使用进程内 viewer / 单一 `pyd` 架构。
 
@@ -372,7 +372,7 @@ python tests/cpp_unit_tests.py
 - DX11GameViewer 优先支持 Windows，使用 Win32 + Direct3D 11
 - DX11GameViewer 当前包含基础相机、HUD、天空、地面、网格、飞机 / 导弹 / 地面单位渲染、OBJ mesh 加载和 primitive fallback
 
-### DX11GameViewer 启动步骤
+### BVR Sim Game Mode 启动步骤
 
 1. 先构建原生扩展
 
@@ -400,17 +400,17 @@ core = bvr_sim_cpp.SimCore(
 )
 
 core.start_telemetry_bridge()
-core.start_dx11_game_viewer()
+core.start_game_mode()
 core.start()
 ```
 
-### DX11GameViewer Python 接口
+### BVR Sim Game Mode Python 接口
 
-- `core.start_dx11_game_viewer()`
-- `core.stop_dx11_game_viewer()`
-- `core.is_dx11_game_viewer_running()`
-- `core.is_dx11_game_viewer_supported()`
-- `core.get_dx11_game_viewer_status()`
+- `core.start_game_mode()`
+- `core.stop_game_mode()`
+- `core.is_game_mode_running()`
+- `core.is_game_mode_supported()`
+- `core.get_game_mode_status()`
 
 ### OpenGL Viewer 启动步骤
 

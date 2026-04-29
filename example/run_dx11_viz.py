@@ -30,7 +30,7 @@ def main():
             sim.core.set_acmi_file_path(f"./test_logs/replay_dx11_{turn}.acmi")
             obs, info = sim.reset(seed=None)
             sim.core.step_sync(1)
-            sim.core.start_dx11_game_viewer()
+            sim.core.start_game_mode()
             episode_done = False
             print()
             while not episode_done:
@@ -40,14 +40,14 @@ def main():
                 episode_done = info["episode_done"]
                 step_time = max(t1 - t0, 1e-6)
                 fps = 1.0 / step_time
-                viewer_status = sim.core.get_dx11_game_viewer_status()
+                viewer_status = sim.core.get_game_mode_status()
                 object_count = viewer_status.get("last_object_count", 0)
                 print(f"\rSim FPS: {fps:8.2f}  Viewer Objects: {object_count:4d}", end="")
 
-            sim.core.stop_dx11_game_viewer()
+            sim.core.stop_game_mode()
             turn += 1
     except KeyboardInterrupt:
-        sim.core.stop_dx11_game_viewer()
+        sim.core.stop_game_mode()
     finally:
         del sim
 

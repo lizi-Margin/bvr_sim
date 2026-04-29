@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "rubbish_can/json.hpp"
 #include "telemetry/embedded_web_server.hxx"
@@ -57,11 +57,11 @@ public:
     void start_opengl_viewer();
     void stop_opengl_viewer();
     json::JSON get_opengl_viewer_status() const;
-    bool is_dx11_game_viewer_running() const noexcept;
-    bool is_dx11_game_viewer_supported() const noexcept;
-    void start_dx11_game_viewer();
-    void stop_dx11_game_viewer();
-    json::JSON get_dx11_game_viewer_status() const;
+    bool is_game_mode_running() const noexcept;
+    bool is_game_mode_supported() const noexcept;
+    void start_game_mode();
+    void stop_game_mode();
+    json::JSON get_game_mode_status() const;
 
 private:
     void run_loop();
@@ -84,8 +84,9 @@ private:
     std::shared_ptr<TelemetryBridge> telemetry_bridge_;
     std::shared_ptr<EmbeddedWebServer> visualization_server_;
     std::shared_ptr<OpenGLViewer> opengl_viewer_;
-    std::shared_ptr<DX11GameViewer> dx11_game_viewer_;
+    std::shared_ptr<DX11GameViewer> game_mode_;
 
 };
 
 }
+

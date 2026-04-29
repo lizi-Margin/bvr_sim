@@ -36,9 +36,9 @@ def main():
     from tests.test_cpp import main as cpp_core_full_test
     cpp_result = cpp_core_full_test()
 
-    print("\nRunning DX11 game viewer smoke test...")
-    from tests.test_dx11_game_viewer_smoke import main as dx11_game_viewer_smoke_test
-    dx11_result = dx11_game_viewer_smoke_test()
+    print("\nRunning BVR Sim Game Mode smoke test...")
+    from tests.test_game_mode_smoke import main as game_mode_smoke_test
+    dx11_result = game_mode_smoke_test()
 
     print("\nRunning Python core full test...")
     from tests.test_py import main as python_core_full_test

@@ -166,10 +166,10 @@ python run_tests.py
 
 1. `SimCore`
 2. `TelemetryBridge`
-3. `EmbeddedWebServer`、`OpenGLViewer` 或 `DX11GameViewer`
+3. `EmbeddedWebServer`、`OpenGLViewer` 或 `BVR Sim Game Mode`
 4. `web/` 前端、进程内原生 OpenGL 窗口或进程内原生 DX11 窗口
 
-当前确定继续使用单一 `bvr_sim_cpp` 原生扩展架构。`DX11GameViewer` 是进程内 viewer，不规划独立 `game_app.exe`。
+当前确定继续使用单一 `bvr_sim_cpp` 原生扩展架构。`BVR Sim Game Mode` 是进程内游戏模式，不规划独立 `game_app.exe`。
 
 关键入口：
 
@@ -212,7 +212,7 @@ python run_tests.py
 - 将原生窗口输入转换成 telemetry 命令
 - 不直接访问仿真对象实例
 
-`DX11GameViewer`
+`BVR Sim Game Mode`（当前 DX11 后端）
 
 - 运行在进程内独立线程
 - 使用 Win32 + Direct3D 11 渲染当前实时快照
@@ -227,7 +227,7 @@ python run_tests.py
 - 只写结构化命令
 - 不依赖 C++ 内部对象模型
 
-进程内 OpenGL viewer 和 DX11GameViewer 也遵守同一原则：
+进程内 OpenGL viewer 和 BVR Sim Game Mode 也遵守同一原则：
 
 - 只读 `WorldSnapshot`
 - 只写结构化命令

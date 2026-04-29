@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import time
 
@@ -16,9 +16,9 @@ def get_root_dir() -> str:
 
 def wait_for_status(core, predicate, timeout_sec: float = 5.0) -> dict:
     deadline = time.time() + timeout_sec
-    last_status = core.get_dx11_game_viewer_status()
+    last_status = core.get_game_mode_status()
     while time.time() < deadline:
-        last_status = core.get_dx11_game_viewer_status()
+        last_status = core.get_game_mode_status()
         if predicate(last_status):
             return last_status
         time.sleep(0.05)
@@ -41,7 +41,7 @@ def main() -> int:
         sim.reset(seed=None)
         sim.core.step_sync(1)
 
-        initial_status = sim.core.get_dx11_game_viewer_status()
+        initial_status = sim.core.get_game_mode_status()
         assert "supported" in initial_status
         assert "running" in initial_status
         assert "backend" in initial_status
@@ -50,7 +50,7 @@ def main() -> int:
             assert initial_status["running"] is False
             return 0
 
-        sim.core.start_dx11_game_viewer()
+        sim.core.start_game_mode()
         running_status = wait_for_status(sim.core, lambda status: status["running"] is True)
         assert running_status["backend"] == "dx11"
         assert running_status["platform"] == "windows"
@@ -67,11 +67,11 @@ def main() -> int:
         assert rendered_status["last_object_count"] > 0
         assert rendered_status["last_vertex_count"] > 0
 
-        sim.core.stop_dx11_game_viewer()
+        sim.core.stop_game_mode()
         stopped_status = wait_for_status(sim.core, lambda status: status["running"] is False)
         assert stopped_status["supported"] is True
     finally:
-        sim.core.stop_dx11_game_viewer()
+        sim.core.stop_game_mode()
         del sim
 
     return 0
@@ -79,3 +79,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

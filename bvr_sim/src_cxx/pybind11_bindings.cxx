@@ -1,4 +1,4 @@
-#include <pybind11/pybind11.h>
+﻿#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 #include <pybind11/eigen.h>
@@ -141,12 +141,12 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("get_opengl_viewer_status", [](SimCore& self) -> py::object {
             return json_to_python(self.get_opengl_viewer_status());
         })
-        .def("start_dx11_game_viewer", &SimCore::start_dx11_game_viewer)
-        .def("stop_dx11_game_viewer", &SimCore::stop_dx11_game_viewer)
-        .def("is_dx11_game_viewer_running", &SimCore::is_dx11_game_viewer_running)
-        .def("is_dx11_game_viewer_supported", &SimCore::is_dx11_game_viewer_supported)
-        .def("get_dx11_game_viewer_status", [](SimCore& self) -> py::object {
-            return json_to_python(self.get_dx11_game_viewer_status());
+        .def("start_game_mode", &SimCore::start_game_mode)
+        .def("stop_game_mode", &SimCore::stop_game_mode)
+        .def("is_game_mode_running", &SimCore::is_game_mode_running)
+        .def("is_game_mode_supported", &SimCore::is_game_mode_supported)
+        .def("get_game_mode_status", [](SimCore& self) -> py::object {
+            return json_to_python(self.get_game_mode_status());
         });
 
     py::class_<RLManager, std::shared_ptr<RLManager>>(m, "RLManager")
@@ -178,3 +178,4 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("get_obs_dim", &RLManager::get_obs_dim);
 
 }
+
