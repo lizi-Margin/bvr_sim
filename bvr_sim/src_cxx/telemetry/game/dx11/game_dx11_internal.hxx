@@ -114,6 +114,7 @@ struct ViewerInputState {
     bool move_up = false;
     bool move_down = false;
     bool dragging = false;
+    bool mouse_has_reference = false;
     int last_mouse_x = 0;
     int last_mouse_y = 0;
     int mouse_x = 0;

@@ -713,6 +713,21 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                     static_cast<float>(object.position[2]),
                     static_cast<float>(object.position[1])
                 );
+                if (resolved_input.input_mode == ViewerInputState::InputMode::Control) {
+                    aircraft_target = object_position;
+                    aircraft_eye = add(
+                        aircraft_target,
+                        make_float3(
+                            std::cos(resolved_input.camera_pitch) * std::cos(resolved_input.camera_yaw) * resolved_input.camera_distance,
+                            std::sin(resolved_input.camera_pitch) * resolved_input.camera_distance,
+                            std::cos(resolved_input.camera_pitch) * std::sin(resolved_input.camera_yaw) * resolved_input.camera_distance
+                        )
+                    );
+                    aircraft_up = make_float3(0.0f, 1.0f, 0.0f);
+                    use_aircraft_view = true;
+                    break;
+                }
+
                 const Float3x3 orientation = Float3x3::from_sim_orientation(object.orientation).convert_nwu_to_viewer();
                 const Float3 forward = normalize(make_float3(orientation.m[0][0], orientation.m[1][0], orientation.m[2][0]));
                 const Float3 up = resolved_input.camera_roll_locked

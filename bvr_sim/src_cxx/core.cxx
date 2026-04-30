@@ -462,7 +462,13 @@ TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand&
 
         const auto register_key = command.payload.at("register_key").ToString();
         format_check(!register_key.empty(), "Telemetry object_debug register_key must not be empty");
-        object->set(register_key, command.payload.at("value"));
+        int penalty = -1;
+        if (command.payload.hasKey("penalty", json::JSON::Class::Integral)) {
+            penalty = static_cast<int>(command.payload.at("penalty").ToInt());
+        } else if (command.payload.hasKey("penalty", json::JSON::Class::Floating)) {
+            penalty = static_cast<int>(command.payload.at("penalty").ToFloat());
+        }
+        object->set_with_penalty(register_key, command.payload.at("value"), penalty);
         SL::get().printf("[SimCore] object_debug wrote register key %s for uid %s\n", register_key.c_str(), command.target_uid.c_str());
         return make_command_result("applied", "object register updated", command);
     }

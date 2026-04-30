@@ -20,6 +20,8 @@ public:
     std::optional<json::JSON> get(const std::string& key) const noexcept;
     bool set(const std::string& key, const json::JSON& value) noexcept;
     bool set(const std::string& key, json::JSON&& value) noexcept;
+    bool set_with_penalty(const std::string& key, const json::JSON& value, int penalty) noexcept;
+    bool set_with_penalty(const std::string& key, json::JSON&& value, int penalty) noexcept;
 
     std::optional<json::JSON> pop(const std::string& key) noexcept;
 
@@ -41,6 +43,7 @@ public:
 
 private:
     std::map<std::string, json::JSON> data_;
+    std::map<std::string, int> key_penalty_;
     mutable std::shared_mutex mutex_;
 };
 

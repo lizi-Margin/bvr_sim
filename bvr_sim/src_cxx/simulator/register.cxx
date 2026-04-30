@@ -16,12 +16,42 @@ std::optional<json::JSON> Register::get(const std::string& key) const noexcept {
 bool Register::set(const std::string& key, const json::JSON& value) noexcept {
     std::unique_lock lock(mutex_);
     data_[key] = value;
+    key_penalty_[key] = 0;
     return true;
 }
 
 bool Register::set(const std::string& key, json::JSON&& value) noexcept {
     std::unique_lock lock(mutex_);
     data_[key] = std::move(value);
+    key_penalty_[key] = 0;
+    return true;
+}
+
+bool Register::set_with_penalty(const std::string& key, const json::JSON& value, int penalty) noexcept {
+    if (penalty >= 0) {
+        return false;
+    }
+    std::unique_lock lock(mutex_);
+    const auto it = key_penalty_.find(key);
+    if (it != key_penalty_.end() && penalty < it->second) {
+        return false;
+    }
+    data_[key] = value;
+    key_penalty_[key] = penalty;
+    return true;
+}
+
+bool Register::set_with_penalty(const std::string& key, json::JSON&& value, int penalty) noexcept {
+    if (penalty >= 0) {
+        return false;
+    }
+    std::unique_lock lock(mutex_);
+    const auto it = key_penalty_.find(key);
+    if (it != key_penalty_.end() && penalty < it->second) {
+        return false;
+    }
+    data_[key] = std::move(value);
+    key_penalty_[key] = penalty;
     return true;
 }
 
@@ -31,6 +61,7 @@ std::optional<json::JSON> Register::pop(const std::string& key) noexcept {
     if (it != data_.end()) {
         json::JSON value = std::move(it->second);
         data_.erase(it);
+        key_penalty_.erase(key);
         return value;
     }
     return std::nullopt;

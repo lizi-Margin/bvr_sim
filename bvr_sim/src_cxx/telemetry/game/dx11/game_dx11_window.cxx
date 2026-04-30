@@ -144,7 +144,25 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             window->input.mouse_aim_x = normalize_mouse_axis(mouse_x, width - 1);
             window->input.mouse_aim_y = normalize_mouse_axis(mouse_y, height - 1);
 
-            if (window->input.camera_mode == ViewerInputState::CameraMode::FollowObject) {
+            const bool control_focus_object =
+                window->input.input_mode == ViewerInputState::InputMode::Control
+                && !window->input.focus_uid.empty()
+                && window->input.camera_mode == ViewerInputState::CameraMode::FollowObject;
+
+            if (control_focus_object) {
+                if (!window->input.mouse_has_reference) {
+                    window->input.last_mouse_x = mouse_x;
+                    window->input.last_mouse_y = mouse_y;
+                    window->input.mouse_has_reference = true;
+                    return 0;
+                }
+                const int dx = mouse_x - window->input.last_mouse_x;
+                const int dy = mouse_y - window->input.last_mouse_y;
+                window->input.last_mouse_x = mouse_x;
+                window->input.last_mouse_y = mouse_y;
+                window->input.camera_yaw -= static_cast<float>(dx) * 0.006f;
+                window->input.camera_pitch += static_cast<float>(dy) * 0.0045f;
+                window->input.camera_pitch = std::clamp(window->input.camera_pitch, -1.45f, 1.45f);
                 return 0;
             }
 

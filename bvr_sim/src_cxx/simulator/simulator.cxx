@@ -164,6 +164,10 @@ bool SimulatedObject::set(const std::string& key, const json::JSON& value) noexc
     return register_.set(key, value);
 }
 
+bool SimulatedObject::set_with_penalty(const std::string& key, const json::JSON& value, int penalty) noexcept {
+    return register_.set_with_penalty(key, value, penalty);
+}
+
 void SimulatedObject::write_register() noexcept {
     json::JSON Type_json = json::JSON::Make(json::JSON::Class::String);
     Type_json = SOT_to_string(Type);

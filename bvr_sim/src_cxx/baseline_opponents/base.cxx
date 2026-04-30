@@ -1,7 +1,4 @@
 #include "base.hxx"
-#include "cmd_handler.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/json_getter.hxx"
 #include <algorithm>
 
 namespace bvr_sim {
@@ -68,38 +65,20 @@ void BaseOpponent3D::apply_action(
     const std::map<std::string, double>& legacy_action,
     json::JSON fire_action_json
 ) noexcept {
-    const auto manual_control = agent->get("manual_control");
-    if (manual_control.has_value()
-        && manual_control->JSONType() == json::JSON::Class::Boolean
-        && manual_control->ToBool()) {
-        return;
-    }
-
-    std::string cmd;
+    constexpr int kBaselineActionPenalty = -10;
     {
         json::JSON base = json::JSON::Make(json::JSON::Class::Object);
         for (const auto& [key, value] : legacy_action) {
             base[key] = json::Float(value);
         }
         base["fire"] = fire_action_json;
-        cmd = "set " + agent->uid + " " + base.dump(1, "", "");
         _action_cache = std::move(base);
-        // std::printf("BaseOpponent3D::apply_action: %s\n", cmd.c_str());
-        // std::printf("BaseOpponent3D::action cachk: %s\n", _action_cache.dump().c_str());
     }
 
-    {
-        auto res = CmdHandler::instance().handle(cmd);
-        if (res.JSONType() == json::JSON::Class::Object) {
-            if (res["status"].ToString() == "ok") {
-                // pass
-            } else {
-                SL::get().print("[BaseOpponent3D] Error: " + res["message"].ToString());
-            }
-        } else {
-            SL::get().print("[BaseOpponent3D] Error: Invalid response format from CmdHandler.");
-        }
+    for (const auto& [key, value] : legacy_action) {
+        agent->set_with_penalty(key, json::Float(value), kBaselineActionPenalty);
     }
+    agent->set_with_penalty("fire", fire_action_json, kBaselineActionPenalty);
 }
 
 std::optional<json::JSON> BaseOpponent3D::get_action_cache() const noexcept {

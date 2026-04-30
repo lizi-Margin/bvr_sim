@@ -59,6 +59,7 @@ json::JSON CmdHandler::_handle(const std::string& cmd) noexcept {
         case ParsedCommand::GET:
             return handle_get(parsed);
         case ParsedCommand::SET:
+        case ParsedCommand::SETP:
             return handle_set(parsed);
         case ParsedCommand::INIT:
             return handle_init(parsed);
@@ -114,9 +115,23 @@ json::JSON CmdHandler::handle_set(const ParsedCommand& parsed) noexcept {
         return err;
     }
 
+    if (parsed.type == ParsedCommand::SETP && parsed.penalty >= 0) {
+        json::JSON err = json::JSON::Make(json::JSON::Class::Object);
+        err["status"] = json::String("error");
+        err["message"] = json::String("setp penalty must be negative");
+        return err;
+    }
+
     bool all_ok = true;
     for (auto &p : kv.ObjectRange()) {
-        if (!obj->set(p.first, p.second)) {
+        bool ok = false;
+        if (parsed.type == ParsedCommand::SETP) {
+            ok = obj->set_with_penalty(p.first, p.second, parsed.penalty);
+        } else {
+            ok = obj->set(p.first, p.second);
+        }
+
+        if (!ok) {
             all_ok = false;
         }
     }
@@ -193,31 +208,47 @@ json::JSON CmdHandler::handle_list(const ParsedCommand& parsed) noexcept {
 
 CmdHandler::ParsedCommand CmdHandler::parse_command(const std::string& input)
 {
-    // 强制三段格式：cmd uid json
-    static const std::regex pattern(
+    static const std::regex base_pattern(
         R"(^\s*([A-Za-z0-9]+)\s+([A-Za-z0-9]+)\s+(.+)\s*$)"
+    );
+    static const std::regex setp_pattern(
+        R"(^\s*([A-Za-z0-9]+)\s+([A-Za-z0-9]+)\s+(-?\d+)\s+(.+)\s*$)"
     );
 
     std::smatch match;
-    if (!std::regex_match(input, match, pattern)) {
-        throw std::runtime_error("Command format invalid: expected 'cmd uid json'");
-    }
-
-    std::string cmd  = match[1].str();
-    std::string uid  = match[2].str();
-    std::string json_str = match[3].str();  // 捕获剩余全部内容
-
-    json::JSON value = json::JSON::Make( json::JSON::Class::Object );
-    try {
-        value = json::JSON::Load(json_str);
-    } catch (...) {
-        throw std::runtime_error("Invalid JSON payload");
+    if (!std::regex_match(input, match, base_pattern)) {
+        throw std::runtime_error("Command format invalid");
     }
 
     ParsedCommand out;
-    out.cmd = cmd;
-    out.uid = uid;
-    out.value = std::move(value);
+    out.cmd = match[1].str();
+
+    if (out.cmd == "setp") {
+        std::smatch setp_match;
+        if (!std::regex_match(input, setp_match, setp_pattern)) {
+            throw std::runtime_error("Command format invalid: expected 'setp uid penalty json'");
+        }
+        out.uid = setp_match[2].str();
+        try {
+            out.penalty = std::stoi(setp_match[3].str());
+        } catch (...) {
+            throw std::runtime_error("Invalid penalty for setp");
+        }
+
+        try {
+            out.value = json::JSON::Load(setp_match[4].str());
+        } catch (...) {
+            throw std::runtime_error("Invalid JSON payload");
+        }
+    } else {
+        out.uid = match[2].str();
+        try {
+            out.value = json::JSON::Load(match[3].str());
+        } catch (...) {
+            throw std::runtime_error("Invalid JSON payload");
+        }
+    }
+
     return out;
 }
 
@@ -226,6 +257,8 @@ void CmdHandler::process_command_type(ParsedCommand& parsed) {
         parsed.type = ParsedCommand::GET;
     } else if (parsed.cmd == "set") {
         parsed.type = ParsedCommand::SET;
+    } else if (parsed.cmd == "setp") {
+        parsed.type = ParsedCommand::SETP;
     } else if (parsed.cmd == "init") {
         parsed.type = ParsedCommand::INIT;
     } else if (parsed.cmd == "clear") {

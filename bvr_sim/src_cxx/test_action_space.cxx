@@ -16,3 +16,15 @@ TEST(ActionSpace, ConstructFromRegisterWithValidAction) {
     ASSERT_NEAR(action.delta_speed(), 0.3, 1e-9);
 }
 
+TEST(ActionSpace, RegisterPenaltyKeepsStrongerAction) {
+    bvr_sim::Register reg;
+
+    reg.set("delta_heading", json::JSON(0.8));  // penalty=0 strongest
+    reg.set_with_penalty("delta_heading", json::JSON(0.1), -10);
+    reg.set_with_penalty("delta_altitude", json::JSON(0.2), -10);
+    reg.set_with_penalty("delta_speed", json::JSON(0.3), -10);
+    reg.set_with_penalty("fire", json::JSON(), -10);
+
+    bvr_sim::ActionSpace action(reg);
+    ASSERT_NEAR(action.delta_heading(), 0.8, 1e-9);
+}

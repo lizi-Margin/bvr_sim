@@ -97,6 +97,7 @@ public:
 
     std::optional<json::JSON> get(const std::string& key) const noexcept;
     bool set(const std::string& key, const json::JSON& value) noexcept;
+    bool set_with_penalty(const std::string& key, const json::JSON& value, int penalty) noexcept;
     // Register& get_register() noexcept { return register_; }
     const Register& get_register() const noexcept { return register_; }
     virtual void write_register() noexcept;

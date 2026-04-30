@@ -27,9 +27,10 @@ private:
 
 
     struct ParsedCommand {
-        enum Type { GET, SET, INIT, CLEAR, LIST, INVALID } type = INVALID;
-        std::string cmd; // "get" | "set" | "init" | "clear" | "list"
+        enum Type { GET, SET, SETP, INIT, CLEAR, LIST, INVALID } type = INVALID;
+        std::string cmd; // "get" | "set" | "setp" | "init" | "clear" | "list"
         std::string uid;
+        int penalty = 0; // for setp, must be < 0
         json::JSON value; // present for SET and INIT when JSON provided
     };
 

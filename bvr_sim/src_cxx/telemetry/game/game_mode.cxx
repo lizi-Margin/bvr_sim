@@ -1,5 +1,6 @@
 #include "game_mode.hxx"
 #include "dx11/game_dx11_internal.hxx"
+#include "c3utils/c3utils.hxx"
 
 #include <algorithm>
 #include <chrono>
@@ -209,50 +210,62 @@ void GameMode::run_loop() noexcept {
             material_system_enabled_ = window.input.material_system_enabled;
         }
 
-        auto submit_action_bool_to_uid = [this](const std::string& uid, const char* key, bool value) {
-            TelemetryCommand command;
-            command.kind = TelemetryCommandKind::ObjectDebug;
-            command.target_uid = uid;
-            command.payload = json::JSON::Make(json::JSON::Class::Object);
-            command.payload["register_key"] = json::String(key);
-            command.payload["value"] = json::Boolean(value);
-            submit_command(command);
-        };
-        auto release_manual_control = [&]() {
-            if (!manual_control_uid_.empty()) {
-                submit_action_bool_to_uid(manual_control_uid_, "manual_control", false);
-                manual_control_uid_.clear();
-            }
-        };
-
+        constexpr int kGameModeActionPenalty = -1;
         if (window.input.mouse_aim_enabled
             && window.input.input_mode == ViewerInputState::InputMode::Control
             && window.input.camera_mode == ViewerInputState::CameraMode::FollowObject
             && !window.input.focus_uid.empty()) {
-            const float delta_heading = std::clamp(-window.input.mouse_aim_x, -1.0f, 1.0f);
-            const float delta_altitude = std::clamp(-window.input.mouse_aim_y, -1.0f, 1.0f);
+            float delta_heading = 0.0f;
+            float delta_altitude = 0.0f;
             const float delta_speed = 0.0f;
 
-            auto submit_action_component = [this, &window](const char* key, double value) {
+            if (snapshot) {
+                auto focused_it = std::find_if(
+                    snapshot->objects.begin(),
+                    snapshot->objects.end(),
+                    [&window](const TelemetryObjectState& obj) { return obj.uid == window.input.focus_uid; });
+                if (focused_it != snapshot->objects.end()) {
+                    const float cy = std::cos(window.input.camera_yaw);
+                    const float sy = std::sin(window.input.camera_yaw);
+                    const float cp = std::cos(window.input.camera_pitch);
+                    const float sp = std::sin(window.input.camera_pitch);
+
+                    // camera forward in viewer frame, then convert viewer(N,U,W) -> NWU
+                    const float fwd_n = -cp * cy;
+                    const float fwd_w = -cp * sy;
+                    const float fwd_u = -sp;
+
+                    const float desired_heading = std::atan2(fwd_w, fwd_n);
+                    const float desired_pitch = -std::atan2(fwd_u, std::sqrt(fwd_n * fwd_n + fwd_w * fwd_w));
+
+                    const float current_pitch = static_cast<float>(focused_it->orientation[1]);
+                    const float current_yaw = static_cast<float>(focused_it->orientation[2]);
+                    const float heading_err = static_cast<float>(c3utils::norm_pi(desired_heading - current_yaw));
+                    const float pitch_err = desired_pitch - current_pitch;
+
+                    const float max_heading = static_cast<float>(c3utils::deg2rad(85.0));
+                    const float max_pitch = static_cast<float>(c3utils::deg2rad(45.0));
+                    delta_heading = std::clamp(heading_err / max_heading, -1.0f, 1.0f);
+                    delta_altitude = std::clamp(-(pitch_err / max_pitch), -1.0f, 1.0f);
+                }
+            }
+
+            auto submit_action_component = [this, &window, kGameModeActionPenalty](const char* key, double value) {
                 TelemetryCommand command;
                 command.kind = TelemetryCommandKind::ObjectDebug;
                 command.target_uid = window.input.focus_uid;
                 command.payload = json::JSON::Make(json::JSON::Class::Object);
                 command.payload["register_key"] = json::String(key);
                 command.payload["value"] = json::Float(value);
+                command.payload["penalty"] = json::Integral(kGameModeActionPenalty);
                 submit_command(command);
             };
-            if (!manual_control_uid_.empty() && manual_control_uid_ != window.input.focus_uid) {
-                submit_action_bool_to_uid(manual_control_uid_, "manual_control", false);
-            }
-            manual_control_uid_ = window.input.focus_uid;
-
-            submit_action_bool_to_uid(window.input.focus_uid, "manual_control", true);
+            action_control_uid_ = window.input.focus_uid;
             submit_action_component("delta_heading", delta_heading);
             submit_action_component("delta_altitude", delta_altitude);
             submit_action_component("delta_speed", delta_speed);
         } else {
-            release_manual_control();
+            action_control_uid_.clear();
         }
 
         const RenderScene scene = build_render_scene(window.input, width, height, snapshot.get());
