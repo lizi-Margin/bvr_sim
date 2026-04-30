@@ -68,6 +68,13 @@ void BaseOpponent3D::apply_action(
     const std::map<std::string, double>& legacy_action,
     json::JSON fire_action_json
 ) noexcept {
+    const auto manual_control = agent->get("manual_control");
+    if (manual_control.has_value()
+        && manual_control->JSONType() == json::JSON::Class::Boolean
+        && manual_control->ToBool()) {
+        return;
+    }
+
     std::string cmd;
     {
         json::JSON base = json::JSON::Make(json::JSON::Class::Object);

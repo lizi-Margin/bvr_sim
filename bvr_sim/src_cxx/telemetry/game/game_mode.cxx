@@ -193,6 +193,38 @@ void GameMode::run_loop() noexcept {
             material_system_enabled_ = window.input.material_system_enabled;
         }
 
+        if (window.input.mouse_aim_enabled
+            && window.input.camera_mode == ViewerInputState::CameraMode::FollowObject
+            && !window.input.focus_uid.empty()) {
+            const float delta_heading = std::clamp(-window.input.mouse_aim_x, -1.0f, 1.0f);
+            const float delta_altitude = std::clamp(-window.input.mouse_aim_y, -1.0f, 1.0f);
+            const float delta_speed = 0.0f;
+
+            auto submit_action_component = [this, &window](const char* key, double value) {
+                TelemetryCommand command;
+                command.kind = TelemetryCommandKind::ObjectDebug;
+                command.target_uid = window.input.focus_uid;
+                command.payload = json::JSON::Make(json::JSON::Class::Object);
+                command.payload["register_key"] = json::String(key);
+                command.payload["value"] = json::Float(value);
+                submit_command(command);
+            };
+            auto submit_action_bool = [this, &window](const char* key, bool value) {
+                TelemetryCommand command;
+                command.kind = TelemetryCommandKind::ObjectDebug;
+                command.target_uid = window.input.focus_uid;
+                command.payload = json::JSON::Make(json::JSON::Class::Object);
+                command.payload["register_key"] = json::String(key);
+                command.payload["value"] = json::Boolean(value);
+                submit_command(command);
+            };
+
+            submit_action_bool("manual_control", true);
+            submit_action_component("delta_heading", delta_heading);
+            submit_action_component("delta_altitude", delta_altitude);
+            submit_action_component("delta_speed", delta_speed);
+        }
+
         const RenderScene scene = build_render_scene(window.input, width, height, snapshot.get());
         RenderCommandList command_list = record_render_commands(scene);
         RenderFrameStats hud_stats;

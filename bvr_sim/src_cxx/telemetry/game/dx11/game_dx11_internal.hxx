@@ -111,6 +111,13 @@ struct ViewerInputState {
     bool dragging = false;
     int last_mouse_x = 0;
     int last_mouse_y = 0;
+    int mouse_x = 0;
+    int mouse_y = 0;
+    int client_width = 1;
+    int client_height = 1;
+    float mouse_aim_x = 0.0f;
+    float mouse_aim_y = 0.0f;
+    bool mouse_aim_enabled = true;
     CameraMode camera_mode = CameraMode::FollowObject;
     float camera_yaw = 0.70f;
     float camera_pitch = 0.55f;

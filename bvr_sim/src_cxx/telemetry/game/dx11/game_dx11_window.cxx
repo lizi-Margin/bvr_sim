@@ -29,6 +29,15 @@ Float3 scale(const Float3& v, float s) {
     return make_float3(v.x * s, v.y * s, v.z * s);
 }
 
+float normalize_mouse_axis(int value, int extent_minus_one) {
+    if (extent_minus_one <= 0) {
+        return 0.0f;
+    }
+    const float t = static_cast<float>(value) / static_cast<float>(extent_minus_one);
+    const float normalized = (t * 2.0f) - 1.0f;
+    return std::clamp(normalized, -1.0f, 1.0f);
+}
+
 void cycle_follow_target(ViewerInputState& input) {
     input.camera_mode = ViewerInputState::CameraMode::FollowObject;
     if (input.snapshot_uids.empty()) {
@@ -117,9 +126,30 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         }
         return 0;
     case WM_MOUSEMOVE:
-        if (window && window->input.dragging) {
+        if (window) {
             const int mouse_x = GET_X_LPARAM(l_param);
             const int mouse_y = GET_Y_LPARAM(l_param);
+            RECT rect = {};
+            GetClientRect(hwnd, &rect);
+            const int client_w = static_cast<int>(rect.right - rect.left);
+            const int client_h = static_cast<int>(rect.bottom - rect.top);
+            const int width = std::max(1, client_w);
+            const int height = std::max(1, client_h);
+            window->input.client_width = width;
+            window->input.client_height = height;
+            window->input.mouse_x = mouse_x;
+            window->input.mouse_y = mouse_y;
+            window->input.mouse_aim_x = normalize_mouse_axis(mouse_x, width - 1);
+            window->input.mouse_aim_y = normalize_mouse_axis(mouse_y, height - 1);
+
+            if (window->input.camera_mode == ViewerInputState::CameraMode::FollowObject) {
+                return 0;
+            }
+
+            if (!window->input.dragging) {
+                return 0;
+            }
+
             const int dx = mouse_x - window->input.last_mouse_x;
             const int dy = mouse_y - window->input.last_mouse_y;
             window->input.last_mouse_x = mouse_x;
