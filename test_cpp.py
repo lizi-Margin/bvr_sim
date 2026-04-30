@@ -1,60 +1,59 @@
-import json, time, commentjson
-import numpy as np
+import time
+import commentjson
 import os
-from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
+
 
 def get_root_dir() -> str:
     return os.path.dirname(os.path.realpath(__file__))
 
 
 def main():
-    # Load environment config
-    # with open(os.path.join(get_root_dir(), "./tests/demo_config_cpp.jsonc"), "r") as fin:
-    with open(os.path.join(get_root_dir(), "./example/custom_5v5_f22_f16.jsonc"), "r") as fin:
+    with open(os.path.join(get_root_dir(), "./example/dx11.jsonc"), "r", encoding="utf-8") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)
-    sim = BVR3DEnvCpp(env_config, [], log_file_path="./test_logs/bvr_sim.log", acmi_file_path="./test_logs/replay.acmi")
-    obs, info = sim.reset(seed=None)
+    from bvr_sim import BVR3DEnvCpp
 
-    
+    sim = BVR3DEnvCpp(
+        env_config,
+        [],
+        log_file_path=os.path.join(get_root_dir(), "./test_logs/bvr_sim_dx11.log"),
+        acmi_file_path=os.path.join(get_root_dir(), "./test_logs/replay_dx11.acmi"),
+    )
+
+    obs, info = sim.reset(seed=None)
+    sim.core.step_sync(1)
+
     try:
         turn = 0
-        mean_step_time = 0.0
-        red_wins = 0
-        blue_wins = 0
-        draw = 0
-        while turn < 4:
-            sim.core.set_acmi_file_path(f"./test_logs/replay_{turn}.acmi")
+        while turn < 1000:
+            sim.core.set_acmi_file_path(f"./test_logs/replay_dx11_{turn}.acmi")
             obs, info = sim.reset(seed=None)
-            i = 0
+            sim.core.step_sync(1)
+            sim.core.start_game_mode()
             episode_done = False
+            print()
             while not episode_done:
                 t0 = time.time()
                 obs, reward, done, info = sim.step({})
                 t1 = time.time()
                 episode_done = info["episode_done"]
-                mean_step_time = 0.999 * mean_step_time + 0.001 * (t1 - t0) if mean_step_time > 0 else (t1 - t0)
-                print(f"\rfps: {1.0 / mean_step_time:.2f}, mean time: {mean_step_time:.6f}s", end="")
-                i += 1
-                if episode_done:
-                    if info["win_team"] == "red":
-                        red_wins += 1
-                    elif info["win_team"] == "blue":
-                        blue_wins += 1
-                    else:
-                        draw += 1
+                step_time = max(t1 - t0, 1e-6)
+                fps = 1.0 / step_time
+                viewer_status = sim.core.get_game_mode_status()
+                object_count = viewer_status.get("last_object_count", 0)
+                print(f"\rSim FPS: {fps:8.2f}  Viewer Objects: {object_count:4d}", end="")
+
+            sim.core.stop_game_mode()
             turn += 1
     except KeyboardInterrupt:
-        pass
-    del sim
-    print(f"\nRed wins: {red_wins}, Blue wins: {blue_wins}, Draws: {draw}")
-    print(f"Red win rate: {red_wins / turn:.2%}, Blue win rate: {blue_wins / turn:.2%}, Draw rate: {draw / turn:.2%}")
-    # input("推演结束，按Enter退出。")
-    return 0
-        
+        sim.core.stop_game_mode()
+    finally:
+        del sim
 
-    
+    return 0
+
+
 if __name__ == "__main__":
     main()
-        
+
