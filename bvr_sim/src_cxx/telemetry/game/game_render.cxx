@@ -199,6 +199,27 @@ void append_line_segment(
     out_vertices.push_back(DX11Vertex{{x1,y1,z},{c0,c1,c2},{nx,ny,nz},{0.0f,0.0f}});
 }
 
+bool project_direction_to_ndc(
+    const Float3& dir,
+    const Float3& cam_forward,
+    const Float3& cam_right,
+    const Float3& cam_up,
+    float fov_x,
+    float fov_y,
+    float clamp_abs,
+    float& out_x,
+    float& out_y) {
+    const float f = dir.x * cam_forward.x + dir.y * cam_forward.y + dir.z * cam_forward.z;
+    if (f <= 0.02f) {
+        return false;
+    }
+    const float r = dir.x * cam_right.x + dir.y * cam_right.y + dir.z * cam_right.z;
+    const float u = dir.x * cam_up.x + dir.y * cam_up.y + dir.z * cam_up.z;
+    out_x = std::clamp((r / f) / std::tan(fov_x * 0.5f), -clamp_abs, clamp_abs);
+    out_y = std::clamp((u / f) / std::tan(fov_y * 0.5f), -clamp_abs, clamp_abs);
+    return true;
+}
+
 } // namespace
 
 RenderCommandList record_render_commands(RenderScene scene) {
@@ -435,13 +456,7 @@ void append_hud_render_commands(
         const float aim_cp = std::cos(input.aim_pitch);
         const float aim_sp = std::sin(input.aim_pitch);
         const Float3 aim_fwd{-aim_cp * aim_cy, -aim_sp, -aim_cp * aim_sy};
-        const float aim_f = aim_fwd.x * cam_fwd.x + aim_fwd.y * cam_fwd.y + aim_fwd.z * cam_fwd.z;
-        if (aim_f > 0.02f) {
-            const float aim_r = aim_fwd.x * cam_right.x + aim_fwd.y * cam_right.y + aim_fwd.z * cam_right.z;
-            const float aim_u = aim_fwd.x * cam_up.x + aim_fwd.y * cam_up.y + aim_fwd.z * cam_up.z;
-            target_x = std::clamp((aim_r / aim_f) / std::tan(fov_x * 0.5f), -0.95f, 0.95f);
-            target_y = std::clamp((aim_u / aim_f) / std::tan(fov_y * 0.5f), -0.95f, 0.95f);
-        }
+        project_direction_to_ndc(aim_fwd, cam_fwd, cam_right, cam_up, fov_x, fov_y, 0.95f, target_x, target_y);
 
         if (snapshot) {
             auto focused_it = std::find_if(
@@ -452,14 +467,8 @@ void append_hud_render_commands(
                 const Float3x3 orientation = Float3x3::from_sim_orientation(focused_it->orientation).convert_nwu_to_viewer();
                 const Float3 obj_fwd{orientation.m[0][0], orientation.m[1][0], orientation.m[2][0]};
 
-                const float f = obj_fwd.x * cam_fwd.x + obj_fwd.y * cam_fwd.y + obj_fwd.z * cam_fwd.z;
-                if (f > 0.05f) {
-                    const float r = obj_fwd.x * cam_right.x + obj_fwd.y * cam_right.y + obj_fwd.z * cam_right.z;
-                    const float u = obj_fwd.x * cam_up.x + obj_fwd.y * cam_up.y + obj_fwd.z * cam_up.z;
-                    boresight_x = std::clamp((r / f) / std::tan(fov_x * 0.5f), -0.98f, 0.98f);
-                    boresight_y = std::clamp((u / f) / std::tan(fov_y * 0.5f), -0.98f, 0.98f);
-                    boresight_valid = true;
-                }
+                boresight_valid = project_direction_to_ndc(
+                    obj_fwd, cam_fwd, cam_right, cam_up, fov_x, fov_y, 0.98f, boresight_x, boresight_y);
             }
         }
     }
