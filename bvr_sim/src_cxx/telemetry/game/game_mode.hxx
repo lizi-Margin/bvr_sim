@@ -53,6 +53,7 @@ private:
     long last_vertex_count_ = 0;
     bool shadows_enabled_ = true;
     bool material_system_enabled_ = true;
+    std::string manual_control_uid_;
 };
 
 } // namespace bvr_sim

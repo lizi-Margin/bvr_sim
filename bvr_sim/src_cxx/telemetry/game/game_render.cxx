@@ -77,16 +77,19 @@ std::vector<std::string> make_hud_lines(
     lines.emplace_back(line1);
 
     char line2[320];
+    const char* mode_text = input.input_mode == ViewerInputState::InputMode::Control ? "control" : "follow";
+    const char* focus_text = input.focus_uid.empty() ? "free" : "object";
     std::snprintf(
         line2,
         sizeof(line2),
-        "Camera Target (%.1f, %.1f, %.1f)  FOV %.1f  Dist %.1f  Mode %s",
+        "Camera Target (%.1f, %.1f, %.1f)  FOV %.1f  Dist %.1f  Mode %s  Focus %s",
         input.camera_target.x,
         input.camera_target.y,
         input.camera_target.z,
         input.camera_fov_y,
         input.camera_distance,
-        input.camera_mode == ViewerInputState::CameraMode::Free ? "free" : "follow");
+        mode_text,
+        focus_text);
     lines.emplace_back(line2);
 
     char line3[192];
@@ -100,7 +103,7 @@ std::vector<std::string> make_hud_lines(
     lines.emplace_back(line3);
 
     lines.emplace_back("Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
-    lines.emplace_back("View: +/- FOV  F1 free  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
+    lines.emplace_back("View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
     return lines;
 }
 

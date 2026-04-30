@@ -174,16 +174,32 @@ void GameMode::run_loop() noexcept {
                     window.input.snapshot_uids.push_back(object.uid);
                 }
             }
-            if (window.input.camera_mode == ViewerInputState::CameraMode::FollowObject) {
-                const bool focus_missing = window.input.focus_uid.empty()
-                    || std::find(window.input.snapshot_uids.begin(), window.input.snapshot_uids.end(), window.input.focus_uid)
-                           == window.input.snapshot_uids.end();
-                if (focus_missing) {
-                    window.input.focus_uid = window.input.snapshot_uids.empty() ? std::string{} : window.input.snapshot_uids.front();
+        }
+
+        const int object_count = static_cast<int>(window.input.snapshot_uids.size());
+        if (object_count <= 0) {
+            window.input.focus_cycle_index = -1;
+            window.input.focus_uid.clear();
+            window.input.camera_mode = ViewerInputState::CameraMode::Free;
+        } else {
+            if (!window.input.focus_uid.empty()) {
+                auto it = std::find(window.input.snapshot_uids.begin(), window.input.snapshot_uids.end(), window.input.focus_uid);
+                if (it != window.input.snapshot_uids.end()) {
+                    window.input.focus_cycle_index = static_cast<int>(std::distance(window.input.snapshot_uids.begin(), it));
+                } else {
+                    window.input.focus_cycle_index = -1;
+                    window.input.focus_uid.clear();
                 }
             }
-        } else {
-            window.input.focus_uid.clear();
+
+            if (window.input.focus_cycle_index >= 0 && window.input.focus_cycle_index < object_count) {
+                window.input.focus_uid = window.input.snapshot_uids[static_cast<size_t>(window.input.focus_cycle_index)];
+                window.input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+            } else {
+                window.input.focus_cycle_index = -1;
+                window.input.focus_uid.clear();
+                window.input.camera_mode = ViewerInputState::CameraMode::Free;
+            }
         }
         {
             std::lock_guard<std::mutex> lock(state_mutex_);
@@ -193,7 +209,24 @@ void GameMode::run_loop() noexcept {
             material_system_enabled_ = window.input.material_system_enabled;
         }
 
+        auto submit_action_bool_to_uid = [this](const std::string& uid, const char* key, bool value) {
+            TelemetryCommand command;
+            command.kind = TelemetryCommandKind::ObjectDebug;
+            command.target_uid = uid;
+            command.payload = json::JSON::Make(json::JSON::Class::Object);
+            command.payload["register_key"] = json::String(key);
+            command.payload["value"] = json::Boolean(value);
+            submit_command(command);
+        };
+        auto release_manual_control = [&]() {
+            if (!manual_control_uid_.empty()) {
+                submit_action_bool_to_uid(manual_control_uid_, "manual_control", false);
+                manual_control_uid_.clear();
+            }
+        };
+
         if (window.input.mouse_aim_enabled
+            && window.input.input_mode == ViewerInputState::InputMode::Control
             && window.input.camera_mode == ViewerInputState::CameraMode::FollowObject
             && !window.input.focus_uid.empty()) {
             const float delta_heading = std::clamp(-window.input.mouse_aim_x, -1.0f, 1.0f);
@@ -209,20 +242,17 @@ void GameMode::run_loop() noexcept {
                 command.payload["value"] = json::Float(value);
                 submit_command(command);
             };
-            auto submit_action_bool = [this, &window](const char* key, bool value) {
-                TelemetryCommand command;
-                command.kind = TelemetryCommandKind::ObjectDebug;
-                command.target_uid = window.input.focus_uid;
-                command.payload = json::JSON::Make(json::JSON::Class::Object);
-                command.payload["register_key"] = json::String(key);
-                command.payload["value"] = json::Boolean(value);
-                submit_command(command);
-            };
+            if (!manual_control_uid_.empty() && manual_control_uid_ != window.input.focus_uid) {
+                submit_action_bool_to_uid(manual_control_uid_, "manual_control", false);
+            }
+            manual_control_uid_ = window.input.focus_uid;
 
-            submit_action_bool("manual_control", true);
+            submit_action_bool_to_uid(window.input.focus_uid, "manual_control", true);
             submit_action_component("delta_heading", delta_heading);
             submit_action_component("delta_altitude", delta_altitude);
             submit_action_component("delta_speed", delta_speed);
+        } else {
+            release_manual_control();
         }
 
         const RenderScene scene = build_render_scene(window.input, width, height, snapshot.get());

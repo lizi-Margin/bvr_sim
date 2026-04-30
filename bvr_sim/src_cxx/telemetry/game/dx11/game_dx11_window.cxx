@@ -39,23 +39,25 @@ float normalize_mouse_axis(int value, int extent_minus_one) {
 }
 
 void cycle_follow_target(ViewerInputState& input) {
-    input.camera_mode = ViewerInputState::CameraMode::FollowObject;
-    if (input.snapshot_uids.empty()) {
+    const int object_count = static_cast<int>(input.snapshot_uids.size());
+    if (object_count <= 0) {
+        input.focus_cycle_index = -1;
+    } else {
+        const int slot_count = object_count + 1; // object slots + one free slot
+        int next_index = input.focus_cycle_index + 1;
+        if (next_index >= slot_count) {
+            next_index = -1;
+        }
+        input.focus_cycle_index = next_index;
+    }
+
+    if (input.focus_cycle_index < 0 || input.focus_cycle_index >= object_count) {
         input.focus_uid.clear();
-        return;
+        input.camera_mode = ViewerInputState::CameraMode::Free;
+    } else {
+        input.focus_uid = input.snapshot_uids[static_cast<size_t>(input.focus_cycle_index)];
+        input.camera_mode = ViewerInputState::CameraMode::FollowObject;
     }
-
-    if (input.focus_uid.empty()) {
-        input.focus_uid = input.snapshot_uids.front();
-        return;
-    }
-
-    auto current = std::find(input.snapshot_uids.begin(), input.snapshot_uids.end(), input.focus_uid);
-    if (current == input.snapshot_uids.end() || ++current == input.snapshot_uids.end()) {
-        input.focus_uid = input.snapshot_uids.front();
-        return;
-    }
-    input.focus_uid = *current;
 }
 
 void flush_desktop_composition() {
@@ -146,6 +148,11 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
                 return 0;
             }
 
+            if (window->input.input_mode == ViewerInputState::InputMode::Follow
+                && window->input.focus_uid.empty()) {
+                return 0;
+            }
+
             if (!window->input.dragging) {
                 return 0;
             }
@@ -161,6 +168,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         return 0;
     case WM_MOUSEWHEEL:
         if (window) {
+            if (window->input.input_mode == ViewerInputState::InputMode::Follow
+                && window->input.focus_uid.empty()) {
+                return 0;
+            }
             const int delta = GET_WHEEL_DELTA_WPARAM(w_param);
             window->input.camera_distance -= static_cast<float>(delta) * 6.4f;
             window->input.camera_distance = std::clamp(window->input.camera_distance, 1000.0f, 180000.0f);
@@ -171,12 +182,19 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             break;
         }
         if (w_param == VK_F1) {
-            window->input.camera_mode = ViewerInputState::CameraMode::Free;
-            window->input.focus_uid.clear();
+            const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
+            window->input.input_mode = ViewerInputState::InputMode::Control;
+            if (was_control_mode) {
+                cycle_follow_target(window->input);
+            }
             return 0;
         }
         if (w_param == VK_F2) {
-            cycle_follow_target(window->input);
+            const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
+            window->input.input_mode = ViewerInputState::InputMode::Follow;
+            if (!was_control_mode) {
+                cycle_follow_target(window->input);
+            }
             return 0;
         }
         if (w_param == VK_F3) {
@@ -197,6 +215,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         }
         if (w_param == VK_OEM_MINUS || w_param == VK_SUBTRACT) {
             window->input.camera_fov_y = std::min(110.0f, window->input.camera_fov_y + 2.0f);
+            return 0;
+        }
+        if (window->input.input_mode == ViewerInputState::InputMode::Follow
+            && window->input.focus_uid.empty()) {
             return 0;
         }
         if (w_param == 'W') window->input.move_forward = true;
@@ -226,7 +248,9 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
 } // namespace
 
 void update_camera(ViewerInputState& input, float dt_seconds) {
+    (void)dt_seconds;
     if (input.camera_mode == ViewerInputState::CameraMode::FollowObject
+        || (input.input_mode == ViewerInputState::InputMode::Follow && input.focus_uid.empty())
         || (!input.move_forward
             && !input.move_backward
             && !input.move_left
@@ -332,11 +356,14 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
     draw_line(16, 16, line1.str());
 
     std::ostringstream line2;
+    const char* mode_text = input.input_mode == ViewerInputState::InputMode::Control ? "control" : "follow";
+    const char* focus_text = input.focus_uid.empty() ? "free" : "object";
     line2 << std::fixed << std::setprecision(1)
           << "Camera Target (" << input.camera_target.x << ", " << input.camera_target.y << ", " << input.camera_target.z << ")"
           << "  FOV " << input.camera_fov_y
           << "  Dist " << input.camera_distance
-          << "  Mode " << (input.camera_mode == ViewerInputState::CameraMode::Free ? "free" : "follow");
+          << "  Mode " << mode_text
+          << "  Focus " << focus_text;
     draw_line(16, 40, line2.str());
 
     std::ostringstream line3;
@@ -346,7 +373,7 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
     draw_line(16, 64, line3.str());
 
     draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
-    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 free  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
+    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
 
     if (font && old_font) {
         SelectObject(dc, old_font);

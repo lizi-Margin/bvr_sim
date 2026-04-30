@@ -97,6 +97,11 @@ struct RenderScene {
 };
 
 struct ViewerInputState {
+    enum class InputMode {
+        Control,
+        Follow,
+    };
+
     enum class CameraMode {
         Free,
         FollowObject,
@@ -118,6 +123,7 @@ struct ViewerInputState {
     float mouse_aim_x = 0.0f;
     float mouse_aim_y = 0.0f;
     bool mouse_aim_enabled = true;
+    InputMode input_mode = InputMode::Control;
     CameraMode camera_mode = CameraMode::FollowObject;
     float camera_yaw = 0.70f;
     float camera_pitch = 0.55f;
@@ -127,6 +133,7 @@ struct ViewerInputState {
     bool shadows_enabled = true;
     bool material_system_enabled = false;
     bool camera_roll_locked = true;
+    int focus_cycle_index = -1; // -1 means free camera slot
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;
 };
