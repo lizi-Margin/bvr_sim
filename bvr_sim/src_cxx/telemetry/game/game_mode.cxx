@@ -225,10 +225,10 @@ void GameMode::run_loop() noexcept {
                     snapshot->objects.end(),
                     [&window](const TelemetryObjectState& obj) { return obj.uid == window.input.focus_uid; });
                 if (focused_it != snapshot->objects.end()) {
-                    const float cy = std::cos(window.input.camera_yaw);
-                    const float sy = std::sin(window.input.camera_yaw);
-                    const float cp = std::cos(window.input.camera_pitch);
-                    const float sp = std::sin(window.input.camera_pitch);
+                    const float cy = std::cos(window.input.aim_yaw);
+                    const float sy = std::sin(window.input.aim_yaw);
+                    const float cp = std::cos(window.input.aim_pitch);
+                    const float sp = std::sin(window.input.aim_pitch);
 
                     // camera forward in viewer frame, then convert viewer(N,U,W) -> NWU
                     const float fwd_n = -cp * cy;
@@ -251,13 +251,13 @@ void GameMode::run_loop() noexcept {
             }
 
             auto submit_action_component = [this, &window, kGameModeActionPenalty](const char* key, double value) {
+                json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+                kv[key] = json::Float(value);
                 TelemetryCommand command;
-                command.kind = TelemetryCommandKind::ObjectDebug;
+                command.kind = TelemetryCommandKind::Command;
                 command.target_uid = window.input.focus_uid;
-                command.payload = json::JSON::Make(json::JSON::Class::Object);
-                command.payload["register_key"] = json::String(key);
-                command.payload["value"] = json::Float(value);
-                command.payload["penalty"] = json::Integral(kGameModeActionPenalty);
+                command.payload = json::String(
+                    "setp " + window.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
                 submit_command(command);
             };
             action_control_uid_ = window.input.focus_uid;
@@ -282,6 +282,7 @@ void GameMode::run_loop() noexcept {
             width,
             height,
             window.input,
+            snapshot.get(),
             snapshot ? snapshot->sim_time : 0.0,
             snapshot ? static_cast<long>(snapshot->objects.size()) : 0L,
             hud_stats);

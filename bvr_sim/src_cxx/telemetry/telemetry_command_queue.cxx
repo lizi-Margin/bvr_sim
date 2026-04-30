@@ -21,6 +21,9 @@ std::optional<TelemetryCommandKind> telemetry_command_kind_from_string(const std
     if (command_name == "object_debug") {
         return TelemetryCommandKind::ObjectDebug;
     }
+    if (command_name == "command") {
+        return TelemetryCommandKind::Command;
+    }
     return std::nullopt;
 }
 
@@ -38,6 +41,8 @@ std::string telemetry_command_kind_to_string(TelemetryCommandKind kind) noexcept
         return "set_subscription_filter";
     case TelemetryCommandKind::ObjectDebug:
         return "object_debug";
+    case TelemetryCommandKind::Command:
+        return "command";
     default:
         return "unknown";
     }

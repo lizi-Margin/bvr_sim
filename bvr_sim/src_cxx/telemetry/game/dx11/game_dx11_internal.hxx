@@ -128,12 +128,15 @@ struct ViewerInputState {
     CameraMode camera_mode = CameraMode::FollowObject;
     float camera_yaw = 0.70f;
     float camera_pitch = 0.55f;
+    float aim_yaw = 0.70f;
+    float aim_pitch = 0.55f;
     float camera_distance = 1000.0f;
     Float3 camera_target{0.0f, 6000.0f, 0.0f};
     float camera_fov_y = 100.0f;
     bool shadows_enabled = true;
     bool material_system_enabled = false;
     bool camera_roll_locked = true;
+    bool capslock_held = false;
     int focus_cycle_index = -1; // -1 means free camera slot
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;
@@ -216,6 +219,7 @@ void append_hud_render_commands(
     UINT width,
     UINT height,
     const ViewerInputState& input,
+    const WorldSnapshot* snapshot,
     double sim_time,
     long object_count,
     const RenderFrameStats& stats);

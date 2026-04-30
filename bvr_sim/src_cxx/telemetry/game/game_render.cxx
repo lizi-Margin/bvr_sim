@@ -1,8 +1,10 @@
 #include "dx11/game_dx11_internal.hxx"
 
 
+#include <algorithm>
 #include <array>
 #include <cctype>
+#include <cmath>
 #include <cstdio>
 #include <string>
 #include <utility>
@@ -102,7 +104,7 @@ std::vector<std::string> make_hud_lines(
         input.camera_roll_locked ? "on" : "off");
     lines.emplace_back(line3);
 
-    lines.emplace_back("Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
+    lines.emplace_back("Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel  Hold CapsLock: free look");
     lines.emplace_back("View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
     return lines;
 }
@@ -176,6 +178,25 @@ void append_text_quad_vertices(
     out_vertices.push_back(DX11Vertex{{x0,y0,z},{c0,c1,c2},{nx,ny,nz},{0.0f,0.0f}});
     out_vertices.push_back(DX11Vertex{{x1,y1,z},{c0,c1,c2},{nx,ny,nz},{1.0f,1.0f}});
     out_vertices.push_back(DX11Vertex{{x0,y1,z},{c0,c1,c2},{nx,ny,nz},{0.0f,1.0f}});
+}
+
+void append_line_segment(
+    std::vector<DX11Vertex>& out_vertices,
+    float x0,
+    float y0,
+    float x1,
+    float y1,
+    const Float3& color,
+    float opacity) {
+    const float z = 0.0f;
+    const float nx = 0.0f;
+    const float ny = 0.0f;
+    const float nz = 1.0f;
+    const float c0 = color.x * opacity;
+    const float c1 = color.y * opacity;
+    const float c2 = color.z * opacity;
+    out_vertices.push_back(DX11Vertex{{x0,y0,z},{c0,c1,c2},{nx,ny,nz},{0.0f,0.0f}});
+    out_vertices.push_back(DX11Vertex{{x1,y1,z},{c0,c1,c2},{nx,ny,nz},{0.0f,0.0f}});
 }
 
 } // namespace
@@ -288,6 +309,7 @@ void append_hud_render_commands(
     UINT width,
     UINT height,
     const ViewerInputState& input,
+    const WorldSnapshot* snapshot,
     double sim_time,
     long object_count,
     const RenderFrameStats& stats) {
@@ -367,6 +389,128 @@ void append_hud_render_commands(
         1.0f,
         1.0f
     ));
+
+    const bool show_control_hud =
+        input.input_mode == ViewerInputState::InputMode::Control
+        && input.camera_mode == ViewerInputState::CameraMode::FollowObject
+        && !input.focus_uid.empty();
+    if (!show_control_hud) {
+        return;
+    }
+
+    const float fov_y = std::max(0.25f, input.camera_fov_y * static_cast<float>(3.14159265358979323846 / 180.0));
+    const float aspect = std::max(1.0f, static_cast<float>(width) / static_cast<float>(height));
+    const float fov_x = 2.0f * std::atan(std::tan(fov_y * 0.5f) * aspect);
+
+    float target_x = 0.0f;
+    float target_y = 0.0f;
+
+    float boresight_x = 0.0f;
+    float boresight_y = 0.0f;
+    bool boresight_valid = false;
+    const float cam_cy = std::cos(input.camera_yaw);
+    const float cam_sy = std::sin(input.camera_yaw);
+    const float cam_cp = std::cos(input.camera_pitch);
+    const float cam_sp = std::sin(input.camera_pitch);
+    Float3 cam_fwd{-cam_cp * cam_cy, -cam_sp, -cam_cp * cam_sy};
+    const Float3 world_up{0.0f, 1.0f, 0.0f};
+    Float3 cam_right{
+        world_up.y * cam_fwd.z - world_up.z * cam_fwd.y,
+        world_up.z * cam_fwd.x - world_up.x * cam_fwd.z,
+        world_up.x * cam_fwd.y - world_up.y * cam_fwd.x
+    };
+    const float right_len = std::sqrt(cam_right.x * cam_right.x + cam_right.y * cam_right.y + cam_right.z * cam_right.z);
+    if (right_len > 1e-6f) {
+        cam_right.x /= right_len;
+        cam_right.y /= right_len;
+        cam_right.z /= right_len;
+        const Float3 cam_up{
+            cam_fwd.y * cam_right.z - cam_fwd.z * cam_right.y,
+            cam_fwd.z * cam_right.x - cam_fwd.x * cam_right.z,
+            cam_fwd.x * cam_right.y - cam_fwd.y * cam_right.x
+        };
+
+        const float aim_cy = std::cos(input.aim_yaw);
+        const float aim_sy = std::sin(input.aim_yaw);
+        const float aim_cp = std::cos(input.aim_pitch);
+        const float aim_sp = std::sin(input.aim_pitch);
+        const Float3 aim_fwd{-aim_cp * aim_cy, -aim_sp, -aim_cp * aim_sy};
+        const float aim_f = aim_fwd.x * cam_fwd.x + aim_fwd.y * cam_fwd.y + aim_fwd.z * cam_fwd.z;
+        if (aim_f > 0.02f) {
+            const float aim_r = aim_fwd.x * cam_right.x + aim_fwd.y * cam_right.y + aim_fwd.z * cam_right.z;
+            const float aim_u = aim_fwd.x * cam_up.x + aim_fwd.y * cam_up.y + aim_fwd.z * cam_up.z;
+            target_x = std::clamp((aim_r / aim_f) / std::tan(fov_x * 0.5f), -0.95f, 0.95f);
+            target_y = std::clamp((aim_u / aim_f) / std::tan(fov_y * 0.5f), -0.95f, 0.95f);
+        }
+
+        if (snapshot) {
+            auto focused_it = std::find_if(
+                snapshot->objects.begin(),
+                snapshot->objects.end(),
+                [&input](const TelemetryObjectState& obj) { return obj.uid == input.focus_uid; });
+            if (focused_it != snapshot->objects.end()) {
+                const Float3x3 orientation = Float3x3::from_sim_orientation(focused_it->orientation).convert_nwu_to_viewer();
+                const Float3 obj_fwd{orientation.m[0][0], orientation.m[1][0], orientation.m[2][0]};
+
+                const float f = obj_fwd.x * cam_fwd.x + obj_fwd.y * cam_fwd.y + obj_fwd.z * cam_fwd.z;
+                if (f > 0.05f) {
+                    const float r = obj_fwd.x * cam_right.x + obj_fwd.y * cam_right.y + obj_fwd.z * cam_right.z;
+                    const float u = obj_fwd.x * cam_up.x + obj_fwd.y * cam_up.y + obj_fwd.z * cam_up.z;
+                    boresight_x = std::clamp((r / f) / std::tan(fov_x * 0.5f), -0.98f, 0.98f);
+                    boresight_y = std::clamp((u / f) / std::tan(fov_y * 0.5f), -0.98f, 0.98f);
+                    boresight_valid = true;
+                }
+            }
+        }
+    }
+
+    std::vector<DX11Vertex> hud_lines;
+    hud_lines.reserve(256);
+
+    const Float3 boresight_color{0.92f, 0.95f, 1.0f};
+    const Float3 target_color{0.35f, 1.0f, 0.62f};
+    const Float3 link_color{0.55f, 0.90f, 1.0f};
+
+    const int ring_segments = 24;
+    const float ring_radius = 0.035f;
+    for (int i = 0; i < ring_segments; ++i) {
+        const float a0 = static_cast<float>(i) * static_cast<float>(2.0 * 3.14159265358979323846 / ring_segments);
+        const float a1 = static_cast<float>(i + 1) * static_cast<float>(2.0 * 3.14159265358979323846 / ring_segments);
+        const float x0 = target_x + std::cos(a0) * ring_radius;
+        const float y0 = target_y + std::sin(a0) * ring_radius;
+        const float x1 = target_x + std::cos(a1) * ring_radius;
+        const float y1 = target_y + std::sin(a1) * ring_radius;
+        append_line_segment(hud_lines, x0, y0, x1, y1, target_color, 0.95f);
+    }
+
+    if (boresight_valid) {
+        const float cross = 0.020f;
+        append_line_segment(hud_lines, boresight_x - cross, boresight_y, boresight_x - 0.006f, boresight_y, boresight_color, 0.95f);
+        append_line_segment(hud_lines, boresight_x + 0.006f, boresight_y, boresight_x + cross, boresight_y, boresight_color, 0.95f);
+        append_line_segment(hud_lines, boresight_x, boresight_y - cross, boresight_x, boresight_y - 0.006f, boresight_color, 0.95f);
+        append_line_segment(hud_lines, boresight_x, boresight_y + 0.006f, boresight_x, boresight_y + cross, boresight_color, 0.95f);
+        append_line_segment(hud_lines, boresight_x, boresight_y, target_x, target_y, link_color, 0.55f);
+    }
+
+    if (!hud_lines.empty()) {
+        command_list.commands.push_back(make_draw_command(
+            std::move(hud_lines),
+            D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+            identity,
+            identity,
+            Float3{0.0f, 0.0f, 0.0f},
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            "sky",
+            0.0f,
+            1.0f,
+            1.0f
+        ));
+    }
 }
 
 #endif

@@ -163,6 +163,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
                 window->input.camera_yaw -= static_cast<float>(dx) * 0.006f;
                 window->input.camera_pitch += static_cast<float>(dy) * 0.0045f;
                 window->input.camera_pitch = std::clamp(window->input.camera_pitch, -1.45f, 1.45f);
+                if (!window->input.capslock_held) {
+                    window->input.aim_yaw = window->input.camera_yaw;
+                    window->input.aim_pitch = window->input.camera_pitch;
+                }
                 return 0;
             }
 
@@ -227,6 +231,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             window->input.camera_roll_locked = !window->input.camera_roll_locked;
             return 0;
         }
+        if (w_param == VK_CAPITAL) {
+            window->input.capslock_held = true;
+            return 0;
+        }
         if (w_param == VK_OEM_PLUS || w_param == VK_ADD) {
             window->input.camera_fov_y = std::max(20.0f, window->input.camera_fov_y - 2.0f);
             return 0;
@@ -249,6 +257,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
     case WM_KEYUP:
         if (!window) {
             break;
+        }
+        if (w_param == VK_CAPITAL) {
+            window->input.capslock_held = false;
+            return 0;
         }
         if (w_param == 'W') window->input.move_forward = false;
         if (w_param == 'S') window->input.move_backward = false;
@@ -390,7 +402,7 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
           << "  RollLock " << (input.camera_roll_locked ? "on" : "off");
     draw_line(16, 64, line3.str());
 
-    draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel");
+    draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel  Hold CapsLock: free look");
     draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
 
     if (font && old_font) {

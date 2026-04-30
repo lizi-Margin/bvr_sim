@@ -27,6 +27,31 @@ TelemetryCommandResult make_command_result(
     return result;
 }
 
+std::string json_unescape_string(const std::string& escaped) {
+    std::string out;
+    out.reserve(escaped.size());
+    for (size_t i = 0; i < escaped.size(); ++i) {
+        const char c = escaped[i];
+        if (c == '\\' && i + 1 < escaped.size()) {
+            const char n = escaped[++i];
+            switch (n) {
+            case '\\': out.push_back('\\'); break;
+            case '"': out.push_back('"'); break;
+            case 'n': out.push_back('\n'); break;
+            case 'r': out.push_back('\r'); break;
+            case 't': out.push_back('\t'); break;
+            default:
+                out.push_back('\\');
+                out.push_back(n);
+                break;
+            }
+        } else {
+            out.push_back(c);
+        }
+    }
+    return out;
+}
+
 }
 
 SimCore::SimCore(double dt, const std::string& log_file_path, const std::string& acmi_file_path)
@@ -452,14 +477,6 @@ TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand&
         format_check(command.payload.JSONType() == json::JSON::Class::Object, "Telemetry object_debug payload must be object");
         format_check(command.payload.hasKey("register_key", json::JSON::Class::String), "Telemetry object_debug payload requires string register_key");
         format_check(command.payload.hasKey("value"), "Telemetry object_debug payload requires value");
-
-        auto object = SOPool::instance().get(command.target_uid);
-        if (!object) {
-            colorful::printHUANG("[SimCore] object_debug target not found");
-            SL::get().printf("[SimCore] object_debug target not found: %s\n", command.target_uid.c_str());
-            return make_command_result("error", "target object not found", command);
-        }
-
         const auto register_key = command.payload.at("register_key").ToString();
         format_check(!register_key.empty(), "Telemetry object_debug register_key must not be empty");
         int penalty = -1;
@@ -468,9 +485,57 @@ TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand&
         } else if (command.payload.hasKey("penalty", json::JSON::Class::Floating)) {
             penalty = static_cast<int>(command.payload.at("penalty").ToFloat());
         }
-        object->set_with_penalty(register_key, command.payload.at("value"), penalty);
-        SL::get().printf("[SimCore] object_debug wrote register key %s for uid %s\n", register_key.c_str(), command.target_uid.c_str());
-        return make_command_result("applied", "object register updated", command);
+
+        json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+        kv[register_key] = command.payload.at("value");
+
+        std::string cmd_line;
+        if (penalty < 0) {
+            cmd_line = "setp " + command.target_uid + " " + std::to_string(penalty) + " " + kv.dump(1, "", "");
+        } else {
+            cmd_line = "set " + command.target_uid + " " + kv.dump(1, "", "");
+        }
+
+        auto cmd_result = CmdHandler::instance().handle(cmd_line);
+        TelemetryCommandResult result = make_command_result("error", "object_debug command failed", command);
+        if (cmd_result.JSONType() == json::JSON::Class::Object) {
+            result.status = cmd_result.hasKey("status", json::JSON::Class::String) ? cmd_result["status"].ToString() : "error";
+            if (cmd_result.hasKey("message", json::JSON::Class::String)) {
+                result.message = cmd_result["message"].ToString();
+            } else {
+                result.message = cmd_result.dump(1, "", "");
+            }
+        } else {
+            result.message = "cmd handler returned non-object response";
+        }
+        return result;
+    }
+
+    if (command.kind == TelemetryCommandKind::Command) {
+        std::string cmd_line;
+        if (command.payload.JSONType() == json::JSON::Class::String) {
+            cmd_line = json_unescape_string(command.payload.ToString());
+        } else if (command.payload.JSONType() == json::JSON::Class::Object
+            && command.payload.hasKey("cmd", json::JSON::Class::String)) {
+            cmd_line = json_unescape_string(command.payload.at("cmd").ToString());
+        } else {
+            return make_command_result("error", "command payload must be string or {\"cmd\": string}", command);
+        }
+        format_check(!cmd_line.empty(), "Telemetry command payload cmd must not be empty");
+
+        auto cmd_result = CmdHandler::instance().handle(cmd_line);
+        TelemetryCommandResult result = make_command_result("error", "command failed", command);
+        if (cmd_result.JSONType() == json::JSON::Class::Object) {
+            result.status = cmd_result.hasKey("status", json::JSON::Class::String) ? cmd_result["status"].ToString() : "error";
+            if (cmd_result.hasKey("message", json::JSON::Class::String)) {
+                result.message = cmd_result["message"].ToString();
+            } else {
+                result.message = cmd_result.dump(1, "", "");
+            }
+        } else {
+            result.message = "cmd handler returned non-object response";
+        }
+        return result;
     }
 
     return make_command_result("error", "unsupported telemetry command", command);
