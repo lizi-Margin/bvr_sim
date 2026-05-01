@@ -138,6 +138,12 @@ struct ViewerInputState {
     bool material_system_enabled = false;
     bool camera_roll_locked = true;
     bool capslock_held = false;
+    bool ctrl_aileron_left = false;
+    bool ctrl_aileron_right = false;
+    bool ctrl_elevator_up = false;
+    bool ctrl_elevator_down = false;
+    bool ctrl_rudder_left = false;
+    bool ctrl_rudder_right = false;
     int focus_cycle_index = -1; // -1 means free camera slot
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;

@@ -206,6 +206,16 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         if (!window) {
             break;
         }
+        if (window->input.input_mode == ViewerInputState::InputMode::Control
+            && window->input.camera_mode == ViewerInputState::CameraMode::FollowObject
+            && !window->input.focus_uid.empty()) {
+            if (w_param == 'A') { window->input.ctrl_aileron_left = true; return 0; }
+            if (w_param == 'D') { window->input.ctrl_aileron_right = true; return 0; }
+            if (w_param == 'W') { window->input.ctrl_elevator_up = true; return 0; }
+            if (w_param == 'S') { window->input.ctrl_elevator_down = true; return 0; }
+            if (w_param == 'Q') { window->input.ctrl_rudder_left = true; return 0; }
+            if (w_param == 'E') { window->input.ctrl_rudder_right = true; return 0; }
+        }
         if (w_param == VK_F1) {
             const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
             window->input.input_mode = ViewerInputState::InputMode::Control;
@@ -261,6 +271,12 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         if (!window) {
             break;
         }
+        if (w_param == 'A') { window->input.ctrl_aileron_left = false; }
+        if (w_param == 'D') { window->input.ctrl_aileron_right = false; }
+        if (w_param == 'W') { window->input.ctrl_elevator_up = false; }
+        if (w_param == 'S') { window->input.ctrl_elevator_down = false; }
+        if (w_param == 'Q') { window->input.ctrl_rudder_left = false; }
+        if (w_param == 'E') { window->input.ctrl_rudder_right = false; }
         if (w_param == VK_CAPITAL) {
             window->input.capslock_held = false;
             return 0;

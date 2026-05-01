@@ -258,11 +258,58 @@ void GameMode::run_loop() noexcept {
                     "setp " + window.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
                 submit_command(command);
             };
+            auto submit_action_component_null = [this, &window, kGameModeActionPenalty](const char* key) {
+                json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+                kv[key] = json::JSON();
+                TelemetryCommand command;
+                command.kind = TelemetryCommandKind::Command;
+                command.target_uid = window.input.focus_uid;
+                command.payload = json::String(
+                    "setp " + window.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+                submit_command(command);
+            };
+
+            const float aileron_cmd = window.input.ctrl_aileron_right ? (window.input.ctrl_aileron_left ? 0.0f : 1.0f)
+                                                                       : (window.input.ctrl_aileron_left ? -1.0f : 0.0f);
+            const float elevator_cmd = window.input.ctrl_elevator_up ? (window.input.ctrl_elevator_down ? 0.0f : 1.0f)
+                                                                      : (window.input.ctrl_elevator_down ? -1.0f : 0.0f);
+            const float rudder_cmd = window.input.ctrl_rudder_right ? (window.input.ctrl_rudder_left ? 0.0f : -1.0f)
+                                                                     : (window.input.ctrl_rudder_left ? 1.0f : 0.0f);
             action_control_uid_ = window.input.focus_uid;
             submit_action_component("delta_heading", delta_heading);
             submit_action_component("delta_altitude", delta_altitude);
             submit_action_component("delta_speed", delta_speed);
+            if (std::abs(aileron_cmd) > 1e-6f) {
+                submit_action_component("aileron_cmd", aileron_cmd);
+            } else {
+                submit_action_component_null("aileron_cmd");
+            }
+            if (std::abs(elevator_cmd) > 1e-6f) {
+                submit_action_component("elevator_cmd", elevator_cmd);
+            } else {
+                submit_action_component_null("elevator_cmd");
+            }
+            if (std::abs(rudder_cmd) > 1e-6f) {
+                submit_action_component("rudder_cmd", rudder_cmd);
+            } else {
+                submit_action_component_null("rudder_cmd");
+            }
         } else {
+            if (!action_control_uid_.empty()) {
+                auto submit_clear_for_uid = [this, kGameModeActionPenalty](const std::string& uid, const char* key) {
+                    json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+                    kv[key] = json::JSON();
+                    TelemetryCommand command;
+                    command.kind = TelemetryCommandKind::Command;
+                    command.target_uid = uid;
+                    command.payload = json::String(
+                        "setp " + uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+                    submit_command(command);
+                };
+                submit_clear_for_uid(action_control_uid_, "aileron_cmd");
+                submit_clear_for_uid(action_control_uid_, "elevator_cmd");
+                submit_clear_for_uid(action_control_uid_, "rudder_cmd");
+            }
             action_control_uid_.clear();
         }
 
@@ -312,5 +359,3 @@ void GameMode::run_loop() noexcept {
 #endif
 
 } // namespace bvr_sim
-
-
