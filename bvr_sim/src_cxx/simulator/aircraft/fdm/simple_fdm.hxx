@@ -29,7 +29,7 @@ public:
 
     void reset(const std::map<std::string, std::any>& initial_state) override;
 
-    void step(const std::map<std::string, double>& action) override;
+    void step(const ActionSpace& action) override;
 
     void set_aircraft_parameters(const std::map<std::string, double>& params) noexcept;
 };

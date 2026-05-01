@@ -145,15 +145,36 @@ public:
     ~ActionSpace() = default;
 
     double delta_heading() const {
+        if (!action_json.hasKey("delta_heading") || action_json.at("delta_heading").JSONType() == json::JSON::Class::Null) {
+            return 0.0;
+        }
         return action_json.at("delta_heading").ToFloat();
     }
 
     double delta_altitude() const {
+        if (!action_json.hasKey("delta_altitude") || action_json.at("delta_altitude").JSONType() == json::JSON::Class::Null) {
+            return 0.0;
+        }
         return action_json.at("delta_altitude").ToFloat();
     }
 
     double delta_speed() const {
+        if (!action_json.hasKey("delta_speed") || action_json.at("delta_speed").JSONType() == json::JSON::Class::Null) {
+            return 0.0;
+        }
         return action_json.at("delta_speed").ToFloat();
+    }
+
+    void set_delta_heading(double value) {
+        action_json["delta_heading"] = json::Float(value);
+    }
+
+    void set_delta_altitude(double value) {
+        action_json["delta_altitude"] = json::Float(value);
+    }
+
+    void set_delta_speed(double value) {
+        action_json["delta_speed"] = json::Float(value);
     }
 
     std::array<double, 3> get_campus() const {

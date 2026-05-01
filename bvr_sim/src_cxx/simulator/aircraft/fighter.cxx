@@ -73,40 +73,26 @@ void Fighter::step() {
 
     _t += dt;
 
-    std::map<std::string, double> action;
+    ActionSpace action_space(std::map<std::string, json::JSON>{
+        {"delta_heading", json::Float(0.0)},
+        {"delta_altitude", json::Float(0.0)},
+        {"delta_speed", json::Float(0.0)}
+    });
+
     if (action_space_check::has_possible_action(register_)){
-        ActionSpace action_space(register_);
-        action["delta_heading"] = action_space.delta_heading();
-        action["delta_altitude"] = action_space.delta_altitude();
-        action["delta_speed"] = action_space.delta_speed();
-        if (auto cmd = action_space.aileron_cmd(); cmd.has_value()) {
-            action["aileron_cmd"] = cmd.value();
-        }
-        if (auto cmd = action_space.elevator_cmd(); cmd.has_value()) {
-            action["elevator_cmd"] = cmd.value();
-        }
-        if (auto cmd = action_space.rudder_cmd(); cmd.has_value()) {
-            action["rudder_cmd"] = cmd.value();
-        }
-        if (auto cmd = action_space.throttle_cmd(); cmd.has_value()) {
-            action["throttle_cmd"] = cmd.value();
-        }
+        action_space = ActionSpace(register_);
         if (action_space.fire()){
             if (shoot(action_space.fire_weapon_spec(), action_space.fire_target_uid())){
                 last_shoot_time = _t;
             }
         }
-    } else {
-        action["delta_heading"] = 0.0;
-        action["delta_altitude"] = 0.0;
-        action["delta_speed"] = 0.0;
     }
     if (BYPASS_THROTTLE_CONTROL && get_mach() < 1.0) {
-        action["delta_speed"] = 1.0;
+        action_space.set_delta_speed(1.0);
     }
     // action_space_check::wipe_out_action(register_);
 
-    fdm->step(action);
+    fdm->step(action_space);
     if (fdm->is_terminated()) {
         SL::get().printf("[Fighter] %s FDM terminated, setting is_alive to false\n", uid.c_str());
         is_alive = false;

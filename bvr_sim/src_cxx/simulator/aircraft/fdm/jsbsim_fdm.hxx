@@ -112,7 +112,7 @@ public:
 
     void reset(const std::map<std::string, std::any>& initial_state) override;
 
-    void step(const std::map<std::string, double>& action) override;
+    void step(const ActionSpace& action) override;
 
     double get_mach() const noexcept;
 
@@ -129,7 +129,7 @@ private:
 
     // void clear_default_condition() noexcept;
 
-    void run_jsbsim_step(const std::map<std::string, double>& action) noexcept;
+    void run_jsbsim_step(const ActionSpace& action) noexcept;
 
     void set_jsbsim_controls(const std::array<double, 4>& controls) noexcept;
 

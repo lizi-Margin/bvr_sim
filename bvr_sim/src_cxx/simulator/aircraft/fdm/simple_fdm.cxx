@@ -81,25 +81,11 @@ void SimpleFDM::reset(const std::map<std::string, std::any>& initial_state) {
     }
 }
 
-void SimpleFDM::step(const std::map<std::string, double>& action) {
+void SimpleFDM::step(const ActionSpace& action) {
     // Extract and clamp normalized commands
-    double delta_heading_cmd = 0.0;
-    auto heading_it = action.find("delta_heading");
-    if (heading_it != action.end()) {
-        delta_heading_cmd = heading_it->second;
-    }
-
-    double delta_altitude_cmd = 0.0;
-    auto altitude_it = action.find("delta_altitude");
-    if (altitude_it != action.end()) {
-        delta_altitude_cmd = altitude_it->second;
-    }
-
-    double delta_speed_cmd = 0.0;
-    auto speed_it = action.find("delta_speed");
-    if (speed_it != action.end()) {
-        delta_speed_cmd = speed_it->second;
-    }
+    double delta_heading_cmd = action.delta_heading();
+    double delta_altitude_cmd = action.delta_altitude();
+    double delta_speed_cmd = action.delta_speed();
 
     double delta_heading_rate = norm(
         delta_heading_cmd * max_turn_rate,

@@ -293,26 +293,18 @@ double JSBSimFDM::get_mach() const noexcept {
     return mach;
 }
 
-void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noexcept {
-    auto get_optional_action = [&](const std::string& key) -> std::optional<double> {
-        auto it = action.find(key);
-        if (it == action.end()) {
-            return std::nullopt;
-        }
-        return it->second;
-    };
+void JSBSimFDM::run_jsbsim_step(const ActionSpace& action) noexcept {
+    auto aileron_override = action.aileron_cmd();
+    auto elevator_override = action.elevator_cmd();
+    auto rudder_override = action.rudder_cmd();
+    auto throttle_override = action.throttle_cmd();
 
-    auto aileron_override = get_optional_action("aileron_cmd");
-    auto elevator_override = get_optional_action("elevator_cmd");
-    auto rudder_override = get_optional_action("rudder_cmd");
-    auto throttle_override = get_optional_action("throttle_cmd");
-
-    double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(85);
+    double delta_heading_raw = norm(action.delta_heading(), -1, 1) * deg2rad(85);
     // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(40);
     double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw, jsbsim_inner_dt);
     delta_heading = delta_heading_filt;
 
-    double delta_pitch_raw = -norm(action.at("delta_altitude"), -1, 1) * deg2rad(45);
+    double delta_pitch_raw = -norm(action.delta_altitude(), -1, 1) * deg2rad(45);
     double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw, jsbsim_inner_dt);
     delta_pitch = delta_pitch_filt;
     // delta_pitch = -deg2rad(20);
@@ -328,7 +320,7 @@ void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noe
     fix_vec.rotate_zyx_self(0, delta_pitch, delta_heading + yaw);
 
     double mach_current = get_mach();
-    double intent_mach = mach_current + action.at("delta_speed");
+    double intent_mach = mach_current + action.delta_speed();
     // double intent_mach = 1.2;
 
     for (int step = 0; step < jsbsim_inner_steps; ++step) {
@@ -384,7 +376,7 @@ void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noe
     }
 }
 
-void JSBSimFDM::step(const std::map<std::string, double>& action) {
+void JSBSimFDM::step(const ActionSpace& action) {
     if (!initialized) {
         throw std::runtime_error("JSBSimFDM must be reset before stepping");
     }
