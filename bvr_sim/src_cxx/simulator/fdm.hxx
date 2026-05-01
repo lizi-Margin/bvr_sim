@@ -8,7 +8,7 @@
 
 namespace bvr_sim {
 
-class BaseFDM {
+class FDM_API {
 protected:
     double dt;
 
@@ -17,16 +17,13 @@ protected:
     double roll;
     double pitch;
     double yaw;
-    bool terminate;
 
 public:
-    explicit BaseFDM(double dt = 0.1) noexcept;
+    explicit FDM_API(double dt = 0.1) noexcept;
 
-    virtual ~BaseFDM() noexcept = default;
+    virtual ~FDM_API() noexcept = default;
 
     virtual void reset(const std::map<std::string, std::any>& initial_state) = 0;
-
-    virtual void step(const std::map<std::string, double>& action) = 0;
 
     std::array<double, 3> get_position() const noexcept;
     std::array<double, 3> get_velocity() const noexcept;
@@ -43,8 +40,6 @@ public:
 
     std::map<std::string, std::any> get_state_dict() const noexcept;
 
-    bool is_terminated() const noexcept { return terminate; };
-
     virtual std::string log() const noexcept { return  "";}
 
 protected:
@@ -52,3 +47,4 @@ protected:
 };
 
 }
+

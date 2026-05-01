@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simulator/aircraft/fdm/base.hxx"
+#include "simulator/fdm.hxx"
 #include "simulator/param_store.hxx"
 #include <map>
 #include <string>
@@ -12,7 +12,7 @@ namespace bvr_sim {
 
 /// Lifetime contract: the ParamStore reference must outlive this object.
 /// Satisfied when both are owned by the same Missile class.
-class GenericMissileFDM : public BaseFDM {
+class GenericMissileFDM : public FDM_API {
 public:
     explicit GenericMissileFDM(const ParamStore& params, double dt = 0.1) noexcept;
 
@@ -21,7 +21,7 @@ public:
     /// action keys:
     ///   "ny" (double) — lateral acceleration command (g-units)
     ///   "nz" (double) — longitudinal/normal acceleration command (g-units)
-    void step(const std::map<std::string, double>& action) override;
+    void step(const std::map<std::string, double>& action);
 
     double get_current_mass()  const noexcept { return m_; }
     double get_elapsed_time()  const noexcept { return t_; }

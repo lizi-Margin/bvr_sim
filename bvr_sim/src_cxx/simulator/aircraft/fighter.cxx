@@ -79,6 +79,18 @@ void Fighter::step() {
         action["delta_heading"] = action_space.delta_heading();
         action["delta_altitude"] = action_space.delta_altitude();
         action["delta_speed"] = action_space.delta_speed();
+        if (auto cmd = action_space.aileron_cmd(); cmd.has_value()) {
+            action["aileron_cmd"] = cmd.value();
+        }
+        if (auto cmd = action_space.elevator_cmd(); cmd.has_value()) {
+            action["elevator_cmd"] = cmd.value();
+        }
+        if (auto cmd = action_space.rudder_cmd(); cmd.has_value()) {
+            action["rudder_cmd"] = cmd.value();
+        }
+        if (auto cmd = action_space.throttle_cmd(); cmd.has_value()) {
+            action["throttle_cmd"] = cmd.value();
+        }
         if (action_space.fire()){
             if (shoot(action_space.fire_weapon_spec(), action_space.fire_target_uid())){
                 last_shoot_time = _t;
@@ -143,3 +155,4 @@ std::array<double, 3> Fighter::get_rpy() const noexcept {
 }
 
 }
+

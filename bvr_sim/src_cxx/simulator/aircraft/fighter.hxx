@@ -1,7 +1,7 @@
 #pragma once
 
 #include "base.hxx"
-#include "fdm/base.hxx"
+#include "fdm/ac_fdm.hxx"
 #include "fdm/simple_fdm.hxx"
 #include "fdm/jsbsim_fdm.hxx"
 #include <string>
@@ -16,7 +16,7 @@ class Missile;
 class Fighter : public Aircraft {
 private:
     double _t;
-    std::unique_ptr<BaseFDM> fdm;
+    std::unique_ptr<AircraftFDM> fdm;
 
 public:
     double min_shoot_interval;

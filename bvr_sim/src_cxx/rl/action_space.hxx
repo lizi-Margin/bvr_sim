@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <map>
+#include <optional>
 #include <utility>
 #include "rubbish_can/json.hpp"
 #include "rubbish_can/check.hxx"
@@ -12,7 +13,8 @@ namespace bvr_sim {
 namespace action_space_check {
 
 inline bool has_possible_action(const Register& register_) {
-    return register_.has("delta_heading") || register_.has("delta_altitude") || register_.has("delta_speed") || register_.has("fire");
+    return register_.has("delta_heading") || register_.has("delta_altitude") || register_.has("delta_speed") || register_.has("fire") ||
+           register_.has("aileron_cmd") || register_.has("elevator_cmd") || register_.has("rudder_cmd") || register_.has("throttle_cmd");
 }
 
 inline void wipe_out_action(Register& register_) { 
@@ -20,6 +22,10 @@ inline void wipe_out_action(Register& register_) {
     register_.pop("delta_altitude");
     register_.pop("delta_speed");
     register_.pop("fire");
+    register_.pop("aileron_cmd");
+    register_.pop("elevator_cmd");
+    register_.pop("rudder_cmd");
+    register_.pop("throttle_cmd");
     // legacy
     register_.pop("shoot");
     
@@ -29,9 +35,21 @@ inline void wipe_out_action(Register& register_) {
 }
 
 inline void check_action_json(const json::JSON& action_json) {
-    check(action_json.hasKey_checkTypeIfExist("delta_heading", json::JSON::Class::Floating), "delta_heading");
-    check(action_json.hasKey_checkTypeIfExist("delta_altitude", json::JSON::Class::Floating), "delta_altitude");
-    check(action_json.hasKey_checkTypeIfExist("delta_speed", json::JSON::Class::Floating), "delta_speed");
+    auto check_optional_number_or_null = [&](const std::string& key) {
+        if (!action_json.hasKey(key)) {
+            return;
+        }
+        auto type = action_json.at(key).JSONType();
+        check(type == json::JSON::Class::Floating || type == json::JSON::Class::Integral || type == json::JSON::Class::Null, key.c_str());
+    };
+
+    check_optional_number_or_null("delta_heading");
+    check_optional_number_or_null("delta_altitude");
+    check_optional_number_or_null("delta_speed");
+    check_optional_number_or_null("aileron_cmd");
+    check_optional_number_or_null("elevator_cmd");
+    check_optional_number_or_null("rudder_cmd");
+    check_optional_number_or_null("throttle_cmd");
     if (action_json.hasKey("fire", json::JSON::Class::Object)) {
         auto fire_json = action_json.at("fire");
         check(fire_json.hasKey_checkTypeIfExist("target_uid", json::JSON::Class::String), "fire.target_uid");
@@ -82,6 +100,10 @@ public:
         auto delta_heading = register_.get("delta_heading");
         auto delta_altitude = register_.get("delta_altitude");
         auto delta_speed = register_.get("delta_speed");
+        auto aileron_cmd = register_.get("aileron_cmd");
+        auto elevator_cmd = register_.get("elevator_cmd");
+        auto rudder_cmd = register_.get("rudder_cmd");
+        auto throttle_cmd = register_.get("throttle_cmd");
         
 
         // lambda to retrieve the float value from the register, with error checking
@@ -94,6 +116,8 @@ public:
                 action_json[key] = std::move(value);
             } else if (value.JSONType() == json::JSON::Class::Integral) {
                 action_json[key] = json::Float(value.ToInt());
+            } else if (value.JSONType() == json::JSON::Class::Null) {
+                action_json[key] = json::JSON();
             } else {
                 colorful::printHONG(
                     "Expected a numeric type for action component, but got type %s",
@@ -106,6 +130,10 @@ public:
         get_float_from_register(delta_heading, "delta_heading");
         get_float_from_register(delta_altitude, "delta_altitude");
         get_float_from_register(delta_speed, "delta_speed");
+        get_float_from_register(aileron_cmd, "aileron_cmd");
+        get_float_from_register(elevator_cmd, "elevator_cmd");
+        get_float_from_register(rudder_cmd, "rudder_cmd");
+        get_float_from_register(throttle_cmd, "throttle_cmd");
 
         auto fire = register_.get("fire");
         if (fire.has_value()) {
@@ -140,6 +168,46 @@ public:
         return action_json.hasKey("fire", json::JSON::Class::Object);
     }
 
+    std::optional<double> aileron_cmd() const {
+        if (!action_json.hasKey("aileron_cmd")) {
+            return std::nullopt;
+        }
+        if (action_json.at("aileron_cmd").JSONType() == json::JSON::Class::Null) {
+            return std::nullopt;
+        }
+        return action_json.at("aileron_cmd").ToFloat();
+    }
+
+    std::optional<double> elevator_cmd() const {
+        if (!action_json.hasKey("elevator_cmd")) {
+            return std::nullopt;
+        }
+        if (action_json.at("elevator_cmd").JSONType() == json::JSON::Class::Null) {
+            return std::nullopt;
+        }
+        return action_json.at("elevator_cmd").ToFloat();
+    }
+
+    std::optional<double> rudder_cmd() const {
+        if (!action_json.hasKey("rudder_cmd")) {
+            return std::nullopt;
+        }
+        if (action_json.at("rudder_cmd").JSONType() == json::JSON::Class::Null) {
+            return std::nullopt;
+        }
+        return action_json.at("rudder_cmd").ToFloat();
+    }
+
+    std::optional<double> throttle_cmd() const {
+        if (!action_json.hasKey("throttle_cmd")) {
+            return std::nullopt;
+        }
+        if (action_json.at("throttle_cmd").JSONType() == json::JSON::Class::Null) {
+            return std::nullopt;
+        }
+        return action_json.at("throttle_cmd").ToFloat();
+    }
+
     std::string fire_target_uid() {
         if (!fire()) {
             format_check(false, "make sure fire is true to call this function");
@@ -156,3 +224,4 @@ public:
 };
 
 }
+

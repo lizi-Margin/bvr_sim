@@ -7,7 +7,7 @@ namespace bvr_sim {
 using namespace c3utils;
 
 SimpleFDM::SimpleFDM(double dt) noexcept
-    : BaseFDM(dt),
+    : AircraftFDM(dt),
       max_speed(411.0),          // m/s (Mach 1.2)
       min_speed(150.0),          // m/s (minimum airspeed)
       max_turn_rate(deg2rad(9.0)),   // rad/s (9 degrees/sec)

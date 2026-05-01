@@ -28,3 +28,27 @@ TEST(ActionSpace, RegisterPenaltyKeepsStrongerAction) {
     bvr_sim::ActionSpace action(reg);
     ASSERT_NEAR(action.delta_heading(), 0.8, 1e-9);
 }
+
+TEST(ActionSpace, ControlOverrideFromRegisterSupportsNumberAndNull) {
+    bvr_sim::Register reg;
+    reg.set("delta_heading", json::JSON(0.0));
+    reg.set("delta_altitude", json::JSON(0.0));
+    reg.set("delta_speed", json::JSON(0.0));
+    reg.set("aileron_cmd", json::JSON(0.5));
+    reg.set("elevator_cmd", json::JSON());
+    reg.set("rudder_cmd", json::JSON(-2));
+
+    bvr_sim::ActionSpace action(reg);
+    auto aileron = action.aileron_cmd();
+    auto elevator = action.elevator_cmd();
+    auto rudder = action.rudder_cmd();
+    auto throttle = action.throttle_cmd();
+
+    ASSERT(aileron.has_value());
+    ASSERT_NEAR(aileron.value(), 0.5, 1e-9);
+    ASSERT(!elevator.has_value());
+    ASSERT(rudder.has_value());
+    ASSERT_NEAR(rudder.value(), -2.0, 1e-9);
+    ASSERT(!throttle.has_value());
+}
+

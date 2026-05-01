@@ -1,4 +1,5 @@
 #include "dx11/game_dx11_internal.hxx"
+#include "c3utils/c3utils.hxx"
 
 
 #include <algorithm>
@@ -106,6 +107,71 @@ std::vector<std::string> make_hud_lines(
 
     lines.emplace_back("Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel  Hold CapsLock: free look");
     lines.emplace_back("View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
+    return lines;
+}
+
+std::vector<std::string> make_focus_aircraft_lines(const ViewerInputState& input, const WorldSnapshot* snapshot) {
+    std::vector<std::string> lines;
+    lines.reserve(16);
+    if (!snapshot || input.focus_uid.empty()) {
+        lines.emplace_back("Aircraft: N/A");
+        return lines;
+    }
+
+    auto focused_it = std::find_if(
+        snapshot->objects.begin(),
+        snapshot->objects.end(),
+        [&input](const TelemetryObjectState& obj) { return obj.uid == input.focus_uid; });
+    if (focused_it == snapshot->objects.end()) {
+        lines.emplace_back("Aircraft: N/A");
+        return lines;
+    }
+
+    const TelemetryObjectState& obj = *focused_it;
+    const json::JSON& reg = obj.debug_register;
+    lines.emplace_back("Aircraft: " + obj.uid);
+
+    const double speed_mps = std::sqrt(
+        obj.velocity[0] * obj.velocity[0]
+        + obj.velocity[1] * obj.velocity[1]
+        + obj.velocity[2] * obj.velocity[2]);
+    const double speed_kmh = speed_mps * 3.6;
+    const double altitude_ft = obj.position[2] * 3.280839895013123;
+    double mach = 0.0;
+    if (reg.JSONType() == json::JSON::Class::Object && reg.hasKey("mach", json::JSON::Class::Floating)) {
+        mach = reg.at("mach").ToFloat();
+    } else {
+        mach = c3utils::get_mach(speed_mps, obj.position[2]);
+    }
+
+    char line_speed_alt[256];
+    std::snprintf(
+        line_speed_alt,
+        sizeof(line_speed_alt),
+        "SPD %.0f km/h  MACH %.2f  ALT %.0f ft",
+        speed_kmh,
+        mach,
+        altitude_ft);
+    lines.emplace_back(line_speed_alt);
+
+    lines.emplace_back("Pylons:");
+    bool has_pylon_line = false;
+    if (reg.JSONType() == json::JSON::Class::Object && reg.hasKey("pylon_mounts", json::JSON::Class::Object)) {
+        const auto pylon_mounts = reg.at("pylon_mounts");
+        for (const auto& kv : pylon_mounts.ObjectRange()) {
+            const std::string pylon_name = kv.first;
+            std::string weapon_name = "";
+            if (kv.second.JSONType() == json::JSON::Class::String) {
+                weapon_name = kv.second.ToString();
+            }
+            lines.emplace_back("  " + pylon_name + "-" + (weapon_name.empty() ? "EMPTY" : weapon_name));
+            has_pylon_line = true;
+        }
+    }
+    if (!has_pylon_line) {
+        lines.emplace_back("  N/A");
+    }
+
     return lines;
 }
 
@@ -339,6 +405,7 @@ void append_hud_render_commands(
     }
 
     const std::vector<std::string> lines = make_hud_lines(input, sim_time, object_count, stats);
+    const std::vector<std::string> aircraft_lines = make_focus_aircraft_lines(input, snapshot);
     const int pixel_scale = 2;
     const int glyph_w = 5 * pixel_scale;
     const int glyph_h = 7 * pixel_scale;
@@ -357,8 +424,8 @@ void append_hud_render_commands(
     const Float3 shadow_color{0.02f, 0.05f, 0.08f};
 
     const int x_start = 16;
-    int y = 16;
-    for (const std::string& line : lines) {
+    int y_top = 16;
+    for (const std::string& line : aircraft_lines) {
         int x = x_start;
         for (char c : line) {
             for (int gy = 0; gy < 7; ++gy) {
@@ -367,7 +434,7 @@ void append_hud_render_commands(
                         continue;
                     }
                     const float sx0 = static_cast<float>(x + gx * pixel_scale + 1);
-                    const float sy0 = static_cast<float>(y + gy * pixel_scale + 1);
+                    const float sy0 = static_cast<float>(y_top + gy * pixel_scale + 1);
                     const float sx1 = sx0 + static_cast<float>(pixel_scale);
                     const float sy1 = sy0 + static_cast<float>(pixel_scale);
                     const Float3 s0 = to_ndc(sx0, sy0);
@@ -375,7 +442,7 @@ void append_hud_render_commands(
                     append_text_quad_vertices(vertices, s0.x, s0.y, s1.x, s1.y, shadow_color, 0.8f);
 
                     const float tx0 = static_cast<float>(x + gx * pixel_scale);
-                    const float ty0 = static_cast<float>(y + gy * pixel_scale);
+                    const float ty0 = static_cast<float>(y_top + gy * pixel_scale);
                     const float tx1 = tx0 + static_cast<float>(pixel_scale);
                     const float ty1 = ty0 + static_cast<float>(pixel_scale);
                     const Float3 t0 = to_ndc(tx0, ty0);
@@ -385,7 +452,41 @@ void append_hud_render_commands(
             }
             x += glyph_w + glyph_gap;
         }
-        y += line_h;
+        y_top += line_h;
+    }
+
+    int y_bottom = static_cast<int>(height) - 16 - static_cast<int>(line_h * static_cast<int>(lines.size()));
+    if (y_bottom < 16) {
+        y_bottom = 16;
+    }
+    for (const std::string& line : lines) {
+        int x = x_start;
+        for (char c : line) {
+            for (int gy = 0; gy < 7; ++gy) {
+                for (int gx = 0; gx < 5; ++gx) {
+                    if (!glyph_bit(c, gx, gy)) {
+                        continue;
+                    }
+                    const float sx0 = static_cast<float>(x + gx * pixel_scale + 1);
+                    const float sy0 = static_cast<float>(y_bottom + gy * pixel_scale + 1);
+                    const float sx1 = sx0 + static_cast<float>(pixel_scale);
+                    const float sy1 = sy0 + static_cast<float>(pixel_scale);
+                    const Float3 s0 = to_ndc(sx0, sy0);
+                    const Float3 s1 = to_ndc(sx1, sy1);
+                    append_text_quad_vertices(vertices, s0.x, s0.y, s1.x, s1.y, shadow_color, 0.8f);
+
+                    const float tx0 = static_cast<float>(x + gx * pixel_scale);
+                    const float ty0 = static_cast<float>(y_bottom + gy * pixel_scale);
+                    const float tx1 = tx0 + static_cast<float>(pixel_scale);
+                    const float ty1 = ty0 + static_cast<float>(pixel_scale);
+                    const Float3 t0 = to_ndc(tx0, ty0);
+                    const Float3 t1 = to_ndc(tx1, ty1);
+                    append_text_quad_vertices(vertices, t0.x, t0.y, t1.x, t1.y, text_color, 1.0f);
+                }
+            }
+            x += glyph_w + glyph_gap;
+        }
+        y_bottom += line_h;
     }
 
     if (vertices.empty()) {

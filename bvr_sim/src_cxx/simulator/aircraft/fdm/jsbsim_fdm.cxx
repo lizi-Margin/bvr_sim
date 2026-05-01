@@ -16,6 +16,7 @@
 #include <string>
 #include <filesystem>
 #include <algorithm>
+#include <optional>
 #include "FGFCS.h"
 #include "resource_paths.hxx"
 
@@ -79,7 +80,7 @@ namespace Catalog {
 }
 
 JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs) noexcept
-    : BaseFDM(dt),
+    : AircraftFDM(dt),
       aircraft_model("F16"),
       jsbsim_exec(nullptr),
       initialized(false),
@@ -293,6 +294,19 @@ double JSBSimFDM::get_mach() const noexcept {
 }
 
 void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noexcept {
+    auto get_optional_action = [&](const std::string& key) -> std::optional<double> {
+        auto it = action.find(key);
+        if (it == action.end()) {
+            return std::nullopt;
+        }
+        return it->second;
+    };
+
+    auto aileron_override = get_optional_action("aileron_cmd");
+    auto elevator_override = get_optional_action("elevator_cmd");
+    auto rudder_override = get_optional_action("rudder_cmd");
+    auto throttle_override = get_optional_action("throttle_cmd");
+
     double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(85);
     // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(40);
     double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw, jsbsim_inner_dt);
@@ -345,6 +359,19 @@ void JSBSimFDM::run_jsbsim_step(const std::map<std::string, double>& action) noe
             // -1
             -0.75
         );
+
+        if (aileron_override.has_value()) {
+            control_commands[0] = norm(aileron_override.value(), -1.0, 1.0);
+        }
+        if (elevator_override.has_value()) {
+            control_commands[1] = norm(elevator_override.value(), -1.0, 1.0);
+        }
+        if (rudder_override.has_value()) {
+            control_commands[2] = norm(rudder_override.value(), -1.0, 1.0);
+        }
+        if (throttle_override.has_value()) {
+            control_commands[3] = norm(throttle_override.value(), -1.0, 1.0);
+        }
 
         set_jsbsim_controls(control_commands);
 

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "base.hxx"
+#include "ac_fdm.hxx"
 #include <map>
 #include <string>
 #include <any>
 
 namespace bvr_sim {
 
-class SimpleFDM : public BaseFDM {
+class SimpleFDM : public AircraftFDM {
 private:
     // F-16 specific performance parameters (from original F16 class)
     double max_speed;

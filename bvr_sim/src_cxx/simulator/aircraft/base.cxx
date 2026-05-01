@@ -323,6 +323,13 @@ void Aircraft::write_register() noexcept {
     }
     register_.set("enemies_lock.size()", json::Integral(static_cast<int>(enemies_lock.size())));
     register_.set("enemies_lock", enemies_lock_list);
+
+    json::JSON pylon_mounts_json = json::JSON::Make(json::JSON::Class::Object);
+    const auto& mounts = pylon_manager.get_all_mounts();
+    for (const auto& [pylon_name, weapon_name] : mounts) {
+        pylon_mounts_json[pylon_name] = json::String(weapon_name);
+    }
+    register_.set("pylon_mounts", pylon_mounts_json);
 }
 
 bool Aircraft::is_compass_action(const std::map<std::string, double>& action) const noexcept {

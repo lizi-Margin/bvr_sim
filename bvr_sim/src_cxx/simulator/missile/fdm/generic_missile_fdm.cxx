@@ -37,7 +37,7 @@ std::array<double, 3> add_scaled_vec(
 }
 
 GenericMissileFDM::GenericMissileFDM(const ParamStore& params, double dt) noexcept
-    : BaseFDM(dt), params_(params),
+    : FDM_API(dt), params_(params),
       t_(0.0), m_(0.0), t_thrust_cached_(0.0),
       m0_(0.0), dm_(0.0), thrust_(0.0), S_ref_(0.0),
       mach_min_(0.0), g_(9.81),
@@ -85,7 +85,6 @@ void GenericMissileFDM::reset(const std::map<std::string, std::any>& initial_sta
     nz_actual_ = 0.0;
     dtheta_ = 0.0;
     dphi_ = 0.0;
-    terminate = false;
 }
 
 void GenericMissileFDM::step(const std::map<std::string, double>& action) {

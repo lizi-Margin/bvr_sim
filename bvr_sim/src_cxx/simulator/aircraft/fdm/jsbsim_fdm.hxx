@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base.hxx"
+#include "ac_fdm.hxx"
 #include "../fc/fc_old.hxx"
 #include "rubbish_can/filter.hxx"
 #include "extern/jsbsim/src/FGFDMExec.h"
@@ -83,7 +83,7 @@ namespace Catalog {
     void add_jsbsim_props(const std::vector<std::string>& props) noexcept;
 }
 
-class JSBSimFDM : public BaseFDM {
+class JSBSimFDM : public AircraftFDM {
 private:
     std::string aircraft_model;
 
