@@ -1,4 +1,5 @@
 #include "dx11/game_dx11_internal.hxx"
+#include "game_config.hxx"
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
 
@@ -714,15 +715,20 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                     static_cast<float>(object.position[1])
                 );
                 if (resolved_input.input_mode == ViewerInputState::InputMode::Control) {
+                    const float control_distance = std::max(GameCameraConfig::k_min_distance, resolved_input.camera_distance);
+                    const float control_height = control_distance * GameCameraConfig::k_follow_height_ratio;
                     aircraft_target = object_position;
                     aircraft_eye = add(
                         aircraft_target,
                         make_float3(
-                            std::cos(resolved_input.camera_pitch) * std::cos(resolved_input.camera_yaw) * resolved_input.camera_distance,
-                            std::sin(resolved_input.camera_pitch) * resolved_input.camera_distance,
-                            std::cos(resolved_input.camera_pitch) * std::sin(resolved_input.camera_yaw) * resolved_input.camera_distance
+                            std::cos(resolved_input.camera_pitch) * std::cos(resolved_input.camera_yaw) * control_distance,
+                            std::sin(resolved_input.camera_pitch) * control_distance,
+                            std::cos(resolved_input.camera_pitch) * std::sin(resolved_input.camera_yaw) * control_distance
                         )
                     );
+                    // Raise camera rig without changing view direction baseline.
+                    aircraft_target = add(aircraft_target, make_float3(0.0f, control_height, 0.0f));
+                    aircraft_eye = add(aircraft_eye, make_float3(0.0f, control_height, 0.0f));
                     aircraft_up = make_float3(0.0f, 1.0f, 0.0f);
                     use_aircraft_view = true;
                     break;
@@ -733,10 +739,10 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
                 const Float3 up = resolved_input.camera_roll_locked
                     ? make_float3(0.0f, 1.0f, 0.0f)
                     : normalize(make_float3(orientation.m[0][1], orientation.m[1][1], orientation.m[2][1]));
-                const float follow_distance = std::max(1000.0f, resolved_input.camera_distance);
+                const float follow_distance = std::max(GameCameraConfig::k_min_distance, resolved_input.camera_distance);
                 const Float3 world_camera_offset = add(
                     scale(forward, -follow_distance),
-                    scale(up, follow_distance * 0.28f)
+                    scale(up, follow_distance * GameCameraConfig::k_follow_height_ratio)
                 );
                 aircraft_eye = add(object_position, world_camera_offset);
                 aircraft_target = add(aircraft_eye, scale(forward, std::max(10000.0f, follow_distance)));

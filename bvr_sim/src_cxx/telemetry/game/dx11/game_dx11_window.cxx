@@ -196,7 +196,10 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             }
             const int delta = GET_WHEEL_DELTA_WPARAM(w_param);
             window->input.camera_distance -= static_cast<float>(delta) * 6.4f;
-            window->input.camera_distance = std::clamp(window->input.camera_distance, 1000.0f, 180000.0f);
+            window->input.camera_distance = std::clamp(
+                window->input.camera_distance,
+                GameCameraConfig::k_min_distance,
+                GameCameraConfig::k_max_distance);
         }
         return 0;
     case WM_KEYDOWN:

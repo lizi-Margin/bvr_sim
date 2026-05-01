@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../game_config.hxx"
 #include "../../telemetry_types.hxx"
 #include "../game_types.hxx"
 
@@ -130,7 +131,7 @@ struct ViewerInputState {
     float camera_pitch = 0.55f;
     float aim_yaw = 0.70f;
     float aim_pitch = 0.55f;
-    float camera_distance = 1000.0f;
+    float camera_distance = GameCameraConfig::k_min_distance;
     Float3 camera_target{0.0f, 6000.0f, 0.0f};
     float camera_fov_y = 100.0f;
     bool shadows_enabled = true;

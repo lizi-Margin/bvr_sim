@@ -238,15 +238,13 @@ void GameMode::run_loop() noexcept {
                     const float desired_heading = std::atan2(fwd_w, fwd_n);
                     const float desired_pitch = -std::atan2(fwd_u, std::sqrt(fwd_n * fwd_n + fwd_w * fwd_w));
 
-                    const float current_pitch = static_cast<float>(focused_it->orientation[1]);
                     const float current_yaw = static_cast<float>(focused_it->orientation[2]);
                     const float heading_err = static_cast<float>(c3utils::norm_pi(desired_heading - current_yaw));
-                    const float pitch_err = desired_pitch - current_pitch;
 
                     const float max_heading = static_cast<float>(c3utils::deg2rad(85.0));
-                    const float max_pitch = static_cast<float>(c3utils::deg2rad(45.0));
+                    const float max_pitch = static_cast<float>(c3utils::deg2rad(45));
                     delta_heading = std::clamp(heading_err / max_heading, -1.0f, 1.0f);
-                    delta_altitude = std::clamp(-(pitch_err / max_pitch), -1.0f, 1.0f);
+                    delta_altitude = std::clamp(-(desired_pitch / max_pitch), -1.0f, 1.0f);
                 }
             }
 
