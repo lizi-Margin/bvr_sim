@@ -286,23 +286,21 @@ void GameMode::run_loop() noexcept {
                                                                       : (window.input.ctrl_elevator_down ? -1.0f : 0.0f);
             const float rudder_cmd = window.input.ctrl_rudder_right ? (window.input.ctrl_rudder_left ? 0.0f : -1.0f)
                                                                      : (window.input.ctrl_rudder_left ? 1.0f : 0.0f);
+            const bool any_surface_key_pressed =
+                window.input.ctrl_aileron_left || window.input.ctrl_aileron_right
+                || window.input.ctrl_elevator_up || window.input.ctrl_elevator_down
+                || window.input.ctrl_rudder_left || window.input.ctrl_rudder_right;
             action_control_uid_ = window.input.focus_uid;
             submit_action_component("delta_heading", delta_heading);
             submit_action_component("delta_altitude", delta_altitude);
             submit_action_component("delta_speed", delta_speed);
-            if (std::abs(aileron_cmd) > 1e-6f) {
+            if (any_surface_key_pressed) {
                 submit_action_component("aileron_cmd", aileron_cmd);
-            } else {
-                submit_action_component_null("aileron_cmd");
-            }
-            if (std::abs(elevator_cmd) > 1e-6f) {
                 submit_action_component("elevator_cmd", elevator_cmd);
-            } else {
-                submit_action_component_null("elevator_cmd");
-            }
-            if (std::abs(rudder_cmd) > 1e-6f) {
                 submit_action_component("rudder_cmd", rudder_cmd);
             } else {
+                submit_action_component_null("aileron_cmd");
+                submit_action_component_null("elevator_cmd");
                 submit_action_component_null("rudder_cmd");
             }
 

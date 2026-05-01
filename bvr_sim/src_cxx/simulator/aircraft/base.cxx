@@ -235,13 +235,15 @@ void Aircraft::maintain_missile_lists() noexcept {
 }
 
 void Aircraft::hit(double damage) noexcept {
-    if (damage < 0.0) {
+    constexpr double eps = 1e-6;
+
+    if (damage < 0.0 + eps) {
         bloods = 0.0;
     } else {
         bloods -= damage;
     }
 
-    if (bloods <= 0.0) {
+    if (bloods <= 0.0 + eps) {
         is_alive = false;
     }
 }
