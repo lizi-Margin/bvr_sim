@@ -1,6 +1,7 @@
 import time
 import commentjson
 import os
+from bvr_sim.uhtk.siri.utils.sleeper import Sleeper
 
 
 def get_root_dir() -> str:
@@ -8,7 +9,7 @@ def get_root_dir() -> str:
 
 
 def main():
-    with open(os.path.join(get_root_dir(), "./example/dx11.jsonc"), "r", encoding="utf-8") as fin:
+    with open(os.path.join(get_root_dir(), "./example/custom_5v5_f22_f16_bvr.jsonc"), "r", encoding="utf-8") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)
@@ -35,7 +36,9 @@ def main():
             print()
             while not episode_done:
                 t0 = time.time()
+                slp = Sleeper(tick=0.01)
                 obs, reward, done, info = sim.step({})
+                slp.sleep()
                 t1 = time.time()
                 episode_done = info["episode_done"]
                 step_time = max(t1 - t0, 1e-6)

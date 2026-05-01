@@ -215,6 +215,8 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             if (w_param == 'S') { window->input.ctrl_elevator_down = true; return 0; }
             if (w_param == 'Q') { window->input.ctrl_rudder_left = true; return 0; }
             if (w_param == 'E') { window->input.ctrl_rudder_right = true; return 0; }
+            if (w_param == 'R') { window->input.fire_r_armed = true; return 0; }
+            if (w_param == VK_CONTROL) { window->input.pylon_cycle_ctrl_armed = true; return 0; }
         }
         if (w_param == VK_F1) {
             const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
@@ -277,6 +279,18 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
         if (w_param == 'S') { window->input.ctrl_elevator_down = false; }
         if (w_param == 'Q') { window->input.ctrl_rudder_left = false; }
         if (w_param == 'E') { window->input.ctrl_rudder_right = false; }
+        if (w_param == 'R') {
+            if (window->input.fire_r_armed) {
+                window->input.fire_once_requested = true;
+            }
+            window->input.fire_r_armed = false;
+        }
+        if (w_param == VK_CONTROL) {
+            if (window->input.pylon_cycle_ctrl_armed) {
+                window->input.pylon_cycle_requested = true;
+            }
+            window->input.pylon_cycle_ctrl_armed = false;
+        }
         if (w_param == VK_CAPITAL) {
             window->input.capslock_held = false;
             return 0;

@@ -144,6 +144,11 @@ struct ViewerInputState {
     bool ctrl_elevator_down = false;
     bool ctrl_rudder_left = false;
     bool ctrl_rudder_right = false;
+    bool fire_r_armed = false;
+    bool fire_once_requested = false;
+    bool pylon_cycle_ctrl_armed = false;
+    bool pylon_cycle_requested = false;
+    std::string selected_pylon_name;
     int focus_cycle_index = -1; // -1 means free camera slot
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;

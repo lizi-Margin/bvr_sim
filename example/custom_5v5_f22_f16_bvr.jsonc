@@ -1,0 +1,205 @@
+{
+  "dt": 0.025,
+  "max_steps": 20000,
+  "red_meta": {
+    "A00": {
+      "unit_spec": "F22",
+      "color": "Red",
+      "position": [78000.0, -9000.0, 9000.0],
+      "velocity": [-290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      // "opponent_type": "standoff"
+      "opponent_type": "tactical"
+    },
+    "A01": {
+      "unit_spec": "F22",
+      "color": "Red",
+      "position": [78000.0, 9000.0, 9000.0],
+      "velocity": [-290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      "opponent_type": "tactical"
+      // "opponent_type": "standoff"
+    },
+    "A02": {
+      "unit_spec": "F16",
+      "color": "Red",
+      "position": [70000.0, 4500.0, 7000.0],
+      "velocity": [-290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "R03": "AIM-9M",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+        "L03": "AIM-9M",
+      },
+      "opponent_type": "tactical"
+    },
+    "A03": {
+      "unit_spec": "F16",
+      "color": "Red",
+      "position": [70000.0, 1500.0, 7000.0],
+      "velocity": [-290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "R03": "AIM-9M",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+        "L03": "AIM-9M",
+      },
+      "opponent_type": "tactical"
+    },
+    "A04": {
+      "unit_spec": "F16",
+      "color": "Red",
+      "position": [70000.0, -1500.0, 7000.0],
+      "velocity": [-290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "R03": "AIM-9M",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+        "L03": "AIM-9M",
+      },
+      "opponent_type": "tactical"
+    },
+    "A05": {
+      "unit_spec": "F16",
+      "color": "Red",
+      "position": [70000.0, -4500.0, 7000.0],
+      "velocity": [-290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "R03": "AIM-9M",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+        "L03": "AIM-9M",
+      },
+      "opponent_type": "tactical"
+    }
+  },
+  "blue_meta": {
+    "B00": {
+      "unit_spec": "F22",
+      "color": "Blue",
+      "position": [22000.0, 9000.0, 9000.0],
+      "velocity": [290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      // "opponent_type": "standoff"
+      "opponent_type": "tactical"
+    },
+    "B01": {
+      "unit_spec": "F22",
+      "color": "Blue",
+      "position": [22000.0, -9000.0, 9000.0],
+      "velocity": [290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      // "opponent_type": "standoff"
+      "opponent_type": "tactical"
+    },
+    "B02": {
+      "unit_spec": "F16",
+      "color": "Blue",
+      "position": [30000.0, -4500.0, 7000.0],
+      "velocity": [290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      "opponent_type": "tactical"
+    },
+    "B03": {
+      "unit_spec": "F16",
+      "color": "Blue",
+      "position": [30000.0, -1500.0, 7000.0],
+      "velocity": [290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      "opponent_type": "tactical"
+    },
+    "B04": {
+      "unit_spec": "F16",
+      "color": "Blue",
+      "position": [30000.0, 1500.0, 7000.0],
+      "velocity": [290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      "opponent_type": "tactical"
+    },
+    "B05": {
+      "unit_spec": "F16",
+      "color": "Blue",
+      "position": [30000.0, 4500.0, 7000.0],
+      "velocity": [290.0, 0.0, 0.0],
+      "fdm_type": "jsbsim",
+      "record": false,
+      "pylon_mounts": {
+        "R01": "AIM-120C5",
+        "R02": "AIM-120C5",
+        "L01": "AIM-120C5",
+        "L02": "AIM-120C5",
+      },
+      "opponent_type": "tactical"
+    }
+  },
+  "ground_units": {},
+  "field_size": 140000.0,
+  "obs_type": "text",
+  "blue_opponent_type": null,
+  "reward_config": {}
+}

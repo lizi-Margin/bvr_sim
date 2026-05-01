@@ -39,7 +39,12 @@ void TacticalOpponent3D::take_action(
     // Filter out dead enemies
     std::vector<std::shared_ptr<Aircraft>> alive_enemies;
     if (!agent->enemies_lock.empty()) {
-        alive_enemies = agent->enemies_lock;
+        alive_enemies.reserve(agent->enemies_lock.size());
+        for (const auto& enemy : agent->enemies_lock) {
+            if (enemy && enemy->is_alive) {
+                alive_enemies.push_back(enemy);
+            }
+        }
     } else {
         for (const auto& enemy : enemies) {
             if (enemy->is_alive && enemy->Type == SOT::Aircraft) {
@@ -391,7 +396,7 @@ void TacticalOpponent3D::tactical_attack(
 
     if (enemy_locked &&
         agent->pylon_manager.num_left_weapons("AIM-120") > 0 &&
-        time_since_last_shoot > static_cast<int>(10.0 / agent->dt)) {  // Convert 10 seconds to steps
+        time_since_last_shoot > static_cast<int>(20.0 / agent->dt)) {  // Convert 10 seconds to steps
         if (distance < c3u::nm_to_meters(8.0)) {
             shoot = true;
             fire = get_fire_action(agent, target->uid, "AIM-120");

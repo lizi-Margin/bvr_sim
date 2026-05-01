@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace bvr_sim {
 
@@ -268,6 +269,16 @@ void GameMode::run_loop() noexcept {
                     "setp " + window.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
                 submit_command(command);
             };
+            auto submit_action_component_json = [this, &window, kGameModeActionPenalty](const char* key, const json::JSON& value) {
+                json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+                kv[key] = value;
+                TelemetryCommand command;
+                command.kind = TelemetryCommandKind::Command;
+                command.target_uid = window.input.focus_uid;
+                command.payload = json::String(
+                    "setp " + window.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+                submit_command(command);
+            };
 
             const float aileron_cmd = window.input.ctrl_aileron_right ? (window.input.ctrl_aileron_left ? 0.0f : 1.0f)
                                                                        : (window.input.ctrl_aileron_left ? -1.0f : 0.0f);
@@ -294,6 +305,85 @@ void GameMode::run_loop() noexcept {
             } else {
                 submit_action_component_null("rudder_cmd");
             }
+
+            std::vector<std::string> selectable_pylons;
+            if (snapshot) {
+                auto focused_it = std::find_if(
+                    snapshot->objects.begin(),
+                    snapshot->objects.end(),
+                    [&window](const TelemetryObjectState& obj) { return obj.uid == window.input.focus_uid; });
+                if (focused_it != snapshot->objects.end()) {
+                    const json::JSON& reg = focused_it->debug_register;
+                    if (reg.JSONType() == json::JSON::Class::Object && reg.hasKey("pylon_mounts", json::JSON::Class::Object)) {
+                        const auto pylon_mounts = reg.at("pylon_mounts");
+                        for (const auto& kv : pylon_mounts.ObjectRange()) {
+                            selectable_pylons.push_back(kv.first);
+                        }
+                    }
+                }
+            }
+            if (!selectable_pylons.empty()) {
+                if (window.input.selected_pylon_name.empty()
+                    || std::find(selectable_pylons.begin(), selectable_pylons.end(), window.input.selected_pylon_name) == selectable_pylons.end()) {
+                    window.input.selected_pylon_name = selectable_pylons.front();
+                }
+                if (window.input.pylon_cycle_requested) {
+                    auto it = std::find(selectable_pylons.begin(), selectable_pylons.end(), window.input.selected_pylon_name);
+                    size_t idx = 0;
+                    if (it != selectable_pylons.end()) {
+                        idx = static_cast<size_t>(std::distance(selectable_pylons.begin(), it));
+                        idx = (idx + 1) % selectable_pylons.size();
+                    }
+                    window.input.selected_pylon_name = selectable_pylons[idx];
+                }
+            } else {
+                window.input.selected_pylon_name.clear();
+            }
+            window.input.pylon_cycle_requested = false;
+
+            bool fire_emitted = false;
+            if (window.input.fire_once_requested && snapshot) {
+                auto focused_it = std::find_if(
+                    snapshot->objects.begin(),
+                    snapshot->objects.end(),
+                    [&window](const TelemetryObjectState& obj) { return obj.uid == window.input.focus_uid; });
+                if (focused_it != snapshot->objects.end()) {
+                    const json::JSON& reg = focused_it->debug_register;
+                    std::string weapon_spec;
+                    if (!window.input.selected_pylon_name.empty()
+                        && reg.JSONType() == json::JSON::Class::Object
+                        && reg.hasKey("pylon_mounts", json::JSON::Class::Object)) {
+                        const auto pylon_mounts = reg.at("pylon_mounts");
+                        if (pylon_mounts.hasKey(window.input.selected_pylon_name, json::JSON::Class::String)) {
+                            weapon_spec = pylon_mounts.at(window.input.selected_pylon_name).ToString();
+                        }
+                    }
+                    std::string target_uid;
+                    if (reg.JSONType() == json::JSON::Class::Object && reg.hasKey("enemies_lock", json::JSON::Class::Array)) {
+                        const auto enemies_lock = reg.at("enemies_lock");
+                        for (const auto& enm : enemies_lock.ArrayRange()) {
+                            if (enm.JSONType() == json::JSON::Class::String) {
+                                target_uid = enm.ToString();
+                                if (!target_uid.empty()) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!weapon_spec.empty() && !target_uid.empty()) {
+                        json::JSON fire_obj = json::JSON::Make(json::JSON::Class::Object);
+                        fire_obj["target_uid"] = json::String(target_uid);
+                        fire_obj["weapon_spec"] = json::String(weapon_spec);
+                        submit_action_component_json("fire", fire_obj);
+                        fire_emitted = true;
+                    }
+                }
+            }
+            if (!fire_emitted) {
+                submit_action_component_null("fire");
+            }
+            window.input.fire_once_requested = false;
         } else {
             if (!action_control_uid_.empty()) {
                 auto submit_clear_for_uid = [this, kGameModeActionPenalty](const std::string& uid, const char* key) {
@@ -309,7 +399,10 @@ void GameMode::run_loop() noexcept {
                 submit_clear_for_uid(action_control_uid_, "aileron_cmd");
                 submit_clear_for_uid(action_control_uid_, "elevator_cmd");
                 submit_clear_for_uid(action_control_uid_, "rudder_cmd");
+                submit_clear_for_uid(action_control_uid_, "fire");
             }
+            window.input.fire_once_requested = false;
+            window.input.pylon_cycle_requested = false;
             action_control_uid_.clear();
         }
 

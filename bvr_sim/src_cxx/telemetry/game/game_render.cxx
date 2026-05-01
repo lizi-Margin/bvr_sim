@@ -164,7 +164,8 @@ std::vector<std::string> make_focus_aircraft_lines(const ViewerInputState& input
             if (kv.second.JSONType() == json::JSON::Class::String) {
                 weapon_name = kv.second.ToString();
             }
-            lines.emplace_back("  " + pylon_name + "-" + (weapon_name.empty() ? "EMPTY" : weapon_name));
+            const bool selected = !input.selected_pylon_name.empty() && pylon_name == input.selected_pylon_name;
+            lines.emplace_back(std::string(selected ? "> " : "  ") + pylon_name + "-" + (weapon_name.empty() ? "EMPTY" : weapon_name));
             has_pylon_line = true;
         }
     }
@@ -217,6 +218,7 @@ bool glyph_bit(char c, int x, int y) {
     case '/': return (x + y == 6);
     case '-': return (y == 3 && x >= 1 && x <= 3);
     case '+': return ((x == 2 && y >= 1 && y <= 5) || (y == 3 && x >= 0 && x <= 4));
+    case '>': return ((x == y - 1 && y >= 1 && y <= 3) || (x == 5 - y && y >= 3 && y <= 5));
     case '(': return ((x == 3 && y >= 1 && y <= 5) || ((y == 0 || y == 6) && x == 4));
     case ')': return ((x == 1 && y >= 1 && y <= 5) || ((y == 0 || y == 6) && x == 0));
     default: return false;
