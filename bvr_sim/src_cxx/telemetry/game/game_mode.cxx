@@ -295,6 +295,18 @@ void GameMode::run_loop() noexcept {
             submit_action_component("delta_altitude", delta_altitude);
             submit_action_component("delta_speed", delta_speed);
             if (any_surface_key_pressed) {
+                if (snapshot) {
+                    auto focused_it = std::find_if(
+                        snapshot->objects.begin(),
+                        snapshot->objects.end(),
+                        [&window](const TelemetryObjectState& obj) { return obj.uid == window.input.focus_uid; });
+                    if (focused_it != snapshot->objects.end()) {
+                        window.input.aim_yaw = static_cast<float>(
+                            c3utils::norm_pi(static_cast<float>(focused_it->orientation[2]) - static_cast<float>(c3utils::pi)));
+                        window.input.aim_pitch = static_cast<float>(focused_it->orientation[1]);
+                        window.input.aim_pitch = std::clamp(window.input.aim_pitch, -1.45f, 1.45f);
+                    }
+                }
                 submit_action_component("aileron_cmd", aileron_cmd);
                 submit_action_component("elevator_cmd", elevator_cmd);
                 submit_action_component("rudder_cmd", rudder_cmd);
