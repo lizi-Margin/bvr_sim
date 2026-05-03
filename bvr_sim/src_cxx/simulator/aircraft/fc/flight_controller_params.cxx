@@ -17,7 +17,7 @@ FlightControllerParamsManager::FlightControllerParamsManager() noexcept {
     params_map_["F4N_original"] = FlightControllerParams::get_f16_params();
     params_map_["AJ37"] = FlightControllerParams::get_f16_params();
     params_map_["JA37"] = FlightControllerParams::get_f16_params();
-    params_map_["F22"] = FlightControllerParams::get_f16_params();
+    params_map_["F22"] = FlightControllerParams::get_f22_params();
     params_map_["F22_original"] = FlightControllerParams::get_f16_params();
 }
 
