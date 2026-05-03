@@ -1,3 +1,4 @@
+import copy
 import json, os
 import random
 import numpy as np
@@ -235,8 +236,8 @@ class BVR3DEnvCpp:
             self.num_red, self.num_blue
         )
 
-        init_spec = self.red_meta.copy()
-        init_spec.update(self.blue_meta)
+        init_spec = copy.deepcopy(self.red_meta)
+        init_spec.update(copy.deepcopy(self.blue_meta))
 
         # Build initialization spec for red
         for i, uid in enumerate(self.red_ids):
