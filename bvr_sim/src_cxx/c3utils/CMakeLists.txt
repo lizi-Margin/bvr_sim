@@ -4,7 +4,7 @@
 function(set_compiler_params target_name)
     if(MSVC)
         # Windows MSVC
-        target_compile_options(${target_name} PRIVATE /W4 /WX- /wd4819)
+        target_compile_options(${target_name} PRIVATE /W4 /WX- /EHsc /wd4819)
         target_compile_definitions(${target_name} PRIVATE _USE_MATH_DEFINES)
 
         # Add debug symbols for Debug builds

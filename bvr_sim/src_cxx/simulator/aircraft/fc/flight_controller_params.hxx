@@ -93,15 +93,15 @@ struct FlightControllerParams {
     static FlightControllerParams get_f15_params() noexcept {
         FlightControllerParams f15_params;
 
-        f15_params.kroll_p = 2.2;
-        f15_params.kroll_i = 0.1;
-        f15_params.kroll_d = 0.0;
-        f15_params.kpitch_p = -1.2;
-        f15_params.kpitch_i = -0.1;
-        f15_params.kpitch_d = -0.0;
+        f15_params.kroll_p = 1.2;
+        f15_params.kroll_i = 1.4;
+        f15_params.kroll_d = 0.3;
+        f15_params.kpitch_p = -1.5;
+        f15_params.kpitch_i = -0.0;
+        f15_params.kpitch_d = -0.5;
 
-        f15_params.kthrottle_p = 0.03;
-        f15_params.kthrottle_i = 0.06;
+        f15_params.kthrottle_p = 0.1;
+        f15_params.kthrottle_i = 0.1;
         f15_params.kthrottle_d = 500;
 
         f15_params.crash_height_threshold_B = c3u::feet_to_meters(4000.0); 
@@ -122,12 +122,12 @@ struct FlightControllerParams {
     static FlightControllerParams get_f22_params() noexcept {
         FlightControllerParams f22_params;
 
-        f22_params.kroll_p = 1.2;
-        f22_params.kroll_i = 0.4;
-        f22_params.kroll_d = 0.0;
-        f22_params.kpitch_p = -0.01;
-        f22_params.kpitch_i = -0.005;
-        f22_params.kpitch_d = -0.000;
+        f22_params.kroll_p = 3.8;
+        f22_params.kroll_i = 2.0;
+        f22_params.kroll_d = 0.2;
+        f22_params.kpitch_p = -3.0;
+        f22_params.kpitch_i = -0.0;
+        f22_params.kpitch_d = -0.0;
 
         f22_params.kthrottle_p = 0.03;
         f22_params.kthrottle_i = 0.06;
@@ -142,7 +142,7 @@ struct FlightControllerParams {
 
         f22_params.minimum_speed_B = 0.18;
         f22_params.maximum_speed_A = 0.5;
-        f22_params.pitch_push_down_cutoff = -0.05;
+        f22_params.pitch_push_down_cutoff = 0.5;
 
         return f22_params;
     }

@@ -3,7 +3,7 @@
   "max_steps": 20000,
   "red_meta": {
     "A00": {
-      "unit_spec": "F22",
+      "unit_spec": "F15",
       "color": "Red",
       "position": [78000.0, -9000.0, 9000.0],
       "velocity": [-290.0, 0.0, 0.0],
@@ -12,8 +12,10 @@
       "pylon_mounts": {
         "R01": "AIM-120C5",
         "R02": "AIM-120C5",
+        "R03": "AIM-120C5",
         "L01": "AIM-120C5",
         "L02": "AIM-120C5",
+        "L03": "AIM-120C5",
       },
       // "opponent_type": "standoff"
       "opponent_type": "tactical"
