@@ -6,7 +6,7 @@
 set -e
 
 BUILD_DIR="build"
-CMAKE_BUILD_TYPE="Release"
+CMAKE_BUILD_TYPE="Debug"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "========================================"
