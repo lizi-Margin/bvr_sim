@@ -12,7 +12,7 @@
 #include <sstream>
 #include "check.hxx"
 
-// #define DISABLE 1
+#define DISABLE 1
 
 class SL {
 private:
