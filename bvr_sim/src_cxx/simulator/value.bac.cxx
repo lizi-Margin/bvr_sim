@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cctype>
-#include "rubbish_can/colorful.hxx"
+#include "support/colorful.hxx"
 
 namespace bvr_sim {
 

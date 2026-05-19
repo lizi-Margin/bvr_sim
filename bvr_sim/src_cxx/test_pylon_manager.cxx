@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "simulator/pylon_manager.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/SL.hxx"
 #include "test_main.hxx"
 
 // Test PylonManager::weapon_matches with exact match only

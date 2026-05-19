@@ -1,5 +1,5 @@
 #include "rws.hxx"
-#include "rubbish_can/rubbish_can.hxx"
+#include "support/support.hxx"
 #include "../aircraft/base.hxx"
 #include "../missile/base.hxx"
 

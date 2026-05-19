@@ -1,7 +1,7 @@
 #pragma once
 
 #include "telemetry_command_queue.hxx"
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 #include <atomic>
 #include <functional>
 #include <memory>

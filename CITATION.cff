@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "BVR Sim"
+message: "If you use BVR Sim in academic work, please cite the repository or the accompanying paper."
+type: software
+authors:
+  - family-names: "Sun"
+    given-names: "Haocheng"
+repository-code: "https://github.com/lizi-Margin/bvr_sim"
+abstract: "A 3D Beyond Visual Range air combat simulation environment for multi-agent reinforcement learning with Python and C++ backends."
+keywords:
+  - beyond-visual-range air combat
+  - multi-agent reinforcement learning
+  - simulation
+license: GPL-3.0-only

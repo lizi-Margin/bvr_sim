@@ -4,7 +4,7 @@
 
 ## 顶层结构
 
-项目主体在 [`bvr_sim/`](G:\bvr_sim\bvr_sim) 下，分成两层：
+项目主体在 [`bvr_sim/`](bvr_sim) 下，分成两层：
 
 - Python 主逻辑
 - C++ 原生核心
@@ -26,7 +26,7 @@ bvr_sim/
 
 ## Python 环境主线
 
-入口：[`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py)
+入口：[`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py)
 
 主线流程大致是：
 
@@ -41,7 +41,7 @@ bvr_sim/
 
 ## C++ 环境主线
 
-入口：[`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py)
+入口：[`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py)
 
 它本质上是一个 Python adapter，负责：
 
@@ -53,15 +53,15 @@ bvr_sim/
 
 如果你要改原生行为，通常要同时看：
 
-- [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py)
+- [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py)
 - `bvr_sim/src_cxx/`
 
 ## 奖励系统
 
 奖励相关代码在：
 
-- [`bvr_sim/src_py/reward/reward_components.py`](G:\bvr_sim\bvr_sim\src_py\reward\reward_components.py)
-- [`bvr_sim/src_py/reward/reward_visualization.py`](G:\bvr_sim\bvr_sim\src_py\reward\reward_visualization.py)
+- [`bvr_sim/src_py/reward/reward_components.py`](bvr_sim/src_py/reward/reward_components.py)
+- [`bvr_sim/src_py/reward/reward_visualization.py`](bvr_sim/src_py/reward/reward_visualization.py)
 
 设计上：
 
@@ -73,9 +73,9 @@ bvr_sim/
 
 规则对手代码在：
 
-- [`bvr_sim/src_py/baseline_opponents/simple_opponents.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\simple_opponents.py)
-- [`bvr_sim/src_py/baseline_opponents/tactical_opponent.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\tactical_opponent.py)
-- [`bvr_sim/src_py/baseline_opponents/slamraam_policy.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\slamraam_policy.py)
+- [`bvr_sim/src_py/baseline_opponents/simple_opponents.py`](bvr_sim/src_py/baseline_opponents/simple_opponents.py)
+- [`bvr_sim/src_py/baseline_opponents/tactical_opponent.py`](bvr_sim/src_py/baseline_opponents/tactical_opponent.py)
+- [`bvr_sim/src_py/baseline_opponents/slamraam_policy.py`](bvr_sim/src_py/baseline_opponents/slamraam_policy.py)
 
 如果你要增加一种新 opponent，优先遵循这里已有的模式，不要把策略逻辑散落回 `bvr_env.py`。
 
@@ -83,7 +83,7 @@ bvr_sim/
 
 观测空间工厂在：
 
-- [`bvr_sim/src_py/observation_space.py`](G:\bvr_sim\bvr_sim\src_py\observation_space.py)
+- [`bvr_sim/src_py/observation_space.py`](bvr_sim/src_py/observation_space.py)
 
 当前支持多种 `obs_type`。如果你要新增一种观测形式，最好：
 
@@ -95,7 +95,7 @@ bvr_sim/
 
 动作相关定义在：
 
-- [`bvr_sim/action_space.py`](G:\bvr_sim\bvr_sim\action_space.py)
+- [`bvr_sim/action_space.py`](bvr_sim/action_space.py)
 
 这是 Python 环境、C++ 环境和外部包装层之间的重要边界。改动作编码时，要同步检查：
 
@@ -107,7 +107,7 @@ bvr_sim/
 
 位置随机化和编队参数主要经过：
 
-- [`bvr_sim/spawn_manager.py`](G:\bvr_sim\bvr_sim\spawn_manager.py)
+- [`bvr_sim/spawn_manager.py`](bvr_sim/spawn_manager.py)
 
 配置里常见的：
 
@@ -120,9 +120,9 @@ bvr_sim/
 
 示例包装在：
 
-- [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
-- [`example/env_harl.py`](G:\bvr_sim\example\env_harl.py)
-- [`example/env_marlbenchmark.py`](G:\bvr_sim\example\env_marlbenchmark.py)
+- [`example/env_wrapper.py`](example/env_wrapper.py)
+- [`example/env_harl.py`](example/env_harl.py)
+- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
 
 如果你要维护兼容层，尽量把框架特定逻辑放在这些包装层里，不要污染核心环境。
 
@@ -173,13 +173,13 @@ python run_tests.py
 
 关键入口：
 
-- [`core.cxx`](G:\bvr_sim\bvr_sim\src_cxx\core.cxx)
-- [`telemetry_bridge.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\telemetry_bridge.cxx)
-- [`embedded_web_server.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\embedded_web_server.cxx)
-- [`opengl_viewer.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\opengl_viewer.cxx)
-- [`dx11_game_mode.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_mode.cxx)
-- [`dx11_game_mode_render.cxx`](G:\bvr_sim\bvr_sim\src_cxx\telemetry\dx11_game_mode_render.cxx)
-- [`main.ts`](G:\bvr_sim\web\src\main.ts)
+- [`core.cxx`](bvr_sim/src_cxx/core.cxx)
+- [`telemetry_bridge.cxx`](bvr_sim/src_cxx/telemetry/telemetry_bridge.cxx)
+- [`embedded_web_server.cxx`](bvr_sim/src_cxx/telemetry/embedded_web_server.cxx)
+- [`opengl_viewer.cxx`](bvr_sim/src_cxx/telemetry/opengl_viewer.cxx)
+- [`dx11_game_mode.cxx`](bvr_sim/src_cxx/telemetry/dx11_game_mode.cxx)
+- [`dx11_game_mode_render.cxx`](bvr_sim/src_cxx/telemetry/dx11_game_mode_render.cxx)
+- [`main.ts`](web/src/main.ts)
 
 ### 职责边界
 
@@ -193,7 +193,7 @@ python run_tests.py
 
 - 运行在独立守护线程
 - 从 `SOPool` 读取当前对象
-- 通过 [`register.hxx`](G:\bvr_sim\bvr_sim\src_cxx\simulator\register.hxx) 构建严格 `WorldSnapshot`
+- 通过 [`register.hxx`](bvr_sim/src_cxx/simulator/register.hxx) 构建严格 `WorldSnapshot`
 - 保存最新快照
 - 处理 `focus_uid` 和 `subscription_filter`
 

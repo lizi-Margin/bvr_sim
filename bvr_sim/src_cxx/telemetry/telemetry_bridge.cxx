@@ -1,7 +1,7 @@
 #include "telemetry_bridge.hxx"
 #include "global_config.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/SL.hxx"
+#include "support/check.hxx"
 #include "so_pool.hxx"
 
 #include <chrono>

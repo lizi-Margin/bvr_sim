@@ -9,9 +9,9 @@
 
 项目里已经有三类入口：
 
-- 通用/外部框架包装示例：[`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
-- HARL 适配：[`example/env_harl.py`](G:\bvr_sim\example\env_harl.py)
-- MARLBenchmark 适配：[`example/env_marlbenchmark.py`](G:\bvr_sim\example\env_marlbenchmark.py)
+- 通用/外部框架包装示例：[`example/env_wrapper.py`](example/env_wrapper.py)
+- HARL 适配：[`example/env_harl.py`](example/env_harl.py)
+- MARLBenchmark 适配：[`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
 
 如果你是第一次做集成，不要从 `src_py/` 或 `src_cxx/` 开始读，先从这三个包装文件入手。
 
@@ -26,8 +26,8 @@ obs, reward, done, info = env.step(action)
 
 主入口：
 
-- Python 环境：[`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py)
-- C++ 环境：[`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py)
+- Python 环境：[`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py)
+- C++ 环境：[`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py)
 
 ## 什么时候用 Python 环境
 
@@ -47,7 +47,7 @@ obs, reward, done, info = env.step(action)
 
 ## HARL 适配
 
-参考 [`example/env_harl.py`](G:\bvr_sim\example\env_harl.py)。
+参考 [`example/env_harl.py`](example/env_harl.py)。
 
 这个文件做的事情主要有：
 
@@ -63,7 +63,7 @@ obs, reward, done, info = env.step(action)
 
 参考：
 
-- [`example/env_marlbenchmark.py`](G:\bvr_sim\example\env_marlbenchmark.py)
+- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
 
 这个文件已经处理了几件关键事情：
 
@@ -78,7 +78,7 @@ obs, reward, done, info = env.step(action)
 
 参考：
 
-- [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
+- [`example/env_wrapper.py`](example/env_wrapper.py)
 
 这个文件更接近“项目方自己使用的包装层”，特点是：
 
@@ -156,9 +156,9 @@ obs, reward, done, info = env.step(action)
 
 仓库里现成可以参考的脚本：
 
-- [`tests/test_py.py`](G:\bvr_sim\tests\test_py.py)
-- [`tests/test_cpp.py`](G:\bvr_sim\tests\test_cpp.py)
-- [`tests/test_mmodelA_smoke.py`](G:\bvr_sim\tests\test_mmodelA_smoke.py)
+- [`tests/test_py.py`](tests/test_py.py)
+- [`tests/test_cpp.py`](tests/test_cpp.py)
+- [`tests/test_mmodelA_smoke.py`](tests/test_mmodelA_smoke.py)
 
 ## 对外开源时的建议
 

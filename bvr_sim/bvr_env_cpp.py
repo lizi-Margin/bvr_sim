@@ -88,7 +88,7 @@ if not _import_success:
     print("Warning: Failed to import bvr_sim_cpp from any package")
 
 # if auto_import:
-#     lib_dir = "MISSION/bvr_sim/install/lib"
+#     lib_dir = "bvr_sim/install/lib"
 #     lib_files = os.listdir(lib_dir)
 #     for lib_file in lib_files:
 #         if lib_file.endswith(".pyd"):

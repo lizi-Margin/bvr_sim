@@ -242,7 +242,7 @@ Set `distill_reward_weight > 0` in config and optionally `USE_DISTILL_REWARD_ACT
 
 ## Related References
 
-- **AGENTS.bac.md**: Comprehensive guide covering observation/action encoding, reward shaping, distillation, and debugging tips (for MISSION/bvr_sim)
+- **AGENTS.bac.md**: Comprehensive guide covering observation/action encoding, reward shaping, distillation, and debugging tips.
 - **`docs/getting_started.md`**: Step-by-step installation and first-run guide
 - **`docs/configuration.md`**: Configuration file format and common parameters
 - **docs/开发日志.md**: Development progress and architectural notes (Chinese)

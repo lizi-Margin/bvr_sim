@@ -6,8 +6,8 @@
 
 项目里现成的示例配置有两份：
 
-- Python 环境：[`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json)
-- C++ 环境：[`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
+- Python 环境：[`tests/demo_config.json`](tests/demo_config.json)
+- C++ 环境：[`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)
 
 建议：
 
@@ -48,7 +48,7 @@ bvr_sim/resources/
 
 ## Python 环境配置
 
-Python 环境入口是 [`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py) 中的 `BVR3DEnv`。
+Python 环境入口是 [`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py) 中的 `BVR3DEnv`。
 
 一个最小 Python 配置通常包含：
 
@@ -112,7 +112,7 @@ Python 环境入口是 [`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py) 中
   - `entity`
   - `text`
 
-观测空间工厂见 [`bvr_sim/src_py/observation_space.py`](G:\bvr_sim\bvr_sim\src_py\observation_space.py)。
+观测空间工厂见 [`bvr_sim/src_py/observation_space.py`](bvr_sim/src_py/observation_space.py)。
 
 `blue_opponent_type`
 
@@ -123,11 +123,11 @@ Python 环境入口是 [`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py) 中
 `reward_config`
 
 - 奖励配置字典
-- 由 [`bvr_sim/src_py/reward/reward_components.py`](G:\bvr_sim\bvr_sim\src_py\reward\reward_components.py) 读取
+- 由 [`bvr_sim/src_py/reward/reward_components.py`](bvr_sim/src_py/reward/reward_components.py) 读取
 
 ## C++ 环境配置
 
-C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py) 中的 `BVR3DEnvCpp`。
+C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py) 中的 `BVR3DEnvCpp`。
 
 `tests/demo_config_cpp.jsonc` 支持注释，适合维护更复杂的样例。
 
@@ -224,15 +224,15 @@ C++ 环境入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py
 
 Python 侧规则对手实现在：
 
-- [`bvr_sim/src_py/baseline_opponents/__init__.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\__init__.py)
-- [`bvr_sim/src_py/baseline_opponents/simple_opponents.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\simple_opponents.py)
-- [`bvr_sim/src_py/baseline_opponents/tactical_opponent.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\tactical_opponent.py)
-- [`bvr_sim/src_py/baseline_opponents/slamraam_policy.py`](G:\bvr_sim\bvr_sim\src_py\baseline_opponents\slamraam_policy.py)
+- [`bvr_sim/src_py/baseline_opponents/__init__.py`](bvr_sim/src_py/baseline_opponents/__init__.py)
+- [`bvr_sim/src_py/baseline_opponents/simple_opponents.py`](bvr_sim/src_py/baseline_opponents/simple_opponents.py)
+- [`bvr_sim/src_py/baseline_opponents/tactical_opponent.py`](bvr_sim/src_py/baseline_opponents/tactical_opponent.py)
+- [`bvr_sim/src_py/baseline_opponents/slamraam_policy.py`](bvr_sim/src_py/baseline_opponents/slamraam_policy.py)
 
 如果你要给试用者一个稳定入口，优先使用仓库现有 demo config 里的默认策略组合，不要一开始就暴露太多实验性选项。
 
 最近一轮更新里，C++ `tactical` 对手已支持 `AIM-9M`，并且初始左右展开方向不再固定。
-最新一轮提交又新增了 C++ `standoff` 对手；可以直接参考 [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc) 里的混编写法。
+最新一轮提交又新增了 C++ `standoff` 对手；可以直接参考 [`example/custom_5v5_f22_f16.jsonc`](example/custom_5v5_f22_f16.jsonc) 里的混编写法。
 
 ## 观测与动作
 
@@ -244,7 +244,7 @@ C++ 环境中，`BVR3DEnvCpp` 也会把 `obs_type` 传给内部 RL manager。
 
 ### 动作
 
-两套环境都围绕 [`bvr_sim/action_space.py`](G:\bvr_sim\bvr_sim\action_space.py) 中的动作空间工作。
+两套环境都围绕 [`bvr_sim/action_space.py`](bvr_sim/action_space.py) 中的动作空间工作。
 
 概念上动作包含四个方向：
 

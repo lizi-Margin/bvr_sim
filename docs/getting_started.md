@@ -10,7 +10,7 @@
 
 ### 纯 Python 环境
 
-入口是 [`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py) 里的 `BVR3DEnv`。
+入口是 [`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py) 里的 `BVR3DEnv`。
 
 适合：
 
@@ -20,7 +20,7 @@
 
 ### C++ + Python 混合环境
 
-入口是 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py) 里的 `BVR3DEnvCpp`。
+入口是 [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py) 里的 `BVR3DEnvCpp`。
 
 适合：
 
@@ -64,7 +64,7 @@ bash bvr_sim/build_linux.sh
 python tests/test_py.py
 ```
 
-它读取 [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json)。
+它读取 [`tests/demo_config.json`](tests/demo_config.json)。
 
 运行成功后你通常会得到：
 
@@ -78,7 +78,7 @@ python tests/test_py.py
 python tests/test_cpp.py
 ```
 
-它读取 [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)。
+它读取 [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)。
 
 运行成功后你通常会得到：
 
@@ -94,7 +94,7 @@ python tests/test_cpp.py
 python example/run_custom_5v5_acmi.py
 ```
 
-它读取 [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc)，会生成一份 5v5 的 ACMI 回放。
+它读取 [`example/custom_5v5_f22_f16.jsonc`](example/custom_5v5_f22_f16.jsonc)，会生成一份 5v5 的 ACMI 回放。
 这个示例同时覆盖了：
 
 - `F22` / `F16` 混编
@@ -106,7 +106,7 @@ python example/run_custom_5v5_acmi.py
 
 ### Python 版配置
 
-[`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json) 里最重要的是：
+[`tests/demo_config.json`](tests/demo_config.json) 里最重要的是：
 
 - `red_fighters`
 - `blue_fighters`
@@ -117,7 +117,7 @@ python example/run_custom_5v5_acmi.py
 
 ### C++ 版配置
 
-[`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc) 里最重要的是：
+[`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc) 里最重要的是：
 
 - `red_meta`
 - `blue_meta`
@@ -129,7 +129,7 @@ python example/run_custom_5v5_acmi.py
 
 如果你想看最近新增的武器与编组配置，再看：
 
-- [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc)
+- [`example/custom_5v5_f22_f16.jsonc`](example/custom_5v5_f22_f16.jsonc)
 
 这个示例里，`F22` 默认使用 `standoff`，`F16` 默认使用 `tactical`，适合直接观察两类规则对手的职责分工。
 
@@ -137,26 +137,26 @@ python example/run_custom_5v5_acmi.py
 
 建议按这个顺序读：
 
-1. [`tests/test_py.py`](G:\bvr_sim\tests\test_py.py)
-2. [`tests/test_cpp.py`](G:\bvr_sim\tests\test_cpp.py)
-3. [`bvr_sim/__init__.py`](G:\bvr_sim\bvr_sim\__init__.py)
-4. [`bvr_sim/bvr_env.py`](G:\bvr_sim\bvr_sim\bvr_env.py)
-5. [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py)
+1. [`tests/test_py.py`](tests/test_py.py)
+2. [`tests/test_cpp.py`](tests/test_cpp.py)
+3. [`bvr_sim/__init__.py`](bvr_sim/__init__.py)
+4. [`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py)
+5. [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py)
 
 如果你要改行为逻辑，再继续看：
 
 - `bvr_sim/src_py/simulator/`
 - `bvr_sim/src_py/reward/`
 - `bvr_sim/src_py/baseline_opponents/`
-- [`bvr_sim/src_py/observation_space.py`](G:\bvr_sim\bvr_sim\src_py\observation_space.py)
+- [`bvr_sim/src_py/observation_space.py`](bvr_sim/src_py/observation_space.py)
 
 ## 6. RL 框架集成从哪里开始
 
 仓库里已经有适配示例：
 
-- [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
-- [`example/env_harl.py`](G:\bvr_sim\example\env_harl.py)
-- [`example/env_marlbenchmark.py`](G:\bvr_sim\example\env_marlbenchmark.py)
+- [`example/env_wrapper.py`](example/env_wrapper.py)
+- [`example/env_harl.py`](example/env_harl.py)
+- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
 
 如果你的试用者是想把环境接进自己训练框架，先看这些文件比直接翻核心源码更有效。
 
@@ -208,11 +208,10 @@ python tests/cpp_unit_tests.py
 
 更偏研究和设计材料的文档在 `docs/` 下，例如：
 
-- [`docs/doc.md`](G:\bvr_sim\docs\doc.md)
-- [`docs/installation.md`](G:\bvr_sim\docs\installation.md)
-- [`docs/configuration.md`](G:\bvr_sim\docs\configuration.md)
-- [`docs/integration.md`](G:\bvr_sim\docs\integration.md)
+- [`docs/doc.md`](docs/doc.md)
+- [`docs/installation.md`](docs/installation.md)
+- [`docs/configuration.md`](docs/configuration.md)
+- [`docs/integration.md`](docs/integration.md)
 - `docs/开发日志.md`
-- `docs/毕业设计中期报告.md`
 
 这些适合了解背景，不适合当首次上手说明。

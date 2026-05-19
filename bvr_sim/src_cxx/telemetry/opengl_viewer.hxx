@@ -3,7 +3,7 @@
 #include "telemetry_bridge.hxx"
 #include "telemetry_command_queue.hxx"
 #include "telemetry_types.hxx"
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 
 #include <atomic>
 #include <functional>

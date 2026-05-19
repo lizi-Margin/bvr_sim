@@ -7,7 +7,7 @@
 #include <optional>
 #include "observation_space.hxx"
 #include "reward_manager.hxx"
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 
 namespace bvr_sim {
 

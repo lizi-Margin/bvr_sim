@@ -1,7 +1,7 @@
 #pragma once
 
 #include "register.hxx"
-#include "rubbish_can/colorful.hxx"
+#include "support/colorful.hxx"
 #include <string>
 #include <array>
 #include <vector>

@@ -1,7 +1,7 @@
 #include "telemetry_snapshot_builder.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/check.hxx"
-#include "rubbish_can/colorful.hxx"
+#include "support/SL.hxx"
+#include "support/check.hxx"
+#include "support/colorful.hxx"
 #include <sstream>
 
 namespace {

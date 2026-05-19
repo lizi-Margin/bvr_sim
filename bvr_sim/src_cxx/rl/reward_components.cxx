@@ -5,7 +5,7 @@
 #include "simulator/missile/base.hxx"
 #include "global_config.hxx"
 #include "c3utils/funcs.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 #include <algorithm>
 #include <cmath>
 

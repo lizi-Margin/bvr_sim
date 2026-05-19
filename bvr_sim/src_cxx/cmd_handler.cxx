@@ -1,8 +1,8 @@
 #include "cmd_handler.hxx"
 #include "so_pool.hxx"
 #include "bsl_pool.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/SL.hxx"
+#include "support/check.hxx"
 #include "unit_factory.hxx"
 #include <regex>
 #include <sstream>

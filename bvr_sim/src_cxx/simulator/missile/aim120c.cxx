@@ -3,9 +3,9 @@
 #include "../sense/base.hxx"
 #include "../ground/base.hxx"
 #include "../ground/aa.hxx"
-#include "rubbish_can/rubbish_can.hxx"
+#include "support/support.hxx"
 #include "c3utils/c3utils.hxx"
-#include "rubbish_can/interp_table.hxx"
+#include "support/interp_table.hxx"
 #include <cmath>
 #include <algorithm>
 

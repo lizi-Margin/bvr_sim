@@ -3,7 +3,7 @@
 #include "../simulator.hxx"
 #include "simulator/sense/base.hxx"
 #include "simulator/pylon_manager.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 #include <string>
 #include <array>
 #include <vector>

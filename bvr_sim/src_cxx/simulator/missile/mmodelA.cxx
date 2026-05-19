@@ -4,7 +4,7 @@
 #include "../ground/base.hxx"
 #include "../ground/aa.hxx"
 #include "../simulator.hxx"
-#include "rubbish_can/rubbish_can.hxx"
+#include "support/support.hxx"
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
 #include <cmath>

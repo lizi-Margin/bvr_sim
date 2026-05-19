@@ -1,9 +1,9 @@
 #include "jsbsim_fdm.hxx"
 #include "c3utils/c3utils.hxx"
 #include "funcs.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/colorful.hxx"
-#include "rubbish_can/set_env.hxx"
+#include "support/SL.hxx"
+#include "support/colorful.hxx"
+#include "support/set_env.hxx"
 #include "simulator.hxx"
 #include "vector.hxx"
 #include <array>

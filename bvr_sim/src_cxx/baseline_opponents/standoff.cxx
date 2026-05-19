@@ -2,7 +2,7 @@
 #include "simulator/aircraft/base.hxx"
 #include "simulator/missile/base.hxx"
 #include "simulator/pylon_manager.hxx"
-#include "rubbish_can/rubbish_can.hxx"
+#include "support/support.hxx"
 #include "global_config.hxx"
 #include "c3utils/funcs.hxx"
 #include <algorithm>

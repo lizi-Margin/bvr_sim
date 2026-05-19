@@ -1,35 +1,35 @@
-1. JSBSim
-        
+# Third-Party Licenses
 
-  - License：GNU Lesser General Public License v2.1
+This file summarizes notable third-party code and resources bundled with or used by `bvr-sim`. It is not a replacement for the original license texts shipped with each dependency.
 
-  - 合规要求：遵循其官方LGPLv2.1条款，分发时需提供源码获取途径，修改后需开源修改部分
+## JSBSim
 
-  - Website：https://jsbsim.sourceforge.net/
+- License: GNU Lesser General Public License v2.1
+- Website: https://jsbsim.sourceforge.net/
+- Notes: JSBSim source/resources are used by the flight dynamics path. Preserve upstream copyright notices and comply with LGPLv2.1 when distributing modified copies or linked binaries.
 
-2. Eigen
-        
+## Eigen
 
-  - License：Mozilla Public License v2.0（MPL2.0）
+- License: Mozilla Public License v2.0
+- Website: https://eigen.tuxfamily.org/
+- Notes: Eigen is used as a C++ math dependency. Preserve upstream notices; modifications to Eigen files remain subject to MPL-2.0.
 
-  - 合规要求：修改Eigen相关文件需以MPL2.0分发，保留版权声明
+## pybind11
 
-  - Website：https://eigen.tuxfamily.org/
+- License: BSD 3-Clause
+- Website: https://github.com/pybind/pybind11
+- Notes: Used for Python/C++ bindings. Preserve upstream copyright and license notices.
 
-3. pybind11
-        
+## cpptrace
 
-  - License：BSD 3-Clause
+- License: MIT
+- Website: https://github.com/jeremy-rifkin/cpptrace
+- Notes: Used for native stack traces. Preserve upstream copyright and license notices.
 
-  - 合规要求：保留版权声明，不得用于违反法律法规的场景
+## Web Frontend Dependencies
 
-  - Website：https://github.com/pybind/pybind11
+The web visualization uses Node/npm dependencies declared in [`web/package.json`](web/package.json) and locked in [`web/package-lock.json`](web/package-lock.json). Review the lockfile before publishing binary or hosted distributions.
 
-4. cpptrace
-        
+## Runtime Assets
 
-  - License：MIT
-
-  - 合规要求：保留版权声明，可自由使用但不得篡改原版权信息
-
-  - Website：https://github.com/jeremy-rifkin/cpptrace
+Runtime assets under `bvr_sim/resources/` may include upstream aircraft definitions, engine definitions, textures, meshes, and project-specific simulation parameters. Keep source notices beside those files and review asset-level license files before publishing release archives or wheels.

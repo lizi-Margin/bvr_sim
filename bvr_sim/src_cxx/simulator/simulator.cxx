@@ -1,6 +1,6 @@
 #include "simulator.hxx"
 #include "register.hxx"
-#include "rubbish_can/rubbish_can.hxx"
+#include "support/support.hxx"
 #include <cmath>
 #include <random>
 #include <sstream>

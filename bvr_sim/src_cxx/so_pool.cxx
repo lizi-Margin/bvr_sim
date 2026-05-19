@@ -1,6 +1,6 @@
 #include "so_pool.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/SL.hxx"
+#include "support/check.hxx"
 #include <algorithm>
 
 namespace bvr_sim {

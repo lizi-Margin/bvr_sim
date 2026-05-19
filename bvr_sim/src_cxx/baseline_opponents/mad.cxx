@@ -1,7 +1,7 @@
 #include "mad.hxx"
 #include "simulator/aircraft/base.hxx"
 #include "simulator/pylon_manager.hxx"
-#include "rubbish_can/rubbish_can.hxx"
+#include "support/support.hxx"
 #include <algorithm>
 #include <cmath>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "base.hxx"
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 #include <string>
 #include <vector>
 #include <memory>

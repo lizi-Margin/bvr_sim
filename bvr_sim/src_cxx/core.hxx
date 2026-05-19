@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 #include "telemetry/embedded_web_server.hxx"
 #include "telemetry/game/game_mode.hxx"
 #include "telemetry/opengl_viewer.hxx"

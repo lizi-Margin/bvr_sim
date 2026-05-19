@@ -2,7 +2,7 @@
 
 #include "ac_fdm.hxx"
 #include "../fc/fc_old.hxx"
-#include "rubbish_can/filter.hxx"
+#include "support/filter.hxx"
 #include "extern/jsbsim/src/FGFDMExec.h"
 #include "extern/jsbsim/src/models/FGPropulsion.h"
 #include "extern/jsbsim/src/simgear/misc/sg_path.hxx"

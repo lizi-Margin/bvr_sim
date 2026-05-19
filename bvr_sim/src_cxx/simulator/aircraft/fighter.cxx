@@ -1,7 +1,7 @@
 #include "fighter.hxx"
 #include "../missile/base.hxx"
 // #include "../so_pool.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/SL.hxx"
 // #include "simulator/pylon_manager.hxx"
 #include "rl/action_space.hxx"
 #include <iostream>

@@ -5,10 +5,10 @@
 #include "simulator/aircraft/base.hxx"
 #include "simulator/missile/base.hxx"
 #include "bsl_pool.hxx"
-#include "rubbish_can/rubbish_can.hxx"
-#include "rubbish_can/colorful.hxx"
+#include "support/support.hxx"
+#include "support/colorful.hxx"
 #include "action_space.hxx"
-#include "rubbish_can/json_getter.hxx"
+#include "support/json_getter.hxx"
 #include <algorithm>
 
 namespace bvr_sim {

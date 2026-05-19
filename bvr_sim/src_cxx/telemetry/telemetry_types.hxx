@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 #include <array>
 #include <string>
 #include <vector>

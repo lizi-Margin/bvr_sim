@@ -2,7 +2,7 @@
 
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/SL.hxx"
 
 #include <algorithm>
 #include <array>

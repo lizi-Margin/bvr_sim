@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 #include "telemetry_types.hxx"
 #include <deque>
 #include <mutex>

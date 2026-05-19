@@ -2,7 +2,7 @@
 
 这份文档专门讲如何安装和构建 `bvr-sim`。
 
-如果你只是第一次体验项目，先看 [`docs/getting_started.md`](G:\bvr_sim\docs\getting_started.md)。
+如果你只是第一次体验项目，先看 [`docs/getting_started.md`](docs/getting_started.md)。
 
 ## 安装路径
 
@@ -46,7 +46,7 @@ Linux 建议：
 pip install -e .
 ```
 
-这一步会安装 [`pyproject.toml`](G:\bvr_sim\pyproject.toml) 中声明的依赖，并把当前仓库以 editable mode 安装。
+这一步会安装 [`pyproject.toml`](pyproject.toml) 中声明的依赖，并把当前仓库以 editable mode 安装。
 当前仓库的 Python 打包后端已经切到 `scikit-build-core`，因此 `pip install -e .` 不再只是纯 Python 安装流程，也兼容原生扩展的标准 Python 构建链路。
 
 如果你想直接验证 wheel 构建，可以执行：
@@ -56,7 +56,7 @@ python -m pip install build
 python -m build --wheel
 ```
 
-产物会输出到 `dist/`。当前仓库内的 CI workflow 是 [`.github/workflows/wheels.yml`](G:\bvr_sim\.github\workflows\wheels.yml)，目标平台是 Linux / Windows 64-bit，CPython `3.12` 到 `3.14`。
+产物会输出到 `dist/`。当前仓库内的 CI workflow 是 [`.github/workflows/wheels.yml`](.github/workflows/wheels.yml)，目标平台是 Linux / Windows 64-bit，CPython `3.12` 到 `3.14`。
 
 安装完成后建议立即执行：
 
@@ -187,7 +187,7 @@ python run_tests.py
 - `bvr_sim/install/lib/` 下是否存在 `.pyd` 或 `.so`
 - Python 是否正在使用当前仓库对应的安装环境
 
-相关入口见 [`bvr_sim/bvr_env_cpp.py`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py)。
+相关入口见 [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py)。
 
 ### C++ unit test 可执行文件不存在
 

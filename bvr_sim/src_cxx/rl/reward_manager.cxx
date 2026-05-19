@@ -1,7 +1,7 @@
 #include "reward_manager.hxx"
 // #include "simulator/simulator.hxx"
-#include "rubbish_can/rubbish_can.hxx"
-#include "rubbish_can/json.hpp"
+#include "support/support.hxx"
+#include "support/json.hpp"
 #include "simulator/aircraft/base.hxx"
 #include <fstream>
 #include <sstream>

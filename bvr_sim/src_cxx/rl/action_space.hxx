@@ -3,8 +3,8 @@
 #include <map>
 #include <optional>
 #include <utility>
-#include "rubbish_can/json.hpp"
-#include "rubbish_can/check.hxx"
+#include "support/json.hpp"
+#include "support/check.hxx"
 #include "simulator/register.hxx"
 
 

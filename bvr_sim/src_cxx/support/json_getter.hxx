@@ -1,7 +1,7 @@
 # pragma once
 
 #include <array>
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 
 inline bool get_string_from_json(
         const std::string& key,

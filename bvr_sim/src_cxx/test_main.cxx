@@ -3,7 +3,7 @@
 #include <string>
 #include <cmath>
 #include <functional>
-#include "rubbish_can/json.hpp"
+#include "support/json.hpp"
 #include "test_main.hxx"
 
 // Example tests

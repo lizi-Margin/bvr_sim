@@ -1,5 +1,5 @@
 #include "param_store.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>

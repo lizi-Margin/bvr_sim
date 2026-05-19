@@ -4,8 +4,8 @@
 #include "missile_aerodynamics.hxx"
 #include <deque>
 #include <optional>
-#include "rubbish_can/interp_table.hxx"
-#include "rubbish_can/filter.hxx"
+#include "support/interp_table.hxx"
+#include "support/filter.hxx"
 
 namespace bvr_sim {
 

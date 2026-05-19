@@ -1,9 +1,9 @@
 #include "radar.hxx"
 #include "../aircraft/base.hxx"
 #include "../../c3utils/funcs.hxx"
-#include "rubbish_can/colorful.hxx"
-#include "rubbish_can/check.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/colorful.hxx"
+#include "support/check.hxx"
+#include "support/SL.hxx"
 #include <cmath>
 #include <algorithm>
 #include <sstream>

@@ -1,6 +1,6 @@
 #include "test_main.hxx"
 #include "global_config.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/SL.hxx"
 #include "so_pool.hxx"
 #include "telemetry/telemetry_bridge.hxx"
 

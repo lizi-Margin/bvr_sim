@@ -114,7 +114,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/rl/reward_components.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl/reward_manager.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/rl/rl_manager.cxx"
-    "${CMAKE_CURRENT_SOURCE_DIR}/rubbish_can/set_env.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/support/set_env.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/pybind11_bindings.cxx"
 )
 

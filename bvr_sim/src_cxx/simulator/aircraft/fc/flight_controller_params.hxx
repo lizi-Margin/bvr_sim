@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 #include <memory>
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 #include "c3utils/c3utils.hxx"
 
 namespace bvr_sim {

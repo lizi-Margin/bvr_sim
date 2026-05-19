@@ -23,17 +23,11 @@
 ### Refercence
 BVR Gym: A Reinforcement Learning Environment for Beyond-Visual-Range Air Combat
 https://arxiv.org/abs/2403.17533
-MISSION/bvr_sim_v3/paper_BVR-Gym.pdf
-MISSION/bvr_sim_v3/paper_BVR-Gym.txt
 
 B-ACE: An Open Lightweight Beyond Visual Range Air Combat Simulation Environment for Multi-Agent Reinforcement Learning
 https://doi.org/10.13140/RG.2.2.11999.57762
-MISSION/bvr_sim_v3/paper_B-ACE.pdf
-MISSION/bvr_sim_v3/paper_B-ACE.txt
 
 
 WUKONG: Beyond-Visual-Range Air Combat Tactics Auto-Generation by Reinforcement Learning
 https://ieeexplore.ieee.org/document/9207088
-MISSION/bvr_sim_v3/paper_WUKONG.pdf
-MISSION/bvr_sim_v3/paper_WUKONG.txt
 

@@ -5,9 +5,9 @@
 #include "../weapon_factory.hxx"
 #include "simulator/pylon_manager.hxx"
 #include "so_pool.hxx"
-#include "rubbish_can/check.hxx"
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/colorful.hxx"
+#include "support/check.hxx"
+#include "support/SL.hxx"
+#include "support/colorful.hxx"
 #include "c3utils/c3utils.hxx"
 
 #include <cmath>

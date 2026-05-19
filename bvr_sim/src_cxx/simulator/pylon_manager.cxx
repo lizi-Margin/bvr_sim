@@ -1,5 +1,5 @@
 #include "pylon_manager.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/SL.hxx"
 #include <algorithm>
 
 namespace bvr_sim {

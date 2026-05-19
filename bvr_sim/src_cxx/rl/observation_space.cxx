@@ -3,7 +3,7 @@
 #include "simulator/aircraft/base.hxx"
 #include "simulator/missile/base.hxx"
 #include "c3utils/funcs.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 
 namespace bvr_sim {
 

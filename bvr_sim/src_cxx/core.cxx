@@ -1,10 +1,10 @@
 #include "core.hxx"
 #include "cmd_handler.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 #include "so_pool.hxx"
 #include "bsl_pool.hxx"
-#include "rubbish_can/rubbish_can.hxx"
-#include "rubbish_can/SL.hxx"
+#include "support/support.hxx"
+#include "support/SL.hxx"
 #include "global_config.hxx"
 #include "telemetry/telemetry_types.hxx"
 #include <fstream>

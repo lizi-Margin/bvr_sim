@@ -1,6 +1,6 @@
 #include "flight_controller_params.hxx"
 #include "c3utils/c3utils.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/check.hxx"
 #include <cmath>
 
 namespace bvr_sim {

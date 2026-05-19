@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rubbish_can/json.hpp"
-#include "rubbish_can/interp_table.hxx"
+#include "support/json.hpp"
+#include "support/interp_table.hxx"
 #include <map>
 #include <memory>
 #include <optional>

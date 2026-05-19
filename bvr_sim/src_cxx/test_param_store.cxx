@@ -1,6 +1,6 @@
 #include "test_main.hxx"
 #include "simulator/param_store.hxx"
-#include "rubbish_can/interp_table.hxx"
+#include "support/interp_table.hxx"
 #include <memory>
 #include <cmath>
 

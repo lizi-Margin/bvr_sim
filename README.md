@@ -52,6 +52,12 @@ example/               外部框架适配示例
 docs/                  研究材料与补充文档
 ```
 
+## 开源状态说明
+
+当前仓库按 GPLv3 发布主项目代码，第三方依赖和资源保留各自原始许可证。项目面向科研、算法验证和仿真环境开发；导弹、飞机和传感器模型均为研究仿真用途，不应被理解为真实装备性能声明。
+
+公开发布前的维护清单见 [`docs/release_checklist.md`](docs/release_checklist.md)。如果你在论文或项目中使用本仓库，可以先参考 [`CITATION.cff`](CITATION.cff)，正式仓库 URL 确定后需要更新其中的占位地址。
+
 ## 环境要求
 
 - Python 3.8+
@@ -61,7 +67,7 @@ docs/                  研究材料与补充文档
   - Windows: 建议使用 Visual Studio / MSVC
   - Linux: 建议使用 `gcc` 或 `clang`
 
-Python 依赖定义在 [`pyproject.toml`](G:\bvr_sim\pyproject.toml) 中，核心依赖包括：
+Python 依赖定义在 [`pyproject.toml`](pyproject.toml) 中，核心依赖包括：
 
 - `numpy`
 - `scipy`
@@ -144,8 +150,8 @@ python tests/test_py.py
 
 这个脚本会：
 
-- 加载 [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json)
-- 创建 [`BVR3DEnv`](G:\bvr_sim\bvr_sim\bvr_env.py)
+- 加载 [`tests/demo_config.json`](tests/demo_config.json)
+- 创建 [`BVR3DEnv`](bvr_sim/bvr_env.py)
 - 在 `test_logs/` 下输出 ACMI 回放
 
 如果你只是第一次体验项目，建议先跑这一步。
@@ -174,8 +180,8 @@ python tests/test_cpp.py
 
 这个脚本会：
 
-- 加载 [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
-- 创建 [`BVR3DEnvCpp`](G:\bvr_sim\bvr_sim\bvr_env_cpp.py)
+- 加载 [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)
+- 创建 [`BVR3DEnvCpp`](bvr_sim/bvr_env_cpp.py)
 - 在 `test_logs/` 下输出日志与 ACMI 回放
 
 ### 5. 运行完整测试
@@ -240,9 +246,9 @@ while not done:
 
 示例配置见：
 
-- [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json)
-- [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
-- [`example/custom_5v5_f22_f16.jsonc`](G:\bvr_sim\example\custom_5v5_f22_f16.jsonc)
+- [`tests/demo_config.json`](tests/demo_config.json)
+- [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)
+- [`example/custom_5v5_f22_f16.jsonc`](example/custom_5v5_f22_f16.jsonc)
 
 常见字段：
 
@@ -290,29 +296,29 @@ while not done:
 
 仓库中已经有一些适配入口或示例：
 
-- [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
-- [`example/env_harl.py`](G:\bvr_sim\example\env_harl.py)
-- [`example/env_marlbenchmark.py`](G:\bvr_sim\example\env_marlbenchmark.py)
-- [`example/run_custom_5v5_acmi.py`](G:\bvr_sim\example\run_custom_5v5_acmi.py)
+- [`example/env_wrapper.py`](example/env_wrapper.py)
+- [`example/env_harl.py`](example/env_harl.py)
+- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
+- [`example/run_custom_5v5_acmi.py`](example/run_custom_5v5_acmi.py)
 
-其中 [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py) 展示了如何把环境包装成外部 MARL 框架可用的接口。
-如果你想直接看一个较新的 C++ 推演样例，可以先运行 [`example/run_custom_5v5_acmi.py`](G:\bvr_sim\example\run_custom_5v5_acmi.py)。
+其中 [`example/env_wrapper.py`](example/env_wrapper.py) 展示了如何把环境包装成外部 MARL 框架可用的接口。
+如果你想直接看一个较新的 C++ 推演样例，可以先运行 [`example/run_custom_5v5_acmi.py`](example/run_custom_5v5_acmi.py)。
 
 ## 文档导航
 
 如果你是第一次试用，建议按这个顺序看：
 
 1. 本页 README
-2. [`docs/getting_started.md`](G:\bvr_sim\docs\getting_started.md)
-3. [`docs/installation.md`](G:\bvr_sim\docs\installation.md)
-4. [`docs/configuration.md`](G:\bvr_sim\docs\configuration.md)
-5. [`docs/integration.md`](G:\bvr_sim\docs\integration.md)
-6. [`tests/demo_config.json`](G:\bvr_sim\tests\demo_config.json) 或 [`tests/demo_config_cpp.jsonc`](G:\bvr_sim\tests\demo_config_cpp.jsonc)
-7. [`example/env_wrapper.py`](G:\bvr_sim\example\env_wrapper.py)
+2. [`docs/getting_started.md`](docs/getting_started.md)
+3. [`docs/installation.md`](docs/installation.md)
+4. [`docs/configuration.md`](docs/configuration.md)
+5. [`docs/integration.md`](docs/integration.md)
+6. [`tests/demo_config.json`](tests/demo_config.json) 或 [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)
+7. [`example/env_wrapper.py`](example/env_wrapper.py)
 
 已有研究/设计材料：
 
-- [`docs/doc.md`](G:\bvr_sim\docs\doc.md)
+- [`docs/doc.md`](docs/doc.md)
 - `docs/*.md`
 - `docs/*.tex`
 
@@ -343,7 +349,7 @@ python tests/cpp_unit_tests.py
 
 如果你要改环境逻辑，而不是只做试用：
 
-- [`docs/developer/architecture.md`](G:\bvr_sim\docs\developer\architecture.md)
+- [`docs/developer/architecture.md`](docs/developer/architecture.md)
 
 ## 实时可视化
 
@@ -532,6 +538,8 @@ npm --prefix web run build
 
 ## 许可证
 
-见 [`LICENSE`](G:\bvr_sim\LICENSE) 和 [`LICENSE.GPL`](G:\bvr_sim\LICENSE.GPL)。
+主项目按 GNU General Public License v3.0 发布，官方文本见 [`LICENSE`](LICENSE)。
+
+第三方依赖和内置资源的许可证摘要见 [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md)。其中 JSBSim、Eigen、pybind11、cpptrace 等组件保留其原始许可证和版权声明。
 
 

@@ -1,7 +1,7 @@
 #include "embedded_web_server.hxx"
 
-#include "rubbish_can/SL.hxx"
-#include "rubbish_can/check.hxx"
+#include "support/SL.hxx"
+#include "support/check.hxx"
 
 #include <algorithm>
 #include <array>
