@@ -3,6 +3,7 @@ Visualization script for BVR Sim performance benchmark results.
 Generates publication-quality charts for thesis/paper.
 """
 
+import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,7 +15,7 @@ plt.rcParams['font.size'] = 11
 plt.rcParams['figure.figsize'] = (14, 10)
 
 # Read the CSV file
-csv_file = Path("benchmark_results_20260324_035734.csv")
+csv_file = Path(sys.argv[1])
 df = pd.read_csv(csv_file)
 
 # Extract data for each backend
