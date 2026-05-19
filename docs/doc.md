@@ -19,6 +19,13 @@
 * reward设计 (Reward Shaping and Distill Reward)
 * 专业的飞行控制律 (分层: 默认使用底层飞控, 强化学习专注于决策)
 * 自博弈/规则baseline双支持
+* Entity-oriented observation，支持对飞机、导弹等单位使用统一特征 schema 和共享编码器
+
+### Observation design notes
+
+历史上尝试过 compact/extended vector、canvas image、LiDAR-style ray grid 和 entity observation。当前推荐 `entity` observation：它保留相对位置、速度、角度、径向速度和类型信息，同时避免稀疏图像观测带来的显存和样本效率问题。
+
+更多设计取舍见 [`docs/observation_design.md`](observation_design.md)。
 
 ### Refercence
 BVR Gym: A Reinforcement Learning Environment for Beyond-Visual-Range Air Combat

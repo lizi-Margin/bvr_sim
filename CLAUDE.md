@@ -242,8 +242,8 @@ Set `distill_reward_weight > 0` in config and optionally `USE_DISTILL_REWARD_ACT
 
 ## Related References
 
-- **AGENTS.bac.md**: Comprehensive guide covering observation/action encoding, reward shaping, distillation, and debugging tips.
+- **docs/observation_design.md**: Public observation design notes covering vector, canvas, LiDAR-style, and entity-oriented observations.
 - **`docs/getting_started.md`**: Step-by-step installation and first-run guide
 - **`docs/configuration.md`**: Configuration file format and common parameters
-- **docs/开发日志.md**: Development progress and architectural notes (Chinese)
+- **docs/release_checklist.md**: Open-source release checklist and paper preparation notes.
 - **Upstream BVR-Gym** (arXiv:2403.17533): Comparison reference

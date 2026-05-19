@@ -209,9 +209,10 @@ python tests/cpp_unit_tests.py
 更偏研究和设计材料的文档在 `docs/` 下，例如：
 
 - [`docs/doc.md`](docs/doc.md)
+- [`docs/observation_design.md`](docs/observation_design.md)
 - [`docs/installation.md`](docs/installation.md)
 - [`docs/configuration.md`](docs/configuration.md)
 - [`docs/integration.md`](docs/integration.md)
-- `docs/开发日志.md`
+- [`docs/observation_design.md`](docs/observation_design.md)
 
 这些适合了解背景，不适合当首次上手说明。

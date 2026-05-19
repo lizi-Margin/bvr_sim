@@ -14,6 +14,7 @@ __pycache__
 /docs/*
 !/docs/.gitignore
 !/docs/doc.md
+!/docs/observation_design.md
 !/docs/getting_started.md
 !/docs/installation.md
 !/docs/configuration.md

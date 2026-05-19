@@ -113,6 +113,7 @@ Python 环境入口是 [`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py) 中的 `BVR3DE
   - `text`
 
 观测空间工厂见 [`bvr_sim/src_py/observation_space.py`](bvr_sim/src_py/observation_space.py)。
+观测空间设计取舍见 [`docs/observation_design.md`](docs/observation_design.md)。
 
 `blue_opponent_type`
 
@@ -241,6 +242,8 @@ Python 侧规则对手实现在：
 Python 环境的 observation space 由 `obs_type` 决定。
 
 C++ 环境中，`BVR3DEnvCpp` 也会把 `obs_type` 传给内部 RL manager。
+
+`entity` observation 是当前推荐的结构化观测方向。它把飞机、导弹等单位组织成统一宽度的 entity rows，便于策略网络对每个单位使用共享编码器，再聚合为全局决策特征。
 
 ### 动作
 
