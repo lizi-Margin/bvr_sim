@@ -212,6 +212,17 @@ float4 ps_main(PSInput input) : SV_TARGET {
         float water_mask = saturate(terrain_mask.g);
         float village_mask = saturate(terrain_mask.b);
         float forest_mask = saturate(terrain_mask.a);
+        float2 road_world = input.world_position.xz;
+        float road_center_z = sin(road_world.x * 0.000075 + 1.2) * 18000.0
+            + sin(road_world.x * 0.00019 + 0.4) * 5200.0;
+        float road_center_x = sin(road_world.y * 0.000066 + 2.1) * 22000.0
+            + sin(road_world.y * 0.00016 + 1.7) * 6200.0 + 64000.0;
+        float diagonal_center_z = road_world.x * -0.34 + 112000.0
+            + sin((road_world.x + road_world.y) * 0.000048) * 19000.0;
+        float shader_road = 1.0 - smoothstep(3600.0, 9600.0, abs(road_world.y - road_center_z));
+        shader_road = max(shader_road, 1.0 - smoothstep(3200.0, 8600.0, abs(road_world.x - road_center_x)));
+        shader_road = max(shader_road, (1.0 - smoothstep(2800.0, 7600.0, abs(road_world.y - diagonal_center_z))) * 0.82);
+        road_mask = max(road_mask, shader_road * (1.0 - water_mask));
         float terrain = terrain_fbm(terrain_position * 0.42 + 7000.0);
         float macro = terrain_fbm(terrain_position * 0.13 + 17000.0);
         float biome = terrain_fbm(terrain_position * 0.045 - 42000.0);
@@ -229,11 +240,11 @@ float4 ps_main(PSInput input) : SV_TARGET {
         base_color = lerp(base_color, rock, saturate(height_blend * 0.72 + slope * 0.45));
         base_color *= lerp(0.88, 1.12, terrain);
         base_color *= lerp(0.92, 1.08, terrain_fbm(terrain_position * 0.85 + 9000.0));
-        float3 road_color = float3(0.17, 0.16, 0.13) * lerp(0.86, 1.10, terrain);
+        float3 road_color = float3(0.39, 0.34, 0.22) * lerp(0.84, 1.12, terrain);
         float3 village_color = float3(0.43, 0.38, 0.30) * lerp(0.88, 1.10, macro);
         float3 water_color = float3(0.04, 0.18, 0.24) + float3(0.02, 0.07, 0.09) * terrain_fbm(terrain_position * 1.7 + 33000.0);
         base_color = lerp(base_color, village_color, village_mask * 0.82);
-        base_color = lerp(base_color, road_color, road_mask * 0.94);
+        base_color = lerp(base_color, road_color, road_mask);
         base_color = lerp(base_color, water_color, water_mask * 0.94);
     } else if (!simple_material) {
         float2 uv_panel_cell = abs(frac(input.uv * float2(18.0, 10.0)) - 0.5);

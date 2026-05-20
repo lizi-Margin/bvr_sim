@@ -501,19 +501,25 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
         const float value = std::sin(x * 127.1f + y * 311.7f) * 43758.5453f;
         return value - std::floor(value);
     };
+    auto road_presence = [](float world_axis, float lane) {
+        const float t = (world_axis + 480000.0f) / 960000.0f;
+        const float broken = std::sin(t * 17.0f + lane * 2.37f) * 0.5f + 0.5f;
+        const float broad = std::sin(t * 5.0f + lane * 1.13f) * 0.5f + 0.5f;
+        return std::max(0.72f, std::min(1.0f, broad * 0.82f + broken * 0.32f));
+    };
     auto road_center_z = [](float world_x, float lane) {
         const float t = (world_x + 480000.0f) / 960000.0f;
         return std::sin(t * 5.7f + lane * 1.37f) * 52000.0f
             + std::sin(t * 13.0f + lane * 0.53f) * 18000.0f
             + std::sin(t * 29.0f + lane * 2.10f) * 6200.0f
-            + (lane - 0.5f) * 165000.0f;
+            + (lane - 1.0f) * 145000.0f;
     };
     auto road_center_x = [](float world_z, float lane) {
         const float t = (world_z + 480000.0f) / 960000.0f;
         return std::sin(t * 4.8f + lane * 1.91f) * 47000.0f
             + std::sin(t * 11.0f + lane * 0.74f) * 16000.0f
             + std::sin(t * 23.0f + lane * 1.60f) * 5200.0f
-            + (lane - 0.5f) * 210000.0f;
+            + (lane - 1.0f) * 180000.0f;
     };
 
     for (UINT y = 0; y < terrain_size; ++y) {
@@ -524,13 +530,27 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
             const float world_z = (v - 0.5f) * 960000.0f;
 
             float road_mask = 0.0f;
-            for (int lane = 0; lane < 2; ++lane) {
+            for (int lane = 0; lane < 3; ++lane) {
                 const float center_z = road_center_z(world_x, static_cast<float>(lane));
-                const float width = lane == 0 ? 360.0f : 430.0f;
-                road_mask = std::max(road_mask, 1.0f - smoothstep(width, width + 540.0f, std::abs(world_z - center_z)));
+                const float width = lane == 1 ? 3000.0f : 2400.0f;
+                const float mask = 1.0f - smoothstep(width, width + 3600.0f, std::abs(world_z - center_z));
+                road_mask = std::max(road_mask, mask * road_presence(world_x, static_cast<float>(lane)));
             }
-            const float center_x = road_center_x(world_z, 0.0f);
-            road_mask = std::max(road_mask, 1.0f - smoothstep(360.0f, 900.0f, std::abs(world_x - center_x)));
+            for (int lane = 0; lane < 2; ++lane) {
+                const float center_x = road_center_x(world_z, static_cast<float>(lane));
+                const float mask = 1.0f - smoothstep(2200.0f, 5200.0f, std::abs(world_x - center_x));
+                road_mask = std::max(road_mask, mask * road_presence(world_z, static_cast<float>(lane) + 3.0f));
+            }
+            for (int lane = 0; lane < 2; ++lane) {
+                const float t = ((world_x * 0.72f + world_z * 0.28f) + 620000.0f) / 1240000.0f;
+                const float slope = lane == 0 ? 0.42f : -0.36f;
+                const float offset = lane == 0 ? -94000.0f : 118000.0f;
+                const float center_z = world_x * slope + offset
+                    + std::sin(t * 8.5f + static_cast<float>(lane) * 1.4f) * 26000.0f
+                    + std::sin(t * 21.0f + static_cast<float>(lane) * 2.2f) * 7200.0f;
+                const float mask = 1.0f - smoothstep(1900.0f, 4400.0f, std::abs(world_z - center_z));
+                road_mask = std::max(road_mask, mask * road_presence(world_x + world_z, static_cast<float>(lane) + 5.0f) * 0.86f);
+            }
 
             float water_mask = 0.0f;
             for (int lake = 0; lake < 6; ++lake) {
