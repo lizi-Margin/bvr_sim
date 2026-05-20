@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -164,6 +165,58 @@ Float3 scale(const Float3& v, float s) {
 
 float dot(const Float3& a, const Float3& b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+float fract(float v) {
+    return v - std::floor(v);
+}
+
+float smooth_value(float t) {
+    return t * t * (3.0f - 2.0f * t);
+}
+
+float hash_2d(float x, float z) {
+    return fract(std::sin(x * 127.1f + z * 311.7f) * 43758.5453f);
+}
+
+float value_noise(float x, float z) {
+    const float ix = std::floor(x);
+    const float iz = std::floor(z);
+    const float fx = smooth_value(fract(x));
+    const float fz = smooth_value(fract(z));
+    const float a = hash_2d(ix, iz);
+    const float b = hash_2d(ix + 1.0f, iz);
+    const float c = hash_2d(ix, iz + 1.0f);
+    const float d = hash_2d(ix + 1.0f, iz + 1.0f);
+    const float ab = a + (b - a) * fx;
+    const float cd = c + (d - c) * fx;
+    return ab + (cd - ab) * fz;
+}
+
+float fbm(float x, float z, int octaves) {
+    float value = 0.0f;
+    float amplitude = 0.5f;
+    float frequency = 1.0f;
+    float norm = 0.0f;
+    for (int i = 0; i < octaves; ++i) {
+        value += value_noise(x * frequency, z * frequency) * amplitude;
+        norm += amplitude;
+        amplitude *= 0.52f;
+        frequency *= 2.03f;
+    }
+    return norm > 0.0f ? value / norm : 0.0f;
+}
+
+float terrain_height_at(float x, float z) {
+    constexpr float k_terrain_feature_scale = 20.0f;
+    const float sx = x * k_terrain_feature_scale;
+    const float sz = z * k_terrain_feature_scale;
+    const float continent = fbm(sx * 0.0000065f + 19.0f, sz * 0.0000065f - 41.0f, 5);
+    const float hills = fbm(sx * 0.000024f - 7.0f, sz * 0.000024f + 13.0f, 6);
+    const float ridges_raw = fbm(sx * 0.000055f + sz * 0.000011f, sz * 0.000055f - sx * 0.000009f, 5);
+    const float ridges = std::pow(std::abs(ridges_raw * 2.0f - 1.0f), 1.85f);
+    const float fine = fbm(sx * 0.00019f + 101.0f, sz * 0.00019f - 65.0f, 3);
+    return (continent - 0.45f) * 260.0f + (hills - 0.48f) * 180.0f + ridges * 105.0f + (fine - 0.5f) * 22.0f - 24.0f;
 }
 
 Float3 cross(const Float3& a, const Float3& b) {
@@ -576,31 +629,40 @@ void append_obj_mesh(std::vector<DX11Vertex>& vertices, const MeshData& mesh, fl
 }
 
 void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
-    constexpr int kSubdivisions = 96;
+    static std::mutex cache_mutex;
+    static float cached_size = 0.0f;
+    static std::vector<DX11Vertex> cached_vertices;
+
+    {
+        std::lock_guard<std::mutex> lock(cache_mutex);
+        if (cached_size == size && !cached_vertices.empty()) {
+            vertices = cached_vertices;
+            return;
+        }
+    }
+
+    std::vector<DX11Vertex> generated;
+    constexpr int kSubdivisions = 128;
     const std::array<float, 3> lowland = {0.14f, 0.25f, 0.17f};
     const std::array<float, 3> highland = {0.34f, 0.33f, 0.22f};
     const std::array<float, 3> rock = {0.38f, 0.36f, 0.31f};
 
-    auto terrain_height = [](float x, float z) {
-        const float broad = std::sin(x * 0.000055f + z * 0.000037f) * 0.5f + 0.5f;
-        const float ridge = std::sin(x * 0.00019f - z * 0.00015f) * 0.5f + 0.5f;
-        const float detail = std::sin((x + z) * 0.00072f) * 0.5f + 0.5f;
-        return (broad * 65.0f) + (ridge * ridge * 42.0f) + (detail * 15.0f) - 18.0f;
-    };
-
     auto terrain_normal = [&](float x, float z) {
-        constexpr float sample_step = 260.0f;
-        const float h_l = terrain_height(x - sample_step, z);
-        const float h_r = terrain_height(x + sample_step, z);
-        const float h_d = terrain_height(x, z - sample_step);
-        const float h_u = terrain_height(x, z + sample_step);
+        constexpr float sample_step = 420.0f;
+        const float h_l = terrain_height_at(x - sample_step, z);
+        const float h_r = terrain_height_at(x + sample_step, z);
+        const float h_d = terrain_height_at(x, z - sample_step);
+        const float h_u = terrain_height_at(x, z + sample_step);
         return normalize(make_float3(h_l - h_r, sample_step * 2.0f, h_d - h_u));
     };
 
     auto color_at = [&](float x, float z) {
-        const float band = std::sin(x * 0.00012f + z * 0.00019f) * 0.5f + 0.5f;
-        const float macro = std::sin(x * 0.000031f - z * 0.000047f) * 0.5f + 0.5f;
-        const float height_blend = std::clamp((terrain_height(x, z) + 18.0f) / 122.0f, 0.0f, 1.0f);
+        constexpr float k_terrain_feature_scale = 20.0f;
+        const float sx = x * k_terrain_feature_scale;
+        const float sz = z * k_terrain_feature_scale;
+        const float band = fbm(sx * 0.000021f, sz * 0.000021f, 5);
+        const float macro = fbm(sx * 0.000007f + 41.0f, sz * 0.000007f - 23.0f, 4);
+        const float height_blend = std::clamp((terrain_height_at(x, z) + 70.0f) / 360.0f, 0.0f, 1.0f);
         const float edge = std::clamp((std::max(std::abs(x), std::abs(z)) - size * 0.72f) / (size * 0.24f), 0.0f, 1.0f);
         const std::array<float, 3> far_haze = {0.48f, 0.55f, 0.44f};
         std::array<float, 3> color{};
@@ -616,8 +678,10 @@ void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
     auto push_ground_vertex = [&](float x, float z) {
         const float u = (x + size) / 18000.0f;
         const float v = (z + size) / 18000.0f;
-        push_vertex(vertices, make_float3(x, terrain_height(x, z), z), color_at(x, z), terrain_normal(x, z), {u, v});
+        push_vertex(generated, make_float3(x, terrain_height_at(x, z), z), color_at(x, z), terrain_normal(x, z), {u, v});
     };
+
+    generated.reserve(kSubdivisions * kSubdivisions * 6);
 
     for (int z = 0; z < kSubdivisions; ++z) {
         const float z0 = -size + 2.0f * size * static_cast<float>(z) / static_cast<float>(kSubdivisions);
@@ -633,6 +697,13 @@ void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
             push_ground_vertex(x1, z1);
         }
     }
+
+    {
+        std::lock_guard<std::mutex> lock(cache_mutex);
+        cached_size = size;
+        cached_vertices = generated;
+    }
+    vertices = std::move(generated);
 }
 
 void append_sky_quad(std::vector<DX11Vertex>& vertices) {

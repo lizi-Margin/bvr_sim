@@ -58,10 +58,29 @@ float4 vs_shadow_main(VSInput input) : SV_POSITION {
 }
 
 float terrain_noise(float2 p) {
-    float n = sin(p.x * 0.00019 + p.y * 0.00031) * 0.5 + 0.5;
-    n += (sin(p.x * 0.00073 - p.y * 0.00041) * 0.5 + 0.5) * 0.45;
-    n += (sin((p.x + p.y) * 0.0017) * 0.5 + 0.5) * 0.18;
-    return saturate(n / 1.63);
+    p *= 0.000055;
+    float2 i = floor(p);
+    float2 f = frac(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = frac(sin(dot(i, float2(127.1, 311.7))) * 43758.5453);
+    float b = frac(sin(dot(i + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);
+    float c = frac(sin(dot(i + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);
+    float d = frac(sin(dot(i + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);
+    return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+}
+
+float terrain_fbm(float2 p) {
+    float value = 0.0;
+    float amp = 0.52;
+    float norm = 0.0;
+    float2 q = p;
+    for (int i = 0; i < 5; ++i) {
+        value += terrain_noise(q) * amp;
+        norm += amp;
+        q = q * 2.07 + float2(913.5, -271.9);
+        amp *= 0.52;
+    }
+    return value / max(norm, 0.0001);
 }
 
 float3 apply_normal_map(float3 geometric_normal, float3 world_position, float2 uv, float normal_enabled) {
@@ -186,20 +205,23 @@ float4 ps_main(PSInput input) : SV_TARGET {
         base_color = input.color;
     }
     if (u_material_flags.y > 0.5) {
-        float terrain = terrain_noise(input.world_position.xz);
-        float macro = terrain_noise(input.world_position.xz * 0.22 + 17000.0);
+        float2 terrain_position = input.world_position.xz * 20.0;
+        float terrain = terrain_fbm(terrain_position * 0.42 + 7000.0);
+        float macro = terrain_fbm(terrain_position * 0.13 + 17000.0);
+        float biome = terrain_fbm(terrain_position * 0.045 - 42000.0);
         float height_blend = saturate((input.world_position.y + 180.0) / 980.0);
         float slope = saturate(1.0 - normalize(input.normal).y);
         float3 grass = float3(0.16, 0.28, 0.15);
+        float3 forest = float3(0.06, 0.18, 0.08);
         float3 scrub = float3(0.34, 0.34, 0.20);
         float3 dry = float3(0.47, 0.43, 0.25);
         float3 rock = float3(0.38, 0.37, 0.32);
         base_color = lerp(grass, scrub, terrain);
-        base_color = lerp(base_color, dry, macro * 0.38);
+        base_color = lerp(base_color, forest, smoothstep(0.58, 0.82, biome) * (1.0 - slope));
+        base_color = lerp(base_color, dry, macro * 0.22);
         base_color = lerp(base_color, rock, saturate(height_blend * 0.72 + slope * 0.45));
-        base_color *= texture_color;
-        base_color *= lerp(0.82, 1.16, terrain_noise(input.world_position.xz * 1.9));
-        base_color *= lerp(0.82, 1.22, terrain);
+        base_color *= lerp(0.88, 1.12, terrain);
+        base_color *= lerp(0.92, 1.08, terrain_fbm(terrain_position * 0.85 + 9000.0));
     } else if (!simple_material) {
         float2 uv_panel_cell = abs(frac(input.uv * float2(18.0, 10.0)) - 0.5);
         float uv_panel_line = 1.0 - smoothstep(0.455, 0.5, max(uv_panel_cell.x, uv_panel_cell.y));
@@ -218,7 +240,7 @@ float4 ps_main(PSInput input) : SV_TARGET {
 
     float3 normal = normalize(input.normal);
     if (u_material_flags.y > 0.5) {
-        normal = normalize(lerp(float3(0.0, 1.0, 0.0), normal, 0.28));
+        normal = normalize(lerp(float3(0.0, 1.0, 0.0), normal, 0.12));
     }
     float3 light_dir = normalize(u_light_direction_ambient.xyz);
     float ndotl = saturate(dot(normal, light_dir));
