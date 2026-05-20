@@ -487,20 +487,82 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
         return false;
     }
 
-    constexpr UINT terrain_size = 128;
+    constexpr UINT terrain_size = 1024;
     std::vector<std::uint32_t> terrain_pixels(terrain_size * terrain_size);
+
+    auto saturate = [](float value) {
+        return std::max(0.0f, std::min(1.0f, value));
+    };
+    auto smoothstep = [&](float edge0, float edge1, float value) {
+        const float t = saturate((value - edge0) / std::max(0.0001f, edge1 - edge0));
+        return t * t * (3.0f - 2.0f * t);
+    };
+    auto hash2 = [](float x, float y) {
+        const float value = std::sin(x * 127.1f + y * 311.7f) * 43758.5453f;
+        return value - std::floor(value);
+    };
+    auto road_center_z = [](float world_x, float lane) {
+        const float t = (world_x + 480000.0f) / 960000.0f;
+        return std::sin(t * 8.2f + lane * 0.85f) * 42000.0f
+            + std::sin(t * 19.0f + lane * 0.26f) * 14500.0f
+            + (lane - 1.0f) * 85000.0f;
+    };
+    auto road_center_x = [](float world_z, float lane) {
+        const float t = (world_z + 480000.0f) / 960000.0f;
+        return std::sin(t * 7.1f + lane * 1.15f) * 36000.0f
+            + std::sin(t * 15.0f + lane * 0.41f) * 13000.0f
+            + (lane - 1.0f) * 115000.0f;
+    };
+
     for (UINT y = 0; y < terrain_size; ++y) {
         for (UINT x = 0; x < terrain_size; ++x) {
-            const float fx = static_cast<float>(x);
-            const float fy = static_cast<float>(y);
-            float value = std::sin(fx * 0.27f + fy * 0.15f) * 0.5f + 0.5f;
-            value += (std::sin(fx * 0.07f - fy * 0.31f) * 0.5f + 0.5f) * 0.45f;
-            value += (std::sin((fx + fy) * 0.49f) * 0.5f + 0.5f) * 0.15f;
-            value = std::max(0.0f, std::min(1.0f, value / 1.6f));
-            const float r = 0.68f + value * 0.22f;
-            const float g = 0.74f + value * 0.16f;
-            const float b = 0.50f + value * 0.12f;
-            terrain_pixels[y * terrain_size + x] = pack_rgba8(r, g, b);
+            const float u = static_cast<float>(x) / static_cast<float>(terrain_size - 1);
+            const float v = static_cast<float>(y) / static_cast<float>(terrain_size - 1);
+            const float world_x = (u - 0.5f) * 960000.0f;
+            const float world_z = (v - 0.5f) * 960000.0f;
+
+            float road_mask = 0.0f;
+            for (int lane = 0; lane < 3; ++lane) {
+                const float center_z = road_center_z(world_x, static_cast<float>(lane));
+                const float width = lane == 1 ? 8200.0f : 6200.0f;
+                road_mask = std::max(road_mask, 1.0f - smoothstep(width, width + 4200.0f, std::abs(world_z - center_z)));
+                const float center_x = road_center_x(world_z, static_cast<float>(lane));
+                const float cross_width = lane == 1 ? 7000.0f : 5200.0f;
+                road_mask = std::max(road_mask, 1.0f - smoothstep(cross_width, cross_width + 3600.0f, std::abs(world_x - center_x)));
+            }
+
+            float water_mask = 0.0f;
+            for (int lake = 0; lake < 6; ++lake) {
+                const float seed = static_cast<float>(lake);
+                const float cx = -305000.0f + seed * 118000.0f + (hash2(seed, 8.0f) - 0.5f) * 42000.0f;
+                const float cz = (hash2(seed, 21.0f) - 0.5f) * 340000.0f;
+                const float rx = 15000.0f + hash2(seed, 3.0f) * 26000.0f;
+                const float rz = 9000.0f + hash2(seed, 5.0f) * 21000.0f;
+                const float dx = (world_x - cx) / rx;
+                const float dz = (world_z - cz) / rz;
+                water_mask = std::max(water_mask, 1.0f - smoothstep(0.82f, 1.08f, dx * dx + dz * dz));
+            }
+
+            float village_mask = 0.0f;
+            for (int village = 0; village < 9; ++village) {
+                const float seed = static_cast<float>(village);
+                const float cx = -330000.0f + seed * 82000.0f + (hash2(seed, 31.0f) - 0.5f) * 26000.0f;
+                const float cz = road_center_z(cx, std::fmod(seed, 3.0f)) + (hash2(seed, 32.0f) - 0.5f) * 24000.0f;
+                const float dx = std::abs(world_x - cx);
+                const float dz = std::abs(world_z - cz);
+                const float town = (1.0f - smoothstep(14500.0f, 26500.0f, std::max(dx, dz))) * (0.76f + hash2(seed, 37.0f) * 0.24f);
+                village_mask = std::max(village_mask, town);
+            }
+
+            const float grove_noise = std::sin(world_x * 0.000037f + world_z * 0.000053f)
+                * std::sin(world_x * 0.000071f - world_z * 0.000029f);
+            const float forest_mask = smoothstep(0.28f, 0.74f, grove_noise) * (1.0f - road_mask) * (1.0f - water_mask);
+
+            const float road = saturate(road_mask * (1.0f - water_mask));
+            const float water = saturate(water_mask);
+            const float village = saturate(village_mask * (1.0f - water_mask));
+            const float forest = saturate(forest_mask);
+            terrain_pixels[y * terrain_size + x] = pack_rgba8(road, water, village, forest);
         }
     }
     if (!create_texture_srv_from_pixels(d3d11, terrain_size, terrain_size, terrain_pixels, &d3d11.terrain_texture_srv, error)) {

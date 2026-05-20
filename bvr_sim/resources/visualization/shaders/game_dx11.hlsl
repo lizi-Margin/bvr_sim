@@ -206,6 +206,12 @@ float4 ps_main(PSInput input) : SV_TARGET {
     }
     if (u_material_flags.y > 0.5) {
         float2 terrain_position = input.world_position.xz * 20.0;
+        float2 mask_uv = saturate(input.world_position.xz / 960000.0 + 0.5);
+        float4 terrain_mask = u_albedo_texture.Sample(u_albedo_sampler, mask_uv);
+        float road_mask = saturate(terrain_mask.r);
+        float water_mask = saturate(terrain_mask.g);
+        float village_mask = saturate(terrain_mask.b);
+        float forest_mask = saturate(terrain_mask.a);
         float terrain = terrain_fbm(terrain_position * 0.42 + 7000.0);
         float macro = terrain_fbm(terrain_position * 0.13 + 17000.0);
         float biome = terrain_fbm(terrain_position * 0.045 - 42000.0);
@@ -218,10 +224,17 @@ float4 ps_main(PSInput input) : SV_TARGET {
         float3 rock = float3(0.38, 0.37, 0.32);
         base_color = lerp(grass, scrub, terrain);
         base_color = lerp(base_color, forest, smoothstep(0.58, 0.82, biome) * (1.0 - slope));
+        base_color = lerp(base_color, forest * 0.82, forest_mask * (1.0 - slope) * 0.55);
         base_color = lerp(base_color, dry, macro * 0.22);
         base_color = lerp(base_color, rock, saturate(height_blend * 0.72 + slope * 0.45));
         base_color *= lerp(0.88, 1.12, terrain);
         base_color *= lerp(0.92, 1.08, terrain_fbm(terrain_position * 0.85 + 9000.0));
+        float3 road_color = float3(0.17, 0.16, 0.13) * lerp(0.86, 1.10, terrain);
+        float3 village_color = float3(0.43, 0.38, 0.30) * lerp(0.88, 1.10, macro);
+        float3 water_color = float3(0.04, 0.18, 0.24) + float3(0.02, 0.07, 0.09) * terrain_fbm(terrain_position * 1.7 + 33000.0);
+        base_color = lerp(base_color, village_color, village_mask * 0.82);
+        base_color = lerp(base_color, road_color, road_mask * 0.94);
+        base_color = lerp(base_color, water_color, water_mask * 0.94);
     } else if (!simple_material) {
         float2 uv_panel_cell = abs(frac(input.uv * float2(18.0, 10.0)) - 0.5);
         float uv_panel_line = 1.0 - smoothstep(0.455, 0.5, max(uv_panel_cell.x, uv_panel_cell.y));
