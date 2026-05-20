@@ -22,7 +22,7 @@
 
 - `2026-04-10` 的 `080f546`
   - 新增 C++ `standoff` baseline opponent
-  - `example/custom_5v5_f22_f16.jsonc` 已改用 `standoff` + `tactical` 的混合编组
+  - `experimental/custom_5v5_f22_f16.jsonc` 已改用 `standoff` + `tactical` 的混合编组
 - `2026-04-06` 的 `2261257`
   - 增加基于 `scikit-build-core` 的 wheel / sdist 构建路径
   - 仓库已包含 `.github/workflows/wheels.yml`，用于 Linux / Windows 64-bit wheel 构建
@@ -31,7 +31,7 @@
   - 新的 ISA Atmosphere
   - 新增 `AIM-9M`
   - C++ tactical strategy 开始支持 `AIM-9M`
-  - 新增 `example/run_custom_5v5_acmi.py` 与 `example/custom_5v5_f22_f16.jsonc`
+  - 新增 `experimental/run_custom_5v5_acmi.py` 与 `experimental/custom_5v5_f22_f16.jsonc`
 - `2026-03-30` 的 `8beb51a`
   - `MModelA` 新增 `enable_INS_guide` 开关
 - `2026-03-30` 的 `0e7929d`
@@ -47,8 +47,10 @@ bvr_sim/               Python 包与 C++ 核心源码
   src_cxx/             C++ 仿真核心
   build_windows.bat    Windows 构建脚本
   build_linux.sh       Linux 构建脚本
-tests/                 smoke tests、unit tests、示例配置
-example/               外部框架适配示例
+tests/                 smoke tests、unit tests
+benchmarks/            标准 benchmark 脚本与 1v1-10v10 配置
+rl_envs/               正式外部 RL 框架适配入口
+experimental/          实验性脚本与 JSON/JSONC 配置
 docs/                  研究材料与补充文档
 ```
 
@@ -248,7 +250,7 @@ while not done:
 
 - [`tests/demo_config.json`](tests/demo_config.json)
 - [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)
-- [`example/custom_5v5_f22_f16.jsonc`](example/custom_5v5_f22_f16.jsonc)
+- [`experimental/custom_5v5_f22_f16.jsonc`](experimental/custom_5v5_f22_f16.jsonc)
 
 常见字段：
 
@@ -296,13 +298,13 @@ while not done:
 
 仓库中已经有一些适配入口或示例：
 
-- [`example/env_wrapper.py`](example/env_wrapper.py)
-- [`example/env_harl.py`](example/env_harl.py)
-- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
-- [`example/run_custom_5v5_acmi.py`](example/run_custom_5v5_acmi.py)
+- [`rl_envs/env_wrapper.py`](rl_envs/env_wrapper.py)
+- [`rl_envs/env_harl.py`](rl_envs/env_harl.py)
+- [`rl_envs/env_marlbenchmark.py`](rl_envs/env_marlbenchmark.py)
+- [`experimental/run_custom_5v5_acmi.py`](experimental/run_custom_5v5_acmi.py)
 
-其中 [`example/env_wrapper.py`](example/env_wrapper.py) 展示了如何把环境包装成外部 MARL 框架可用的接口。
-如果你想直接看一个较新的 C++ 推演样例，可以先运行 [`example/run_custom_5v5_acmi.py`](example/run_custom_5v5_acmi.py)。
+其中 [`rl_envs/env_wrapper.py`](rl_envs/env_wrapper.py) 展示了如何把环境包装成外部 MARL 框架可用的接口。
+如果你想直接看一个较新的 C++ 推演样例，可以先运行 [`experimental/run_custom_5v5_acmi.py`](experimental/run_custom_5v5_acmi.py)。
 
 ## 文档导航
 
@@ -314,7 +316,7 @@ while not done:
 4. [`docs/configuration.md`](docs/configuration.md)
 5. [`docs/integration.md`](docs/integration.md)
 6. [`tests/demo_config.json`](tests/demo_config.json) 或 [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)
-7. [`example/env_wrapper.py`](example/env_wrapper.py)
+7. [`rl_envs/env_wrapper.py`](rl_envs/env_wrapper.py)
 
 已有研究/设计材料：
 
@@ -391,7 +393,7 @@ bvr_sim\build_windows.bat
 2. 运行 DX11 示例
 
 ```bash
-python example/run_dx11_viz.py
+python experimental/run_dx11_viz.py
 ```
 
 3. 或者直接从 Python 调用
@@ -423,7 +425,7 @@ core.start()
 1. 运行示例
 
 ```bash
-python example/run_opengl_viz.py
+python experimental/run_opengl_viz.py
 ```
 
 2. 或者直接从 Python 调用

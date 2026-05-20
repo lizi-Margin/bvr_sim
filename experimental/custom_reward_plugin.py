@@ -39,7 +39,7 @@ class CustomDistanceToBoundaryReward:
     to the edges where maneuvering space is limited.
 
     Usage:
-        from example.custom_reward_plugin import CustomDistanceToBoundaryReward
+        from experimental.custom_reward_plugin import CustomDistanceToBoundaryReward
         from bvr_sim.src_py.reward.reward_components import RewardManager
 
         manager = RewardManager()
@@ -103,7 +103,7 @@ class CustomFormationReward:
     Useful for training cooperative behaviors like wingman positioning.
 
     Usage:
-        from example.custom_reward_plugin import CustomFormationReward
+        from experimental.custom_reward_plugin import CustomFormationReward
         from bvr_sim.src_py.reward.reward_components import RewardManager
 
         manager = RewardManager()
@@ -177,7 +177,7 @@ class CustomEnemyFocusReward:
     simulating cooperative attack patterns.
 
     Usage:
-        from example.custom_reward_plugin import CustomEnemyFocusReward
+        from experimental.custom_reward_plugin import CustomEnemyFocusReward
         from bvr_sim.src_py.reward.reward_components import RewardManager
 
         manager = RewardManager()
@@ -305,6 +305,6 @@ if __name__ == "__main__":
     print("   - Rewards multiple aircraft engaging the same enemy")
     print()
     print("Usage example:")
-    print("    from example.custom_reward_plugin import get_custom_reward_manager")
+    print("    from experimental.custom_reward_plugin import get_custom_reward_manager")
     print("    manager = get_custom_reward_manager()")
     print("    reward = manager.compute_reward(env, agent_uid, info)")

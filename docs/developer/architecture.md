@@ -101,7 +101,7 @@ bvr_sim/
 
 - `bvr_env.py`
 - `bvr_env_cpp.py`
-- `example/` 下包装文件
+- `rl_envs/` 下包装文件
 
 ## 出生阵位与初始化
 
@@ -120,9 +120,9 @@ bvr_sim/
 
 示例包装在：
 
-- [`example/env_wrapper.py`](example/env_wrapper.py)
-- [`example/env_harl.py`](example/env_harl.py)
-- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
+- [`rl_envs/env_wrapper.py`](../../rl_envs/env_wrapper.py)
+- [`rl_envs/env_harl.py`](../../rl_envs/env_harl.py)
+- [`rl_envs/env_marlbenchmark.py`](../../rl_envs/env_marlbenchmark.py)
 
 如果你要维护兼容层，尽量把框架特定逻辑放在这些包装层里，不要污染核心环境。
 

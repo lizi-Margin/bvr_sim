@@ -6,7 +6,7 @@
 
 ```python
 # 自定义奖励
-from example.custom_reward_plugin import CustomFormationReward, get_custom_reward_manager
+from experimental.custom_reward_plugin import CustomFormationReward, get_custom_reward_manager
 from bvr_sim.src_py.reward.reward_components import RewardManager
 
 # 方法1: 直接使用自定义组件
@@ -19,7 +19,7 @@ manager = get_custom_reward_manager()
 
 ```python
 # 自定义观测空间
-from example.custom_observation_plugin import CustomEnergyObservationSpace
+from experimental.custom_observation_plugin import CustomEnergyObservationSpace
 from bvr_sim import BVR3DEnv
 
 # 在环境中使用自定义观测空间
@@ -161,7 +161,7 @@ class ObservationSpace(ABC):
 ### 1. 边界距离奖励
 
 ```python
-from example.custom_reward_plugin import CustomDistanceToBoundaryReward
+from experimental.custom_reward_plugin import CustomDistanceToBoundaryReward
 
 # 惩罚靠近仿真边界
 reward = CustomDistanceToBoundaryReward(
@@ -174,7 +174,7 @@ reward = CustomDistanceToBoundaryReward(
 ### 2. 编队保持奖励
 
 ```python
-from example.custom_reward_plugin import CustomFormationReward
+from experimental.custom_reward_plugin import CustomFormationReward
 
 # 鼓励保持编队间距
 reward = CustomFormationReward(
@@ -187,7 +187,7 @@ reward = CustomFormationReward(
 ### 3. 敌机聚焦奖励
 
 ```python
-from example.custom_reward_plugin import CustomEnemyFocusReward
+from experimental.custom_reward_plugin import CustomEnemyFocusReward
 
 # 鼓励多架飞机协同攻击同一目标
 reward = CustomEnemyFocusReward(
@@ -201,7 +201,7 @@ reward = CustomEnemyFocusReward(
 ### 1. 能量状态观测
 
 ```python
-from example.custom_observation_plugin import CustomEnergyObservationSpace
+from experimental.custom_observation_plugin import CustomEnergyObservationSpace
 
 # 包含能量特征的观测
 obs_space = CustomEnergyObservationSpace()
@@ -211,7 +211,7 @@ obs_space = CustomEnergyObservationSpace()
 ### 2. 导弹告警观测
 
 ```python
-from example.custom_observation_plugin import CustomMissileWarningObservationSpace
+from experimental.custom_observation_plugin import CustomMissileWarningObservationSpace
 
 # 增强的导弹告警系统
 obs_space = CustomMissileWarningObservationSpace()
@@ -221,7 +221,7 @@ obs_space = CustomMissileWarningObservationSpace()
 ### 3. 威胁等级观测
 
 ```python
-from example.custom_observation_plugin import CustomThreatLevelObservationSpace
+from experimental.custom_observation_plugin import CustomThreatLevelObservationSpace
 
 # 综合威胁评估
 obs_space = CustomThreatLevelObservationSpace(max_enemies=5)
@@ -231,14 +231,14 @@ obs_space = CustomThreatLevelObservationSpace(max_enemies=5)
 ## 注册到ScenarioConfig
 
 ```python
-# example/env_wrapper.py
+# rl_envs/env_wrapper.py
 class ScenarioConfig:
     # ...
     
     # 使用自定义奖励管理器
     def get_reward_manager(self):
         from bvr_sim.src_py.reward.reward_components import RewardManager
-        from example.custom_reward_plugin import CustomFormationReward
+        from experimental.custom_reward_plugin import CustomFormationReward
         
         manager = RewardManager()
         manager.add_component(CustomFormationReward(weight=0.05))
@@ -314,7 +314,7 @@ print(f"Observation dimension: {obs_dim}")
 
 ## 参考实现
 
-- `example/custom_reward_plugin.py` - Python自定义奖励示例
-- `example/custom_observation_plugin.py` - Python自定义观测示例
+- `experimental/custom_reward_plugin.py` - Python自定义奖励示例
+- `experimental/custom_observation_plugin.py` - Python自定义观测示例
 - `bvr_sim/src_cxx/rl/reward_components.cxx` - C++奖励组件
 - `bvr_sim/src_cxx/rl/observation_space.hxx` - C++观测空间

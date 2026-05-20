@@ -60,6 +60,94 @@ RenderCommand make_draw_command(
     return command;
 }
 
+void apply_camera_basis(RenderCommand& command, const RenderScene& scene) {
+    command.camera_forward = scene.camera_forward;
+    command.camera_right = scene.camera_right;
+    command.camera_up = scene.camera_up;
+    command.camera_tan_half_fov_y = scene.camera_tan_half_fov_y;
+    command.camera_aspect = scene.camera_aspect;
+}
+
+Float3 make_vec3(float x, float y, float z) {
+    return Float3{x, y, z};
+}
+
+Float3 add_vec3(const Float3& a, const Float3& b) {
+    return make_vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+Float3 sub_vec3(const Float3& a, const Float3& b) {
+    return make_vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+Float3 scale_vec3(const Float3& v, float s) {
+    return make_vec3(v.x * s, v.y * s, v.z * s);
+}
+
+float dot_vec3(const Float3& a, const Float3& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+Float3 cross_vec3(const Float3& a, const Float3& b) {
+    return make_vec3(
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x
+    );
+}
+
+Float3 normalize_vec3(const Float3& v) {
+    const float len_sq = dot_vec3(v, v);
+    if (len_sq <= 1e-8f) {
+        return make_vec3(0.0f, 1.0f, 0.0f);
+    }
+    return scale_vec3(v, 1.0f / std::sqrt(len_sq));
+}
+
+Float4x4 look_at_row_matrix(const Float3& eye, const Float3& target, const Float3& up_hint) {
+    const Float3 forward = normalize_vec3(sub_vec3(target, eye));
+    const Float3 right = normalize_vec3(cross_vec3(up_hint, forward));
+    const Float3 up = cross_vec3(forward, right);
+
+    Float4x4 out = Float4x4::identity();
+    out.m[0][0] = right.x;
+    out.m[1][0] = right.y;
+    out.m[2][0] = right.z;
+    out.m[0][1] = up.x;
+    out.m[1][1] = up.y;
+    out.m[2][1] = up.z;
+    out.m[0][2] = forward.x;
+    out.m[1][2] = forward.y;
+    out.m[2][2] = forward.z;
+    out.m[3][0] = -dot_vec3(right, eye);
+    out.m[3][1] = -dot_vec3(up, eye);
+    out.m[3][2] = -dot_vec3(forward, eye);
+    return out;
+}
+
+Float4x4 orthographic_matrix(float width, float height, float z_near, float z_far) {
+    Float4x4 out{};
+    out.m[0][0] = 2.0f / width;
+    out.m[1][1] = 2.0f / height;
+    out.m[2][2] = 1.0f / (z_far - z_near);
+    out.m[3][2] = -z_near / (z_far - z_near);
+    out.m[3][3] = 1.0f;
+    return out;
+}
+
+Float4x4 build_shadow_view_projection(const Float3& center) {
+    const Float3 light_dir = normalize_vec3(make_vec3(
+        GameLightingConfig::k_sun_dir_x,
+        GameLightingConfig::k_sun_dir_y,
+        GameLightingConfig::k_sun_dir_z
+    ));
+    const Float3 light_eye = sub_vec3(center, scale_vec3(light_dir, 12000.0f));
+    const Float3 up_hint = std::abs(light_dir.y) > 0.92f ? make_vec3(0.0f, 0.0f, 1.0f) : make_vec3(0.0f, 1.0f, 0.0f);
+    const Float4x4 view = look_at_row_matrix(light_eye, center, up_hint);
+    const Float4x4 projection = orthographic_matrix(6000.0f, 6000.0f, 10.0f, 26000.0f);
+    return view * projection;
+}
+
 std::vector<std::string> make_hud_lines(
     const ViewerInputState& input,
     double sim_time,
@@ -106,7 +194,7 @@ std::vector<std::string> make_hud_lines(
     lines.emplace_back(line3);
 
     lines.emplace_back("Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel  Hold CapsLock: free look");
-    lines.emplace_back("View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
+    lines.emplace_back("View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll");
     return lines;
 }
 
@@ -293,9 +381,11 @@ bool project_direction_to_ndc(
 RenderCommandList record_render_commands(RenderScene scene) {
     RenderCommandList command_list;
     command_list.commands.reserve(4 + scene.object_batches.size());
+    command_list.shadow_map_enabled = scene.shadows_enabled;
+    command_list.shadow_view_projection = build_shadow_view_projection(scene.shadow_center);
 
     command_list.commands.push_back(make_clear_command({0.54f, 0.66f, 0.74f, 1.0f}));
-    command_list.commands.push_back(make_draw_command(
+    RenderCommand sky_command = make_draw_command(
         std::move(scene.sky_vertices),
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
         scene.clip_space,
@@ -311,11 +401,13 @@ RenderCommandList record_render_commands(RenderScene scene) {
         0.0f,
         1.0f,
         1.0f
-    ));
+    );
+    apply_camera_basis(sky_command, scene);
+    command_list.commands.push_back(std::move(sky_command));
 
     const Float4x4 view_projection = scene.view * scene.projection;
     const Float4x4 identity_world = Float4x4::identity();
-    command_list.commands.push_back(make_draw_command(
+    RenderCommand ground_command = make_draw_command(
         std::move(scene.ground_vertices),
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
         view_projection,
@@ -331,47 +423,35 @@ RenderCommandList record_render_commands(RenderScene scene) {
         0.04f,
         12.0f,
         1.0f
-    ));
-    command_list.commands.push_back(make_draw_command(
-        std::move(scene.grid_vertices),
-        D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
-        view_projection,
-        identity_world,
-        scene.camera_position,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        "sky",
-        0.0f,
-        1.0f,
-        1.0f
-    ));
+    );
+    ground_command.shadow_world_view_proj = identity_world * command_list.shadow_view_projection;
+    ground_command.receive_shadows = command_list.shadow_map_enabled;
+    apply_camera_basis(ground_command, scene);
+    command_list.commands.push_back(std::move(ground_command));
 
-    for (auto& batch : scene.shadow_batches) {
-        command_list.commands.push_back(make_draw_command(
-            std::move(batch.vertices),
+    for (auto& batch : scene.object_batches) {
+        RenderCommand shadow_command = make_draw_command(
+            batch.vertices,
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-            batch.world * view_projection,
+            batch.world * command_list.shadow_view_projection,
             batch.world,
             scene.camera_position,
             true,
-            false,
-            false,
             true,
+            false,
+            false,
             false,
             false,
             "sky",
             0.0f,
             1.0f,
-            0.22f
-        ));
-    }
+            1.0f
+        );
+        if (command_list.shadow_map_enabled) {
+            command_list.shadow_commands.push_back(std::move(shadow_command));
+        }
 
-    for (auto& batch : scene.object_batches) {
-        command_list.commands.push_back(make_draw_command(
+        RenderCommand object_command = make_draw_command(
             std::move(batch.vertices),
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
             batch.world * view_projection,
@@ -387,7 +467,11 @@ RenderCommandList record_render_commands(RenderScene scene) {
             0.28f,
             48.0f,
             1.0f
-        ));
+        );
+        object_command.shadow_world_view_proj = batch.world * command_list.shadow_view_projection;
+        object_command.receive_shadows = command_list.shadow_map_enabled;
+        apply_camera_basis(object_command, scene);
+        command_list.commands.push_back(std::move(object_command));
     }
 
     return command_list;

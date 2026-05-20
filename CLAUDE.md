@@ -10,13 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Python smoke test | `python tests/test_py.py` |
 | C++ smoke test | `python tests/test_cpp.py` |
 | Full test suite | `python run_tests.py` |
-| Run 5v5 ACMI | `python example/run_custom_5v5_acmi.py` |
+| Run 5v5 ACMI | `python experimental/run_custom_5v5_acmi.py` |
 
 ## Project Overview
 
 **BVR Sim** is a 3D Beyond Visual Range (BVR) air combat simulation environment for multi-agent reinforcement learning. It combines a Python control layer with high-performance C++ physics simulation (aircraft flight dynamics, missile guidance, radar sensors).
 
-- **Main entry point for RL training:** `example/env_wrapper.py` → exposes `ScenarioConfig` and `make_env()`
+- **Main entry point for RL training:** `rl_envs/env_wrapper.py` → exposes `ScenarioConfig` and `make_env()`
 - **Core environment:** `bvr_sim/bvr_env.py` (Gymnasium-style interface)
 - **C++ backend:** `bvr_sim/bvr_env_cpp.py` (high-performance variant)
 - **Configuration:** JSONC files in `conf_system/` directory (see `docs/configuration.md`)
@@ -78,7 +78,7 @@ python cpp_unit_tests.py
 ```bash
 # Fast validation using minimal scenario (random 1v1)
 python -c "
-from example.env_wrapper import make_env, ScenarioConfig
+from rl_envs.env_wrapper import make_env, ScenarioConfig
 cfg = ScenarioConfig(render=False)
 env = make_env(cfg)
 obs, info = env.reset()
@@ -146,7 +146,7 @@ for _ in range(100):
   - **cpptrace**: Stack tracing for debugging
   - **JSBSim**: Flight dynamics engine (C++ fork)
 
-#### Examples & Wrappers (`example/`)
+#### RL Wrappers (`rl_envs/`)
 
 - **`env_wrapper.py`**: Standard integration for UHRL-style frameworks
   - Gymnasium-compatible interface
@@ -235,7 +235,7 @@ Set `distill_reward_weight > 0` in config and optionally `USE_DISTILL_REWARD_ACT
 | `bvr_sim/bvr_env.py` | Core Gymnasium environment |
 | `bvr_sim/src_py/simulator/` | Physics simulation stack |
 | `bvr_sim/src_cxx/` | C++ performance kernels |
-| `example/env_wrapper.py` | Standard RL integration point |
+| `rl_envs/env_wrapper.py` | Standard RL integration point |
 | `conf_system/` | Training scenario configurations (JSONC format) |
 | `tests/` | Test suites (Python, C++, unit tests) |
 | `docs/` | User guides (getting_started.md, configuration.md, etc.) |

@@ -24,6 +24,9 @@ std::optional<TelemetryCommandKind> telemetry_command_kind_from_string(const std
     if (command_name == "command") {
         return TelemetryCommandKind::Command;
     }
+    if (command_name == "set_game_camera") {
+        return TelemetryCommandKind::SetGameCamera;
+    }
     return std::nullopt;
 }
 
@@ -43,6 +46,8 @@ std::string telemetry_command_kind_to_string(TelemetryCommandKind kind) noexcept
         return "object_debug";
     case TelemetryCommandKind::Command:
         return "command";
+    case TelemetryCommandKind::SetGameCamera:
+        return "set_game_camera";
     default:
         return "unknown";
     }

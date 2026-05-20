@@ -371,7 +371,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Sync BVR C++ env state into UnrealCV.")
     parser.add_argument(
         "--config",
-        default=str(REPO_ROOT / "example" / "unreal.jsonc"),
+        default=str(REPO_ROOT / "experimental" / "unreal.jsonc"),
         help="Scenario config JSONC path.",
     )
     parser.add_argument("--sync-every", type=int, default=1, help="Push transforms to UE every N sim steps.")

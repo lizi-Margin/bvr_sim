@@ -1,6 +1,6 @@
 """
 Performance benchmark script for BVR Sim environments.
-Tests fps (steps per second) for different team sizes (1v1 to 6v6)
+Tests fps (steps per second) for standard team sizes (1v1 to 10v10)
 across both Python (BVR3DEnv) and C++ (BVR3DEnvCpp) backends.
 
 Output: CSV file with results suitable for paper/thesis reporting.
@@ -12,15 +12,25 @@ import os
 import csv
 from datetime import datetime
 from pathlib import Path
-import commentjson
-import numpy as np
 
 from bvr_sim.bvr_env import BVR3DEnv
 from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
 
 
 def get_root_dir() -> str:
-    return os.path.dirname(os.path.realpath(__file__))
+    return str(Path(__file__).resolve().parents[1])
+
+
+def get_benchmark_dir() -> Path:
+    return Path(__file__).resolve().parent
+
+
+def get_python_config_path(team_size: int) -> Path:
+    return get_benchmark_dir() / "configs" / "python" / f"benchmark_config_py_{team_size}v{team_size}.json"
+
+
+def get_cpp_config_path(team_size: int) -> Path:
+    return get_benchmark_dir() / "configs" / "cpp" / f"benchmark_config_cpp_{team_size}v{team_size}.jsonc"
 
 
 def generate_config_py(team_size: int, output_path: str) -> dict:
@@ -69,6 +79,7 @@ def generate_config_py(team_size: int, output_path: str) -> dict:
         config["blue_fighters"][f"B{i:02d}"] = {"model": "F16", "record": False}
 
     # Save to file
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
         json.dump(config, f, indent=2)
 
@@ -164,6 +175,7 @@ def generate_config_cpp(team_size: int, output_path: str) -> dict:
         }
 
     # Save to file
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
         json.dump(config, f, indent=2)
 
@@ -286,11 +298,13 @@ def benchmark_env_cpp(config: dict, team_size: int, num_episodes: int = 3) -> di
 
 def main():
     root_dir = get_root_dir()
+    results_dir = get_benchmark_dir() / "results"
+    results_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_csv = f"benchmark_results_{timestamp}.csv"
+    output_csv = results_dir / f"benchmark_results_{timestamp}.csv"
 
     # Team sizes to test
-    team_sizes = [1, 2, 3, 4, 5, 6]
+    team_sizes = list(range(1, 11))
     num_episodes_per_config = 3
 
     all_results = []
@@ -307,19 +321,13 @@ def main():
 
         # Python version
         print(f"  Testing Python backend ({team_size}v{team_size})...")
-        config_py_path = os.path.join(
-            root_dir, f"tests/benchmark_config_py_{team_size}v{team_size}.json"
-        )
-        config_py = generate_config_py(team_size, config_py_path)
+        config_py = generate_config_py(team_size, str(get_python_config_path(team_size)))
         result_py = benchmark_env_py(config_py, team_size, num_episodes_per_config)
         all_results.append(result_py)
 
         # C++ version
         print(f"  Testing C++ backend ({team_size}v{team_size})...")
-        config_cpp_path = os.path.join(
-            root_dir, f"tests/benchmark_config_cpp_{team_size}v{team_size}.jsonc"
-        )
-        config_cpp = generate_config_cpp(team_size, config_cpp_path)
+        config_cpp = generate_config_cpp(team_size, str(get_cpp_config_path(team_size)))
         result_cpp = benchmark_env_cpp(config_cpp, team_size, num_episodes_per_config)
         all_results.append(result_cpp)
 
@@ -327,7 +335,7 @@ def main():
     print("\n" + "=" * 80)
     print("Writing results to CSV...")
 
-    csv_path = os.path.join(root_dir, output_csv)
+    csv_path = str(output_csv)
     with open(csv_path, "w", newline="") as csvfile:
         fieldnames = [
             "team_size",

@@ -436,7 +436,7 @@ void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, lo
     draw_line(16, 64, line3.str());
 
     draw_line(16, rect.bottom - 56, "Move: W A S D  Vertical: Q/E  Look: drag mouse  Zoom: wheel  Hold CapsLock: free look");
-    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll lock");
+    draw_line(16, rect.bottom - 34, "View: +/- FOV  F1 control/next  F2 follow/next  F3 shadows  F4 materials  F5 roll");
 
     if (font && old_font) {
         SelectObject(dc, old_font);

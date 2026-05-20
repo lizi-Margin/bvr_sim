@@ -47,7 +47,7 @@ class CustomEnergyObservationSpace:
     - Energy management indicators
 
     Usage:
-        from example.custom_observation_plugin import CustomEnergyObservationSpace
+        from experimental.custom_observation_plugin import CustomEnergyObservationSpace
         from bvr_sim.src_py.observation_space import CompactObsSpace
 
         # Use custom observation space
@@ -288,7 +288,7 @@ class CustomMissileWarningObservationSpace:
     - Evasion readiness indicators
 
     Usage:
-        from example.custom_observation_plugin import CustomMissileWarningObservationSpace
+        from experimental.custom_observation_plugin import CustomMissileWarningObservationSpace
 
         obs_space = CustomMissileWarningObservationSpace()
     """
@@ -532,7 +532,7 @@ class CustomThreatLevelObservationSpace:
     - Composite threat score per enemy
 
     Usage:
-        from example.custom_observation_plugin import CustomThreatLevelObservationSpace
+        from experimental.custom_observation_plugin import CustomThreatLevelObservationSpace
 
         obs_space = CustomThreatLevelObservationSpace(max_enemies=5)
     """

@@ -30,6 +30,7 @@ __pycache__
 
 /.worktrees/
 
-/*.png
-/*.csv
+*.csv
+*.png
+benchmarks/results/
 /benchmark_logs/

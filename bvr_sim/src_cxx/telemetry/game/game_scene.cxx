@@ -583,16 +583,39 @@ void append_obj_mesh(std::vector<DX11Vertex>& vertices, const MeshData& mesh, fl
 }
 
 void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
-    constexpr int kSubdivisions = 28;
-    const std::array<float, 3> lowland = {0.17f, 0.24f, 0.17f};
-    const std::array<float, 3> highland = {0.28f, 0.31f, 0.22f};
-    const Float3 normal = make_float3(0.0f, 1.0f, 0.0f);
+    constexpr int kSubdivisions = 96;
+    const std::array<float, 3> lowland = {0.14f, 0.25f, 0.17f};
+    const std::array<float, 3> highland = {0.34f, 0.33f, 0.22f};
+    const std::array<float, 3> rock = {0.38f, 0.36f, 0.31f};
+
+    auto terrain_height = [](float x, float z) {
+        const float broad = std::sin(x * 0.000055f + z * 0.000037f) * 0.5f + 0.5f;
+        const float ridge = std::sin(x * 0.00019f - z * 0.00015f) * 0.5f + 0.5f;
+        const float detail = std::sin((x + z) * 0.00072f) * 0.5f + 0.5f;
+        return (broad * 620.0f) + (ridge * ridge * 420.0f) + (detail * 95.0f) - 260.0f;
+    };
+
+    auto terrain_normal = [&](float x, float z) {
+        constexpr float sample_step = 260.0f;
+        const float h_l = terrain_height(x - sample_step, z);
+        const float h_r = terrain_height(x + sample_step, z);
+        const float h_d = terrain_height(x, z - sample_step);
+        const float h_u = terrain_height(x, z + sample_step);
+        return normalize(make_float3(h_l - h_r, sample_step * 2.0f, h_d - h_u));
+    };
 
     auto color_at = [&](float x, float z) {
         const float band = std::sin(x * 0.00012f + z * 0.00019f) * 0.5f + 0.5f;
+        const float macro = std::sin(x * 0.000031f - z * 0.000047f) * 0.5f + 0.5f;
+        const float height_blend = std::clamp((terrain_height(x, z) + 160.0f) / 920.0f, 0.0f, 1.0f);
+        const float edge = std::clamp((std::max(std::abs(x), std::abs(z)) - size * 0.72f) / (size * 0.24f), 0.0f, 1.0f);
+        const std::array<float, 3> far_haze = {0.48f, 0.55f, 0.44f};
         std::array<float, 3> color{};
         for (int i = 0; i < 3; ++i) {
-            color[i] = lowland[i] * (1.0f - band) + highland[i] * band;
+            const float ground = lowland[i] * (1.0f - band) + highland[i] * band;
+            const float local = ground * (1.0f - height_blend) + rock[i] * height_blend;
+            const float varied = local * (0.88f + macro * 0.20f);
+            color[i] = varied * (1.0f - edge) + far_haze[i] * edge;
         }
         return color;
     };
@@ -600,7 +623,7 @@ void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
     auto push_ground_vertex = [&](float x, float z) {
         const float u = (x + size) / 18000.0f;
         const float v = (z + size) / 18000.0f;
-        push_vertex(vertices, make_float3(x, 0.0f, z), color_at(x, z), normal, {u, v});
+        push_vertex(vertices, make_float3(x, terrain_height(x, z), z), color_at(x, z), terrain_normal(x, z), {u, v});
     };
 
     for (int z = 0; z < kSubdivisions; ++z) {
@@ -620,35 +643,31 @@ void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
 }
 
 void append_sky_quad(std::vector<DX11Vertex>& vertices) {
-    const std::array<float, 3> top = {0.20f, 0.39f, 0.62f};
-    const std::array<float, 3> horizon = {0.77f, 0.83f, 0.88f};
+    const std::array<float, 3> zenith = {0.10f, 0.29f, 0.58f};
+    const std::array<float, 3> upper = {0.18f, 0.42f, 0.70f};
+    const std::array<float, 3> horizon = {0.76f, 0.82f, 0.78f};
+    const std::array<float, 3> low_haze = {0.90f, 0.78f, 0.58f};
 
     auto push_sky_vertex = [&](float x, float y, const std::array<float, 3>& color) {
         push_vertex(vertices, make_float3(x, y, 0.0f), color, make_float3(0.0f, 0.0f, -1.0f));
     };
 
-    push_sky_vertex(-1.0f, 1.0f, top);
-    push_sky_vertex(1.0f, 1.0f, top);
+    push_sky_vertex(-1.0f, 1.0f, zenith);
+    push_sky_vertex(1.0f, 1.0f, upper);
+    push_sky_vertex(1.0f, 0.18f, horizon);
+
+    push_sky_vertex(-1.0f, 1.0f, zenith);
+    push_sky_vertex(1.0f, 0.18f, horizon);
+    push_sky_vertex(-1.0f, 0.18f, upper);
+
+    push_sky_vertex(-1.0f, 0.18f, upper);
+    push_sky_vertex(1.0f, 0.18f, horizon);
     push_sky_vertex(1.0f, -1.0f, horizon);
 
-    push_sky_vertex(-1.0f, 1.0f, top);
+    push_sky_vertex(-1.0f, 0.18f, upper);
     push_sky_vertex(1.0f, -1.0f, horizon);
-    push_sky_vertex(-1.0f, -1.0f, horizon);
-}
+    push_sky_vertex(-1.0f, -1.0f, low_haze);
 
-void append_grid(std::vector<DX11Vertex>& vertices, float size, int half_count) {
-    const float r = 0.24f;
-    const float g = 0.29f;
-    const float b = 0.25f;
-    for (int i = -half_count; i <= half_count; ++i) {
-        const float value = size * static_cast<float>(i) / static_cast<float>(half_count);
-        const std::array<float, 3> color = {r, g, b};
-        const Float3 normal = make_float3(0.0f, 1.0f, 0.0f);
-        push_vertex(vertices, make_float3(value, 0.0f, -size), color, normal);
-        push_vertex(vertices, make_float3(value, 0.0f, size), color, normal);
-        push_vertex(vertices, make_float3(-size, 0.0f, value), color, normal);
-        push_vertex(vertices, make_float3(size, 0.0f, value), color, normal);
-    }
 }
 
 Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
@@ -777,38 +796,25 @@ RenderScene build_render_scene(const ViewerInputState& input, UINT width, UINT h
     scene.projection = perspective_matrix(static_cast<float>(c3utils::deg2rad(resolved_input.camera_fov_y)), aspect, 10.0f, 500000.0f);
     scene.clip_space = orthographic_identity_clip_matrix();
     scene.camera_position = eye;
+    scene.camera_forward = normalize(sub(target, eye));
+    scene.camera_right = normalize(cross(up, scene.camera_forward));
+    scene.camera_up = cross(scene.camera_forward, scene.camera_right);
+    scene.camera_tan_half_fov_y = std::tan(static_cast<float>(c3utils::deg2rad(resolved_input.camera_fov_y)) * 0.5f);
+    scene.camera_aspect = aspect;
+    scene.shadow_center = target;
+    scene.shadows_enabled = resolved_input.shadows_enabled;
 
     append_sky_quad(scene.sky_vertices);
-    append_ground_plane(scene.ground_vertices, 140000.0f);
-    append_grid(scene.grid_vertices, 120000.0f, 18);
+    append_ground_plane(scene.ground_vertices, 480000.0f);
 
     if (!snapshot) {
         return scene;
     }
 
-    if (resolved_input.shadows_enabled) {
-        scene.shadow_batches.reserve(snapshot->objects.size());
-    }
     scene.object_batches.reserve(snapshot->objects.size());
     for (const auto& object : snapshot->objects) {
         if (!object.alive) {
             continue;
-        }
-
-        if (resolved_input.shadows_enabled) {
-            RenderScene::ObjectBatch shadow_batch;
-            create_object_geometry(object, shadow_batch.vertices);
-            for (auto& vertex : shadow_batch.vertices) {
-                vertex.color[0] = 0.0f;
-                vertex.color[1] = 0.0f;
-                vertex.color[2] = 0.0f;
-                vertex.uv[0] = 0.0f;
-                vertex.uv[1] = 0.0f;
-            }
-            shadow_batch.world = build_shadow_world_matrix(object);
-            shadow_batch.material_key = "sky";
-            shadow_batch.use_material_system = false;
-            scene.shadow_batches.push_back(std::move(shadow_batch));
         }
 
         RenderScene::ObjectBatch batch;

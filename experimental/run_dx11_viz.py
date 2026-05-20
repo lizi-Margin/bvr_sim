@@ -8,7 +8,7 @@ def get_root_dir() -> str:
 
 
 def main():
-    with open(os.path.join(get_root_dir(), "../example/dx11.jsonc"), "r", encoding="utf-8") as fin:
+    with open(os.path.join(get_root_dir(), "dx11.jsonc"), "r", encoding="utf-8") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)

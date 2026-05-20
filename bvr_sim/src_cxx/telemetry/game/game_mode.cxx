@@ -3,13 +3,61 @@
 #include "c3utils/c3utils.hxx"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
 #include <vector>
 
 namespace bvr_sim {
+
+namespace {
+
+std::optional<double> json_number_at(const json::JSON& payload, const char* key) {
+    if (!payload.hasKey(key)) {
+        return std::nullopt;
+    }
+    const auto& value = payload.at(key);
+    if (value.JSONType() == json::JSON::Class::Floating) {
+        return value.ToFloat();
+    }
+    if (value.JSONType() == json::JSON::Class::Integral) {
+        return static_cast<double>(value.ToInt());
+    }
+    return std::nullopt;
+}
+
+std::optional<bool> json_bool_at(const json::JSON& payload, const char* key) {
+    if (!payload.hasKey(key) || payload.at(key).JSONType() != json::JSON::Class::Boolean) {
+        return std::nullopt;
+    }
+    return payload.at(key).ToBool();
+}
+
+std::optional<std::array<double, 3>> json_array3_at(const json::JSON& payload, const char* key) {
+    if (!payload.hasKey(key) || payload.at(key).JSONType() != json::JSON::Class::Array) {
+        return std::nullopt;
+    }
+    auto arr = payload.at(key);
+    if (arr.size() != 3) {
+        return std::nullopt;
+    }
+    std::array<double, 3> out{0.0, 0.0, 0.0};
+    for (size_t i = 0; i < 3; ++i) {
+        if (arr[i].JSONType() == json::JSON::Class::Floating) {
+            out[i] = arr[i].ToFloat();
+        } else if (arr[i].JSONType() == json::JSON::Class::Integral) {
+            out[i] = static_cast<double>(arr[i].ToInt());
+        } else {
+            return std::nullopt;
+        }
+    }
+    return out;
+}
+
+} // namespace
 
 GameMode::GameMode()
     : running_(false),
@@ -63,6 +111,81 @@ bool GameMode::is_supported() const noexcept {
     return supported_.load();
 }
 
+json::JSON GameMode::state_to_json(const GameModeState& state) {
+    json::JSON out = json::JSON::Make(json::JSON::Class::Object);
+    out["camera_mode"] = json::String(state.camera_mode);
+    out["target_uid"] = json::String(state.target_uid);
+    out["focus_index"] = json::Integral(state.focus_index);
+    out["distance"] = json::Float(state.distance);
+    out["yaw"] = json::Float(state.yaw);
+    out["pitch"] = json::Float(state.pitch);
+    out["fov_y"] = json::Float(state.fov_y);
+    out["roll_locked"] = json::Boolean(state.roll_locked);
+    out["mouse_aim_enabled"] = json::Boolean(state.mouse_aim_enabled);
+    if (state.target.has_value()) {
+        json::JSON target = json::JSON::Make(json::JSON::Class::Array);
+        target.append(json::Float((*state.target)[0]));
+        target.append(json::Float((*state.target)[1]));
+        target.append(json::Float((*state.target)[2]));
+        out["target"] = target;
+    }
+    return out;
+}
+
+void GameMode::apply_state_command(const TelemetryCommand& command) {
+    if (command.kind != TelemetryCommandKind::SetGameCamera) {
+        return;
+    }
+    if (command.payload.JSONType() != json::JSON::Class::Object) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    const auto& payload = command.payload;
+    if (payload.hasKey("mode", json::JSON::Class::String)) {
+        const std::string mode = payload.at("mode").ToString();
+        if (mode == "follow" || mode == "fixed" || mode == "free") {
+            state_.camera_mode = mode;
+        }
+    }
+    if (payload.hasKey("camera_mode", json::JSON::Class::String)) {
+        const std::string mode = payload.at("camera_mode").ToString();
+        if (mode == "follow" || mode == "fixed" || mode == "free") {
+            state_.camera_mode = mode;
+        }
+    }
+    if (!command.target_uid.empty()) {
+        state_.target_uid = command.target_uid;
+    }
+    if (payload.hasKey("target_uid", json::JSON::Class::String)) {
+        state_.target_uid = payload.at("target_uid").ToString();
+    }
+    if (payload.hasKey("focus_index", json::JSON::Class::Integral)) {
+        state_.focus_index = static_cast<int>(payload.at("focus_index").ToInt());
+    }
+    if (auto value = json_number_at(payload, "distance")) {
+        state_.distance = std::clamp(*value, 50.0, 1000000.0);
+    }
+    if (auto value = json_number_at(payload, "yaw")) {
+        state_.yaw = *value;
+    }
+    if (auto value = json_number_at(payload, "pitch")) {
+        state_.pitch = std::clamp(*value, -1.45, 1.45);
+    }
+    if (auto value = json_number_at(payload, "fov_y")) {
+        state_.fov_y = std::clamp(*value, 20.0, 120.0);
+    }
+    if (auto value = json_bool_at(payload, "roll_locked")) {
+        state_.roll_locked = *value;
+    }
+    if (auto value = json_bool_at(payload, "mouse_aim_enabled")) {
+        state_.mouse_aim_enabled = *value;
+    }
+    if (auto value = json_array3_at(payload, "target")) {
+        state_.target = *value;
+    }
+}
+
 json::JSON GameMode::get_status() const {
     json::JSON status = json::JSON::Make(json::JSON::Class::Object);
     status["running"] = json::Boolean(is_running());
@@ -84,6 +207,7 @@ json::JSON GameMode::get_status() const {
     status["last_vertex_count"] = json::Integral(last_vertex_count_);
     status["shadows_enabled"] = json::Boolean(shadows_enabled_);
     status["material_system_enabled"] = json::Boolean(material_system_enabled_);
+    status["state"] = state_to_json(state_);
     return status;
 }
 
@@ -91,6 +215,11 @@ void GameMode::submit_command(const TelemetryCommand& command) const {
     if (command_submitter_) {
         command_submitter_(command);
     }
+}
+
+void GameMode::queue_viewer_command(const TelemetryCommand& command) {
+    apply_state_command(command);
+    viewer_command_queue_.push(command);
 }
 
 #ifndef _WIN32
@@ -109,6 +238,55 @@ void GameMode::run_loop() noexcept {
 }
 
 #else
+
+namespace {
+
+void apply_game_mode_state_to_input(const GameMode::GameModeState& state, ViewerInputState& input) {
+    if (state.camera_mode == "follow") {
+        input.input_mode = ViewerInputState::InputMode::Follow;
+        input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+        input.focus_uid = state.target_uid;
+        input.focus_cycle_index = state.target_uid.empty() ? state.focus_index : -1;
+    } else {
+        input.input_mode = ViewerInputState::InputMode::Follow;
+        input.camera_mode = ViewerInputState::CameraMode::Free;
+        input.focus_uid.clear();
+        input.focus_cycle_index = -1;
+    }
+
+    input.camera_distance = static_cast<float>(state.distance);
+    input.camera_yaw = static_cast<float>(state.yaw);
+    input.camera_pitch = static_cast<float>(state.pitch);
+    input.camera_fov_y = static_cast<float>(state.fov_y);
+    input.camera_roll_locked = state.roll_locked;
+    input.mouse_aim_enabled = state.mouse_aim_enabled;
+    if (state.target.has_value()) {
+        input.camera_target = Float3{
+            static_cast<float>((*state.target)[0]),
+            static_cast<float>((*state.target)[1]),
+            static_cast<float>((*state.target)[2])};
+    }
+}
+
+GameMode::GameModeState make_state_from_input(const ViewerInputState& input) {
+    GameMode::GameModeState state;
+    state.camera_mode = input.camera_mode == ViewerInputState::CameraMode::FollowObject ? "follow" : "free";
+    state.target_uid = input.focus_uid;
+    state.focus_index = input.focus_cycle_index;
+    state.distance = input.camera_distance;
+    state.yaw = input.camera_yaw;
+    state.pitch = input.camera_pitch;
+    state.fov_y = input.camera_fov_y;
+    state.roll_locked = input.camera_roll_locked;
+    state.mouse_aim_enabled = input.mouse_aim_enabled;
+    state.target = std::array<double, 3>{
+        input.camera_target.x,
+        input.camera_target.y,
+        input.camera_target.z};
+    return state;
+}
+
+} // namespace
 
 void GameMode::run_loop() noexcept {
     Win32Window window;
@@ -139,6 +317,14 @@ void GameMode::run_loop() noexcept {
     auto previous_time = std::chrono::steady_clock::now();
 
     while (!stop_requested_.load()) {
+        while (auto command = viewer_command_queue_.try_pop()) {
+            apply_state_command(*command);
+        }
+        {
+            std::lock_guard<std::mutex> lock(state_mutex_);
+            apply_game_mode_state_to_input(state_, window.input);
+        }
+
         MSG msg = {};
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT) {
@@ -197,6 +383,11 @@ void GameMode::run_loop() noexcept {
             if (window.input.focus_cycle_index >= 0 && window.input.focus_cycle_index < object_count) {
                 window.input.focus_uid = window.input.snapshot_uids[static_cast<size_t>(window.input.focus_cycle_index)];
                 window.input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+            } else if (window.input.input_mode == ViewerInputState::InputMode::Follow
+                && window.input.camera_mode == ViewerInputState::CameraMode::FollowObject) {
+                window.input.focus_cycle_index = 0;
+                window.input.focus_uid = window.input.snapshot_uids.front();
+                window.input.camera_mode = ViewerInputState::CameraMode::FollowObject;
             } else {
                 window.input.focus_cycle_index = -1;
                 window.input.focus_uid.clear();
@@ -205,6 +396,11 @@ void GameMode::run_loop() noexcept {
         }
         {
             std::lock_guard<std::mutex> lock(state_mutex_);
+            auto updated_state = make_state_from_input(window.input);
+            if (state_.camera_mode == "fixed" && updated_state.camera_mode == "free") {
+                updated_state.camera_mode = "fixed";
+            }
+            state_ = updated_state;
             last_sim_time_ = snapshot ? snapshot->sim_time : 0.0;
             last_object_count_ = snapshot ? static_cast<long>(snapshot->objects.size()) : 0L;
             shadows_enabled_ = window.input.shadows_enabled;

@@ -10,8 +10,20 @@ Integrates BVR3DEnv with:
 
 import numpy as np
 import os, time
-from ..example import BaseEnv, get_N_AGENT_EACH_TEAM, get_N_TEAM
 from bvr_sim.src_py.reward.reward_visualization import RewardVisualizer
+
+
+class BaseEnv:
+    def __init__(self, rank) -> None:
+        self.rank = rank
+
+
+def get_N_TEAM(config) -> int:
+    return len(config.AGENT_ID_EACH_TEAM)
+
+
+def get_N_AGENT_EACH_TEAM(config) -> list:
+    return [len(team) for team in config.AGENT_ID_EACH_TEAM]
 
 
 # Register this ScenarioConfig into MISSION/env_router.py

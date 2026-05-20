@@ -89,15 +89,26 @@ bool upload_scene_constants(D3D11Context& d3d11, const RenderCommand& command) {
         SceneConstants constants{};
         constants.world_view_proj = command.world_view_proj;
         constants.world = command.world;
-        constants.light_direction_ambient = {-0.40f, 0.82f, -0.40f, 0.40f};
-        constants.light_color_intensity = {1.05f, 1.00f, 0.94f, 1.08f};
+        constants.shadow_world_view_proj = command.shadow_world_view_proj;
+        constants.light_direction_ambient = {
+            GameLightingConfig::k_sun_dir_x,
+            GameLightingConfig::k_sun_dir_y,
+            GameLightingConfig::k_sun_dir_z,
+            0.40f
+        };
+        constants.light_color_intensity = {
+            GameLightingConfig::k_sun_r,
+            GameLightingConfig::k_sun_g,
+            GameLightingConfig::k_sun_b,
+            GameLightingConfig::k_sun_intensity
+        };
         const D3D11Context::MaterialResource* material = command.use_material_system ? find_material(d3d11, command.material_key) : nullptr;
         const bool terrain_material = material ? material->terrain : command.terrain_material;
         const float fog_start = material ? material->fog_start : 65000.0f;
         const float fog_density = material ? material->fog_density : (terrain_material ? 0.000022f : 0.000010f);
         const std::array<float, 3> fog_color = material ? material->fog_color : std::array<float, 3>{0.74f, 0.81f, 0.85f};
         const float team_tint_strength = command.use_material_system
-            ? 0.0f
+            ? (material ? material->team_tint_strength : 0.0f)
             : (terrain_material ? 1.0f : 1.0f);
         const float specular_strength = command.use_material_system
             ? (material ? material->specular_strength : command.specular_strength)
@@ -119,7 +130,21 @@ bool upload_scene_constants(D3D11Context& d3d11, const RenderCommand& command) {
         };
         constants.fog_color_density = {fog_color[0], fog_color[1], fog_color[2], fog_density};
         constants.ambient_sky_ground = {0.58f, 0.28f, 0.0f, 0.0f};
-        constants.material_tint = {team_tint_strength, command.opacity, 0.0f, 0.0f};
+        constants.material_tint = {team_tint_strength, command.opacity, command.receive_shadows ? 1.0f : 0.0f, 0.0f};
+        constants.shadow_params = {d3d11.shadow_srv ? 1.0f : 0.0f, 0.0012f, 0.48f, 0.0f};
+        constants.camera_forward_fov = {
+            command.camera_forward.x,
+            command.camera_forward.y,
+            command.camera_forward.z,
+            command.camera_tan_half_fov_y
+        };
+        constants.camera_right_aspect = {
+            command.camera_right.x,
+            command.camera_right.y,
+            command.camera_right.z,
+            command.camera_aspect
+        };
+        constants.camera_up_pad = {command.camera_up.x, command.camera_up.y, command.camera_up.z, 0.0f};
         std::memcpy(mapped.pData, &constants, sizeof(constants));
         d3d11.context->Unmap(d3d11.constant_buffer, 0);
     } else {
@@ -138,6 +163,7 @@ void bind_draw_state(D3D11Context& d3d11, D3D11_PRIMITIVE_TOPOLOGY topology, boo
         d3d11.context->VSSetConstantBuffers(0, 1, &d3d11.constant_buffer);
         d3d11.context->PSSetConstantBuffers(0, 1, &d3d11.constant_buffer);
         d3d11.context->PSSetSamplers(0, 1, &d3d11.texture_sampler);
+        d3d11.context->PSSetSamplers(1, 1, &d3d11.shadow_sampler);
         d3d11.context->IASetInputLayout(d3d11.input_layout);
         d3d11.context->RSSetState(d3d11.rasterizer_state);
         d3d11.common_pipeline_bound = true;
@@ -195,6 +221,8 @@ void bind_material_texture(D3D11Context& d3d11, const RenderCommand& command) {
         srvs[0] = d3d11.terrain_texture_srv ? d3d11.terrain_texture_srv : d3d11.white_texture_srv;
     }
     d3d11.context->PSSetShaderResources(0, 4, srvs);
+    ID3D11ShaderResourceView* shadow_srv[1] = {d3d11.shadow_srv};
+    d3d11.context->PSSetShaderResources(4, 1, shadow_srv);
     d3d11.current_material_key = cache_key;
     d3d11.material_textures_bound = true;
 }
@@ -469,10 +497,9 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
             value += (std::sin(fx * 0.07f - fy * 0.31f) * 0.5f + 0.5f) * 0.45f;
             value += (std::sin((fx + fy) * 0.49f) * 0.5f + 0.5f) * 0.15f;
             value = std::max(0.0f, std::min(1.0f, value / 1.6f));
-            const bool field_line = (x % 32 == 0) || (y % 32 == 0);
-            const float r = field_line ? 0.52f : 0.68f + value * 0.22f;
-            const float g = field_line ? 0.56f : 0.74f + value * 0.16f;
-            const float b = field_line ? 0.42f : 0.50f + value * 0.12f;
+            const float r = 0.68f + value * 0.22f;
+            const float g = 0.74f + value * 0.16f;
+            const float b = 0.50f + value * 0.12f;
             terrain_pixels[y * terrain_size + x] = pack_rgba8(r, g, b);
         }
     }
@@ -790,6 +817,7 @@ void destroy_d3d11(D3D11Context& d3d11) {
     safe_release(d3d11.flat_normal_texture_srv);
     safe_release(d3d11.white_texture_srv);
     safe_release(d3d11.alpha_blend_state);
+    destroy_shadow_map_resources(d3d11);
     safe_release(d3d11.depth_disabled_state);
     safe_release(d3d11.depth_readonly_state);
     safe_release(d3d11.depth_state);
@@ -797,6 +825,7 @@ void destroy_d3d11(D3D11Context& d3d11) {
     safe_release(d3d11.dynamic_vertex_buffer);
     safe_release(d3d11.constant_buffer);
     safe_release(d3d11.input_layout);
+    safe_release(d3d11.shadow_vertex_shader);
     safe_release(d3d11.pixel_shader);
     safe_release(d3d11.vertex_shader);
     safe_release(d3d11.dsv);
@@ -870,6 +899,7 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
     const char* shader_source = shader_source_storage.c_str();
 
     ID3DBlob* vs_blob = nullptr;
+    ID3DBlob* shadow_vs_blob = nullptr;
     ID3DBlob* ps_blob = nullptr;
     ID3DBlob* error_blob = nullptr;
     hr = D3DCompile(shader_source, std::strlen(shader_source), nullptr, nullptr, nullptr, "vs_main", "vs_4_0", 0, 0, &vs_blob, &error_blob);
@@ -878,9 +908,17 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
         error = "D3DCompile(vs_main) failed";
         return false;
     }
+    hr = D3DCompile(shader_source, std::strlen(shader_source), nullptr, nullptr, nullptr, "vs_shadow_main", "vs_4_0", 0, 0, &shadow_vs_blob, &error_blob);
+    if (FAILED(hr) || !shadow_vs_blob) {
+        safe_release(error_blob);
+        safe_release(vs_blob);
+        error = "D3DCompile(vs_shadow_main) failed";
+        return false;
+    }
     hr = D3DCompile(shader_source, std::strlen(shader_source), nullptr, nullptr, nullptr, "ps_main", "ps_4_0", 0, 0, &ps_blob, &error_blob);
     safe_release(error_blob);
     if (FAILED(hr) || !ps_blob) {
+        safe_release(shadow_vs_blob);
         safe_release(vs_blob);
         error = "D3DCompile(ps_main) failed";
         return false;
@@ -888,13 +926,23 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
 
     hr = d3d11.device->CreateVertexShader(vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), nullptr, &d3d11.vertex_shader);
     if (FAILED(hr) || !d3d11.vertex_shader) {
+        safe_release(shadow_vs_blob);
         safe_release(vs_blob);
         safe_release(ps_blob);
         error = "CreateVertexShader failed";
         return false;
     }
+    hr = d3d11.device->CreateVertexShader(shadow_vs_blob->GetBufferPointer(), shadow_vs_blob->GetBufferSize(), nullptr, &d3d11.shadow_vertex_shader);
+    if (FAILED(hr) || !d3d11.shadow_vertex_shader) {
+        safe_release(shadow_vs_blob);
+        safe_release(vs_blob);
+        safe_release(ps_blob);
+        error = "CreateVertexShader(shadow) failed";
+        return false;
+    }
     hr = d3d11.device->CreatePixelShader(ps_blob->GetBufferPointer(), ps_blob->GetBufferSize(), nullptr, &d3d11.pixel_shader);
     if (FAILED(hr) || !d3d11.pixel_shader) {
+        safe_release(shadow_vs_blob);
         safe_release(vs_blob);
         safe_release(ps_blob);
         error = "CreatePixelShader failed";
@@ -915,6 +963,7 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
         &d3d11.input_layout
     );
     safe_release(vs_blob);
+    safe_release(shadow_vs_blob);
     safe_release(ps_blob);
     if (FAILED(hr) || !d3d11.input_layout) {
         error = "CreateInputLayout failed";
@@ -992,6 +1041,9 @@ bool create_d3d11(HWND hwnd, D3D11Context& d3d11, std::string& error) {
     if (!create_texture_sampler(d3d11, error)) {
         return false;
     }
+    if (!create_shadow_map_resources(d3d11, error)) {
+        return false;
+    }
 
     return true;
 }
@@ -1040,8 +1092,21 @@ bool execute_render_commands(D3D11Context& d3d11, const RenderCommandList& comma
     out_stats = {};
     out_stats.command_count = static_cast<long>(command_list.commands.size());
 
+    if (!render_shadow_map(d3d11, command_list)) {
+        return false;
+    }
+
     ID3D11RenderTargetView* render_targets[1] = {d3d11.rtv};
     d3d11.context->OMSetRenderTargets(1, render_targets, d3d11.dsv);
+    d3d11.common_pipeline_bound = false;
+    D3D11_VIEWPORT viewport = {};
+    viewport.TopLeftX = 0.0f;
+    viewport.TopLeftY = 0.0f;
+    viewport.Width = static_cast<float>(std::max<UINT>(1, d3d11.back_buffer_width));
+    viewport.Height = static_cast<float>(std::max<UINT>(1, d3d11.back_buffer_height));
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    d3d11.context->RSSetViewports(1, &viewport);
 
     for (const RenderCommand& command : command_list.commands) {
         if (command.type == RenderCommandType::Clear) {

@@ -184,6 +184,21 @@ void SimCore::step(int steps) {
 }
 
 json::JSON SimCore::handle(const std::string& cmd) {
+    constexpr const char* kGameModeGet = "game_mode get";
+    constexpr const char* kGameModeSet = "game_mode set ";
+    if (cmd == kGameModeGet) {
+        return get_game_mode_status();
+    }
+    if (cmd.rfind(kGameModeSet, 0) == 0) {
+        json::JSON payload = json::JSON::Load(cmd.substr(std::string(kGameModeSet).size()));
+        TelemetryCommand command;
+        command.kind = TelemetryCommandKind::SetGameCamera;
+        command.payload = payload;
+        if (payload.JSONType() == json::JSON::Class::Object && payload.hasKey("target_uid", json::JSON::Class::String)) {
+            command.target_uid = payload.at("target_uid").ToString();
+        }
+        return telemetry_command_result_to_json(handle_telemetry_command(command));
+    }
     return CmdHandler::instance().handle(cmd);
 }
 
@@ -471,6 +486,13 @@ TelemetryCommandResult SimCore::handle_telemetry_command(const TelemetryCommand&
         format_check(step_count > 0, "Telemetry step command requires positive steps");
         step(step_count);
         return make_command_result("applied", "simulation advanced", command);
+    }
+    if (command.kind == TelemetryCommandKind::SetGameCamera) {
+        format_check(command.payload.JSONType() == json::JSON::Class::Object, "Telemetry set_game_camera payload must be object");
+        if (game_mode_) {
+            game_mode_->queue_viewer_command(command);
+        }
+        return make_command_result("applied", "game mode camera command queued", command);
     }
     if (command.kind == TelemetryCommandKind::ObjectDebug) {
         format_check(!command.target_uid.empty(), "Telemetry object_debug command requires target_uid");

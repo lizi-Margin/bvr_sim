@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`bvr_sim/` is the main package. Top-level Python entry points such as `bvr_env.py` and `bvr_env_cpp.py` wrap the simulation backends. Core Python simulation logic lives under `bvr_sim/src_py/` (`simulator/`, `reward/`, `baseline_opponents/`), while native code lives under `bvr_sim/src_cxx/`. Build outputs land in `bvr_sim/build/` and `bvr_sim/install/`; treat both as generated artifacts. Tests and runnable configs live in `tests/`, and integration examples live in `example/`.
+`bvr_sim/` is the main package. Top-level Python entry points such as `bvr_env.py` and `bvr_env_cpp.py` wrap the simulation backends. Core Python simulation logic lives under `bvr_sim/src_py/` (`simulator/`, `reward/`, `baseline_opponents/`), while native code lives under `bvr_sim/src_cxx/`. Build outputs land in `bvr_sim/build/` and `bvr_sim/install/`; treat both as generated artifacts. Tests live in `tests/`, standard performance configs/runners live in `benchmarks/`, formal RL environment wrappers live in `rl_envs/`, and experimental scripts/configs live in `experimental/`.
 
 ## Build, Test, and Development Commands
 Use `pip install -e .` for an editable Python install from the repo root.

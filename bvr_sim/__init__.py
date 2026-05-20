@@ -27,12 +27,12 @@ Wrappers for RL frameworks
 # for MARLBenchmark (on-policy, off-policy):
 # compatible fork: https://github.com/lizi-Margin/off-policy
 # original: https://github.com/marlbenchmark
-# from .env_marlbenchmark import BVRSimEnvMarlBenchmark, MultiAgentEnvWrapper
+# from rl_envs.env_marlbenchmark import BVRSimEnvMarlBenchmark, MultiAgentEnvWrapper
 
 # for HARL
 # compatible fork: https://github.com/lizi-Margin/HARL4BVRSim
 # original: https://github.com/PKU-MARL/HARL
-# from .env_harl import BVRSimEnv, HARLLogger
+# from rl_envs.env_harl import BVRSimEnv, HARLLogger
 
 # for UHRL: https://github.com/lizi-Margin/UHRL
-# from .env_wrapper import BVR3DWrapper, make_env, ScenarioConfig
+# from rl_envs.env_wrapper import BVR3DWrapper, make_env, ScenarioConfig

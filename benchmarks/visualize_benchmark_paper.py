@@ -13,8 +13,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-DEFAULT_WINDOWS_CSV = "benchmark_results_20260504_170324.csv"
-DEFAULT_LINUX_CSV = "benchmark_results_20260504_170324_linux.csv"
+BENCHMARK_DIR = Path(__file__).resolve().parent
+RESULTS_DIR = BENCHMARK_DIR / "results"
+DEFAULT_WINDOWS_CSV = RESULTS_DIR / "benchmark_results_20260504_170324.csv"
+DEFAULT_LINUX_CSV = RESULTS_DIR / "benchmark_results_20260504_170324_linux.csv"
 SERIES_COLORS = {
     ("Windows", "Python"): "#1f77b4",
     ("Windows", "C++"): "#d62728",
@@ -166,19 +168,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--windows-csv",
         type=Path,
-        default=Path(DEFAULT_WINDOWS_CSV),
+        default=DEFAULT_WINDOWS_CSV,
         help="Benchmark CSV collected on Windows.",
     )
     parser.add_argument(
         "--linux-csv",
         type=Path,
-        default=Path(DEFAULT_LINUX_CSV),
+        default=DEFAULT_LINUX_CSV,
         help="Benchmark CSV collected on Linux.",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("."),
+        default=RESULTS_DIR,
         help="Directory for generated figures.",
     )
     return parser.parse_args()

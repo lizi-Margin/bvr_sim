@@ -33,15 +33,19 @@ TEST(TelemetryCommandQueue, ParsesKnownCommandKinds) {
     auto focus = bvr_sim::telemetry_command_kind_from_string("set_focus_uid");
     auto object_debug = bvr_sim::telemetry_command_kind_from_string("object_debug");
     auto command = bvr_sim::telemetry_command_kind_from_string("command");
+    auto set_game_camera = bvr_sim::telemetry_command_kind_from_string("set_game_camera");
 
     ASSERT(pause.has_value());
     ASSERT(focus.has_value());
     ASSERT(object_debug.has_value());
     ASSERT(command.has_value());
+    ASSERT(set_game_camera.has_value());
     ASSERT(static_cast<int>(*pause) == static_cast<int>(bvr_sim::TelemetryCommandKind::Pause));
     ASSERT(static_cast<int>(*focus) == static_cast<int>(bvr_sim::TelemetryCommandKind::SetFocusUid));
     ASSERT(static_cast<int>(*object_debug) == static_cast<int>(bvr_sim::TelemetryCommandKind::ObjectDebug));
     ASSERT(static_cast<int>(*command) == static_cast<int>(bvr_sim::TelemetryCommandKind::Command));
+    ASSERT(static_cast<int>(*set_game_camera) == static_cast<int>(bvr_sim::TelemetryCommandKind::SetGameCamera));
+    ASSERT(bvr_sim::telemetry_command_kind_to_string(bvr_sim::TelemetryCommandKind::SetGameCamera) == "set_game_camera");
 }
 
 TEST(TelemetryCommandQueue, RejectsUnknownCommandKind) {

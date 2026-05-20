@@ -9,7 +9,7 @@ def get_root_dir() -> str:
 
 
 def main():
-    with open(os.path.join(get_root_dir(), "./example/custom_5v5_f22_f16_bvr.jsonc"), "r", encoding="utf-8") as fin:
+    with open(os.path.join(get_root_dir(), "./experimental/custom_5v5_f22_f16_bvr.jsonc"), "r", encoding="utf-8") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)

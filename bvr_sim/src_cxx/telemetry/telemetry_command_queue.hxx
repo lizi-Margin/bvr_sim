@@ -16,7 +16,8 @@ enum class TelemetryCommandKind {
     SetFocusUid,
     SetSubscriptionFilter,
     ObjectDebug,
-    Command
+    Command,
+    SetGameCamera
 };
 
 struct TelemetryCommand {

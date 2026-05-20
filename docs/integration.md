@@ -9,9 +9,9 @@
 
 项目里已经有三类入口：
 
-- 通用/外部框架包装示例：[`example/env_wrapper.py`](example/env_wrapper.py)
-- HARL 适配：[`example/env_harl.py`](example/env_harl.py)
-- MARLBenchmark 适配：[`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
+- 通用/外部框架包装示例：[`rl_envs/env_wrapper.py`](../rl_envs/env_wrapper.py)
+- HARL 适配：[`rl_envs/env_harl.py`](../rl_envs/env_harl.py)
+- MARLBenchmark 适配：[`rl_envs/env_marlbenchmark.py`](../rl_envs/env_marlbenchmark.py)
 
 如果你是第一次做集成，不要从 `src_py/` 或 `src_cxx/` 开始读，先从这三个包装文件入手。
 
@@ -47,7 +47,7 @@ obs, reward, done, info = env.step(action)
 
 ## HARL 适配
 
-参考 [`example/env_harl.py`](example/env_harl.py)。
+参考 [`rl_envs/env_harl.py`](../rl_envs/env_harl.py)。
 
 这个文件做的事情主要有：
 
@@ -63,7 +63,7 @@ obs, reward, done, info = env.step(action)
 
 参考：
 
-- [`example/env_marlbenchmark.py`](example/env_marlbenchmark.py)
+- [`rl_envs/env_marlbenchmark.py`](../rl_envs/env_marlbenchmark.py)
 
 这个文件已经处理了几件关键事情：
 
@@ -78,7 +78,7 @@ obs, reward, done, info = env.step(action)
 
 参考：
 
-- [`example/env_wrapper.py`](example/env_wrapper.py)
+- [`rl_envs/env_wrapper.py`](../rl_envs/env_wrapper.py)
 
 这个文件更接近“项目方自己使用的包装层”，特点是：
 
@@ -166,4 +166,4 @@ obs, reward, done, info = env.step(action)
 
 - README 里只保留一个最小集成示例
 - 复杂框架适配全部放进 `docs/integration.md`
-- 每个 `example/` 文件顶部都写清楚“这个文件是给哪个框架用的”
+- 每个 `rl_envs/` 文件顶部都写清楚“这个文件是给哪个框架用的”

@@ -14,8 +14,11 @@ plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams['font.size'] = 11
 plt.rcParams['figure.figsize'] = (14, 10)
 
+BENCHMARK_DIR = Path(__file__).resolve().parent
+RESULTS_DIR = BENCHMARK_DIR / "results"
+
 # Read the CSV file
-csv_file = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("benchmark_results_20260324_035734.csv")
+csv_file = Path(sys.argv[1]) if len(sys.argv) > 1 else RESULTS_DIR / "benchmark_results_20260324_035734.csv"
 df = pd.read_csv(csv_file)
 
 # Extract data for each backend
@@ -193,7 +196,8 @@ fig.suptitle('BVR Sim Performance Benchmark Results\nPython (BVR3DEnv) vs C++ (B
 plt.tight_layout(rect=[0, 0, 1, 0.96])
 
 # Save figure
-output_path = "benchmark_visualization.png"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+output_path = RESULTS_DIR / "benchmark_visualization.png"
 plt.savefig(output_path, dpi=300, bbox_inches='tight')
 print(f"[DONE] Visualization saved to: {output_path}")
 
@@ -238,7 +242,7 @@ for i, (bar, val) in enumerate(zip(bars3, speedup_arr)):
             ha='center', va='bottom', fontsize=9, fontweight='bold', color='darkgreen')
 
 plt.tight_layout()
-output_path2 = "benchmark_detailed_comparison.png"
+output_path2 = RESULTS_DIR / "benchmark_detailed_comparison.png"
 plt.savefig(output_path2, dpi=300, bbox_inches='tight')
 print(f"[DONE] Detailed comparison saved to: {output_path2}")
 
