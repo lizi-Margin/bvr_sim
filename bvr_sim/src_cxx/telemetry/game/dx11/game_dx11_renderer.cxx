@@ -507,6 +507,12 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
         const float broad = std::sin(t * 5.0f + lane * 1.13f) * 0.5f + 0.5f;
         return std::max(0.72f, std::min(1.0f, broad * 0.82f + broken * 0.32f));
     };
+    auto road_width_scale = [](float world_axis, float lane) {
+        const float t = (world_axis + 480000.0f) / 960000.0f;
+        const float width_noise = std::sin(t * 23.0f + lane * 3.11f) * 0.5f + 0.5f;
+        const float broad_noise = std::sin(t * 7.0f + lane * 1.63f) * 0.5f + 0.5f;
+        return 0.2f + 0.3f * std::min(1.0f, width_noise * 0.65f + broad_noise * 0.45f);
+    };
     auto road_center_z = [](float world_x, float lane) {
         const float t = (world_x + 480000.0f) / 960000.0f;
         return std::sin(t * 5.7f + lane * 1.37f) * 52000.0f
@@ -532,13 +538,15 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
             float road_mask = 0.0f;
             for (int lane = 0; lane < 3; ++lane) {
                 const float center_z = road_center_z(world_x, static_cast<float>(lane));
-                const float width = lane == 1 ? 3000.0f : 2400.0f;
-                const float mask = 1.0f - smoothstep(width, width + 3600.0f, std::abs(world_z - center_z));
+                const float width_scale = road_width_scale(world_x, static_cast<float>(lane));
+                const float width = (lane == 1 ? 300.0f : 240.0f) * width_scale;
+                const float mask = 1.0f - smoothstep(width, width + 360.0f * width_scale, std::abs(world_z - center_z));
                 road_mask = std::max(road_mask, mask * road_presence(world_x, static_cast<float>(lane)));
             }
             for (int lane = 0; lane < 2; ++lane) {
                 const float center_x = road_center_x(world_z, static_cast<float>(lane));
-                const float mask = 1.0f - smoothstep(2200.0f, 5200.0f, std::abs(world_x - center_x));
+                const float width_scale = road_width_scale(world_z, static_cast<float>(lane) + 3.0f);
+                const float mask = 1.0f - smoothstep(220.0f * width_scale, 520.0f * width_scale, std::abs(world_x - center_x));
                 road_mask = std::max(road_mask, mask * road_presence(world_z, static_cast<float>(lane) + 3.0f));
             }
             for (int lane = 0; lane < 2; ++lane) {
@@ -548,7 +556,8 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
                 const float center_z = world_x * slope + offset
                     + std::sin(t * 8.5f + static_cast<float>(lane) * 1.4f) * 26000.0f
                     + std::sin(t * 21.0f + static_cast<float>(lane) * 2.2f) * 7200.0f;
-                const float mask = 1.0f - smoothstep(1900.0f, 4400.0f, std::abs(world_z - center_z));
+                const float width_scale = road_width_scale(world_x + world_z, static_cast<float>(lane) + 5.0f);
+                const float mask = 1.0f - smoothstep(190.0f * width_scale, 440.0f * width_scale, std::abs(world_z - center_z));
                 road_mask = std::max(road_mask, mask * road_presence(world_x + world_z, static_cast<float>(lane) + 5.0f) * 0.86f);
             }
 

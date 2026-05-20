@@ -219,9 +219,12 @@ float4 ps_main(PSInput input) : SV_TARGET {
             + sin(road_world.y * 0.00016 + 1.7) * 6200.0 + 64000.0;
         float diagonal_center_z = road_world.x * -0.34 + 112000.0
             + sin((road_world.x + road_world.y) * 0.000048) * 19000.0;
-        float shader_road = 1.0 - smoothstep(3600.0, 9600.0, abs(road_world.y - road_center_z));
-        shader_road = max(shader_road, 1.0 - smoothstep(3200.0, 8600.0, abs(road_world.x - road_center_x)));
-        shader_road = max(shader_road, (1.0 - smoothstep(2800.0, 7600.0, abs(road_world.y - diagonal_center_z))) * 0.82);
+        float road_width_z = lerp(0.2, 0.5, saturate(sin(road_world.x * 0.00023 + 1.9) * 0.35 + sin(road_world.x * 0.000071 + 0.6) * 0.28 + 0.5));
+        float road_width_x = lerp(0.2, 0.5, saturate(sin(road_world.y * 0.00021 + 3.1) * 0.35 + sin(road_world.y * 0.000069 + 1.4) * 0.28 + 0.5));
+        float road_width_d = lerp(0.2, 0.5, saturate(sin((road_world.x + road_world.y) * 0.00019 + 2.4) * 0.35 + sin((road_world.x + road_world.y) * 0.000061) * 0.28 + 0.5));
+        float shader_road = 1.0 - smoothstep(360.0 * road_width_z, 960.0 * road_width_z, abs(road_world.y - road_center_z));
+        shader_road = max(shader_road, 1.0 - smoothstep(320.0 * road_width_x, 860.0 * road_width_x, abs(road_world.x - road_center_x)));
+        shader_road = max(shader_road, (1.0 - smoothstep(280.0 * road_width_d, 760.0 * road_width_d, abs(road_world.y - diagonal_center_z))) * 0.82);
         road_mask = max(road_mask, shader_road * (1.0 - water_mask));
         float terrain = terrain_fbm(terrain_position * 0.42 + 7000.0);
         float macro = terrain_fbm(terrain_position * 0.13 + 17000.0);
