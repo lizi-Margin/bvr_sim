@@ -447,14 +447,8 @@ bool is_missile_object(const TelemetryObjectState& object) {
     return object.type.find("Missile") != std::string::npos;
 }
 
-float object_world_radius(const TelemetryObjectState& object) {
-    if (is_missile_object(object)) {
-        return 180.0f;
-    }
-    if (is_aircraft_object(object)) {
-        return 320.0f;
-    }
-    return 180.0f;
+float object_render_scale(const TelemetryObjectState&) {
+    return 1.0f;
 }
 
 std::string resolve_mesh_asset_name(const TelemetryObjectState& object) {
@@ -544,32 +538,31 @@ void append_aircraft_primitive(std::vector<DX11Vertex>& vertices, const std::arr
         push_lit_triangle(vertices, a, c, d, color);
     };
 
-    push_triangle(make_float3(180.0f, 0.0f, 0.0f), make_float3(-120.0f, 40.0f, 90.0f), make_float3(-120.0f, 40.0f, -90.0f));
-    push_triangle(make_float3(180.0f, 0.0f, 0.0f), make_float3(-120.0f, -40.0f, -90.0f), make_float3(-120.0f, -40.0f, 90.0f));
+    push_triangle(make_float3(9.0f, 0.0f, 0.0f), make_float3(-6.0f, 2.0f, 4.5f), make_float3(-6.0f, 2.0f, -4.5f));
+    push_triangle(make_float3(9.0f, 0.0f, 0.0f), make_float3(-6.0f, -2.0f, -4.5f), make_float3(-6.0f, -2.0f, 4.5f));
 
-    append_box(vertices, 150.0f, 16.0f, 520.0f, color);
+    append_box(vertices, 7.5f, 0.8f, 18.0f, color);
 }
 
 void append_missile_primitive(std::vector<DX11Vertex>& vertices, const std::array<float, 3>& color) {
-    append_box(vertices, 220.0f, 24.0f, 24.0f, color);
+    append_box(vertices, 3.0f, 0.25f, 0.25f, color);
 }
 
 void append_ground_primitive(std::vector<DX11Vertex>& vertices, const std::array<float, 3>& color) {
     append_box(vertices, 180.0f, 90.0f, 180.0f, color);
 }
 
-void append_obj_mesh(std::vector<DX11Vertex>& vertices, const MeshData& mesh, float world_radius, const std::array<float, 3>& color) {
+void append_obj_mesh(std::vector<DX11Vertex>& vertices, const MeshData& mesh, float render_scale, const std::array<float, 3>& color) {
     if (!mesh.loaded || mesh.vertices.empty() || mesh.radius <= 1e-6f) {
         return;
     }
 
-    const float scale_value = world_radius / mesh.radius;
     for (size_t i = 0; i + 2 < mesh.vertices.size(); i += 3) {
         const auto make_position = [&](const MeshData::MeshVertex& mesh_vertex) {
             return make_float3(
-                (mesh_vertex.position[0] - mesh.center[0]) * scale_value,
-                (mesh_vertex.position[1] - mesh.center[1]) * scale_value,
-                (mesh_vertex.position[2] - mesh.center[2]) * scale_value
+                (mesh_vertex.position[0] - mesh.center[0]) * render_scale,
+                (mesh_vertex.position[1] - mesh.center[1]) * render_scale,
+                (mesh_vertex.position[2] - mesh.center[2]) * render_scale
             );
         };
         const auto push_mesh_vertex = [&](const MeshData::MeshVertex& source) {
@@ -592,7 +585,7 @@ void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
         const float broad = std::sin(x * 0.000055f + z * 0.000037f) * 0.5f + 0.5f;
         const float ridge = std::sin(x * 0.00019f - z * 0.00015f) * 0.5f + 0.5f;
         const float detail = std::sin((x + z) * 0.00072f) * 0.5f + 0.5f;
-        return (broad * 620.0f) + (ridge * ridge * 420.0f) + (detail * 95.0f) - 260.0f;
+        return (broad * 65.0f) + (ridge * ridge * 42.0f) + (detail * 15.0f) - 18.0f;
     };
 
     auto terrain_normal = [&](float x, float z) {
@@ -607,7 +600,7 @@ void append_ground_plane(std::vector<DX11Vertex>& vertices, float size) {
     auto color_at = [&](float x, float z) {
         const float band = std::sin(x * 0.00012f + z * 0.00019f) * 0.5f + 0.5f;
         const float macro = std::sin(x * 0.000031f - z * 0.000047f) * 0.5f + 0.5f;
-        const float height_blend = std::clamp((terrain_height(x, z) + 160.0f) / 920.0f, 0.0f, 1.0f);
+        const float height_blend = std::clamp((terrain_height(x, z) + 18.0f) / 122.0f, 0.0f, 1.0f);
         const float edge = std::clamp((std::max(std::abs(x), std::abs(z)) - size * 0.72f) / (size * 0.24f), 0.0f, 1.0f);
         const std::array<float, 3> far_haze = {0.48f, 0.55f, 0.44f};
         std::array<float, 3> color{};
@@ -671,7 +664,7 @@ void append_sky_quad(std::vector<DX11Vertex>& vertices) {
 }
 
 Float4x4 build_object_world_matrix(const TelemetryObjectState& object) {
-    const float scale_value = object_world_radius(object) / 180.0f;
+    const float scale_value = object_render_scale(object);
     const Float4x4 scale_m = Float4x4::scale(scale_value, scale_value, scale_value);
     const Float4x4 model_offset = Float4x4::rotation_y(static_cast<float>(c3utils::deg2rad(270.0)));
     const Float4x4 rotation_m = build_object_rotation_matrix(object);
@@ -700,7 +693,7 @@ void create_object_geometry(const TelemetryObjectState& object, std::vector<DX11
     const std::string mesh_asset = resolve_mesh_asset_name(object);
     if (!mesh_asset.empty()) {
         if (MeshData* mesh = load_named_mesh(mesh_asset)) {
-            append_obj_mesh(vertices, *mesh, object_world_radius(object), color);
+            append_obj_mesh(vertices, *mesh, 1.0f, color);
             return;
         }
     }

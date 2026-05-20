@@ -3,6 +3,7 @@
 #include "../telemetry_bridge.hxx"
 #include "../telemetry_command_queue.hxx"
 #include "../telemetry_types.hxx"
+#include "game_config.hxx"
 #include "support/json.hpp"
 
 #include <array>
@@ -22,7 +23,7 @@ public:
         std::string camera_mode = "follow";
         std::string target_uid;
         int focus_index = 0;
-        double distance = 1000.0;
+        double distance = GameCameraConfig::k_min_distance;
         double yaw = 0.70;
         double pitch = 0.55;
         double fov_y = 100.0;
