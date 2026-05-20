@@ -487,7 +487,7 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
         return false;
     }
 
-    constexpr UINT terrain_size = 1024;
+    constexpr UINT terrain_size = 2048;
     std::vector<std::uint32_t> terrain_pixels(terrain_size * terrain_size);
 
     auto saturate = [](float value) {
@@ -503,15 +503,17 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
     };
     auto road_center_z = [](float world_x, float lane) {
         const float t = (world_x + 480000.0f) / 960000.0f;
-        return std::sin(t * 8.2f + lane * 0.85f) * 42000.0f
-            + std::sin(t * 19.0f + lane * 0.26f) * 14500.0f
-            + (lane - 1.0f) * 85000.0f;
+        return std::sin(t * 5.7f + lane * 1.37f) * 52000.0f
+            + std::sin(t * 13.0f + lane * 0.53f) * 18000.0f
+            + std::sin(t * 29.0f + lane * 2.10f) * 6200.0f
+            + (lane - 0.5f) * 165000.0f;
     };
     auto road_center_x = [](float world_z, float lane) {
         const float t = (world_z + 480000.0f) / 960000.0f;
-        return std::sin(t * 7.1f + lane * 1.15f) * 36000.0f
-            + std::sin(t * 15.0f + lane * 0.41f) * 13000.0f
-            + (lane - 1.0f) * 115000.0f;
+        return std::sin(t * 4.8f + lane * 1.91f) * 47000.0f
+            + std::sin(t * 11.0f + lane * 0.74f) * 16000.0f
+            + std::sin(t * 23.0f + lane * 1.60f) * 5200.0f
+            + (lane - 0.5f) * 210000.0f;
     };
 
     for (UINT y = 0; y < terrain_size; ++y) {
@@ -522,14 +524,13 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
             const float world_z = (v - 0.5f) * 960000.0f;
 
             float road_mask = 0.0f;
-            for (int lane = 0; lane < 3; ++lane) {
+            for (int lane = 0; lane < 2; ++lane) {
                 const float center_z = road_center_z(world_x, static_cast<float>(lane));
-                const float width = lane == 1 ? 8200.0f : 6200.0f;
-                road_mask = std::max(road_mask, 1.0f - smoothstep(width, width + 4200.0f, std::abs(world_z - center_z)));
-                const float center_x = road_center_x(world_z, static_cast<float>(lane));
-                const float cross_width = lane == 1 ? 7000.0f : 5200.0f;
-                road_mask = std::max(road_mask, 1.0f - smoothstep(cross_width, cross_width + 3600.0f, std::abs(world_x - center_x)));
+                const float width = lane == 0 ? 360.0f : 430.0f;
+                road_mask = std::max(road_mask, 1.0f - smoothstep(width, width + 540.0f, std::abs(world_z - center_z)));
             }
+            const float center_x = road_center_x(world_z, 0.0f);
+            road_mask = std::max(road_mask, 1.0f - smoothstep(360.0f, 900.0f, std::abs(world_x - center_x)));
 
             float water_mask = 0.0f;
             for (int lake = 0; lake < 6; ++lake) {
@@ -550,7 +551,7 @@ bool create_procedural_textures(D3D11Context& d3d11, std::string& error) {
                 const float cz = road_center_z(cx, std::fmod(seed, 3.0f)) + (hash2(seed, 32.0f) - 0.5f) * 24000.0f;
                 const float dx = std::abs(world_x - cx);
                 const float dz = std::abs(world_z - cz);
-                const float town = (1.0f - smoothstep(14500.0f, 26500.0f, std::max(dx, dz))) * (0.76f + hash2(seed, 37.0f) * 0.24f);
+                const float town = (1.0f - smoothstep(2600.0f, 5200.0f, std::max(dx, dz))) * (0.76f + hash2(seed, 37.0f) * 0.24f);
                 village_mask = std::max(village_mask, town);
             }
 
