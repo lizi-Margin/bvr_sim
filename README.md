@@ -1,13 +1,39 @@
 # BVR Sim
 
+<p align="center">
+  <strong>面向多智能体强化学习的 3D 超视距空战仿真环境</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.bilibili.com/video/BV115SvBaEGn">演示视频</a>
+  ·
+  <a href="docs/getting_started.md">快速开始</a>
+  ·
+  <a href="docs/configuration.md">配置说明</a>
+  ·
+  <a href="docs/integration.md">RL 集成</a>
+</p>
+
+<p align="center">
+  <img alt="Python 3.8+" src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white">
+  <img alt="C++ backend" src="https://img.shields.io/badge/C%2B%2B-backend-00599C?logo=cplusplus&logoColor=white">
+  <img alt="Gymnasium compatible" src="https://img.shields.io/badge/Gymnasium-RL-16A085">
+  <img alt="License GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue">
+</p>
+
+<p align="center">
+  <img src="docs/assets/game-mode.png" alt="BVR Sim game mode cockpit view" width="49%">
+  <img src="docs/assets/tactical-view.png" alt="BVR Sim tactical visualization view" width="49%">
+</p>
+
 `bvr-sim` 是一个面向多智能体强化学习的 3D 超视距空战仿真环境，提供两套后端：
 
 - 纯 Python 环境，便于调试和快速验证
 - C++ + Python 混合环境，便于更高性能训练和扩展
 
-项目当前已经包含：
+## 核心能力
 
-- 3D 飞机动力学与高度控制
+- 基于 JSBSim 的六自由度飞行动力学模型
 - 空空导弹与地面防空单位仿真
 - C++ `MModelA` 导弹模型，支持 `AIM-120C7` 与 `AIM-9M`
 - ISA 大气与更严格的 C++ 参数/动作校验
