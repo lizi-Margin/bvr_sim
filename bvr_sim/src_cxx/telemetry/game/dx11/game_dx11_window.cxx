@@ -197,6 +197,9 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             if (w_param == VK_CONTROL) { window->input.pylon_cycle_ctrl_armed = true; return 0; }
         }
         if (w_param == VK_F1) {
+            if ((l_param & (1L << 30)) != 0) {
+                return 0;
+            }
             const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
             window->input.input_mode = ViewerInputState::InputMode::Control;
             if (was_control_mode) {
@@ -205,9 +208,14 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             return 0;
         }
         if (w_param == VK_F2) {
+            if ((l_param & (1L << 30)) != 0) {
+                return 0;
+            }
             const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
             window->input.input_mode = ViewerInputState::InputMode::Follow;
-            if (!was_control_mode) {
+            if (was_control_mode) {
+                window->input.focus_cycle_requested = false;
+            } else {
                 window->input.focus_cycle_requested = true;
             }
             return 0;

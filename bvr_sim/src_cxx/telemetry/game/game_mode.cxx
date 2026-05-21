@@ -277,10 +277,6 @@ void GameMode::run_loop() noexcept {
             apply_state_command(*command);
         }
 
-        if (!renderer->process_messages()) {
-            break;
-        }
-
         const auto now = std::chrono::steady_clock::now();
         const float dt_seconds = std::clamp(
             std::chrono::duration_cast<std::chrono::duration<float>>(now - previous_time).count(),
@@ -309,6 +305,10 @@ void GameMode::run_loop() noexcept {
             renderer->apply_camera_state(cam);
         }
 
+        if (!renderer->process_messages()) {
+            break;
+        }
+
         auto snapshot = snapshot_provider_ ? snapshot_provider_() : std::shared_ptr<const WorldSnapshot>();
 
         renderer->update_input(snapshot.get(), dt_seconds);
@@ -334,6 +334,23 @@ void GameMode::run_loop() noexcept {
             last_vertex_count_ = frame_stats.vertex_count;
             shadows_enabled_ = renderer->get_shadows_enabled();
             material_system_enabled_ = renderer->get_material_system_enabled();
+
+            const RendererCameraState cam = renderer->get_camera_state();
+            state_.input_mode = cam.input_mode;
+            state_.camera_mode = cam.camera_mode;
+            state_.target_uid = cam.target_uid;
+            state_.focus_index = cam.focus_index;
+            state_.distance = cam.distance;
+            state_.yaw = cam.yaw;
+            state_.pitch = cam.pitch;
+            state_.fov_y = cam.fov_y;
+            state_.roll_locked = cam.roll_locked;
+            state_.mouse_aim_enabled = cam.mouse_aim_enabled;
+            if (cam.has_target) {
+                state_.target = std::array<double, 3>{cam.target[0], cam.target[1], cam.target[2]};
+            } else {
+                state_.target.reset();
+            }
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
