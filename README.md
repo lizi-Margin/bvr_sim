@@ -22,8 +22,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/assets/game-mode.png" alt="BVR Sim game mode cockpit view" width="49%">
-  <img src="docs/assets/tactical-view.png" alt="BVR Sim tactical visualization view" width="49%">
+  <img src="docs/assets/game-mode.png" alt="BVR Sim game mode cockpit view" width="90%">
 </p>
 
 `bvr-sim` 是一个面向多智能体强化学习的 3D 超视距空战仿真环境，提供两套后端：
@@ -35,8 +34,8 @@
 
 - 基于 JSBSim 的六自由度飞行动力学模型
 - 空空导弹与地面防空单位仿真
-- C++ `MModelA` 导弹模型，支持 `AIM-120C7` 与 `AIM-9M`
-- ISA 大气与更严格的 C++ 参数/动作校验
+- 支持 `AIM-120C`、`AIM-9M` 与参数化定制导弹
+- 支持标准大气模型和可配置交战场景
 - 多种 observation space
 - 可配置 reward shaping
 - 基于 ACMI 的 Tacview 回放输出
@@ -56,12 +55,6 @@ rl_envs/               正式外部 RL 框架适配入口
 experimental/          实验性脚本与 JSON/JSONC 配置
 docs/                  研究材料与补充文档
 ```
-
-## 开源状态说明
-
-当前仓库按 GPLv3 发布主项目代码，第三方依赖和资源保留各自原始许可证。项目面向科研、算法验证和仿真环境开发；导弹、飞机和传感器模型均为研究仿真用途，不应被理解为真实装备性能声明。
-
-公开发布前的维护清单见 [`docs/release_checklist.md`](docs/release_checklist.md)。如果你在论文或项目中使用本仓库，可以先参考 [`CITATION.cff`](CITATION.cff)，正式仓库 URL 确定后需要更新其中的占位地址。
 
 ## 环境要求
 
