@@ -355,6 +355,559 @@ void append_line_segment(
     out_vertices.push_back(DX11Vertex{{x1,y1,z},{c0,c1,c2},{nx,ny,nz},{0.0f,0.0f}});
 }
 
+void append_hud_rect(
+    std::vector<DX11Vertex>& out_vertices,
+    float x0,
+    float y0,
+    float x1,
+    float y1,
+    const Float3& color) {
+    append_text_quad_vertices(out_vertices, x0, y0, x1, y1, color, 1.0f);
+}
+
+void append_hud_point(
+    std::vector<DX11Vertex>& out_vertices,
+    float x,
+    float y,
+    float radius_x,
+    float radius_y,
+    const Float3& color) {
+    append_text_quad_vertices(out_vertices, x - radius_x, y - radius_y, x + radius_x, y + radius_y, color, 1.0f);
+}
+
+void append_hud_text_pixels(
+    std::vector<DX11Vertex>& vertices,
+    const std::string& text,
+    float x_px,
+    float y_px,
+    UINT width,
+    UINT height,
+    int pixel_scale,
+    const Float3& color,
+    float opacity) {
+    auto to_ndc = [width, height](float px, float py) -> Float3 {
+        const float x = (px / static_cast<float>(width)) * 2.0f - 1.0f;
+        const float y = 1.0f - (py / static_cast<float>(height)) * 2.0f;
+        return Float3{x, y, 0.0f};
+    };
+
+    int x = static_cast<int>(x_px);
+    const int y = static_cast<int>(y_px);
+    const int glyph_w = 5 * pixel_scale;
+    const int glyph_gap = pixel_scale;
+    for (char c : text) {
+        for (int gy = 0; gy < 7; ++gy) {
+            for (int gx = 0; gx < 5; ++gx) {
+                if (!glyph_bit(c, gx, gy)) {
+                    continue;
+                }
+                const float tx0 = static_cast<float>(x + gx * pixel_scale);
+                const float ty0 = static_cast<float>(y + gy * pixel_scale);
+                const float tx1 = tx0 + static_cast<float>(pixel_scale);
+                const float ty1 = ty0 + static_cast<float>(pixel_scale);
+                const Float3 t0 = to_ndc(tx0, ty0);
+                const Float3 t1 = to_ndc(tx1, ty1);
+                append_text_quad_vertices(vertices, t0.x, t0.y, t1.x, t1.y, color, opacity);
+            }
+        }
+        x += glyph_w + glyph_gap;
+    }
+}
+
+Float3 make_hud_contact_color(const TelemetryObjectState& observer, const TelemetryObjectState& contact) {
+    if (contact.uid == observer.uid) {
+        return Float3{0.72f, 0.78f, 0.86f};
+    }
+    if (!observer.team.empty() && observer.team == contact.team) {
+        return Float3{0.32f, 1.0f, 0.52f};
+    }
+    return Float3{1.0f, 0.24f, 0.20f};
+}
+
+bool is_hud_contact_visible(const TelemetryObjectState& observer, const TelemetryObjectState& contact) {
+    return contact.alive && contact.uid != observer.uid;
+}
+
+std::string hud_upper(std::string value) {
+    for (char& c : value) {
+        c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    }
+    return value;
+}
+
+std::string hud_clip(std::string value, size_t max_len) {
+    if (value.size() <= max_len) {
+        return value;
+    }
+    return value.substr(0, max_len);
+}
+
+struct HudSensorTrack {
+    std::string uid;
+    std::string level;
+    std::string sensor;
+    int level_value = 0;
+    bool alive = true;
+    std::array<double, 3> position{0.0, 0.0, 0.0};
+    std::array<double, 3> velocity{0.0, 0.0, 0.0};
+};
+
+bool json_number_to_double(const json::JSON& value, double& out) {
+    if (value.JSONType() == json::JSON::Class::Floating) {
+        out = value.ToFloat();
+        return true;
+    }
+    if (value.JSONType() == json::JSON::Class::Integral) {
+        out = static_cast<double>(value.ToInt());
+        return true;
+    }
+    return false;
+}
+
+bool json_vec3_to_array(const json::JSON& value, std::array<double, 3>& out) {
+    if (value.JSONType() != json::JSON::Class::Array || value.size() < 3) {
+        return false;
+    }
+    for (int i = 0; i < 3; ++i) {
+        if (!json_number_to_double(value.at(static_cast<unsigned>(i)), out[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::vector<HudSensorTrack> read_hud_sensor_tracks(const TelemetryObjectState& observer) {
+    std::vector<HudSensorTrack> tracks;
+    const json::JSON& reg = observer.debug_register;
+    if (reg.JSONType() != json::JSON::Class::Object || !reg.hasKey("sensor_tracks", json::JSON::Class::Array)) {
+        return tracks;
+    }
+
+    for (const auto& item : reg.at("sensor_tracks").ArrayRange()) {
+        if (item.JSONType() != json::JSON::Class::Object || !item.hasKey("uid", json::JSON::Class::String)) {
+            continue;
+        }
+        HudSensorTrack track;
+        track.uid = item.at("uid").ToString();
+        if (item.hasKey("best_level", json::JSON::Class::String)) {
+            track.level = item.at("best_level").ToString();
+        }
+        if (item.hasKey("best_sensor_name", json::JSON::Class::String)) {
+            track.sensor = item.at("best_sensor_name").ToString();
+        }
+        if (item.hasKey("best_level_value", json::JSON::Class::Integral)) {
+            track.level_value = static_cast<int>(item.at("best_level_value").ToInt());
+        }
+        if (item.hasKey("is_alive", json::JSON::Class::Boolean)) {
+            track.alive = item.at("is_alive").ToBool();
+        }
+        if (item.hasKey("position")) {
+            json_vec3_to_array(item.at("position"), track.position);
+        }
+        if (item.hasKey("velocity")) {
+            json_vec3_to_array(item.at("velocity"), track.velocity);
+        }
+        if (track.level_value >= 1 && track.alive) {
+            tracks.push_back(std::move(track));
+        }
+    }
+    return tracks;
+}
+
+void append_tactical_hud_panels(
+    RenderCommandList& command_list,
+    UINT width,
+    UINT height,
+    const ViewerInputState& input,
+    const WorldSnapshot* snapshot) {
+    if (!snapshot || input.focus_uid.empty() || width < 520 || height < 360) {
+        return;
+    }
+
+    auto observer_it = std::find_if(
+        snapshot->objects.begin(),
+        snapshot->objects.end(),
+        [&input](const TelemetryObjectState& obj) { return obj.uid == input.focus_uid; });
+    if (observer_it == snapshot->objects.end()) {
+        return;
+    }
+
+    const TelemetryObjectState& observer = *observer_it;
+    const std::vector<HudSensorTrack> sensor_tracks = read_hud_sensor_tracks(observer);
+    const float datalink_range_nm = 30.0f;
+    const float radar_range_nm = 30.0f;
+    const float meters_per_nm = 1852.0f;
+    const float heading = static_cast<float>(observer.orientation[2]);
+    const float cos_h = std::cos(heading);
+    const float sin_h = std::sin(heading);
+
+    auto to_ndc = [width, height](float px, float py) -> Float3 {
+        const float x = (px / static_cast<float>(width)) * 2.0f - 1.0f;
+        const float y = 1.0f - (py / static_cast<float>(height)) * 2.0f;
+        return Float3{x, y, 0.0f};
+    };
+    auto px_to_ndc_x = [width](float px) -> float {
+        return (px / static_cast<float>(width)) * 2.0f;
+    };
+    auto px_to_ndc_y = [height](float px) -> float {
+        return (px / static_cast<float>(height)) * 2.0f;
+    };
+    auto append_px_line = [&to_ndc](std::vector<DX11Vertex>& vertices, float x0, float y0, float x1, float y1, const Float3& color, float opacity) {
+        const Float3 a = to_ndc(x0, y0);
+        const Float3 b = to_ndc(x1, y1);
+        append_line_segment(vertices, a.x, a.y, b.x, b.y, color, opacity);
+    };
+    auto append_px_point = [&to_ndc, &px_to_ndc_x, &px_to_ndc_y](std::vector<DX11Vertex>& vertices, float x, float y, float radius_px, const Float3& color) {
+        const Float3 p = to_ndc(x, y);
+        append_hud_point(vertices, p.x, p.y, px_to_ndc_x(radius_px), px_to_ndc_y(radius_px), color);
+    };
+    auto append_px_thick_line = [&to_ndc](std::vector<DX11Vertex>& vertices, float x0, float y0, float x1, float y1, float thickness_px, const Float3& color, float opacity) {
+        const float dx = x1 - x0;
+        const float dy = y1 - y0;
+        const float len = std::sqrt(dx * dx + dy * dy);
+        if (len <= 0.01f) {
+            return;
+        }
+        const float half = thickness_px * 0.5f;
+        const float nx = -dy / len * half;
+        const float ny = dx / len * half;
+        const Float3 a = to_ndc(x0 + nx, y0 + ny);
+        const Float3 b = to_ndc(x1 + nx, y1 + ny);
+        const Float3 c = to_ndc(x1 - nx, y1 - ny);
+        const Float3 d = to_ndc(x0 - nx, y0 - ny);
+        append_text_quad_vertices(vertices, a.x, a.y, c.x, c.y, color, opacity);
+        vertices[vertices.size() - 6] = DX11Vertex{{a.x,a.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 5] = DX11Vertex{{b.x,b.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 4] = DX11Vertex{{c.x,c.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 3] = DX11Vertex{{a.x,a.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 2] = DX11Vertex{{c.x,c.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 1] = DX11Vertex{{d.x,d.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+    };
+    auto append_px_diamond = [&to_ndc](std::vector<DX11Vertex>& vertices, float x, float y, float radius_px, const Float3& color, float opacity) {
+        const Float3 top = to_ndc(x, y - radius_px);
+        const Float3 right = to_ndc(x + radius_px, y);
+        const Float3 bottom = to_ndc(x, y + radius_px);
+        const Float3 left = to_ndc(x - radius_px, y);
+        append_text_quad_vertices(vertices, left.x, top.y, right.x, bottom.y, color, opacity);
+        vertices[vertices.size() - 6] = DX11Vertex{{top.x,top.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 5] = DX11Vertex{{right.x,right.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 4] = DX11Vertex{{bottom.x,bottom.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 3] = DX11Vertex{{top.x,top.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 2] = DX11Vertex{{bottom.x,bottom.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+        vertices[vertices.size() - 1] = DX11Vertex{{left.x,left.y,0.0f},{color.x * opacity,color.y * opacity,color.z * opacity},{0.0f,0.0f,1.0f},{0.0f,0.0f}};
+    };
+    auto append_px_oriented_diamond = [&to_ndc](std::vector<DX11Vertex>& vertices, float x, float y, float dir_x, float dir_y, float length_px, float width_px, const Float3& color, float opacity) {
+        const float len = std::sqrt(dir_x * dir_x + dir_y * dir_y);
+        float ux = 0.0f;
+        float uy = -1.0f;
+        if (len > 0.001f) {
+            ux = dir_x / len;
+            uy = dir_y / len;
+        }
+        const float px = -uy;
+        const float py = ux;
+        const float half_len = length_px * 0.5f;
+        const float half_width = width_px * 0.5f;
+        const Float3 nose = to_ndc(x + ux * half_len, y + uy * half_len);
+        const Float3 right = to_ndc(x + px * half_width, y + py * half_width);
+        const Float3 tail = to_ndc(x - ux * half_len, y - uy * half_len);
+        const Float3 left = to_ndc(x - px * half_width, y - py * half_width);
+        const float c0 = color.x * opacity;
+        const float c1 = color.y * opacity;
+        const float c2 = color.z * opacity;
+        vertices.push_back(DX11Vertex{{nose.x,nose.y,0.0f},{c0,c1,c2},{0.0f,0.0f,1.0f},{0.0f,0.0f}});
+        vertices.push_back(DX11Vertex{{right.x,right.y,0.0f},{c0,c1,c2},{0.0f,0.0f,1.0f},{0.0f,0.0f}});
+        vertices.push_back(DX11Vertex{{tail.x,tail.y,0.0f},{c0,c1,c2},{0.0f,0.0f,1.0f},{0.0f,0.0f}});
+        vertices.push_back(DX11Vertex{{nose.x,nose.y,0.0f},{c0,c1,c2},{0.0f,0.0f,1.0f},{0.0f,0.0f}});
+        vertices.push_back(DX11Vertex{{tail.x,tail.y,0.0f},{c0,c1,c2},{0.0f,0.0f,1.0f},{0.0f,0.0f}});
+        vertices.push_back(DX11Vertex{{left.x,left.y,0.0f},{c0,c1,c2},{0.0f,0.0f,1.0f},{0.0f,0.0f}});
+    };
+
+    const float panel_size = std::min(380.0f, std::max(264.0f, static_cast<float>(height) * 0.44f));
+    const float margin_x = 24.0f;
+    const float margin_bottom = std::min(120.0f, std::max(72.0f, static_cast<float>(height) * 0.10f));
+    const float panel_top = static_cast<float>(height) - margin_bottom - panel_size;
+    const float panel_bottom = static_cast<float>(height) - margin_bottom;
+    const float circle_left = margin_x;
+    const float circle_center_x = circle_left + panel_size * 0.5f;
+    const float circle_center_y = panel_top + panel_size * 0.5f;
+    const float circle_radius = panel_size * 0.46f;
+    const float radar_right = static_cast<float>(width) - margin_x;
+    const float radar_left = radar_right - panel_size;
+    const float radar_top = panel_top;
+    const float radar_bottom = panel_bottom;
+    const float table_width = 370.0f;
+    const float table_row_h = 18.0f;
+    const float table_height = 42.0f + table_row_h * static_cast<float>(std::min<size_t>(sensor_tracks.size(), 8));
+    const float table_right = static_cast<float>(width) - margin_x;
+    const float table_left = std::max(margin_x, table_right - table_width);
+    const float table_top = 24.0f;
+    const float table_bottom = table_top + table_height;
+
+    std::vector<DX11Vertex> panel_vertices;
+    panel_vertices.reserve(24);
+    const Float3 panel_color{0.02f, 0.08f, 0.10f};
+    Float3 p0 = to_ndc(circle_left, panel_top);
+    Float3 p1 = to_ndc(circle_left + panel_size, panel_bottom);
+    append_hud_rect(panel_vertices, p0.x, p0.y, p1.x, p1.y, panel_color);
+    p0 = to_ndc(radar_left, radar_top);
+    p1 = to_ndc(radar_right, radar_bottom);
+    append_hud_rect(panel_vertices, p0.x, p0.y, p1.x, p1.y, panel_color);
+    p0 = to_ndc(table_left, table_top);
+    p1 = to_ndc(table_right, table_bottom);
+    append_hud_rect(panel_vertices, p0.x, p0.y, p1.x, p1.y, panel_color);
+
+    const Float4x4 identity = Float4x4::identity();
+    command_list.hud_commands.push_back(make_draw_command(
+        std::move(panel_vertices),
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+        identity,
+        identity,
+        Float3{0.0f, 0.0f, 0.0f},
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        "sky",
+        0.0f,
+        1.0f,
+        0.34f
+    ));
+
+    std::vector<DX11Vertex> line_vertices;
+    line_vertices.reserve(320);
+    const Float3 grid_color{0.24f, 0.86f, 0.72f};
+    const Float3 border_color{0.55f, 1.0f, 0.86f};
+    const int ring_segments = 48;
+    for (float range_nm : {10.0f, 20.0f, 30.0f}) {
+        const float radius = circle_radius * (range_nm / datalink_range_nm);
+        for (int i = 0; i < ring_segments; ++i) {
+            const float a0 = static_cast<float>(i) * static_cast<float>(2.0 * 3.14159265358979323846 / ring_segments);
+            const float a1 = static_cast<float>(i + 1) * static_cast<float>(2.0 * 3.14159265358979323846 / ring_segments);
+            append_px_line(
+                line_vertices,
+                circle_center_x + std::sin(a0) * radius,
+                circle_center_y - std::cos(a0) * radius,
+                circle_center_x + std::sin(a1) * radius,
+                circle_center_y - std::cos(a1) * radius,
+                range_nm >= datalink_range_nm ? border_color : grid_color,
+                range_nm >= datalink_range_nm ? 0.78f : 0.36f);
+        }
+    }
+    append_px_line(line_vertices, circle_center_x - circle_radius, circle_center_y, circle_center_x + circle_radius, circle_center_y, grid_color, 0.32f);
+    append_px_line(line_vertices, circle_center_x, circle_center_y - circle_radius, circle_center_x, circle_center_y + circle_radius, grid_color, 0.32f);
+
+    append_px_line(line_vertices, radar_left, radar_top, radar_right, radar_top, border_color, 0.78f);
+    append_px_line(line_vertices, radar_right, radar_top, radar_right, radar_bottom, border_color, 0.78f);
+    append_px_line(line_vertices, radar_right, radar_bottom, radar_left, radar_bottom, border_color, 0.78f);
+    append_px_line(line_vertices, radar_left, radar_bottom, radar_left, radar_top, border_color, 0.78f);
+    append_px_line(line_vertices, radar_left + panel_size * 0.5f, radar_top, radar_left + panel_size * 0.5f, radar_bottom, border_color, 0.48f);
+    for (int i = 1; i < 4; ++i) {
+        const float t = static_cast<float>(i) / 4.0f;
+        append_px_line(line_vertices, radar_left, radar_top + panel_size * t, radar_right, radar_top + panel_size * t, grid_color, 0.30f);
+        append_px_line(line_vertices, radar_left + panel_size * t, radar_top, radar_left + panel_size * t, radar_bottom, grid_color, 0.30f);
+    }
+    append_px_line(line_vertices, table_left, table_top + 28.0f, table_right, table_top + 28.0f, border_color, 0.52f);
+
+    std::vector<DX11Vertex> contact_vertices;
+    std::vector<DX11Vertex> vector_vertices;
+    contact_vertices.reserve(snapshot->objects.size() * 60 + sensor_tracks.size() * 42 + 24);
+    vector_vertices.reserve(snapshot->objects.size() * 12 + sensor_tracks.size() * 12);
+    append_px_diamond(contact_vertices, circle_center_x, circle_center_y, 6.0f, Float3{0.78f, 0.84f, 0.90f}, 1.0f);
+    append_px_diamond(contact_vertices, radar_left + panel_size * 0.5f, radar_bottom - 8.0f, 6.0f, Float3{0.78f, 0.84f, 0.90f}, 1.0f);
+
+    const float radar_fov_deg = 120.0f;
+    const float radar_half_fov_rad = static_cast<float>((radar_fov_deg * 0.5) * 3.14159265358979323846 / 180.0);
+    for (const TelemetryObjectState& contact : snapshot->objects) {
+        if (!is_hud_contact_visible(observer, contact)) {
+            continue;
+        }
+
+        const float rel_north = static_cast<float>(contact.position[0] - observer.position[0]);
+        const float rel_west = static_cast<float>(contact.position[1] - observer.position[1]);
+        const float forward_nm = (rel_north * cos_h + rel_west * sin_h) / meters_per_nm;
+        const float right_nm = (rel_west * cos_h - rel_north * sin_h) / meters_per_nm;
+        const float range_nm = std::sqrt(forward_nm * forward_nm + right_nm * right_nm);
+        if (range_nm > datalink_range_nm) {
+            continue;
+        }
+
+        const float vel_north = static_cast<float>(contact.velocity[0]);
+        const float vel_west = static_cast<float>(contact.velocity[1]);
+        const float vel_forward = vel_north * cos_h + vel_west * sin_h;
+        const float vel_right = vel_west * cos_h - vel_north * sin_h;
+        const float speed = std::sqrt(vel_forward * vel_forward + vel_right * vel_right);
+        const Float3 contact_color = make_hud_contact_color(observer, contact);
+        const float circle_x = circle_center_x - right_nm / datalink_range_nm * circle_radius;
+        const float circle_y = circle_center_y - forward_nm / datalink_range_nm * circle_radius;
+        const float symbol_dir_x = speed > 1.0f ? vel_right / speed : 0.0f;
+        const float symbol_dir_y = speed > 1.0f ? -vel_forward / speed : -1.0f;
+        append_px_oriented_diamond(contact_vertices, circle_x, circle_y, symbol_dir_x, symbol_dir_y, 14.0f, 9.0f, contact_color, 0.96f);
+        if (speed > 1.0f) {
+            const float vector_len = std::clamp(speed / 10.0f, 28.0f, 68.0f);
+            append_px_thick_line(
+                vector_vertices,
+                circle_x - symbol_dir_x * 8.0f,
+                circle_y - symbol_dir_y * 8.0f,
+                circle_x + symbol_dir_x * vector_len,
+                circle_y + symbol_dir_y * vector_len,
+                5.0f,
+                contact_color,
+                1.0f);
+        }
+
+    }
+
+    for (const HudSensorTrack& track : sensor_tracks) {
+        const float rel_north = static_cast<float>(track.position[0] - observer.position[0]);
+        const float rel_west = static_cast<float>(track.position[1] - observer.position[1]);
+        const float forward_nm = (rel_north * cos_h + rel_west * sin_h) / meters_per_nm;
+        const float right_nm = (rel_west * cos_h - rel_north * sin_h) / meters_per_nm;
+        const float range_nm = std::sqrt(forward_nm * forward_nm + right_nm * right_nm);
+        const auto contact_it = std::find_if(
+            snapshot->objects.begin(),
+            snapshot->objects.end(),
+            [&track](const TelemetryObjectState& obj) { return obj.uid == track.uid; });
+        const Float3 track_color = contact_it != snapshot->objects.end()
+            ? make_hud_contact_color(observer, *contact_it)
+            : Float3{1.0f, 0.24f, 0.20f};
+        const float azimuth = std::atan2(right_nm, forward_nm);
+        const float clamped_azimuth = std::clamp(azimuth, -radar_half_fov_rad, radar_half_fov_rad);
+        const float az_t = (clamped_azimuth + radar_half_fov_rad) / (radar_half_fov_rad * 2.0f);
+        const float range_t = std::clamp(range_nm / radar_range_nm, 0.0f, 1.0f);
+        const float radar_x = radar_right - az_t * panel_size;
+        const float radar_y = std::clamp(radar_bottom - range_t * panel_size, radar_top + 7.0f, radar_bottom - 7.0f);
+        const float vel_north = static_cast<float>(track.velocity[0]);
+        const float vel_west = static_cast<float>(track.velocity[1]);
+        const float vel_forward = vel_north * cos_h + vel_west * sin_h;
+        const float vel_right = vel_west * cos_h - vel_north * sin_h;
+        const float speed = std::sqrt(vel_forward * vel_forward + vel_right * vel_right);
+        const float marker_len = track.level_value >= 3 ? 22.0f : 18.0f;
+        const float marker_width = track.level_value >= 3 ? 14.0f : 12.0f;
+        const float symbol_dir_x = speed > 1.0f ? -vel_right / speed : 0.0f;
+        const float symbol_dir_y = speed > 1.0f ? -vel_forward / speed : -1.0f;
+        append_px_oriented_diamond(contact_vertices, radar_x, radar_y, symbol_dir_x, symbol_dir_y, marker_len, marker_width, track_color, 0.95f);
+        if (speed > 1.0f) {
+            const float vector_len = std::clamp(speed / 9.0f, 32.0f, 84.0f);
+            append_px_thick_line(
+                vector_vertices,
+                radar_x - symbol_dir_x * marker_len * 0.45f,
+                radar_y - symbol_dir_y * marker_len * 0.45f,
+                radar_x + symbol_dir_x * vector_len,
+                radar_y + symbol_dir_y * vector_len,
+                track.level_value >= 3 ? 6.0f : 5.0f,
+                track_color,
+                1.0f);
+        }
+    }
+
+    std::vector<DX11Vertex> table_text_vertices;
+    table_text_vertices.reserve(6000);
+    const Float3 text_color{0.92f, 1.0f, 0.92f};
+    const Float3 dim_text_color{0.46f, 0.86f, 0.72f};
+    append_hud_text_pixels(table_text_vertices, "SENSOR TRACKS", table_left + 10.0f, table_top + 8.0f, width, height, 2, text_color, 1.0f);
+    append_hud_text_pixels(table_text_vertices, "UID", table_left + 10.0f, table_top + 34.0f, width, height, 1, dim_text_color, 0.90f);
+    append_hud_text_pixels(table_text_vertices, "LEVEL", table_left + 132.0f, table_top + 34.0f, width, height, 1, dim_text_color, 0.90f);
+    append_hud_text_pixels(table_text_vertices, "SENSOR", table_left + 230.0f, table_top + 34.0f, width, height, 1, dim_text_color, 0.90f);
+    if (sensor_tracks.empty()) {
+        append_hud_text_pixels(table_text_vertices, "NO DETECTION TRACKS", table_left + 10.0f, table_top + 54.0f, width, height, 1, dim_text_color, 0.85f);
+    } else {
+        const size_t max_rows = std::min<size_t>(sensor_tracks.size(), 8);
+        for (size_t i = 0; i < max_rows; ++i) {
+            const HudSensorTrack& track = sensor_tracks[i];
+            const float y = table_top + 54.0f + static_cast<float>(i) * table_row_h;
+            const Float3 row_color = track.level_value >= 3
+                ? Float3{1.0f, 0.86f, 0.34f}
+                : (track.level_value >= 2 ? Float3{0.70f, 1.0f, 0.78f} : Float3{0.62f, 0.90f, 1.0f});
+            append_hud_text_pixels(table_text_vertices, hud_clip(hud_upper(track.uid), 18), table_left + 10.0f, y, width, height, 1, row_color, 0.95f);
+            append_hud_text_pixels(table_text_vertices, hud_clip(hud_upper(track.level), 12), table_left + 132.0f, y, width, height, 1, row_color, 0.95f);
+            append_hud_text_pixels(table_text_vertices, hud_clip(hud_upper(track.sensor), 16), table_left + 230.0f, y, width, height, 1, row_color, 0.95f);
+        }
+    }
+
+    if (!line_vertices.empty()) {
+        command_list.hud_commands.push_back(make_draw_command(
+            std::move(line_vertices),
+            D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
+            identity,
+            identity,
+            Float3{0.0f, 0.0f, 0.0f},
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            "sky",
+            0.0f,
+            1.0f,
+            0.78f
+        ));
+    }
+
+    if (!table_text_vertices.empty()) {
+        command_list.hud_commands.push_back(make_draw_command(
+            std::move(table_text_vertices),
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            identity,
+            identity,
+            Float3{0.0f, 0.0f, 0.0f},
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            "sky",
+            0.0f,
+            1.0f,
+            1.0f
+        ));
+    }
+
+    if (!contact_vertices.empty()) {
+        command_list.hud_commands.push_back(make_draw_command(
+            std::move(contact_vertices),
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            identity,
+            identity,
+            Float3{0.0f, 0.0f, 0.0f},
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            "sky",
+            0.0f,
+            1.0f,
+            0.92f
+        ));
+    }
+
+    if (!vector_vertices.empty()) {
+        command_list.hud_commands.push_back(make_draw_command(
+            std::move(vector_vertices),
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            identity,
+            identity,
+            Float3{0.0f, 0.0f, 0.0f},
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            "sky",
+            0.0f,
+            1.0f,
+            1.0f
+        ));
+    }
+}
+
 bool project_direction_to_ndc(
     const Float3& dir,
     const Float3& cam_forward,
@@ -490,6 +1043,19 @@ void append_hud_render_commands(
         return;
     }
 
+    constexpr float k_hud_reference_width = 1280.0f;
+    constexpr float k_hud_reference_height = 720.0f;
+    const float hud_scale = std::clamp(
+        std::min(
+            static_cast<float>(width) / k_hud_reference_width,
+            static_cast<float>(height) / k_hud_reference_height),
+        0.50f,
+        4.00f);
+    const UINT hud_width = std::max<UINT>(32, static_cast<UINT>(std::round(static_cast<float>(width) / hud_scale)));
+    const UINT hud_height = std::max<UINT>(32, static_cast<UINT>(std::round(static_cast<float>(height) / hud_scale)));
+
+    append_tactical_hud_panels(command_list, hud_width, hud_height, input, snapshot);
+
     const std::vector<std::string> lines = make_hud_lines(input, sim_time, object_count, stats);
     const std::vector<std::string> aircraft_lines = make_focus_aircraft_lines(input, snapshot);
     const int pixel_scale = 2;
@@ -498,9 +1064,9 @@ void append_hud_render_commands(
     const int glyph_gap = 1 * pixel_scale;
     const int line_h = glyph_h + 6;
 
-    auto to_ndc = [width, height](float px, float py) -> Float3 {
-        const float x = (px / static_cast<float>(width)) * 2.0f - 1.0f;
-        const float y = 1.0f - (py / static_cast<float>(height)) * 2.0f;
+    auto to_ndc = [hud_width, hud_height](float px, float py) -> Float3 {
+        const float x = (px / static_cast<float>(hud_width)) * 2.0f - 1.0f;
+        const float y = 1.0f - (py / static_cast<float>(hud_height)) * 2.0f;
         return Float3{x, y, 0.0f};
     };
 
@@ -541,7 +1107,7 @@ void append_hud_render_commands(
         y_top += line_h;
     }
 
-    int y_bottom = static_cast<int>(height) - 16 - static_cast<int>(line_h * static_cast<int>(lines.size()));
+    int y_bottom = static_cast<int>(hud_height) - 16 - static_cast<int>(line_h * static_cast<int>(lines.size()));
     if (y_bottom < 16) {
         y_bottom = 16;
     }
@@ -580,7 +1146,7 @@ void append_hud_render_commands(
     }
 
     const Float4x4 identity = Float4x4::identity();
-    command_list.commands.push_back(make_draw_command(
+    command_list.hud_commands.push_back(make_draw_command(
         std::move(vertices),
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
         identity,
@@ -689,7 +1255,7 @@ void append_hud_render_commands(
     }
 
     if (!hud_lines.empty()) {
-        command_list.commands.push_back(make_draw_command(
+        command_list.hud_commands.push_back(make_draw_command(
             std::move(hud_lines),
             D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
             identity,

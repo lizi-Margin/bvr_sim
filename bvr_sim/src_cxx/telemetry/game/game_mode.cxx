@@ -113,6 +113,7 @@ bool GameMode::is_supported() const noexcept {
 
 json::JSON GameMode::state_to_json(const GameModeState& state) {
     json::JSON out = json::JSON::Make(json::JSON::Class::Object);
+    out["input_mode"] = json::String(state.input_mode);
     out["camera_mode"] = json::String(state.camera_mode);
     out["target_uid"] = json::String(state.target_uid);
     out["focus_index"] = json::Integral(state.focus_index);
@@ -142,6 +143,12 @@ void GameMode::apply_state_command(const TelemetryCommand& command) {
 
     std::lock_guard<std::mutex> lock(state_mutex_);
     const auto& payload = command.payload;
+    if (payload.hasKey("input_mode", json::JSON::Class::String)) {
+        const std::string mode = payload.at("input_mode").ToString();
+        if (mode == "follow" || mode == "control") {
+            state_.input_mode = mode;
+        }
+    }
     if (payload.hasKey("mode", json::JSON::Class::String)) {
         const std::string mode = payload.at("mode").ToString();
         if (mode == "follow" || mode == "fixed" || mode == "free") {
@@ -242,13 +249,15 @@ void GameMode::run_loop() noexcept {
 namespace {
 
 void apply_game_mode_state_to_input(const GameMode::GameModeState& state, ViewerInputState& input) {
+    input.input_mode = state.input_mode == "control"
+        ? ViewerInputState::InputMode::Control
+        : ViewerInputState::InputMode::Follow;
+
     if (state.camera_mode == "follow") {
-        input.input_mode = ViewerInputState::InputMode::Follow;
         input.camera_mode = ViewerInputState::CameraMode::FollowObject;
         input.focus_uid = state.target_uid;
         input.focus_cycle_index = state.target_uid.empty() ? state.focus_index : -1;
     } else {
-        input.input_mode = ViewerInputState::InputMode::Follow;
         input.camera_mode = ViewerInputState::CameraMode::Free;
         input.focus_uid.clear();
         input.focus_cycle_index = -1;
@@ -270,6 +279,7 @@ void apply_game_mode_state_to_input(const GameMode::GameModeState& state, Viewer
 
 GameMode::GameModeState make_state_from_input(const ViewerInputState& input) {
     GameMode::GameModeState state;
+    state.input_mode = input.input_mode == ViewerInputState::InputMode::Control ? "control" : "follow";
     state.camera_mode = input.camera_mode == ViewerInputState::CameraMode::FollowObject ? "follow" : "free";
     state.target_uid = input.focus_uid;
     state.focus_index = input.focus_cycle_index;
@@ -369,6 +379,7 @@ void GameMode::run_loop() noexcept {
             window.input.focus_cycle_index = -1;
             window.input.focus_uid.clear();
             window.input.camera_mode = ViewerInputState::CameraMode::Free;
+            window.input.focus_cycle_requested = false;
         } else {
             if (!window.input.focus_uid.empty()) {
                 auto it = std::find(window.input.snapshot_uids.begin(), window.input.snapshot_uids.end(), window.input.focus_uid);
@@ -378,6 +389,17 @@ void GameMode::run_loop() noexcept {
                     window.input.focus_cycle_index = -1;
                     window.input.focus_uid.clear();
                 }
+            }
+
+            if (window.input.focus_cycle_requested) {
+                const int slot_count = object_count + 1; // object slots + one free camera slot
+                int next_index = window.input.focus_cycle_index + 1;
+                if (next_index >= slot_count) {
+                    next_index = -1;
+                }
+                window.input.focus_cycle_index = next_index;
+                window.input.focus_uid.clear();
+                window.input.focus_cycle_requested = false;
             }
 
             if (window.input.focus_cycle_index >= 0 && window.input.focus_cycle_index < object_count) {

@@ -1,4 +1,5 @@
 #include "simulator.hxx"
+#include "data_obj.hxx"
 #include "register.hxx"
 #include "sense/sensor_manager.hxx"
 #include "support/support.hxx"
@@ -11,6 +12,49 @@
 namespace bvr_sim {
 
 using namespace c3utils;
+
+namespace {
+
+const char* sensor_detection_level_to_string(SensorDetectionLevel level) noexcept {
+    switch (level) {
+        case SensorDetectionLevel::Detection: return "Detection";
+        case SensorDetectionLevel::Localization: return "Localization";
+        case SensorDetectionLevel::Tracking: return "Tracking";
+        case SensorDetectionLevel::None:
+        default: return "None";
+    }
+}
+
+json::JSON vec3_to_json(const std::array<double, 3>& vec) {
+    json::JSON out = json::JSON::Make(json::JSON::Class::Array);
+    out.append(vec[0]);
+    out.append(vec[1]);
+    out.append(vec[2]);
+    return out;
+}
+
+json::JSON sensor_tracks_to_json(const SensorManager& sensor_manager) {
+    json::JSON tracks_json = json::JSON::Make(json::JSON::Class::Array);
+    for (const auto& [uid, track] : sensor_manager.get_tracks()) {
+        if (track.best_level == SensorDetectionLevel::None || !track.best_observation) {
+            continue;
+        }
+
+        json::JSON item = json::JSON::Make(json::JSON::Class::Object);
+        item["uid"] = json::String(uid);
+        item["best_sensor_name"] = json::String(track.best_sensor_name);
+        item["best_level"] = json::String(sensor_detection_level_to_string(track.best_level));
+        item["best_level_value"] = json::Integral(static_cast<long>(track.best_level));
+        item["position"] = vec3_to_json(track.best_observation->position);
+        item["velocity"] = vec3_to_json(track.best_observation->velocity);
+        item["is_alive"] = json::Boolean(track.best_observation->is_alive);
+        item["source_uid"] = track.source ? json::String(track.source->uid) : json::String("");
+        tracks_json.append(item);
+    }
+    return tracks_json;
+}
+
+}
 
 std::string SOT_to_string(SOT type) noexcept {
     switch (type) {
@@ -215,6 +259,8 @@ void SimulatedObject::write_register() noexcept {
     rpy_json.append(rpy[1]);
     rpy_json.append(rpy[2]);
     register_.set("rpy", rpy_json);
+
+    register_.set("sensor_tracks", sensor_tracks_to_json(*sensor_manager_));
 }
 
 SensorManager& SimulatedObject::sensor_manager() noexcept {

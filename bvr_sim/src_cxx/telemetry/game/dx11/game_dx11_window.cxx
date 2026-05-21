@@ -38,28 +38,6 @@ float normalize_mouse_axis(int value, int extent_minus_one) {
     return std::clamp(normalized, -1.0f, 1.0f);
 }
 
-void cycle_follow_target(ViewerInputState& input) {
-    const int object_count = static_cast<int>(input.snapshot_uids.size());
-    if (object_count <= 0) {
-        input.focus_cycle_index = -1;
-    } else {
-        const int slot_count = object_count + 1; // object slots + one free slot
-        int next_index = input.focus_cycle_index + 1;
-        if (next_index >= slot_count) {
-            next_index = -1;
-        }
-        input.focus_cycle_index = next_index;
-    }
-
-    if (input.focus_cycle_index < 0 || input.focus_cycle_index >= object_count) {
-        input.focus_uid.clear();
-        input.camera_mode = ViewerInputState::CameraMode::Free;
-    } else {
-        input.focus_uid = input.snapshot_uids[static_cast<size_t>(input.focus_cycle_index)];
-        input.camera_mode = ViewerInputState::CameraMode::FollowObject;
-    }
-}
-
 void flush_desktop_composition() {
     GdiFlush();
     using DwmFlushFn = HRESULT(WINAPI*)();
@@ -222,7 +200,7 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
             window->input.input_mode = ViewerInputState::InputMode::Control;
             if (was_control_mode) {
-                cycle_follow_target(window->input);
+                window->input.focus_cycle_requested = true;
             }
             return 0;
         }
@@ -230,7 +208,7 @@ LRESULT CALLBACK dx11_window_proc(HWND hwnd, UINT msg, WPARAM w_param, LPARAM l_
             const bool was_control_mode = window->input.input_mode == ViewerInputState::InputMode::Control;
             window->input.input_mode = ViewerInputState::InputMode::Follow;
             if (!was_control_mode) {
-                cycle_follow_target(window->input);
+                window->input.focus_cycle_requested = true;
             }
             return 0;
         }

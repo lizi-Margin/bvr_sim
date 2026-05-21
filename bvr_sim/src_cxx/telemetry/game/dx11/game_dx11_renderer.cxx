@@ -247,6 +247,39 @@ bool upload_and_draw(
     return true;
 }
 
+bool execute_hud_pass(D3D11Context& d3d11, const std::vector<RenderCommand>& hud_commands, RenderFrameStats& out_stats) {
+    if (hud_commands.empty()) {
+        return true;
+    }
+
+    ID3D11RenderTargetView* render_targets[1] = {d3d11.rtv};
+    d3d11.context->OMSetRenderTargets(1, render_targets, d3d11.dsv);
+    d3d11.common_pipeline_bound = false;
+    d3d11.current_topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    d3d11.current_depth_state = nullptr;
+    d3d11.blend_enabled = false;
+    d3d11.current_material_key.clear();
+    d3d11.material_textures_bound = false;
+
+    for (const RenderCommand& command : hud_commands) {
+        if (command.type == RenderCommandType::Clear) {
+            continue;
+        }
+
+        RenderCommand hud_command = command;
+        hud_command.depth_enabled = false;
+        hud_command.depth_write_enabled = false;
+        hud_command.blend_enabled = true;
+        hud_command.lighting_enabled = false;
+        hud_command.receive_shadows = false;
+        if (!upload_and_draw(d3d11, hud_command, out_stats)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool create_depth_buffer(D3D11Context& d3d11, int width, int height, std::string& error) {
     safe_release(d3d11.dsv);
     safe_release(d3d11.depth_texture);
@@ -1182,7 +1215,7 @@ void update_viewport_from_client_rect(HWND hwnd, ID3D11DeviceContext* context, U
 
 bool execute_render_commands(D3D11Context& d3d11, const RenderCommandList& command_list, RenderFrameStats& out_stats) {
     out_stats = {};
-    out_stats.command_count = static_cast<long>(command_list.commands.size());
+    out_stats.command_count = static_cast<long>(command_list.commands.size() + command_list.hud_commands.size());
 
     if (!render_shadow_map(d3d11, command_list)) {
         return false;
@@ -1210,6 +1243,10 @@ bool execute_render_commands(D3D11Context& d3d11, const RenderCommandList& comma
         if (!upload_and_draw(d3d11, command, out_stats)) {
             return false;
         }
+    }
+
+    if (!execute_hud_pass(d3d11, command_list.hud_commands, out_stats)) {
+        return false;
     }
 
     return true;

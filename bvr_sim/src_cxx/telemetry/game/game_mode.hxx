@@ -20,10 +20,11 @@ namespace bvr_sim {
 class GameMode {
 public:
     struct GameModeState {
+        std::string input_mode = "follow";
         std::string camera_mode = "follow";
         std::string target_uid;
         int focus_index = 0;
-        double distance = GameCameraConfig::k_min_distance;
+        double distance = GameCameraConfig::k_defualt_distance;
         double yaw = 0.70;
         double pitch = 0.55;
         double fov_y = 100.0;
@@ -79,7 +80,6 @@ private:
 };
 
 } // namespace bvr_sim
-
 
 
 

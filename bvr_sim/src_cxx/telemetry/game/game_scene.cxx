@@ -501,7 +501,10 @@ bool is_missile_object(const TelemetryObjectState& object) {
 }
 
 float object_render_scale(const TelemetryObjectState&) {
-    return 1.0f;
+    if (GameModelScaleConfig::k_use_real_scale) {
+        return 1.0f;
+    }
+    return GameModelScaleConfig::k_uniform_scale;
 }
 
 std::string resolve_mesh_asset_name(const TelemetryObjectState& object) {

@@ -81,6 +81,7 @@ struct RenderCommand {
 
 struct RenderCommandList {
     std::vector<RenderCommand> commands;
+    std::vector<RenderCommand> hud_commands;
     std::vector<RenderCommand> shadow_commands;
     Float4x4 shadow_view_projection{};
     bool shadow_map_enabled = false;
@@ -169,6 +170,7 @@ struct ViewerInputState {
     bool fire_once_requested = false;
     bool pylon_cycle_ctrl_armed = false;
     bool pylon_cycle_requested = false;
+    bool focus_cycle_requested = false;
     std::string selected_pylon_name;
     int focus_cycle_index = 0; // -1 means free camera slot
     std::string focus_uid;
