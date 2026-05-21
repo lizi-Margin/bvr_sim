@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../game_config.hxx"
+#include "../game_renderer.hxx"
 #include "../../telemetry_types.hxx"
 #include "../game_types.hxx"
 
 #include <array>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -172,7 +174,7 @@ struct ViewerInputState {
     bool pylon_cycle_requested = false;
     bool focus_cycle_requested = false;
     std::string selected_pylon_name;
-    int focus_cycle_index = 0; // -1 means free camera slot
+    int focus_cycle_index = 0;
     std::string focus_uid;
     std::vector<std::string> snapshot_uids;
 };
@@ -246,6 +248,7 @@ struct D3D11Context {
     bool material_textures_bound = false;
 };
 
+// DX11-internal free functions (used within dx11/ files only)
 void update_camera(ViewerInputState& input, float dt_seconds);
 bool create_window(Win32Window& window, std::string& error);
 void destroy_window(Win32Window& window);
@@ -270,8 +273,35 @@ void destroy_shadow_map_resources(D3D11Context& d3d11);
 bool render_shadow_map(D3D11Context& d3d11, const RenderCommandList& command_list);
 void draw_hud_text(HWND hwnd, const ViewerInputState& input, double sim_time, long object_count, const RenderFrameStats& stats);
 
+// DX11Renderer: IRenderer implementation
+class DX11Renderer : public IRenderer {
+public:
+    DX11Renderer();
+    ~DX11Renderer() override;
+
+    bool initialize(std::string& error) override;
+    void destroy() override;
+    bool process_messages() override;
+    void apply_camera_state(const RendererCameraState& state) override;
+    RendererCameraState get_camera_state() const override;
+    void update_input(const WorldSnapshot* snapshot, float dt_seconds) override;
+    bool render_frame(const RendererFrameInput& input, RendererFrameStats& out_stats) override;
+    bool is_window_closed() const override;
+    bool get_shadows_enabled() const override;
+    bool get_material_system_enabled() const override;
+    void set_command_submitter(std::function<void(const TelemetryCommand&)> submitter) override;
+
+private:
+    void submit_command(const TelemetryCommand& command);
+
+    Win32Window window_;
+    D3D11Context d3d11_;
+    bool initialized_ = false;
+    bool window_closed_ = false;
+    std::string action_control_uid_;
+    std::function<void(const TelemetryCommand&)> command_submitter_;
+};
+
 #endif
 
 } // namespace bvr_sim
-
-

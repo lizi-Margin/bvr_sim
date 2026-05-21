@@ -1,5 +1,7 @@
 #include "game_dx11_internal.hxx"
 #include "resource_paths.hxx"
+#include "../c3utils/c3utils.hxx"
+#include "../../support/json.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -1252,9 +1254,401 @@ bool execute_render_commands(D3D11Context& d3d11, const RenderCommandList& comma
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// DX11Renderer implementation
+// ---------------------------------------------------------------------------
+
+DX11Renderer::DX11Renderer() = default;
+DX11Renderer::~DX11Renderer() { destroy(); }
+
+bool DX11Renderer::initialize(std::string& error) {
+    if (!create_window(window_, error)) {
+        return false;
+    }
+    if (!create_d3d11(window_.hwnd, d3d11_, error)) {
+        destroy_window(window_);
+        return false;
+    }
+    initialized_ = true;
+    return true;
+}
+
+void DX11Renderer::destroy() {
+    if (initialized_) {
+        destroy_d3d11(d3d11_);
+        destroy_window(window_);
+        initialized_ = false;
+    }
+}
+
+bool DX11Renderer::process_messages() {
+    MSG msg = {};
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+        if (msg.message == WM_QUIT) {
+            window_closed_ = true;
+            return false;
+        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return true;
+}
+
+void DX11Renderer::submit_command(const TelemetryCommand& command) {
+    if (command_submitter_) {
+        command_submitter_(command);
+    }
+}
+
+void DX11Renderer::set_command_submitter(std::function<void(const TelemetryCommand&)> submitter) {
+    command_submitter_ = std::move(submitter);
+}
+
+bool DX11Renderer::get_shadows_enabled() const {
+    return window_.input.shadows_enabled;
+}
+
+bool DX11Renderer::get_material_system_enabled() const {
+    return window_.input.material_system_enabled;
+}
+
+void DX11Renderer::apply_camera_state(const RendererCameraState& state) {
+    window_.input.input_mode = state.input_mode == "control"
+        ? ViewerInputState::InputMode::Control
+        : ViewerInputState::InputMode::Follow;
+
+    if (state.camera_mode == "follow") {
+        window_.input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+        window_.input.focus_uid = state.target_uid;
+        window_.input.focus_cycle_index = state.target_uid.empty() ? state.focus_index : -1;
+    } else {
+        window_.input.camera_mode = ViewerInputState::CameraMode::Free;
+        window_.input.focus_uid.clear();
+        window_.input.focus_cycle_index = -1;
+    }
+
+    window_.input.camera_distance = static_cast<float>(state.distance);
+    window_.input.camera_yaw = static_cast<float>(state.yaw);
+    window_.input.camera_pitch = static_cast<float>(state.pitch);
+    window_.input.camera_fov_y = static_cast<float>(state.fov_y);
+    window_.input.camera_roll_locked = state.roll_locked;
+    window_.input.mouse_aim_enabled = state.mouse_aim_enabled;
+    if (state.has_target) {
+        window_.input.camera_target = Float3{
+            static_cast<float>(state.target[0]),
+            static_cast<float>(state.target[1]),
+            static_cast<float>(state.target[2])};
+    }
+}
+
+RendererCameraState DX11Renderer::get_camera_state() const {
+    RendererCameraState state;
+    state.input_mode = window_.input.input_mode == ViewerInputState::InputMode::Control ? "control" : "follow";
+    state.camera_mode = window_.input.camera_mode == ViewerInputState::CameraMode::FollowObject ? "follow" : "free";
+    state.target_uid = window_.input.focus_uid;
+    state.focus_index = window_.input.focus_cycle_index;
+    state.distance = window_.input.camera_distance;
+    state.yaw = window_.input.camera_yaw;
+    state.pitch = window_.input.camera_pitch;
+    state.fov_y = window_.input.camera_fov_y;
+    state.roll_locked = window_.input.camera_roll_locked;
+    state.mouse_aim_enabled = window_.input.mouse_aim_enabled;
+    state.has_target = true;
+    state.target[0] = window_.input.camera_target.x;
+    state.target[1] = window_.input.camera_target.y;
+    state.target[2] = window_.input.camera_target.z;
+    return state;
+}
+
+void DX11Renderer::update_input(const WorldSnapshot* snapshot, float dt_seconds) {
+    update_camera(window_.input, dt_seconds);
+    constexpr int kGameModeActionPenalty = -1;
+
+    // Update snapshot UIDs for focus cycling
+    window_.input.snapshot_uids.clear();
+    if (snapshot) {
+        window_.input.snapshot_uids.reserve(snapshot->objects.size());
+        for (const auto& object : snapshot->objects) {
+            if (object.alive) {
+                window_.input.snapshot_uids.push_back(object.uid);
+            }
+        }
+    }
+
+    const int object_count = static_cast<int>(window_.input.snapshot_uids.size());
+    if (object_count <= 0) {
+        window_.input.focus_cycle_index = -1;
+        window_.input.focus_uid.clear();
+        window_.input.camera_mode = ViewerInputState::CameraMode::Free;
+        window_.input.focus_cycle_requested = false;
+    } else {
+        if (!window_.input.focus_uid.empty()) {
+            auto it = std::find(window_.input.snapshot_uids.begin(), window_.input.snapshot_uids.end(), window_.input.focus_uid);
+            if (it != window_.input.snapshot_uids.end()) {
+                window_.input.focus_cycle_index = static_cast<int>(std::distance(window_.input.snapshot_uids.begin(), it));
+            } else {
+                window_.input.focus_cycle_index = -1;
+                window_.input.focus_uid.clear();
+            }
+        }
+
+        if (window_.input.focus_cycle_requested) {
+            const int slot_count = object_count + 1;
+            int next_index = window_.input.focus_cycle_index + 1;
+            if (next_index >= slot_count) {
+                next_index = -1;
+            }
+            window_.input.focus_cycle_index = next_index;
+            window_.input.focus_uid.clear();
+            window_.input.focus_cycle_requested = false;
+        }
+
+        if (window_.input.focus_cycle_index >= 0 && window_.input.focus_cycle_index < object_count) {
+            window_.input.focus_uid = window_.input.snapshot_uids[static_cast<size_t>(window_.input.focus_cycle_index)];
+            window_.input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+        } else if (window_.input.input_mode == ViewerInputState::InputMode::Follow
+            && window_.input.camera_mode == ViewerInputState::CameraMode::FollowObject) {
+            window_.input.focus_cycle_index = 0;
+            window_.input.focus_uid = window_.input.snapshot_uids.front();
+            window_.input.camera_mode = ViewerInputState::CameraMode::FollowObject;
+        } else {
+            window_.input.focus_cycle_index = -1;
+            window_.input.focus_uid.clear();
+            window_.input.camera_mode = ViewerInputState::CameraMode::Free;
+        }
+    }
+
+    if (!window_.input.mouse_aim_enabled
+        || window_.input.input_mode != ViewerInputState::InputMode::Control
+        || window_.input.camera_mode != ViewerInputState::CameraMode::FollowObject
+        || window_.input.focus_uid.empty()) {
+        if (!action_control_uid_.empty()) {
+            auto submit_clear = [this, kGameModeActionPenalty](const std::string& uid, const char* key) {
+                json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+                kv[key] = json::JSON();
+                TelemetryCommand command;
+                command.kind = TelemetryCommandKind::Command;
+                command.target_uid = uid;
+                command.payload = json::String("setp " + uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+                submit_command(command);
+            };
+            submit_clear(action_control_uid_, "aileron_cmd");
+            submit_clear(action_control_uid_, "elevator_cmd");
+            submit_clear(action_control_uid_, "rudder_cmd");
+            submit_clear(action_control_uid_, "fire");
+            action_control_uid_.clear();
+        }
+        window_.input.fire_once_requested = false;
+        window_.input.pylon_cycle_requested = false;
+        return;
+    }
+
+    auto submit_action = [this, kGameModeActionPenalty](const char* key, double value) {
+        json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+        kv[key] = json::Float(value);
+        TelemetryCommand command;
+        command.kind = TelemetryCommandKind::Command;
+        command.target_uid = window_.input.focus_uid;
+        command.payload = json::String("setp " + window_.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+        submit_command(command);
+    };
+    auto submit_action_null = [this, kGameModeActionPenalty](const char* key) {
+        json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+        kv[key] = json::JSON();
+        TelemetryCommand command;
+        command.kind = TelemetryCommandKind::Command;
+        command.target_uid = window_.input.focus_uid;
+        command.payload = json::String("setp " + window_.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+        submit_command(command);
+    };
+    auto submit_action_json = [this, kGameModeActionPenalty](const char* key, const json::JSON& value) {
+        json::JSON kv = json::JSON::Make(json::JSON::Class::Object);
+        kv[key] = value;
+        TelemetryCommand command;
+        command.kind = TelemetryCommandKind::Command;
+        command.target_uid = window_.input.focus_uid;
+        command.payload = json::String("setp " + window_.input.focus_uid + " " + std::to_string(kGameModeActionPenalty) + " " + kv.dump(1, "", ""));
+        submit_command(command);
+    };
+
+    float delta_heading = 0.0f;
+    float delta_altitude = 0.0f;
+    if (snapshot) {
+        auto focused_it = std::find_if(snapshot->objects.begin(), snapshot->objects.end(),
+            [this](const TelemetryObjectState& obj) { return obj.uid == window_.input.focus_uid; });
+        if (focused_it != snapshot->objects.end()) {
+            const float cy = std::cos(window_.input.aim_yaw);
+            const float sy = std::sin(window_.input.aim_yaw);
+            const float cp = std::cos(window_.input.aim_pitch);
+            const float sp = std::sin(window_.input.aim_pitch);
+            const float fwd_n = -cp * cy;
+            const float fwd_w = -cp * sy;
+            const float fwd_u = -sp;
+            const float desired_heading = std::atan2(fwd_w, fwd_n);
+            const float desired_pitch = -std::atan2(fwd_u, std::sqrt(fwd_n * fwd_n + fwd_w * fwd_w));
+            const float current_yaw = static_cast<float>(focused_it->orientation[2]);
+            const float heading_err = static_cast<float>(c3utils::norm_pi(desired_heading - current_yaw));
+            const float max_heading = static_cast<float>(c3utils::deg2rad(85.0));
+            const float max_pitch = static_cast<float>(c3utils::deg2rad(45));
+            delta_heading = std::clamp(heading_err / max_heading, -1.0f, 1.0f);
+            delta_altitude = std::clamp(-(desired_pitch / max_pitch), -1.0f, 1.0f);
+        }
+    }
+
+    const float aileron_cmd = window_.input.ctrl_aileron_right ? (window_.input.ctrl_aileron_left ? 0.0f : 1.0f)
+                                                               : (window_.input.ctrl_aileron_left ? -1.0f : 0.0f);
+    const float elevator_cmd = window_.input.ctrl_elevator_up ? (window_.input.ctrl_elevator_down ? 0.0f : 1.0f)
+                                                              : (window_.input.ctrl_elevator_down ? -1.0f : 0.0f);
+    const float rudder_cmd = window_.input.ctrl_rudder_right ? (window_.input.ctrl_rudder_left ? 0.0f : -1.0f)
+                                                             : (window_.input.ctrl_rudder_left ? 1.0f : 0.0f);
+    const bool any_surface_key = window_.input.ctrl_aileron_left || window_.input.ctrl_aileron_right
+        || window_.input.ctrl_elevator_up || window_.input.ctrl_elevator_down
+        || window_.input.ctrl_rudder_left || window_.input.ctrl_rudder_right;
+
+    action_control_uid_ = window_.input.focus_uid;
+    submit_action("delta_heading", delta_heading);
+    submit_action("delta_altitude", delta_altitude);
+    submit_action("delta_speed", 0.0);
+
+    if (any_surface_key) {
+        if (snapshot) {
+            auto focused_it = std::find_if(snapshot->objects.begin(), snapshot->objects.end(),
+                [this](const TelemetryObjectState& obj) { return obj.uid == window_.input.focus_uid; });
+            if (focused_it != snapshot->objects.end()) {
+                window_.input.aim_yaw = static_cast<float>(c3utils::norm_pi(static_cast<float>(focused_it->orientation[2]) - static_cast<float>(c3utils::pi)));
+                window_.input.aim_pitch = std::clamp(static_cast<float>(focused_it->orientation[1]), -1.45f, 1.45f);
+            }
+        }
+        submit_action("aileron_cmd", aileron_cmd);
+        submit_action("elevator_cmd", elevator_cmd);
+        submit_action("rudder_cmd", rudder_cmd);
+    } else {
+        submit_action_null("aileron_cmd");
+        submit_action_null("elevator_cmd");
+        submit_action_null("rudder_cmd");
+    }
+
+    // Pylon management
+    std::vector<std::string> selectable_pylons;
+    if (snapshot) {
+        auto focused_it = std::find_if(snapshot->objects.begin(), snapshot->objects.end(),
+            [this](const TelemetryObjectState& obj) { return obj.uid == window_.input.focus_uid; });
+        if (focused_it != snapshot->objects.end()) {
+            const json::JSON& reg = focused_it->debug_register;
+            if (reg.JSONType() == json::JSON::Class::Object && reg.hasKey("pylon_mounts", json::JSON::Class::Object)) {
+                for (const auto& kv : reg.at("pylon_mounts").ObjectRange()) {
+                    selectable_pylons.push_back(kv.first);
+                }
+            }
+        }
+    }
+    if (!selectable_pylons.empty()) {
+        if (window_.input.selected_pylon_name.empty()
+            || std::find(selectable_pylons.begin(), selectable_pylons.end(), window_.input.selected_pylon_name) == selectable_pylons.end()) {
+            window_.input.selected_pylon_name = selectable_pylons.front();
+        }
+        if (window_.input.pylon_cycle_requested) {
+            auto it = std::find(selectable_pylons.begin(), selectable_pylons.end(), window_.input.selected_pylon_name);
+            size_t idx = it != selectable_pylons.end() ? (static_cast<size_t>(std::distance(selectable_pylons.begin(), it)) + 1) % selectable_pylons.size() : 0;
+            window_.input.selected_pylon_name = selectable_pylons[idx];
+        }
+    } else {
+        window_.input.selected_pylon_name.clear();
+    }
+    window_.input.pylon_cycle_requested = false;
+
+    // Fire
+    bool fire_emitted = false;
+    if (window_.input.fire_once_requested && snapshot) {
+        auto focused_it = std::find_if(snapshot->objects.begin(), snapshot->objects.end(),
+            [this](const TelemetryObjectState& obj) { return obj.uid == window_.input.focus_uid; });
+        if (focused_it != snapshot->objects.end()) {
+            const json::JSON& reg = focused_it->debug_register;
+            std::string weapon_spec;
+            if (!window_.input.selected_pylon_name.empty()
+                && reg.JSONType() == json::JSON::Class::Object
+                && reg.hasKey("pylon_mounts", json::JSON::Class::Object)) {
+                const auto pylon_mounts = reg.at("pylon_mounts");
+                if (pylon_mounts.hasKey(window_.input.selected_pylon_name, json::JSON::Class::String)) {
+                    weapon_spec = pylon_mounts.at(window_.input.selected_pylon_name).ToString();
+                }
+            }
+            std::string target_uid;
+            if (reg.JSONType() == json::JSON::Class::Object && reg.hasKey("enemies_lock", json::JSON::Class::Array)) {
+                for (const auto& enm : reg.at("enemies_lock").ArrayRange()) {
+                    if (enm.JSONType() == json::JSON::Class::String) {
+                        target_uid = enm.ToString();
+                        if (!target_uid.empty()) break;
+                    }
+                }
+            }
+            if (!weapon_spec.empty() && !target_uid.empty()) {
+                json::JSON fire_obj = json::JSON::Make(json::JSON::Class::Object);
+                fire_obj["target_uid"] = json::String(target_uid);
+                fire_obj["weapon_spec"] = json::String(weapon_spec);
+                submit_action_json("fire", fire_obj);
+                fire_emitted = true;
+            }
+        }
+    }
+    if (!fire_emitted) {
+        submit_action_null("fire");
+    }
+    window_.input.fire_once_requested = false;
+}
+
+bool DX11Renderer::render_frame(const RendererFrameInput& frame_input, RendererFrameStats& out_stats) {
+    UINT width = 1;
+    UINT height = 1;
+    update_viewport_from_client_rect(window_.hwnd, d3d11_.context, width, height);
+
+    std::string error;
+    if (!resize_swap_chain_if_needed(d3d11_, window_.hwnd, width, height, error)) {
+        return false;
+    }
+
+    const RenderScene scene = build_render_scene(window_.input, width, height, frame_input.snapshot);
+    RenderCommandList command_list = record_render_commands(scene);
+
+    RenderFrameStats hud_stats;
+    for (const auto& cmd : command_list.commands) {
+        if (cmd.type == RenderCommandType::Draw && !cmd.vertices.empty()) {
+            ++hud_stats.draw_calls;
+            hud_stats.vertex_count += static_cast<long>(cmd.vertices.size());
+        }
+    }
+
+    append_hud_render_commands(command_list, width, height, window_.input,
+        frame_input.snapshot, frame_input.sim_time, frame_input.object_count, hud_stats);
+
+    RenderFrameStats frame_stats;
+    if (!execute_render_commands(d3d11_, command_list, frame_stats)) {
+        return false;
+    }
+
+    out_stats.command_count = frame_stats.command_count;
+    out_stats.draw_calls = frame_stats.draw_calls;
+    out_stats.vertex_count = frame_stats.vertex_count;
+
+    d3d11_.swap_chain->Present(1, 0);
+    return true;
+}
+
+bool DX11Renderer::is_window_closed() const {
+    return window_closed_;
+}
+
 #endif
 
 } // namespace bvr_sim
+
+std::unique_ptr<bvr_sim::IRenderer> bvr_sim::create_dx11_renderer() {
+#ifdef _WIN32
+    return std::make_unique<DX11Renderer>();
+#else
+    return nullptr;
+#endif
+}
 
 
 
