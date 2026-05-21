@@ -7,9 +7,15 @@
 
 namespace bvr_sim {
 
-class DataObj : public SimulatedObject {
+class DataObj {
 public:
     const std::shared_ptr<SimulatedObject> source;
+    const std::string uid;
+    const TeamColor color;
+    double dt;
+    bool is_alive;
+    std::array<double, 3> position;
+    std::array<double, 3> velocity;
 
 protected:
     std::string name_suffix;
@@ -26,11 +32,11 @@ public:
         double noise_std_velocity = 0.0
     ) noexcept;
 
-    ~DataObj() noexcept override = default;
+    ~DataObj() noexcept = default;
 
-    void step() override;
+    void step() noexcept;
 
-    std::string log() noexcept override;
+    std::string log() noexcept;
 
     std::array<double, 3> get_position_error() const noexcept;
     std::array<double, 3> get_velocity_error() const noexcept;
@@ -38,15 +44,15 @@ public:
     double get_velocity_error_magnitude() const noexcept;
 
 protected:
-    std::array<double, 3> add_position_error(
+    static std::array<double, 3> add_position_error(
         const std::array<double, 3>& true_position,
         double std_dev
-    ) const noexcept;
+    ) noexcept;
 
-    std::array<double, 3> add_velocity_error(
+    static std::array<double, 3> add_velocity_error(
         const std::array<double, 3>& true_velocity,
         double std_dev
-    ) const noexcept;
+    ) noexcept;
 };
 
 }

@@ -11,16 +11,14 @@ DataObj::DataObj(
     double noise_std_position,
     double noise_std_velocity
 ) noexcept
-    : SimulatedObject(
-        source_obj->uid,
-        source_obj->color,
-        add_position_error(source_obj->position, noise_std_position),
-        add_velocity_error(source_obj->velocity, noise_std_velocity),
-        source_obj->dt,
-        SOT::DataObj
-      ),
-      source(source_obj),
-      name_suffix("0" + get_new_uuid()),
+    : source(source_obj),
+      uid(source_obj->uid),
+      color(source_obj->color),
+      dt(source_obj->dt),
+      is_alive(source_obj->is_alive),
+      position(add_position_error(source_obj->position, noise_std_position)),
+      velocity(add_velocity_error(source_obj->velocity, noise_std_velocity)),
+      name_suffix("0" + SimulatedObject::get_new_uuid()),
       noise_std_position(noise_std_position),
       noise_std_velocity(noise_std_velocity),
       true_position(source_obj->position),
@@ -30,7 +28,7 @@ DataObj::DataObj(
 std::array<double, 3> DataObj::add_position_error(
     const std::array<double, 3>& true_pos,
     double std_dev
-) const noexcept {
+) noexcept {
     if (std_dev <= 0) {
         return true_pos;
     }
@@ -50,7 +48,7 @@ std::array<double, 3> DataObj::add_position_error(
 std::array<double, 3> DataObj::add_velocity_error(
     const std::array<double, 3>& true_vel,
     double std_dev
-) const noexcept {
+) noexcept {
     if (std_dev <= 0) {
         return true_vel;
     }
@@ -67,7 +65,7 @@ std::array<double, 3> DataObj::add_velocity_error(
     return result;
 }
 
-void DataObj::step() {
+void DataObj::step() noexcept {
 }
 
 std::string DataObj::log() noexcept {

@@ -156,17 +156,15 @@ bool Aircraft::shoot(
     return true;
 }
 
-void Aircraft::add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor) {
+bool Aircraft::add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor) noexcept {
     if (!sensor) {
         SL::get().print("[Aircraft] Error: Sensor " + name + " is nullptr");
-        return;
+        return false;
     }
-    if (sensors.find(name) != sensors.end()) {
+    if (!SimulatedObject::add_sensor(name, sensor)) {
         SL::get().print("[Aircraft] Error: Sensor name " + name + " already exists");
-        return;
+        return false;
     }
-
-    sensors[name] = sensor;
 
     if (name == "radar") {
         radar = sensor;
@@ -177,16 +175,7 @@ void Aircraft::add_sensor(const std::string& name, const std::shared_ptr<SensorB
     } else if (name == "sa_datalink") {
         sa_datalink = sensor;
     }
-}
-
-void Aircraft::update_sensors() noexcept {
-    for (auto& [name, sensor] : sensors) {
-        if (sensor != nullptr) {
-            sensor->update();
-        } else {
-            std::cout << "Warning: " << name << " sensor is None" << std::endl;
-        }
-    }
+    return true;
 }
 
 double Aircraft::get_roll() const noexcept {

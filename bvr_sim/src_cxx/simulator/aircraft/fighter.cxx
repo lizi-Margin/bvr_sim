@@ -104,7 +104,7 @@ void Fighter::step() {
     position = fdm->get_position();
     velocity = fdm->get_velocity();
 
-    if (sensors.size() == 0) {
+    if (get_sensors().size() == 0) {
         SL::get().printf("Warning: Fighter %s has no sensors\n", uid.c_str());
     }
     update_sensors();

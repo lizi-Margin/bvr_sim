@@ -24,6 +24,8 @@ public:
     void update() override;
 
     std::string log_suffix() const noexcept override { return ""; }
+
+    SensorDetectionLevel get_detection_level() const noexcept override { return SensorDetectionLevel::Detection; }
 };
 
 class MissileWarningSystem : public SensorBase {
@@ -41,6 +43,8 @@ public:
     void update() override;
 
     std::string log_suffix() const noexcept override { return ""; }
+
+    SensorDetectionLevel get_detection_level() const noexcept override { return SensorDetectionLevel::Localization; }
 };
 
 }

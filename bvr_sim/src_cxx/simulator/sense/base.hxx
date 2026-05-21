@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../data_obj.hxx"
+#include "sensor_manager.hxx"
 #include <string>
 #include <map>
 #include <memory>
@@ -22,6 +23,8 @@ public:
     virtual void update() = 0;
 
     virtual std::string log_suffix() const noexcept = 0;
+
+    virtual SensorDetectionLevel get_detection_level() const noexcept { return SensorDetectionLevel::Detection; }
 
     const std::map<std::string, std::shared_ptr<DataObj>>& get_data() const noexcept { return data_dict; }
 

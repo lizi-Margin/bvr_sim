@@ -36,7 +36,6 @@ public:
     PylonManager pylon_manager;
 
 protected:
-    std::map<std::string, std::shared_ptr<SensorBase>> sensors;
 
 public:
     Aircraft(
@@ -59,8 +58,7 @@ public:
         const std::string& target_uid
     ) noexcept;
 
-    void add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor);
-    void update_sensors() noexcept;
+    bool add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor) noexcept;
 
     virtual double get_roll() const noexcept;
     virtual double get_pitch() const noexcept;
@@ -72,7 +70,9 @@ public:
 
     virtual std::string log() noexcept override;
 
-    const std::map<std::string, std::shared_ptr<SensorBase>>& get_sensors() const noexcept { return sensors; }
+    const std::map<std::string, std::shared_ptr<SensorBase>>& get_sensors() const noexcept {
+        return SimulatedObject::get_sensors();
+    }
 
 
     virtual void write_register() noexcept override;
@@ -82,11 +82,6 @@ public:
         enemies_lock.clear();
         launched_missiles.clear();
         under_missiles.clear();
-        for (auto& [name, sensor] : sensors) {
-            check(sensor, "sensor");
-            sensor->clean_up();
-        }
-        sensors.clear();
         sa_datalink = nullptr;
         radar = nullptr;
         rws = nullptr;

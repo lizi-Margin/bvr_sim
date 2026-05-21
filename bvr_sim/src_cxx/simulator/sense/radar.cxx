@@ -416,7 +416,12 @@ std::shared_ptr<SimulatedObject> Radar::_get_best_target(double& out_el, double&
         });
 
     for (const auto& dataobj : dl_dataobj_list) {
-        auto el_az = _get_el_az(_get_rel_pos_vec(dataobj), _get_parent_nose_vec());
+        auto rel_pos_vec = Vector3({
+            dataobj->position[0] - parent->position[0],
+            dataobj->position[1] - parent->position[1],
+            dataobj->position[2] - parent->position[2]
+        });
+        auto el_az = _get_el_az(rel_pos_vec, _get_parent_nose_vec());
         double el = el_az[0];
         double az = el_az[1];
         if (std::abs(el) < gimbal_limit && std::abs(az) < gimbal_limit) {

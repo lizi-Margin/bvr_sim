@@ -80,6 +80,8 @@ public:
 
     std::string log_suffix() const noexcept override;
 
+    SensorDetectionLevel get_detection_level() const noexcept override { return SensorDetectionLevel::Tracking; }
+
     virtual void clean_up() noexcept override {
         SensorBase::clean_up();
         track_targets.clear();

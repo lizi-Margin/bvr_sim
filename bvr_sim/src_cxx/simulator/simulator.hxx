@@ -1,6 +1,7 @@
 #pragma once
 
 #include "register.hxx"
+#include "sense/sensor_manager.hxx"
 #include "support/colorful.hxx"
 #include <string>
 #include <array>
@@ -8,6 +9,7 @@
 #include <tuple>
 #include <optional>
 #include <memory>
+#include <map>
 
 namespace bvr_sim {
 
@@ -59,6 +61,7 @@ public:
 protected:
     bool render_explosion;
     Register register_;
+    std::unique_ptr<SensorManager> sensor_manager_;
 
 public:
     SimulatedObject(
@@ -70,7 +73,7 @@ public:
         SOT type_ = SOT::Unknown
     ) noexcept;
 
-    virtual ~SimulatedObject() noexcept = default;
+    virtual ~SimulatedObject() noexcept;
     bool trashed() const noexcept { return rubbish_countup > 0; }
 
     void tick() noexcept;
@@ -102,6 +105,13 @@ public:
     const Register& get_register() const noexcept { return register_; }
     virtual void write_register() noexcept;
 
+    SensorManager& sensor_manager() noexcept;
+    const SensorManager& sensor_manager() const noexcept;
+    bool add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor) noexcept;
+    void update_sensors() noexcept;
+    std::shared_ptr<SensorBase> get_sensor(const std::string& name) const noexcept;
+    const std::map<std::string, std::shared_ptr<SensorBase>>& get_sensors() const noexcept;
+
     void debug_print() const noexcept {
         colorful::printHUANG("SimulatedObject::DebugPrint");
         std::cout << "uid: " << uid << std::endl;
@@ -120,6 +130,9 @@ public:
     virtual void clean_up() noexcept {
         enemies.clear();
         partners.clear();
+        if (sensor_manager_) {
+            sensor_manager_->clear();
+        }
     }
 };
 

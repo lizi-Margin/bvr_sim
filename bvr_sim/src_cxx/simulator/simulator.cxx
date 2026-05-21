@@ -1,5 +1,6 @@
 #include "simulator.hxx"
 #include "register.hxx"
+#include "sense/sensor_manager.hxx"
 #include "support/support.hxx"
 #include <cmath>
 #include <random>
@@ -71,10 +72,13 @@ SimulatedObject::SimulatedObject(
       is_alive(true),
       position{0.0, 0.0, 0.0},
       velocity{0.0, 0.0, 0.0},
-      render_explosion(false)
+      render_explosion(false),
+      sensor_manager_(std::make_unique<SensorManager>(this))
 {
     update_state(position_, velocity_);
 }
+
+SimulatedObject::~SimulatedObject() noexcept = default;
 
 void SimulatedObject::tick() noexcept {
     check(static_cast<int>(Type) != static_cast<int>(SOT::Unknown), "SimulatedObject::tick: SOT::Unknown is not allowed");
@@ -211,6 +215,30 @@ void SimulatedObject::write_register() noexcept {
     rpy_json.append(rpy[1]);
     rpy_json.append(rpy[2]);
     register_.set("rpy", rpy_json);
+}
+
+SensorManager& SimulatedObject::sensor_manager() noexcept {
+    return *sensor_manager_;
+}
+
+const SensorManager& SimulatedObject::sensor_manager() const noexcept {
+    return *sensor_manager_;
+}
+
+bool SimulatedObject::add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor) noexcept {
+    return sensor_manager_->add_sensor(name, sensor);
+}
+
+void SimulatedObject::update_sensors() noexcept {
+    sensor_manager_->update_all();
+}
+
+std::shared_ptr<SensorBase> SimulatedObject::get_sensor(const std::string& name) const noexcept {
+    return sensor_manager_->get_sensor(name);
+}
+
+const std::map<std::string, std::shared_ptr<SensorBase>>& SimulatedObject::get_sensors() const noexcept {
+    return sensor_manager_->get_sensors();
 }
 
 }

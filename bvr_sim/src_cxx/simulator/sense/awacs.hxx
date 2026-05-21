@@ -26,6 +26,8 @@ public:
 
     std::string log_suffix() const noexcept override;
 
+    SensorDetectionLevel get_detection_level() const noexcept override { return SensorDetectionLevel::Localization; }
+
 private:
     void _update();
 };

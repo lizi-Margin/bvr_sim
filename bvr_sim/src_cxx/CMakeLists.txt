@@ -103,6 +103,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/fdm/generic_missile_fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/base.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/sensor_manager.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/awacs.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/rws.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/radar.cxx"
@@ -276,6 +277,9 @@ if(BVR_SIM_BUILD_TESTS)
         "${CMAKE_CURRENT_SOURCE_DIR}/so_pool.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/global_config.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/base.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/sensor_manager.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/data_obj.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/fdm.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/param_store.cxx"
@@ -289,6 +293,7 @@ if(BVR_SIM_BUILD_TESTS)
         "${CMAKE_CURRENT_SOURCE_DIR}/test_generic_missile_fdm.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/pylon_manager.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_pylon_manager.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_sensor_manager.cxx"
     )
 
     # Link with main library dependencies
