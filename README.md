@@ -42,29 +42,6 @@
 - 基于 ACMI 的 Tacview 回放输出
 - 规则对手与外部 RL 框架适配入口
 
-## 最近更新
-
-最近几次 `git` 提交里，和使用方式直接相关的变化主要有：
-
-- `2026-04-10` 的 `080f546`
-  - 新增 C++ `standoff` baseline opponent
-  - `experimental/custom_5v5_f22_f16.jsonc` 已改用 `standoff` + `tactical` 的混合编组
-- `2026-04-06` 的 `2261257`
-  - 增加基于 `scikit-build-core` 的 wheel / sdist 构建路径
-  - 仓库已包含 `.github/workflows/wheels.yml`，用于 Linux / Windows 64-bit wheel 构建
-- `2026-03-30` 的 `d723ddf` 对应版本 `0.3.0`
-  - 新版 `MModelA`
-  - 新的 ISA Atmosphere
-  - 新增 `AIM-9M`
-  - C++ tactical strategy 开始支持 `AIM-9M`
-  - 新增 `experimental/run_custom_5v5_acmi.py` 与 `experimental/custom_5v5_f22_f16.jsonc`
-- `2026-03-30` 的 `8beb51a`
-  - `MModelA` 新增 `enable_INS_guide` 开关
-- `2026-03-30` 的 `0e7929d`
-  - `tactical` 对手的初始侧向机动不再固定，首次进入交战时会随机左右展开
-- `2026-03-25` 的 `4bb4e98`
-  - C++ 参数读取、动作字段校验更严格，不合法字段更容易在初始化或 `step` 时直接报错
-
 ## 仓库结构
 
 ```text
@@ -319,6 +296,13 @@ while not done:
 - `bvr_sim/install/`
 - `benchmark_logs/`
 - `test_logs/`
+
+## 最近更新
+
+- 新增 game mode / DX11 可视化，支持 HUD、态势显示、雷达画面和键盘镜头控制。
+- 改进地形与道路渲染，空战场景的空间感和可读性更好。
+- 增强传感器与目标跟踪能力，便于观察交战态势变化。
+- 整理 benchmark 与 5v5 示例场景，方便从单机对抗扩展到编队推演。
 
 ## 与外部框架集成
 
