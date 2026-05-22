@@ -1,218 +1,239 @@
-# BVR Sim Getting Started
+# 新手上手指南
 
-这份文档面向第一次试用 `bvr-sim` 的人，目标是尽快完成三件事：
+这份文档只面向一个目标：让第一次接触项目的人，先跑通一个强化学习空战训练任务。
 
-1. 安装项目
-2. 跑通一个 smoke test
-3. 知道下一步从哪里改配置、看回放、接 RL 框架
+你不需要先理解空战模型、C++ 绑定、奖励函数或观测空间。先跑通，再看配置。
 
-## 1. 你会接触到哪两套环境
+## 最终目标
 
-### 纯 Python 环境
+先跑这条最小训练命令：
 
-入口是 [`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py) 里的 `BVR3DEnv`。
+```bash
+python -m bvr_sim_rl --backend python --config tests/demo_config.json --timesteps 128 --rollouts 16 --device cpu
+```
 
-适合：
+它会用纯 Python 后端启动一个很短的 PPO 训练任务。跑通后，再切到 C++ 后端做更快训练。
 
-- 快速理解环境逻辑
-- 调试奖励、观测、规则对手
-- 不依赖原生编译先跑起来
+## 1. 安装
 
-### C++ + Python 混合环境
+在仓库根目录创建虚拟环境：
 
-入口是 [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py) 里的 `BVR3DEnvCpp`。
+```bash
+python -m venv .venv
+```
 
-适合：
+Windows PowerShell:
 
-- 更高性能训练
-- 使用 C++ 核心能力
-- 跑原生 unit tests
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-如果你只是第一次试用，先从 Python 环境开始。
+Linux/macOS:
 
-## 2. 安装
+```bash
+source .venv/bin/activate
+```
 
-仓库根目录执行：
+安装项目和 RL 依赖：
+
+```bash
+pip install -e ".[rl]"
+```
+
+如果引号导致 shell 报错，就分两步：
 
 ```bash
 pip install -e .
+pip install skrl torch
 ```
 
-如果你后面需要 C++ 环境，还需要本地具备：
+## 2. 跑一个最小 PPO 训练
 
-- `git`
-- `cmake`
-- C++ 编译器
+先用 Python 后端，因为它不需要编译 C++。
 
-Windows 使用：
+```bash
+python -m bvr_sim_rl --backend python --config tests/demo_config.json --timesteps 128 --rollouts 16 --device cpu
+```
+
+这不是为了训练出强策略，而是为了确认：
+
+- Python 包能导入
+- 仿真环境能 reset/step
+- `skrl` PPO 能拿到观测和动作
+- 日志和 checkpoint 能写出
+
+输出目录：
+
+```text
+runs/bvr_sim_rl/
+```
+
+想跑久一点：
+
+```bash
+python -m bvr_sim_rl --backend python --config tests/demo_config.json --timesteps 10000
+```
+
+## 3. 使用 C++ 后端训练
+
+C++ 后端更适合正式训练。先编译：
+
+Windows:
 
 ```powershell
 bvr_sim\build_windows.bat
 ```
 
-Linux 使用：
+Linux:
 
 ```bash
 bash bvr_sim/build_linux.sh
 ```
 
-## 3. 第一次运行
+快速确认 C++ 后端能训练：
 
-### 跑 Python 版
+```bash
+python -m bvr_sim_rl --backend cpp --config tests/demo_config_cpp.jsonc --timesteps 128 --rollouts 16 --device cpu
+```
+
+正式一点的训练：
+
+```bash
+python -m bvr_sim_rl --backend cpp --config tests/demo_config_cpp.jsonc --timesteps 10000
+```
+
+## 4. 这个训练入口在哪里
+
+核心文件只有两个：
+
+```text
+bvr_sim_rl/env.py
+bvr_sim_rl/ppo.py
+```
+
+`env.py` 负责把 BVR Sim 包装成 `skrl` 可以训练的环境。
+
+`ppo.py` 负责创建 PPO 模型、memory、agent 和 trainer。
+
+## 5. 动作是怎么接上的
+
+仿真器原始动作空间是：
+
+```text
+MultiDiscrete([15, 15, 9, 2])
+```
+
+四个维度分别是：
+
+```text
+delta_heading, delta_altitude, delta_speed, shoot
+```
+
+PPO 更适合先用连续动作，所以 `bvr_sim_rl` 对外暴露：
+
+```text
+Box(-1, 1, shape=(4,))
+```
+
+每一步训练时，它会把 PPO 输出的连续动作量化回仿真器的离散动作。
+
+## 6. 单独验证仿真器
+
+如果训练失败，先确认仿真器本身能跑。
+
+Python 后端：
 
 ```bash
 python tests/test_py.py
 ```
 
-它读取 [`tests/demo_config.json`](tests/demo_config.json)。
-
-运行成功后你通常会得到：
-
-- `test_logs/replay.acmi`
-
-### 跑 C++ 版
-
-先完成构建，再执行：
+C++ 后端：
 
 ```bash
 python tests/test_cpp.py
 ```
 
-它读取 [`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc)。
-
-运行成功后你通常会得到：
-
-- `test_logs/replay_0.acmi`
-- `test_logs/replay_1.acmi`
-- `test_logs/bvr_sim.log`
-
-### 跑一个较新的 C++ 示例
-
-如果你想直接看最近加入的多机混编场景，可以执行：
+完整测试：
 
 ```bash
-python experimental/run_custom_5v5_acmi.py
+python run_tests.py
 ```
 
-它读取 [`experimental/custom_5v5_f22_f16.jsonc`](../experimental/custom_5v5_f22_f16.jsonc)，会生成一份 5v5 的 ACMI 回放。
-这个示例同时覆盖了：
+## 7. 查看空战回放
 
-- `F22` / `F16` 混编
-- `AIM-120C7` 与 `AIM-9M` 混合挂载
-- 单机级别 `opponent_type`
-- `standoff` + `tactical` 的混合规则对手编组
+部分测试和示例会生成：
 
-## 4. 配置文件先看什么
+```text
+test_logs/*.acmi
+```
 
-### Python 版配置
+用 Tacview 打开 `.acmi` 文件，可以查看空战轨迹。
 
-[`tests/demo_config.json`](tests/demo_config.json) 里最重要的是：
+训练命令默认不一定生成回放。如果你想确认回放功能，先跑：
 
-- `red_fighters`
-- `blue_fighters`
-- `ground_units`
-- `obs_type`
-- `blue_opponent_type`
-- `reward_config`
+```bash
+python tests/test_py.py
+python tests/test_cpp.py
+```
 
-### C++ 版配置
+## 8. 接下来读什么
 
-[`tests/demo_config_cpp.jsonc`](tests/demo_config_cpp.jsonc) 里最重要的是：
+建议顺序：
 
-- `red_meta`
-- `blue_meta`
-- `pylon_mounts`
-- `fdm_type`
-- `opponent_type`
-- `obs_type`
-- `reward_config`
+1. [PPO 快速开始](rl/ppo_quickstart.md)
+2. [Python 后端入门配置](../tests/demo_config.json)
+3. [C++ 后端入门配置](../tests/demo_config_cpp.jsonc)
+4. [RL 环境适配代码](../bvr_sim_rl/env.py)
+5. [PPO 训练代码](../bvr_sim_rl/ppo.py)
 
-如果你想看最近新增的武器与编组配置，再看：
+想继续改仿真和任务，再看：
 
-- [`experimental/custom_5v5_f22_f16.jsonc`](../experimental/custom_5v5_f22_f16.jsonc)
+- [配置说明](configuration.md)
+- [外部框架集成](integration.md)
+- [开发者架构说明](developer/architecture.md)
 
-这个示例里，`F22` 默认使用 `standoff`，`F16` 默认使用 `tactical`，适合直接观察两类规则对手的职责分工。
+## 常见问题
 
-## 5. 先理解哪些代码文件
-
-建议按这个顺序读：
-
-1. [`tests/test_py.py`](tests/test_py.py)
-2. [`tests/test_cpp.py`](tests/test_cpp.py)
-3. [`bvr_sim/__init__.py`](bvr_sim/__init__.py)
-4. [`bvr_sim/bvr_env.py`](bvr_sim/bvr_env.py)
-5. [`bvr_sim/bvr_env_cpp.py`](bvr_sim/bvr_env_cpp.py)
-
-如果你要改行为逻辑，再继续看：
-
-- `bvr_sim/src_py/simulator/`
-- `bvr_sim/src_py/reward/`
-- `bvr_sim/src_py/baseline_opponents/`
-- [`bvr_sim/src_py/observation_space.py`](bvr_sim/src_py/observation_space.py)
-
-## 6. RL 框架集成从哪里开始
-
-仓库里已经有适配示例：
-
-- [`rl_envs/env_wrapper.py`](../rl_envs/env_wrapper.py)
-- [`rl_envs/env_harl.py`](../rl_envs/env_harl.py)
-- [`rl_envs/env_marlbenchmark.py`](../rl_envs/env_marlbenchmark.py)
-
-如果你的试用者是想把环境接进自己训练框架，先看这些文件比直接翻核心源码更有效。
-
-## 7. 常见排查
-
-### Python 版能跑，C++ 版不能跑
-
-优先检查：
-
-- 是否执行过构建脚本
-- `bvr_sim/install/lib/` 下是否生成原生库
-- `bvr_sim/install/bin/` 下是否有 unit test 可执行文件
-
-### unit test 找不到
+### 找不到 `skrl` 或 `torch`
 
 执行：
 
 ```bash
-python tests/cpp_unit_tests.py
+pip install skrl torch
 ```
 
-如果报可执行文件不存在，说明构建还没完成。
-完整回归时，`python run_tests.py` 还会额外执行 `test_c3utils`。
+### `bvr_sim_cpp` 不能导入
 
-### 回放没有生成
+说明 C++ 后端还没有编译，先执行：
 
-检查：
+```powershell
+bvr_sim\build_windows.bat
+```
 
-- 运行脚本是否启用了 render
-- `test_logs/` 是否存在
-- 是否被中断得太早
+或：
 
-## 8. 建议的试用路径
+```bash
+bash bvr_sim/build_linux.sh
+```
 
-如果你要把项目发给别人，可以直接让对方按下面顺序操作：
+### Python 后端能跑，C++ 后端不能跑
 
-1. `pip install -e .`
-2. `python tests/test_py.py`
-3. 打开 `test_logs/replay.acmi`
-4. 如果需要 C++ 后端，再执行构建脚本
-5. `python tests/test_cpp.py`
-6. 看 `rl_envs/` 下的外部框架适配
+先跑：
 
-如果要体验最近一轮能力更新，可以在第 5 步后再补一条：
+```bash
+python tests/test_cpp.py
+```
 
-7. `python experimental/run_custom_5v5_acmi.py`
+如果这里失败，问题在 C++ 构建或原生扩展导入，不在 PPO。
 
-## 9. 相关文档
+### 训练很慢
 
-更偏研究和设计材料的文档在 `docs/` 下，例如：
+先确认你用的是 C++ 后端：
 
-- [`docs/doc.md`](docs/doc.md)
-- [`docs/observation_design.md`](docs/observation_design.md)
-- [`docs/installation.md`](docs/installation.md)
-- [`docs/configuration.md`](docs/configuration.md)
-- [`docs/integration.md`](docs/integration.md)
-- [`docs/observation_design.md`](docs/observation_design.md)
+```bash
+python -m bvr_sim_rl --backend cpp --config tests/demo_config_cpp.jsonc --timesteps 10000
+```
 
-这些适合了解背景，不适合当首次上手说明。
+### 没有看到回放文件
+
+训练默认关注 checkpoint 和日志，不一定打开 ACMI。需要回放时先跑 smoke test 或专门的示例脚本。

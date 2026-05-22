@@ -44,7 +44,7 @@ dependencies = [
 cmake.source-dir = "bvr_sim"
 cmake.build-type = "Release"
 build.targets = ["bvr_sim_cpp"]
-wheel.packages = ["bvr_sim"]
+wheel.packages = ["bvr_sim", "bvr_sim_rl"]
 sdist.exclude = [
     ".git/**",
     ".github/**",
@@ -63,6 +63,15 @@ sdist.exclude = [
 [tool.scikit-build.metadata.version]
 provider = "scikit_build_core.metadata.regex"
 input = "bvr_sim/__init__.py"
+
+[project.optional-dependencies]
+rl = [
+    "skrl",
+    "torch",
+]
+
+[project.scripts]
+bvr-sim-ppo = "bvr_sim_rl.ppo:main"
 
 [tool.scikit-build.cmake.define]
 BVR_SIM_PYTHON_MODULE_DESTINATION = "bvr_sim"

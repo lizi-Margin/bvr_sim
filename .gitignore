@@ -7,6 +7,7 @@ __pycache__
 
 /build
 /dist
+/runs/
 
 /.cache
 /.marscode
@@ -25,6 +26,8 @@ __pycache__
 !/docs/release_checklist.md
 !/docs/developer/
 !/docs/developer/architecture.md
+!/docs/rl/
+!/docs/rl/*.md
 !/docs/superpowers/
 !/docs/superpowers/specs/
 !/docs/superpowers/specs/*.md
