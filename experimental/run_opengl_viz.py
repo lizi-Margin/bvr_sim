@@ -20,7 +20,7 @@ def main():
         log_file_path=os.path.join(get_root_dir(), "../test_logs/bvr_sim_web.log"),
         acmi_file_path=os.path.join(get_root_dir(), "../test_logs/replay.acmi"),
     )
-    static_root = os.path.join(get_root_dir(), "../web/dist")
+    static_root = os.path.join(get_root_dir(), "../bvr_sim/web/dist")
 
     obs, info = sim.reset(seed=None)
     sim.core.step_sync(1)

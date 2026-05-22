@@ -28,7 +28,7 @@ This file summarizes notable third-party code and resources bundled with or used
 
 ## Web Frontend Dependencies
 
-The web visualization uses Node/npm dependencies declared in [`web/package.json`](web/package.json) and locked in [`web/package-lock.json`](web/package-lock.json). Review the lockfile before publishing binary or hosted distributions.
+The web visualization uses Node/npm dependencies declared in [`../../bvr_sim/web/package.json`](../../bvr_sim/web/package.json) and locked in [`../../bvr_sim/web/package-lock.json`](../../bvr_sim/web/package-lock.json). Review the lockfile before publishing binary or hosted distributions.
 
 ## Runtime Assets
 

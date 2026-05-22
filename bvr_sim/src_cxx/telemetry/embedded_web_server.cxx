@@ -471,9 +471,9 @@ std::filesystem::path normalize_static_root(const std::string& raw_root) {
 
 std::filesystem::path find_default_static_root() {
     const std::vector<std::filesystem::path> candidates = {
-        std::filesystem::current_path() / "web" / "dist",
-        std::filesystem::current_path().parent_path() / "web" / "dist",
-        std::filesystem::current_path().parent_path().parent_path() / "web" / "dist"
+        std::filesystem::current_path() / "bvr_sim" / "web" / "dist",
+        std::filesystem::current_path().parent_path() / "bvr_sim" / "web" / "dist",
+        std::filesystem::current_path().parent_path().parent_path() / "bvr_sim" / "web" / "dist"
     };
 
     for (const auto& candidate : candidates) {

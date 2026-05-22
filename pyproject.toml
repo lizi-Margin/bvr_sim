@@ -44,13 +44,14 @@ dependencies = [
 cmake.source-dir = "bvr_sim"
 cmake.build-type = "Release"
 build.targets = ["bvr_sim_cpp"]
-wheel.packages = ["bvr_sim", "rl_envs"]
+wheel.packages = ["bvr_sim"]
 sdist.exclude = [
     ".git/**",
     ".github/**",
     "benchmark_logs/**",
     "build/**",
     "dist/**",
+    "rl_envs/**",
     "test_logs/**",
     "bvr_sim/build/**",
     "bvr_sim/install/**",

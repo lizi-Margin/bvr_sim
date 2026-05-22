@@ -167,7 +167,7 @@ python run_tests.py
 1. `SimCore`
 2. `TelemetryBridge`
 3. `EmbeddedWebServer`、`OpenGLViewer` 或 `BVR Sim Game Mode`
-4. `web/` 前端、进程内原生 OpenGL 窗口或进程内原生 DX11 窗口
+4. `bvr_sim/web/` 前端、进程内原生 OpenGL 窗口或进程内原生 DX11 窗口
 
 当前确定继续使用单一 `bvr_sim_cpp` 原生扩展架构。`BVR Sim Game Mode` 是进程内游戏模式，不规划独立 `game_app.exe`。
 
@@ -179,7 +179,7 @@ python run_tests.py
 - [`opengl_viewer.cxx`](bvr_sim/src_cxx/telemetry/opengl_viewer.cxx)
 - [`dx11_game_mode.cxx`](bvr_sim/src_cxx/telemetry/dx11_game_mode.cxx)
 - [`dx11_game_mode_render.cxx`](bvr_sim/src_cxx/telemetry/dx11_game_mode_render.cxx)
-- [`main.ts`](web/src/main.ts)
+- [`main.ts`](../../bvr_sim/web/src/main.ts)
 
 ### 职责边界
 
@@ -203,7 +203,7 @@ python run_tests.py
 - 暴露 `GET /diagnostics`
 - 暴露 WebSocket `/ws`
 - 转发浏览器命令到桥接层
-- 可选直接托管 `web/dist` 下的静态前端入口
+- 可选直接托管 `bvr_sim/web/dist` 下的静态前端入口
 
 `OpenGLViewer`
 
@@ -221,7 +221,7 @@ python run_tests.py
 - 不直接访问仿真对象实例
 - 不要求或创建独立客户端进程
 
-`web/`
+`bvr_sim/web/`
 
 - 只读 `WorldSnapshot`
 - 只写结构化命令
@@ -293,7 +293,7 @@ python run_tests.py
 ```bash
 python tests/cpp_unit_tests.py
 python tests/test_web_bridge_smoke.py
-npm --prefix web run build
+npm --prefix bvr_sim/web run build
 ```
 
 `test_web_bridge_smoke.py` 当前会验证：

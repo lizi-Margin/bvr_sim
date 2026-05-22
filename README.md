@@ -360,7 +360,7 @@ python tests/cpp_unit_tests.py
 
 当前仓库包含三条实时可视化路径，均基于 C++ `SimCore` 的实时状态，不包含录像回放链路：
 
-- Web 可视化：`EmbeddedWebServer` + `web/` 前端
+- Web 可视化：`EmbeddedWebServer` + `bvr_sim/web/` 前端
 - 原生 OpenGL viewer：调试用抽象战场视图
 - 原生 BVR Sim Game Mode（DX11 后端）：当前原生游戏模式方向
 
@@ -484,7 +484,7 @@ bash bvr_sim/build_linux.sh
 2. 安装前端依赖
 
 ```bash
-npm --prefix web install
+npm --prefix bvr_sim/web install
 ```
 
 3. 启动仿真和可视化服务
@@ -498,13 +498,13 @@ core = bvr_sim_cpp.SimCore(
     acmi_file_path=""
 )
 
-core.set_visualization_static_root("./web/dist")
+core.set_visualization_static_root("./bvr_sim/web/dist")
 core.start_telemetry_bridge()
 core.start_visualization_server(8765)
 core.start()
 ```
 
-如果 `./web/dist` 已存在，内嵌服务器会直接托管打包后的前端，浏览器可以直接访问：
+如果 `./bvr_sim/web/dist` 已存在，内嵌服务器会直接托管打包后的前端，浏览器可以直接访问：
 
 ```text
 http://127.0.0.1:8765/
@@ -513,7 +513,7 @@ http://127.0.0.1:8765/
 4. 启动前端开发服务器
 
 ```bash
-npm --prefix web run dev -- --host 127.0.0.1 --port 5173
+npm --prefix bvr_sim/web run dev -- --host 127.0.0.1 --port 5173
 ```
 
 5. 如果你需要前端热更新，浏览器打开：
@@ -538,13 +538,13 @@ http://127.0.0.1:5173/?server=http://127.0.0.1:8765
 ```bash
 python tests/cpp_unit_tests.py
 python tests/test_web_bridge_smoke.py
-npm --prefix web run build
+npm --prefix bvr_sim/web run build
 ```
 
 ## 许可证
 
 主项目按 GNU General Public License v3.0 发布，官方文本见 [`LICENSE`](LICENSE)。
 
-第三方依赖和内置资源的许可证摘要见 [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md)。其中 JSBSim、Eigen、pybind11、cpptrace 等组件保留其原始许可证和版权声明。
+第三方依赖和内置资源的许可证摘要见 [`docs/legal/THIRD_PARTY_LICENSES.md`](docs/legal/THIRD_PARTY_LICENSES.md)。其中 JSBSim、Eigen、pybind11、cpptrace 等组件保留其原始许可证和版权声明。
 
 

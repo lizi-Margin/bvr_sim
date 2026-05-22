@@ -40,10 +40,10 @@ def main() -> int:
     assert "web-visualization-phase1" in module_path.replace("\\", "/"), module_path
     npm_executable = "npm.cmd" if os.name == "nt" else "npm"
     subprocess.run(
-        [npm_executable, "--prefix", "web", "run", "build"],
+        [npm_executable, "--prefix", os.path.join("bvr_sim", "web"), "run", "build"],
         check=True,
     )
-    dist_dir = os.path.join(REPO_ROOT, "web", "dist")
+    dist_dir = os.path.join(REPO_ROOT, "bvr_sim", "web", "dist")
     assert os.path.isdir(dist_dir), dist_dir
     assert os.path.isfile(os.path.join(dist_dir, "index.html"))
     assets_dir = os.path.join(dist_dir, "assets")

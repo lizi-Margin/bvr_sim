@@ -42,7 +42,7 @@ If you change the web visualization, also run:
 
 ```bash
 python tests/test_web_bridge_smoke.py
-npm --prefix web run build
+npm --prefix bvr_sim/web run build
 ```
 
 ## Code Style
@@ -59,4 +59,3 @@ Include:
 - The scenario or behavior affected.
 - The tests or build commands you ran.
 - Any compatibility notes for configs, wrappers, or visualization output.
-

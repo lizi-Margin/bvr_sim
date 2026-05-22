@@ -15,7 +15,7 @@ python tests/test_py.py
 python tests/test_cpp.py
 python tests/cpp_unit_tests.py
 python run_tests.py
-npm --prefix web run build
+npm --prefix bvr_sim/web run build
 ```
 
 ## Paper Preparation
