@@ -31,11 +31,36 @@ try_list = [
 ]
 bvr_sim_cpp = None
 _import_success = False
+_dll_directory_handles = []
+
+
+def _add_dll_directories(module_path: str):
+    if not hasattr(os, "add_dll_directory"):
+        return
+
+    dll_dirs = [os.path.dirname(os.path.abspath(module_path))]
+    env_dirs = os.environ.get("BVR_SIM_CPP_DLL_DIRS")
+    if env_dirs:
+        dll_dirs.extend(env_dirs.split(os.pathsep))
+
+    seen = set()
+    for dll_dir in dll_dirs:
+        dll_dir = os.path.abspath(os.path.expandvars(os.path.expanduser(dll_dir)))
+        if dll_dir in seen or not os.path.isdir(dll_dir):
+            continue
+        seen.add(dll_dir)
+        _dll_directory_handles.append(os.add_dll_directory(dll_dir))
 
 
 def _load_local_bvr_sim_cpp():
     base_dir = os.path.dirname(os.path.abspath(__file__))
+    override_path = os.environ.get("BVR_SIM_CPP_PATH")
+    if override_path:
+        candidate_patterns = [override_path]
+    else:
+        candidate_patterns = []
     candidate_patterns = [
+        *candidate_patterns,
         os.path.join(base_dir, "build", "Release", "bvr_sim_cpp*.pyd"),
         os.path.join(base_dir, "build", "bvr_sim_cpp*.so"),
         os.path.join(base_dir, "install", "lib", "bvr_sim_cpp*.pyd"),
@@ -53,6 +78,7 @@ def _load_local_bvr_sim_cpp():
             print(f"Failed to create import spec for local bvr_sim_cpp: {module_path}")
             continue
 
+        _add_dll_directories(module_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         print(f"Successfully loaded local bvr_sim_cpp from {module_path}")

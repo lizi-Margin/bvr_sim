@@ -66,5 +66,6 @@ public:
 
 std::unique_ptr<IRenderer> create_dx11_renderer();
 std::unique_ptr<IRenderer> create_dx12_renderer();
+std::unique_ptr<IRenderer> create_ogre_renderer();
 
 } // namespace bvr_sim

@@ -79,6 +79,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/dx11/game_dx11_scene.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/dx12/game_dx12_renderer.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/dx11/game_dx11_window.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/game/ogre/game_ogre_renderer.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/simulator.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/register.cxx"
@@ -120,6 +121,12 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/support/set_env.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/pybind11_bindings.cxx"
 )
+
+option(BVR_SIM_ENABLE_OGRE_NEXT "Enable experimental OGRE Next GameMode renderer" OFF)
+set(BVR_SIM_OGRE_NEXT_ROOT "" CACHE PATH "Path to OGRE Next source tree")
+set(BVR_SIM_OGRE_NEXT_BUILD_DIR "" CACHE PATH "Path to OGRE Next build tree")
+set(BVR_SIM_OGRE_NEXT_DEPS_DIR "" CACHE PATH "Path to OGRE Next dependencies install tree")
+set(BVR_SIM_OGRE_NEXT_MEDIA_DIR "" CACHE PATH "Path to OGRE Next Samples/Media directory")
 
 # ============================================================================
 # Include Directories
@@ -238,6 +245,35 @@ target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
 target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
 target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
 target_compile_definitions(bvr_sim_cpp PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
+if(BVR_SIM_ENABLE_OGRE_NEXT)
+    if(NOT BVR_SIM_OGRE_NEXT_ROOT OR NOT BVR_SIM_OGRE_NEXT_BUILD_DIR OR NOT BVR_SIM_OGRE_NEXT_MEDIA_DIR)
+        message(FATAL_ERROR "BVR_SIM_ENABLE_OGRE_NEXT requires BVR_SIM_OGRE_NEXT_ROOT, BVR_SIM_OGRE_NEXT_BUILD_DIR, and BVR_SIM_OGRE_NEXT_MEDIA_DIR")
+    endif()
+    set(BVR_SIM_OGRE_PLUGIN_DIR "${BVR_SIM_OGRE_NEXT_BUILD_DIR}/bin/$<CONFIG>")
+    set(BVR_SIM_OGRE_MEDIA_DIR "${BVR_SIM_OGRE_NEXT_MEDIA_DIR}")
+    string(REPLACE "\\" "/" BVR_SIM_OGRE_PLUGIN_DIR "${BVR_SIM_OGRE_PLUGIN_DIR}")
+    string(REPLACE "\\" "/" BVR_SIM_OGRE_MEDIA_DIR "${BVR_SIM_OGRE_MEDIA_DIR}")
+    target_compile_definitions(bvr_sim_cpp PRIVATE
+        BVR_SIM_ENABLE_OGRE_NEXT
+        OGRE_IGNORE_UNKNOWN_DEBUG
+        BVR_SIM_OGRE_PLUGIN_DIR="${BVR_SIM_OGRE_PLUGIN_DIR}"
+        BVR_SIM_OGRE_MEDIA_DIR="${BVR_SIM_OGRE_MEDIA_DIR}"
+    )
+    target_include_directories(bvr_sim_cpp PRIVATE
+        "${BVR_SIM_OGRE_NEXT_ROOT}/OgreMain/include"
+        "${BVR_SIM_OGRE_NEXT_ROOT}/Components/Hlms/Common/include"
+        "${BVR_SIM_OGRE_NEXT_ROOT}/Components/Hlms/Pbs/include"
+        "${BVR_SIM_OGRE_NEXT_ROOT}/Components/Hlms/Unlit/include"
+        "${BVR_SIM_OGRE_NEXT_ROOT}/RenderSystems/Direct3D11/include"
+        "${BVR_SIM_OGRE_NEXT_BUILD_DIR}/include"
+    )
+    if(BVR_SIM_OGRE_NEXT_DEPS_DIR)
+        target_include_directories(bvr_sim_cpp PRIVATE "${BVR_SIM_OGRE_NEXT_DEPS_DIR}/include")
+        target_link_directories(bvr_sim_cpp PRIVATE "${BVR_SIM_OGRE_NEXT_DEPS_DIR}/lib/$<CONFIG>")
+    endif()
+    target_link_directories(bvr_sim_cpp PRIVATE "${BVR_SIM_OGRE_NEXT_BUILD_DIR}/lib/$<CONFIG>")
+    target_link_libraries(bvr_sim_cpp PRIVATE OgreNextMain OgreNextHlmsPbs OgreNextHlmsUnlit)
+endif()
 if(MSVC)
     target_link_libraries(bvr_sim_cpp PRIVATE ws2_32 wsock32 d3d11 dxgi windowscodecs)
 elseif(UNIX AND NOT APPLE)

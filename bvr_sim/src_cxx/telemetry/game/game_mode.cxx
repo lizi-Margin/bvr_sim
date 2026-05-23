@@ -198,7 +198,11 @@ json::JSON GameMode::get_status() const {
     status["supported"] = json::Boolean(is_supported());
 #ifdef _WIN32
     status["platform"] = json::String("windows");
+#ifdef BVR_SIM_ENABLE_OGRE_NEXT
+    status["backend"] = json::String("ogre-next-d3d11");
+#else
     status["backend"] = json::String("dx11");
+#endif
 #else
     status["platform"] = json::String("linux_or_other");
     status["backend"] = json::String("stub");
@@ -246,6 +250,15 @@ void GameMode::run_loop() noexcept {
 #else
 
 void GameMode::run_loop() noexcept {
+#ifdef BVR_SIM_ENABLE_OGRE_NEXT
+    auto renderer = create_ogre_renderer();
+    if (!renderer) {
+        std::lock_guard<std::mutex> lock(state_mutex_);
+        last_error_ = "Failed to create OGRE renderer";
+        running_ = false;
+        return;
+    }
+#else
     auto renderer = create_dx11_renderer();
     if (!renderer) {
         std::lock_guard<std::mutex> lock(state_mutex_);
@@ -253,6 +266,7 @@ void GameMode::run_loop() noexcept {
         running_ = false;
         return;
     }
+#endif
 
     renderer->set_command_submitter(command_submitter_);
 

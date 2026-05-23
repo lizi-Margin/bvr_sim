@@ -1,4 +1,5 @@
 /build
+/build-ogre-probe
 /install
 __pycache__
 *.pyc
