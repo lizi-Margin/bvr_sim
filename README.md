@@ -1,4 +1,6 @@
-<h1>BVR Sim: An Open High-Throughput Environment for Heterogeneous Air-Combat Reinforcement Learning <sub>English | <a href="README_zh-CN.md">简体中文</a></sub></h1>
+<h2 align="center"><em>BVR Sim</em>: A Fast RL Environment for Heterogeneous Air-Combat</h2>
+
+<p align="center"><sub>English | <a href="README_zh-CN.md">简体中文</a></sub></p>
 
 <p align="center">
   <img alt="Python 3.8+" src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white">
@@ -8,60 +10,27 @@
   <img alt="License GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue">
 </p>
 
+`bvr-sim` is a 3D beyond-visual-range air-combat simulation environment for reinforcement-learning research and engineering validation. The project provides a pure-Python backend and an accelerated C++ backend, together with a lightweight built-in `skrl` PPO training entry point that lets users run an air-combat reinforcement-learning workflow immediately after installation.
+
+<div align="center">
+
+| Heterogeneous F-22/F-16 6v6 | Human–AI Real-Time Air Combat | Heterogeneous Air Combat + Ground Air Defense |
+|:---:|:---:|:---:|
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/f22-f16-heterogeneous-6v6.mp4"><img src="media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="Heterogeneous F-22 and F-16 6-vs-6 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/human-ai-realtime-air-combat.mp4"><img src="media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="Human and AI real-time air-combat game"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/heterogeneous-air-ground-rl.mp4"><img src="media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="Heterogeneous air combat and ground air-defense reinforcement learning"></a> |
+
+| Well-Tuned IPPO: 2v2 | Well-Tuned PPO: 1v1 | UnrealCV + UE5 Real-Time Rendering |
+|:---:|:---:|:---:|
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ippo-2v2.mp4"><img src="media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="Well-tuned IPPO in a 2-vs-2 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ppo-1v1.mp4"><img src="media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="Well-tuned PPO in a 1-vs-1 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src="media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV and Unreal Engine 5 real-time rendering"></a> |
+
+| Composite Missile Guidance + FDM | Simple FDM Reinforcement Learning | |
+|:---:|:---:|:---:|
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/missile-composite-guidance-fdm.mp4"><img src="media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="Composite missile guidance with flight dynamics"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/simple-fdm-rl.mp4"><img src="media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="Simple flight dynamics model reinforcement learning"></a> | |
+
+</div>
+
 <p align="center">
   <img src="docs/assets/game-mode.png" alt="BVR Sim game mode cockpit view" width="90%">
 </p>
-
-`bvr-sim` is a 3D beyond-visual-range air-combat simulation environment for reinforcement-learning research and engineering validation. The project provides a pure-Python backend and an accelerated C++ backend, together with a lightweight built-in `skrl` PPO training entry point that lets users run an air-combat reinforcement-learning workflow immediately after installation.
-
-## Demo Gallery
-
-Click any preview to open the corresponding MP4 video.
-
-<div align="center">
-
-**Simulation and Rendering**
-
-| UnrealCV + UE5 Real-Time Rendering | Simple FDM Reinforcement Learning | Heterogeneous Air Combat + Ground Air Defense |
-|:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src="media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV and Unreal Engine 5 real-time rendering"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/simple-fdm-rl.mp4"><img src="media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="Simple flight dynamics model reinforcement learning"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/heterogeneous-air-ground-rl.mp4"><img src="media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="Heterogeneous air combat and ground air-defense reinforcement learning"></a> |
-
-**Learning and Guidance**
-
-| Well-Tuned PPO: 1v1 | Well-Tuned IPPO: 2v2 | Composite Missile Guidance + FDM |
-|:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ppo-1v1.mp4"><img src="media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="Well-tuned PPO in a 1-vs-1 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ippo-2v2.mp4"><img src="media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="Well-tuned IPPO in a 2-vs-2 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/missile-composite-guidance-fdm.mp4"><img src="media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="Composite missile guidance with flight dynamics"></a> |
-
-**Heterogeneous and Human Interaction**
-
-| Heterogeneous F-22/F-16 6v6 | Human–AI Real-Time Air Combat | |
-|:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/f22-f16-heterogeneous-6v6.mp4"><img src="media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="Heterogeneous F-22 and F-16 6-vs-6 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/human-ai-realtime-air-combat.mp4"><img src="media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="Human and AI real-time air-combat game"></a> | |
-
-</div>
-
-## Performance and MARL Validation
-
-Table 3 of the paper reports headless throughput at a 0.4-second decision interval. Values are mean ± standard deviation over three repeats; real-time factor (RTF) is simulated time divided by wall-clock time.
-
-<div align="center">
-
-| Scale | Python steps/s | C++ steps/s | C++ RTF | Speedup |
-|:---:|---:|---:|---:|---:|
-| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 104.26 | 2.72× |
-| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 57.43 | 2.81× |
-| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 35.34 | 3.94× |
-| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 20.48 | 3.92× |
-| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 16.80 | 4.36× |
-| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 22.17 | 6.55× |
-
-</div>
-
-<p align="center">
-  <img src="media/paper/marl-training-reward.png" width="78%" alt="HAPPO and MAPPO mean episode reward on the BVR Sim 2v2 task">
-</p>
-
-The archived HAPPO and MAPPO traces above reproduce Fig. 3 of the paper and verify end-to-end integration on the same 2-vs-2 BVR task. Each curve is from one run, so the figure is an integration check rather than an algorithm ranking.
 
 ## System Architecture
 
@@ -104,6 +73,29 @@ The following comparison reproduces Table 1 of the paper for the cited public re
 | Real-time 3D visualization | FlightGear | Tacview | Godot | Native viewers |
 
 </div>
+
+## Performance and MARL Validation
+
+Table 3 of the paper reports headless throughput at a 0.4-second decision interval. Values are mean ± standard deviation over three repeats; real-time factor (RTF) is simulated time divided by wall-clock time.
+
+<div align="center">
+
+| Scale | Python steps/s | C++ steps/s | C++ RTF | Speedup |
+|:---:|---:|---:|---:|---:|
+| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 104.26 | 2.72× |
+| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 57.43 | 2.81× |
+| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 35.34 | 3.94× |
+| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 20.48 | 3.92× |
+| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 16.80 | 4.36× |
+| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 22.17 | 6.55× |
+
+</div>
+
+<p align="center">
+  <img src="media/paper/marl-training-reward.png" width="78%" alt="HAPPO and MAPPO mean episode reward on the BVR Sim 2v2 task">
+</p>
+
+The archived HAPPO and MAPPO traces above reproduce Fig. 3 of the paper and verify end-to-end integration on the same 2-vs-2 BVR task. Each curve is from one run, so the figure is an integration check rather than an algorithm ranking.
 
 ## Core Features
 
