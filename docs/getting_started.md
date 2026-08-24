@@ -129,13 +129,14 @@ MultiDiscrete([15, 15, 9, 2])
 delta_heading, delta_altitude, delta_speed, shoot
 ```
 
-PPO 更适合先用连续动作，所以 `bvr_sim_rl` 对外暴露：
+`bvr_sim_rl` 直接保留仿真器的离散动作空间：
 
 ```text
-Box(-1, 1, shape=(4,))
+MultiDiscrete([15, 15, 9, 2])
 ```
 
-每一步训练时，它会把 PPO 输出的连续动作量化回仿真器的离散动作。
+PPO 使用四个 categorical 分支分别建模航向、高度、速度和发射动作，
+训练时优化的动作与仿真器实际执行的动作一致，不再经过连续值量化。
 
 ## 6. 单独验证仿真器
 

@@ -45,13 +45,26 @@ python -m bvr_sim_rl --backend python --config tests/demo_config.json --timestep
 ## Notes
 
 The simulator action space is `MultiDiscrete([15, 15, 9, 2])`. The PPO helper
-exposes a continuous `Box(-1, 1, shape=(4,))` action space to skrl and quantizes
-actions back to the simulator action before stepping.
+uses four categorical policy branches with 15, 15, 9, and 2 logits. The action
+optimized by PPO is therefore exactly the action executed by the simulator;
+there is no continuous surrogate or post-sampling rounding step.
 
 Training logs and checkpoints are written under:
 
 ```text
 runs/bvr_sim_rl/
+```
+
+The command also writes a portable frozen-policy checkpoint named
+`ppo_<backend>_seed<seed>.pt` in the selected log directory. Set the seed
+explicitly for paper runs and evaluate without further learning:
+
+```bash
+python -m bvr_sim_rl --backend cpp --config experiments/paper/f16_1v1_cpp.jsonc \
+  --timesteps 100000 --seed 1111 --logdir runs/paper/f16_1v1/seed_1111
+python -m bvr_sim_rl.evaluate --backend cpp --config experiments/paper/f16_1v1_cpp.jsonc \
+  --checkpoint runs/paper/f16_1v1/seed_1111/ppo_cpp_seed1111.pt \
+  --episodes 500 --seed 30000 --output runs/paper/f16_1v1/seed_1111/eval.json
 ```
 
 For a quick smoke run, reduce the number of timesteps:

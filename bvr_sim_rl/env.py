@@ -44,10 +44,11 @@ def make_env(
 class BVRSkrlEnv(gymnasium.Env):
     """Small adapter from BVR3DEnv/BVR3DEnvCpp to skrl's Gymnasium wrapper.
 
-    BVR Sim uses a MultiDiscrete flight-control action. This adapter exposes a
-    continuous Box action to PPO and quantizes it back to the simulator action.
-    If the scenario has multiple RL-controlled aircraft, they are treated as a
-    small vector batch backed by one simulator instance.
+    The simulator's native ``MultiDiscrete`` action is preserved. This lets PPO
+    optimize the probability of the action that is actually executed instead
+    of sampling a continuous surrogate and rounding it after the fact. If the
+    scenario has multiple RL-controlled aircraft, they are treated as a small
+    vector batch backed by one simulator instance.
     """
 
     metadata = {"render_modes": []}
@@ -64,7 +65,7 @@ class BVRSkrlEnv(gymnasium.Env):
         self.logdir = logdir
         self._discrete_action_space = self.env.action_space
         self.observation_space = self.env.observation_space
-        self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(4,), dtype=np.float32)
+        self.action_space = self._discrete_action_space
         self.num_envs = self._infer_num_envs()
 
     def _infer_num_envs(self) -> int:
@@ -79,7 +80,7 @@ class BVRSkrlEnv(gymnasium.Env):
         return self._as_obs_batch(obs), info
 
     def step(self, action):
-        sim_action = self._continuous_to_multidiscrete(action)
+        sim_action = self._validate_multidiscrete(action)
         obs, reward, done, info = self.env.step(sim_action)
         obs_batch = self._as_obs_batch(obs)
         reward_batch = self._as_reward_batch(reward)
@@ -116,17 +117,21 @@ class BVRSkrlEnv(gymnasium.Env):
             done_array = np.repeat(done_array, self.num_envs, axis=0)
         return done_array
 
-    def _continuous_to_multidiscrete(self, action: Any) -> np.ndarray:
-        action_array = np.asarray(action, dtype=np.float32)
+    def _validate_multidiscrete(self, action: Any) -> np.ndarray:
+        action_array = np.asarray(action)
         if action_array.ndim == 1:
             action_array = action_array.reshape(1, -1)
-        if action_array.shape[-1] != 4:
-            raise ValueError(f"Expected action shape (*, 4), got {action_array.shape}")
-
-        nvec = np.asarray(self._discrete_action_space.nvec, dtype=np.float32)
-        clipped = np.clip(action_array, -1.0, 1.0)
-        discrete = np.rint((clipped + 1.0) * 0.5 * (nvec - 1.0)).astype(np.int64)
-        return np.clip(discrete, 0, nvec.astype(np.int64) - 1)
+        nvec = np.asarray(self._discrete_action_space.nvec, dtype=np.int64)
+        if action_array.shape[-1] != nvec.size:
+            raise ValueError(f"Expected action shape (*, {nvec.size}), got {action_array.shape}")
+        if not np.all(np.isfinite(action_array)):
+            raise ValueError("Actions must be finite")
+        discrete = action_array.astype(np.int64)
+        if not np.array_equal(action_array, discrete):
+            raise ValueError("MultiDiscrete actions must contain integer values")
+        if np.any(discrete < 0) or np.any(discrete >= nvec):
+            raise ValueError(f"Action is outside MultiDiscrete bounds {nvec.tolist()}: {discrete.tolist()}")
+        return discrete
 
 
 class BVRSkrlTorchWrapper:

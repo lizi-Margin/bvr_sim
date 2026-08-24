@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import os
+import platform
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Optional
 
 import torch
@@ -15,12 +19,12 @@ from .env import BVRSkrlEnv, BVRSkrlTorchWrapper
 class PPOConfig:
     timesteps: int = 10000
     rollouts: int = 64
-    learning_epochs: int = 4
+    learning_epochs: int = 16
     mini_batches: int = 4
     learning_rate: float = 3e-4
     discount_factor: float = 0.99
     lam: float = 0.95
-    entropy_loss_scale: float = 0.0
+    entropy_loss_scale: float = 1e-4
     value_loss_scale: float = 2.0
     checkpoint_interval: int = 1000
     write_interval: int = 200
@@ -28,12 +32,36 @@ class PPOConfig:
     device: str = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
+class Policy(torch.nn.Module):
+    """Serializable policy network shared by training and frozen evaluation."""
+
+    def __init__(self, num_observations: int, action_nvec: list[int]):
+        super().__init__()
+        self.action_nvec = tuple(int(value) for value in action_nvec)
+        self.net = nn.Sequential(
+            nn.Linear(num_observations, 128),
+            nn.ELU(),
+            nn.Linear(128, 128),
+            nn.ELU(),
+        )
+        self.logits_layer = nn.Linear(128, sum(self.action_nvec))
+
+    def logits(self, observations: torch.Tensor) -> torch.Tensor:
+        return self.logits_layer(self.net(observations))
+
+    def deterministic(self, observations: torch.Tensor) -> torch.Tensor:
+        return torch.stack(
+            [branch.argmax(dim=-1) for branch in torch.split(self.logits(observations), self.action_nvec, dim=-1)],
+            dim=-1,
+        )
+
+
 def train_ppo(
     config: str,
     backend: str = "cpp",
     logdir: str = "./runs/bvr_sim_rl",
     ppo_cfg: Optional[PPOConfig] = None,
-) -> None:
+) -> Path:
     cfg = ppo_cfg or PPOConfig()
 
     from skrl.agents.torch.ppo import PPO
@@ -42,7 +70,7 @@ def train_ppo(
     except ImportError:
         from skrl.agents.torch.ppo import PPO_DEFAULT_CONFIG as BASE_PPO_CONFIG
     from skrl.memories.torch import RandomMemory
-    from skrl.models.torch import DeterministicMixin, GaussianMixin, Model
+    from skrl.models.torch import DeterministicMixin, Model, MultiCategoricalMixin
     from skrl.resources.preprocessors.torch import RunningStandardScaler
     from skrl.trainers.torch import SequentialTrainer
     from skrl.utils import set_seed
@@ -54,30 +82,16 @@ def train_ppo(
         device=cfg.device,
     ).wrapper
 
-    class Policy(GaussianMixin, Model):
+    class SkrlPolicy(MultiCategoricalMixin, Model):
         def __init__(self, observation_space, action_space, device):
             Model.__init__(self, observation_space=observation_space, action_space=action_space, device=device)
-            GaussianMixin.__init__(
-                self,
-                clip_actions=True,
-                clip_log_std=True,
-                min_log_std=-20.0,
-                max_log_std=2.0,
-                reduction="sum",
-            )
-            self.net = nn.Sequential(
-                nn.Linear(self.num_observations, 128),
-                nn.ELU(),
-                nn.Linear(128, 128),
-                nn.ELU(),
-            )
-            self.mean_layer = nn.Linear(128, self.num_actions)
-            self.log_std_parameter = nn.Parameter(torch.zeros(self.num_actions))
+            MultiCategoricalMixin.__init__(self, unnormalized_log_prob=True, reduction="sum")
+            self.network = Policy(self.num_observations, action_space.nvec.tolist())
 
         def compute(self, inputs, role):
             del role
-            x = self.net(inputs.get("observations", inputs.get("states")))
-            return torch.tanh(self.mean_layer(x)), {"log_std": self.log_std_parameter}
+            observations = inputs.get("observations", inputs.get("states"))
+            return self.network.logits(observations), {}
 
     class Value(DeterministicMixin, Model):
         def __init__(self, observation_space, action_space, device):
@@ -96,7 +110,7 @@ def train_ppo(
             return self.net(inputs.get("observations", inputs.get("states"))), {}
 
     models = {
-        "policy": Policy(env.observation_space, env.action_space, cfg.device),
+        "policy": SkrlPolicy(env.observation_space, env.action_space, cfg.device),
         "value": Value(env.observation_space, env.action_space, cfg.device),
     }
     memory = RandomMemory(memory_size=cfg.rollouts, num_envs=env.num_envs, device=cfg.device)
@@ -121,6 +135,27 @@ def train_ppo(
     )
     trainer = SequentialTrainer(cfg={"timesteps": cfg.timesteps, "headless": True}, env=env, agents=agent)
     trainer.train()
+    artifact = Path(logdir) / f"ppo_{backend}_seed{cfg.seed}.pt"
+    torch.save(
+        {
+            "format": "bvr-sim-skrl-ppo-v2-multicategorical",
+            "policy": models["policy"].network.state_dict(),
+            "observation_preprocessor": agent._observation_preprocessor.state_dict(),
+            "num_observations": models["policy"].num_observations,
+            "action_nvec": env.action_space.nvec.tolist(),
+            "ppo_config": cfg.__dict__,
+            "config_path": str(Path(config).resolve()),
+            "config_sha256": hashlib.sha256(Path(config).read_bytes()).hexdigest(),
+            "versions": {
+                "python": platform.python_version(),
+                "torch": torch.__version__,
+            },
+        },
+        artifact,
+    )
+    metadata = artifact.with_suffix(".json")
+    metadata.write_text(json.dumps({"checkpoint": str(artifact), "seed": cfg.seed, "timesteps": cfg.timesteps}, indent=2), encoding="utf-8")
+    return artifact
 
 
 def _make_agent_cfg(
@@ -192,15 +227,31 @@ def main(argv: Optional[list] = None) -> int:
     parser.add_argument("--backend", choices=("cpp", "python"), default="cpp", help="Simulator backend.")
     parser.add_argument("--timesteps", type=int, default=10000)
     parser.add_argument("--rollouts", type=int, default=64)
+    parser.add_argument("--learning-epochs", type=int, default=16)
+    parser.add_argument("--mini-batches", type=int, default=4)
+    parser.add_argument("--entropy-loss-scale", type=float, default=1e-4)
     parser.add_argument("--logdir", default="./runs/bvr_sim_rl")
     parser.add_argument("--device", default=PPOConfig.device)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--checkpoint-interval", type=int, default=1000)
+    parser.add_argument("--write-interval", type=int, default=200)
     args = parser.parse_args(argv)
 
     train_ppo(
         config=args.config,
         backend=args.backend,
         logdir=args.logdir,
-        ppo_cfg=PPOConfig(timesteps=args.timesteps, rollouts=args.rollouts, device=args.device),
+        ppo_cfg=PPOConfig(
+            timesteps=args.timesteps,
+            rollouts=args.rollouts,
+            learning_epochs=args.learning_epochs,
+            mini_batches=args.mini_batches,
+            entropy_loss_scale=args.entropy_loss_scale,
+            device=args.device,
+            seed=args.seed,
+            checkpoint_interval=args.checkpoint_interval,
+            write_interval=args.write_interval,
+        ),
     )
     return 0
 
