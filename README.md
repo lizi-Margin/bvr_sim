@@ -1,19 +1,21 @@
 # BVR Sim
 
+[English](README.md) | [简体中文](README_zh-CN.md)
+
 <p align="center">
-  <strong>面向多智能体强化学习的 3D 超视距空战仿真环境</strong>
+  <strong>A 3D Beyond-Visual-Range Air-Combat Simulation Environment for Multi-Agent Reinforcement Learning</strong>
 </p>
 
 <p align="center">
-  <a href="https://www.bilibili.com/video/BV115SvBaEGn">演示视频</a>
+  <a href="https://www.bilibili.com/video/BV115SvBaEGn">Demo Video</a>
   ·
-  <a href="docs/getting_started.md">快速开始</a>
+  <a href="docs/getting_started.md">Quick Start</a>
   ·
-  <a href="docs/rl/ppo_quickstart.md">PPO 训练</a>
+  <a href="docs/rl/ppo_quickstart.md">PPO Training</a>
   ·
-  <a href="docs/configuration.md">配置说明</a>
+  <a href="docs/configuration.md">Configuration</a>
   ·
-  <a href="docs/integration.md">RL 集成</a>
+  <a href="docs/integration.md">RL Integration</a>
 </p>
 
 <p align="center">
@@ -28,36 +30,36 @@
   <img src="docs/assets/game-mode.png" alt="BVR Sim game mode cockpit view" width="90%">
 </p>
 
-`bvr-sim` 是一个面向强化学习研究与工程验证的 3D 超视距空战仿真环境。项目提供纯 Python 后端和 C++ 加速后端，并内置一个轻量 `skrl` PPO 训练入口，使用户可以在安装后直接跑通空战强化学习训练流程。
+`bvr-sim` is a 3D beyond-visual-range air-combat simulation environment for reinforcement-learning research and engineering validation. The project provides a pure-Python backend and an accelerated C++ backend, together with a lightweight built-in `skrl` PPO training entry point that lets users run an air-combat reinforcement-learning workflow immediately after installation.
 
-## 核心能力
+## Core Features
 
-- 基于 JSBSim 的飞行动力学建模
-- 空空导弹、挂载、发射和交战结果仿真
-- 可配置红蓝双方、初始态、武器、规则对手和奖励项
-- Gymnasium 风格 observation/action space
-- 纯 Python 后端，便于理解、调试和快速验证
-- C++ 后端，适合性能要求更高的训练和仿真
-- Tacview `.acmi` 回放输出
-- 内置轻量 PPO 训练助手 `bvr_sim_rl`
-- Web、OpenGL 和 DX11 可视化路径
+- JSBSim-based flight-dynamics modeling
+- Air-to-air missile, loadout, launch, and engagement-outcome simulation
+- Configurable red and blue teams, initial states, weapons, rule-based opponents, and reward terms
+- Gymnasium-style observation and action spaces
+- Pure-Python backend for inspection, debugging, and rapid validation
+- C++ backend for performance-intensive training and simulation
+- Tacview-compatible `.acmi` replay output
+- Built-in lightweight PPO training helper in `bvr_sim_rl`
+- Web, OpenGL, and DX11 visualization paths
 
-## 支持的强化学习框架
+## Supported Reinforcement-Learning Frameworks
 
-- **skrl**：仓库内置轻量 PPO 训练入口 `bvr_sim_rl/`，用于安装检查、训练和评估。框架项目见 [skrl](https://github.com/Toni-SM/skrl)。
-- **MARLBenchmark / off-policy**：适配器 [`rl_envs/env_marlbenchmark.py`](rl_envs/env_marlbenchmark.py) 提供多智能体局部观测、集中式 shared observation 和 legacy Gym space 接口。上游框架见 [marlbenchmark/off-policy](https://github.com/marlbenchmark/off-policy)，本项目使用的维护分支见 [lizi-Margin/off-policy](https://github.com/lizi-Margin/off-policy)。
-- **HARL**：适配器 [`rl_envs/env_harl.py`](rl_envs/env_harl.py) 实现 HARL 所需的局部/共享观测、reward、done、info 和 available-action tuple。框架与算法实现见 [PKU-MARL/HARL](https://github.com/PKU-MARL/HARL)，对应论文为 *Heterogeneous-Agent Reinforcement Learning* [1]。
-- **UHRL / HMP2G**：适配器 [`rl_envs/env_wrapper.py`](rl_envs/env_wrapper.py) 面向内部 UHRL 分支，实现 `ScenarioConfig`、`make_env`、队伍映射、状态和可用动作等接口。UHRL 是基于公开 [HMP2G](https://github.com/binary-husky/hmp2g) 开发的私有分支；HMP2G 的公开背景与应用见 Unreal-MAP [2]。
+- **skrl**: the repository includes the lightweight `bvr_sim_rl/` PPO entry point for installation checks, training, and evaluation. See the [skrl project](https://github.com/Toni-SM/skrl).
+- **MARLBenchmark / off-policy**: [`rl_envs/env_marlbenchmark.py`](rl_envs/env_marlbenchmark.py) provides per-agent observations, centralized shared observations, and legacy Gym space interfaces. See the upstream [marlbenchmark/off-policy](https://github.com/marlbenchmark/off-policy) framework and the [lizi-Margin/off-policy](https://github.com/lizi-Margin/off-policy) branch maintained for this project.
+- **HARL**: [`rl_envs/env_harl.py`](rl_envs/env_harl.py) implements HARL's local/shared observations, rewards, done flags, information dictionaries, and available-action tuple. See [PKU-MARL/HARL](https://github.com/PKU-MARL/HARL) and the corresponding paper, *Heterogeneous-Agent Reinforcement Learning* [1].
+- **UHRL / HMP2G**: [`rl_envs/env_wrapper.py`](rl_envs/env_wrapper.py) targets the internal UHRL branch and implements `ScenarioConfig`, `make_env`, team mapping, state, and available-action interfaces. UHRL is a private branch developed from the public [HMP2G](https://github.com/binary-husky/hmp2g) framework; see Unreal-MAP [2] for the public background and application of HMP2G.
 
-MARLBenchmark 和 UHRL 在此表示已经实现框架接口，并不表示已经验证相应框架中的全部算法。Python 与 C++ 仿真后端均可由这些适配器选择。
+MARLBenchmark and UHRL support here means that framework interfaces are implemented; it does not imply validation of every algorithm provided by those frameworks. All adapters can select either the Python or C++ simulation backend.
 
-## 快速开始：直接训练 PPO
+## Quick Start: Train PPO Directly
 
-以下命令均在仓库根目录执行。
+Run all commands below from the repository root.
 
-### 1. 创建虚拟环境
+### 1. Create a Virtual Environment
 
-需要 Python 3.8+，推荐 Python 3.10+。
+Python 3.8 or later is required; Python 3.10 or later is recommended.
 
 ```bash
 python -m venv .venv
@@ -75,42 +77,42 @@ Linux/macOS:
 source .venv/bin/activate
 ```
 
-### 2. 安装项目和训练依赖
+### 2. Install the Project and Training Dependencies
 
 ```bash
 pip install -e ".[rl]"
 ```
 
-如果当前 shell 不接受引号，可以分两步安装：
+If the current shell does not accept the quoted extras syntax, install in two steps:
 
 ```bash
 pip install -e .
 pip install skrl torch
 ```
 
-### 3. 使用 Python 后端训练
+### 3. Train with the Python Backend
 
-Python 后端不需要编译原生扩展，适合首次验证安装和训练流程。
-
-```bash
-python -m bvr_sim_rl --backend python --config tests/demo_config.json --timesteps 10000
-```
-
-只想快速确认链路是否可用，可以运行一个短任务：
+The Python backend requires no native-extension build and is suitable for initial installation and training-workflow checks.
 
 ```bash
-python -m bvr_sim_rl --backend python --config tests/demo_config.json --timesteps 128 --rollouts 16 --device cpu
+python -m bvr_sim_rl --backend python --config scripts/tests/demo_config.json --timesteps 10000
 ```
 
-训练日志和 checkpoint 默认写入：
+To perform a short end-to-end check:
+
+```bash
+python -m bvr_sim_rl --backend python --config scripts/tests/demo_config.json --timesteps 128 --rollouts 16 --device cpu
+```
+
+Training logs and checkpoints are written by default to:
 
 ```text
 runs/bvr_sim_rl/
 ```
 
-### 4. 使用 C++ 后端训练
+### 4. Train with the C++ Backend
 
-C++ 后端适合更长时间、更高性能的训练。先编译原生扩展：
+The C++ backend is intended for longer, higher-throughput training. Build the native extension first.
 
 Windows:
 
@@ -124,93 +126,93 @@ Linux:
 bash bvr_sim/build_linux.sh
 ```
 
-然后运行：
+Then run:
 
 ```bash
-python -m bvr_sim_rl --backend cpp --config tests/demo_config_cpp.jsonc --timesteps 10000
+python -m bvr_sim_rl --backend cpp --config scripts/tests/demo_config_cpp.jsonc --timesteps 10000
 ```
 
-安装后也可以使用命令行入口：
+After installation, the command-line entry point is also available:
 
 ```bash
-bvr-sim-ppo --backend cpp --config tests/demo_config_cpp.jsonc --timesteps 10000
+bvr-sim-ppo --backend cpp --config scripts/tests/demo_config_cpp.jsonc --timesteps 10000
 ```
 
-## PPO 训练入口
+## PPO Training Entry Point
 
-轻量训练模块位于：
+The lightweight training module is located at:
 
 ```text
 bvr_sim_rl/
 ```
 
-它负责创建 `BVR3DEnv` 或 `BVR3DEnvCpp`，将仿真观测转换为 `skrl` 可用的 tensor，并将 PPO 输出的连续动作量化回仿真器的离散动作。
+It creates either `BVR3DEnv` or `BVR3DEnvCpp`, converts simulator observations into tensors accepted by `skrl`, and quantizes the continuous actions produced by PPO back into the simulator's discrete actions.
 
-仿真器原始动作空间为：
+The simulator's native action space is:
 
 ```text
 MultiDiscrete([15, 15, 9, 2])
 ```
 
-四个维度分别表示：
+The four dimensions represent:
 
 ```text
 delta_heading, delta_altitude, delta_speed, shoot
 ```
 
-PPO 侧使用连续动作空间：
+The PPO side uses a continuous action space:
 
 ```text
 Box(-1, 1, shape=(4,))
 ```
 
-详细说明见 [docs/rl/ppo_quickstart.md](docs/rl/ppo_quickstart.md)。
+See [docs/rl/ppo_quickstart.md](docs/rl/ppo_quickstart.md) for details.
 
-## 验证仿真器
+## Validate the Simulator
 
-Python 后端 smoke test:
+Python backend smoke test:
 
 ```bash
-python tests/test_py.py
+python scripts/tests/test_py.py
 ```
 
-C++ 后端 smoke test:
+C++ backend smoke test:
 
 ```bash
-python tests/test_cpp.py
+python scripts/tests/test_cpp.py
 ```
 
 C++ unit tests:
 
 ```bash
-python tests/cpp_unit_tests.py
+python scripts/tests/cpp_unit_tests.py
 ```
 
-完整测试，会重新构建原生扩展：
+Run the complete test suite, which rebuilds the native extension:
 
 ```bash
-python run_tests.py
+python scripts/run_tests.py
 ```
 
-## 回放输出
+## Replay Output
 
-部分测试和示例会生成 Tacview 兼容回放：
+Some tests and examples generate Tacview-compatible replays at:
 
 ```text
 test_logs/*.acmi
 ```
 
-可以使用 Tacview 打开 `.acmi` 文件查看交战过程。
+Open the `.acmi` files with Tacview to inspect an engagement.
 
-## 最小 Python 示例
+## Minimal Python Example
 
-纯 Python 后端：
+Pure-Python backend:
 
 ```python
 import json
 from bvr_sim import BVR3DEnv
 
-with open("tests/demo_config.json", "r", encoding="utf-8") as f:
+with open("scripts/tests/demo_config.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
 env = BVR3DEnv(config, logdir="./test_logs")
@@ -222,13 +224,13 @@ while not done:
     done = info["episode_done"]
 ```
 
-C++ 后端：
+C++ backend:
 
 ```python
 import commentjson
 from bvr_sim import BVR3DEnvCpp
 
-with open("tests/demo_config_cpp.jsonc", "r", encoding="utf-8") as f:
+with open("scripts/tests/demo_config_cpp.jsonc", "r", encoding="utf-8") as f:
     config = commentjson.load(f)
 
 env = BVR3DEnvCpp(config, rl_index=[0], log_file_path="./test_logs/bvr_sim.log")
@@ -241,21 +243,23 @@ while not done:
     done = info["episode_done"]
 ```
 
-## 项目结构
+## Project Structure
 
 ```text
-bvr_sim/                     主 Python 包与 C++ 源码
-  src_py/                    Python 仿真、奖励、规则对手
-  src_cxx/                   C++ 仿真核心
-  web/                       Web 可视化前端
-bvr_sim_rl/                  轻量 skrl PPO 训练入口
-tests/                       smoke tests 和单元测试
-benchmarks/                  benchmark 配置与脚本
-experimental/                实验脚本、场景和可视化示例
-docs/                        文档、设计记录和使用说明
+bvr_sim/                     Main Python package and C++ sources
+  src_py/                    Python simulation, rewards, and rule-based opponents
+  src_cxx/                   C++ simulation core
+  web/                       Web visualization frontend
+bvr_sim_rl/                  Lightweight skrl PPO training entry point
+scripts/                     Development and evaluation entry points
+  benchmarks/               Benchmark configurations and scripts
+  experimental/             Experimental scenarios and visualization examples
+  experiments/paper/        Paper experiment scripts and configurations
+  tests/                    Smoke tests and unit tests
+docs/                        Documentation, design notes, and usage guides
 ```
 
-不要手动编辑生成目录：
+Do not edit generated directories manually:
 
 ```text
 bvr_sim/build/
@@ -265,38 +269,38 @@ benchmark_logs/
 runs/
 ```
 
-## 文档索引
+## Documentation Index
 
-- [新手快速开始](docs/getting_started.md)
-- [PPO 训练说明](docs/rl/ppo_quickstart.md)
-- [安装说明](docs/installation.md)
-- [配置说明](docs/configuration.md)
-- [外部 RL 框架集成](docs/integration.md)
-- [开发者架构说明](docs/developer/architecture.md)
+- [Getting Started](docs/getting_started.md)
+- [PPO Training Guide](docs/rl/ppo_quickstart.md)
+- [Installation](docs/installation.md)
+- [Configuration](docs/configuration.md)
+- [External RL Framework Integration](docs/integration.md)
+- [Developer Architecture](docs/developer/architecture.md)
 
-## 可视化
+## Visualization
 
-C++ 后端包含多条实时可视化路径：
+The C++ backend provides several real-time visualization paths:
 
-- Web 可视化：`EmbeddedWebServer` + `bvr_sim/web/`
-- 原生 OpenGL viewer
-- Windows 原生 DX11 game mode
+- Web visualization: `EmbeddedWebServer` + `bvr_sim/web/`
+- Native OpenGL viewer
+- Native Windows DX11 game mode
 
-编译 C++ 后端后，可以运行：
+After building the C++ backend, run:
 
 ```bash
-python experimental/run_web_viz.py
-python experimental/run_opengl_viz.py
-python experimental/run_dx11_viz.py
+python scripts/experimental/run_web_viz.py
+python scripts/experimental/run_opengl_viz.py
+python scripts/experimental/run_dx11_viz.py
 ```
 
-## 许可证
+## License
 
-BVR Sim 使用 GPLv3 发布，见 [LICENSE](LICENSE)。
+BVR Sim is released under GPLv3. See [LICENSE](LICENSE).
 
-第三方依赖和内置资源说明见 [docs/legal/THIRD_PARTY_LICENSES.md](docs/legal/THIRD_PARTY_LICENSES.md)。
+For third-party dependencies and bundled-resource notices, see [docs/legal/THIRD_PARTY_LICENSES.md](docs/legal/THIRD_PARTY_LICENSES.md).
 
-## 参考文献
+## References
 
 1. Yifan Zhong, Jakub Grudzien Kuba, Xidong Feng, Siyi Hu, Jiaming Ji, and Yaodong Yang. “Heterogeneous-Agent Reinforcement Learning.” *Journal of Machine Learning Research*, 25(32):1–67, 2024. [Paper](https://jmlr.org/papers/v25/23-0488.html)
 2. Tianyi Hu, Qingxu Fu, Zhiqiang Pu, Yuan Wang, and Tenghai Qiu. “Unreal-MAP: Unreal-Engine-Based General Platform for Multi-Agent Reinforcement Learning.” *Proceedings of the AAAI Conference on Artificial Intelligence*, 40(35):29486–29494, 2026. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/40190) · [DOI](https://doi.org/10.1609/aaai.v40i35.40190)

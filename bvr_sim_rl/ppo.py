@@ -223,7 +223,7 @@ def _make_agent_cfg(
 
 def main(argv: Optional[list] = None) -> int:
     parser = argparse.ArgumentParser(description="Train a minimal PPO policy for BVR Sim with skrl.")
-    parser.add_argument("--config", default="tests/demo_config_cpp.jsonc", help="BVR Sim JSON/JSONC config path.")
+    parser.add_argument("--config", default="scripts/tests/demo_config_cpp.jsonc", help="BVR Sim JSON/JSONC config path.")
     parser.add_argument("--backend", choices=("cpp", "python"), default="cpp", help="Simulator backend.")
     parser.add_argument("--timesteps", type=int, default=10000)
     parser.add_argument("--rollouts", type=int, default=64)

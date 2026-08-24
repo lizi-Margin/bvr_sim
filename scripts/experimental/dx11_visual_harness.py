@@ -11,7 +11,7 @@ import commentjson
 from PIL import ImageGrab
 
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
 
@@ -54,7 +54,7 @@ def get_user32():
 
 
 def get_root_dir() -> str:
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 
 def find_window_rect(title: str):
@@ -164,7 +164,7 @@ def capture_window_png(output_path: str, settle_sec: float, allow_fullscreen_fal
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Launch DX11 GameMode and capture a close aircraft screenshot.")
-    parser.add_argument("--config", default="tests/demo_config_cpp.jsonc")
+    parser.add_argument("--config", default="scripts/tests/demo_config_cpp.jsonc")
     parser.add_argument("--output", default="test_logs/dx11_visual_harness.png")
     parser.add_argument("--build", action="store_true")
     parser.add_argument("--steps", type=int, default=80)

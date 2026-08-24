@@ -28,7 +28,7 @@ import unrealcv
 from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXED_RESOLUTION = "960x960"
 UE_IP = "127.0.0.1"
 UE_PORT = 9000

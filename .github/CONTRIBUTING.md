@@ -27,21 +27,21 @@ bash bvr_sim/build_linux.sh
 Use the smallest test that covers your change:
 
 ```bash
-python tests/test_py.py
-python tests/test_cpp.py
-python tests/cpp_unit_tests.py
+python scripts/tests/test_py.py
+python scripts/tests/test_cpp.py
+python scripts/tests/cpp_unit_tests.py
 ```
 
 Before a larger pull request, run:
 
 ```bash
-python run_tests.py
+python scripts/run_tests.py
 ```
 
 If you change the web visualization, also run:
 
 ```bash
-python tests/test_web_bridge_smoke.py
+python scripts/tests/test_web_bridge_smoke.py
 npm --prefix bvr_sim/web run build
 ```
 

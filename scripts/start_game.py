@@ -5,7 +5,7 @@ import os
 
 
 def get_root_dir() -> str:
-    return os.path.dirname(os.path.realpath(__file__))
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 
 def configure_renderer(renderer: str) -> str:
@@ -61,7 +61,7 @@ def main():
     renderer = configure_renderer(args.renderer)
     from bvr_sim.uhtk.siri.utils.sleeper import Sleeper
 
-    with open(os.path.join(get_root_dir(), "./experimental/custom_5v5_f22_f16_bvr.jsonc"), "r", encoding="utf-8") as fin:
+    with open(os.path.join(get_root_dir(), "scripts/experimental/custom_5v5_f22_f16_bvr.jsonc"), "r", encoding="utf-8") as fin:
         env_config = commentjson.load(fin)
 
     os.makedirs("./test_logs/", exist_ok=True)

@@ -9,13 +9,13 @@ on:
   #     - ".github/workflows/wheels.yml"
   #     - "pyproject.toml"
   #     - "bvr_sim/**"
-  #     - "tests/**"
+  #     - "scripts/tests/**"
   pull_request:
     paths:
       - ".github/workflows/wheels.yml"
       - "pyproject.toml"
       - "bvr_sim/**"
-      - "tests/**"
+      - "scripts/tests/**"
 
 jobs:
   build_wheels:

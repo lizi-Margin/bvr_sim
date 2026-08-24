@@ -18,7 +18,7 @@ from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
 
 
 def get_root_dir() -> str:
-    return str(Path(__file__).resolve().parents[1])
+    return str(Path(__file__).resolve().parents[2])
 
 
 def get_benchmark_dir() -> Path:

@@ -5,7 +5,7 @@ import time
 import commentjson
 
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from bvr_sim.bvr_env_cpp import BVR3DEnvCpp
 

@@ -5,8 +5,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repo = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$config = Join-Path $repo "experiments\paper\f16_1v1_cpp.jsonc"
+$repo = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$config = Join-Path $repo "scripts\experiments\paper\f16_1v1_cpp.jsonc"
 $runRoot = Join-Path $repo "runs\paper\f16_1v1"
 $processes = @()
 
@@ -38,6 +38,6 @@ foreach ($process in $processes) {
 
 $inputs = @((Join-Path $runRoot "tactical\eval.json"))
 $inputs += $Seeds | ForEach-Object { Join-Path $runRoot "seed_$_\eval.json" }
-python (Join-Path $repo "experiments\paper\summarize_results.py") @inputs `
+python (Join-Path $repo "scripts\experiments\paper\summarize_results.py") @inputs `
     --csv (Join-Path $runRoot "summary.csv") `
     --json (Join-Path $runRoot "summary.json")

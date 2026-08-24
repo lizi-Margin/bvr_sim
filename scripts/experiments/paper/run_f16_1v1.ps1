@@ -6,8 +6,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repo = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$config = Join-Path $repo "experiments\paper\f16_1v1_cpp.jsonc"
+$repo = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
+$config = Join-Path $repo "scripts\experiments\paper\f16_1v1_cpp.jsonc"
 $runRoot = Join-Path $repo "runs\paper\f16_1v1"
 New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
 

@@ -4,6 +4,7 @@ __pycache__
 
 /AGENTS.md
 /CLAUDE.md
+/.claude/skills/
 
 /build
 /dist
@@ -38,5 +39,5 @@ __pycache__
 
 *.csv
 *.png
-benchmarks/results/
+/scripts/benchmarks/results/
 /benchmark_logs/

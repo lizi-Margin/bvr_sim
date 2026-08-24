@@ -12,7 +12,7 @@ import struct
 import time
 
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PACKAGE_ROOT = os.path.join(REPO_ROOT, "bvr_sim")
 BVR_ENV_CPP_PATH = os.path.join(PACKAGE_ROOT, "bvr_env_cpp.py")
 

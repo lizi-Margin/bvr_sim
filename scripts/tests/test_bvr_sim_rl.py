@@ -3,7 +3,7 @@ import os
 import sys
 from gymnasium import spaces
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from bvr_sim_rl.env import BVRSkrlEnv
 
