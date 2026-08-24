@@ -7,18 +7,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.bilibili.com/video/BV115SvBaEGn">演示视频</a>
-  ·
-  <a href="docs/getting_started.md">快速开始</a>
-  ·
-  <a href="docs/rl/ppo_quickstart.md">PPO 训练</a>
-  ·
-  <a href="docs/configuration.md">配置说明</a>
-  ·
-  <a href="docs/integration.md">RL 集成</a>
-</p>
-
-<p align="center">
   <img alt="Python 3.8+" src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white">
   <img alt="C++ backend" src="https://img.shields.io/badge/C%2B%2B-backend-00599C?logo=cplusplus&logoColor=white">
   <img alt="Gymnasium compatible" src="https://img.shields.io/badge/Gymnasium-RL-16A085">
@@ -43,6 +31,92 @@
 - Tacview `.acmi` 回放输出
 - 内置轻量 PPO 训练助手 `bvr_sim_rl`
 - Web、OpenGL 和 DX11 可视化路径
+
+## 支持的飞机
+
+C++ JSBSim 后端目前支持以下飞机系列的模型映射：
+
+- F-15
+- F-16
+- F/A-18
+- F-22
+- F-4N Phantom II
+- AJ 37 和 JA 37 Viggen
+
+同一场景中可以同时配置不同的飞机模型、控制器参数、传感器和武器挂载。
+
+## 系统架构
+
+<p align="center">
+  <img src="media/paper/system-architecture.png" width="100%" alt="BVR Sim 系统架构">
+</p>
+
+统一战术接口将航向、高度、速度和开火指令映射到各机型专用的内环控制器。仿真、学习接口以及可选的遥测和渲染相互解耦，使同一场景可以使用 Python 参考后端或加速 C++ 后端运行。
+
+## 环境能力对比
+
+下表复现论文 Table 1，对比所引用公开版本的能力。叉号表示未在相应公开版本中找到文档说明或直接支持。
+
+| 能力 | BVR Gym | LAG | B-ACE | BVR Sim |
+|:---|:---:|:---:|:---:|:---:|
+| 开源 | ✓ | ✓ | ✓ | ✓ |
+| JSBSim 飞机动力学 | ✓ | ✓ | × | ✓ |
+| BVR 级导弹交战 | ✓ | × | ✓ | ✓ |
+| 单场景混合多种飞机模型 | × | × | × | ✓ |
+| 内置机动与开火接口 | 仅机动 | ✓ | ✓ | ✓ |
+| 可互换的 Python/原生 C++ 后端 | × | × | × | ✓ |
+| 统一定宽实体表 | × | × | × | ✓ |
+| 规则基线与自博弈 | ✓ | ✓ | ✓ | ✓ |
+| ACMI/Tacview 导出或遥测 | ✓ | ✓ | × | ✓ |
+| 实时 3D 可视化 | FlightGear | Tacview | Godot | 原生查看器 |
+
+## 性能与 MARL 验证
+
+论文 Table 3 给出了决策间隔为 0.4 秒时的无渲染吞吐量。结果为三次重复的均值 ± 标准差；实时因子（RTF）等于模拟时间除以墙钟时间。
+
+| 规模 | Python steps/s | C++ steps/s | C++ RTF | 加速比 |
+|:---:|---:|---:|---:|---:|
+| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 104.26 | 2.72× |
+| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 57.43 | 2.81× |
+| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 35.34 | 3.94× |
+| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 20.48 | 3.92× |
+| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 16.80 | 4.36× |
+| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 22.17 | 6.55× |
+
+<p align="center">
+  <img src="media/paper/marl-training-reward.png" width="78%" alt="BVR Sim 2v2 任务中的 HAPPO 和 MAPPO 平均回合奖励">
+</p>
+
+上图复现论文 Fig. 3，展示归档的 HAPPO 和 MAPPO 训练曲线，并验证两种算法在同一个 2v2 BVR 任务上的端到端集成。每条曲线仅来自一次运行，因此该图用于集成验证，而不是算法排名。
+
+## 演示合集
+
+点击任意预览图即可打开相应的 MP4 视频。
+
+<div align="center">
+
+**仿真与渲染**
+
+| UnrealCV + UE5 实时渲染 | 简化 FDM 强化学习 | 空战 + 地面防空异构强化学习 |
+|:---:|:---:|:---:|
+| <a href="media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src="media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV 与 Unreal Engine 5 实时渲染"></a> | <a href="media/demos/simple-fdm-rl.mp4"><img src="media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="简化飞行动力学强化学习"></a> | <a href="media/demos/heterogeneous-air-ground-rl.mp4"><img src="media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="空战与地面防空异构强化学习"></a> |
+| 通过 UnrealCV 将仿真状态实时映射到 Unreal Engine | 使用轻量飞行动力学模型进行强化学习控制 | 异构飞机与地面防空单位共同运行 |
+
+**学习与制导**
+
+| 调优 PPO：1v1 | 调优 IPPO：2v2 | 复合导弹制导 + FDM |
+|:---:|:---:|:---:|
+| <a href="media/demos/ppo-1v1.mp4"><img src="media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="1v1 交战中的调优 PPO"></a> | <a href="media/demos/ippo-2v2.mp4"><img src="media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="2v2 交战中的调优 IPPO"></a> | <a href="media/demos/missile-composite-guidance-fdm.mp4"><img src="media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="复合导弹制导与飞行动力学"></a> |
+| PPO 策略执行 1v1 BVR 交战 | 独立 PPO 策略执行 2v2 交战 | 复合导弹制导逻辑与飞行动力学耦合 |
+
+**异构编队与人机交互**
+
+| F-22/F-16 异构 6v6 | 人类–AI 实时空战 | |
+|:---:|:---:|:---:|
+| <a href="media/demos/f22-f16-heterogeneous-6v6.mp4"><img src="media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="F-22 和 F-16 异构 6v6 交战"></a> | <a href="media/demos/human-ai-realtime-air-combat.mp4"><img src="media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="人类与 AI 实时空战游戏"></a> | |
+| F-22/F-16 混合编队使用 AIM-9M 和 AIM-120C 武器 | 人类参与者与 AI 控制飞机实时交战 | |
+
+</div>
 
 ## 支持的强化学习框架
 
@@ -293,6 +367,18 @@ python scripts/experimental/run_web_viz.py
 python scripts/experimental/run_opengl_viz.py
 python scripts/experimental/run_dx11_viz.py
 ```
+
+<p align="center">
+  <a href="https://www.bilibili.com/video/BV115SvBaEGn">演示视频</a>
+  ·
+  <a href="docs/getting_started.md">快速开始</a>
+  ·
+  <a href="docs/rl/ppo_quickstart.md">PPO 训练</a>
+  ·
+  <a href="docs/configuration.md">配置说明</a>
+  ·
+  <a href="docs/integration.md">RL 集成</a>
+</p>
 
 ## 许可证
 

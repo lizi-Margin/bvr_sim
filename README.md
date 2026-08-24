@@ -7,18 +7,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.bilibili.com/video/BV115SvBaEGn">Demo Video</a>
-  ·
-  <a href="docs/getting_started.md">Quick Start</a>
-  ·
-  <a href="docs/rl/ppo_quickstart.md">PPO Training</a>
-  ·
-  <a href="docs/configuration.md">Configuration</a>
-  ·
-  <a href="docs/integration.md">RL Integration</a>
-</p>
-
-<p align="center">
   <img alt="Python 3.8+" src="https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white">
   <img alt="C++ backend" src="https://img.shields.io/badge/C%2B%2B-backend-00599C?logo=cplusplus&logoColor=white">
   <img alt="Gymnasium compatible" src="https://img.shields.io/badge/Gymnasium-RL-16A085">
@@ -43,6 +31,92 @@
 - Tacview-compatible `.acmi` replay output
 - Built-in lightweight PPO training helper in `bvr_sim_rl`
 - Web, OpenGL, and DX11 visualization paths
+
+## Supported Aircraft
+
+The C++ JSBSim backend currently provides mappings for the following aircraft families:
+
+- F-15
+- F-16
+- F/A-18
+- F-22
+- F-4N Phantom II
+- AJ 37 and JA 37 Viggen
+
+Different aircraft models, controller parameters, sensors, and weapon loadouts can coexist in the same scenario.
+
+## System Architecture
+
+<p align="center">
+  <img src="media/paper/system-architecture.png" width="100%" alt="BVR Sim system architecture">
+</p>
+
+The shared tactical interface maps heading, altitude, speed, and fire commands to aircraft-specific inner-loop controllers. Simulation, learning interfaces, and optional telemetry or rendering remain decoupled, allowing the same scenario to run through the Python reference backend or accelerated C++ backend.
+
+## Environment Comparison
+
+The following comparison reproduces Table 1 of the paper for the cited public releases. A cross means that documented or direct support was not found in the corresponding release.
+
+| Capability | BVR Gym | LAG | B-ACE | BVR Sim |
+|:---|:---:|:---:|:---:|:---:|
+| Open source | ✓ | ✓ | ✓ | ✓ |
+| JSBSim aircraft dynamics | ✓ | ✓ | × | ✓ |
+| BVR-class missile engagement | ✓ | × | ✓ | ✓ |
+| Mixed aircraft models in one scenario | × | × | × | ✓ |
+| Built-in maneuver-and-fire interface | Maneuver only | ✓ | ✓ | ✓ |
+| Interchangeable Python/native C++ backends | × | × | × | ✓ |
+| Uniform fixed-width entity table | × | × | × | ✓ |
+| Rule baseline and self-play | ✓ | ✓ | ✓ | ✓ |
+| ACMI/Tacview export or telemetry | ✓ | ✓ | × | ✓ |
+| Real-time 3D visualization | FlightGear | Tacview | Godot | Native viewers |
+
+## Performance and MARL Validation
+
+Table 3 of the paper reports headless throughput at a 0.4-second decision interval. Values are mean ± standard deviation over three repeats; real-time factor (RTF) is simulated time divided by wall-clock time.
+
+| Scale | Python steps/s | C++ steps/s | C++ RTF | Speedup |
+|:---:|---:|---:|---:|---:|
+| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 104.26 | 2.72× |
+| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 57.43 | 2.81× |
+| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 35.34 | 3.94× |
+| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 20.48 | 3.92× |
+| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 16.80 | 4.36× |
+| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 22.17 | 6.55× |
+
+<p align="center">
+  <img src="media/paper/marl-training-reward.png" width="78%" alt="HAPPO and MAPPO mean episode reward on the BVR Sim 2v2 task">
+</p>
+
+The archived HAPPO and MAPPO traces above reproduce Fig. 3 of the paper and verify end-to-end integration on the same 2-vs-2 BVR task. Each curve is from one run, so the figure is an integration check rather than an algorithm ranking.
+
+## Demo Gallery
+
+Click any preview to open the corresponding MP4 video.
+
+<div align="center">
+
+**Simulation and Rendering**
+
+| UnrealCV + UE5 Real-Time Rendering | Simple FDM Reinforcement Learning | Heterogeneous Air Combat + Ground Air Defense |
+|:---:|:---:|:---:|
+| <a href="media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src="media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV and Unreal Engine 5 real-time rendering"></a> | <a href="media/demos/simple-fdm-rl.mp4"><img src="media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="Simple flight dynamics model reinforcement learning"></a> | <a href="media/demos/heterogeneous-air-ground-rl.mp4"><img src="media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="Heterogeneous air combat and ground air-defense reinforcement learning"></a> |
+| Simulator state mirrored into Unreal Engine through UnrealCV | RL control with the lightweight flight-dynamics model | Heterogeneous aircraft operating with ground air-defense units |
+
+**Learning and Guidance**
+
+| Well-Tuned PPO: 1v1 | Well-Tuned IPPO: 2v2 | Composite Missile Guidance + FDM |
+|:---:|:---:|:---:|
+| <a href="media/demos/ppo-1v1.mp4"><img src="media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="Well-tuned PPO in a 1-vs-1 engagement"></a> | <a href="media/demos/ippo-2v2.mp4"><img src="media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="Well-tuned IPPO in a 2-vs-2 engagement"></a> | <a href="media/demos/missile-composite-guidance-fdm.mp4"><img src="media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="Composite missile guidance with flight dynamics"></a> |
+| PPO policy in a 1-vs-1 BVR engagement | Independent PPO policies in a 2-vs-2 engagement | Composite missile-guidance logic coupled with flight dynamics |
+
+**Heterogeneous and Human Interaction**
+
+| Heterogeneous F-22/F-16 6v6 | Human–AI Real-Time Air Combat | |
+|:---:|:---:|:---:|
+| <a href="media/demos/f22-f16-heterogeneous-6v6.mp4"><img src="media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="Heterogeneous F-22 and F-16 6-vs-6 engagement"></a> | <a href="media/demos/human-ai-realtime-air-combat.mp4"><img src="media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="Human and AI real-time air-combat game"></a> | |
+| Mixed F-22/F-16 teams using AIM-9M and AIM-120C weapons | A human participant engages AI-controlled aircraft in real time | |
+
+</div>
 
 ## Supported Reinforcement-Learning Frameworks
 
@@ -293,6 +367,18 @@ python scripts/experimental/run_web_viz.py
 python scripts/experimental/run_opengl_viz.py
 python scripts/experimental/run_dx11_viz.py
 ```
+
+<p align="center">
+  <a href="https://www.bilibili.com/video/BV115SvBaEGn">Demo Video</a>
+  ·
+  <a href="docs/getting_started.md">Quick Start</a>
+  ·
+  <a href="docs/rl/ppo_quickstart.md">PPO Training</a>
+  ·
+  <a href="docs/configuration.md">Configuration</a>
+  ·
+  <a href="docs/integration.md">RL Integration</a>
+</p>
 
 ## License
 
