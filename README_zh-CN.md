@@ -10,21 +10,17 @@
   <img alt="License GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue">
 </p>
 
-`bvr-sim` 是一个面向强化学习研究与工程验证的 3D 超视距空战仿真环境。项目提供纯 Python 后端和 C++ 加速后端，并内置一个轻量 `skrl` PPO 训练入口，使用户可以在安装后直接跑通空战强化学习训练流程。
+BVR-Sim 是一个面向强化学习研究的 3D 超视距空战环境，提供 Python 与加速 C++ 后端，并内置 skrl PPO 训练流程，可用于快速开展实验。
 
 <div align="center">
 
 | F-22/F-16 异构 6v6 | 人类–AI 实时空战 | 空战 + 地面防空异构强化学习 |
 |:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/f22-f16-heterogeneous-6v6.mp4"><img src="media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="F-22 和 F-16 异构 6v6 交战"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/human-ai-realtime-air-combat.mp4"><img src="media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="人类与 AI 实时空战游戏"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/heterogeneous-air-ground-rl.mp4"><img src="media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="空战与地面防空异构强化学习"></a> |
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/f22-f16-heterogeneous-6v6.mp4"><img src=".github/media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="F-22 和 F-16 异构 6v6 交战"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/human-ai-realtime-air-combat.mp4"><img src=".github/media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="人类与 AI 实时空战游戏"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/heterogeneous-air-ground-rl.mp4"><img src=".github/media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="空战与地面防空异构强化学习"></a> |
 
-| 调优 IPPO：2v2 | 调优 PPO：1v1 | UnrealCV + UE5 实时渲染 |
+| 调优 IPPO：2v2 | 复合导弹制导 + FDM | UnrealCV + UE5 实时渲染 |
 |:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ippo-2v2.mp4"><img src="media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="2v2 交战中的调优 IPPO"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ppo-1v1.mp4"><img src="media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="1v1 交战中的调优 PPO"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src="media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV 与 Unreal Engine 5 实时渲染"></a> |
-
-| 复合导弹制导 + FDM | 简化 FDM 强化学习 | |
-|:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/missile-composite-guidance-fdm.mp4"><img src="media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="复合导弹制导与飞行动力学"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/simple-fdm-rl.mp4"><img src="media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="简化飞行动力学强化学习"></a> | |
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/ippo-2v2.mp4"><img src=".github/media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="2v2 交战中的调优 IPPO"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/missile-composite-guidance-fdm.mp4"><img src=".github/media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="复合导弹制导与飞行动力学"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src=".github/media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV 与 Unreal Engine 5 实时渲染"></a> |
 
 </div>
 
@@ -35,7 +31,7 @@
 ## 系统架构
 
 <p align="center">
-  <img src="media/paper/system-architecture.png" width="100%" alt="BVR Sim 系统架构">
+  <img src=".github/media/paper/system-architecture.png" width="100%" alt="BVR Sim 系统架构">
 </p>
 
 统一战术接口将航向、高度、速度和开火指令映射到各机型专用的内环控制器。仿真、学习接口以及可选的遥测和渲染相互解耦，使同一场景可以使用 Python 参考后端或加速 C++ 后端运行。
@@ -59,7 +55,7 @@ C++ JSBSim 后端目前支持以下飞机系列的模型映射：
 
 <div align="center">
 
-| 能力 | BVR Gym | LAG | B-ACE | BVR Sim |
+| 能力 | BVR Gym [3] | LAG [4, 5] | B-ACE [6] | BVR Sim |
 |:---|:---:|:---:|:---:|:---:|
 | 开源 | ✓ | ✓ | ✓ | ✓ |
 | JSBSim 飞机动力学 | ✓ | ✓ | × | ✓ |
@@ -74,32 +70,46 @@ C++ JSBSim 后端目前支持以下飞机系列的模型映射：
 
 </div>
 
-## 性能与 MARL 验证
+## MARL 验证
 
-论文 Table 3 给出了决策间隔为 0.4 秒时的无渲染吞吐量。结果为三次重复的均值 ± 标准差；实时因子（RTF）等于模拟时间除以墙钟时间。
+<p align="center">
+  <img src=".github/media/paper/marl-training-reward.png" width="78%" alt="BVR Sim 2v2 任务中的 HAPPO 和 MAPPO 平均回合奖励">
+</p>
+
+上图复现论文 Fig. 3，展示归档的 HAPPO [8] 和 MAPPO [7] 训练曲线，并验证两种算法在同一个 2v2 BVR 任务上的端到端集成。每条曲线仅来自一次运行，因此该图用于集成验证，而不是算法排名。
+
+## 性能
+
+BVR Sim 提供两条互补的飞行动力学路径，用于强化学习开发的不同阶段。
 
 <div align="center">
 
-| 规模 | Python steps/s | C++ steps/s | C++ RTF | 加速比 |
-|:---:|---:|---:|---:|---:|
-| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 104.26 | 2.72× |
-| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 57.43 | 2.81× |
-| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 35.34 | 3.94× |
-| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 20.48 | 3.92× |
-| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 16.80 | 4.36× |
-| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 22.17 | 6.55× |
+| JSBSim FDM：调优 PPO 1v1 | Simple FDM：快速 RL 验证 |
+|:---:|:---:|
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/ppo-1v1.mp4"><img src=".github/media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="使用 JSBSim 飞行动力学的调优 PPO 1v1 交战"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/simple-fdm-rl.mp4"><img src=".github/media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="使用 Simple FDM 快速验证强化学习"></a> |
 
 </div>
 
-<p align="center">
-  <img src="media/paper/marl-training-reward.png" width="78%" alt="BVR Sim 2v2 任务中的 HAPPO 和 MAPPO 平均回合奖励">
-</p>
+JSBSim FDM 提供更高保真、接近真实的飞机动力学，适合飞控与交战研究。Simple FDM 是轻量替代方案，适合快速验证 RL 流程、调试奖励并检查早期收敛情况。
 
-上图复现论文 Fig. 3，展示归档的 HAPPO 和 MAPPO 训练曲线，并验证两种算法在同一个 2v2 BVR 任务上的端到端集成。每条曲线仅来自一次运行，因此该图用于集成验证，而不是算法排名。
+论文 Table 3 给出了决策间隔为 0.4 秒时的无渲染吞吐量，结果为三次重复的均值 ± 标准差。
+
+<div align="center">
+
+| 规模 | Python steps/s | C++ steps/s | 加速比 |
+|:---:|---:|---:|---:|
+| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 2.72× |
+| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 2.81× |
+| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 3.94× |
+| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 3.92× |
+| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 4.36× |
+| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 6.55× |
+
+</div>
 
 ## 核心能力
 
-- 基于 JSBSim 的飞行动力学建模
+- 基于 JSBSim 的飞行动力学建模 [9]
 - 空空导弹、挂载、发射和交战结果仿真
 - 可配置红蓝双方、初始态、武器、规则对手和奖励项
 - Gymnasium 风格 observation/action space
@@ -350,6 +360,8 @@ python scripts/experimental/run_dx11_viz.py
 ## 项目结构
 
 ```text
+.github/
+  media/                     README 演示视频、缩略图和论文图片
 bvr_sim/                     主 Python 包与 C++ 源码
   src_py/                    Python 仿真、奖励、规则对手
   src_cxx/                   C++ 仿真核心
@@ -383,3 +395,10 @@ BVR Sim 使用 GPLv3 发布，见 [LICENSE](LICENSE)。
 
 1. Yifan Zhong, Jakub Grudzien Kuba, Xidong Feng, Siyi Hu, Jiaming Ji, and Yaodong Yang. “Heterogeneous-Agent Reinforcement Learning.” *Journal of Machine Learning Research*, 25(32):1–67, 2024. [Paper](https://jmlr.org/papers/v25/23-0488.html)
 2. Tianyi Hu, Qingxu Fu, Zhiqiang Pu, Yuan Wang, and Tenghai Qiu. “Unreal-MAP: Unreal-Engine-Based General Platform for Multi-Agent Reinforcement Learning.” *Proceedings of the AAAI Conference on Artificial Intelligence*, 40(35):29486–29494, 2026. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/40190) · [DOI](https://doi.org/10.1609/aaai.v40i35.40190)
+3. Edvards Scukins, Markus Klein, Lars Kroon, and Petter Ögren. “BVR Gym: A Reinforcement Learning Environment for Beyond-Visual-Range Air Combat.” *arXiv preprint arXiv:2403.17533*, 2024. [Paper](https://arxiv.org/abs/2403.17533) · [DOI](https://doi.org/10.48550/arXiv.2403.17533)
+4. Qihan Liu, Yuhua Jiang, and Xiaoteng Ma. “Light Aircraft Game: A Lightweight, Scalable, Gym-Wrapped Aircraft Competitive Environment with Baseline Reinforcement Learning Algorithms.” GitHub repository, 2022. [Repository](https://github.com/liuqh16/LAG)
+5. Hanzhong Cao. “Light Aircraft Game: Basic Implementation and Training Results Analysis.” *arXiv preprint arXiv:2506.14164*, 2025. [Paper](https://arxiv.org/abs/2506.14164)
+6. André R. Kuroswiski, Annie S. Wu, and Angelo Passaro. “B-ACE: An Open Lightweight Beyond Visual Range Air Combat Simulation Environment for Multi-Agent Reinforcement Learning.” *2024 Interservice/Industry Training, Simulation and Education Conference (I/ITSEC)*, Paper No. 24464, 2024.
+7. Chao Yu, Akash Velu, Eugene Vinitsky, Jiaxuan Gao, Yu Wang, Alexandre Bayen, and Yi Wu. “The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games.” *Advances in Neural Information Processing Systems*, 35:24611–24624, 2022. [DOI](https://doi.org/10.52202/068431-1787)
+8. Jakub Grudzien Kuba, Ruiqing Chen, Muning Wen, Ying Wen, Fanglei Sun, Jun Wang, and Yaodong Yang. “Trust Region Policy Optimisation in Multi-Agent Reinforcement Learning.” *International Conference on Learning Representations*, 2022. [Paper](https://openreview.net/forum?id=EcGGFkNTxdJ)
+9. Jon S. Berndt. “JSBSim: An Open Source Flight Dynamics Model in C++.” *AIAA Modeling and Simulation Technologies Conference and Exhibit*, AIAA Paper 2004-4923, 2004.

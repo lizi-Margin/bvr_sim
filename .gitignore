@@ -39,6 +39,6 @@ __pycache__
 
 *.csv
 *.png
-!/media/paper/*.png
+!/.github/media/paper/*.png
 /scripts/benchmarks/results/
 /benchmark_logs/

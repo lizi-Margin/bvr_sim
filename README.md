@@ -10,21 +10,17 @@
   <img alt="License GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue">
 </p>
 
-`bvr-sim` is a 3D beyond-visual-range air-combat simulation environment for reinforcement-learning research and engineering validation. The project provides a pure-Python backend and an accelerated C++ backend, together with a lightweight built-in `skrl` PPO training entry point that lets users run an air-combat reinforcement-learning workflow immediately after installation.
+BVR-Sim is a 3D beyond-visual-range air-combat environment for reinforcement-learning research, with Python and accelerated C++ backends and a built-in skrl PPO training pipeline for immediate experimentation.
 
 <div align="center">
 
 | Heterogeneous F-22/F-16 6v6 | Human–AI Real-Time Air Combat | Heterogeneous Air Combat + Ground Air Defense |
 |:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/f22-f16-heterogeneous-6v6.mp4"><img src="media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="Heterogeneous F-22 and F-16 6-vs-6 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/human-ai-realtime-air-combat.mp4"><img src="media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="Human and AI real-time air-combat game"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/heterogeneous-air-ground-rl.mp4"><img src="media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="Heterogeneous air combat and ground air-defense reinforcement learning"></a> |
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/f22-f16-heterogeneous-6v6.mp4"><img src=".github/media/demos/thumbnails/f22-f16-heterogeneous-6v6.jpg" width="100%" alt="Heterogeneous F-22 and F-16 6-vs-6 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/human-ai-realtime-air-combat.mp4"><img src=".github/media/demos/thumbnails/human-ai-realtime-air-combat.jpg" width="100%" alt="Human and AI real-time air-combat game"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/heterogeneous-air-ground-rl.mp4"><img src=".github/media/demos/thumbnails/heterogeneous-air-ground-rl.jpg" width="100%" alt="Heterogeneous air combat and ground air-defense reinforcement learning"></a> |
 
-| Well-Tuned IPPO: 2v2 | Well-Tuned PPO: 1v1 | UnrealCV + UE5 Real-Time Rendering |
+| Well-Tuned IPPO: 2v2 | Composite Missile Guidance + FDM | UnrealCV + UE5 Real-Time Rendering |
 |:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ippo-2v2.mp4"><img src="media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="Well-tuned IPPO in a 2-vs-2 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/ppo-1v1.mp4"><img src="media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="Well-tuned PPO in a 1-vs-1 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src="media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV and Unreal Engine 5 real-time rendering"></a> |
-
-| Composite Missile Guidance + FDM | Simple FDM Reinforcement Learning | |
-|:---:|:---:|:---:|
-| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/missile-composite-guidance-fdm.mp4"><img src="media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="Composite missile guidance with flight dynamics"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/media/demos/simple-fdm-rl.mp4"><img src="media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="Simple flight dynamics model reinforcement learning"></a> | |
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/ippo-2v2.mp4"><img src=".github/media/demos/thumbnails/ippo-2v2.jpg" width="100%" alt="Well-tuned IPPO in a 2-vs-2 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/missile-composite-guidance-fdm.mp4"><img src=".github/media/demos/thumbnails/missile-composite-guidance-fdm.jpg" width="100%" alt="Composite missile guidance with flight dynamics"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/unrealcv-ue5-realtime-rendering.mp4"><img src=".github/media/demos/thumbnails/unrealcv-ue5-realtime-rendering.jpg" width="100%" alt="UnrealCV and Unreal Engine 5 real-time rendering"></a> |
 
 </div>
 
@@ -35,7 +31,7 @@
 ## System Architecture
 
 <p align="center">
-  <img src="media/paper/system-architecture.png" width="100%" alt="BVR Sim system architecture">
+  <img src=".github/media/paper/system-architecture.png" width="100%" alt="BVR Sim system architecture">
 </p>
 
 The shared tactical interface maps heading, altitude, speed, and fire commands to aircraft-specific inner-loop controllers. Simulation, learning interfaces, and optional telemetry or rendering remain decoupled, allowing the same scenario to run through the Python reference backend or accelerated C++ backend.
@@ -59,7 +55,7 @@ The following comparison reproduces Table 1 of the paper for the cited public re
 
 <div align="center">
 
-| Capability | BVR Gym | LAG | B-ACE | BVR Sim |
+| Capability | BVR Gym [3] | LAG [4, 5] | B-ACE [6] | BVR Sim |
 |:---|:---:|:---:|:---:|:---:|
 | Open source | ✓ | ✓ | ✓ | ✓ |
 | JSBSim aircraft dynamics | ✓ | ✓ | × | ✓ |
@@ -74,32 +70,46 @@ The following comparison reproduces Table 1 of the paper for the cited public re
 
 </div>
 
-## Performance and MARL Validation
+## MARL Validation
 
-Table 3 of the paper reports headless throughput at a 0.4-second decision interval. Values are mean ± standard deviation over three repeats; real-time factor (RTF) is simulated time divided by wall-clock time.
+<p align="center">
+  <img src=".github/media/paper/marl-training-reward.png" width="78%" alt="HAPPO and MAPPO mean episode reward on the BVR Sim 2v2 task">
+</p>
+
+The archived HAPPO [8] and MAPPO [7] traces above reproduce Fig. 3 of the paper and verify end-to-end integration on the same 2-vs-2 BVR task. Each curve is from one run, so the figure is an integration check rather than an algorithm ranking.
+
+## Performance
+
+BVR Sim provides two complementary flight-dynamics paths for different stages of reinforcement-learning development.
 
 <div align="center">
 
-| Scale | Python steps/s | C++ steps/s | C++ RTF | Speedup |
-|:---:|---:|---:|---:|---:|
-| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 104.26 | 2.72× |
-| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 57.43 | 2.81× |
-| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 35.34 | 3.94× |
-| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 20.48 | 3.92× |
-| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 16.80 | 4.36× |
-| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 22.17 | 6.55× |
+| JSBSim FDM: Well-Tuned PPO 1v1 | Simple FDM: Rapid RL Validation |
+|:---:|:---:|
+| <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/ppo-1v1.mp4"><img src=".github/media/demos/thumbnails/ppo-1v1.jpg" width="100%" alt="Well-tuned PPO with JSBSim flight dynamics in a 1-vs-1 engagement"></a> | <a href="https://cdn.jsdelivr.net/gh/lizi-Margin/bvr_sim@master/.github/media/demos/simple-fdm-rl.mp4"><img src=".github/media/demos/thumbnails/simple-fdm-rl.jpg" width="100%" alt="Rapid reinforcement-learning validation with Simple FDM"></a> |
 
 </div>
 
-<p align="center">
-  <img src="media/paper/marl-training-reward.png" width="78%" alt="HAPPO and MAPPO mean episode reward on the BVR Sim 2v2 task">
-</p>
+The JSBSim FDM path provides higher-fidelity, near-realistic aircraft dynamics for flight-control and engagement studies. Simple FDM is a lightweight alternative for fast RL pipeline validation, reward debugging, and early convergence checks.
 
-The archived HAPPO and MAPPO traces above reproduce Fig. 3 of the paper and verify end-to-end integration on the same 2-vs-2 BVR task. Each curve is from one run, so the figure is an integration check rather than an algorithm ranking.
+Table 3 of the paper reports headless throughput at a 0.4-second decision interval. Values are mean ± standard deviation over three repeats.
+
+<div align="center">
+
+| Scale | Python steps/s | C++ steps/s | Speedup |
+|:---:|---:|---:|---:|
+| 1v1 | 95.84 ± 8.07 | 260.65 ± 2.75 | 2.72× |
+| 2v2 | 51.01 ± 8.09 | 143.58 ± 4.56 | 2.81× |
+| 4v4 | 22.43 ± 3.30 | 88.36 ± 16.56 | 3.94× |
+| 6v6 | 13.07 ± 1.18 | 51.21 ± 12.33 | 3.92× |
+| 8v8 | 9.63 ± 1.24 | 42.01 ± 12.06 | 4.36× |
+| 10v10 | 8.46 ± 1.61 | 55.43 ± 38.71 | 6.55× |
+
+</div>
 
 ## Core Features
 
-- JSBSim-based flight-dynamics modeling
+- JSBSim-based flight-dynamics modeling [9]
 - Air-to-air missile, loadout, launch, and engagement-outcome simulation
 - Configurable red and blue teams, initial states, weapons, rule-based opponents, and reward terms
 - Gymnasium-style observation and action spaces
@@ -350,6 +360,8 @@ python scripts/experimental/run_dx11_viz.py
 ## Project Structure
 
 ```text
+.github/
+  media/                     README demo videos, thumbnails, and paper figures
 bvr_sim/                     Main Python package and C++ sources
   src_py/                    Python simulation, rewards, and rule-based opponents
   src_cxx/                   C++ simulation core
@@ -383,3 +395,10 @@ For third-party dependencies and bundled-resource notices, see [docs/legal/THIRD
 
 1. Yifan Zhong, Jakub Grudzien Kuba, Xidong Feng, Siyi Hu, Jiaming Ji, and Yaodong Yang. “Heterogeneous-Agent Reinforcement Learning.” *Journal of Machine Learning Research*, 25(32):1–67, 2024. [Paper](https://jmlr.org/papers/v25/23-0488.html)
 2. Tianyi Hu, Qingxu Fu, Zhiqiang Pu, Yuan Wang, and Tenghai Qiu. “Unreal-MAP: Unreal-Engine-Based General Platform for Multi-Agent Reinforcement Learning.” *Proceedings of the AAAI Conference on Artificial Intelligence*, 40(35):29486–29494, 2026. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/40190) · [DOI](https://doi.org/10.1609/aaai.v40i35.40190)
+3. Edvards Scukins, Markus Klein, Lars Kroon, and Petter Ögren. “BVR Gym: A Reinforcement Learning Environment for Beyond-Visual-Range Air Combat.” *arXiv preprint arXiv:2403.17533*, 2024. [Paper](https://arxiv.org/abs/2403.17533) · [DOI](https://doi.org/10.48550/arXiv.2403.17533)
+4. Qihan Liu, Yuhua Jiang, and Xiaoteng Ma. “Light Aircraft Game: A Lightweight, Scalable, Gym-Wrapped Aircraft Competitive Environment with Baseline Reinforcement Learning Algorithms.” GitHub repository, 2022. [Repository](https://github.com/liuqh16/LAG)
+5. Hanzhong Cao. “Light Aircraft Game: Basic Implementation and Training Results Analysis.” *arXiv preprint arXiv:2506.14164*, 2025. [Paper](https://arxiv.org/abs/2506.14164)
+6. André R. Kuroswiski, Annie S. Wu, and Angelo Passaro. “B-ACE: An Open Lightweight Beyond Visual Range Air Combat Simulation Environment for Multi-Agent Reinforcement Learning.” *2024 Interservice/Industry Training, Simulation and Education Conference (I/ITSEC)*, Paper No. 24464, 2024.
+7. Chao Yu, Akash Velu, Eugene Vinitsky, Jiaxuan Gao, Yu Wang, Alexandre Bayen, and Yi Wu. “The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games.” *Advances in Neural Information Processing Systems*, 35:24611–24624, 2022. [DOI](https://doi.org/10.52202/068431-1787)
+8. Jakub Grudzien Kuba, Ruiqing Chen, Muning Wen, Ying Wen, Fanglei Sun, Jun Wang, and Yaodong Yang. “Trust Region Policy Optimisation in Multi-Agent Reinforcement Learning.” *International Conference on Learning Representations*, 2022. [Paper](https://openreview.net/forum?id=EcGGFkNTxdJ)
+9. Jon S. Berndt. “JSBSim: An Open Source Flight Dynamics Model in C++.” *AIAA Modeling and Simulation Technologies Conference and Exhibit*, AIAA Paper 2004-4923, 2004.
