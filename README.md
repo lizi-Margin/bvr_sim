@@ -42,6 +42,15 @@
 - 内置轻量 PPO 训练助手 `bvr_sim_rl`
 - Web、OpenGL 和 DX11 可视化路径
 
+## 支持的强化学习框架
+
+- **skrl**：仓库内置轻量 PPO 训练入口 `bvr_sim_rl/`，用于安装检查、训练和评估。框架项目见 [skrl](https://github.com/Toni-SM/skrl)。
+- **MARLBenchmark / off-policy**：适配器 [`rl_envs/env_marlbenchmark.py`](rl_envs/env_marlbenchmark.py) 提供多智能体局部观测、集中式 shared observation 和 legacy Gym space 接口。上游框架见 [marlbenchmark/off-policy](https://github.com/marlbenchmark/off-policy)，本项目使用的维护分支见 [lizi-Margin/off-policy](https://github.com/lizi-Margin/off-policy)。
+- **HARL**：适配器 [`rl_envs/env_harl.py`](rl_envs/env_harl.py) 实现 HARL 所需的局部/共享观测、reward、done、info 和 available-action tuple。框架与算法实现见 [PKU-MARL/HARL](https://github.com/PKU-MARL/HARL)，对应论文为 *Heterogeneous-Agent Reinforcement Learning* [1]。
+- **UHRL / HMP2G**：适配器 [`rl_envs/env_wrapper.py`](rl_envs/env_wrapper.py) 面向内部 UHRL 分支，实现 `ScenarioConfig`、`make_env`、队伍映射、状态和可用动作等接口。UHRL 是基于公开 [HMP2G](https://github.com/binary-husky/hmp2g) 开发的私有分支；HMP2G 的公开背景与应用见 Unreal-MAP [2]。
+
+MARLBenchmark 和 UHRL 在此表示已经实现框架接口，并不表示已经验证相应框架中的全部算法。Python 与 C++ 仿真后端均可由这些适配器选择。
+
 ## 快速开始：直接训练 PPO
 
 以下命令均在仓库根目录执行。
@@ -286,3 +295,8 @@ python experimental/run_dx11_viz.py
 BVR Sim 使用 GPLv3 发布，见 [LICENSE](LICENSE)。
 
 第三方依赖和内置资源说明见 [docs/legal/THIRD_PARTY_LICENSES.md](docs/legal/THIRD_PARTY_LICENSES.md)。
+
+## 参考文献
+
+1. Yifan Zhong, Jakub Grudzien Kuba, Xidong Feng, Siyi Hu, Jiaming Ji, and Yaodong Yang. “Heterogeneous-Agent Reinforcement Learning.” *Journal of Machine Learning Research*, 25(32):1–67, 2024. [Paper](https://jmlr.org/papers/v25/23-0488.html)
+2. Tianyi Hu, Qingxu Fu, Zhiqiang Pu, Yuan Wang, and Tenghai Qiu. “Unreal-MAP: Unreal-Engine-Based General Platform for Multi-Agent Reinforcement Learning.” *Proceedings of the AAAI Conference on Artificial Intelligence*, 40(35):29486–29494, 2026. [Paper](https://ojs.aaai.org/index.php/AAAI/article/view/40190) · [DOI](https://doi.org/10.1609/aaai.v40i35.40190)
