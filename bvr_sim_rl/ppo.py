@@ -12,13 +12,13 @@ from typing import Any, Optional
 import torch
 import torch.nn as nn
 
-from .env import BVRSkrlEnv, BVRSkrlTorchWrapper
+from .env import BVRSkrlTorchWrapper, BVRVectorEnv
 
 
 @dataclass
 class PPOConfig:
     timesteps: int = 10000
-    rollouts: int = 64
+    rollouts: int = 256
     learning_epochs: int = 16
     mini_batches: int = 4
     learning_rate: float = 3e-4
@@ -29,6 +29,7 @@ class PPOConfig:
     checkpoint_interval: int = 1000
     write_interval: int = 200
     seed: int = 42
+    num_envs: int = 8
     device: str = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 
@@ -78,7 +79,8 @@ def train_ppo(
     set_seed(cfg.seed)
     os.makedirs(logdir, exist_ok=True)
     env = BVRSkrlTorchWrapper(
-        BVRSkrlEnv(config=config, backend=backend, logdir=logdir),
+        BVRVectorEnv(config=config, backend=backend, logdir=logdir,
+                     num_envs=cfg.num_envs, seed=cfg.seed),
         device=cfg.device,
     ).wrapper
 
@@ -226,13 +228,15 @@ def main(argv: Optional[list] = None) -> int:
     parser.add_argument("--config", default="scripts/tests/demo_config_cpp.jsonc", help="BVR Sim JSON/JSONC config path.")
     parser.add_argument("--backend", choices=("cpp", "python"), default="cpp", help="Simulator backend.")
     parser.add_argument("--timesteps", type=int, default=10000)
-    parser.add_argument("--rollouts", type=int, default=64)
+    parser.add_argument("--rollouts", type=int, default=PPOConfig.rollouts)
     parser.add_argument("--learning-epochs", type=int, default=16)
     parser.add_argument("--mini-batches", type=int, default=4)
     parser.add_argument("--entropy-loss-scale", type=float, default=1e-4)
     parser.add_argument("--logdir", default="./runs/bvr_sim_rl")
     parser.add_argument("--device", default=PPOConfig.device)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--num-envs", type=int, default=PPOConfig.num_envs,
+                        help="Number of independent simulator instances.")
     parser.add_argument("--checkpoint-interval", type=int, default=1000)
     parser.add_argument("--write-interval", type=int, default=200)
     args = parser.parse_args(argv)
@@ -249,6 +253,7 @@ def main(argv: Optional[list] = None) -> int:
             entropy_loss_scale=args.entropy_loss_scale,
             device=args.device,
             seed=args.seed,
+            num_envs=args.num_envs,
             checkpoint_interval=args.checkpoint_interval,
             write_interval=args.write_interval,
         ),

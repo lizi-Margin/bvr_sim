@@ -167,23 +167,26 @@ pip install skrl torch
 
 ### 3. Train with the Python Backend
 
-The Python backend requires no native-extension build and is suitable for initial installation and training-workflow checks.
+The Python backend requires no native-extension build. Use the tested PPO entry point and the Python-specific convergence configuration:
 
 ```bash
-python -m bvr_sim_rl --backend python --config scripts/tests/demo_config.json --timesteps 10000
+python -m bvr_sim_rl \
+  --backend python \
+  --config scripts/experiments/ppo/f16_1v1_convergence_python.jsonc \
+  --timesteps 100000 \
+  --num-envs 8 \
+  --rollouts 256 \
+  --seed 1111 \
+  --logdir runs/bvr_sim_rl/python_f16_1v1_seed1111
 ```
 
-To perform a short end-to-end check:
+Monitor the run in another terminal:
 
 ```bash
-python -m bvr_sim_rl --backend python --config scripts/tests/demo_config.json --timesteps 128 --rollouts 16 --device cpu
+tensorboard --logdir runs/bvr_sim_rl/python_f16_1v1_seed1111
 ```
 
-Training logs and checkpoints are written by default to:
-
-```text
-runs/bvr_sim_rl/
-```
+`timesteps` counts vector steps. With 8 independent environments, this command collects approximately 800,000 environment transitions.
 
 ### 4. Train with the C++ Backend
 
@@ -201,17 +204,26 @@ Linux:
 bash bvr_sim/build_linux.sh
 ```
 
-Then run:
+Then use the tested C++ training entry point and convergence configuration:
 
 ```bash
-python -m bvr_sim_rl --backend cpp --config scripts/tests/demo_config_cpp.jsonc --timesteps 10000
+python -m bvr_sim_rl \
+  --backend cpp \
+  --config scripts/experiments/ppo/f16_1v1_convergence_cpp.jsonc \
+  --timesteps 80000 \
+  --num-envs 8 \
+  --rollouts 256 \
+  --seed 1111 \
+  --logdir runs/bvr_sim_rl/cpp_f16_1v1_seed1111
 ```
 
-After installation, the command-line entry point is also available:
+Monitor reward, episode return, and episode length in another terminal:
 
 ```bash
-bvr-sim-ppo --backend cpp --config scripts/tests/demo_config_cpp.jsonc --timesteps 10000
+tensorboard --logdir runs/bvr_sim_rl/cpp_f16_1v1_seed1111
 ```
+
+The 80,000-step command collects approximately 640,000 environment transitions and takes about one hour on the tested machine. In TensorBoard, `Info / return_per_step` is the most useful convergence signal when episode lengths are changing.
 
 ## Minimal Python Example
 

@@ -167,23 +167,26 @@ pip install skrl torch
 
 ### 3. 使用 Python 后端训练
 
-Python 后端不需要编译原生扩展，适合首次验证安装和训练流程。
+Python 后端不需要编译原生扩展。使用已经验证的 PPO 入口和 Python 专用收敛配置：
 
 ```bash
-python -m bvr_sim_rl --backend python --config scripts/tests/demo_config.json --timesteps 10000
+python -m bvr_sim_rl \
+  --backend python \
+  --config scripts/experiments/ppo/f16_1v1_convergence_python.jsonc \
+  --timesteps 100000 \
+  --num-envs 8 \
+  --rollouts 256 \
+  --seed 1111 \
+  --logdir runs/bvr_sim_rl/python_f16_1v1_seed1111
 ```
 
-只想快速确认链路是否可用，可以运行一个短任务：
+在另一个终端中监控训练：
 
 ```bash
-python -m bvr_sim_rl --backend python --config scripts/tests/demo_config.json --timesteps 128 --rollouts 16 --device cpu
+tensorboard --logdir runs/bvr_sim_rl/python_f16_1v1_seed1111
 ```
 
-训练日志和 checkpoint 默认写入：
-
-```text
-runs/bvr_sim_rl/
-```
+`timesteps` 统计的是向量环境步数。使用 8 个独立环境时，该命令约采集 80 万条环境 transition。
 
 ### 4. 使用 C++ 后端训练
 
@@ -201,17 +204,26 @@ Linux:
 bash bvr_sim/build_linux.sh
 ```
 
-然后运行：
+然后使用已经验证的 C++ 训练入口和收敛配置：
 
 ```bash
-python -m bvr_sim_rl --backend cpp --config scripts/tests/demo_config_cpp.jsonc --timesteps 10000
+python -m bvr_sim_rl \
+  --backend cpp \
+  --config scripts/experiments/ppo/f16_1v1_convergence_cpp.jsonc \
+  --timesteps 80000 \
+  --num-envs 8 \
+  --rollouts 256 \
+  --seed 1111 \
+  --logdir runs/bvr_sim_rl/cpp_f16_1v1_seed1111
 ```
 
-安装后也可以使用命令行入口：
+在另一个终端中监控 reward、episode return 和 episode 长度：
 
 ```bash
-bvr-sim-ppo --backend cpp --config scripts/tests/demo_config_cpp.jsonc --timesteps 10000
+tensorboard --logdir runs/bvr_sim_rl/cpp_f16_1v1_seed1111
 ```
+
+80,000 步约采集 64 万条环境 transition，在本次测试机器上约运行一小时。当 episode 长度发生变化时，TensorBoard 中的 `Info / return_per_step` 是更有参考价值的收敛指标。
 
 ## 最小 Python 示例
 
