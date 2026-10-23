@@ -2,6 +2,8 @@
 #include "ModelImporter.h" // Upstream importer declarations require WickedEngine.h first.
 #include "gameplay/game_session.hxx"
 #include <Windows.h>
+#include <Xinput.h>
+#include <atomic>
 #include <filesystem>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -32,6 +34,9 @@ struct Input {
     float x = 0, y = 0;
     int wheel = 0;
     bool active = false, quit = false;
+    int width=0,height=0;
+    bool pad_connected=false;
+    std::array<float,6> pad_axes{};
     std::vector<int> held, pressed;
 };
 class GamePath : public wi::RenderPath3D {
@@ -151,6 +156,11 @@ class Renderer {
         : model_files(models.begin(), models.end()), width(w), height(h) {
         if (w < 320 || h < 240)
             throw std::invalid_argument("Window too small");
+        // Wicked owns process-global GPU jobs/resources; rebuilding that
+        // runtime after ShutDown caused a reproducible native crash. Reuse the
+        // resident Renderer/scene reset, or start a fresh process instead.
+        static std::atomic_flag process_gpu_started=ATOMIC_FLAG_INIT;
+        if(process_gpu_started.test_and_set())throw std::runtime_error("One Wicked Renderer lifetime per process: reuse the resident Renderer or start a new process");
         if (!LoadLibraryW(std::filesystem::path(engine + "/WickedEngine/dxcompiler.dll").c_str()))
             throw std::runtime_error("Cannot load Wicked Engine dxcompiler.dll");
         wi::arguments::Parse(L"alwaysactive dx12");
@@ -169,9 +179,9 @@ class Renderer {
         wc.hCursor = LoadCursor(nullptr, IDC_CROSS);
         RegisterClassW(&wc);
         RECT r{0, 0, w, h};
-        AdjustWindowRect(&r, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, FALSE);
+        AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
         window = CreateWindowW(wc.lpszClassName, L"BVR SIM | Flight Operations",
-                               WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, 100, 80,
+                               WS_OVERLAPPEDWINDOW, 100, 80,
                                r.right - r.left, r.bottom - r.top, nullptr, nullptr, wc.hInstance, nullptr);
         if (!window)
             throw std::runtime_error("Cannot create game window");
@@ -227,7 +237,7 @@ class Renderer {
             // A weak height-fog layer begins beyond 100 km and applies to both
             // the sky planet and finite terrain to make their horizon continuous.
             auto haze=visual_profile.value("horizon_height_fog",nlohmann::json::object());
-            sky.SetHeightFog(true);sky.fogStart=haze.value("start_m",100000.f);sky.fogDensity=haze.value("density_per_m",.00005f);
+            sky.SetHeightFog(haze.value("enabled",true));sky.fogStart=haze.value("start_m",100000.f);sky.fogDensity=haze.value("density_per_m",.00005f);
             sky.fogHeightStart=haze.value("base_m",0.f);sky.fogHeightEnd=haze.value("top_m",16000.f);sky.stars=0;
             auto albedo=visual_profile.value("planet_albedo",std::vector<float>{.12f,.16f,.1f});
             sky.atmosphereParameters.groundAlbedo={albedo[0],albedo[1],albedo[2]};
@@ -274,7 +284,9 @@ class Renderer {
     void set_quality(const std::string &q) {
         quality = q;
         path->setShadowsEnabled(q != "low");
-        path->setFXAAEnabled(true);
+        const bool taa=!visual_profile.is_null()&&visual_profile.value("temporal_aa",false);
+        wi::renderer::SetTemporalAAEnabled(taa);
+        path->setFXAAEnabled(visual_profile.is_null()?true:visual_profile.value("fxaa",!taa));
         path->setBloomEnabled(q != "low");
         path->setSSREnabled(q == "high");
         path->setSSGIEnabled(q == "high");
@@ -417,12 +429,29 @@ class Renderer {
             TranslateMessage(&m);
             DispatchMessage(&m);
         }
+        RECT bounds{};GetClientRect(window,&bounds);
+        int client_width=bounds.right-bounds.left,client_height=bounds.bottom-bounds.top;
+        if(client_width>0&&client_height>0&&(client_width!=width||client_height!=height)){
+            width=client_width;height=client_height;
+            wi::graphics::GetDevice()->WaitForGPU();app->SetWindow(window);
+            auto& c=*path->camera;c.CreatePerspective(float(width),float(height),.2f,600000.f,c.fov);
+        }
+        in.width=width;in.height=height;
         in.active = GetForegroundWindow() == window;
         POINT p;
         GetCursorPos(&p);
         ScreenToClient(window, &p);
         in.x = float(p.x);
         in.y = float(p.y);
+        using GetPad=DWORD(WINAPI*)(DWORD,XINPUT_STATE*);
+        static HMODULE pad_library=LoadLibraryW(L"xinput1_4.dll");
+        static GetPad get_pad=pad_library?reinterpret_cast<GetPad>(GetProcAddress(pad_library,"XInputGetState")):nullptr;
+        if(get_pad&&in.active)for(DWORD i=0;i<XUSER_MAX_COUNT;++i){
+            XINPUT_STATE state{};if(get_pad(i,&state)!=ERROR_SUCCESS)continue;
+            const auto& g=state.Gamepad;in.pad_connected=true;
+            auto norm=[](SHORT v){return std::clamp(float(v)/32767.f,-1.f,1.f);};
+            in.pad_axes={norm(g.sThumbLX),norm(g.sThumbLY),norm(g.sThumbRX),norm(g.sThumbRY),g.bLeftTrigger/255.f,g.bRightTrigger/255.f};break;
+        }
         for (int k = 1; k < 256; ++k) {
             bool down = in.active && (GetAsyncKeyState(k) & 0x8000);
             if (down)
@@ -432,6 +461,12 @@ class Renderer {
             previous[k] = down;
         }
         return in;
+    }
+    void resize(int w,int h){
+        if(closed||w<320||h<240)throw std::invalid_argument("Resize requires a live window of at least320x240");
+        RECT bounds{0,0,w,h};AdjustWindowRect(&bounds,DWORD(GetWindowLongPtrW(window,GWL_STYLE)),FALSE);
+        if(!SetWindowPos(window,nullptr,0,0,bounds.right-bounds.left,bounds.bottom-bounds.top,SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE))throw std::runtime_error("Window resize failed");
+        poll();
     }
     void camera(const std::array<float, 3> &eye, const std::array<float, 3> &target, float fov) {
         camera_up_vector = {0, 1, 0};
@@ -620,7 +655,11 @@ class Renderer {
     int shader_errors() const {
         return wi::renderer::GetShaderErrorCount() + wi::renderer::GetShaderMissingCount();
     }
-    std::string visual_settings() const {return visual_profile.dump();}
+    std::string visual_settings() const {
+        auto result=visual_profile.is_null()?nlohmann::json::object():visual_profile;
+        result["actual_output"]={{"width",width},{"height",height},{"vertical_fov",path->camera->fov},{"temporal_aa",wi::renderer::GetTemporalAAEnabled()},{"fxaa",path->getFXAAEnabled()}};
+        return result.dump();
+    }
     size_t effect_count() const {return effects?effects->count():0;}
     void set_clouds(bool enabled){
         if(visual_profile.is_null())throw std::runtime_error("Cloud evaluation requires the visual profile");
@@ -742,6 +781,8 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readonly("y", &Input::y)
         .def_readonly("wheel", &Input::wheel)
         .def_readonly("active", &Input::active)
+        .def_readonly("width", &Input::width).def_readonly("height", &Input::height)
+        .def_readonly("pad_connected", &Input::pad_connected).def_readonly("pad_axes", &Input::pad_axes)
         .def_readonly("quit", &Input::quit)
         .def_readonly("held", &Input::held)
         .def_readonly("pressed", &Input::pressed);
@@ -775,5 +816,6 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("audio_counts", &Renderer::audio_counts)
         .def("audio_available", &Renderer::audio_available)
         .def("place_asset", &Renderer::place_asset)
+        .def("resize",&Renderer::resize)
         .def("close", &Renderer::close);
 }

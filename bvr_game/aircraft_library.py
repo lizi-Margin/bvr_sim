@@ -16,6 +16,9 @@ import sys
 import time
 from .app import native, serialize, ROOT
 from .presentation import curve,safe_aim,mouse_pitch,mouse_roll_rate
+from .presentation import ChaseCamera
+from .player_profiles import PlayerProfileStore
+from .player_input import PlayerInputAdapter,native_intent,unit
 from .sortie_logs import SortieJournal,open_logs_directory
 
 
@@ -91,7 +94,11 @@ def fly(row, output, seconds=10, render=False, interactive=False):
         config.altitude = max(1000., min(19500., row['validation'].get('initial_altitude_m', 5000.)))
         config.player_north = config.player_west = 0
         session.reset(config)
-        journal.start(serialize(config),{'entry':'aircraft_library.fly','aircraft_id':row['id'],'fdm':row['fdm'],'appearance':row['appearance']})
+        profiles=PlayerProfileStore();profile=profiles.apply(session,native,row['id'])
+        adapter=PlayerInputAdapter(profile);chase=ChaseCamera(profile['camera'])
+        chase.scale=max(row['appearance']['bounds']['span'])/19
+        camera_params={};free=False;zoom=False;exact=False;viewport=[960,640];aim=[480,320]
+        journal.start(serialize(config),{'entry':'aircraft_library.fly','aircraft_id':row['id'],'fdm':row['fdm'],'appearance':row['appearance'],'player_flight_profile':profile})
         if render or interactive:
             renderer, dll = renderer_for(row, interactive)
             renderer.presentation(False)
@@ -112,21 +119,29 @@ def fly(row, output, seconds=10, render=False, interactive=False):
                     open_logs_directory(journal.paths());continue
                 if interactive:
                     held = set(event.held)
+                    if getattr(event,'width',0)>0:viewport=[event.width,event.height]
                     throttle = max(0, min(1, throttle + event.wheel*.05))
-                    command.throttle = throttle
-                    aim=safe_aim(event.x,event.y,960,640);dx=(aim[0]/960-.5)*2
-                    command.heading -= curve(dx)
-                    command.pitch = mouse_pitch(aim[1],640)
-                    command.manual_pitch=87 in held or 83 in held
-                    command.pitch_input=int(83 in held)-int(87 in held)
-                    command.manual_roll = 65 in held or 68 in held
-                    command.roll_input = int(68 in held)-int(65 in held)
-                    if row['fdm']['type']=='yasim':command.roll_rate=mouse_roll_rate(aim[0],960)
-                    elif not command.manual_roll and abs(dx)<=.035 and (command.manual_pitch or abs(command.pitch)>.05):
-                        command.manual_roll=True;command.roll_input=0.
-            session.submit(command);journal.record('command',serialize(command),frame.tick)
-            session.step(1)
-            journal.record('step',{'ticks':1,'exact':False},frame.tick)
+                    throttle = adapter.throttle(throttle,event,config.dt)
+                    free=67 in held;zoom=2 in held;aim=[event.x,event.y]
+                    if 80 in event.pressed:session.set_paused(not frame.paused)
+                    exact=190 in event.pressed
+                    if 116 in event.pressed:adapter.mode='raw_manual' if adapter.mode=='assisted' else 'assisted'
+                    if 117 in event.pressed:
+                        if not session.frame().paused:print('Pause with P before reloading player profiles',file=sys.stderr)
+                        else:
+                            candidate=PlayerProfileStore(profiles.path);profile=candidate.apply(session,native,row['id']);profiles=candidate
+                            adapter.profile=profile;chase.settings=profile['camera'];journal.record('player_profile_reload',profile,frame.tick)
+                    if not camera_params:
+                        n,w,h=player.position;d=unit(player.velocity)
+                        camera_params={'eye':[-w,h,n],'target':[-w-d[1]*1000,h+d[2]*1000,n+d[0]*1000],'fov':profile['camera']['normal_fov'],'up':[0,1,0]}
+                    values=adapter.update(event,config.dt,player,camera_params,*viewport,
+                        hold_direction=free or max(map(abs,chase.free))>.01)
+                    intent=native_intent(native,{**values,'throttle':throttle})
+                    session.submit_player(intent);journal.record('player_intent',serialize(intent),frame.tick)
+            if not interactive:session.submit(command);journal.record('command',serialize(command),frame.tick)
+            if exact:session.step_exact(1)
+            else:session.step(1)
+            journal.record('step',{'ticks':1,'exact':exact},frame.tick)
             frame = session.frame()
             if ticks % 50 == 0:
                 trajectory.append(serialize(frame))
@@ -137,7 +152,11 @@ def fly(row, output, seconds=10, render=False, interactive=False):
                 distance = max(row['appearance']['bounds']['span'])*2.2
                 eye = [position[i]-forward[i]*distance+(distance*.35 if i == 1 else 0) for i in range(3)]
                 target = [position[i]+forward[i]*distance*.2 for i in range(3)]
-                renderer.camera(eye, target, .85)
+                if interactive:
+                    eye,target,fov,up=chase.update(p,config.dt,free,aim,*viewport,zoom)
+                    camera_params={'eye':eye,'target':target,'fov':fov,'up':up}
+                    renderer.camera(eye,target,fov);renderer.camera_up(up)
+                else:renderer.camera(eye, target, .85)
                 renderer.render(frame, [], [])
             ticks += 1
             if not player.alive:

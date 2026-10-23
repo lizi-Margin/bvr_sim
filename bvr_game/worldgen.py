@@ -83,6 +83,9 @@ class Baker:
         blend=np.clip((d-450)/1100,0,1);h=np.where(d<1550,valley*(1-blend)+h*blend,h)
         if self.imported_elevation is not None:
             data,meta=self.imported_elevation;h=sample_grid(data,meta,n,w)
+        if self.r.get('landscape'):
+            from .river_valley import height_rule
+            return height_rule(self,n,w,h)
         for a in self.r['airfields']:
             c=a['center'];edge=np.maximum(np.abs(n-c[0])-2050,np.abs(w-(c[1]+650))-1400)
             t=np.clip(edge/450,0,1);t=t*t*(3-2*t)
@@ -143,6 +146,9 @@ class Baker:
         # Dense ribbons conform to the shared height field, even on a gently sloping courtyard.
         self.surface_ribbon(id,[[center[0]-size[0]/2,center[1]],[center[0]+size[0]/2,center[1]]],size[1],material,.095 if material=='marking' else .035)
     def build_airport(self):
+        if self.r.get('landscape'):
+            from .river_valley import build_airfield
+            return build_airfield(self)
         for a in self.r['airfields']:
             n,w=a['center'];length=a['runway_length_m'];width=a['runway_width_m'];lo=n-length/2;hi=n+length/2
             self.surface_ribbon('runway_shoulder',[[lo-30,w],[hi+30,w]],width+28,'soil')
@@ -179,6 +185,9 @@ class Baker:
                 p=road.interpolate(distance);a=road.interpolate(distance-1);b=road.interpolate(distance+1);dn=b.x-a.x;dw=b.y-a.y;l=math.hypot(dn,dw)
                 self.place(self.r['asset_roles']['lamp'],p.x-dw/l*9,p.y+dn/l*9,category='prop',zone=settlement['id']+'_street_equipment',minimum=5,clearance=False)
     def build_industry(self):
+        if self.r.get('landscape'):
+            from .river_valley import build_industry
+            return build_industry(self)
         n0,w0,n1,w1=self.industry.bounds
         target=self.r['mission']['target'];self.place(self.r['asset_roles']['target'],*target,category='building',zone='mission_objective',minimum=0,clearance=False)
         for i in range(7):
@@ -195,7 +204,8 @@ class Baker:
         exclusions.extend(poly for _,poly in self.exclusions)
         exclusions.extend(Point(s['center']).buffer(s['radius_m']) for s in self.r['settlements'])
         farm=box(-9800,-9800,9800,9800).difference(unary_union(exclusions))
-        seeds=[[n+self.rng.uniform(-350,350),w+self.rng.uniform(-350,350)] for n in range(-8800,8801,1600) for w in range(-8800,8801,1600)]
+        field_spacing=self.r.get('field_spacing_m',1600)
+        seeds=[[n+self.rng.uniform(-350,350),w+self.rng.uniform(-350,350)] for n in range(-8800,8801,field_spacing) for w in range(-8800,8801,field_spacing)]
         fields=[]
         for index,a in enumerate(seeds):
             poly=[[-10000,-10000],[10000,-10000],[10000,10000],[-10000,10000]]
@@ -204,7 +214,9 @@ class Baker:
                 normal=[b[0]-a[0],b[1]-a[1]];poly=clip_poly(poly,normal,(b[0]**2+b[1]**2-a[0]**2-a[1]**2)/2)
                 if not poly:break
             for piece in pieces(Polygon(poly).intersection(farm)):
-                if piece.area>20000:fields.append({'id':f'field_{index:03d}_{len(fields)}','polygon':list(map(list,piece.exterior.coords)),'holes':[list(map(list,r.coords)) for r in piece.interiors],'color':self.rng.choice([[.78,.72,.38,1],[.53,.62,.28,1],[.7,.5,.24,1],[.62,.65,.31,1]]),'area_m2':piece.area})
+                if piece.area>20000:fields.append({'id':f'field_{index:03d}_{len(fields)}','polygon':list(map(list,piece.exterior.coords)),'holes':[list(map(list,r.coords)) for r in piece.interiors],'color':self.rng.choice(self.r.get('field_palette_linear',[[.78,.72,.38,1],[.53,.62,.28,1],[.7,.5,.24,1],[.62,.65,.31,1]])),'area_m2':piece.area})
+        if self.r.get('landscape'):
+            for index,field in enumerate(fields):field['surface']='grass' if index%5<3 else 'farmland'
         self.fields=fields;return fields
     def build_scatter(self):
         role=self.r['asset_roles']
@@ -237,13 +249,14 @@ class Baker:
         m=self.terrain.fine_meta;s=m['spacing'];n,w=np.meshgrid(m['origin_north']+(np.arange(m['columns']-1)+.5)*s,m['origin_west']+(np.arange(m['rows']-1)+.5)*s)
         labels=np.zeros(n.shape,dtype=np.uint8);colors=np.ones((*n.shape,4),dtype=np.float32)
         for index,f in enumerate(self.fields):
-            mask=contains_xy(Polygon(f['polygon'],f['holes']),n,w);labels[mask]=1;colors[mask]=f['color']
+            mask=contains_xy(Polygon(f['polygon'],f['holes']),n,w);labels[mask]=0 if f.get('surface')=='grass' else 1;colors[mask]=f['color']
         for poly in self.forests.values():labels[contains_xy(poly,n,w)]=2
         height=sample_grid(self.terrain.fine,m,n,w);slope=np.hypot(np.gradient(height,s,axis=0),np.gradient(height,s,axis=1))
         labels[(slope>.3)&(labels!=2)]=4
         labels[contains_xy(self.industry,n,w)]=3
-        for r,line in self.roads:labels[contains_xy(line.buffer(r['width_m']/2),n,w)]=5
-        labels[contains_xy(self.water,n,w)]=6
+        if not self.r.get('landscape'):
+            for r,line in self.roads:labels[contains_xy(line.buffer(r['width_m']/2),n,w)]=5
+            labels[contains_xy(self.water,n,w)]=6
         # The focus boundary is a resolution transition, not a rectangular biome.
         # Coarse regional land-use continues past it and provides the seam labels.
         bm=self.terrain.base_meta;bs=bm['spacing']
@@ -265,7 +278,9 @@ class Baker:
         return labels,colors
     def bake(self,out):
         out=Path(out);out.mkdir(parents=True,exist_ok=True);terrain=self.build_terrain();self.build_airport();self.build_settlements();self.build_industry();self.build_fields()
-        for r,line in self.roads:self.surface_ribbon(r['id'],r['points'],r['width_m'],'pavement')
+        for r,line in self.roads:
+            if self.r.get('landscape'):self.surface_ribbon(r['id']+'_shoulder',r['points'],r['width_m']+3,'soil',.015)
+            self.surface_ribbon(r['id'],r['points'],r['width_m'],'pavement')
         for river in self.r['rivers']:self.surface_ribbon(river['id'],river['points'],river['width_m'],'water',.025)
         self.build_scatter();labels,colors=self.landcover();terrain_file=out/'terrain.npz'
         deterministic_npz(terrain_file,{'base':terrain.base,'focus':terrain.fine,'landcover':labels,'macro_color':colors,'outer_landcover':self.outer_landcover,'outer_macro_color':self.outer_colors})
@@ -291,6 +306,15 @@ class Baker:
         if self.r.get('detail_sample'):
             from .detail_bake import refine
             result=refine(self,result,out)
+        if self.r.get('landscape'):
+            from .river_valley import finish_world
+            from .detail_bake import _bake_material
+            arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
+            regional={**self.r['detail_sample'],'size_m':[x*1000 for x in self.r['focus_area_km']],
+                'texture_resolution':self.r['landscape']['macro_resolution'],'seam_blend_m':self.r['landscape']['regional_transition_m']}
+            _bake_material(result,arrays,result['terrain']['details'][0],regional,out,self,material_id='regional_1',prefix='regional')
+            result['terrain']['details'][0]['material']='regional_1'
+            result=finish_world(self,result,out)
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
         return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(self.instances),'counts':counts,'chunks':len(chunks),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}
 def main():

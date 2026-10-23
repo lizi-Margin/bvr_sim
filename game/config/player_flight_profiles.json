@@ -1,0 +1,1124 @@
+{
+  "schema_version": 1,
+  "version": "player-flight-1.0",
+  "provenance": "Engineering player-assistance settings. Not FDM parameters, not AI/RL gains, not certified aircraft envelope data. Tuned labels become valid only after recorded response validation.",
+  "units": {
+    "control": {
+      "heading_gain": "controller gain or dimensionless ratio",
+      "bank_gain": "controller gain or dimensionless ratio",
+      "roll_rate_gain": "controller gain or dimensionless ratio",
+      "pitch_gain": "controller gain or dimensionless ratio",
+      "pitch_rate_gain": "controller gain or dimensionless ratio",
+      "yaw_damping": "controller gain or dimensionless ratio",
+      "sideslip_gain": "controller gain or dimensionless ratio",
+      "trim_gain": "normalized/(rad*s), bounded flight-path trim integrator",
+      "trim_limit": "controller gain or dimensionless ratio",
+      "max_bank": "rad",
+      "max_roll_rate": "rad/s",
+      "max_pitch_rate": "rad/s",
+      "max_turn_rate": "rad/s",
+      "max_alpha": "rad",
+      "min_alpha": "rad",
+      "max_g": "g",
+      "min_g": "g",
+      "protection_gain": "controller gain or dimensionless ratio",
+      "reference_speed": "m/s",
+      "min_speed": "m/s",
+      "schedule_min": "controller gain or dimensionless ratio",
+      "schedule_max": "controller gain or dimensionless ratio",
+      "surface_rate": "normalized/s",
+      "release_seconds": "s",
+      "target_response": "s",
+      "bank_response": "s"
+    },
+    "input": {
+      "deadzone": "dimensionless",
+      "sensitivity": "dimensionless",
+      "curve": "dimensionless",
+      "edge_fraction": "dimensionless",
+      "edge_pan_rate": "rad/s",
+      "aim_distance_m": "m",
+      "direction_response": "s",
+      "max_edge_pan": "rad",
+      "edge_recenter_seconds": "s",
+      "max_target_elevation": "rad",
+      "throttle_rate": "normalized/s"
+    },
+    "camera": {
+      "distance_spans": "dimensionless span/ratio",
+      "lift_spans": "dimensionless span/ratio",
+      "lookahead_m": "m",
+      "smoothing_hz": "1/s",
+      "roll_feedback": "dimensionless span/ratio",
+      "roll_limit_rad": "rad",
+      "normal_fov": "rad",
+      "zoom_fov": "rad",
+      "free_yaw_range": "rad",
+      "free_pitch_range": "rad"
+    }
+  },
+  "templates": {
+    "base": {
+      "control": {
+        "heading_gain": 0.55,
+        "bank_gain": 2.8,
+        "roll_rate_gain": 0.8,
+        "pitch_gain": 0.7,
+        "pitch_rate_gain": 1.8,
+        "yaw_damping": 0.12,
+        "sideslip_gain": 0.25,
+        "trim_gain": 0.04,
+        "trim_limit": 0.22,
+        "max_bank": 1.134464,
+        "max_roll_rate": 1.5,
+        "max_pitch_rate": 0.35,
+        "max_turn_rate": 0.25,
+        "max_alpha": 0.28,
+        "min_alpha": -0.14,
+        "max_g": 7.0,
+        "min_g": -1.5,
+        "protection_gain": 4.0,
+        "reference_speed": 300.0,
+        "min_speed": 95.0,
+        "schedule_min": 0.35,
+        "schedule_max": 3.0,
+        "surface_rate": 3.0,
+        "release_seconds": 0.5,
+        "target_response": 0.16,
+        "bank_response": 0.25
+      },
+      "input": {
+        "deadzone": 0.015,
+        "sensitivity": 1.0,
+        "curve": 1.2,
+        "edge_fraction": 0.82,
+        "edge_pan_rate": 0.45,
+        "aim_distance_m": 12000.0,
+        "direction_response": 0.06,
+        "max_edge_pan": 1.2,
+        "edge_recenter_seconds": 0.3,
+        "max_target_elevation": 1.553343,
+        "throttle_rate": 0.4
+      },
+      "camera": {
+        "distance_spans": 1.7,
+        "lift_spans": 0.42,
+        "lookahead_m": 1200.0,
+        "smoothing_hz": 5.0,
+        "roll_feedback": 0.12,
+        "roll_limit_rad": 0.12,
+        "normal_fov": 1.0,
+        "zoom_fov": 0.55,
+        "free_yaw_range": 2.5,
+        "free_pitch_range": 1.2
+      }
+    },
+    "fighter": {
+      "inherits": "base"
+    },
+    "attack": {
+      "inherits": "base",
+      "control": {
+        "reference_speed": 180.0,
+        "min_speed": 65.0,
+        "max_bank": 1.047198,
+        "max_roll_rate": 0.8,
+        "max_pitch_rate": 0.25,
+        "max_turn_rate": 0.18,
+        "max_g": 4.0,
+        "pitch_rate_gain": 1.5,
+        "roll_rate_gain": 0.9
+      }
+    },
+    "transport": {
+      "inherits": "base",
+      "control": {
+        "reference_speed": 220.0,
+        "min_speed": 85.0,
+        "max_bank": 0.610865,
+        "max_roll_rate": 0.35,
+        "max_pitch_rate": 0.12,
+        "max_turn_rate": 0.08,
+        "max_g": 2.5,
+        "min_g": -0.3,
+        "max_alpha": 0.22,
+        "surface_rate": 1.5,
+        "heading_gain": 0.25,
+        "bank_response": 0.6,
+        "pitch_gain": 0.45
+      },
+      "input": {
+        "sensitivity": 0.8
+      }
+    },
+    "prop": {
+      "inherits": "attack",
+      "control": {
+        "reference_speed": 100.0,
+        "min_speed": 35.0,
+        "max_roll_rate": 0.65,
+        "max_turn_rate": 0.18,
+        "max_g": 3.5,
+        "schedule_max": 2.0
+      },
+      "input": {
+        "sensitivity": 0.9
+      }
+    },
+    "sailplane": {
+      "inherits": "prop",
+      "control": {
+        "reference_speed": 55.0,
+        "min_speed": 22.0,
+        "max_bank": 0.872665,
+        "max_pitch_rate": 0.16,
+        "max_g": 3.0,
+        "surface_rate": 2.0
+      },
+      "input": {
+        "sensitivity": 0.8
+      }
+    }
+  },
+  "aircraft": {
+    "F22": {
+      "template": "fighter",
+      "tuning_status": "candidate_pending_actual_tuning",
+      "assignment_basis": "Combat configuration; separately maintained player gains",
+      "overrides": {
+        "control": {
+          "roll_rate_gain": 0.22,
+          "bank_gain": 2.0,
+          "schedule_max": 1.8,
+          "max_roll_rate": 1.15,
+          "max_g": 6.0,
+          "max_bank": 1.134464,
+          "max_alpha": 0.2,
+          "min_speed": 150.0,
+          "max_pitch_rate": 0.22,
+          "trim_gain": 0.12,
+          "pitch_rate_gain": 4.0
+        }
+      }
+    },
+    "F16": {
+      "template": "fighter",
+      "tuning_status": "candidate_pending_actual_tuning",
+      "assignment_basis": "Combat configuration; separately maintained player gains",
+      "overrides": {
+        "control": {
+          "pitch_rate_gain": 3.0,
+          "trim_gain": 0.3,
+          "trim_limit": 0.5,
+          "surface_rate": 1.5
+        }
+      }
+    },
+    "F15": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Combat configuration; separately maintained player gains",
+      "overrides": {}
+    },
+    "F18": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Combat configuration; separately maintained player gains",
+      "overrides": {}
+    },
+    "F4N": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Combat configuration; separately maintained player gains",
+      "overrides": {}
+    },
+    "FG-707": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-717": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-727-230": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-737-800": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-747-8i": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-757-200": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-767-300": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-777": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-787-8": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-A-10": {
+      "template": "attack",
+      "tuning_status": "candidate_pending_actual_tuning",
+      "assignment_basis": "Explicit source attack-aircraft assignment",
+      "overrides": {
+        "control": {
+          "trim_gain": 0.12,
+          "trim_limit": 0.35,
+          "pitch_rate_gain": 5.0
+        }
+      }
+    },
+    "FG-A-6E": {
+      "template": "attack",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Explicit source attack-aircraft assignment",
+      "overrides": {}
+    },
+    "FG-A300-600": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-A320-family": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-A340-600": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-A380": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-a4": {
+      "template": "attack",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Explicit source attack-aircraft assignment",
+      "overrides": {}
+    },
+    "FG-Aermacchi-MB-339": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Aero-L-29": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Alphajet": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-AN-225": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-AR-234": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Avro-Arrow": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-B-1B": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-B-2": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-B-36D-Peacemaker": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-B-52F": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-BAC-TSR2": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-BAe-125": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-BAe-146": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Bell-P-59": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Buccaneer": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Campini-Caproni-N1": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-CanberraBI8": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Caproni-C22J": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Caravelle": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Carreidas": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Citation-Bravo": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-CitationX": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Coanda-1910": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Concorde": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-CRJ-200": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-CRJ700-family": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Dassault-Mystere-IV": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-DC-10-30": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-dc8-73": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-DH-106": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-E3B": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-Embraer-ERJ-145": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-eurofighter": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F-106-dart": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F-117": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-f-14b": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F15C": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F-35B": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F-86": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F-8E-Crusader": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F11-Tiger": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F16": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F18-CAF": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F80C": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F9F-Panther": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Falcon-50": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-FMA-IA36-Condor": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-fokker100": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Fouga-Magister": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-G91-R": {
+      "template": "attack",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Explicit source attack-aircraft assignment",
+      "overrides": {}
+    },
+    "FG-Gloster-Meteor": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Gloster-Whittle": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Grumman-EA-6B-Prowler": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-Hansajet": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-harrier": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Hawker-Siddeley-Nimrod": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-He162": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Heinkel-He-178": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Heinkel-He-280": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Horten-Ho-IX": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Hunter": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-IL-76": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-j22": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-j7w": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-JA37": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Jaguar": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-JAS39-Gripen": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-KC135": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-KM": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-L-1011-500": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-l39": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Leduc-022": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Lightning": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F22": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Lockheed-NF104A": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Lockheed-P-2-Neptune": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Lockheed-S3-Viking": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Lockheed-SR71": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Lockheed-U-2S": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-M-4-Bison-A": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-MB326": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MC-15": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-McDonnell-Douglas-T-45-Goshawk": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-F4": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MD-11": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-MD-80": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-ME-262": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Messerschmitt-Libelle": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Messerschmitt-P1101": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MiG-15": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MiG-21bis": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Mig-29": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-mirage2000": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Mirage_F1": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MirageG8": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MirageIII": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MirageIV": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MRJ": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-MS-760": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-Nord-1405-Gerfaut-II": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Nord-2502": {
+      "template": "prop",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source validation cruise speed<170m/s; conservative slower-aircraft template, not individual tuning",
+      "overrides": {}
+    },
+    "FG-North-American-RA-5C-Vigilante": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-Northrop-T38-Talon": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Northrop-yb49": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-Pilatus-PC-24": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-PZL-230F": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-RainbowRacer71": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-SaabJ35F": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-seahawk": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-SeaVixen": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Stiletto": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Su-25": {
+      "template": "attack",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Explicit source attack-aircraft assignment",
+      "overrides": {}
+    },
+    "FG-SU-37": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Sukhoi-Su-33": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Super-Etendard": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Supermarine-Swift": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-T-4": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-T-50": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-T37": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-T7-RedHawk": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Tu-134": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-Tu-22-Blinder": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-tu154b": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-victor": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-vulcanb2": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Westwind-II": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-XB-70": {
+      "template": "transport",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Source geometry span>=38m or explicit large-transport identifier; conservative template",
+      "overrides": {}
+    },
+    "FG-Yak-130": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Yak-23": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-Yak-36": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    },
+    "FG-YF-23": {
+      "template": "fighter",
+      "tuning_status": "template_not_individually_tuned",
+      "assignment_basis": "Remaining source fast-aircraft template; not individual tuning",
+      "overrides": {}
+    }
+  }
+}

@@ -114,6 +114,8 @@ public:
     void reset(const std::map<std::string, std::any>& initial_state) override;
 
     void step(const ActionSpace& action) override;
+    void step_surfaces(const FlightSurfaceControls& controls) override;
+    FlightMeasurements flight_measurements() const override;
 
     double get_mach() const noexcept;
     std::map<std::string,double> visual_properties() const override;

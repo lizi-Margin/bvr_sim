@@ -10,6 +10,7 @@
 #include <any>
 #include "rl/action_space.hxx"
 #include <optional>
+#include "player_flight.hxx"
 
 namespace bvr_sim {
 
@@ -20,6 +21,8 @@ private:
     double _t;
     std::unique_ptr<AircraftFDM> fdm;
     std::optional<ActionSpace> pilot_input_;
+    std::optional<PlayerFlightIntent> player_intent_;
+    PlayerFlightController player_controller_;
 
 public:
     double min_shoot_interval;
@@ -53,6 +56,16 @@ public:
                          std::optional<double> elevator = std::nullopt,
                          std::optional<double> roll_rate = std::nullopt);
     std::map<std::string,double> visual_properties() const { return fdm->visual_properties(); }
+    void configure_player_flight(const PlayerFlightProfile& p){player_controller_.configure(p);}
+    PlayerFlightProfile player_flight_profile() const{return player_controller_.profile();}
+    void set_player_flight(const PlayerFlightIntent& intent){
+        validate_player_intent(intent);auto profile=player_controller_.profile();
+        if(!player_intent_)player_controller_.configure(profile);
+        player_intent_=intent;pilot_input_.reset();
+    }
+    PlayerFlightState player_flight_state() const {
+        auto s=player_controller_.state();s.measured=fdm->flight_measurements();return s;
+    }
 
     double get_speed() const noexcept override;
     double get_heading() const noexcept override;

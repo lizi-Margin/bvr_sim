@@ -16,5 +16,6 @@ public:
     double property(const std::string& name) const;
     void set_property(const std::string& name, double value);
     std::map<std::string,double> visual_properties() const;
+    FlightMeasurements flight_measurements() const override;
 };
 }

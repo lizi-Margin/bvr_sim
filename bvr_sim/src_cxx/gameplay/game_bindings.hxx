@@ -1,5 +1,6 @@
 #pragma once
 #include "game_session.hxx"
+#include "simulator/aircraft/player_flight.hxx"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -8,6 +9,50 @@ inline void bind_game_api(pybind11::module_ &m) {
     namespace py = pybind11;
 #define RW(T, field) .def_readwrite(#field, &T::field)
 #define RO(T, field) .def_readonly(#field, &T::field)
+    py::enum_<PlayerFlightMode>(m,"PlayerFlightMode")
+        .value("Assisted",PlayerFlightMode::Assisted).value("RawManual",PlayerFlightMode::RawManual);
+    py::class_<PlayerFlightIntent>(m,"PlayerFlightIntent").def(py::init<>())
+        RW(PlayerFlightIntent,direction) RW(PlayerFlightIntent,throttle)
+        RW(PlayerFlightIntent,pitch_input) RW(PlayerFlightIntent,roll_input) RW(PlayerFlightIntent,yaw_input)
+        RW(PlayerFlightIntent,manual_pitch) RW(PlayerFlightIntent,manual_roll) RW(PlayerFlightIntent,manual_yaw)
+        RW(PlayerFlightIntent,protection) RW(PlayerFlightIntent,mode)
+        RW(PlayerFlightIntent,fire) RW(PlayerFlightIntent,drop_bomb) RW(PlayerFlightIntent,lock)
+        RW(PlayerFlightIntent,target_uid) RW(PlayerFlightIntent,weapon);
+    py::class_<FlightMeasurements>(m,"FlightMeasurements")
+        RO(FlightMeasurements,position) RO(FlightMeasurements,velocity) RO(FlightMeasurements,orientation)
+        RO(FlightMeasurements,body_rates) RO(FlightMeasurements,alpha) RO(FlightMeasurements,beta)
+        RO(FlightMeasurements,normal_g) RO(FlightMeasurements,speed);
+    py::class_<FlightSurfaceControls>(m,"FlightSurfaceControls")
+        .def(py::init<>()) RW(FlightSurfaceControls,aileron) RW(FlightSurfaceControls,elevator)
+        RW(FlightSurfaceControls,rudder) RW(FlightSurfaceControls,throttle);
+    py::class_<PlayerFlightProfile>(m,"PlayerFlightProfile").def(py::init<>())
+        RW(PlayerFlightProfile,id) RW(PlayerFlightProfile,version) RW(PlayerFlightProfile,source_hash)
+        RW(PlayerFlightProfile,heading_gain) RW(PlayerFlightProfile,bank_gain) RW(PlayerFlightProfile,roll_rate_gain)
+        RW(PlayerFlightProfile,pitch_gain) RW(PlayerFlightProfile,pitch_rate_gain)
+        RW(PlayerFlightProfile,yaw_damping) RW(PlayerFlightProfile,sideslip_gain)
+        RW(PlayerFlightProfile,trim_gain) RW(PlayerFlightProfile,trim_limit)
+        RW(PlayerFlightProfile,max_bank) RW(PlayerFlightProfile,max_roll_rate)
+        RW(PlayerFlightProfile,max_pitch_rate) RW(PlayerFlightProfile,max_turn_rate)
+        RW(PlayerFlightProfile,max_alpha) RW(PlayerFlightProfile,min_alpha)
+        RW(PlayerFlightProfile,max_g) RW(PlayerFlightProfile,min_g) RW(PlayerFlightProfile,protection_gain)
+        RW(PlayerFlightProfile,reference_speed) RW(PlayerFlightProfile,min_speed)
+        RW(PlayerFlightProfile,schedule_min) RW(PlayerFlightProfile,schedule_max)
+        RW(PlayerFlightProfile,surface_rate) RW(PlayerFlightProfile,release_seconds)
+        RW(PlayerFlightProfile,target_response) RW(PlayerFlightProfile,bank_response)
+        .def("validate",&PlayerFlightProfile::validate);
+    py::class_<PlayerFlightState>(m,"PlayerFlightState")
+        RO(PlayerFlightState,configured) RO(PlayerFlightState,active) RO(PlayerFlightState,protecting)
+        RO(PlayerFlightState,saturated) RO(PlayerFlightState,measured) RO(PlayerFlightState,controls)
+        RO(PlayerFlightState,target_direction) RO(PlayerFlightState,direction_error) RO(PlayerFlightState,body_direction_error)
+        RO(PlayerFlightState,target_bank) RO(PlayerFlightState,roll_error)
+        RO(PlayerFlightState,desired_roll_rate) RO(PlayerFlightState,desired_pitch_rate)
+        RO(PlayerFlightState,pitch_manual_weight) RO(PlayerFlightState,roll_manual_weight)
+        RO(PlayerFlightState,profile_id) RO(PlayerFlightState,profile_hash) RO(PlayerFlightState,mode);
+    py::class_<PlayerFlightController>(m,"PlayerFlightController").def(py::init<>())
+        .def("configure",&PlayerFlightController::configure)
+        .def("update",&PlayerFlightController::update)
+        .def("state",&PlayerFlightController::state)
+        .def("profile",&PlayerFlightController::profile);
     py::class_<VehicleRoute>(m, "VehicleRoute")
         .def(py::init<>()) RW(VehicleRoute, points) RW(VehicleRoute, speed) RW(VehicleRoute, loop);
     py::class_<GroundUnitSpec>(m, "GroundUnitSpec")
@@ -99,6 +144,10 @@ inline void bind_game_api(pybind11::module_ &m) {
         .def(py::init<const std::string &>(), py::arg("log_path") = "bvr_game.log")
         .def("reset", &GameSession::reset)
         .def("submit", &GameSession::submit)
+        .def("submit_player",&GameSession::submit_player)
+        .def("configure_player_flight",&GameSession::configure_player_flight)
+        .def("player_flight_profile",&GameSession::player_flight_profile)
+        .def("player_flight_state",&GameSession::player_flight_state)
         .def("step", &GameSession::step, py::arg("ticks") = 1, py::call_guard<py::gil_scoped_release>())
         .def("step_exact", &GameSession::step_exact, py::arg("ticks") = 1,
              py::call_guard<py::gil_scoped_release>())

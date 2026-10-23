@@ -267,6 +267,29 @@ void GameSession::submit(const PilotCommand &command) {
 std::shared_ptr<Fighter> GameSession::fighter(const std::string &uid) const {
     return std::dynamic_pointer_cast<Fighter>(SOPool::instance().get(uid));
 }
+void GameSession::configure_player_flight(const PlayerFlightProfile& profile){
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(closed_)throw std::runtime_error("Session is closed");
+    profile.validate();auto p=fighter("player");if(!p)throw std::logic_error("Reset before configuring player flight");
+    if(p->player_flight_state().active&&!paused_)throw std::logic_error("Pause before reloading an active player flight profile");
+    p->configure_player_flight(profile);
+}
+PlayerFlightProfile GameSession::player_flight_profile() const {
+    std::lock_guard<std::mutex> lock(mutex_);auto p=fighter("player");
+    if(closed_||!p)throw std::logic_error("No active player");return p->player_flight_profile();
+}
+PlayerFlightState GameSession::player_flight_state() const {
+    std::lock_guard<std::mutex> lock(mutex_);auto p=fighter("player");
+    if(closed_||!p)throw std::logic_error("No active player");return p->player_flight_state();
+}
+void GameSession::submit_player(const PlayerFlightIntent& intent){
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(closed_)throw std::runtime_error("Session is closed");
+    validate_player_intent(intent);auto p=fighter("player");
+    if(!p)throw std::logic_error("No active player");p->player_flight_profile();
+    if(pending_.size()>=256)throw std::runtime_error("Pilot command queue is full");
+    pending_.push_back(intent);
+}
 void GameSession::record(std::string kind, std::string actor, std::string target, std::string weapon,
                          std::string message, std::array<double, 3> position) {
     events_.push_back({tick_, std::move(kind), std::move(actor), std::move(target), std::move(weapon),
@@ -285,12 +308,11 @@ void GameSession::drive_player(const PilotCommand &c) {
         c.manual_pitch ? std::optional<double>(-std::clamp(c.pitch_input, -1.0, 1.0)) : std::nullopt,
         c.roll_rate);
 }
-void GameSession::apply_command(const PilotCommand &c) {
+void GameSession::apply_command(const PilotCommand &c,bool drive) {
     auto player = fighter(c.uid);
     if (!player || !player->is_alive)
         return;
-    pilot_controls_ = c;
-    drive_player(c);
+    if(drive){pilot_controls_ = c;drive_player(c);}
     applied_tick_ = tick_;
     if (c.lock) {
         const auto radar = std::dynamic_pointer_cast<Radar>(player->radar);
@@ -440,8 +462,18 @@ void GameSession::advance(int n, bool force) {
         if ((paused_ && !force) || result_ != "running")
             break;
         ++tick_;
-        for (const auto &command : pending_)
-            apply_command(command);
+        for (const auto &command : pending_){
+            if(auto legacy=std::get_if<PilotCommand>(&command))apply_command(*legacy);
+            else {
+                const auto& intent=std::get<PlayerFlightIntent>(command);
+                if(auto p=fighter("player");p&&p->is_alive){
+                    pilot_controls_.reset();p->set_player_flight(intent);
+                    PilotCommand actions;actions.fire=intent.fire;actions.drop_bomb=intent.drop_bomb;
+                    actions.lock=intent.lock;actions.target_uid=intent.target_uid;actions.weapon=intent.weapon;
+                    apply_command(actions,false);
+                }
+            }
+        }
         pending_.clear();
         if (pilot_controls_)
             drive_player(*pilot_controls_);
@@ -690,7 +722,9 @@ void GameSession::set_terrain(const GameTerrain &terrain) {
     double highest = *std::max_element(terrain.heights.begin(), terrain.heights.end());
     for (const auto &tile : terrain.detail_tiles) {
         if (!std::isfinite(tile.spacing) || tile.spacing <= 0 || tile.columns < 2 || tile.rows < 2 ||
-            tile.columns > 512 || tile.rows > 512 || !std::isfinite(tile.origin_north) ||
+            // Bounded1024x1024 permits a continuous20km/25m regional tile
+            // (~5MiB of doubles); its sampling/physics are otherwise unchanged.
+            tile.columns > 1024 || tile.rows > 1024 || !std::isfinite(tile.origin_north) ||
             !std::isfinite(tile.origin_west) ||
             std::any_of(tile.heights.begin(), tile.heights.end(), [](double h) { return !std::isfinite(h); }))
             throw std::invalid_argument("Invalid detail height field");

@@ -40,23 +40,29 @@ class Labels:
         self.rectangles.append(box);self.placed.append({'text':text,'bounds':box});return px,py
 
 class ChaseCamera:
-    def __init__(self):self.eye=None;self.target=None;self.yaw=None;self.fov=1.0;self.free=[0.,0.];self.roll=0.;self.last_position=None
-    def reset(self):self.__init__()
+    def __init__(self,settings=None):
+        if settings is None:
+            from .player_profiles import PlayerProfileStore
+            settings=PlayerProfileStore().resolve('F22')['camera']
+        self.settings=dict(settings)
+        self.eye=None;self.target=None;self.yaw=None;self.fov=self.settings['normal_fov'];self.free=[0.,0.];self.roll=0.;self.last_position=None
+    def reset(self):self.__init__(self.settings)
     def update(self,entity,dt,free,aim,width,height,zoom):
-        dt=min(max(dt,.001),.1);alpha=1-math.exp(-dt*7)
-        yaw=math.atan2(entity.velocity[1],entity.velocity[0])
+        cfg=self.settings;dt=min(max(dt,0),.1);alpha=1-math.exp(-dt*cfg['smoothing_hz'])
+        yaw=math.atan2(entity.velocity[1],entity.velocity[0]) if math.hypot(*entity.velocity[:2])>.1 else entity.orientation[2]
         if self.yaw is None:self.yaw=yaw
         self.yaw+=math.remainder(yaw-self.yaw,2*math.pi)*alpha
-        desired=[(aim[0]/width-.5)*4.5,(aim[1]/height-.5)*1.1] if free else [0,0]
+        desired=[(aim[0]/width-.5)*2*cfg['free_yaw_range'],(aim[1]/height-.5)*2*cfg['free_pitch_range']] if free else [0,0]
         self.free=[a+(b-a)*alpha for a,b in zip(self.free,desired)]
-        self.roll+=(max(-.25,min(.25,entity.orientation[0]*.18))-self.roll)*alpha
-        self.fov+=((.72 if zoom else 1.0)-self.fov)*(1-math.exp(-dt*9))
-        yaw=self.yaw+self.free[0];pitch=math.atan2(entity.velocity[2],math.hypot(*entity.velocity[:2]))
+        self.roll+=(max(-cfg['roll_limit_rad'],min(cfg['roll_limit_rad'],entity.orientation[0]*cfg['roll_feedback']))-self.roll)*alpha
+        self.fov+=((cfg['zoom_fov'] if zoom else cfg['normal_fov'])-self.fov)*alpha
+        yaw=self.yaw+self.free[0];pitch=math.atan2(entity.velocity[2],math.hypot(*entity.velocity[:2]))-self.free[1]
         scale=getattr(self,'scale',1.)
-        north,west,alt=entity.position;distance=(33 if not zoom else 28)*scale
-        forward=(-math.sin(yaw),math.cos(yaw));lift=8*scale+math.sin(self.free[1])*distance
-        eye=[-west-forward[0]*distance,alt+lift-math.sin(pitch)*distance*.4,north-forward[1]*distance]
-        target=[-west+forward[0]*24*scale,alt+2*scale+math.sin(pitch)*12,north+forward[1]*24*scale]
+        north,west,alt=entity.position;distance=cfg['distance_spans']*19*scale
+        forward=[-math.sin(yaw)*math.cos(pitch),math.sin(pitch),math.cos(yaw)*math.cos(pitch)]
+        position=[-west,alt,north];lift=cfg['lift_spans']*19*scale
+        eye=[position[i]-forward[i]*distance+(lift if i==1 else 0) for i in range(3)]
+        target=[position[i]+forward[i]*cfg['lookahead_m'] for i in range(3)]
         current=[-west,alt,north]
         if self.eye is None:self.eye=eye;self.target=target
         elif self.last_position is not None:
@@ -68,4 +74,5 @@ class ChaseCamera:
         self.last_position=current
         self.eye=[a+(b-a)*alpha for a,b in zip(self.eye,eye)]
         self.target=[a+(b-a)*alpha for a,b in zip(self.target,target)]
-        return self.eye,self.target,self.fov,[math.sin(self.roll),math.cos(self.roll),0]
+        right=[math.cos(yaw),0,math.sin(yaw)]
+        return self.eye,self.target,self.fov,[right[i]*math.sin(self.roll)+(math.cos(self.roll) if i==1 else 0) for i in range(3)]

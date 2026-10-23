@@ -83,7 +83,7 @@ void Fighter::step() {
         {"delta_speed", json::Float(0.0)}
     });
 
-    if (action_space_check::has_possible_action(register_)){
+    if (!player_intent_ && action_space_check::has_possible_action(register_)){
         action_space = ActionSpace(register_);
         if (action_space.fire()){
             if (shoot(action_space.fire_weapon_spec(), action_space.fire_target_uid())){
@@ -92,12 +92,15 @@ void Fighter::step() {
         }
     }
     if (pilot_input_) action_space = *pilot_input_;
-    if (!pilot_input_ && BYPASS_THROTTLE_CONTROL && get_mach() < 1.0) {
+    if (!player_intent_ && !pilot_input_ && BYPASS_THROTTLE_CONTROL && get_mach() < 1.0) {
         action_space.set_delta_speed(1.0);
     }
     // action_space_check::wipe_out_action(register_);
 
-    fdm->step(action_space);
+    if(player_intent_){
+        auto controls=player_controller_.update(fdm->flight_measurements(),*player_intent_,dt);
+        fdm->step_surfaces(controls);
+    }else fdm->step(action_space);
     if (fdm->is_terminated()) {
         SL::get().printf("[Fighter] %s FDM terminated, setting is_alive to false\n", uid.c_str());
         is_alive = false;
@@ -128,6 +131,7 @@ double Fighter::get_speed() const noexcept {
 void Fighter::set_pilot_input(double heading, double climb, double throttle,
                              std::optional<double> aileron, std::optional<double> elevator,
                              std::optional<double> roll_rate) {
+    player_intent_.reset();player_controller_.deactivate();
     json::JSON action=json::Object();
     action["delta_heading"]=json::Float(heading);
     action["delta_altitude"]=json::Float(climb);

@@ -175,6 +175,17 @@ void YASimFDM::read_state() {
     for(double x:velocity)terminate|=!std::isfinite(x);
     terminate|=!std::isfinite(roll)||!std::isfinite(pitch)||!std::isfinite(yaw)||position[2]<0;
 }
+FlightMeasurements YASimFDM::flight_measurements() const {
+    auto m=AircraftFDM::flight_measurements();
+    if(!impl->initialized)return m;
+    auto s=impl->host->getAirplane()->getModel()->getState();
+    float rates[3],alpha,beta,wind[3]={0,0,0};s->globalToLocal(s->rot,rates);
+    m.body_rates=std::array<double,3>{rates[0],-rates[1],-rates[2]};
+    yasim::Glue::calcAlphaBeta(s,wind,&alpha,&beta);m.alpha=alpha;m.beta=-beta;
+    // No calibrated load-factor channel is exposed by this host. Leave it
+    // absent; do not fabricate an aircraft limit from Euler angle derivatives.
+    return m;
+}
 void YASimFDM::step(const ActionSpace& action) {
     if(!impl->initialized)throw std::logic_error("YASimFDM must be reset before stepping");
     if(auto rate=action.roll_rate_cmd();rate&&!std::isfinite(*rate))

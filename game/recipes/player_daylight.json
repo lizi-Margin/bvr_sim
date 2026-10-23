@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "name": "player_daylight",
+  "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
+  "shader_source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shader-source",
+  "shader_cache": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shaders",
+  "physical_sky": true,
+  "aerial_perspective": true,
+  "high_quality_sky": false,
+  "volumetric_clouds": false,
+  "planet_albedo": [
+    0.12,
+    0.16,
+    0.1
+  ],
+  "legacy_distance_fog_density": 0.0,
+  "horizon_height_fog": {
+    "enabled": false,
+    "start_m": 100000,
+    "density_per_m": 0.0,
+    "base_m": 0,
+    "top_m": 16000,
+    "approximation": "No additional height fog; retain actual physical aerial perspective"
+  },
+  "sun_energy": 4.0,
+  "sun_rotation": [
+    -0.4,
+    -0.65,
+    0
+  ],
+  "ambient": [
+    0.13,
+    0.14,
+    0.15
+  ],
+  "sky_exposure": 1.0,
+  "exposure": 1.0,
+  "saturation": 1.0,
+  "paint_factor": 0.72,
+  "paint_roughness": 0.64,
+  "canopy_roughness": 0.09,
+  "canopy_alpha": 0.48,
+  "canopy_transmission": 0.12,
+  "terrain_detail": {
+    "base_color": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Color.jpg",
+    "normal": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_NormalDX.jpg",
+    "roughness_map": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Roughness.jpg",
+    "tile_m": 3.0,
+    "mean_linear_luminance": 0.09249167933424425,
+    "strength": 0.45,
+    "base_color_sha256": "b9b6d61bc3b6137b868a3447eef18737896acd26d58fe2f4b83ce8c0e9d3f8ad",
+    "normal_sha256": "69add2a30fec8812b6d630073a941d709f5060a2ddf5bd6696004b1e577a4897",
+    "roughness_map_sha256": "8810effd44756341170d551501b7d0c645dc2395dbce46a8c7f1e61045258a06"
+  },
+  "shader_patch": {
+    "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
+    "patched_objectHF_sha256": "e598631b961726d43ff9bc57a84112de36c76c4eaa32a37507cc8d3a81fc6a7c",
+    "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
+    "patched_skyHF_sha256": "a74dec34f77c16adc67783bc3d4d0be5e24e88c52be7c24db60a7e625d762e05",
+    "flat_nwu_horizon_haze": "Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.",
+    "planet_ground_radiance": true,
+    "material_flag": "0x42565244",
+    "pipeline": "Existing forward raster path; visibility compute shading remains off"
+  },
+  "provenance": {
+    "geometry": "Existing registered FlightGear geometry unchanged",
+    "material_parameters": "Engineering paint/glass/metal approximations based on source material names and roles, not measured BRDFs",
+    "detail_textures": "Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes",
+    "detail_mean": "Computed from source color in linear sRGB to preserve macro mean brightness",
+    "shader_source": "Pinned Wicked Engine MIT source copied to cache; upstream checkout not edited",
+    "daylight": "Same exposure1/sun energy4/ACES; higher sun elevation and neutralized ambient after inspecting local+Y sun-direction transform",
+    "anti_aliasing": "Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review"
+  },
+  "temporal_aa": true,
+  "fxaa": false
+}

@@ -4,6 +4,8 @@ import argparse, hashlib, importlib, json, math, os, statistics, sys, time
 import textwrap
 from .aircraft import aircraft_catalog,aircraft,loadout,runtime_models
 from .presentation import ChaseCamera,Labels,safe_aim,curve,mouse_pitch,mouse_roll_rate
+from .player_profiles import PlayerProfileStore
+from .player_input import PlayerInputAdapter,native_intent,body_forward,unit
 from contextlib import redirect_stdout
 from pathlib import Path
 from .sortie_logs import SortieJournal,open_logs_directory
@@ -16,6 +18,7 @@ WHITE=0xffeeeeee; GREEN=0xff86f2a6; RED=0xff6d75ff; BLUE=0xffffc885; MUTED=0xffb
 
 def serialize(value):
     if isinstance(value,(str,int,float,bool,type(None))):return value
+    if hasattr(value,'name') and hasattr(value,'value') and type(value).__module__==native.__name__:return value.name
     if isinstance(value,(list,tuple)):return [serialize(x) for x in value]
     if isinstance(value,dict):return {str(k):serialize(v) for k,v in value.items()}
     return {k:serialize(getattr(value,k)) for k in dir(value) if not k.startswith('_') and not callable(getattr(value,k))}
@@ -65,6 +68,7 @@ class FlightGame:
         self.aircraft_rows=aircraft_catalog(include_library=True)['aircraft'];self.aircraft_scroll=0;self.menu_notice=''
         self.aircraft_search='';self.search_active=False;self._preview_model=None
         self.quality='medium';self.last_event_tick=-1;self.fps=0;self.frame_times=[];self.closed=False;self.interactive=False
+        self.profile_store=PlayerProfileStore();self.player_profile=None;self.player_input=None;self.player_profiles_frozen=False
         self.start(record=False)
         self.mode='hangar';self.sim.set_paused(True)
         if render:
@@ -85,7 +89,7 @@ class FlightGame:
                 for obj in self.map.get('assets',[]):
                     self.renderer.place_asset(obj['id'],obj['model'],obj['position'],obj.get('scale',1))
 
-    def start(self,record=True):
+    def start(self,record=True,*,start_position=None,initial_speed=None):
         self.finish_sortie('restarted')
         if self.baked_scene:
             start=self.map['mission'].get('convoy_start',self.map['mission']['strike_start']) if self.config.mission=='convoy' else (self.map['mission']['strike_start'] if self.config.mission=='strike' else self.map['mission']['player_start'])
@@ -106,14 +110,20 @@ class FlightGame:
             self.config.enemy_range=spec['initial_enemy_range_m'];self.config.speed=spec['initial_speed_mps'];self.config.altitude=spec['initial_altitude_m']
             self.config.intercept_waves=spec['wave_count'];self.config.intercept_interval=spec['wave_interval_s'];self.config.intercept_timeout=spec['timeout_s']
             self.config.missiles=6;self.config.bombs=0
+        if start_position is not None:
+            if len(start_position)!=3 or not all(math.isfinite(float(v)) for v in start_position):raise ValueError('Start position must be finite NWU metres')
+            self.config.player_north,self.config.player_west,self.config.altitude=map(float,start_position)
+        if initial_speed is not None:self.config.speed=float(initial_speed)
         self.sim.reset(self.config);self.mode='flight';self.target='';self.camera_state=None;self.camera_manual=False;self.last_event_tick=-1
         self._preview_model=None
         self.chase.reset()
+        self.configure_player_flight()
         self._journal_tick=0
         if record and self.logs_enabled:
             row=self.current_aircraft()
             context={'map':str(self.map_path),'map_sha256':self.scene_hash,'aircraft_id':row['id'],'fdm':row['fdm'],'appearance':{k:row['appearance'].get(k) for k in ['asset_id','glb_sha256','file']},'resource_versions':self.baked_scene.document['resource_versions'] if self.baked_scene else {}}
             context['visual_profile']=self.visual_profile
+            context['player_flight_profile']=self.player_profile
             context['core_sha256']=hashlib.sha256(Path(native.__file__).read_bytes()).hexdigest()
             self.journal.start(serialize(self.config),context)
         pilot=native.PilotCommand();pilot.throttle=self.throttle;self.submit_command(pilot)
@@ -140,6 +150,7 @@ class FlightGame:
         else:
             self.config.speed=self.map.get('mission',{}).get('speed_mps',250)
         self.sim.reset(self.config);self.sim.set_paused(True);self.mode='hangar'
+        self.configure_player_flight()
         self.camera_manual=False;self.chase.reset();self.menu_notice=''
         self._preview_model=None
         if self.renderer:self.renderer.reload()
@@ -154,7 +165,7 @@ class FlightGame:
         row=aircraft(self.config.player_model);preset=loadout(row,id)
         self.config.missiles=preset['missiles'];self.config.bombs=preset['bombs']
         self.weapon='AIM-120C7' if self.config.missiles else 'Mk-82'
-        if self.mode=='hangar':self.sim.reset(self.config);self.sim.set_paused(True)
+        if self.mode=='hangar':self.sim.reset(self.config);self.sim.set_paused(True);self.configure_player_flight()
 
     def current_aircraft(self):
         return next(r for r in self.aircraft_rows if r['simulation_model']==self.config.player_model)
@@ -170,6 +181,26 @@ class FlightGame:
         if self.journal.current:self.journal.finish(reason,serialize(self.sim.frame()),error)
 
     def log_paths(self):return self.journal.paths()
+
+    def configure_player_flight(self):
+        self.player_profile=self.profile_store.apply(self.sim,native,self.current_aircraft()['id'])
+        self.player_input=PlayerInputAdapter(self.player_profile,unit(self.player().velocity))
+        self.chase.settings=self.player_profile['camera']
+
+    def reload_player_flight(self):
+        if self.player_profiles_frozen:raise ValueError('Player profiles are frozen for this evaluation')
+        if not self.sim.frame().paused:raise ValueError('Press P to pause before reloading player profiles')
+        candidate=PlayerProfileStore(self.profile_store.path)
+        resolved=candidate.apply(self.sim,native,self.current_aircraft()['id'])
+        self.profile_store=candidate;self.player_profile=resolved;self.player_input.profile=resolved;self.chase.settings=resolved['camera']
+        self.journal.record('player_profile_reload',resolved,self._journal_tick)
+        return resolved
+
+    def submit_player(self,intent=None,**values):
+        if intent is None:intent=native_intent(native,values)
+        self.throttle=max(0,min(1,float(intent.throttle)))
+        self.sim.submit_player(intent)
+        self.journal.record('player_intent',serialize(intent),self._journal_tick)
 
     def submit_command(self,command):
         self.sim.submit(command)
@@ -251,6 +282,9 @@ class FlightGame:
         metadata['renderer_sha256']=hashlib.sha256(Path(self.r.__file__).read_bytes()).hexdigest()
         if hasattr(self.renderer,'memory_usage'):metadata['vram']=self.renderer.memory_usage()
         metadata['camera_mode']='manual' if self.camera_manual else 'follow'
+        metadata['player_flight_profile']=self.player_profile
+        metadata['player_flight_state']=serialize(self.sim.player_flight_state())
+        metadata['mouse_projection']=self.player_input.last_projection
         metadata['hud_visible']=self.show_hud
         if hasattr(self.renderer,'audio_available'):metadata['audio']={'available':self.renderer.audio_available(),'play_counts':self.renderer.audio_counts()}
         if hasattr(self.renderer,'aircraft_statistics'):metadata['aircraft_statistics']=serialize(self.renderer.aircraft_statistics())
@@ -275,6 +309,13 @@ class FlightGame:
         def panel(x,y,w,h):line(x,y,w,h,0xb51b211b)
         def box(x,y,w,h,color=GREEN):
             line(x,y,w,1,color);line(x,y+h,w,1,color);line(x,y,1,h,color);line(x+w,y,1,h,color)
+        def segment(x1,y1,x2,y2,color=GREEN,thick=1):
+            dx,dy=x2-x1,y2-y1;length=math.hypot(dx,dy)
+            line((x1+x2-length)/2,(y1+y2-thick)/2,length,thick,color,math.atan2(dy,dx))
+        def circle(x,y,r,color):
+            for i in range(24):
+                a=math.tau*i/24;b=math.tau*(i+1)/24
+                segment(x+r*math.cos(a),y+r*math.sin(a),x+r*math.cos(b),y+r*math.sin(b),color,2)
         if self.mode=='hangar':
             panel(0,0,520,1080);text(30,35,'BVR / FLIGHT OPERATIONS',28)
             text(30,90,'SELECT AIRCRAFT  /  CLICK OR SCROLL',17,GREEN)
@@ -320,12 +361,23 @@ class FlightGame:
         if frame.mission=='intercept_patrol':
             text(610,88,f'INTERCEPT / GROUP {frame.mission_wave}/{frame.mission_total}   DESTROYED {frame.air_kills}/{frame.mission_kills_required}',17,GREEN)
             text(610,110,'SEARCH NORTH / SUPPORT YOUR MISSILE / F9 REPLAY LOGS',14,MUTED)
-        # Aim mark is input intent. Aircraft flight-path marker uses measured velocity.
-        ax,ay=self.aim[0]/sx,self.aim[1]/sy
-        box(ax-10,ay-10,20,20);line(ax-20,ay,8);line(ax+12,ay,8)
+        state=self.sim.player_flight_state()
+        text(610,1018,'F5 '+self.player_input.mode.upper()+'  /  F6 reload while paused',15,MUTED)
+        if self.menu_notice:text(610,992,self.menu_notice[:75],15,RED)
+        # Three different symbols: amber aim ring, white nose cross, cyan path
+        # ring/wings. All positions are projected from real world directions.
+        self.flight_marks={}
         if p:
-            dot=self.renderer.project([p.position[i]+p.velocity[i]*2 for i in range(3)])
-            if 0<dot[2]<1:box(dot[0]/sx-5,dot[1]/sy-5,10,10,WHITE)
+            distance=self.player_profile['input']['aim_distance_m']
+            for name,direction,color in [('AIM',self.player_input.direction,0xff77dfff),('NOSE',body_forward(p.orientation),WHITE),('PATH',unit(p.velocity),0xfff5e575)]:
+                mark=self.renderer.project([p.position[i]+direction[i]*distance for i in range(3)])
+                if not 0<mark[2]<1:continue
+                x,y=mark[0]/sx,mark[1]/sy
+                if name=='AIM':
+                    x=min(max(x,450),1480);y=min(max(y,180),810);circle(x,y,12,color)
+                elif name=='NOSE':line(x-9,y,18,2,color);line(x,y-9,2,18,color)
+                else:circle(x,y,5,color);line(x-16,y,9,2,color);line(x+7,y,9,2,color);line(x,y-12,2,5,color)
+                text(x+16,y-8,name,12,color);self.flight_marks[name]=[x*sx,y*sy]
         for c in frame.contacts:
             v=self.renderer.project(c.position)
             if 0<v[2]<1:
@@ -336,9 +388,6 @@ class FlightGame:
                 lx,ly=labels.place(x+28,y-18,caption);text(lx,ly,caption,18,color)
         # Combined RWR bearing ring and range-accurate sensor/SA plot.
         cx,cy,outer,plot=255,770,145,112
-        def segment(x1,y1,x2,y2,color=GREEN,thick=1):
-            dx,dy=x2-x1,y2-y1;length=math.hypot(dx,dy)
-            line((x1+x2-length)/2,(y1+y2-thick)/2,length,thick,color,math.atan2(dy,dx))
         # Dedicated forward radar display alongside the all-around warning/SA ring.
         # Plot only onboard radar tracks; never substitute world entity positions.
         rx,ry,rw,rh=1535,165,355,430
@@ -454,12 +503,13 @@ class FlightGame:
 
     def input(self,event,dt):
         held=set(event.held);pressed=set(event.pressed)
+        if getattr(event,'width',0)>0 and getattr(event,'height',0)>0:self.width,self.height=event.width,event.height
         if event.quit:return False
         if 120 in pressed:
             try:self.last_log_opened=open_logs_directory(self.log_paths())
             except OSError as error:self.menu_notice='Cannot open logs: '+str(error)
             return True
-        self.aim=safe_aim(event.x,event.y,self.width,self.height)
+        self.aim=(min(max(event.x,0),self.width),min(max(event.y,0),self.height))
         if 123 in pressed:self.capture('manual') # F12
         if 81 in pressed:
             self.quality=['low','medium','high'][(['low','medium','high'].index(self.quality)+1)%3];self.renderer.set_quality(self.quality)
@@ -514,24 +564,25 @@ class FlightGame:
             return True
         frame=self.sim.frame()
         if 80 in pressed:self.sim.set_paused(not frame.paused)
+        if 116 in pressed:self.player_input.mode='raw_manual' if self.player_input.mode=='assisted' else 'assisted'
+        if 117 in pressed:
+            try:self.reload_player_flight();self.menu_notice='Player profile reloaded: '+self.player_profile['effective_sha256'][:10]
+            except (ValueError,RuntimeError) as error:self.menu_notice=str(error)
         if 190 in pressed:self.step_exact()
         if 86 in pressed:
             weapons=self.current_aircraft()['supported_weapons']
             if weapons:self.weapon=weapons[(weapons.index(self.weapon)+1)%len(weapons)] if self.weapon in weapons else weapons[0]
         self.throttle=max(0,min(1,self.throttle+getattr(event,'wheel',0)*.05))
+        self.throttle=self.player_input.throttle(self.throttle,event,dt)
         self.zoom=2 in held
-        if 67 in held:return True
         p=self.player(frame)
         if not p:return True
-        dx=(self.aim[0]/self.width-.5)*2;dy=(self.aim[1]/self.height-.5)*2
-        c=native.PilotCommand();c.heading=p.orientation[2]-curve(dx);c.pitch=mouse_pitch(self.aim[1],self.height);c.throttle=self.throttle
-        c.manual_pitch=87 in held or 83 in held;c.pitch_input=int(83 in held)-int(87 in held)
-        c.manual_roll=65 in held or 68 in held;c.roll_input=int(68 in held)-int(65 in held)
-        # Pure vertical input should not ask the heading assistant to roll inverted
-        # to follow a downward aim vector. A/D and horizontal mouse keep their map.
-        if self.config.fdm=='yasim':c.roll_rate=mouse_roll_rate(self.aim[0],self.width)
-        elif not c.manual_roll and abs(dx)<=.035 and (c.manual_pitch or abs(c.pitch)>.05):
-            c.manual_roll=True;c.roll_input=0.
+        camera=self.camera_params
+        if not camera:
+            d=unit(p.velocity);camera={'eye':[-p.position[1],p.position[2],p.position[0]],'target':[-p.position[1]-d[1]*1000,p.position[2]+d[2]*1000,p.position[0]+d[0]*1000],'up':[0,1,0],'fov':self.player_profile['camera']['normal_fov']}
+        values=self.player_input.update(event,dt,p,camera,self.width,self.height,
+            hold_direction=67 in held or max(map(abs,self.chase.free))>.01)
+        c=native_intent(native,{**values,'throttle':self.throttle})
         if 82 in pressed or 9 in pressed:
             candidates=[x.uid for x in frame.contacts]
             if candidates:
@@ -539,7 +590,7 @@ class FlightGame:
                 c.lock=True;c.target_uid=self.target
         c.fire=(32 in pressed or 1 in pressed) and self.weapon=='AIM-120C7';c.target_uid=self.target;c.weapon='AIM-120C7'
         c.drop_bomb=66 in pressed or (32 in pressed and self.weapon=='Mk-82')
-        self.submit_command(c);return True
+        self.submit_player(c);return True
 
 def acceptance(game,mission,max_ticks=5000):
     """Repeatable real combat using the same typed commands as human input."""

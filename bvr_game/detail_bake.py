@@ -31,11 +31,20 @@ def refine(baker,document,out):
     road_distance=np.full(n.shape,np.inf)
     for road,line in baker.roads:road_distance=np.minimum(road_distance,_distance_line(n,w,line)-road['width_m']/2)
     micro*=np.clip((road_distance-4)/12,0,1)
+    if r.get('landscape'):
+        # Preserve physical runway/taxi/apron grades in the fine tile too.
+        for airfield in r['airfields']:
+            cn,cw=airfield['center'];airport_edge=np.maximum(np.abs(n-cn)-airfield['runway_length_m']/2-50,np.abs(w-cw)-airfield['taxi_offset_m']-35)
+            micro*=np.clip(airport_edge/30,0,1)
+            cn,cw=airfield['apron'];airport_edge=np.maximum(np.abs(n-cn)-airfield['apron_size_m'][0]/2-20,np.abs(w-cw)-airfield['apron_size_m'][1]/2-20)
+            micro*=np.clip(airport_edge/30,0,1)
     industry=baker.industry
     micro*=np.where(contains_xy(industry,n,w),0,1)
     # This calls the analytic terrain rules at 5m; the old grid only supplies a boundary seam.
     raw=baker.terrain_rule(n,w)+micro
     old=sample_grid(arrays['focus'],document['terrain']['details'][0],n,w)
+    if not (np.all(np.isfinite(edge)) and np.all(edge>=0) and np.all(edge<=1)):
+        raise ValueError('Refinement seam weights must form a convex blend in[0,1]')
     refined=(edge*raw+(1-edge)*old).astype(np.float32);arrays['sample']=refined
     detail={**meta,'array_key':'sample','material':'detail_1','generator':'analytic rules + independent metre-scale ridges/gullies; coarse interpolation only in seam band'}
     document['terrain']['details'].append(detail)
@@ -175,7 +184,7 @@ def refine(baker,document,out):
     document['terrain']['version']=3
     return document
 
-def _bake_material(document,arrays,meta,spec,out,baker):
+def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',prefix='sample'):
     resolution=int(spec.get('texture_resolution',2048));extent=spec['size_m'];pixel=extent[0]/resolution
     n,w=np.meshgrid(meta['origin_north']+(np.arange(resolution)+.5)*pixel,
                     meta['origin_west']+(np.arange(resolution)+.5)*extent[1]/resolution)
@@ -185,7 +194,7 @@ def _bake_material(document,arrays,meta,spec,out,baker):
         x0=max(0,int((a-meta['origin_north'])/pixel)-1);x1=min(resolution,int((c-meta['origin_north'])/pixel)+2)
         y0=max(0,int((b-meta['origin_west'])/pixel)-1);y1=min(resolution,int((d-meta['origin_west'])/pixel)+2)
         if x0>=x1 or y0>=y1:continue
-        area=np.s_[y0:y1,x0:x1];mask=contains_xy(poly,n[area],w[area]);labels[area][mask]=1;macro[area][mask]=field['color'][:3]
+        area=np.s_[y0:y1,x0:x1];mask=contains_xy(poly,n[area],w[area]);labels[area][mask]=0 if field.get('surface')=='grass' else 1;macro[area][mask]=field['color'][:3]
     for forest in baker.forests.values():labels[contains_xy(forest,n,w)]=2
     labels[contains_xy(baker.industry,n,w)]=3
     for road,line in baker.roads:
@@ -200,6 +209,7 @@ def _bake_material(document,arrays,meta,spec,out,baker):
             if slot not in material:continue
             file=material[slot];source_files[file]=sha(file)
             image=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
+            if slot=='base_color':image=np.where(image<=.04045,image/12.92,((image+.055)/1.055)**2.4)
             # Slow deterministic UV warping breaks the grid while retaining actual source PBR detail.
             u=((n/4+.15*np.sin(w/61))*image.shape[1]).astype(np.int64)%image.shape[1]
             v=((w/4+.15*np.cos(n/73))*image.shape[0]).astype(np.int64)%image.shape[0]
@@ -226,8 +236,9 @@ def _bake_material(document,arrays,meta,spec,out,baker):
         for slot in ['base_color','normal','roughness_map']:
             if slot not in m:continue
             image=np.asarray(Image.open(m[slot]).convert('RGB'),dtype=np.float32)/255
-            u=(np.mod(n-parent['origin_north'],1000)/m['tile_m']*image.shape[1]).astype(int)%image.shape[1]
-            v=(np.mod(w-parent['origin_west'],1000)/m['tile_m']*image.shape[0]).astype(int)%image.shape[0]
+            if slot=='base_color':image=np.where(image<=.04045,image/12.92,((image+.055)/1.055)**2.4)
+            u=(np.mod(n/m['tile_m'],1)*image.shape[1]).astype(int)%image.shape[1]
+            v=(np.mod(w/m['tile_m'],1)*image.shape[0]).astype(int)%image.shape[0]
             sample=image[v,u]
             if slot=='base_color':
                 if index==np.unique(coarse_labels)[0]:color*=fade[...,None]
@@ -240,11 +251,15 @@ def _bake_material(document,arrays,meta,spec,out,baker):
                 rough+=weight*sample[...,0]
     normal/=np.maximum(np.linalg.norm(normal,axis=2,keepdims=True),1e-5)
     paths={}
+    color=np.where(color<=.0031308,color*12.92,1.055*np.maximum(color,0)**(1/2.4)-.055)
     for name,data in [('color',color),('normal',normal*.5+.5),('roughness',rough)]:
-        path=out/('sample_'+name+'.png');Image.fromarray(np.clip(data*255,0,255).astype(np.uint8)).save(path);paths[name]=path
-    document['materials']['detail_1']={'provider':'offline PBR blend','id':'industrial_sample_blend','tile_m':extent[0],
+        path=out/(prefix+'_'+name+'.png');Image.fromarray(np.clip(data*255,0,255).astype(np.uint8)).save(path);paths[name]=path
+    document['materials'][material_id]={'provider':'offline PBR blend','id':prefix+'_linear_pbr_blend','tile_m':extent[0],
         'color':[1,1,1,1],'roughness':.92,'base_color':str(paths['color'].resolve()),'base_color_sha256':sha(paths['color']),
         'normal':str(paths['normal'].resolve()),'normal_sha256':sha(paths['normal']),
         'roughness_map':str(paths['roughness'].resolve()),'roughness_map_sha256':sha(paths['roughness']),
         'license':'CC0 source PBR textures; authored bake recipe follows project license','source_url':'derived:ambientCG sources recorded below','source_files':source_files}
-    document['detail_sample']['material_bake']={'resolution':[resolution,resolution],'pixel_m':pixel,'blend_m':spec.get('material_blend_m',7),'source_textures':source_files,'generator':'analytic land-use masks + smooth weights + warped source PBR sampling'}
+    document['materials'][material_id]['repeat_detail']=True
+    report=document['detail_sample'] if material_id=='detail_1' else document.setdefault('regional_surface',{})
+    report['material_bake']={'resolution':[resolution,resolution],'pixel_m':pixel,'blend_m':spec.get('material_blend_m',7),'source_textures':source_files,
+        'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear'}

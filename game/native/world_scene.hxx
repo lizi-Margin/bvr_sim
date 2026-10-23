@@ -124,7 +124,7 @@ class WorldScene {
                 throw std::runtime_error("Missing normal texture: " + spec.normal);
             auto &slot = m->textures[wi::scene::MaterialComponent::NORMALMAP];
             slot.name = spec.normal;
-            slot.resource = wi::resourcemanager::Load(spec.normal);
+            slot.resource = wi::resourcemanager::Load(spec.normal,wi::resourcemanager::Flags::IMPORT_NORMALMAP);
             m->normalMapStrength = .45f;
         }
         if (!spec.roughness_map.empty()) {
@@ -204,8 +204,8 @@ class WorldScene {
                                              float(patch.heights[(row0 + row) * patch.columns + col0 + col]),
                                              float(n)});
                         uvs.push_back(
-                            {float((override_material.empty() ? col : col0 + col) * patch.spacing / 2),
-                             float((override_material.empty() ? row : row0 + row) * patch.spacing / 2)});
+                            {float(override_material.empty()?n/2:(n-patch.origin_north)/2),
+                             float(override_material.empty()?w/2:(w-patch.origin_west)/2)});
                         detail_uvs.push_back({float(n/detail_tile_m_),float(w/detail_tile_m_)});
                         if(full_terrain){
                             double step=std::min(50.,patch.spacing);
@@ -215,7 +215,7 @@ class WorldScene {
                             smooth_normals.push_back({float(dw*inv),float(inv),float(-dn*inv)});
                         }
                         std::array<float, 4> c{1, 1, 1, 1};
-                        if (!colors.empty())
+                        if (!colors.empty() && override_material.empty())
                             c = sample_color(row0 + row, col0 + col);
                         vertex_colors.push_back(wi::Color(uint8_t(std::clamp(c[0], 0.f, 1.f) * 255),
                                                           uint8_t(std::clamp(c[1], 0.f, 1.f) * 255),

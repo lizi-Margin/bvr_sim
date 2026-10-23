@@ -14,9 +14,11 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <variant>
 #include "simulator/environment.hxx"
 #include "simulator/ground/ground_types.hxx"
 #include "simulator/aircraft/tactical_pilot.hxx"
+#include "simulator/aircraft/player_flight_types.hxx"
 
 namespace bvr_sim {
 class SimCore;
@@ -151,6 +153,10 @@ class GameSession {
     GameSession &operator=(const GameSession &) = delete;
     void reset(const GameConfig &config);
     void submit(const PilotCommand &command);
+    void submit_player(const PlayerFlightIntent &intent);
+    void configure_player_flight(const PlayerFlightProfile &profile);
+    PlayerFlightProfile player_flight_profile() const;
+    PlayerFlightState player_flight_state() const;
     void step(int ticks = 1);       // honors pause
     void step_exact(int ticks = 1); // deterministic debugger step, even when paused
     void set_paused(bool paused);
@@ -168,7 +174,7 @@ class GameSession {
   private:
     void advance(int ticks, bool force);
     void publish_frame();
-    void apply_command(const PilotCommand &command);
+    void apply_command(const PilotCommand &command,bool drive=true);
     void drive_player(const PilotCommand &command);
     void update_enemy();
     void spawn_intercept_wave();
@@ -183,7 +189,7 @@ class GameSession {
     std::shared_ptr<GameTerrain> terrain_;
     GameConfig config_;
     GameFrame frame_;
-    std::vector<PilotCommand> pending_;
+    std::vector<std::variant<PilotCommand,PlayerFlightIntent>> pending_;
     std::optional<PilotCommand> pilot_controls_;
     std::vector<CombatEvent> events_;
     std::set<std::string> seen_deaths_, seen_missiles_;

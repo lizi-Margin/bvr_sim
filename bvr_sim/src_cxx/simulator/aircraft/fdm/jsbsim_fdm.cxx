@@ -359,6 +359,30 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) try 
 } catch(const std::string& error) { throw std::runtime_error(error); }
 catch(const char* error) { throw std::runtime_error(error); }
 
+void JSBSimFDM::step_surfaces(const FlightSurfaceControls& controls) {
+    validate_surface_controls(controls);
+    if(!initialized)throw std::runtime_error("JSBSimFDM must be reset before stepping");
+    // Bypass the AI filters/controller, sharing the same source FCS/actuators,
+    // engines, aerodynamic forces and integrator.
+    for(int i=0;i<jsbsim_inner_steps&&!terminate;++i){
+        set_jsbsim_controls({controls.aileron,controls.elevator,controls.rudder,controls.throttle});
+        if(!jsbsim_exec->Run())throw std::runtime_error("JSBSim direct surface step failed");
+        update_properties();
+    }
+}
+FlightMeasurements JSBSimFDM::flight_measurements() const {
+    auto m=AircraftFDM::flight_measurements();
+    if(!jsbsim_exec)return m;
+    auto get=[&](const char* name)->std::optional<double>{
+        if(!jsbsim_exec->GetPropertyManager()->HasNode(name))return std::nullopt;
+        return jsbsim_exec->GetPropertyValue(name);
+    };
+    auto p=get("velocities/p-rad_sec"),q=get("velocities/q-rad_sec"),r=get("velocities/r-rad_sec");
+    if(p&&q&&r)m.body_rates=std::array<double,3>{*p,*q,*r};
+    m.alpha=get("aero/alpha-rad");m.beta=get("aero/beta-rad");m.normal_g=get("accelerations/Nz");
+    return m;
+}
+
 double JSBSimFDM::get_mach() const noexcept {
     return mach;
 }
