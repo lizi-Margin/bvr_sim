@@ -403,6 +403,19 @@ BVR Sim is released under GPLv3. See [LICENSE](LICENSE).
 
 For third-party dependencies and bundled-resource notices, see [docs/legal/THIRD_PARTY_LICENSES.md](docs/legal/THIRD_PARTY_LICENSES.md).
 
+## Citing
+
+If you use BVR Sim in your research, please cite:
+
+```bibtex
+@article{sun2026bvrsim,
+  title={BVR Sim: An Open and High-Throughput Environment for Heterogeneous Air-Combat Reinforcement Learning},
+  author={Sun, Haocheng and Tan, Mulai},
+  journal={arXiv preprint arXiv:2608.25419},
+  year={2026}
+}
+```
+
 ## References
 
 1. Yifan Zhong, Jakub Grudzien Kuba, Xidong Feng, Siyi Hu, Jiaming Ji, and Yaodong Yang. “Heterogeneous-Agent Reinforcement Learning.” *Journal of Machine Learning Research*, 25(32):1–67, 2024. [Paper](https://jmlr.org/papers/v25/23-0488.html)
@@ -414,3 +427,4 @@ For third-party dependencies and bundled-resource notices, see [docs/legal/THIRD
 7. Chao Yu, Akash Velu, Eugene Vinitsky, Jiaxuan Gao, Yu Wang, Alexandre Bayen, and Yi Wu. “The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games.” *Advances in Neural Information Processing Systems*, 35:24611–24624, 2022. [DOI](https://doi.org/10.52202/068431-1787)
 8. Jakub Grudzien Kuba, Ruiqing Chen, Muning Wen, Ying Wen, Fanglei Sun, Jun Wang, and Yaodong Yang. “Trust Region Policy Optimisation in Multi-Agent Reinforcement Learning.” *International Conference on Learning Representations*, 2022. [Paper](https://openreview.net/forum?id=EcGGFkNTxdJ)
 9. Jon S. Berndt. “JSBSim: An Open Source Flight Dynamics Model in C++.” *AIAA Modeling and Simulation Technologies Conference and Exhibit*, AIAA Paper 2004-4923, 2004.
+10. Weichao Qiu, Fangwei Zhong, Yi Zhang, Siyuan Qiao, Zihao Xiao, Tae Soo Kim, Yizhou Wang, and Alan Yuille. “UnrealCV: Virtual Worlds for Computer Vision.” *ACM Multimedia Open Source Software Competition (MM ’17)*, 2017. [Paper](https://doi.org/10.1145/3123266.3129396) · [Repository](https://github.com/unrealcv/unrealcv).
