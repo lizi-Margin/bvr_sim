@@ -28,10 +28,13 @@ def game_from_state(state,render=False,output=None):
     game=FlightGame(render=render,visible=False,map_path=state['map'],output=output or ROOT/'game/captures/agent')
     apply_config(native,game.config,state['config'])
     game.start()
+    if state.get('player_profile'):game.apply_recorded_player_profile(state['player_profile'])
+    game.player_profiles_frozen=True
     for action in state['actions']:
         if replay_ground_action(native,game.sim,action):continue
         if 'paused' in action:game.sim.set_paused(action['paused']);continue
         if action.get('command'):game.command(**action['command'])
+        if action.get('player_intent'):game.submit_player(**action['player_intent'])
         if action.get('exact'):game.step_exact(action['ticks'])
         else:game.step(action['ticks'])
     if state.get('camera'):game.set_camera(**state['camera'])
@@ -125,7 +128,7 @@ def run(a):
         game=FlightGame(map_path=a.map);row=game.select_aircraft(a.aircraft,a.loadout);mission=a.mission or row['missions'][0]
         if mission not in row['missions']:game.close();raise ValueError('Mission is unsupported for '+a.aircraft)
         game.config.mission=mission;game.config.seed=a.seed;game.start()
-        state={'schema':1,'map':str(a.map.resolve()),'map_sha256':sha(a.map),'config':serialize(game.config),'actions':[]}
+        state={'schema':1,'map':str(a.map.resolve()),'map_sha256':sha(a.map),'config':serialize(game.config),'player_profile':game.player_profile,'actions':[]}
         frame=serialize(game.sim.frame());game.close();state['sortie_logs']=game.log_paths();write_json(a.state,state)
         return {'state':str(a.state.resolve()),'frame':frame,'logs':game.log_paths()}
     if a.action=='logs':
@@ -133,10 +136,13 @@ def run(a):
     state=json.loads(a.state.read_text());game=game_from_state(state,render=a.action=='capture',output=a.output)
     try:
         if a.action=='step':
-            command=json.loads(a.command);game.command(**command) if command else None
+            command=json.loads(a.command);player_intent=json.loads(a.player_intent)
+            if command and player_intent:raise ValueError('Choose --command or --player-intent for one step')
+            if player_intent:game.submit_player(**player_intent)
+            elif command:game.command(**command)
             if a.exact:game.step_exact(a.ticks)
             else:game.step(a.ticks)
-            state['actions'].append({'command':command,'ticks':a.ticks,'exact':a.exact});write_json(a.state,state)
+            state['actions'].append({'command':command,'player_intent':player_intent,'ticks':a.ticks,'exact':a.exact});write_json(a.state,state)
         if a.action=='pause':game.sim.set_paused(a.paused);state['actions'].append({'paused':a.paused});write_json(a.state,state)
         if a.action=='camera':
             game.set_camera(a.eye,a.target,a.fov);state['camera']=game.camera_params;write_json(a.state,state)
@@ -182,7 +188,7 @@ def main():
         if action=='run':
             from .aircraft import aircraft_catalog
             s.add_argument('--mission',choices=['intercept_patrol','air','strike','combined','convoy','training']);s.add_argument('--aircraft',choices=[r['id'] for r in aircraft_catalog(include_library=True)['aircraft']],default='F22');s.add_argument('--loadout');s.add_argument('--seed',type=int,default=7)
-        if action=='step':s.add_argument('--ticks',type=int,default=1);s.add_argument('--command',default='{}');s.add_argument('--exact',action='store_true')
+        if action=='step':s.add_argument('--ticks',type=int,default=1);s.add_argument('--command',default='{}');s.add_argument('--player-intent',default='{}');s.add_argument('--exact',action='store_true')
         if action=='pause':s.add_argument('--paused',action=argparse.BooleanOptionalAction,default=True)
         if action=='camera':s.add_argument('--eye',type=float,nargs=3,required=True);s.add_argument('--target',type=float,nargs=3,required=True);s.add_argument('--fov',type=float,default=1.05)
         if action in ['query','step','pause','camera']:s.set_defaults(output=None)

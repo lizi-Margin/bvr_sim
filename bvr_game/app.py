@@ -196,10 +196,17 @@ class FlightGame:
         self.journal.record('player_profile_reload',resolved,self._journal_tick)
         return resolved
 
+    def apply_recorded_player_profile(self,profile):
+        if profile['aircraft_id']!=self.current_aircraft()['id']:raise ValueError('Recorded player profile belongs to a different aircraft')
+        self.sim.configure_player_flight(self.profile_store.native_resolved(native,profile))
+        self.player_profile=profile;self.player_input.profile=profile;self.chase.settings=profile['camera']
+
     def submit_player(self,intent=None,**values):
         if intent is None:intent=native_intent(native,values)
         self.throttle=max(0,min(1,float(intent.throttle)))
         self.sim.submit_player(intent)
+        self.player_input.direction=unit(intent.direction)
+        self.player_input.mode='raw_manual' if intent.mode==native.PlayerFlightMode.RawManual else 'assisted'
         self.journal.record('player_intent',serialize(intent),self._journal_tick)
 
     def submit_command(self,command):
@@ -285,6 +292,8 @@ class FlightGame:
         metadata['player_flight_profile']=self.player_profile
         metadata['player_flight_state']=serialize(self.sim.player_flight_state())
         metadata['mouse_projection']=self.player_input.last_projection
+        metadata['flight_marks']=getattr(self,'flight_marks',{})
+        metadata['flight_mark_labels']=getattr(self,'flight_mark_labels',{})
         metadata['hud_visible']=self.show_hud
         if hasattr(self.renderer,'audio_available'):metadata['audio']={'available':self.renderer.audio_available(),'play_counts':self.renderer.audio_counts()}
         if hasattr(self.renderer,'aircraft_statistics'):metadata['aircraft_statistics']=serialize(self.renderer.aircraft_statistics())
@@ -363,10 +372,12 @@ class FlightGame:
             text(610,110,'SEARCH NORTH / SUPPORT YOUR MISSILE / F9 REPLAY LOGS',14,MUTED)
         state=self.sim.player_flight_state()
         text(610,1018,'F5 '+self.player_input.mode.upper()+'  /  F6 reload while paused',15,MUTED)
+        if state.energy_limited:text(610,968,'ENERGY / CLIMB DEMAND LIMITED',15,0xff77dfff)
+        elif state.protecting:text(610,968,'ASSIST / ENVELOPE LIMIT',15,0xff77dfff)
         if self.menu_notice:text(610,992,self.menu_notice[:75],15,RED)
         # Three different symbols: amber aim ring, white nose cross, cyan path
         # ring/wings. All positions are projected from real world directions.
-        self.flight_marks={}
+        self.flight_marks={};self.flight_mark_labels={};mark_label_boxes=[]
         if p:
             distance=self.player_profile['input']['aim_distance_m']
             for name,direction,color in [('AIM',self.player_input.direction,0xff77dfff),('NOSE',body_forward(p.orientation),WHITE),('PATH',unit(p.velocity),0xfff5e575)]:
@@ -377,7 +388,11 @@ class FlightGame:
                     x=min(max(x,450),1480);y=min(max(y,180),810);circle(x,y,12,color)
                 elif name=='NOSE':line(x-9,y,18,2,color);line(x,y-9,2,18,color)
                 else:circle(x,y,5,color);line(x-16,y,9,2,color);line(x+7,y,9,2,color);line(x,y-12,2,5,color)
-                text(x+16,y-8,name,12,color);self.flight_marks[name]=[x*sx,y*sy]
+                for dy in [-24,0,24,-48,48]:
+                    label=(x+18,y+dy,52,18)
+                    if not any(abs(label[0]-b[0])<52 and abs(label[1]-b[1])<20 for b in mark_label_boxes):break
+                mark_label_boxes.append(label);text(label[0],label[1],name,12,color)
+                self.flight_mark_labels[name]=list(label);self.flight_marks[name]=[x*sx,y*sy]
         for c in frame.contacts:
             v=self.renderer.project(c.position)
             if 0<v[2]<1:
@@ -563,7 +578,9 @@ class FlightGame:
             if 13 in pressed:self.start()
             return True
         frame=self.sim.frame()
-        if 80 in pressed:self.sim.set_paused(not frame.paused)
+        if 80 in pressed:
+            self.sim.set_paused(not frame.paused)
+            self.journal.record('pause',not frame.paused,self._journal_tick)
         if 116 in pressed:self.player_input.mode='raw_manual' if self.player_input.mode=='assisted' else 'assisted'
         if 117 in pressed:
             try:self.reload_player_flight();self.menu_notice='Player profile reloaded: '+self.player_profile['effective_sha256'][:10]

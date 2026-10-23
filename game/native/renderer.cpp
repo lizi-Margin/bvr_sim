@@ -96,6 +96,7 @@ class Renderer {
     std::map<Entity, Entity> weapon_flames;
     nlohmann::json visual_profile;
     Entity weather_entity=wi::ecs::INVALID_ENTITY;
+    Entity sun_entity=wi::ecs::INVALID_ENTITY;
     static LRESULT CALLBACK wndproc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (m == WM_CLOSE) {
             PostMessage(h, WM_APP + 1, 0, 0);
@@ -220,7 +221,7 @@ class Renderer {
         // Keep nearby BVR contacts clear while fading the finite regional terrain
         // into the same horizon color as the sky before its outer boundary appears.
         sky.fogDensity = .000020f;
-        auto sun = s.Entity_CreateLight("sun", {0, 100, 0}, {1, .94f, .84f}, visual_profile.is_null()?4.f:visual_profile.value("sun_energy",4.f), 100000,
+        auto sun = sun_entity=s.Entity_CreateLight("sun", {0, 100, 0}, {1, .94f, .84f}, visual_profile.is_null()?4.f:visual_profile.value("sun_energy",4.f), 100000,
                                         wi::scene::LightComponent::DIRECTIONAL);
         auto t = s.transforms.GetComponent(sun);
         t->RotateRollPitchYaw(XMFLOAT3(-.65f, -.6f, 0));
@@ -390,9 +391,10 @@ class Renderer {
                          const std::vector<SceneMaterial> &materials,
                          const std::vector<SceneSurface> &surfaces,
                          const std::vector<ScenePlacement> &placements, const std::vector<int> &outer_cover,
-                         const std::vector<std::array<float, 4>> &outer_colors) {
+                         const std::vector<std::array<float, 4>> &outer_colors,
+                         const std::vector<std::string> &terrain_materials) {
         baked_world->configure(terrain, cover, colors, materials, surfaces, placements, outer_cover,
-                               outer_colors);
+                               outer_colors, terrain_materials);
     }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
     double render_height(double n, double w) const { return baked_world->render_height(n, w); }
@@ -658,7 +660,24 @@ class Renderer {
     std::string visual_settings() const {
         auto result=visual_profile.is_null()?nlohmann::json::object():visual_profile;
         result["actual_output"]={{"width",width},{"height",height},{"vertical_fov",path->camera->fov},{"temporal_aa",wi::renderer::GetTemporalAAEnabled()},{"fxaa",path->getFXAAEnabled()}};
+        auto colorspace=wi::graphics::GetDevice()->GetSwapChainColorSpace(&app->swapChain);
+        result["actual_output"]["color_space"]=colorspace==wi::graphics::ColorSpace::SRGB?"sRGB":colorspace==wi::graphics::ColorSpace::HDR10_ST2084?"HDR10_ST2084":"HDR_LINEAR";
+        const auto& sky=wi::scene::GetScene().weather;
+        result["actual_lighting"]={{"sun_direction",{sky.sunDirection.x,sky.sunDirection.y,sky.sunDirection.z}},
+            {"sun_radiance",{sky.sunColor.x,sky.sunColor.y,sky.sunColor.z}},
+            {"ambient",{sky.ambient.x,sky.ambient.y,sky.ambient.z}},{"exposure",path->getExposure()}};
         return result.dump();
+    }
+    void set_daylight(float energy,float exposure,float sky_exposure,const std::array<float,3>& ambient){
+        for(float v:{energy,exposure,sky_exposure})if(!std::isfinite(v)||v<=0||v>100)throw std::invalid_argument("Invalid daylight intensity/exposure");
+        for(float v:ambient)if(!std::isfinite(v)||v<0||v>1)throw std::invalid_argument("Invalid daylight ambient color");
+        auto& scene=wi::scene::GetScene();scene.lights.GetComponent(sun_entity)->intensity=energy;
+        auto sky=scene.weathers.GetComponent(weather_entity);sky->skyExposure=sky_exposure;sky->ambient={ambient[0],ambient[1],ambient[2]};
+        path->setExposure(exposure);
+        if(!visual_profile.is_null()){
+            visual_profile["sun_energy"]=energy;visual_profile["exposure"]=exposure;
+            visual_profile["sky_exposure"]=sky_exposure;visual_profile["ambient"]=ambient;
+        }
     }
     size_t effect_count() const {return effects?effects->count():0;}
     void set_clouds(bool enabled){
@@ -674,6 +693,12 @@ class Renderer {
         if(it==roots.end())throw std::invalid_argument("Rendered entity not found: "+uid);
         auto transform=wi::scene::GetScene().transforms.GetComponent(it->second);
         auto forward=transform->GetForward();return {forward.x,forward.y,forward.z};
+    }
+    std::array<std::array<float,3>,3> entity_basis(const std::string& uid) const {
+        auto it=roots.find(uid);if(it==roots.end())throw std::runtime_error("Entity has not been rendered: "+uid);
+        auto transform=wi::scene::GetScene().transforms.GetComponent(it->second);
+        auto right=transform->GetRight(),up=transform->GetUp(),forward=transform->GetForward();
+        return {{{right.x,right.y,right.z},{up.x,up.y,up.z},{forward.x,forward.y,forward.z}}};
     }
     void preview_aircraft(const std::string& model,const std::map<std::string,double>& properties,double throttle){
         reload();
@@ -712,6 +737,7 @@ class Renderer {
 };
 PYBIND11_MODULE(bvr_game_render, m) {
     m.attr("VISUAL_BETA")=true;
+    m.attr("TERRAIN_TILE_MATERIALS")=true;
     py::class_<ScenePlacement>(m, "ScenePlacement")
         .def(py::init<>())
         .def_readwrite("id", &ScenePlacement::id)
@@ -799,12 +825,17 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("set_quality", &Renderer::set_quality)
         .def("shader_errors", &Renderer::shader_errors)
         .def("visual_settings", &Renderer::visual_settings)
+        .def("set_daylight", &Renderer::set_daylight,py::arg("sun_energy"),py::arg("exposure"),py::arg("sky_exposure"),py::arg("ambient"))
         .def("effect_count", &Renderer::effect_count)
         .def("set_clouds", &Renderer::set_clouds)
         .def("memory_usage", &Renderer::memory_usage)
         .def("entity_forward", &Renderer::entity_forward)
+        .def("entity_basis", &Renderer::entity_basis)
         .def("configure_world", &Renderer::configure_world)
-        .def("configure_scene", &Renderer::configure_scene)
+        .def("configure_scene", &Renderer::configure_scene, py::arg("terrain"), py::arg("cover"),
+             py::arg("colors"), py::arg("materials"), py::arg("surfaces"), py::arg("placements"),
+             py::arg("outer_cover"), py::arg("outer_colors"),
+             py::arg("terrain_materials")=std::vector<std::string>{})
         .def("statistics", &Renderer::statistics)
         .def("preview_aircraft", &Renderer::preview_aircraft)
         .def("aircraft_statistics", &Renderer::aircraft_statistics)

@@ -1,7 +1,7 @@
 """Landscape rules extending the existing Baker; no separate resource pipeline."""
 import math
 import numpy as np
-from shapely.geometry import Point
+from shapely.geometry import Point,Polygon
 
 def smooth(x):
     t=np.clip(x,0,1);return t*t*(3-2*t)
@@ -46,7 +46,7 @@ def build_airfield(baker):
             model=baker.r['asset_roles']['warehouse'][i%len(baker.r['asset_roles']['warehouse'])]
             baker.place(model,a['apron'][0]-a['apron_size_m'][0]*.4+i*a['apron_size_m'][0]*.8/max(1,a['hangars']-1),
                 a['apron'][1]+a['apron_size_m'][1]/2+50,category='building',zone='airport_hangars',yaw=math.pi,scale=1.15,clearance=False)
-        for role,dn,dw,zone in [('utility',920,220,'airport_tower'),('airport_admin',970,550,'airport_administration'),('supply',-800,660,'airport_fuel')]:
+        for role,dn,dw,zone in [('utility',920,360,'airport_tower'),('airport_admin',970,550,'airport_administration'),('supply',-800,660,'airport_fuel')]:
             baker.place(baker.r['asset_roles'][role],n+dn,w+dw,category='building',zone=zone,yaw=math.pi/2,clearance=False)
         for i in range(12):baker.place(baker.r['asset_roles']['apron_equipment'],a['apron'][0]-400+i*65,a['apron'][1]-170,category='prop',zone='apron_equipment',minimum=4,clearance=False)
 
@@ -67,6 +67,33 @@ def build_industry(baker):
     for i in range(8):
         n=target[0]+baker.rng.uniform(-160,160);w=target[1]+baker.rng.uniform(-150,150)
         baker.place(baker.r['asset_roles']['supply'],n,w,category='building',zone='industry_supply',minimum=12)
+
+def subdivide_fields(baker,fields):
+    from shapely.ops import split
+    from shapely.geometry import LineString
+    result=[]
+    for field in fields:
+        source=Polygon(field['polygon'],field['holes']);center=source.centroid
+        road=min((line for _,line in baker.roads),key=lambda line:line.distance(center))
+        d=road.project(center);a=road.interpolate(max(0,d-2));b=road.interpolate(min(road.length,d+2))
+        heading=math.atan2(b.y-a.y,b.x-a.x)
+        parcels=[source]
+        for depth in range(2 if source.area<900000 else 3):
+            divided=[]
+            for parcel in parcels:
+                if parcel.area<60000:divided.append(parcel);continue
+                c=parcel.centroid;axis=heading+(depth%2)*math.pi/2+baker.rng.uniform(-.05,.05)
+                offset=baker.rng.uniform(-.12,.12)*math.sqrt(parcel.area)
+                cn=c.x-math.sin(axis)*offset;cw=c.y+math.cos(axis)*offset
+                cutter=LineString([(cn-math.cos(axis)*30000,cw-math.sin(axis)*30000),(cn+math.cos(axis)*30000,cw+math.sin(axis)*30000)])
+                divided.extend(p for p in split(parcel,cutter).geoms if p.area>1000)
+            parcels=divided
+        for parcel in parcels:
+            result.append({'id':field['id']+'_parcel_'+str(len(result)),'polygon':list(map(list,parcel.exterior.coords)),
+                'holes':[list(map(list,h.coords)) for h in parcel.interiors],
+                'surface':'grass' if baker.rng.random()<.6 else 'farmland',
+                'color':baker.rng.choice(baker.r['field_palette_linear']),'heading_rad':heading,'area_m2':parcel.area})
+    return result
 
 def finish_world(baker,document,out):
     # Individual footprint foundations, not landscape-wide flattening. The same

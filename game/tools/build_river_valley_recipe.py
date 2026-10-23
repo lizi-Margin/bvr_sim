@@ -43,7 +43,14 @@ def recipe():
         elif scatter['id']=='sample_woodland':scatter['count']=400
     r['mission'].update(player_start=[-7000,-3500,650],speed_mps=180,enemy_range_m=160000,target=[2650,-1400])
     if 'convoy_target' in r['mission']:r['mission']['convoy_target']=[2600,-1900]
-    r['mission']['ground_units']=[]
+    r['mission']['strike_start']=[-4500,-1900,3200]
+    r['mission']['convoy_start']=[-20000,-1900,8500]
+    r['mission']['ground_units']=[{'uid':'sam_1','model':'SLAMRAAM','kind':'sam','team':'red',
+        'position':[2450,-1500,0],'missiles':2,'mission_target':True}]
+    for i in range(3):
+        n=2310-i*18;w=-2000+(n-2300)/3
+        r['mission']['ground_units'].append({'uid':'convoy_'+str(i+1),'model':'WillysJeep','kind':'vehicle','team':'red',
+            'position':[n,w,0],'mission_target':True,'route':{'points':[[n,w],[2600,-1900],[2850,-1700],[2900,-1000]],'speed':7,'loop':False}})
     r['detail_sample'].update(center=[-2500,-3000],size_m=[2000,2000],relief_amplitude_m=1.2,texture_resolution=2048,material_blend_m=24,
         roadside_signs=[{'position':[-1390,-2990],'yaw':0},{'position':[-790,-4590],'yaw':1.4}])
     r['exclusion_zones'][1].update(center=[-2200,-3000],size_m=[1250,600])

@@ -182,6 +182,7 @@ FlightMeasurements YASimFDM::flight_measurements() const {
     float rates[3],alpha,beta,wind[3]={0,0,0};s->globalToLocal(s->rot,rates);
     m.body_rates=std::array<double,3>{rates[0],-rates[1],-rates[2]};
     yasim::Glue::calcAlphaBeta(s,wind,&alpha,&beta);m.alpha=alpha;m.beta=-beta;
+    m.density=impl->host->getAirplane()->getModel()->getAtmosphere().getDensity();
     // No calibrated load-factor channel is exposed by this host. Leave it
     // absent; do not fabricate an aircraft limit from Euler angle derivatives.
     return m;

@@ -299,7 +299,8 @@ class WorldScene {
                    const std::vector<std::array<float, 4>> &colors, const std::vector<SceneMaterial> &mats,
                    const std::vector<SceneSurface> &surfaces, const std::vector<ScenePlacement> &placements,
                    const std::vector<int> &outer_cover,
-                   const std::vector<std::array<float, 4>> &outer_colors) {
+                   const std::vector<std::array<float, 4>> &outer_colors,
+                   const std::vector<std::string> &terrain_materials) {
         using namespace DirectX;
         clear();
         for (const auto &m : mats)
@@ -326,8 +327,11 @@ class WorldScene {
                 inner = {t.origin_north, t.origin_west, t.origin_north + (t.columns - 1) * t.spacing,
                          t.origin_west + (t.rows - 1) * t.spacing};
             }
-            const std::string material_name = "detail_" + std::to_string(i);
-            if (i > 0 && materials.count(material_name))
+            const std::string material_name = i < terrain_materials.size() ? terrain_materials[i] :
+                (i > 0 ? "detail_" + std::to_string(i) : "");
+            if (!material_name.empty() && !materials.count(material_name))
+                throw std::invalid_argument("Unknown terrain tile material: " + material_name);
+            if (!material_name.empty())
                 terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), {}, {}, inner, material_name,&terrain);
             else
                 terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), cover, colors, inner,"",&terrain);

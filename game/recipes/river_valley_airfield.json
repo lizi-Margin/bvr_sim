@@ -920,7 +920,7 @@
     "speed_mps": 180,
     "strike_start": [
       -4500,
-      4500,
+      -1900,
       3200
     ],
     "target": [
@@ -930,14 +930,130 @@
     "target_id": "depot",
     "convoy_start": [
       -20000,
-      4500,
+      -1900,
       8500
     ],
     "convoy_target": [
       2600,
       -1900
     ],
-    "ground_units": []
+    "ground_units": [
+      {
+        "uid": "sam_1",
+        "model": "SLAMRAAM",
+        "kind": "sam",
+        "team": "red",
+        "position": [
+          2450,
+          -1500,
+          0
+        ],
+        "missiles": 2,
+        "mission_target": true
+      },
+      {
+        "uid": "convoy_1",
+        "model": "WillysJeep",
+        "kind": "vehicle",
+        "team": "red",
+        "position": [
+          2310,
+          -1996.6666666666667,
+          0
+        ],
+        "mission_target": true,
+        "route": {
+          "points": [
+            [
+              2310,
+              -1996.6666666666667
+            ],
+            [
+              2600,
+              -1900
+            ],
+            [
+              2850,
+              -1700
+            ],
+            [
+              2900,
+              -1000
+            ]
+          ],
+          "speed": 7,
+          "loop": false
+        }
+      },
+      {
+        "uid": "convoy_2",
+        "model": "WillysJeep",
+        "kind": "vehicle",
+        "team": "red",
+        "position": [
+          2292,
+          -2002.6666666666667,
+          0
+        ],
+        "mission_target": true,
+        "route": {
+          "points": [
+            [
+              2292,
+              -2002.6666666666667
+            ],
+            [
+              2600,
+              -1900
+            ],
+            [
+              2850,
+              -1700
+            ],
+            [
+              2900,
+              -1000
+            ]
+          ],
+          "speed": 7,
+          "loop": false
+        }
+      },
+      {
+        "uid": "convoy_3",
+        "model": "WillysJeep",
+        "kind": "vehicle",
+        "team": "red",
+        "position": [
+          2274,
+          -2008.6666666666667,
+          0
+        ],
+        "mission_target": true,
+        "route": {
+          "points": [
+            [
+              2274,
+              -2008.6666666666667
+            ],
+            [
+              2600,
+              -1900
+            ],
+            [
+              2850,
+              -1700
+            ],
+            [
+              2900,
+              -1000
+            ]
+          ],
+          "speed": 7,
+          "loop": false
+        }
+      }
+    ]
   },
   "geographic_import": {
     "schema": "local_metric_bake_v1",

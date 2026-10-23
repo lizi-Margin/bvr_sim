@@ -83,11 +83,12 @@ def observe_local(game):
                             {'id':f.mission,'result':f.result,'kills':f.air_kills,'wave':f.mission_wave,'total':f.mission_total,'next_wave_time':f.next_wave_time,'search_heading':0.})
 
 class ResidentPlaytest:
-    def __init__(self,output,render=False,map_path=None):
+    def __init__(self,output,render=False,map_path=None,visual_profile=None):
         self.output=Path(output).resolve();self.output.mkdir(parents=True,exist_ok=True)
         self.spec=json.loads(SPEC.read_text());self.spec_sha=sha(SPEC)
         self.core_sha=sha(Path(native.__file__))
-        self.game=FlightGame(render=render,visible=False,map_path=map_path or ROOT/self.spec['map'],output=self.output/'client')
+        presentation={'visual_profile':visual_profile} if visual_profile is not None else {}
+        self.game=FlightGame(render=render,visible=False,map_path=map_path or ROOT/self.spec['map'],output=self.output/'client',**presentation)
         self.game.quality='high'
         if self.game.renderer:self.game.renderer.set_quality('high')
         self.configured=False
@@ -97,8 +98,10 @@ class ResidentPlaytest:
         g=self.game;g.select_aircraft(model,'intercept');g.config.mission='intercept_patrol';g.config.seed=seed;g.start()
         self.configured=True;return self.observe()
     def observe(self):return observe_local(self.game)
-    def step(self,ticks=25,command=None,exact=False):
+    def step(self,ticks=25,command=None,exact=False,player_intent=None):
+        if command and player_intent:raise ValueError('Choose AI command or player intent for one step')
         if command:self.game.command(**command)
+        if player_intent:self.game.submit_player(**player_intent)
         self.game.step_exact(ticks) if exact else self.game.step(ticks)
         if self.game.renderer:self.game.draw()
         return self.observe()
@@ -169,15 +172,21 @@ def batch(output,seeds,candidate,workers,worker_timeout=600):
     n=len(rows);summary={'candidate':candidate,'scenario_sha256':sha(SPEC),'policy_sha256':POLICY_SHA,'seeds':seeds,'episodes':rows,'worker_exit_codes':codes,'metrics':{'count':n,'success_rate':sum(r['success'] for r in rows)/n,'survival_rate':sum(r['survived'] for r in rows)/n,'terrain_crash_rate':sum(r['terrain_crash'] for r in rows)/n,'mean_sim_seconds':sum(r['sim_seconds'] for r in rows)/n,'mean_missiles_used':sum(r['missiles_used'] for r in rows)/n}}
     write_json(target/'batch-report.json',summary);print(json.dumps(summary['metrics'],indent=2))
 
-def replay(tape,output,render=False,video=False,window_start=None,window_end=None,video_sample_ticks=5):
-    tape=Path(tape);data=json.loads(tape.read_text());host=ResidentPlaytest(output,render,data['map']);rows=[];encoder=None;video_frames=0;keyframes=[]
+def replay(tape,output,render=False,video=False,window_start=None,window_end=None,video_sample_ticks=5,visual_profile=None):
+    tape=Path(tape);data=json.loads(tape.read_text())
+    if 'context' in data:return replay_journal(tape,output,render,video,visual_profile)
+    host=ResidentPlaytest(output,render,data['map'],visual_profile);rows=[];encoder=None;video_frames=0;keyframes=[]
     if video and not render:raise ValueError('Video requires --render')
     end_time=data['final_frame']['sim_time'] if window_end is None else window_end
     start_time=max(0,end_time-20) if window_start is None else window_start
     video_path=Path(output)/'replay.mp4'
     try:
         from .ground import apply_config
-        apply_config(native,host.game.config,data['config']);host.game.start()
+        if sha(data['map'])!=data['map_sha256']:raise ValueError('Replay map version changed')
+        apply_config(native,host.game.config,data['config'])
+        host.game.start(start_position=data.get('initial_position'),initial_speed=data.get('initial_speed'))
+        host.game.player_profiles_frozen=True
+        if data.get('player_profile'):host.game.apply_recorded_player_profile(data['player_profile'])
         if video:
             import imageio_ffmpeg
             from PIL import Image
@@ -185,15 +194,17 @@ def replay(tape,output,render=False,video=False,window_start=None,window_end=Non
         for index,a in enumerate(data['actions']):
             now=host.game.sim.frame().sim_time
             if video and start_time-.5<=now<=end_time:
-                host.game.command(**a['command']);remaining=a['ticks']
+                if a.get('player_intent'):host.game.submit_player(**a['player_intent'])
+                elif a.get('command'):host.game.command(**a['command'])
+                remaining=a['ticks']
                 while remaining:
-                    count=min(remaining,video_sample_ticks);host.step(count);remaining-=count
+                    count=min(remaining,video_sample_ticks);host.step(count,exact=a.get('exact',False));remaining-=count
                     if start_time<=host.game.sim.frame().sim_time<=end_time:
                         image=Path(output)/'video-frame.png';host.game.renderer.capture(str(image))
                         with Image.open(image) as pixels:encoder.stdin.write(pixels.convert('RGB').tobytes())
                         if video_frames%100==0:keyframes.append({'image':host.game.capture('keyframe-'+str(video_frames)),'tick':host.game.sim.frame().tick})
                         video_frames+=1
-            else:host.step(a['ticks'],a['command'])
+            else:host.step(a['ticks'],a.get('command'),a.get('exact',False),a.get('player_intent'))
             same=digest(serialize(host.game.sim.frame()))==a['frame_sha256'];rows.append(same)
             if not same:break
         if encoder:encoder.stdin.close();assert encoder.wait()==0;encoder=None
@@ -207,6 +218,39 @@ def replay(tape,output,render=False,video=False,window_start=None,window_end=Non
             encoder.stdin.close();encoder.wait()
         host.close()
 
+def replay_journal(tape,output,render=False,video=False,visual_profile=None):
+    """Replay ordinary client journals without dropping input or pause records."""
+    if video:raise ValueError('Journal replay supports --render; use response/route intent tapes for sampled video')
+    data=json.loads(Path(tape).read_text());context=data['context']
+    if 'map' not in context:raise ValueError('This standalone aircraft journal has no world map; replay through its aircraft-library entry')
+    if sha(context['map'])!=context['map_sha256']:raise ValueError('Journal map version changed')
+    presentation={'visual_profile':visual_profile} if visual_profile is not None else {}
+    g=FlightGame(render=render,visible=False,map_path=context['map'],output=Path(output)/'client',**presentation)
+    try:
+        from .ground import apply_config
+        apply_config(native,g.config,data['config'])
+        c=data['config'];g.start(start_position=[c['player_north'],c['player_west'],c['altitude']],initial_speed=c['speed'])
+        if context.get('player_flight_profile'):g.apply_recorded_player_profile(context['player_flight_profile'])
+        g.player_profiles_frozen=True;steps=0
+        for index,row in enumerate(data['actions']):
+            if g.sim.frame().tick!=row['tick']:raise ValueError(f'Journal tick mismatch at action {index}')
+            kind,value=row['kind'],row['value']
+            if kind=='command':g.command(**value)
+            elif kind=='player_intent':g.submit_player(**value)
+            elif kind=='player_profile_reload':g.apply_recorded_player_profile(value)
+            elif kind=='pause':g.sim.set_paused(value)
+            elif kind=='step':
+                g.step_exact(value['ticks']) if value.get('exact') else g.step(value['ticks']);steps+=1
+                if render:g.draw()
+            else:raise ValueError('Unsupported journal action: '+kind)
+        frame=serialize(g.sim.frame());same=frame==data['final_frame']
+        report={'status':'passed' if same else 'failed','journal':str(tape),'journal_sha256':sha(tape),
+            'actions_replayed':len(data['actions']),'steps_replayed':steps,'full_final_frame_equal':same,
+            'final_tick':frame['tick'],'core_sha256':sha(Path(native.__file__)),'rendered':render,
+            'shader_errors':g.renderer.shader_errors() if render else None,'logs':g.log_paths()}
+        write_json(Path(output)/'replay-report.json',report);return report
+    finally:g.close()
+
 def serve(output,render):
     host=ResidentPlaytest(output,render)
     try:
@@ -215,7 +259,8 @@ def serve(output,render):
                 r=json.loads(line);action=r['action']
                 if action=='reset':value=asdict(host.reset(r.get('seed',101),r.get('model','F22')))
                 elif action=='observe':value=asdict(host.observe())
-                elif action=='step':value=asdict(host.step(r.get('ticks',25),r.get('command'),r.get('exact',False)))
+                elif action=='step':value=asdict(host.step(r.get('ticks',25),r.get('command'),r.get('exact',False),r.get('player_intent')))
+                elif action=='player_profile':value=host.game.player_profile
                 elif action=='pause':host.pause(r.get('paused',True));value={'paused':host.game.sim.frame().paused}
                 elif action=='diagnose':value=host.diagnostics()
                 elif action=='logs':value=host.game.log_paths()
@@ -230,10 +275,10 @@ def serve(output,render):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['serve','batch','worker','replay']);p.add_argument('tape',nargs='?',type=Path)
     p.add_argument('--worker-timeout',type=float,default=600);p.add_argument('--video',action='store_true');p.add_argument('--window-start',type=float);p.add_argument('--window-end',type=float);p.add_argument('--video-sample-ticks',type=int,default=5)
-    p.add_argument('--output',type=Path,required=True);p.add_argument('--render',action='store_true');p.add_argument('--candidate',default='baseline-v1');p.add_argument('--workers',type=int,default=4);p.add_argument('--seeds',type=int,nargs='+')
+    p.add_argument('--output',type=Path,required=True);p.add_argument('--render',action='store_true');p.add_argument('--visual-profile',type=Path);p.add_argument('--candidate',default='baseline-v1');p.add_argument('--workers',type=int,default=4);p.add_argument('--seeds',type=int,nargs='+')
     a=p.parse_args();spec=json.loads(SPEC.read_text());seeds=a.seeds or spec['seed_batch']
     if a.action=='serve':serve(a.output,a.render)
     elif a.action=='worker':batch_worker(a.output,seeds,a.candidate)
     elif a.action=='batch':batch(a.output,seeds,a.candidate,a.workers,a.worker_timeout)
-    else:print(json.dumps(replay(a.tape,a.output,a.render,a.video,a.window_start,a.window_end,a.video_sample_ticks),indent=2))
+    else:print(json.dumps(replay(a.tape,a.output,a.render,a.video,a.window_start,a.window_end,a.video_sample_ticks,a.visual_profile),indent=2))
 if __name__=='__main__':main()

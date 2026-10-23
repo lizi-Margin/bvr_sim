@@ -605,8 +605,10 @@ void GameSession::publish_frame() {
             e.health = ac->bloods;
             e.pylons = ac->pylon_manager.get_all_mounts();
             e.throttle = ac->uid == "player" && pilot_controls_ ? pilot_controls_->throttle : .85;
-            if (auto controlled = std::dynamic_pointer_cast<Fighter>(ac))
+            if (auto controlled = std::dynamic_pointer_cast<Fighter>(ac)) {
                 e.animation_properties = controlled->visual_properties();
+                if(auto player_throttle=controlled->player_throttle())e.throttle=*player_throttle;
+            }
         } else if (auto missile = std::dynamic_pointer_cast<Missile>(obj)) {
             e.kind = "missile";
             e.model = missile->missile_model;

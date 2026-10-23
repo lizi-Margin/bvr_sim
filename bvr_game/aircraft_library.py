@@ -123,7 +123,8 @@ def fly(row, output, seconds=10, render=False, interactive=False):
                     throttle = max(0, min(1, throttle + event.wheel*.05))
                     throttle = adapter.throttle(throttle,event,config.dt)
                     free=67 in held;zoom=2 in held;aim=[event.x,event.y]
-                    if 80 in event.pressed:session.set_paused(not frame.paused)
+                    if 80 in event.pressed:
+                        session.set_paused(not frame.paused);journal.record('pause',not frame.paused,frame.tick)
                     exact=190 in event.pressed
                     if 116 in event.pressed:adapter.mode='raw_manual' if adapter.mode=='assisted' else 'assisted'
                     if 117 in event.pressed:

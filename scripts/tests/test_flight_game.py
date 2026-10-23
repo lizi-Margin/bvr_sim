@@ -40,7 +40,11 @@ class FlightGameTests(unittest.TestCase):
             # Core NWU pitch is negative nose-up; vertical velocity is positive up.
             self.assertGreater(-sign*(p.orientation[1]-before),math.radians(3))
             self.assertGreater(sign*p.velocity[2],5)
-            self.assertAlmostEqual(p.animation_properties['controls/flight/elevator'],-sign)
+            # Assisted manual pitch owns the axis, while actual deflection is
+            # still constrained by the configured alpha/G protection.
+            state=self.game.sim.player_flight_state()
+            self.assertEqual(state.pitch_manual_weight,1)
+            self.assertLessEqual(abs(p.animation_properties['controls/flight/elevator']),1)
             self.assertLess(abs(p.orientation[0]),math.radians(5),'Pure pitch unexpectedly rolled the aircraft')
         # Releasing the key restores angle assist, rather than latching the elevator.
         self.game.input(SimpleNamespace(held=[],pressed=[],x=960,y=540,quit=False),.02);self.game.step()
@@ -78,7 +82,12 @@ class FlightGameTests(unittest.TestCase):
                         self.game.input(event,.02);self.game.step()
                     final=self.game.player()
                     self.assertTrue(final.alive)
-                    self.assertGreater(final.orientation[0]*direction,.3)
+                    # New pointing assistance tracks the small off-centre
+                    # direction; it no longer latches the old bank-rate input.
+                    state=self.game.sim.player_flight_state()
+                    self.assertEqual(state.roll_manual_weight,0)
+                    self.assertGreater(final.orientation[0]*direction,.1)
+                    self.assertLess(abs(final.orientation[0]-state.target_bank),.15)
                     self.assertLess(math.remainder(final.orientation[2]-banked.orientation[2],2*math.pi)*direction,-.02)
 
     def test_yasim_mouse_can_establish_bank_and_countersteer(self):
@@ -93,8 +102,24 @@ class FlightGameTests(unittest.TestCase):
         move(960,250)
         centered=self.game.player()
         self.assertTrue(centered.alive)
-        self.assertGreater(centered.orientation[0],math.radians(25))
-        self.assertLess(centered.orientation[2]-banked.orientation[2],-.04)
+        self.assertLess(abs(centered.orientation[0]),math.radians(5))
+        self.assertLess(centered.orientation[2]-banked.orientation[2],-.02)
         move(420,100)
         self.assertLess(self.game.player().orientation[0],centered.orientation[0]-.2)
+
+    def test_free_look_keeps_intent_but_pitch_keys_still_own_axis(self):
+        self.game.config.mission='training';self.game.start()
+        original=list(self.game.player_input.direction)
+        for _ in range(50):
+            self.game.input(SimpleNamespace(held=[67,83],pressed=[],x=1500,y=200,quit=False),.02)
+            self.game.step()
+        self.assertEqual(self.game.player_input.direction,original)
+        self.assertEqual(self.game.sim.player_flight_state().pitch_manual_weight,1)
+        self.assertLess(self.game.player().orientation[1],-.05)
+        rate=self.game.sim.player_flight_state().measured.body_rates[1]
+        for _ in range(50):
+            self.game.input(SimpleNamespace(held=[87,83],pressed=[],x=960,y=540,quit=False),.02)
+            self.game.step()
+        self.assertEqual(self.game.sim.player_flight_state().pitch_manual_weight,1)
+        self.assertLess(abs(self.game.sim.player_flight_state().measured.body_rates[1]),abs(rate)*.5+.01)
 if __name__=='__main__':unittest.main()

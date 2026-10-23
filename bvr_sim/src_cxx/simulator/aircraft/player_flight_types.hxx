@@ -20,7 +20,7 @@ struct PlayerFlightIntent {
 struct FlightMeasurements {
     std::array<double,3> position{},velocity{},orientation{};
     std::optional<std::array<double,3>> body_rates;
-    std::optional<double> alpha,beta,normal_g;
+    std::optional<double> alpha,beta,normal_g,density;
     double speed=0;
 };
 struct FlightSurfaceControls {double aileron=0,elevator=0,rudder=0,throttle=0;};
@@ -39,27 +39,32 @@ struct PlayerFlightProfile {
     double max_alpha=0,min_alpha=0,max_g=0,min_g=0,protection_gain=0;
     double reference_speed=0,min_speed=0,schedule_min=0,schedule_max=0;
     double surface_rate=0,release_seconds=0,target_response=0,bank_response=0;
+    double energy_horizon=0,recovery_speed_ratio=0,recovery_pitch=0;
+    double reference_density=0;
     void validate() const {
         const double positive[]={heading_gain,bank_gain,roll_rate_gain,pitch_gain,pitch_rate_gain,
             max_bank,max_roll_rate,max_pitch_rate,max_turn_rate,max_alpha,max_g,protection_gain,
             reference_speed,min_speed,schedule_min,schedule_max,surface_rate,release_seconds,
-            target_response,bank_response};
+            target_response,bank_response,energy_horizon,recovery_speed_ratio,reference_density};
         for(double v:positive)if(!std::isfinite(v)||v<=0)throw std::invalid_argument("Player flight profile requires finite positive gains/limits/time constants");
-        for(double v:{yaw_damping,sideslip_gain,trim_gain,trim_limit,min_alpha,min_g})
+        for(double v:{yaw_damping,sideslip_gain,trim_gain,trim_limit,min_alpha,min_g,recovery_pitch})
             if(!std::isfinite(v))throw std::invalid_argument("Nonfinite player flight profile");
         if(id.empty()||version.empty()||max_bank>1.5||max_alpha>.8||min_alpha>=max_alpha||
            min_g>=max_g||max_g>15||min_g< -5||min_speed>=reference_speed||schedule_min>schedule_max||
-           trim_limit<0||trim_limit>1||yaw_damping<0||sideslip_gain<0||trim_gain<0)
+           trim_limit<0||trim_limit>1||yaw_damping<0||sideslip_gain<0||trim_gain<0||
+           recovery_speed_ratio<=1||recovery_speed_ratio>2||energy_horizon>60||recovery_pitch>=0||recovery_pitch<-.5||reference_density>2)
             throw std::invalid_argument("Invalid player flight profile bounds/version");
     }
 };
 struct PlayerFlightState {
-    bool configured=false,active=false,protecting=false,saturated=false;
+    bool configured=false,active=false,protecting=false,saturated=false,energy_limited=false;
     FlightMeasurements measured;
     FlightSurfaceControls controls;
     std::array<double,3> target_direction{1,0,0};
+    std::array<double,3> limited_direction{1,0,0};
     double direction_error=0,body_direction_error=0,target_bank=0,roll_error=0;
     double desired_roll_rate=0,desired_pitch_rate=0,pitch_manual_weight=0,roll_manual_weight=0;
+    double pitch_trim=0;
     std::string profile_id,profile_hash,mode="inactive";
 };
 inline void validate_player_intent(const PlayerFlightIntent& x) {

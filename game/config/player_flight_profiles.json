@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "player-flight-1.0",
+  "version": "player-flight-1.4-candidate",
   "provenance": "Engineering player-assistance settings. Not FDM parameters, not AI/RL gains, not certified aircraft envelope data. Tuned labels become valid only after recorded response validation.",
   "units": {
     "control": {
@@ -11,7 +11,7 @@
       "pitch_rate_gain": "controller gain or dimensionless ratio",
       "yaw_damping": "controller gain or dimensionless ratio",
       "sideslip_gain": "controller gain or dimensionless ratio",
-      "trim_gain": "normalized/(rad*s), bounded flight-path trim integrator",
+      "trim_gain": "normalized/rad; integral of body pitch-rate tracking error",
       "trim_limit": "controller gain or dimensionless ratio",
       "max_bank": "rad",
       "max_roll_rate": "rad/s",
@@ -22,14 +22,18 @@
       "max_g": "g",
       "min_g": "g",
       "protection_gain": "controller gain or dimensionless ratio",
-      "reference_speed": "m/s",
-      "min_speed": "m/s",
+      "reference_speed": "m/s at reference_density; dynamic-pressure gain calibration",
+      "min_speed": "m/s at reference_density; dynamically converted to current TAS floor",
       "schedule_min": "controller gain or dimensionless ratio",
       "schedule_max": "controller gain or dimensionless ratio",
       "surface_rate": "normalized/s",
       "release_seconds": "s",
       "target_response": "s",
-      "bank_response": "s"
+      "bank_response": "s",
+      "energy_horizon": "s; kinetic-speed reserve lookahead under gravity",
+      "recovery_speed_ratio": "dimensionless; hysteresis relative to minimum manoeuvre speed",
+      "recovery_pitch": "rad; low-energy flight-path demand",
+      "reference_density": "kg/m^3; density where reference/minimum speeds are calibrated"
     },
     "input": {
       "deadzone": "dimensionless",
@@ -67,7 +71,7 @@
         "pitch_rate_gain": 1.8,
         "yaw_damping": 0.12,
         "sideslip_gain": 0.25,
-        "trim_gain": 0.04,
+        "trim_gain": 0.2,
         "trim_limit": 0.22,
         "max_bank": 1.134464,
         "max_roll_rate": 1.5,
@@ -85,7 +89,11 @@
         "surface_rate": 3.0,
         "release_seconds": 0.5,
         "target_response": 0.16,
-        "bank_response": 0.25
+        "bank_response": 0.25,
+        "energy_horizon": 20.0,
+        "recovery_speed_ratio": 1.2,
+        "recovery_pitch": -0.14,
+        "reference_density": 0.5
       },
       "input": {
         "deadzone": 0.015,
@@ -196,7 +204,7 @@
           "max_alpha": 0.2,
           "min_speed": 150.0,
           "max_pitch_rate": 0.22,
-          "trim_gain": 0.12,
+          "trim_gain": 1.0,
           "pitch_rate_gain": 4.0
         }
       }
@@ -207,10 +215,11 @@
       "assignment_basis": "Combat configuration; separately maintained player gains",
       "overrides": {
         "control": {
-          "pitch_rate_gain": 3.0,
-          "trim_gain": 0.3,
+          "pitch_rate_gain": 1.0,
+          "trim_gain": 0.8,
           "trim_limit": 0.5,
-          "surface_rate": 1.5
+          "surface_rate": 1.5,
+          "min_speed": 120.0
         }
       }
     },
@@ -292,9 +301,13 @@
       "assignment_basis": "Explicit source attack-aircraft assignment",
       "overrides": {
         "control": {
-          "trim_gain": 0.12,
+          "trim_gain": 0.7,
           "trim_limit": 0.35,
           "pitch_rate_gain": 5.0
+        },
+        "camera": {
+          "distance_spans": 2.3,
+          "lift_spans": 0.5
         }
       }
     },

@@ -47,6 +47,10 @@ def validate(path):
     for category,key in [('vegetation','vegetation_instances'),('building','building_instances'),('prop','prop_instances')]:
         if counts.get(category,0)>d['budgets'][key]:failures.append({'budget':key,'actual':counts.get(category,0)})
     fine=scene.arrays['focus'];cover=scene.arrays['landcover'];unique=np.unique(cover).tolist()
-    if len(unique)<7:failures.append({'error':'missing landcover classes','classes':unique})
+    surface_names=['grass','farmland','forest','soil','rock','pavement','water','marking']
+    represented={surface_names[i] for i in unique if 0<=i<len(surface_names)}
+    represented.update(s['material'] for s in d['surfaces'] if s.get('indices'))
+    required=set(surface_names[:7]);missing=required-represented
+    if missing:failures.append({'error':'missing land-use classes','missing':sorted(missing),'raster_classes':unique})
     if np.ptp(fine)<150:failures.append({'error':'insufficient genuine relief'})
-    return {'status':'passed' if not failures else 'failed','map_sha256':sha(path),'terrain_sha256':d['terrain']['sha256'],'instances':len(items),'counts':counts,'chunks':len(d['chunks']),'fine_sample_m':d['terrain']['details'][0]['spacing'],'height_range_m':[float(fine.min()),float(fine.max())],'landcover_classes':unique,'checked_neighbor_pairs':pairs,'failures':failures,'resource_inventory':inventory}
+    return {'status':'passed' if not failures else 'failed','map_sha256':sha(path),'terrain_sha256':d['terrain']['sha256'],'instances':len(items),'counts':counts,'chunks':len(d['chunks']),'fine_sample_m':d['terrain']['details'][0]['spacing'],'height_range_m':[float(fine.min()),float(fine.max())],'landcover_classes':unique,'represented_land_use':sorted(represented),'checked_neighbor_pairs':pairs,'failures':failures,'resource_inventory':inventory}

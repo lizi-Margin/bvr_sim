@@ -380,6 +380,7 @@ FlightMeasurements JSBSimFDM::flight_measurements() const {
     auto p=get("velocities/p-rad_sec"),q=get("velocities/q-rad_sec"),r=get("velocities/r-rad_sec");
     if(p&&q&&r)m.body_rates=std::array<double,3>{*p,*q,*r};
     m.alpha=get("aero/alpha-rad");m.beta=get("aero/beta-rad");m.normal_g=get("accelerations/Nz");
+    if(auto density=get("atmosphere/rho-slugs_ft3"))m.density=*density*515.3788183931961;
     return m;
 }
 
@@ -585,6 +586,11 @@ void JSBSimFDM::set_jsbsim_initial_conditions(double lon, double lat, double alt
     set_property_value(Catalog::ic_h_sl_ft, alt_ft);
     set_property_value(Catalog::ic_psi_true_deg, rad2deg(-yaw_val));
     set_property_value(Catalog::ic_u_fps, u_body_fps);
+    // Explicit nonzero initial attitudes were previously discarded. Keep the
+    // legacy zero-angle path identical, while allowing real inverted/pole
+    // recovery validation. Core pitch is nose-down; JSBSim theta is nose-up.
+    if(roll_val!=0)jsbsim_exec->SetPropertyValue("ic/phi-rad",roll_val);
+    if(pitch_val!=0)jsbsim_exec->SetPropertyValue("ic/theta-rad",-pitch_val);
     // set_property_value(Catalog::ic_v_fps, v_body_fps);
     // set_property_value(Catalog::ic_w_fps, w_body_fps);
     // set_property_value(Catalog::ic_p_rad_sec, 0.0);

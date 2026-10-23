@@ -183,7 +183,7 @@ class Baker:
             if count<settlement['houses']*.8:raise RuntimeError('Settlement could not meet recipe density: '+settlement['id'])
             for distance in np.arange(max(10,start-settlement['radius_m']),min(road.length-10,start+settlement['radius_m']),100):
                 p=road.interpolate(distance);a=road.interpolate(distance-1);b=road.interpolate(distance+1);dn=b.x-a.x;dw=b.y-a.y;l=math.hypot(dn,dw)
-                self.place(self.r['asset_roles']['lamp'],p.x-dw/l*9,p.y+dn/l*9,category='prop',zone=settlement['id']+'_street_equipment',minimum=5,clearance=False)
+                self.place(self.r['asset_roles']['lamp'],p.x-dw/l*9,p.y+dn/l*9,category='prop',zone=settlement['id']+'_street_equipment',minimum=5,clearance=bool(self.r.get('landscape')))
     def build_industry(self):
         if self.r.get('landscape'):
             from .river_valley import build_industry
@@ -216,7 +216,8 @@ class Baker:
             for piece in pieces(Polygon(poly).intersection(farm)):
                 if piece.area>20000:fields.append({'id':f'field_{index:03d}_{len(fields)}','polygon':list(map(list,piece.exterior.coords)),'holes':[list(map(list,r.coords)) for r in piece.interiors],'color':self.rng.choice(self.r.get('field_palette_linear',[[.78,.72,.38,1],[.53,.62,.28,1],[.7,.5,.24,1],[.62,.65,.31,1]])),'area_m2':piece.area})
         if self.r.get('landscape'):
-            for index,field in enumerate(fields):field['surface']='grass' if index%5<3 else 'farmland'
+            from .river_valley import subdivide_fields
+            fields=subdivide_fields(self,fields)
         self.fields=fields;return fields
     def build_scatter(self):
         role=self.r['asset_roles']
@@ -311,9 +312,13 @@ class Baker:
             from .detail_bake import _bake_material
             arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
             regional={**self.r['detail_sample'],'size_m':[x*1000 for x in self.r['focus_area_km']],
-                'texture_resolution':self.r['landscape']['macro_resolution'],'seam_blend_m':self.r['landscape']['regional_transition_m']}
+                'texture_resolution':self.r['landscape']['macro_resolution'],'seam_blend_m':self.r['landscape']['regional_transition_m'],
+                'material_detail_strength':.03}
             _bake_material(result,arrays,result['terrain']['details'][0],regional,out,self,material_id='regional_1',prefix='regional')
             result['terrain']['details'][0]['material']='regional_1'
+            # Fine-patch edges sample the actual parent macro material, rather
+            # than the old 25m landcover approximation that made a rectangle.
+            _bake_material(result,arrays,result['terrain']['details'][1],self.r['detail_sample'],out,self)
             result=finish_world(self,result,out)
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
         return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(self.instances),'counts':counts,'chunks':len(chunks),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}

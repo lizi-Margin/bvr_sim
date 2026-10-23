@@ -231,7 +231,20 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     tint=np.stack([sample_grid(arrays['macro_color'][...,i],cm,n,w) for i in range(3)],axis=2)
     boundary=np.minimum.reduce([n-meta['origin_north'],w-meta['origin_west'],meta['origin_north']+extent[0]-n,meta['origin_west']+extent[1]-w])
     fade=np.clip(boundary/spec.get('seam_blend_m',100),0,1);fade=fade*fade*(3-2*fade)
-    for index in np.unique(coarse_labels):
+    parent_material=document['materials'].get(parent.get('material','')) if material_id=='detail_1' else None
+    if parent_material:
+        from scipy.ndimage import map_coordinates
+        for slot in ['base_color','normal','roughness_map']:
+            file=parent_material[slot];source_files[file]=sha(file)
+            image=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
+            if slot=='base_color':image=np.where(image<=.04045,image/12.92,((image+.055)/1.055)**2.4)
+            u=(n-parent['origin_north'])/(parent['spacing']*(parent['columns']-1))*image.shape[1]-.5
+            v=(w-parent['origin_west'])/(parent['spacing']*(parent['rows']-1))*image.shape[0]-.5
+            sample=np.stack([map_coordinates(image[...,i],[v,u],order=1,mode='nearest') for i in range(3)],axis=2)
+            if slot=='base_color':color=color*fade[...,None]+sample*(1-fade[...,None])
+            elif slot=='normal':normal=normal*fade[...,None]+(sample*2-1)*(1-fade[...,None])
+            else:rough=rough*fade+sample[...,0]*(1-fade)
+    for index in ([] if parent_material else np.unique(coarse_labels)):
         m=document['materials'][names[int(index)]];weight=(coarse_labels==index)*(1-fade)
         for slot in ['base_color','normal','roughness_map']:
             if slot not in m:continue

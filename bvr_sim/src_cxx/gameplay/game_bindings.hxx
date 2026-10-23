@@ -21,7 +21,7 @@ inline void bind_game_api(pybind11::module_ &m) {
     py::class_<FlightMeasurements>(m,"FlightMeasurements")
         RO(FlightMeasurements,position) RO(FlightMeasurements,velocity) RO(FlightMeasurements,orientation)
         RO(FlightMeasurements,body_rates) RO(FlightMeasurements,alpha) RO(FlightMeasurements,beta)
-        RO(FlightMeasurements,normal_g) RO(FlightMeasurements,speed);
+        RO(FlightMeasurements,normal_g) RO(FlightMeasurements,speed) RO(FlightMeasurements,density);
     py::class_<FlightSurfaceControls>(m,"FlightSurfaceControls")
         .def(py::init<>()) RW(FlightSurfaceControls,aileron) RW(FlightSurfaceControls,elevator)
         RW(FlightSurfaceControls,rudder) RW(FlightSurfaceControls,throttle);
@@ -39,14 +39,18 @@ inline void bind_game_api(pybind11::module_ &m) {
         RW(PlayerFlightProfile,schedule_min) RW(PlayerFlightProfile,schedule_max)
         RW(PlayerFlightProfile,surface_rate) RW(PlayerFlightProfile,release_seconds)
         RW(PlayerFlightProfile,target_response) RW(PlayerFlightProfile,bank_response)
+        RW(PlayerFlightProfile,energy_horizon) RW(PlayerFlightProfile,recovery_speed_ratio) RW(PlayerFlightProfile,recovery_pitch)
+        RW(PlayerFlightProfile,reference_density)
         .def("validate",&PlayerFlightProfile::validate);
     py::class_<PlayerFlightState>(m,"PlayerFlightState")
         RO(PlayerFlightState,configured) RO(PlayerFlightState,active) RO(PlayerFlightState,protecting)
         RO(PlayerFlightState,saturated) RO(PlayerFlightState,measured) RO(PlayerFlightState,controls)
+        RO(PlayerFlightState,energy_limited) RO(PlayerFlightState,limited_direction)
         RO(PlayerFlightState,target_direction) RO(PlayerFlightState,direction_error) RO(PlayerFlightState,body_direction_error)
         RO(PlayerFlightState,target_bank) RO(PlayerFlightState,roll_error)
         RO(PlayerFlightState,desired_roll_rate) RO(PlayerFlightState,desired_pitch_rate)
         RO(PlayerFlightState,pitch_manual_weight) RO(PlayerFlightState,roll_manual_weight)
+        RO(PlayerFlightState,pitch_trim)
         RO(PlayerFlightState,profile_id) RO(PlayerFlightState,profile_hash) RO(PlayerFlightState,mode);
     py::class_<PlayerFlightController>(m,"PlayerFlightController").def(py::init<>())
         .def("configure",&PlayerFlightController::configure)

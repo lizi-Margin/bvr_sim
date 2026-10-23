@@ -52,7 +52,8 @@ class PlayerProfileStore:
             if not(0<c['max_bank']<1.5 and c['min_alpha']<0<c['max_alpha']<.8 and -5<c['min_g']<c['max_g']<=15
                    and 0<c['min_speed']<c['reference_speed'] and 0<c['schedule_min']<=c['schedule_max']
                    and 0<c['release_seconds']<5 and 0<c['surface_rate']<100 and 0<c['target_response']<5
-                   and 0<=c['trim_limit']<=1 and 0<=i['deadzone']<.5 and i['sensitivity']>0
+                   and 0<=c['trim_limit']<=1 and 0<c['reference_density']<=2 and 0<c['energy_horizon']<=60 and 1<c['recovery_speed_ratio']<=2
+                   and -.5<=c['recovery_pitch']<0 and 0<=i['deadzone']<.5 and i['sensitivity']>0
                    and i['curve']>=1 and .5<i['edge_fraction']<1 and i['edge_pan_rate']>=0
                    and 0<i['max_edge_pan']<1.5 and 0<i['edge_recenter_seconds']<5
                    and 0<i['max_target_elevation']<math.pi/2 and 0<i['direction_response']<5
@@ -60,11 +61,20 @@ class PlayerProfileStore:
                    and cam['lift_spans']>=0 and cam['smoothing_hz']>0
                    and .3<=cam['normal_fov']<=1.6 and .3<=cam['zoom_fov']<=cam['normal_fov']):
                 raise ValueError(f'{id}: invalid player profile envelope/input/camera bounds')
-            nonpositive=[k for k,v in c.items() if v<=0 and k not in {'min_alpha','min_g','trim_gain','trim_limit','yaw_damping','sideslip_gain'}]
+            nonpositive=[k for k,v in c.items() if v<=0 and k not in {'min_alpha','min_g','trim_gain','trim_limit','yaw_damping','sideslip_gain','recovery_pitch'}]
             if nonpositive:raise ValueError(f'{id}: nonpositive control fields {nonpositive}')
     def native_profile(self,native,aircraft_id):
-        p=self.resolve(aircraft_id);out=native.PlayerFlightProfile()
-        out.id=aircraft_id;out.version=p['version'];out.source_hash=p['effective_sha256']
+        return self.native_resolved(native,self.resolve(aircraft_id))
+    def native_resolved(self,native,p):
+        payload={k:v for k,v in p.items() if k!='effective_sha256'}
+        if hashlib.sha256(canonical(payload)).hexdigest()!=p['effective_sha256']:raise ValueError('Recorded player profile hash mismatch')
+        # Validate all effective input/camera/control fields, not just native
+        # gains. The recorded inheritance metadata remains part of its hash.
+        self.from_document({'schema_version':1,'version':p['version'],'units':self.document['units'],
+            'templates':{'recorded':{k:p[k] for k in ['control','input','camera']}},
+            'aircraft':{p['aircraft_id']:{'template':'recorded','tuning_status':p['tuning_status'],'assignment_basis':p['assignment_basis']}}},self.path)
+        out=native.PlayerFlightProfile()
+        out.id=p['aircraft_id'];out.version=p['version'];out.source_hash=p['effective_sha256']
         for key,value in p['control'].items():setattr(out,key,float(value))
         out.validate();return out
     def apply(self,session,native,aircraft_id):

@@ -34,7 +34,7 @@
     0.15
   ],
   "sky_exposure": 1.0,
-  "exposure": 1.0,
+  "exposure": 2.0,
   "saturation": 1.0,
   "paint_factor": 0.72,
   "paint_roughness": 0.64,
@@ -68,7 +68,7 @@
     "detail_textures": "Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes",
     "detail_mean": "Computed from source color in linear sRGB to preserve macro mean brightness",
     "shader_source": "Pinned Wicked Engine MIT source copied to cache; upstream checkout not edited",
-    "daylight": "Same exposure1/sun energy4/ACES; higher sun elevation and neutralized ambient after inspecting local+Y sun-direction transform",
+    "daylight": "Sun energy4/ACES; exposure2 selected after fixed-camera exposure1/2 and sun4/10 comparisons. Higher sun elevation and neutral ambient; no additional fog.",
     "anti_aliasing": "Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review"
   },
   "temporal_aa": true,

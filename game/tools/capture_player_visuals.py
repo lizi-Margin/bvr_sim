@@ -7,7 +7,7 @@ from bvr_game.app import FlightGame,serialize
 from bvr_game.content import write_json
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--action',choices=['map','input'],default='map');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--action',choices=['map','input','projection'],default='map');a=p.parse_args()
     os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
     g=FlightGame(render=True,visible=False,map_path=ROOT/'game/maps/river_valley_airfield/generated-map.json',
         visual_profile=ROOT/'game/recipes/player_daylight.json',output=a.output/'client')
@@ -32,19 +32,62 @@ def main():
             g.set_camera([32,8511,-20032],[0,8501,-20000],.92)
             for _ in range(40):g.draw()
             rows.append({'view':'fixed_high_horizon','capture':g.capture('fixed_high_horizon'),'shader_errors':g.renderer.shader_errors()})
+        elif a.action=='projection':
+            from bvr_game.player_input import camera_ray
+            for width,height in [(1920,1080),(1280,720),(1600,1000)]:
+                g.renderer.resize(width,height);event=g.renderer.poll();g.width,g.height=event.width,event.height
+                assert [g.width,g.height]==[width,height]
+                for fov in [1.,.55]:
+                    g.set_camera([0,9000,-20000],[0,9000,-19000],fov)
+                    for _ in range(20):g.draw()
+                    errors=[]
+                    for fx in [.25,.5,.75]:
+                        for fy in [.25,.5,.75]:
+                            ray=camera_ray(fx*width,fy*height,width,height,g.camera_params)
+                            eye=g.camera_params['eye'];origin=[eye[2],-eye[0],eye[1]]
+                            pixel=list(g.renderer.project([origin[i]+ray[i]*10000 for i in range(3)]))
+                            errors.append(math.hypot(pixel[0]-fx*width,pixel[1]-fy*height))
+                    assert max(errors)<1.5,(width,height,fov,errors)
+                    rows.append({'viewport':[width,height],'fov':fov,'maximum_roundtrip_error_pixels':max(errors),
+                        'actual_settings':json.loads(g.renderer.visual_settings())['actual_output'],'capture':g.capture(f'projection-{width}-{height}-{fov}')})
+            terrain=g.sim.terrain();height_samples=[];surface_samples=[]
+            for n in range(-5000,5001,1250):
+                for w in range(-6000,2001,1000):
+                    actual=g.renderer.render_height(n,w);expected=terrain.height(n,w)
+                    height_samples.append({'point':[n,w],'core':expected,'renderer':actual,'error_m':abs(actual-expected)})
+            for surface in g.baked_scene.document['environment']['contact_surfaces']:
+                vertices=surface['vertices'];n=sum(v[0] for v in vertices)/len(vertices);w=sum(v[1] for v in vertices)/len(vertices)
+                expected=terrain.contact(n,w,0,float('inf')).height;actual=g.renderer.render_surface_height(n,w)
+                surface_samples.append({'id':surface['id'],'point':[n,w],'core':expected,'renderer':actual,'error_m':abs(actual-expected)})
+            assert max(x['error_m'] for x in height_samples+surface_samples)<=.1
+            rows.append({'terrain_height_parity':height_samples,'contact_surface_height_parity':surface_samples,
+                'terrain_sha256':g.baked_scene.document['terrain']['sha256'],
+                'method':'Independent renderer CPU vertices/triangles versus core GameTerrain; actual uploaded geometry, not a second terrain formula'})
         else:
             for model in ['F22','F16','FG-A-10']:
                 g.select_aircraft(model);g.config.mission='training';g.config.speed=180 if model=='FG-A-10' else 300;g.config.altitude=8500
-                for key in ['W','S']:
+                for key in ['W','S','A','D']:
                     g.start(start_position=[-20000,0,8500],initial_speed=180 if model=='FG-A-10' else 300);initial=serialize(g.player())
                     for _ in range(20):g.draw()
                     for i in range(50):
                         g.input(SimpleNamespace(held=[ord(key)],pressed=[],x=960,y=540,wheel=0,quit=False,active=True),.02);g.step();g.draw(.02)
                     actual=g.player();forward=list(g.renderer.entity_forward('player'));state=serialize(g.sim.player_flight_state())
-                    expected_up=key=='S';assert (actual.orientation[1]<initial['orientation'][1])==expected_up,(model,key,actual.orientation)
-                    assert (forward[1]>0)==expected_up,(model,key,forward)
+                    if key in ['W','S']:
+                        expected_up=key=='S';assert (actual.orientation[1]<initial['orientation'][1])==expected_up,(model,key,actual.orientation)
+                        assert (forward[1]>0)==expected_up,(model,key,forward)
+                    else:assert state['measured']['body_rates'][0]*(1 if key=='D' else -1)>.02,(model,key,state)
+                    roll,pitch,yaw=actual.orientation
+                    f=[math.cos(yaw)*math.cos(pitch),math.sin(yaw)*math.cos(pitch),-math.sin(pitch)]
+                    right=[math.sin(yaw),-math.cos(yaw),0];up=[math.cos(yaw)*math.sin(pitch),math.sin(yaw)*math.sin(pitch),math.cos(pitch)]
+                    r=[right[i]*math.cos(roll)-up[i]*math.sin(roll) for i in range(3)]
+                    u=[up[i]*math.cos(roll)+right[i]*math.sin(roll) for i in range(3)]
+                    expected=[[-a[1],a[2],a[0]] for a in [r,u,f]]
+                    rendered=[list(axis) for axis in g.renderer.entity_basis('player')]
+                    basis_error=max(abs(a-b) for arow,brow in zip(expected,rendered) for a,b in zip(arow,brow))
+                    assert basis_error<1e-5,(model,key,basis_error,expected,rendered)
                     rows.append({'model':model,'key':key,'initial':initial,'core':serialize(actual),'player_state':state,
-                        'rendered_forward':forward,'capture':g.capture(model+'_'+key),'shader_errors':g.renderer.shader_errors(),
+                        'rendered_forward':forward,'rendered_basis':rendered,'independently_expected_basis':expected,'basis_max_component_error':basis_error,
+                        'capture':g.capture(model+'_'+key),'shader_errors':g.renderer.shader_errors(),
                         'input_path':'Real FlightGame.input handler with explicit deterministic events; not a claim of physical keyboard hardware injection'})
         write_json(a.output/'report.json',{'captures':rows,'visual_settings':json.loads(g.renderer.visual_settings()),'statistics':serialize(g.renderer.statistics()),
             'map_sha256':g.scene_hash,'shader_errors':g.renderer.shader_errors(),'native_core':str(__import__('bvr_game.app',fromlist=['native']).native.__file__)})

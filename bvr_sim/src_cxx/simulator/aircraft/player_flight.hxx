@@ -25,15 +25,17 @@ inline std::array<V,3> axes(V rpy){
 class PlayerFlightController {
     PlayerFlightProfile profile_;
     bool configured_=false,initialized_=false;
+    bool recovering_=false;
     double bank_=0,trim_=0,pitch_weight_=0,roll_weight_=0,last_pitch_=0,last_roll_=0;
     player_math::V filtered_target_{1,0,0};
+    player_math::V filtered_up_{0,0,1};
     FlightSurfaceControls previous_;
     PlayerFlightState state_;
 public:
     void configure(const PlayerFlightProfile& profile){
         profile.validate();profile_=profile;configured_=true;
         // Reset only this player's finite controller state on safe reload.
-        initialized_=false;trim_=0;pitch_weight_=roll_weight_=0;previous_={};
+        initialized_=false;recovering_=false;trim_=0;pitch_weight_=roll_weight_=0;previous_={};
         state_={};state_.configured=true;state_.profile_id=profile.id;state_.profile_hash=profile.source_hash;
     }
     const PlayerFlightProfile& profile() const {if(!configured_)throw std::logic_error("Player profile not configured");return profile_;}
@@ -47,7 +49,7 @@ public:
         const auto& p=profile_;const auto body=axes(m.orientation);
         const auto f=body[0],right=body[1],up=body[2];
         auto target=unit(intent.direction);
-        if(!initialized_){filtered_target_=f;bank_=m.orientation[0];initialized_=true;}
+        if(!initialized_){filtered_target_=f;filtered_up_=up;bank_=m.orientation[0];initialized_=true;}
         // Rotate on a sphere; a normalized linear mix stalls at exactly180deg.
         double theta=angle(filtered_target_,target),fraction=1-std::exp(-dt/p.target_response);
         if(theta>1e-7){
@@ -57,7 +59,8 @@ public:
             filtered_target_=unit(add(scale(filtered_target_,std::cos(theta*fraction)),scale(unit(tangent),std::sin(theta*fraction))));
         }
         target=filtered_target_;state_.measured=m;state_.target_direction=target;
-        state_.active=true;state_.protecting=false;state_.saturated=false;
+        state_.active=true;state_.protecting=false;state_.saturated=false;state_.energy_limited=false;
+        state_.limited_direction=target;
         state_.mode=intent.mode==PlayerFlightMode::RawManual?"raw_manual":"assisted";
         state_.direction_error=angle(target,unit(m.velocity,f));state_.body_direction_error=angle(target,f);
         FlightSurfaceControls out;out.throttle=std::clamp(intent.throttle,0.,1.);
@@ -66,56 +69,128 @@ public:
             out.rudder=std::clamp(intent.yaw_input,-1.,1.);trim_=0;pitch_weight_=roll_weight_=1;
         }else{
             double speed=std::max(m.speed,1.);
+            double density=m.density.value_or(p.reference_density);
+            double equivalent_speed=speed*std::sqrt(std::max(.001,density)/p.reference_density);
+            double minimum_tas=p.min_speed*speed/std::max(1.,equivalent_speed);
             double heading=std::atan2(target[1],target[0]);
-            double yaw_error=std::remainder(heading-m.orientation[2],2*3.14159265358979323846);
-            // At a vertical target, horizontal azimuth has no meaning. Bank
-            // demand fades continuously rather than selecting arbitrary yaw.
-            double horizontal=std::hypot(target[0],target[1]);
-            double low=std::clamp((speed-p.min_speed)/(p.reference_speed-p.min_speed),0.,1.);
-            double turn=std::clamp(yaw_error*p.heading_gain,-p.max_turn_rate,p.max_turn_rate)*std::min(1.,horizontal/.2)*(.25+.75*low);
-            double desired_bank=std::clamp(-std::atan(speed*turn/9.80665),-p.max_bank,p.max_bank);
-            bank_+=std::remainder(desired_bank-bank_,2*3.14159265358979323846)*(1-std::exp(-dt/p.bank_response));
-            auto reference_right=unit(cross(f,{0,0,1}),{std::sin(m.orientation[2]),-std::cos(m.orientation[2]),0});
-            auto reference_up=unit(cross(reference_right,f),up);
-            auto desired_up=add(scale(reference_up,std::cos(bank_)),scale(reference_right,std::sin(bank_)));
-            double roll_error=std::atan2(dot(desired_up,right),dot(desired_up,up));
-            double roll_demand=std::clamp(roll_error*p.bank_gain,-p.max_roll_rate,p.max_roll_rate);
-            const double target_elevation=std::atan2(target[2],std::hypot(target[0],target[1]));
+            double low=std::clamp((equivalent_speed-p.min_speed)/(p.reference_speed-p.min_speed),0.,1.);
+            double target_elevation=std::atan2(target[2],std::hypot(target[0],target[1]));
             const double flight_elevation=std::atan2(m.velocity[2],std::hypot(m.velocity[0],m.velocity[1]));
+            // A steep mouse target cannot supply energy. Reduce only the
+            // assisted flight-path demand before kinetic energy is exhausted.
+            // Preserve the raw target; raw manual bypasses this entire layer.
+            if(intent.protection && !intent.manual_pitch){
+                if(speed<minimum_tas)recovering_=true;
+                else if(speed>minimum_tas*p.recovery_speed_ratio)recovering_=false;
+                // Hysteresis controls exit from recovery, not the speed where
+                // level flight becomes forbidden. The old expression forced
+                // a steady descent above min_speed merely for missing reserve.
+                double available=std::clamp((speed-minimum_tas)/(9.80665*p.energy_horizon),-1.,1.);
+                double ceiling=recovering_?p.recovery_pitch:std::asin(available);
+                double limited=std::min(target_elevation,ceiling);
+                state_.energy_limited=limited<target_elevation;state_.protecting|=state_.energy_limited;
+                target_elevation=limited;
+                state_.limited_direction={std::cos(limited)*std::cos(heading),std::cos(limited)*std::sin(heading),std::sin(limited)};
+            }
             double target_pitch_error=target_elevation-flight_elevation;
-            // Pull only as the lift vector aligns with a lateral target. Pure
-            // vertical aiming never asks for a180deg inverted bank.
-            double bank=m.orientation[0];
-            double coordination=9.80665/speed*std::sin(bank)*std::sin(bank)/std::max(.25,std::cos(bank))*std::cos(flight_elevation);
-            double pitch_demand=std::clamp(target_pitch_error*p.pitch_gain*std::cos(bank)+coordination,-p.max_pitch_rate,p.max_pitch_rate);
+            // Geometric path steering has no Euler heading jump at a vertical
+            // attitude. Request curvature, then orient lift against gravity.
+            // Only measured own velocity/attitude enter this computation.
+            auto velocity_direction=unit(m.velocity,f),limited=state_.limited_direction;
+            auto rotation=cross(velocity_direction,limited);
+            auto fallback_axis=unit(cross(velocity_direction,{0,1,0}),{0,0,1});
+            if(std::hypot(velocity_direction[0],velocity_direction[1])>.2)fallback_axis={0,0,1};
+            auto omega=scale(unit(rotation,fallback_axis),angle(velocity_direction,limited)*p.pitch_gain);
+            double turn_limit=std::min(p.max_turn_rate,9.80665*std::tan(p.max_bank)/speed)*(.25+.75*low);
+            omega[2]=std::clamp(omega[2]*p.heading_gain/p.pitch_gain,-turn_limit,turn_limit);
+            double vertical_rate=std::hypot(omega[0],omega[1]);
+            if(vertical_rate>p.max_pitch_rate){omega[0]*=p.max_pitch_rate/vertical_rate;omega[1]*=p.max_pitch_rate/vertical_rate;}
+            omega=add(omega,scale(velocity_direction,-dot(omega,velocity_direction)));
+            auto acceleration=add(scale(cross(omega,velocity_direction),speed),{0,0,9.80665});
+            auto desired_up=unit(add(acceleration,scale(f,-dot(acceleration,f))),up);
+            // Recovering from a steep climb can require pushing rather than
+            // pulling. Do not demand an abrupt half-roll just because that
+            // signed pitch curvature makes the required lift vector reverse.
+            // Flat inverted flight still requests the normal upright recovery.
+            // During energy recovery a half-roll can be necessary: positive
+            // lift can bend a steep ballistic climb down sooner than the
+            // aircraft's small permitted negative-alpha lift. Let the full
+            // geometric lift solution perform that manoeuvre when limited.
+            if(!state_.energy_limited&&(std::abs(f[2])>.5||std::abs(velocity_direction[2])>.5)&&
+               std::abs(omega[2])<.1*std::max(.001,std::hypot(omega[0],omega[1]))&&dot(desired_up,up)<0)
+                desired_up=scale(desired_up,-1.);
+            auto reference_right=unit(cross(f,{0,0,1}),right);
+            auto reference_up=unit(cross(reference_right,f),up);
+            double desired_bank=std::atan2(dot(desired_up,reference_right),dot(desired_up,reference_up));
+            // Bank about world-up ceases to be meaningful near a vertical
+            // forward axis. Fade that limit, retaining vector roll feedback.
+            double bank_limit=p.max_bank+(3.14159265358979323846-p.max_bank)*std::clamp((std::abs(f[2])-.7)/.25,0.,1.);
+            bank_=std::clamp(desired_bank,-bank_limit,bank_limit);
+            desired_up=add(scale(reference_up,std::cos(bank_)),scale(reference_right,std::sin(bank_)));
+            auto held_up=unit(add(filtered_up_,scale(f,-dot(filtered_up_,f))),up);
+            double delta=std::atan2(dot(desired_up,cross(f,held_up)),dot(desired_up,held_up));
+            double response=delta*(1-std::exp(-dt/p.bank_response));
+            filtered_up_=unit(add(scale(held_up,std::cos(response)),scale(cross(f,held_up),std::sin(response))));
+            double roll_error=std::atan2(dot(filtered_up_,right),dot(filtered_up_,up));
+            double roll_demand=std::clamp(roll_error*p.bank_gain,-p.max_roll_rate,p.max_roll_rate);
+            // Lateral intent owns bank. Until that bank is reached, projecting
+            // the *desired* lateral curvature onto the *current* right axis
+            // can demand negative G during a reversal. Preserve measured-bank
+            // coordinated lift while tracking vertical flight-path error.
+            // Blend to the full vector solution near the vertical pole, where
+            // a gravity-referenced bank angle loses meaning.
+            double cos_bank=std::clamp(dot(reference_up,up),-1.,1.);
+            double coordinated=9.80665/speed*(1-cos_bank*cos_bank)/std::max(.25,cos_bank)*std::cos(flight_elevation);
+            double path_pitch=target_pitch_error*p.pitch_gain*cos_bank+coordinated;
+            double pole=std::clamp((std::max(std::abs(f[2]),std::abs(velocity_direction[2]))-.5)/.3,0.,1.);
+            double pitch_demand=std::clamp(path_pitch*(1-pole)+dot(omega,right)*pole,-p.max_pitch_rate,p.max_pitch_rate);
             auto rates=m.body_rates.value_or(V{});
-            double schedule=std::clamp(std::pow(p.reference_speed/speed,2),p.schedule_min,p.schedule_max);
+            double schedule=std::clamp(std::pow(p.reference_speed/std::max(1.,equivalent_speed),2),p.schedule_min,p.schedule_max);
             double ail=(roll_demand-rates[0])*p.roll_rate_gain*schedule;
             if(intent.manual_pitch){pitch_weight_=1;last_pitch_=std::clamp(intent.pitch_input,-1.,1.);trim_=0;}
             else pitch_weight_=std::max(0.,pitch_weight_-dt/p.release_seconds);
             if(intent.manual_roll){roll_weight_=1;last_roll_=std::clamp(intent.roll_input,-1.,1.);}
             else roll_weight_=std::max(0.,roll_weight_-dt/p.release_seconds);
             if(std::abs(target_pitch_error)<.25&&std::abs(roll_error)<.3&&pitch_weight_==0&&std::abs(previous_.elevator)<.95){
-                trim_=std::clamp(trim_+target_pitch_error*p.trim_gain*dt,-p.trim_limit,p.trim_limit);
-            }else trim_*=std::exp(-dt/p.release_seconds);
+                trim_=std::clamp(trim_+(pitch_demand-rates[1])*p.trim_gain*dt,-p.trim_limit,p.trim_limit);
+            }else if(pitch_weight_>0||std::abs(target_pitch_error)>.5){
+                trim_*=std::exp(-dt/p.release_seconds);
+            }
+            // Hold the established aerodynamic trim through short roll
+            // transients. Bleeding it on every reversal caused a persistent
+            // downward flight-path bias during otherwise level manoeuvres.
             double pull=(pitch_demand-rates[1])*p.pitch_rate_gain*schedule+trim_;
-            pull=pull*(1-pitch_weight_)+last_pitch_*pitch_weight_;
+            // Assisted keyboard pitch requests a bounded body pitch rate.
+            // Full direct elevator followed by delayed alpha/G corrections
+            // produced a violent pitch reversal while S was still held.
+            // The same rate feedback damps takeover and its release; raw mode
+            // retains exact direct surfaces for intentional full-stick tests.
+            double manual_pull=(last_pitch_*p.max_pitch_rate-rates[1])*p.pitch_rate_gain*schedule;
+            pull=pull*(1-pitch_weight_)+manual_pull*pitch_weight_;
             ail=ail*(1-roll_weight_)+last_roll_*roll_weight_;
             if(intent.protection){
+                bool surface_capped=false;
                 if(m.alpha){
                     double hi=std::clamp((p.max_alpha-*m.alpha)*p.protection_gain,-1.,1.);
                     double lo=std::clamp((p.min_alpha-*m.alpha)*p.protection_gain,-1.,1.);
-                    double capped=std::clamp(pull,lo,hi);state_.protecting|=capped!=pull;pull=capped;
+                    double capped=std::clamp(pull,lo,hi);surface_capped|=capped!=pull;pull=capped;
                 }
                 if(m.normal_g){
                     double hi=std::clamp((p.max_g-*m.normal_g)*p.protection_gain,-1.,1.);
                     double lo=std::clamp((p.min_g-*m.normal_g)*p.protection_gain,-1.,1.);
-                    double capped=std::clamp(pull,lo,hi);state_.protecting|=capped!=pull;pull=capped;
+                    double capped=std::clamp(pull,lo,hi);surface_capped|=capped!=pull;pull=capped;
                 }
                 // Below the configured sustainable manoeuvre speed unload
                 // rather than increasing engine thrust or aerodynamic lift.
-                if(speed<p.min_speed&&pull>.1){pull=.1;state_.protecting=true;}
-                if(state_.protecting)trim_*=std::exp(-dt/p.release_seconds);
+                // Positive body pitch while inverted can point the path down
+                // and recover energy. Do not suppress that recovery merely
+                // because the same body-axis sign means climbing when upright.
+                bool raises_path=intent.manual_pitch?(last_pitch_>0&&up[2]>0):(acceleration[2]>=9.80665);
+                if(speed<minimum_tas&&pull>.1&&raises_path){pull=.1;surface_capped=true;}
+                state_.protecting|=surface_capped;
+                // Energy limiting already changes the rate demand upstream.
+                // Its status alone must not continuously erase valid trim.
+                if(surface_capped)trim_*=std::exp(-dt/p.release_seconds);
             }
             double rud=intent.manual_yaw?intent.yaw_input:-(m.beta.value_or(0)*p.sideslip_gain+rates[2]*p.yaw_damping);
             state_.saturated=std::abs(ail)>1||std::abs(pull)>1||std::abs(rud)>1;
@@ -128,6 +203,7 @@ public:
             state_.desired_roll_rate=roll_demand;state_.desired_pitch_rate=pitch_demand;
         }
         state_.pitch_manual_weight=pitch_weight_;state_.roll_manual_weight=roll_weight_;
+        state_.pitch_trim=trim_;
         previous_=state_.controls=out;return out;
     }
 };

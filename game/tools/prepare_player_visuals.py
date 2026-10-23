@@ -47,7 +47,7 @@ def main():
     mean=float((linear@np.array([.2126,.7152,.0722])).mean())
     profile={**before,'name':'player_daylight','shader_source':str(source),'shader_cache':str(binary),
         'sun_rotation':[-.4,-.65,0],'ambient':[.13,.14,.15],
-        'exposure':1.,'sky_exposure':1.,'sun_energy':4.,'temporal_aa':True,'fxaa':False,
+        'exposure':2.,'sky_exposure':1.,'sun_energy':4.,'temporal_aa':True,'fxaa':False,
         'horizon_height_fog':{'enabled':False,'start_m':100000,'density_per_m':0.,'base_m':0,'top_m':16000,
             'approximation':'No additional height fog; retain actual physical aerial perspective'},
         'terrain_detail':{**before['terrain_detail'],'base_color':grass['base_color'],'normal':grass['normal'],'roughness_map':grass['roughness_map'],
@@ -56,7 +56,7 @@ def main():
     profile['shader_patch']={**before['shader_patch'],'patched_skyHF_sha256':sha(sky),
         'flat_nwu_horizon_haze':'Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.'}
     profile['provenance']={**before['provenance'],'detail_textures':'Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes',
-        'daylight':'Same exposure1/sun energy4/ACES; higher sun elevation and neutralized ambient after inspecting local+Y sun-direction transform',
+        'daylight':'Sun energy4/ACES; exposure2 selected after fixed-camera exposure1/2 and sun4/10 comparisons. Higher sun elevation and neutral ambient; no additional fog.',
         'anti_aliasing':'Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review'}
     write_changed(ROOT/'game/recipes/player_daylight.json',json.dumps(profile,indent=2)+'\n')
     print(json.dumps({'profile':str(ROOT/'game/recipes/player_daylight.json'),'shader_changed':changed,'source_sha256':sha(sky)},indent=2))

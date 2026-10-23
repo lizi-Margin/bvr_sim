@@ -58,13 +58,19 @@ public:
     std::map<std::string,double> visual_properties() const { return fdm->visual_properties(); }
     void configure_player_flight(const PlayerFlightProfile& p){player_controller_.configure(p);}
     PlayerFlightProfile player_flight_profile() const{return player_controller_.profile();}
+    std::optional<double> player_throttle() const {
+        auto state=player_controller_.state();return state.active?std::optional<double>(state.controls.throttle):std::nullopt;
+    }
     void set_player_flight(const PlayerFlightIntent& intent){
         validate_player_intent(intent);auto profile=player_controller_.profile();
         if(!player_intent_)player_controller_.configure(profile);
         player_intent_=intent;pilot_input_.reset();
     }
     PlayerFlightState player_flight_state() const {
-        auto s=player_controller_.state();s.measured=fdm->flight_measurements();return s;
+        auto s=player_controller_.state();s.measured=fdm->flight_measurements();
+        s.direction_error=player_math::angle(s.target_direction,s.measured.velocity);
+        s.body_direction_error=player_math::angle(s.target_direction,player_math::axes(s.measured.orientation)[0]);
+        return s;
     }
 
     double get_speed() const noexcept override;

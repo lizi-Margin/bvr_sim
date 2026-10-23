@@ -64,4 +64,9 @@ class BakedScene:
             for k in ['id','model','chunk','category','position','yaw','scale','lod_distance','cull_distance']:setattr(p,k,data[k])
             p.target_uid='depot' if data['zone']=='mission_objective' else ''
             placements.append(p)
-        renderer.configure_scene(terrain,self.arrays['landcover'].astype(int).ravel().tolist(),self.arrays['macro_color'].reshape(-1,4).tolist(),materials,surfaces,placements,self.arrays['outer_landcover'].astype(int).ravel().tolist(),self.arrays['outer_macro_color'].reshape(-1,4).tolist())
+        args=[terrain,self.arrays['landcover'].astype(int).ravel().tolist(),self.arrays['macro_color'].reshape(-1,4).tolist(),materials,surfaces,placements,self.arrays['outer_landcover'].astype(int).ravel().tolist(),self.arrays['outer_macro_color'].reshape(-1,4).tolist()]
+        terrain_materials=[d.get('material','' if i==0 else 'detail_'+str(i)) for i,d in enumerate(self.document['terrain']['details'])]
+        if getattr(bindings,'TERRAIN_TILE_MATERIALS',False):args.append(terrain_materials)
+        elif any(d.get('material') for d in self.document['terrain']['details']):
+            raise RuntimeError('This map requires the native terrain tile material interface; rebuild the renderer')
+        renderer.configure_scene(*args)
