@@ -19,7 +19,8 @@ public:
     SimCore(
         double dt,
         const std::string& log_file_path,
-        const std::string& acmi_file_path
+        const std::string& acmi_file_path,
+        bool enable_telemetry = true
     );
     ~SimCore();
 

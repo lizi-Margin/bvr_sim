@@ -25,6 +25,8 @@ public:
         return *instance_;
     }
 
+    static void shutdown() { delete instance_; instance_ = nullptr; }
+
     static SL& get()
     {
         check(instance_, "SL::get() before init_instance()");

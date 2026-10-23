@@ -1,0 +1,6 @@
+interface:
+  display_name: "BVR 仿真对象开发"
+  short_description: "Add BVR simulation objects with core-owned physics"
+  default_prompt: "使用 $bvr-add-sim-object 添加或重构仿真对象，将物理和生命周期放进仿真核心，并验证 Headless 行为。"
+policy:
+  allow_implicit_invocation: true

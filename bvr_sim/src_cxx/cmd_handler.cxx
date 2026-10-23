@@ -209,10 +209,10 @@ json::JSON CmdHandler::handle_list(const ParsedCommand& parsed) noexcept {
 CmdHandler::ParsedCommand CmdHandler::parse_command(const std::string& input)
 {
     static const std::regex base_pattern(
-        R"(^\s*([A-Za-z0-9]+)\s+([A-Za-z0-9]+)\s+(.+)\s*$)"
+        R"(^\s*([A-Za-z0-9]+)\s+(\S+)\s+(.+)\s*$)"
     );
     static const std::regex setp_pattern(
-        R"(^\s*([A-Za-z0-9]+)\s+([A-Za-z0-9]+)\s+(-?\d+)\s+(.+)\s*$)"
+        R"(^\s*([A-Za-z0-9]+)\s+(\S+)\s+(-?\d+)\s+(.+)\s*$)"
     );
 
     std::smatch match;

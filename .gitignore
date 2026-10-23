@@ -2,7 +2,6 @@ __pycache__
 *.pyc
 *.egg-info
 
-/AGENTS.md
 /CLAUDE.md
 /.claude/skills/
 
@@ -15,6 +14,7 @@ __pycache__
 /*.acmi
 /*.log
 /test_logs/
+/scripts/test_logs/
 /.vscode
 /docs/*
 !/docs/.gitignore
@@ -27,6 +27,7 @@ __pycache__
 !/docs/release_checklist.md
 !/docs/developer/
 !/docs/developer/architecture.md
+!/docs/developer/game_prototype.md
 !/docs/rl/
 !/docs/rl/*.md
 !/docs/superpowers/
@@ -42,3 +43,13 @@ __pycache__
 !/.github/media/paper/*.png
 /scripts/benchmarks/results/
 /benchmark_logs/
+/game/build/
+/game/assets/cache/
+/game/assets/registered/
+/game/assets/catalog.json
+/game/maps/training_range_v2/
+/diagnostic-map.json
+/game/runtime.json
+/game/captures/
+/screenshots/
+/log.txt

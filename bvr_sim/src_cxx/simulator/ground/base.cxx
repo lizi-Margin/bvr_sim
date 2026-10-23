@@ -18,7 +18,7 @@ GroundUnit::GroundUnit(
 ) noexcept : SimulatedObject(
         uid,
         color,
-        {position[0], position[1], _get_terrain_height(position[0], position[1])},
+        position,
         {0.0, 0.0, 0.0},
         dt,
         type_
@@ -28,10 +28,8 @@ GroundUnit::GroundUnit(
     _collision_radius(10.0),
     _log_tacview_Type("") {
 
-    // Initialize random yaw for logging
-    static thread_local std::mt19937 generator{std::random_device{}()};
-    static thread_local std::uniform_real_distribution<double> distribution(-c3u::pi, c3u::pi);
-    _yaw_for_log = distribution(generator);
+    // Scene placement supplies altitude; a constructor must not invent terrain.
+    _yaw_for_log = 0.0;
 }
 
 double GroundUnit::get_yaw() const noexcept {
@@ -43,11 +41,7 @@ double GroundUnit::get_heading() const noexcept {
 }
 
 double GroundUnit::_get_terrain_height(double x, double y) const noexcept {
-    std::cout << "get_terrain_height: " << x << ", " << y << "called, but not implemented" << std::endl;
-    // Random terrain height between 0 and 50 meters
-    static thread_local std::mt19937 generator{std::random_device{}()};
-    static thread_local std::uniform_int_distribution<int> distribution(0, 50);
-    return static_cast<double>(distribution(generator));
+    return 0.0; // Legacy callers use the flat default; game terrain is explicit.
 }
 
 bool GroundUnit::check_collision(const std::array<double, 3>& point) const noexcept {

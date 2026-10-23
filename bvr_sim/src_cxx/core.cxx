@@ -54,12 +54,12 @@ std::string json_unescape_string(const std::string& escaped) {
 
 }
 
-SimCore::SimCore(double dt, const std::string& log_file_path, const std::string& acmi_file_path)
+SimCore::SimCore(double dt, const std::string& log_file_path, const std::string& acmi_file_path, bool enable_telemetry)
     : running_(false),
       paused_(false),
       should_exit_(false),
       acmi_file_path_(acmi_file_path),
-      telemetry_bridge_(std::make_shared<TelemetryBridge>()),
+      telemetry_bridge_(enable_telemetry ? std::make_shared<TelemetryBridge>() : nullptr),
       visualization_server_(std::make_shared<EmbeddedWebServer>()),
       opengl_viewer_(std::make_shared<OpenGLViewer>()),
       game_mode_(std::make_shared<GameMode>())
@@ -76,7 +76,7 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
     // truncate acmi file
     truncate_acmi_file();
 
-    telemetry_bridge_->set_command_handler([this](const TelemetryCommand& command) {
+    if (telemetry_bridge_) telemetry_bridge_->set_command_handler([this](const TelemetryCommand& command) {
         return handle_telemetry_command(command);
     });
 
@@ -331,6 +331,9 @@ json::JSON SimCore::get_telemetry_status() const {
 void SimCore::start_telemetry_bridge() {
     if (!telemetry_bridge_) {
         telemetry_bridge_ = std::make_shared<TelemetryBridge>();
+        telemetry_bridge_->set_command_handler([this](const TelemetryCommand& command) {
+            return handle_telemetry_command(command);
+        });
     }
     telemetry_bridge_->start();
 }

@@ -12,6 +12,32 @@
 
 BVR-Sim 是一个面向强化学习研究的 3D 超视距空战环境，提供 Python 与加速 C++ 后端，并内置 skrl PPO 训练流程，可用于快速开展实验。
 
+### 可选的 Flight Operations 单机 Alpha
+
+当前默认地图包含 20×20 km 的重点区域、50 m 高程采样、机场、村镇、工业区、
+河流、农田和成片森林，外围采用大范围粗地形。默认空战从 50 km 开始。
+资源下载与登记、配方生成、地图检查、出击、步进和截图均可通过 Agent CLI 完成，
+详见[当前工作流](game/README.md)。场景为低面数程序化训练场，飞机采用静态姿态。
+
+新的 Windows DX12 客户端采用 Wicked Engine，通过进程内带 tick 的
+`GameSession` 类型化接口访问仿真。包含 F-22/F-16 选择、挂载、鼠标驾驶、
+基于传感器的雷达/锁定/导弹空战、Mk-82 对地投弹、结算和再次出击。
+完成[构建与资源准备](game/README.md)后，在当前仓库根目录启动：
+
+```powershell
+python -m bvr_game play
+python -m bvr_game run --mission strike --render --hidden
+python -m bvr_game run --mission air
+```
+
+这是可玩的早期 Alpha，FlightGear 飞机部件采用静态飞行姿态。
+设置 `BVR_SIM_BUILD_NATIVE_VIEWERS=OFF` 可构建不依赖 GPU/窗口库的仿真核心；
+Wicked 是独立的可选模块，游戏会话无需 TelemetryBridge。Agent 资源检索、下载、
+Blender 转换、登记、地图放置、精确步进与 GPU 取帧见
+[game/README.md](game/README.md)。完整验证命令为
+`python game/tools/validate_game.py --render`；先通过
+`npm.cmd --prefix bvr_sim/web ci --no-audit --no-fund` 安装原有网页前端的测试依赖。
+
 <div align="center">
 
 | F-22/F-16 异构 6v6 | 人类–AI 实时空战 | 空战 + 地面防空异构强化学习 |

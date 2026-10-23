@@ -8,6 +8,8 @@
 #include <memory>
 #include <map>
 #include <any>
+#include "rl/action_space.hxx"
+#include <optional>
 
 namespace bvr_sim {
 
@@ -17,6 +19,7 @@ class Fighter : public Aircraft {
 private:
     double _t;
     std::unique_ptr<AircraftFDM> fdm;
+    std::optional<ActionSpace> pilot_input_;
 
 public:
     double min_shoot_interval;
@@ -44,6 +47,9 @@ public:
     // 控制动作key: delta_heading(double), delta_altitude(double), delta_speed(double)
     // 发射动作key: fire(map_ss with target_uid and weapon_name)
     void step() override;
+    // Persistent human/in-process input; training behavior stays unchanged otherwise.
+    void set_pilot_input(double heading, double climb, double throttle,
+                         std::optional<double> aileron = std::nullopt);
 
     double get_speed() const noexcept override;
     double get_heading() const noexcept override;

@@ -7,6 +7,7 @@
 #include <random>
 #include <sstream>
 #include <iomanip>
+#include <mutex>
 #include "c3utils/c3utils.hxx"
 
 namespace bvr_sim {
@@ -14,6 +15,8 @@ namespace bvr_sim {
 using namespace c3utils;
 
 namespace {
+std::mutex uuid_mutex;
+std::optional<std::mt19937_64> seeded_uuid_generator;
 
 const char* sensor_detection_level_to_string(SensorDetectionLevel level) noexcept {
     switch (level) {
@@ -64,6 +67,7 @@ std::string SOT_to_string(SOT type) noexcept {
         case SOT::GroundUnit: return "GroundUnit";
         case SOT::AA: return "AA";
         case SOT::DataObj: return "DataObj";
+        case SOT::Bomb: return "Bomb";
 
         case SOT::MAX_SOT_VALUE:
         default:
@@ -194,14 +198,20 @@ void SimulatedObject::update_state(
 }
 
 std::string SimulatedObject::get_new_uuid() noexcept {
+    std::lock_guard<std::mutex> lock(uuid_mutex);
     static std::random_device rd;
     static std::mt19937_64 gen(rd());
     static std::uniform_int_distribution<uint64_t> dis;
 
-    uint64_t random_val = dis(gen);
+    uint64_t random_val = dis(seeded_uuid_generator ? *seeded_uuid_generator : gen);
     std::stringstream ss;
     ss << std::setw(8) << std::setfill('0') << (random_val % static_cast<uint64_t>(1e8));
     return ss.str();
+}
+
+void SimulatedObject::set_uuid_seed(std::optional<uint64_t> seed) noexcept {
+    std::lock_guard<std::mutex> lock(uuid_mutex);
+    if(seed)seeded_uuid_generator.emplace(*seed);else seeded_uuid_generator.reset();
 }
 
 std::optional<json::JSON> SimulatedObject::get(const std::string& key) const noexcept {

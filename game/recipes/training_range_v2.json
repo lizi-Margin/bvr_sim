@@ -1,0 +1,721 @@
+{
+  "schema_version": 2,
+  "name": "training_range_v2",
+  "seed": 7,
+  "style": "temperate_europe",
+  "focus_area_km": [
+    20,
+    20
+  ],
+  "outer_extent_km": [
+    512,
+    512
+  ],
+  "height_spacing_m": 50,
+  "outer_height_spacing_m": 2000,
+  "chunk_m": 1000,
+  "budgets": {
+    "vegetation_instances": 8000,
+    "building_instances": 300,
+    "prop_instances": 500,
+    "triangle_budget_visible": 5000000
+  },
+  "terrain": {
+    "river_level_m": 120,
+    "valley_width_m": 2100,
+    "hill_amplitude_m": 650,
+    "airport_height_m": 178,
+    "industrial_height_m": 180
+  },
+  "asset_roles": {
+    "canopy": [
+      "tree_oak",
+      "tree_pine"
+    ],
+    "riverbank": [
+      "tree_small",
+      "bush"
+    ],
+    "rocks": [
+      "rock_a",
+      "rock_b"
+    ],
+    "residential": [
+      "house_a",
+      "house_b",
+      "house_c"
+    ],
+    "warehouse": [
+      "warehouse_a",
+      "warehouse_b"
+    ],
+    "hangar": "warehouse_a",
+    "supply": "tank",
+    "equipment": "container",
+    "fence": "fence",
+    "lamp": "lamp",
+    "apron_equipment": "cone",
+    "target": "warehouse_c",
+    "utility": "tower",
+    "airport_admin": "house_c"
+  },
+  "materials": {
+    "grass": {
+      "provider": "ambientcg",
+      "id": "Grass001",
+      "tile_m": 2,
+      "color": [
+        0.8,
+        0.9,
+        0.7,
+        1
+      ],
+      "roughness": 0.92
+    },
+    "farmland": {
+      "provider": "ambientcg",
+      "id": "Ground072",
+      "tile_m": 3,
+      "color": [
+        0.95,
+        0.78,
+        0.48,
+        1
+      ],
+      "roughness": 0.95
+    },
+    "forest": {
+      "provider": "ambientcg",
+      "id": "Ground068",
+      "tile_m": 2,
+      "color": [
+        0.52,
+        0.66,
+        0.36,
+        1
+      ],
+      "roughness": 0.97
+    },
+    "soil": {
+      "provider": "ambientcg",
+      "id": "Ground072",
+      "tile_m": 2,
+      "color": [
+        0.78,
+        0.65,
+        0.46,
+        1
+      ],
+      "roughness": 0.9
+    },
+    "rock": {
+      "provider": "ambientcg",
+      "id": "Rock048",
+      "tile_m": 4,
+      "color": [
+        0.8,
+        0.79,
+        0.73,
+        1
+      ],
+      "roughness": 0.85
+    },
+    "pavement": {
+      "provider": "ambientcg",
+      "id": "Asphalt033",
+      "tile_m": 3,
+      "color": [
+        0.7,
+        0.72,
+        0.74,
+        1
+      ],
+      "roughness": 0.8
+    },
+    "water": {
+      "provider": "authored",
+      "color": [
+        0.12,
+        0.31,
+        0.38,
+        0.92
+      ],
+      "tile_m": 5,
+      "roughness": 0.08
+    },
+    "marking": {
+      "provider": "authored",
+      "color": [
+        0.9,
+        0.91,
+        0.83,
+        1
+      ],
+      "tile_m": 1,
+      "roughness": 0.8
+    }
+  },
+  "zones": [
+    {
+      "id": "forest_west",
+      "type": "forest",
+      "polygon": [
+        [
+          -9300,
+          -9300
+        ],
+        [
+          -3500,
+          -9300
+        ],
+        [
+          -3700,
+          -6000
+        ],
+        [
+          -7000,
+          -4900
+        ],
+        [
+          -9400,
+          -5600
+        ]
+      ]
+    },
+    {
+      "id": "forest_east",
+      "type": "forest",
+      "polygon": [
+        [
+          -8000,
+          5000
+        ],
+        [
+          -5500,
+          8900
+        ],
+        [
+          -500,
+          9400
+        ],
+        [
+          500,
+          6400
+        ],
+        [
+          -2700,
+          4600
+        ]
+      ]
+    },
+    {
+      "id": "forest_north",
+      "type": "forest",
+      "polygon": [
+        [
+          5000,
+          -8500
+        ],
+        [
+          9500,
+          -9200
+        ],
+        [
+          9400,
+          -3500
+        ],
+        [
+          7000,
+          -3000
+        ],
+        [
+          5000,
+          -5000
+        ]
+      ]
+    },
+    {
+      "id": "forest_ridge",
+      "type": "forest",
+      "polygon": [
+        [
+          6500,
+          5000
+        ],
+        [
+          9500,
+          5500
+        ],
+        [
+          9500,
+          9400
+        ],
+        [
+          4000,
+          9100
+        ],
+        [
+          3500,
+          6800
+        ]
+      ]
+    },
+    {
+      "id": "forest_river",
+      "type": "forest",
+      "polygon": [
+        [
+          1000,
+          1700
+        ],
+        [
+          3800,
+          1800
+        ],
+        [
+          4200,
+          2500
+        ],
+        [
+          1200,
+          3000
+        ]
+      ]
+    },
+    {
+      "id": "industry",
+      "type": "industrial",
+      "polygon": [
+        [
+          4000,
+          4100
+        ],
+        [
+          5200,
+          4100
+        ],
+        [
+          5200,
+          5200
+        ],
+        [
+          4000,
+          5200
+        ]
+      ]
+    },
+    {
+      "id": "agriculture",
+      "type": "farmland",
+      "polygon": [
+        [
+          -9700,
+          -9700
+        ],
+        [
+          9700,
+          -9700
+        ],
+        [
+          9700,
+          9700
+        ],
+        [
+          -9700,
+          9700
+        ]
+      ]
+    }
+  ],
+  "rivers": [
+    {
+      "id": "main_river",
+      "width_m": 170,
+      "bank_width_m": 220,
+      "points": [
+        [
+          -80000,
+          600
+        ],
+        [
+          -10000,
+          600
+        ],
+        [
+          -7000,
+          800
+        ],
+        [
+          -4000,
+          350
+        ],
+        [
+          -1500,
+          100
+        ],
+        [
+          1000,
+          700
+        ],
+        [
+          3500,
+          1000
+        ],
+        [
+          6000,
+          400
+        ],
+        [
+          10000,
+          600
+        ],
+        [
+          80000,
+          600
+        ]
+      ]
+    }
+  ],
+  "roads": [
+    {
+      "id": "airport_village",
+      "width_m": 9,
+      "points": [
+        [
+          -4000,
+          -2600
+        ],
+        [
+          -2600,
+          -2200
+        ],
+        [
+          -2000,
+          -5000
+        ],
+        [
+          -3500,
+          -5400
+        ]
+      ]
+    },
+    {
+      "id": "village_link",
+      "width_m": 11,
+      "points": [
+        [
+          -3500,
+          -5400
+        ],
+        [
+          -800,
+          -5000
+        ],
+        [
+          1500,
+          -3000
+        ],
+        [
+          2500,
+          -500
+        ],
+        [
+          3000,
+          1600
+        ],
+        [
+          4000,
+          4100
+        ],
+        [
+          4500,
+          4400
+        ]
+      ]
+    },
+    {
+      "id": "north_town",
+      "width_m": 9,
+      "points": [
+        [
+          1500,
+          -3000
+        ],
+        [
+          5000,
+          -2300
+        ],
+        [
+          6500,
+          -1900
+        ],
+        [
+          8800,
+          -1400
+        ]
+      ]
+    },
+    {
+      "id": "industrial_service",
+      "width_m": 8,
+      "points": [
+        [
+          4000,
+          4100
+        ],
+        [
+          4000,
+          5200
+        ],
+        [
+          5200,
+          5200
+        ],
+        [
+          5200,
+          4100
+        ],
+        [
+          4000,
+          4100
+        ]
+      ]
+    },
+    {
+      "id": "regional_highway",
+      "width_m": 14,
+      "points": [
+        [
+          -10000,
+          -7000
+        ],
+        [
+          -6000,
+          -6000
+        ],
+        [
+          -3500,
+          -5400
+        ],
+        [
+          1500,
+          -3000
+        ],
+        [
+          6500,
+          -1900
+        ],
+        [
+          10000,
+          -1000
+        ]
+      ]
+    }
+  ],
+  "settlements": [
+    {
+      "id": "south_village",
+      "center": [
+        -3500,
+        -5400
+      ],
+      "road": "airport_village",
+      "houses": 75,
+      "radius_m": 900,
+      "height_m": 290
+    },
+    {
+      "id": "north_village",
+      "center": [
+        6500,
+        -1900
+      ],
+      "road": "north_town",
+      "houses": 90,
+      "radius_m": 1100,
+      "height_m": 240
+    }
+  ],
+  "airfields": [
+    {
+      "id": "main_airfield",
+      "center": [
+        -2500,
+        -3500
+      ],
+      "heading_deg": 0,
+      "runway_length_m": 3000,
+      "runway_width_m": 52,
+      "flatten_margin_m": 350,
+      "apron": [
+        -2300,
+        -2700
+      ],
+      "apron_size_m": [
+        850,
+        650
+      ],
+      "hangars": 5
+    }
+  ],
+  "scatter_rules": [
+    {
+      "id": "forest_canopy",
+      "zones": [
+        "forest_west",
+        "forest_east",
+        "forest_north",
+        "forest_ridge",
+        "forest_river"
+      ],
+      "roles": "canopy",
+      "count": 5600,
+      "min_spacing_m": 13,
+      "cluster_radius_m": 160,
+      "cluster_size": 34,
+      "scale_range": [
+        0.75,
+        1.25
+      ],
+      "lod_distance_m": 1600,
+      "cull_distance_m": 35000
+    },
+    {
+      "id": "riverbank_vegetation",
+      "roles": "riverbank",
+      "count": 1100,
+      "min_spacing_m": 7,
+      "bank_only": true,
+      "scale_range": [
+        0.7,
+        1.2
+      ],
+      "lod_distance_m": 1000,
+      "cull_distance_m": 30000
+    },
+    {
+      "id": "hedgerows",
+      "roles": "riverbank",
+      "count": 900,
+      "min_spacing_m": 8,
+      "field_edges": true,
+      "scale_range": [
+        0.65,
+        1.1
+      ],
+      "lod_distance_m": 1200,
+      "cull_distance_m": 30000
+    },
+    {
+      "id": "rock_clusters",
+      "roles": "rocks",
+      "count": 140,
+      "min_spacing_m": 15,
+      "slope_min": 0.08,
+      "scale_range": [
+        0.6,
+        1.5
+      ],
+      "lod_distance_m": 1700,
+      "cull_distance_m": 30000
+    }
+  ],
+  "exclusion_zones": [
+    {
+      "id": "runway_safety",
+      "shape": "rectangle",
+      "center": [
+        -2500,
+        -3500
+      ],
+      "size_m": [
+        3900,
+        480
+      ],
+      "rules": [
+        "no_vegetation",
+        "no_building"
+      ]
+    },
+    {
+      "id": "apron_safety",
+      "shape": "rectangle",
+      "center": [
+        -2300,
+        -2700
+      ],
+      "size_m": [
+        1000,
+        800
+      ],
+      "rules": [
+        "no_vegetation"
+      ]
+    },
+    {
+      "id": "south_approach",
+      "shape": "rectangle",
+      "center": [
+        -6500,
+        -3500
+      ],
+      "size_m": [
+        4300,
+        1400
+      ],
+      "rules": [
+        "no_tall_objects"
+      ]
+    },
+    {
+      "id": "north_approach",
+      "shape": "rectangle",
+      "center": [
+        1500,
+        -3500
+      ],
+      "size_m": [
+        4300,
+        1400
+      ],
+      "rules": [
+        "no_tall_objects"
+      ]
+    }
+  ],
+  "mission": {
+    "player_start": [
+      -20000,
+      0,
+      8500
+    ],
+    "enemy_range_m": 50000,
+    "speed_mps": 300,
+    "strike_start": [
+      -4500,
+      4500,
+      3200
+    ],
+    "target": [
+      4500,
+      4500
+    ],
+    "target_id": "depot"
+  },
+  "geographic_import": {
+    "schema": "local_metric_bake_v1",
+    "origin_lla": [
+      7.0,
+      50.0,
+      0
+    ],
+    "projection": "local ENU converted to NWU",
+    "sources": {
+      "elevation": "Copernicus DEM",
+      "imagery": "Sentinel-2",
+      "landcover": "ESA WorldCover",
+      "vectors": "OSM/Geofabrik"
+    },
+    "runtime_requires_network": false
+  }
+}

@@ -37,7 +37,8 @@ bvr_sim_cpp = bvr_env_cpp.bvr_sim_cpp
 def main() -> int:
     os.makedirs("./test_logs", exist_ok=True)
     module_path = os.path.abspath(bvr_sim_cpp.__file__)
-    assert "web-visualization-phase1" in module_path.replace("\\", "/"), module_path
+    # Verify this checkout's native build without assuming a worktree name.
+    assert os.path.commonpath([module_path, PACKAGE_ROOT]) == PACKAGE_ROOT, module_path
     npm_executable = "npm.cmd" if os.name == "nt" else "npm"
     subprocess.run(
         [npm_executable, "--prefix", os.path.join("bvr_sim", "web"), "run", "build"],
@@ -191,7 +192,7 @@ def main() -> int:
         lambda data: data["telemetry"]["last_command_result"]["kind"] == "object_debug"
         and data["telemetry"]["last_command_result"]["status"] == "error"
     )
-    assert diagnostics["telemetry"]["last_command_result"]["message"] == "target object not found"
+    assert diagnostics["telemetry"]["last_command_result"]["message"] == "uid not found in active pool or trash bin", diagnostics["telemetry"]["last_command_result"]
     sock.close()
 
     core.stop_visualization_server()

@@ -7,6 +7,7 @@
 #include "simulator/simulator.hxx"
 #include "rl/rl_manager.hxx"
 #include "support/json.hpp"
+#include "gameplay/game_bindings.hxx"
 
 namespace py = pybind11;
 using namespace bvr_sim;
@@ -92,6 +93,7 @@ json::JSON python_to_json(const py::handle& obj) {
 
 PYBIND11_MODULE(bvr_sim_cpp, m) {
     m.doc() = "BVR Sim C++ bindings";
+    bind_game_api(m);
 
     py::enum_<TeamColor>(m, "TeamColor")
         .value("Red", TeamColor::Red)

@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.24)
+project(bvr_game_render LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(WICKED_SOURCE "" CACHE PATH "Wicked Engine checkout")
+set(WICKED_BUILD "" CACHE PATH "Wicked Engine Release build")
+if(NOT WIN32 OR NOT EXISTS "${WICKED_BUILD}/WickedEngine/Release/WickedEngine.lib")
+  message(FATAL_ERROR "Build Wicked Engine Release on Windows first; set WICKED_SOURCE and WICKED_BUILD")
+endif()
+find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
+set(PYBIND11_FINDPYTHON ON)
+add_subdirectory(../../bvr_sim/src_cxx/extern/pybind11 pybind11)
+# Reuse upstream importer without linking the editor UI. Keep upstream source/license in its checkout.
+file(READ "${WICKED_SOURCE}/Editor/ModelImporter_GLTF.cpp" GLTF_SOURCE)
+string(REPLACE "#include \"stdafx.h\"" "#include \"WickedEngine.h\"\n#include <fstream>\n#include <sstream>" GLTF_SOURCE "${GLTF_SOURCE}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/ModelImporter_GLTF.cpp" "${GLTF_SOURCE}")
+pybind11_add_module(bvr_game_render renderer.cpp "${CMAKE_CURRENT_BINARY_DIR}/ModelImporter_GLTF.cpp")
+target_include_directories(bvr_game_render PRIVATE "${WICKED_SOURCE}/WickedEngine" "${WICKED_SOURCE}/Editor" ../../bvr_sim/src_cxx)
+target_compile_definitions(bvr_game_render PRIVATE WICKED_CMAKE_BUILD UNICODE _UNICODE _XM_AVX_INTRINSICS_ _XM_SSE4_INTRINSICS_ _XM_F16C_INTRINSICS_ _XM_FMA3_INTRINSICS_)
+target_compile_options(bvr_game_render PRIVATE /EHsc /bigobj /wd4996)
+target_link_libraries(bvr_game_render PRIVATE
+  "${WICKED_BUILD}/WickedEngine/Release/WickedEngine.lib"
+  "${WICKED_BUILD}/WickedEngine/Release/Jolt.lib"
+  "${WICKED_BUILD}/WickedEngine/LUA/Release/LUA.lib"
+  "${WICKED_BUILD}/WickedEngine/Utility/Release/Utility.lib")
+add_custom_command(TARGET bvr_game_render POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+ "${WICKED_SOURCE}/WickedEngine/dxcompiler.dll" "$<TARGET_FILE_DIR:bvr_game_render>/dxcompiler.dll")

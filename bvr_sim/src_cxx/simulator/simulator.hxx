@@ -35,6 +35,7 @@ enum class SOT {  // Simulated Object Type
     GroundUnit,
     AA,
     DataObj,
+    Bomb,
     MAX_SOT_VALUE
 };
 
@@ -97,6 +98,8 @@ public:
     ) noexcept;
 
     static std::string get_new_uuid() noexcept;
+    // Opt-in deterministic object IDs for repeatable game sessions.
+    static void set_uuid_seed(std::optional<uint64_t> seed) noexcept;
 
     std::optional<json::JSON> get(const std::string& key) const noexcept;
     bool set(const std::string& key, const json::JSON& value) noexcept;

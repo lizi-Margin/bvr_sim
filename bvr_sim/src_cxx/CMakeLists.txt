@@ -61,6 +61,7 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/so_pool.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/bsl_pool.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/core.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/gameplay/game_session.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/resource_paths.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/global_config.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmd_handler.cxx"
@@ -122,6 +123,11 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/pybind11_bindings.cxx"
 )
 
+option(BVR_SIM_BUILD_NATIVE_VIEWERS "Build legacy native window renderers" ON)
+if(NOT BVR_SIM_BUILD_NATIVE_VIEWERS)
+    list(FILTER BVR_SIM_SOURCES EXCLUDE REGEX "/telemetry/(opengl_viewer[.]cxx|game/)")
+    list(APPEND BVR_SIM_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/viewer_stubs.cxx")
+endif()
 option(BVR_SIM_ENABLE_OGRE_NEXT "Enable experimental OGRE Next GameMode renderer" OFF)
 set(BVR_SIM_OGRE_NEXT_ROOT "" CACHE PATH "Path to OGRE Next source tree")
 set(BVR_SIM_OGRE_NEXT_BUILD_DIR "" CACHE PATH "Path to OGRE Next build tree")
@@ -227,7 +233,7 @@ endfunction(set_compiler_params target_name)
 # Create PyBind11 Module
 # ============================================================================
 find_package(Python3 COMPONENTS Interpreter Development.Module REQUIRED)
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND BVR_SIM_BUILD_NATIVE_VIEWERS)
     find_package(OpenGL REQUIRED)
     find_package(X11 REQUIRED)
 endif()
@@ -275,8 +281,11 @@ if(BVR_SIM_ENABLE_OGRE_NEXT)
     target_link_libraries(bvr_sim_cpp PRIVATE OgreNextMain OgreNextHlmsPbs OgreNextHlmsUnlit)
 endif()
 if(MSVC)
-    target_link_libraries(bvr_sim_cpp PRIVATE ws2_32 wsock32 d3d11 dxgi windowscodecs)
-elseif(UNIX AND NOT APPLE)
+    target_link_libraries(bvr_sim_cpp PRIVATE ws2_32 wsock32)
+    if(BVR_SIM_BUILD_NATIVE_VIEWERS)
+        target_link_libraries(bvr_sim_cpp PRIVATE d3d11 dxgi windowscodecs)
+    endif()
+elseif(UNIX AND NOT APPLE AND BVR_SIM_BUILD_NATIVE_VIEWERS)
     target_link_libraries(bvr_sim_cpp PRIVATE OpenGL::GL X11::X11)
 endif()
 set_compiler_params(bvr_sim_cpp)
@@ -341,8 +350,6 @@ if(BVR_SIM_BUILD_TESTS)
     target_compile_definitions(bvr_sim_unit_tests PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
     if(MSVC)
         target_link_libraries(bvr_sim_unit_tests PRIVATE ws2_32 wsock32)
-    elseif(UNIX AND NOT APPLE)
-        target_link_libraries(bvr_sim_unit_tests PRIVATE OpenGL::GL X11::X11)
     endif()
 
     if(BVR_SIM_INSTALL_DEVELOPMENT_ARTIFACTS)

@@ -87,7 +87,8 @@ void Fighter::step() {
             }
         }
     }
-    if (BYPASS_THROTTLE_CONTROL && get_mach() < 1.0) {
+    if (pilot_input_) action_space = *pilot_input_;
+    if (!pilot_input_ && BYPASS_THROTTLE_CONTROL && get_mach() < 1.0) {
         action_space.set_delta_speed(1.0);
     }
     // action_space_check::wipe_out_action(register_);
@@ -118,6 +119,17 @@ void Fighter::step() {
 
 double Fighter::get_speed() const noexcept {
     return fdm->get_speed();
+}
+
+void Fighter::set_pilot_input(double heading, double climb, double throttle,
+                             std::optional<double> aileron) {
+    json::JSON action=json::Object();
+    action["delta_heading"]=json::Float(heading);
+    action["delta_altitude"]=json::Float(climb);
+    action["delta_speed"]=json::Float(0.0);
+    action["throttle_cmd"]=json::Float(throttle);
+    if(aileron)action["aileron_cmd"]=json::Float(*aileron);
+    pilot_input_=ActionSpace(std::move(action));
 }
 
 double Fighter::get_heading() const noexcept {

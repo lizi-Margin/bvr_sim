@@ -12,6 +12,33 @@
 
 BVR-Sim is a 3D beyond-visual-range air-combat environment for reinforcement-learning research, with Python and accelerated C++ backends and a built-in skrl PPO training pipeline for immediate experimentation.
 
+### Optional single-player Flight Operations Alpha
+
+The default range now has a deterministic 20 x 20 km detailed region, a large
+coarse surround, shared scenery LODs and 50 km BVR engagements. Agent commands
+cover resource acquisition/registration, recipe baking, validation and direct
+sortie stepping/capture; see the [current workflow](game/README.md).
+
+The new Windows DX12 client uses Wicked Engine and an in-process, tick-tagged
+`GameSession` API. It includes F-22/F-16 selection, loadouts, mouse flight,
+sensor-based radar/lock/missile combat, Mk-82 strikes, debrief and repeat sorties.
+After the [build and asset setup](game/README.md), launch from this checkout:
+
+```powershell
+python -m bvr_game play
+python -m bvr_game run --mission strike --render --hidden
+python -m bvr_game run --mission air
+```
+
+The game is an early prototype with a training range and static FlightGear
+aircraft parts. The simulation also builds without GPU/window libraries using
+`BVR_SIM_BUILD_NATIVE_VIEWERS=OFF`; Wicked is a separate optional module and
+TelemetryBridge is not required by game sessions. Agent asset search, download,
+Blender conversion, registration, map placement, precise stepping and GPU capture
+are documented in [game/README.md](game/README.md). Validation:
+`python game/tools/validate_game.py --render` (install the existing web frontend's
+dependencies first with `npm.cmd --prefix bvr_sim/web ci --no-audit --no-fund`).
+
 <div align="center">
 
 | Heterogeneous F-22/F-16 6v6 | Human–AI Real-Time Air Combat | Heterogeneous Air Combat + Ground Air Defense |
