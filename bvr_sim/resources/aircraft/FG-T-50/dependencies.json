@@ -1,0 +1,59 @@
+{
+  "files": [
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Saturn",
+      "source": "T-50/Engines/Saturn.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "direct",
+      "source": "T-50/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Saturn",
+      "source": "T-50/Engines/Saturn.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "direct",
+      "source": "T-50/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Speedbrakes",
+      "source": "T-50/Systems/Speedbrakes.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Chute",
+      "source": "T-50/Systems/Chute.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Armament",
+      "source": "T-50/Systems/Armament.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Canopy",
+      "source": "T-50/Systems/Canopy.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T-50/T-50.xml",
+      "reference": "Particles",
+      "source": "T-50/Systems/Particles.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

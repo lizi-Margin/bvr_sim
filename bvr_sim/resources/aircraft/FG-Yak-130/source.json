@@ -1,0 +1,28 @@
+{
+  "set": "Yak-130/Yak-130-set.xml",
+  "name": "Yakovlev Yak-130",
+  "fdm_type": "yasim",
+  "fdm": "Yak-130/Yak-130-yasim.xml",
+  "jets": 2,
+  "model": "Yak-130/Models/Yak-130.xml",
+  "tags": [
+    "yakovlev",
+    "mid-wing",
+    "tricycle",
+    "retractable-gear",
+    "twin-engine",
+    "trainer",
+    "ifr",
+    "jet",
+    "1990s",
+    "2000s",
+    "2010s"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Yak-130.zip",
+  "archive_sha256": "05e28784e1c94c08d2a8e6bda4a862a74f178dead55e0b024e46f9940b16f8e5",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Yak-130.zip"
+}

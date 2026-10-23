@@ -1,0 +1,27 @@
+{
+  "set": "Bell-P-59/p59-set.xml",
+  "name": "Bell P 59 Airacomet (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Bell-P-59/Systems/p59-yasim.xml",
+  "jets": 2,
+  "model": "Bell-P-59/Models/p59.xml",
+  "tags": [
+    "bell",
+    "fighter",
+    "1940s",
+    "mid-wing",
+    "tricycle",
+    "retractable-gear",
+    "twin-engine",
+    "jet",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Bell-P-59.zip",
+  "archive_sha256": "1354fd11035c27213fc9986b57b732b74d30ac5d705a0dd854f0999ef03ad689",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Bell-P-59.zip"
+}

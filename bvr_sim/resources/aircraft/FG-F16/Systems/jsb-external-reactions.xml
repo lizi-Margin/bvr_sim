@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<external_reactions>
+   <force name="pushback" frame="BODY">
+  <location unit="IN">
+    <x>  177.02 </x>
+    <y> 0.0 </y>
+    <z>  -1.9683 </z>
+  </location>
+  <direction>
+    <x>1</x>
+    <y>0</y>
+    <z>0</z>
+  </direction>
+  </force>
+
+  <force name="hook" frame="BODY">
+  <location unit="IN">
+    <x>  280.669 </x>
+    <y> 0.0 </y>
+    <z>  -28.818 </z>
+  </location>
+  <direction>
+    <x>  -0.9995 </x>
+    <y>   0.0 </y>
+    <z>   0.01 </z>
+  </direction>
+   </force>
+
+   <force name="chute" frame="WIND">
+      <location unit="M">
+        <x>    5.5 </x>
+        <y>    0.00000 </y>
+        <z>    0.9 </z>
+      </location>
+      <direction>
+        <x>  -1.0 </x>
+        <y>   0.0 </y>
+        <z>   0.0 </z>
+      </direction>
+    </force>
+ </external_reactions>

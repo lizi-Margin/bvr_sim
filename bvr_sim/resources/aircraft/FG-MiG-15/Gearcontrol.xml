@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Gear control </description>
+	</fileheader>
+
+
+	<channel name="gearcontrol">
+
+
+
+		<switch name="calculations/gearcontrol/control-allowed">
+			<default value="systems/gearcontrol/control-command" />
+			<test logic="AND" value="systems/gearcontrol/control-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/gearcontrol/control-command</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/control-not-allowed">
+			<default value="systems/gearcontrol/control-input" />
+			<test logic="AND" value="systems/gearcontrol/control-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/gearcontrol/control-input</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/gear-one-end-move">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[0]/pos-norm-real eq systems/gearcontrol/control-command
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[0]/stuck eq 1
+				systems/gearcontrol/control-command eq 0
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[0]/torn eq 1
+			</test>
+			<output>systems/gearcontrol/gear-one-end-move</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/gear-two-end-move">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[1]/pos-norm-real eq systems/gearcontrol/control-command
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[1]/stuck eq 1
+				systems/gearcontrol/control-command eq 0
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[0]/torn eq 1
+			</test>
+			<output>systems/gearcontrol/gear-two-end-move</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/gear-three-end-move">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[2]/pos-norm-real eq systems/gearcontrol/control-command
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[2]/stuck eq 1
+				systems/gearcontrol/control-command eq 0
+			</test>
+			<test logic="AND" value="1">
+				gear/unit[0]/torn eq 1
+			</test>
+			<output>systems/gearcontrol/gear-three-end-move</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/gear-end-move">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/gearcontrol/gear-one-end-move eq 1
+				systems/gearcontrol/gear-two-end-move eq 1
+				systems/gearcontrol/gear-three-end-move eq 1
+			</test>
+			<output>systems/gearcontrol/gear-end-move</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/lever-command">
+			<default value="systems/gearcontrol/lever-command" />
+			<test logic="AND" value="0">
+				systems/gearcontrol/gear-end-move eq 1
+			</test>
+			<test logic="AND" value="-1">
+				systems/gearcontrol/gear-end-move eq 0
+				systems/gearcontrol/control-command eq 0
+			</test>
+			<test logic="AND" value="1">
+				systems/gearcontrol/gear-end-move eq 0
+				systems/gearcontrol/control-command eq 1
+			</test>
+			<output>systems/gearcontrol/lever-command</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/safer-command">
+			<default value="systems/gearcontrol/safer-command" />
+			<test logic="AND" value="0">
+				systems/leftpanel/serviceable eq 1
+				systems/gearcontrol/lever-command eq 0
+			</test>
+			<test logic="AND" value="1">
+				systems/leftpanel/serviceable eq 1
+				systems/gearcontrol/lever-command eq 1
+			</test>
+			<test logic="AND" value="1">
+				systems/leftpanel/serviceable eq 1
+				systems/gearcontrol/lever-command eq -1
+			</test>
+			<output>systems/gearcontrol/safer-command</output>
+		</switch>
+
+		<kinematic name="calculations/gearcontrol/safer-pos">
+			<input>systems/gearcontrol/safer-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/gearcontrol/safer-pos</output>
+		</kinematic>
+
+		<switch name="calculations/gearcontrol/safer-switch">
+			<default value="systems/gearcontrol/safer-switch" />
+			<test logic="AND" value="1">
+				systems/gearcontrol/safer-pos ge 0.9
+			</test>
+			<test logic="AND" value="0">
+				systems/gearcontrol/safer-pos lt 0.9
+			</test>
+			<output>systems/gearcontrol/safer-switch</output>
+		</switch>
+
+		<switch name="calculations/gearcontrol/lever-unsafed">
+			<default value="systems/gearcontrol/lever-unsafed" />
+			<test logic="AND" value="systems/gearcontrol/lever-command">
+				systems/gearcontrol/safer-switch eq 1
+			</test>
+			<output>systems/gearcontrol/lever-unsafed</output>
+		</switch>
+
+		<kinematic name="calculations/gearcontrol/lever-pos">
+			<input>systems/gearcontrol/lever-unsafed</input>
+			<traverse>
+			<setting>
+				<position>-1</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>0</position>
+				<time>0.2</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.4</time>
+			</setting>
+			</traverse>
+			<output>systems/gearcontrol/lever-pos</output>
+		</kinematic>
+
+		<switch name="calculations/gearcontrol/control-switch">
+			<default value="systems/gearcontrol/control-switch" />
+			<test logic="AND" value="1">
+				systems/gearcontrol/lever-pos ge 0.9
+			</test>
+			<test logic="AND" value="0">
+				systems/gearcontrol/lever-pos lt -0.9
+			</test>
+			<output>systems/gearcontrol/control-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/gearcontrol/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/gearcontrol/safer-pos ge 0.25
+				systems/gearcontrol/safer-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/gearcontrol/lever-pos ge 0.25
+				systems/gearcontrol/lever-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/gearcontrol/lever-pos le -0.25
+				systems/gearcontrol/lever-pos ge -0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="electrical-fdm-cust">
+
+    <property value="0">electrical/supplier/emergency-on</property>
+
+<channel name="electrical-custom">
+
+
+        <switch name="external power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/electric/master-switch == 1
+                /environment/wildfire/fire-on-crash  == 0
+                /position/altitude-agl-ft lt 8
+            </test>
+            <output>/controls/electric/external-power</output>
+        </switch>
+
+        <summer name="electric master switch">
+            <input>/controls/electric/master-switch</input>
+            <clipto>
+                <min>0.0000</min>
+                <max>1.0000</max>
+            </clipto>
+        </summer>
+       
+
+
+       
+       <switch name="electrical/supplier/battery-on">
+           <default value="0" />
+           <test logic="AND" value="1">
+               /controls/electric/master-switch == 1
+           </test>
+           <output>/controls/engines/engine[0]/master-bat</output>
+        </switch>
+
+        <switch name="electrical/supplier/alternator-on">
+            <default value="0" />
+            <test logic="OR" value="1">
+               propulsion/engine[0]/n2 gt 50
+            </test>
+            <output>/controls/engines/engine[0]/master-alt</output>
+        </switch>
+
+        <switch name="electrical/supplier/external-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/electric/master-switch == 1
+                /controls/electric/external-power  == 1
+                electrical/supplier/alternator-on == 0
+                electrical/supplier/emergency-on == 0
+            </test>
+        </switch>
+
+
+    </channel>
+
+
+</system>

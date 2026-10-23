@@ -1,0 +1,24 @@
+{
+  "set": "F-86/F-86F-set.xml",
+  "name": "F-86F Sabre",
+  "fdm_type": "yasim",
+  "fdm": "F-86/f86f-yasim.xml",
+  "jets": 1,
+  "model": "F-86/Models/F-86F.xml",
+  "tags": [
+    "fighter",
+    "north-american",
+    "1950s",
+    "1960s",
+    "coldwar",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 4,
+  "variant_of": "",
+  "archive": "F-86.zip",
+  "archive_sha256": "37d8870c94d7bad1ea7180bf491afd3443089ca86920f95d5b99ed1000d53e4f",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/F-86.zip"
+}

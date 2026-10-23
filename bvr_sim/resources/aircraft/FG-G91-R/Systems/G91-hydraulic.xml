@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="hydraulic">
+
+    <property value="3500">systems/hydraulics/normal-pressure-psi</property>
+    <property value="3200">systems/hydraulics/minimal-pressure-psi</property>
+    <property value="4000">systems/hydraulics/maximal-pressure-psi</property>
+    <property value="19">systems/hydraulics/reservoir-quantity</property>
+    <property value="0.1">systems/hydraulics/pump_max_flow_rate</property>
+    <property value="0">systems/hydraulics/flight-system-psi</property>
+    <property value="0">systems/hydraulics/flight-system-pump-failed</property>
+    <property value="0.1">systems/hydraulics/lost-performance-system</property>
+    
+    <property value="0">systems/hydraulics/low_press_on</property>
+    <property value="0">systems/hydraulics/emerg_system_press_on</property>
+
+    <channel name="hydraulic pressure" execrate="8">
+        
+        <scheduled_gain name="systems/hydraulics/pump_power">
+            <input>systems/hydraulics/reservoir-quantity</input>
+            <table>
+                <independentVar lookup="row">propulsion/engine/n1</independentVar>
+                <tableData>
+                    0     0.0
+                    30    2.0
+                    100   5.0
+                </tableData>
+            </table>
+            <gain>systems/hydraulics/pump_max_flow_rate</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/hydraulics/pump_flow_rate">
+            <input>systems/hydraulics/reservoir-quantity</input>
+            <table>
+                <independentVar lookup="row">systems/hydraulics/flight-system-psi</independentVar>
+                <tableData>
+                    0       1.0
+                    3500    0.4
+                    4000    0.4
+                </tableData>
+            </table>
+            <gain>systems/hydraulics/pump_power</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/hydraulics/lost_flow_rate">
+            <input>systems/hydraulics/reservoir-quantity</input>
+            <table>
+                <independentVar lookup="row">systems/hydraulics/flight-system-psi</independentVar>
+                <tableData>
+                    0       0.0
+                    3500    45
+                    4000    80
+                </tableData>
+            </table>
+            <gain>systems/hydraulics/lost-performance-system</gain>
+        </scheduled_gain>
+        
+        <integrator name="systems/hydraulics/flight-system-psi">
+            <input>systems/hydraulics/net_flow_rate</input>
+            <c1>systems/hydraulics/pump_power-psi</c1>
+            <clipto>
+                <min>0.0</min>
+                <max>systems/hydraulics/maximal-pressure-psi</max>
+            </clipto>
+        </integrator>
+        
+        <summer name="systems/hydraulics/net_flow_rate">
+            <input>systems/hydraulics/pump_flow_rate</input>
+            <input>-systems/hydraulics/lost_flow_rate</input>
+        </summer>
+        
+        <switch name="systems/hydraulics/low_press_on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/hydraulics/flight-system-psi LT 2000
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/hydraulics/flight-system-norm">
+            <function>
+                <ifthen>
+                    <lt>
+                        <p>systems/hydraulics/flight-system-psi</p>
+                        <p>systems/hydraulics/minimal-pressure-psi</p>
+                    </lt>
+                    <quotient>
+                        <p>systems/hydraulics/flight-system-psi</p>
+                        <p>systems/hydraulics/minimal-pressure-psi</p>
+                    </quotient>
+                    <v>1</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+    </channel>
+    
+    
+    <function name="systems/hydraulics/pump_power-psi">
+        <product>
+            <p>systems/hydraulics/pump_power</p>
+            <ifthen>
+                <ge>
+                    <p>systems/hydraulics/maximal-pressure-psi</p>
+                    <p>systems/hydraulics/flight-system-psi</p>
+                </ge>
+                <quotient>
+                    <sqrt>
+                        <sum>
+                            <p>systems/hydraulics/maximal-pressure-psi</p>
+                            <product>
+                                <p>systems/hydraulics/flight-system-psi</p>
+                                <v>-1.0</v>
+                            </product>
+                        </sum>
+                    </sqrt>
+                    <sqrt>
+                        <p>systems/hydraulics/maximal-pressure-psi</p>
+                    </sqrt>
+                </quotient>
+                <v>0.0</v>
+            </ifthen>
+        </product>
+    </function>
+    
+</system>

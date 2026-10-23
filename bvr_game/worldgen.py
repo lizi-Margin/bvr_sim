@@ -288,6 +288,9 @@ class Baker:
             materials[name]=entry
         target=self.r['mission']['target'];mission=dict(self.r['mission']);mission['target']=[*target,round(terrain.height(*target),5)]
         result={'schema_version':2,'name':self.r['name'],'seed':self.r['seed'],'recipe_sha256':hashlib.sha256(canonical(self.r)).hexdigest(),'coordinates':{'units':'meters','source':'north,west,up','wicked':'-west,up,north','origin_lla':self.r['geographic_import']['origin_lla']},'terrain':{'version':2,'file':terrain_file.name,'sha256':sha(terrain_file),'base':terrain.base_meta,'details':[terrain.fine_meta],'cell_diagonal':'lower-left to upper-right in NWU grid; same triangle planes everywhere'},'focus_area_km':self.r['focus_area_km'],'materials':materials,'instances':self.instances,'surfaces':self.surfaces,'fields':self.fields,'zones':self.r['zones'],'roads':self.r['roads'],'rivers':self.r['rivers'],'airfields':self.r['airfields'],'settlements':self.r['settlements'],'exclusion_zones':self.r['exclusion_zones'],'chunks':chunks,'chunk_m':self.r['chunk_m'],'budgets':self.r['budgets'],'counts':counts,'placement_rejections':self.rejections,'mission':mission,'resource_versions':{id:{'sha256':m['glb_sha256'],'lods':m['lods']} for id,m in self.metadata.items()},'geographic_import':self.r['geographic_import']}
+        if self.r.get('detail_sample'):
+            from .detail_bake import refine
+            result=refine(self,result,out)
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
         return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(self.instances),'counts':counts,'chunks':len(chunks),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}
 def main():

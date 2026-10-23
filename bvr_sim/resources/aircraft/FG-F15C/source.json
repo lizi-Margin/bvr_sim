@@ -1,0 +1,22 @@
+{
+  "set": "F-15/f15c-set.xml",
+  "name": "F-15C",
+  "fdm_type": "jsb",
+  "fdm": "F-15/f15a.xml",
+  "jets": 0,
+  "model": "F-15/Models/F-15C.xml",
+  "tags": [
+    "fighter",
+    "jet",
+    "twin-engine",
+    "retractable-gear",
+    "ifr"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "F-15.zip",
+  "archive_sha256": "7d5e342a81a9dadcd14b08fdf278104a07cf7973d22cfbfbc3ebb49649da40b2",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/F-15.zip"
+}

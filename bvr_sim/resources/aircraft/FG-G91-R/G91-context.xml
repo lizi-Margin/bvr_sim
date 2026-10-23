@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="context">
+    
+    <property value="-1.0">context/simulation/is-starting</property>
+    
+    <property value="0.0">context/gears/on-ground</property>
+    <property value="0.0">context/gears/wow</property>
+    
+    <channel name="Simulation status" execrate="240">
+        
+        <switch name="context/simulation/is-starting">
+            <default value="context/simulation/is-starting" />
+            <test logic="AND" value="1">
+                /sim/fdm-initialized == 1
+                context/simulation/is-starting == -1
+            </test>
+            <test logic="AND" value="0">
+                context/simulation/is-starting == 1
+            </test>
+        </switch>
+
+    </channel>
+    
+        
+    <channel name="Landing gear position" execrate="8">
+        
+        <switch name="context/gears/wow">
+            <default value="0" />
+            <test logic="OR" value="1">
+                gear/unit[0]/WOW eq 1
+                gear/unit[1]/WOW eq 1
+                gear/unit[2]/WOW eq 1
+            </test>
+        </switch>
+        
+        <switch name="context/gears/on-ground">
+            <default value="0" />
+            <test logic="AND" value="2">
+                systems/landing-gear/gear-down-status == 1
+                gear/unit[0]/compression-ft GT 0.001
+                gear/unit[1]/compression-ft GT 0.001
+                gear/unit[2]/compression-ft GT 0.001
+            </test>
+            <test logic="AND" value="1">
+                <test logic="AND">
+                    systems/landing-gear/gear-down-status == 1
+                </test>
+                <test logic="OR">
+                    gear/unit[0]/compression-ft GT 0.001
+                    gear/unit[1]/compression-ft GT 0.001
+                    gear/unit[2]/compression-ft GT 0.001
+                </test>
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+</system>

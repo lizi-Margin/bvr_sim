@@ -1,0 +1,839 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-80: Performance"> 
+	
+	<property value="40">/systems/performance/land-flaps</property>
+	<property value="0">/systems/performance/land-no-slats</property>
+	
+	<channel name="Performance Calculations" execrate="8">
+		
+		
+		<fcs_function name="/systems/performance/v1-table"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<independentVar lookup="column">/systems/performance/to-flaps</independentVar>
+					<tableData>
+						        4    11   15
+						 90000  110  101  100
+						 92000  112  102  102
+						 94000  114  104  103
+						 96000  116  106  105
+						 98000  118  107  106
+						100000  120  109  108
+						102000  122  111  109
+						104000  123  112  111
+						106000  125  114  112
+						108000  126  115  114
+						110000  128  117  115
+						112000  130  118  116
+						114000  131  120  118
+						116000  133  121  119
+						118000  135  122  121
+						120000  136  124  122
+						122000  138  125  124
+						124000  139  127  125
+						126000  141  128  126
+						128000  142  130  128
+						130000  144  131  129
+						132000  145  132  131
+						134000  147  134  132
+						136000  148  135  133
+						138000  150  136  135
+						140000  151  137  136
+						142000  152  139  137
+						144000  154  140  139
+						146000  155  141  140
+						148000  157  143  142
+						150000  158  144  143
+						160000  165  151  140
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v1-delta-11"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">inertia/weight-lbs</independentVar>
+					<tableData breakPoint="120000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  1  1  1  1  1  1  1  1  2  2  3  3  5  5
+						2000  1  1  1  1  1  1  1  1  2  2  3  3  5  5
+						2001  2  2  2  2  2  2  3  3  4  4  6  6  7  7
+						4000  2  2  2  2  2  2  3  3  4  4  6  6  7  7
+						4001  3  3  3  3  4  4  5  5  7  7  8  8  8  8
+						6000  3  3  3  3  4  4  5  5  7  7  8  8  8  8
+						6001  5  5  6  6  6  6  7  7  8  8  9  9  9  9
+						8000  5  5  6  6  6  6  7  7  8  8  9  9  9  9
+					</tableData>
+					<tableData breakPoint="150000">
+						     -40  19  20  24  25  29  30  34  35  39  40  44  45  50
+						   0  1   1   1   1   1   1   1   1   2   2   3   3   6   6
+						2000  1   1   1   1   1   1   1   1   2   2   3   3   6   6
+						2001  2   2   2   2   2   2   3   3   5   5   6   6   8   8
+						4000  2   2   2   2   2   2   3   3   5   5   6   6   8   8
+						4001  3   3   4   4   5   5   6   6   8   8   9   9   10  10
+						6000  3   3   4   4   5   5   6   6   8   8   9   9   10  10
+						6001  6   6   7   7   8   8   9   9   11  11  12  12  12  12
+						8000  6   6   7   7   8   8   9   9   11  11  12  12  12  12
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v1-delta-15"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">inertia/weight-lbs</independentVar>
+					<tableData breakPoint="120000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  0  0  0  0  0  0  1  1  2  2  2  2  4  4
+						2000  0  0  0  0  0  0  1  1  2  2  2  2  4  4
+						2001  1  1  1  1  2  2  2  2  4  4  4  4  5  5
+						4000  1  1  1  1  2  2  2  2  4  4  4  4  5  5
+						4001  2  2  2  2  3  3  4  4  5  5  6  6  7  7
+						6000  2  2  2  2  3  3  4  4  5  5  6  6  7  7
+						6001  4  4  5  5  5  5  6  6  7  7  7  7  7  7
+						8000  4  4  5  5  5  5  6  6  7  7  7  7  7  7
+					</tableData>
+					<tableData breakPoint="150000">
+						     -40  19  20  24  25  29  30  34  35  39  40  44  45  50
+						   0  1   1   1   1   1   1   2   2   3   3   5   5   7   7
+						2000  1   1   1   1   1   1   2   2   3   3   5   5   7   7
+						2001  3   3   3   3   3   3   5   5   7   7   9   9   11  11
+						4000  3   3   3   3   3   3   5   5   7   7   9   9   11  11
+						4001  6   6   6   6   6   6   9   9   11  11  13  13  14  14
+						6000  6   6   6   6   6   6   9   9   11  11  13  13  14  14
+						6001  8   8   9   9   11  11  12  12  15  15  16  16  16  16
+						8000  8   8   9   9   11  11  12  12  15  15  16  16  16  16
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v1-minimum"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">/systems/performance/to-flaps</independentVar>
+					<tableData breakPoint="11">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  116  116  116  116  116  116  114  114  112  112  110  110
+						 999  116  116  116  116  116  116  114  114  112  112  110  110
+						1000  115  115  115  115  115  115  112  112  110  110  108  108
+						1999  115  115  115  115  115  115  112  112  110  110  108  108
+						2000  113  113  113  113  112  112  110  110  107  107  106  106
+						2999  113  113  113  113  112  112  110  110  107  107  106  106
+						3000  112  112  112  112  110  110  108  108  106  106  104  104
+						3999  112  112  112  112  110  110  108  108  106  106  104  104
+						4000  111  111  110  110  108  108  106  106  104  104  102  102
+						4999  111  111  110  110  108  108  106  106  104  104  102  102
+						5000  109  109  107  107  106  106  103  103  101  101  100  100
+						5999  109  109  107  107  106  106  103  103  101  101  100  100
+						6000  107  107  105  105  104  104  102  102  100  100   98   98
+						6999  107  107  105  105  104  104  102  102  100  100   98   98
+						7000  105  105  103  103  102  102  100  100   98   98   96   96
+						7999  105  105  103  103  102  102  100  100   98   98   96   96
+					</tableData>
+					<tableData breakPoint="15">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  115  115  115  115  115  115  113  113  111  111  109  109
+						 999  115  115  115  115  115  115  113  113  111  111  109  109
+						1000  114  114  114  114  114  114  112  112  109  109  107  107
+						1999  114  114  114  114  114  114  112  112  109  109  107  107
+						2000  112  112  112  112  111  111  109  109  106  106  105  105
+						2999  112  112  112  112  111  111  109  109  106  106  105  105
+						3000  111  111  111  111  109  109  107  107  104  104  103  103
+						3999  111  111  111  111  109  109  107  107  104  104  103  103
+						4000  110  110  109  109  107  107  105  105  103  103  101  101
+						4999  110  110  109  109  107  107  105  105  103  103  101  101
+						5000  108  108  106  106  105  105  103  103  101  101   99   99
+						5999  108  108  106  106  105  105  103  103  101  101   99   99
+						6000  106  106  104  104  103  103  101  101   99   99   97   97
+						6999  106  106  104  104  103  103  101  101   99   99   97   97
+						7000  104  104  102  102  101  101   99   99   97   97   95   95
+						7999  104  104  102  102  101  101   99   99   97   97   95   95
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v1-delta">
+			<function>
+				<interpolate1d>
+					<property>/systems/performance/to-flaps</property>
+					<value>11</value><property>/systems/performance/v1-delta-11</property>
+					<value>15</value><property>/systems/performance/v1-delta-15</property>
+				</interpolate1d>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v1">
+			<function>
+				<max>
+					<sum>
+						<property>/systems/performance/v1-table</property>
+						<property>/systems/performance/v1-delta</property>
+					</sum>
+					<property>/systems/performance/v1-minimum</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/performance/vr-table"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<independentVar lookup="column">/systems/performance/to-flaps</independentVar>
+					<tableData>
+						        4    11   15
+						 90000  120  110  108
+						 92000  122  111  109
+						 94000  123  113  111
+						 96000  125  114  112
+						 98000  126  116  114
+						100000  128  117  115
+						102000  130  118  116
+						104000  131  120  118
+						106000  133  121  119
+						108000  134  123  121
+						110000  136  124  122
+						112000  137  125  123
+						114000  139  126  125
+						116000  140  128  126
+						118000  142  129  128
+						120000  143  131  129
+						122000  145  132  130
+						124000  146  133  131
+						126000  147  134  133
+						128000  149  135  134
+						130000  150  137  135
+						132000  151  138  136
+						134000  153  139  137
+						136000  154  140  139
+						138000  155  141  140
+						140000  157  143  141
+						142000  158  144  142
+						144000  159  145  143
+						146000  160  146  144
+						148000  162  147  146
+						150000  163  148  147
+						160000  169  153  152
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/vr-delta-11"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">inertia/weight-lbs</independentVar>
+					<tableData breakPoint="80000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  1  1  1  1  1  1  2  2  2  2  3  3  4  4
+						2000  1  1  1  1  1  1  2  2  2  2  3  3  4  4
+						2001  2  2  2  2  2  2  3  3  4  4  4  4  5  5
+						4000  2  2  2  2  2  2  3  3  4  4  4  4  5  5
+						4001  3  3  3  3  4  4  4  4  5  5  5  5  6  6
+						6000  3  3  3  3  4  4  4  4  5  5  5  5  6  6
+						6001  4  4  4  4  4  4  5  5  6  6  6  6  6  6
+						8000  4  4  4  4  4  4  5  5  6  6  6  6  6  6
+					</tableData>
+					<tableData breakPoint="120000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  1  1  1  1  1  1  1  1  1  1  2  2  3  3
+						2000  1  1  1  1  1  1  1  1  1  1  2  2  3  3
+						2001  1  1  1  1  1  1  2  2  2  2  3  3  3  3
+						4000  1  1  1  1  1  1  2  2  2  2  3  3  3  3
+						4001  2  2  2  2  2  2  2  2  3  3  3  3  4  4
+						6000  2  2  2  2  2  2  2  2  3  3  3  3  4  4
+						6001  2  2  2  2  2  2  3  3  3  3  3  3  4  4
+						8000  2  2  2  2  2  2  3  3  3  3  3  3  4  4
+					</tableData>
+					<tableData breakPoint="150000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  1  1  1  1  1  1  1  1  1  1  1  1  2  2
+						2000  1  1  1  1  1  1  1  1  1  1  1  1  2  2
+						2001  1  1  1  1  1  1  1  1  2  2  2  2  3  3
+						4000  1  1  1  1  1  1  1  1  2  2  2  2  3  3
+						4001  1  1  2  2  2  2  2  2  2  2  3  3  3  3
+						6000  1  1  2  2  2  2  2  2  2  2  3  3  3  3
+						6001  2  2  2  2  2  2  3  3  3  3  3  3  3  3
+						8000  2  2  2  2  2  2  3  3  3  3  3  3  3  3
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/vr-delta-15"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">inertia/weight-lbs</independentVar>
+					<tableData breakPoint="120000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  0  0  0  0  0  0  1  1  1  1  1  1  2  2
+						2000  0  0  0  0  0  0  1  1  1  1  1  1  2  2
+						2001  0  0  1  1  1  1  1  1  2  2  2  2  2  2
+						4000  0  0  1  1  1  1  1  1  2  2  2  2  2  2
+						4001  1  1  2  2  2  2  2  2  2  2  3  3  3  3
+						6000  1  1  2  2  2  2  2  2  2  2  3  3  3  3
+						6001  2  2  2  2  2  2  2  2  3  3  3  3  3  3
+						8000  2  2  2  2  2  2  2  2  3  3  3  3  3  3
+					</tableData>
+					<tableData breakPoint="150000">
+						     -40 19 20 24 25 29 30 34 35 39 40 44 45 50
+						   0  1  1  1  1  1  1  1  1  2  2  2  2  3  3
+						2000  1  1  1  1  1  1  1  1  2  2  2  2  3  3
+						2001  1  1  2  2  2  2  2  2  3  3  3  3  4  4
+						4000  1  1  2  2  2  2  2  2  3  3  3  3  4  4
+						4001  2  2  2  2  3  3  3  3  4  4  4  4  5  5
+						6000  2  2  2  2  3  3  3  3  4  4  4  4  5  5
+						6001  3  3  3  3  4  4  4  4  5  5  5  5  5  5
+						8000  3  3  3  3  4  4  4  4  5  5  5  5  5  5
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/vr-minimum"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">/systems/performance/to-flaps</independentVar>
+					<tableData breakPoint="4">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  122  122  122  122  122  122  120  120  118  118  116  116
+						 999  122  122  122  122  122  122  120  120  118  118  116  116
+						1000  121  121  121  121  121  121  118  118  115  115  114  114
+						1999  121  121  121  121  121  121  118  118  115  115  114  114
+						2000  119  119  119  119  118  118  116  116  114  114  112  112
+						2999  119  119  119  119  118  118  116  116  114  114  112  112
+						3000  118  118  118  118  116  116  114  114  112  112  110  110
+						3999  118  118  118  118  116  116  114  114  112  112  110  110
+						4000  117  117  116  116  114  114  112  112  110  110  108  108
+						4999  117  117  116  116  114  114  112  112  110  110  108  108
+						5000  115  115  114  114  113  113  110  110  108  108  106  106
+						5999  115  115  114  114  113  113  110  110  108  108  106  106
+						6000  114  114  112  112  111  111  108  108  106  106  104  104
+						6999  114  114  112  112  111  111  108  108  106  106  104  104
+						7000  112  112  110  110  109  109  106  106  104  104  102  102
+						7999  112  112  110  110  109  109  106  106  104  104  102  102
+					</tableData>
+					<tableData breakPoint="11">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  121  121  121  121  121  121  119  119  117  117  115  115
+						 999  121  121  121  121  121  121  119  119  117  117  115  115
+						1000  120  120  120  120  120  120  117  117  114  114  113  113
+						1999  120  120  120  120  120  120  117  117  114  114  113  113
+						2000  118  118  118  118  117  117  115  115  113  113  111  111
+						2999  118  118  118  118  117  117  115  115  113  113  111  111
+						3000  117  117  117  117  115  115  113  113  111  111  109  109
+						3999  117  117  117  117  115  115  113  113  111  111  109  109
+						4000  116  116  115  115  113  113  111  111  109  109  107  107
+						4999  116  116  115  115  113  113  111  111  109  109  107  107
+						5000  114  114  113  113  112  112  109  109  107  107  105  105
+						5999  114  114  113  113  112  112  109  109  107  107  105  105
+						6000  113  113  111  111  110  110  107  107  105  105  103  103
+						6999  113  113  111  111  110  110  107  107  105  105  103  103
+						7000  111  111  109  109  108  108  105  105  103  103  101  101
+						7999  111  111  109  109  108  108  105  105  103  103  101  101
+					</tableData>
+					<tableData breakPoint="15">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  118  118  118  118  117  117  116  116  114  114  112  112
+						 999  118  118  118  118  117  117  116  116  114  114  112  112
+						1000  116  116  116  116  116  116  114  114  112  112  110  110
+						1999  116  116  116  116  116  116  114  114  112  112  110  110
+						2000  115  115  115  115  114  114  112  112  110  110  108  108
+						2999  115  115  115  115  114  114  112  112  110  110  108  108
+						3000  114  114  114  114  112  112  110  110  108  108  106  106
+						3999  114  114  114  114  112  112  110  110  108  108  106  106
+						4000  113  113  112  112  110  110  108  108  106  106  104  104
+						4999  113  113  112  112  110  110  108  108  106  106  104  104
+						5000  111  111  110  110  108  108  106  106  104  104  102  102
+						5999  111  111  110  110  108  108  106  106  104  104  102  102
+						6000  110  110  108  108  107  107  104  104  102  102  101  101
+						6999  110  110  108  108  107  107  104  104  102  102  101  101
+						7000  107  107  106  106  104  104  102  102  101  101  100  100
+						7999  107  107  106  106  104  104  102  102  101  101  100  100
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/vr-delta">
+			<function>
+				<interpolate1d>
+					<property>/systems/performance/to-flaps</property>
+					<value>11</value><property>/systems/performance/vr-delta-11</property>
+					<value>15</value><property>/systems/performance/vr-delta-15</property>
+				</interpolate1d>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/vr">
+			<function>
+				<max>
+					<property>/systems/performance/v1</property>
+					<sum>
+						<property>/systems/performance/vr-table</property>
+						<property>/systems/performance/vr-delta</property>
+					</sum>
+					<property>/systems/performance/vr-minimum</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		 
+		<fcs_function name="/systems/performance/v2-table"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<independentVar lookup="column">/systems/performance/to-flaps</independentVar>
+					<tableData>
+						        4    11   15
+						 90000  130  120  119
+						 92000  132  121  120
+						 94000  133  123  121
+						 96000  135  124  123
+						 98000  136  126  124
+						100000  138  127  125
+						102000  139  128  126
+						104000  141  129  128
+						106000  142  131  129
+						108000  143  132  131
+						110000  144  133  132
+						112000  146  136  133
+						114000  147  135  134
+						116000  149  137  136
+						118000  150  138  137
+						120000  151  139  138
+						122000  153  140  139
+						124000  154  141  140
+						126000  155  142  141
+						128000  156  143  142
+						130000  158  144  143
+						132000  159  146  144
+						134000  160  147  145
+						136000  161  148  146
+						138000  163  149  147
+						140000  164  150  148
+						142000  165  151  150
+						144000  166  152  151
+						146000  168  153  152
+						148000  169  155  153
+						150000  170  156  154
+						160000  176  162  160
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v2-minimum"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">/systems/performance/to-flaps</independentVar>
+					<tableData breakPoint="4">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  132  132  132  132  131  131  129  129  127  127  125  125
+						 999  132  132  132  132  131  131  129  129  127  127  125  125
+						1000  130  130  130  130  130  130  127  127  124  124  122  122
+						1999  130  130  130  130  130  130  127  127  124  124  122  122
+						2000  128  128  128  128  128  128  125  125  122  122  120  120
+						2999  128  128  128  128  128  128  125  125  122  122  120  120
+						3000  127  127  127  127  125  125  122  122  120  120  117  117
+						3999  127  127  127  127  125  125  122  122  120  120  117  117
+						4000  125  125  124  124  123  123  120  120  117  117  115  115
+						4999  125  125  124  124  123  123  120  120  117  117  115  115
+						5000  124  124  123  123  120  120  117  117  115  115  114  114
+						5999  124  124  123  123  120  120  117  117  115  115  114  114
+						6000  123  123  121  121  118  118  115  115  114  114  112  112
+						6999  123  123  121  121  118  118  115  115  114  114  112  112
+						7000  119  119  118  118  116  116  114  114  112  112  110  110
+						7999  119  119  118  118  116  116  114  114  112  112  110  110
+					</tableData>
+					<tableData breakPoint="11">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  130  130  130  130  129  129  127  127  125  125  123  123
+						 999  130  130  130  130  129  129  127  127  125  125  123  123
+						1000  128  128  128  128  128  128  125  125  122  122  121  121
+						1999  128  128  128  128  128  128  125  125  122  122  121  121
+						2000  126  126  126  126  126  126  123  123  121  121  119  119
+						2999  126  126  126  126  126  126  123  123  121  121  119  119
+						3000  125  125  125  125  123  123  121  121  119  119  116  116
+						3999  125  125  125  125  123  123  121  121  119  119  116  116
+						4000  123  123  122  122  122  122  119  119  116  116  114  114
+						4999  123  123  122  122  122  122  119  119  116  116  114  114
+						5000  122  122  121  121  119  119  116  116  114  114  113  113
+						5999  122  122  121  121  119  119  116  116  114  114  113  113
+						6000  121  121  119  119  117  117  114  114  113  113  111  111
+						6999  121  121  119  119  117  117  114  114  113  113  111  111
+						7000  118  118  117  117  115  115  113  113  111  111  109  109
+						7999  118  118  117  117  115  115  113  113  111  111  109  109
+					</tableData>
+					<tableData breakPoint="15">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  127  127  127  127  127  127  124  124  122  122  120  120
+						 999  127  127  127  127  127  127  124  124  122  122  120  120
+						1000  125  125  125  125  125  125  122  122  120  120  118  118
+						1999  125  125  125  125  125  125  122  122  120  120  118  118
+						2000  124  124  124  124  123  123  120  120  118  118  116  116
+						2999  124  124  124  124  123  123  120  120  118  118  116  116
+						3000  122  122  122  122  121  121  118  118  116  116  114  114
+						3999  122  122  122  122  121  121  118  118  116  116  114  114
+						4000  121  121  120  120  119  119  116  116  114  114  111  111
+						4999  121  121  120  120  119  119  116  116  114  114  111  111
+						5000  120  120  118  118  116  116  114  114  111  111  110  110
+						5999  120  120  118  118  116  116  114  114  111  111  110  110
+						6000  118  118  116  116  114  114  112  112  109  109  107  107
+						6999  118  118  116  116  114  114  112  112  109  109  107  107
+						7000  115  115  114  114  112  112  110  110  108  108  105  105
+						7999  115  115  114  114  112  112  110  110  108  108  105  105
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/v2">
+			<function>
+				<max>
+					<property>/systems/performance/v2-table</property>
+					<property>/systems/performance/v2-minimum</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/performance/flap-retract-11">
+			<function>
+				<sum>
+					<property>/systems/performance/v2</property>
+					<value>5</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/flap-retract-15">
+			<function>
+				<sum>
+					<property>/systems/performance/v2</property>
+					<value>15</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/flap-retract">
+			<function>
+				<interpolate1d>
+					<property>/systems/performance/to-flaps</property>
+					<value>11</value><property>/systems/performance/flap-retract-11</property>
+					<value>15</value><property>/systems/performance/flap-retract-15</property>
+				</interpolate1d>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/slat-retract"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<tableData>
+						 90000  157
+						 92000  159
+						 94000  160
+						 96000  162
+						 98000  163
+						100000  165
+						102000  167
+						104000  168
+						106000  170
+						108000  171
+						110000  173
+						112000  175
+						114000  176
+						116000  178
+						118000  179
+						120000  181
+						122000  182
+						124000  184
+						126000  185
+						128000  187
+						130000  188
+						132000  189
+						134000  191
+						136000  192
+						138000  194
+						140000  195
+						142000  196
+						144000  198
+						146000  199
+						148000  201
+						150000  202
+						160000  209
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/performance/min-maneuver"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<tableData>
+						 90000  194
+						 92000  196
+						 94000  198
+						 96000  201
+						 98000  203
+						100000  205
+						102000  207
+						104000  209
+						106000  211
+						108000  213
+						110000  215
+						112000  217
+						114000  219
+						116000  221
+						118000  223
+						120000  225
+						122000  227
+						124000  229
+						126000  230
+						128000  232
+						130000  234
+						132000  236
+						134000  238
+						136000  239
+						138000  241
+						140000  243
+						142000  245
+						144000  246
+						146000  248
+						148000  249
+						150000  251
+						160000  259
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		
+		<switch name="/systems/performance/land-slats">
+			<default value="20" />
+			<test value="0">
+				/systems/performance/land-no-slats eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/performance/vref">
+			<function>
+				<product>
+					<difference>
+						<table>
+							<independentVar lookup="row">inertia/weight-lbs</independentVar>
+							<independentVar lookup="column">/systems/performance/land-flaps</independentVar>
+							<independentVar lookup="table">/systems/performance/land-slats</independentVar>
+							<tableData breakPoint="0">
+								        0    11   15   28   40
+								 90000  132  122  119  112  106
+								 95000  136  125  123  116  109
+								100000  139  128  126  118  112
+								105000  143  132  129  122  114
+								110000  146  135  132  124  117
+								115000  149  138  135  127  120
+								120000  152  141  138  130  122
+								125000  156  143  141  133  125
+								130000  159  146  143  135  127
+								135000  162  149  146  138  130
+								140000  165  152  149  141  132
+								145000  168  155  152  143  135
+								160000  177  164  161  151  143
+							</tableData>
+							<tableData breakPoint="20">
+								        0    11   15   28   40
+								 90000  104   98   96   92   89
+								 95000  107  101   99   94   92
+								100000  110  104  102   97   94
+								105000  112  106  104   99   96
+								110000  115  109  107  101   99
+								115000  117  111  109  104  101
+								120000  120  114  111  106  103
+								125000  122  116  113  108  105
+								130000  125  118  116  110  107
+								135000  127  120  118  112  109
+								140000  129  122  120  114  111
+								145000  132  124  122  116  113
+								160000  140  130  128  122  119
+							</tableData>
+						</table>
+						<value>5</value>
+					</difference>
+					<sum>
+						<value>1.3</value>
+						<table>
+							<independentVar lookup="row">atmosphere/density-altitude</independentVar>
+							<tableData>
+									0  0.0000
+								45000  0.2302
+							</tableData>
+						</table>
+					</sum>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/vapp">
+			<function>
+				<sum>
+					<property>/systems/performance/vref</property>
+					<value>5</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/performance/stabilizer-deg">
+			<function>
+				<table>
+					<independentVar lookup="row">/systems/performance/to-cg</independentVar>
+					<independentVar lookup="column">zero</independentVar> 
+					<independentVar lookup="table">/systems/performance/to-flaps</independentVar>
+					<tableData breakPoint="4">
+						    0    1
+						 0  8.4  8.4
+						 5  7.3  7.3
+						10  6.1  6.1
+						15  5.0  5.0
+						20  4.0  4.0
+						25  2.9  2.9
+						30  1.8  1.8
+						34  0.9  0.9
+					</tableData>
+					<tableData breakPoint="11">
+						    0    1
+						 0  9.5  9.5
+						 5  8.2  8.2
+						10  6.9  6.9
+						15  5.6  5.6
+						20  4.4  4.4
+						25  3.2  3.2
+						30  1.9  1.9
+						34  0.9  0.9
+					</tableData>
+					<tableData breakPoint="17">
+						    0    1
+						 2  9.9  9.9
+						 5  9.0  9.0
+						10  7.6  7.6
+						15  6.2  6.2
+						20  4.8  4.8
+						25  3.4  3.4
+						30  2.0  2.0
+						34  1.0  1.0
+					</tableData>
+					<tableData breakPoint="24">
+						    0    1
+						 6  9.9  9.9
+						10  8.5  8.5
+						15  6.7  6.7
+						20  5.2  5.2
+						25  3.6  3.6
+						30  2.1  2.1
+						34  1.0  1.0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/stabilizer-deg-round">
+			<function>
+				<quotient>
+					<floor>
+						<sum>
+							<product>
+								<property>/systems/performance/stabilizer-deg</property>
+								<value>10</value>
+							</product>
+							<value>0.5</value>
+						</sum>
+					</floor>
+					<value>10</value>
+				</quotient>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/stabilizer-error">
+			<function>
+				<difference>
+					<quotient>
+						<floor>
+							<sum>
+								<product>
+									<property>/systems/fcs/stabilizer/final-deg</property>
+									<value>-10</value> 
+								</product>
+								<value>0.5</value> 
+							</sum>
+						</floor>
+						<value>10</value>
+					</quotient>
+					<property>/systems/performance/stabilizer-deg-round</property>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/performance/opt-fl">
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<tableData>
+						100000  370
+						115000  360
+						122500  350
+						130000  340
+						135000  330
+						140000  320
+						147500  310
+						155000  300
+						160000  290
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/performance/max-fl">
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<tableData>
+						113600  370
+						119200  360
+						125000  350
+						131100  340
+						137400  330
+						143900  320
+						150700  310
+						157800  300
+						160000  295
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+	
+	</channel>
+
+</system>

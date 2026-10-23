@@ -1,0 +1,29 @@
+{
+  "set": "Horten-Ho-IX/ho-ix-set.xml",
+  "name": "Horten Ho IX/Gotha Go 229 V3 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Horten-Ho-IX/Systems/ho-ix-yasim.xml",
+  "jets": 2,
+  "model": "Horten-Ho-IX/Models/ho-ix.xml",
+  "tags": [
+    "horten",
+    "fighter",
+    "bomber",
+    "1940s",
+    "ww2",
+    "jet",
+    "twin-engine",
+    "flying-wing",
+    "tricycle",
+    "retractable-gear",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Horten-Ho-IX.zip",
+  "archive_sha256": "305a62b33a9dbf7692fe99bc0ed2b002a081c06730e5e61910b35b1e3348d22a",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Horten-Ho-IX.zip"
+}

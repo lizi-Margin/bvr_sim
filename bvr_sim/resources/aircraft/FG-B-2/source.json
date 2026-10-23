@@ -1,0 +1,30 @@
+{
+  "set": "B-2/B-2-set.xml",
+  "name": "Northrop B-2 Spirit",
+  "fdm_type": "yasim",
+  "fdm": "B-2/B-2-yasim.xml",
+  "jets": 4,
+  "model": "B-2/Models/b2-spirit.xml",
+  "tags": [
+    "bomber",
+    "grumman",
+    "northrop",
+    "1990s",
+    "2000s",
+    "2010s",
+    "gulfwar2",
+    "glass-cockpit",
+    "hud",
+    "ifr",
+    "retractable-gear",
+    "jet",
+    "refuel"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "B-2.zip",
+  "archive_sha256": "facc78f9b40754cd7fe8153b60542c893ab5fc4f0963228fed5b0519b7138a29",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/B-2.zip"
+}

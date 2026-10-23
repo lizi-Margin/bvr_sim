@@ -1,0 +1,528 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Wings">
+    <property value="1.00">systems/wing-drag_coeff</property>
+   
+    <property value="1.00">systems/wing-pos_K</property>
+
+    <channel name="Wing_part1">
+
+
+
+        <scheduled_gain name="systems/wing-lift_coeff_add">
+            <input>fcs/wings-pos-norm</input>
+            <table>
+                <independentVar>velocities/mach</independentVar>
+                <tableData>
+                    0.2000	 0.1
+                    0.35000      0.0
+                </tableData>
+            </table>
+        </scheduled_gain>
+
+        
+
+
+            <switch name="systems/wing-incidence/wing-control">
+                <default value="/controls/flight/wing-incidence" />
+                <test logic="OR" value="0">
+                    velocities/vc-kts gt 260
+                    /systems/electrical/outputs/flaps LT 25
+                </test>
+                <output>/controls/flight/wing-incidence</output>
+            </switch>
+
+        
+            <kinematic name="systems/wing-incidence/control">
+                <input>systems/wing-incidence/wing-cmd</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>5.0000</time>
+                    </setting>
+                </traverse>
+            </kinematic>
+
+            <pure_gain name="fcs/wing-incidence-up">
+                <input>systems/wing-incidence/control</input>
+                <gain>1</gain>
+            </pure_gain>
+
+            <summer name="fcs/wing-incidence-down">
+                <input>systems/wing-pos_K</input>
+                <input>-fcs/wing-incidence-up</input>
+            </summer>
+
+            <pure_gain name="systems/wing-incidence/handle">
+                <input>systems/wing-incidence/control</input>
+                <gain>100</gain>
+            </pure_gain>
+
+            
+
+            <switch name="systems/wing-incidence/wing-cmd">
+                <default value="systems/wing-incidence/wing-cmd" />
+                <test logic="AND" value="1">
+                    systems/wing-incidence/handle lt 0.01
+                    systems/wing-incidence/wing-control  == 1
+                </test>
+                <test logic="AND" value="0">
+                    systems/wing-incidence/handle gt 99.99
+                    systems/wing-incidence/wing-control  == 0
+                </test>
+            </switch>
+
+
+            
+            <switch name="systems/wing-incidence/fromto">
+                <default value="systems/wing-incidence/fromto" />
+
+                <test logic="AND" value="1">
+                        systems/wing-incidence/handle lt 0.01
+                </test>
+                <test logic="OR" value="0">
+                        systems/wing-incidence/handle gt 99.99
+                </test>
+            </switch>
+
+
+            
+            <switch name="systems/wing-incidence/unlock">
+                <default value="systems/wing-incidence/unlock" />
+                <test logic="AND" value="1">
+                        systems/wing-incidence/handle  gt 30
+                        systems/wing-incidence/wing-control  == 1
+                        systems/wing-incidence/fromto == 1
+                </test>
+                 <test logic="AND" value="0">
+                        systems/wing-incidence/wing-control  == 0
+                        fcs/flap-pos-norm == 0
+                </test>
+            </switch>
+
+        <kinematic name="Wings Control">
+                <input>systems/wing-incidence/unlock</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>10.0000</time>
+                    </setting>
+                </traverse>
+                <output>fcs/wings-pos-norm</output>
+            </kinematic>
+
+            <pure_gain name="Wings surface">
+                <input>fcs/wings-pos-norm</input>
+                <gain>1</gain>
+                <output>/surface-positions/wing-pos-norm</output>
+            </pure_gain>
+
+            <pure_gain name="fcs/wings-rad">
+                <input>fcs/wings-pos-norm</input>
+                <gain>0.13962634</gain>
+                <output>fcs/wings-pos-rad</output>
+            </pure_gain>
+
+            <summer name="aero/alpha-rad-w-incidence">
+                <input>aero/alpha-rad</input>
+                <input>fcs/wings-pos-rad</input>
+            </summer>
+
+            
+            
+	<fcs_function name="fcs/elevator-wings-balance-pos">
+            <function>
+		<product>
+		    <property>fcs/wings-pos-norm</property>
+		    <value>1.2</value>
+                 <table>
+                    <independentVar>velocities/mach</independentVar>
+                    <tableData>
+                        0.0000	 0.13962634 
+                        0.50000	 0.2
+                    </tableData>
+                </table>
+		</product>
+            </function>
+        </fcs_function>
+            
+            
+            <switch name="systems/wing-incidence/wgfromto">
+                <default value="systems/wing-incidence/wgfromto" />
+                <test value="1">
+                        systems/wing-incidence/unlock lt 0.01
+                </test>
+                <test value="0">
+                        systems/wing-incidence/unlock gt 0.99
+                </test>
+            </switch>
+
+        </channel>
+
+        <channel name="LE-Flap_TE-Flap">
+
+            
+
+
+            
+
+            <switch name="systems/leflaps/leflaps-control">
+                <default value="fcs/leflap-cmd-norm" />
+                <test value="0">
+                    velocities/vc-kts gt 360
+                </test>
+                <output>fcs/leflap-cmd-norm</output>
+            </switch>
+
+
+            <switch name="systems/leflaps/down">
+                <default value="systems/leflaps/down" />
+                <test logic="AND" value="1">
+                        fcs/wings-pos-norm == 1
+                        systems/wing-incidence/unlock == 1
+                        systems/wing-incidence/wing-control  == 1
+                        systems/wing-incidence/wgfromto == 0
+                </test>
+                 <test logic="AND" value="0">
+                        systems/wing-incidence/handle  lt 100
+                         systems/wing-incidence/wing-control  == 0
+                        systems/wing-incidence/fromto == 0
+                </test>
+                <test value="fcs/leflap-cmd-norm">
+                        fcs/wings-pos-norm == 0
+                </test>
+            </switch>
+
+
+            <kinematic name="LEFlaps Control">
+                <input>systems/leflaps/down</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>3.0000</time>
+                    </setting>
+                </traverse>
+                <output>fcs/leflap-pos-norm</output>
+            </kinematic>
+
+            <pure_gain name="LEFlaps Deg">
+                <input>fcs/leflap-pos-norm</input>
+                <gain>12</gain>
+                <output>fcs/leflap-pos-deg</output>
+            </pure_gain>
+
+            <pure_gain name="LEFlaps surface">
+                <input>fcs/leflap-pos-deg</input>
+                <gain>1</gain>
+                <output>/surface-positions/leflap-pos-norm</output>
+            </pure_gain>
+
+            <pure_gain name="LEFlaps Rad">
+                <input>fcs/leflap-pos-deg</input>
+                <gain>0.0175</gain>
+                <output>fcs/leflap-pos-rad</output>
+            </pure_gain>
+
+
+
+
+
+            
+
+            <switch name="systems/flaps/rest-down">
+                <default value="0" />
+                <test logic="AND" value="1">
+                    /systems/electrical/outputs/flaps  LT 25
+                    systems/wing-incidence/wgfromto == 1
+                    systems/wing-incidence/fromto == 1
+                </test>
+            </switch>
+
+            <switch name="systems/flaps/down">
+                <default value="systems/flaps/down" />
+                <test logic="AND" value="1">
+                        fcs/wings-pos-norm == 1
+                        systems/wing-incidence/unlock == 1
+                        systems/wing-incidence/wing-control  == 1
+                        systems/wing-incidence/wgfromto == 0
+                        systems/flaps/rest-down == 0
+                </test>
+                 <test logic="AND" value="0">
+                        systems/wing-incidence/handle  lt 100
+                         systems/wing-incidence/wing-control  == 0
+                        systems/wing-incidence/fromto == 1
+                        systems/flaps/rest-down == 0
+                </test>
+            </switch>
+
+
+            <switch name="systems/flaps/pos-cmd">
+                <default value="systems/flaps/down" />
+                <test logic="AND" value="systems/flaps/rest-down">
+                    /systems/electrical/outputs/flaps  LT 25
+                </test>
+            </switch>
+
+
+            
+
+            
+            <kinematic name="Flaps Control">
+                <input>systems/flaps/pos-cmd</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>4.0000</time>
+                    </setting>
+                </traverse>
+                <output>fcs/flap-pos-norm</output>
+            </kinematic>
+
+            <pure_gain name="Flaps Deg">
+                <input>fcs/flap-pos-norm</input>
+                <gain>12</gain>
+                <output>fcs/flap-pos-deg</output>
+            </pure_gain>
+
+            <pure_gain name="Flaps Surface">
+                <input>fcs/flap-pos-deg</input>
+                <gain>1</gain>
+                <output>/surface-positions/flaps-pos-norm</output>
+            </pure_gain>
+
+            <switch name="systems/flaps-int-pos-norm">
+                <default value="0" />
+                <test logic="AND" value="fcs/flap-pos-deg">
+                    systems/flaps/rest-down  == 0
+                    systems/flaps/down == 1
+                </test>
+                <output>/surface-positions/flaps-int-pos-norm</output>
+            </switch>
+
+            <pure_gain name="Flaps Rad">
+                <input>fcs/flap-pos-deg</input>
+                <gain>0.0175</gain>
+                <output>fcs/flap-pos-rad</output>
+            </pure_gain>
+
+        </channel>
+
+        <channel name="Wing_part2">
+            
+
+
+            
+
+
+            <switch name="systems/wings-fold/wing-control">
+                <default value="/controls/flight/wing-fold-cmd" />
+                <test logic="AND" value="0">
+                    /controls/gear/gear-down == 0
+                </test>
+                <output>/controls/flight/wing-fold-cmd</output>
+            </switch>
+
+
+
+            
+            <kinematic name="systems/wings-fold/control">
+                <input>systems/wings-fold/wing-fold-cmd</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>10.0000</time>
+                    </setting>
+                </traverse>
+            </kinematic>
+
+            <pure_gain name="systems/wings-fold/handle">
+                <input>systems/wings-fold/control</input>
+                <gain>100</gain>
+            </pure_gain>
+
+            
+
+            <switch name="wing-fold-cmd">
+                <default value="systems/wings-fold/wing-fold-cmd" />
+                <test logic="AND" value="1">
+                    systems/wings-fold/handle lt 0.01
+                    systems/wings-fold/wing-control == 1
+                </test>
+                <test logic="AND" value="0">
+                    systems/wings-fold/handle gt 99.99
+                    systems/wings-fold/wing-control == 0
+                </test>
+                <output>systems/wings-fold/wing-fold-cmd</output>
+            </switch>
+
+
+        
+            <switch name="wings-fold-fromto">
+                <default value="systems/wings-fold/fromto" />
+                <test value="1">
+                        systems/wings-fold/handle lt 0.01
+                </test>
+                <test value="0">
+                        systems/wings-fold/handle gt 99.99
+                </test>
+                <output>systems/wings-fold/fromto</output>
+            </switch>
+
+
+            
+            <switch name="wings-fold-unlock">
+                <default value="systems/wings-fold/unlock" />
+                <test logic="AND" value="1">
+                        systems/wings-fold/handle  gt 30
+                        systems/wings-fold/wing-control  == 1
+                        systems/wings-fold/fromto == 1
+                </test>
+                 <test logic="AND" value="0">
+                        systems/wings-fold/handle  lt 100
+                        systems/wings-fold/wing-control  == 0
+                        systems/wings-fold/fromto == 0
+                </test>
+                <test logic="AND" value="1">
+                    sim-time-sec lt 3.0
+                    systems/wings-fold/wing-control  == 1
+                </test>
+                <output>systems/wings-fold/unlock</output>
+            </switch>
+
+
+            <kinematic name="Wing Fold Position Norm">
+                <input>systems/wings-fold/unlock</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>5.0000</time>
+                    </setting>
+                </traverse>
+                <output>fcs/wing-fold-pos-norm</output>
+            </kinematic>
+
+           
+
+           <switch name="systems/wings-fold/right-wing">
+                <default value="0" />
+                <test value="1">
+                    fcs/wing-fold-pos-norm == 0
+                </test>
+            </switch>
+
+            <actuator name="Right Wing Fold">
+                <input>systems/wings-fold/right-wing</input>
+                <rate_limit>0.3</rate_limit>
+                <output>gear/unit[4]/pos-norm</output>
+            </actuator>
+
+
+            <switch name="systems/wings-fold/left-wing">
+                <default value="0" />
+                <test value="1">
+                    fcs/wing-fold-pos-norm == 0
+                </test>
+            </switch>
+
+            <actuator name="Left Wing Fold">
+                <input>systems/wings-fold/left-wing</input>
+                <rate_limit>0.3</rate_limit>
+                <output>gear/unit[3]/pos-norm</output>
+            </actuator>
+
+
+            <pure_gain name="Wing Fold Position">
+                <input>fcs/wing-fold-pos-norm</input>
+                <gain>1</gain>
+                <output>/surface-positions/wing-fold-pos-norm</output>
+            </pure_gain>
+
+    </channel>
+
+
+    <channel name="Aileron">
+
+        <switch name="systems/aileron-down-cmd">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /systems/electrical/outputs/flaps LT 25
+            </test>
+        </switch>
+
+
+        <kinematic name="systems/aileron-down-pos-norm">
+            <input>systems/aileron-down-cmd</input>
+            <traverse>
+                <setting>
+                    <position>0.0000</position>
+                    <time>0.0000</time>
+                </setting>
+                <setting>
+                    <position>1.0000</position>
+                    <time>5.0000</time>
+                </setting>
+            </traverse>
+        </kinematic>
+
+
+        <pure_gain name="systems/aileron-down-pos-rad">
+            <input>systems/aileron-down-pos-norm</input>
+            <gain>-0.35</gain>
+         </pure_gain>
+
+        <switch name="systems/right-aileron-pos-rad">
+            <default value="systems/aileron-down-pos-rad" />
+            <test logic="AND" value="fcs/right-aileron-control">
+                systems/aileron-down-pos-norm  == 0
+            </test>
+            <output>fcs/right-aileron-pos-rad</output>
+        </switch>
+
+        <pure_gain name="systems/right-aileron-pos-deg">
+            <input>fcs/right-aileron-pos-rad</input>
+            <gain>57.29578</gain>
+            <output>fcs/right-aileron-pos-norm</output>
+        </pure_gain>
+
+
+        <switch name="systems/left-aileron-pos-rad">
+            <default value="systems/aileron-down-pos-rad" />
+            <test logic="AND" value="fcs/left-aileron-control">
+                systems/aileron-down-pos-norm  == 0
+            </test>
+            <output>fcs/left-aileron-pos-rad</output>
+        </switch>
+
+        <pure_gain name="systems/left-aileron-pos-deg">
+            <input>fcs/left-aileron-pos-rad</input>
+            <gain>57.29578</gain>
+            <output>fcs/left-aileron-pos-norm</output>
+        </pure_gain>
+
+    </channel>
+
+
+</system>

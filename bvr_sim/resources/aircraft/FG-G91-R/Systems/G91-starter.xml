@@ -1,0 +1,575 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="starter">
+    
+    <property value="0">systems/starter/start-process-active</property>
+    <property value="0">systems/starter/start-process-terminated</property>
+    <property value="0">systems/starter/start-starter-gas</property>
+    <property value="0">systems/starter/start-starter-gas-test</property>
+    <property value="0">systems/starter/ignition-on-throttle-togle</property>
+    <property value="0">systems/starter/ignition-on-throttle-pos</property>
+    <property value="0">systems/starter/ignition-on-throttle-washed</property>
+    <property value="0">systems/starter/high-energy-lighter-on</property>
+    <property value="0">systems/starter/sw-cover-togle</property>
+    <property value="0">systems/starter/sw-cover-pos</property>
+    <property value="0">systems/starter/sw-pushed</property>
+    <property value="0">systems/starter/sw-push-togle</property>
+    <property value="0">systems/starter/sw-push-pos</property>
+    <property value="0">systems/starter/sw-push-togle-washed</property>
+    <property value="0">systems/starter/sw-push-rele-deleyed-on</property>
+    <property value="0">systems/starter/sw-push-rele-deleyed-cartridge</property>
+    <property value="0">systems/starter/reset-cartridge</property>
+    <property value="0">systems/starter/fuel-shut-off-valve-lock</property>
+    <property value="0">systems/starter/fuel-shut-off-valve-lock-pos</property>
+    <property value="0">systems/starter/fuel-shut-off-valve</property>
+    <property value="0">systems/starter/fuel-shut-off-valve-pos</property>
+    <property value="0">systems/starter/fuel-shut-off-valve-on</property>
+    <property value="0">systems/starter/fuel-booster-pump</property>
+    <property value="0">systems/starter/fuel-booster-pump-pos</property>
+    <property value="0">systems/starter/fuel-booster-pump-on</property>
+    <property value="0">systems/starter/NE</property>
+    <property value="0">systems/starter/NE-pos</property>
+    <property value="0">systems/starter/NE-on</property>
+    <property value="0">systems/starter/engine-JPTL</property>
+    <property value="0">systems/starter/engine-JPTL-pos</property>
+    <property value="0">systems/starter/drop-tank-press</property>
+    <property value="0">systems/starter/drop-tank-press-pos</property>
+    <property value="0">systems/starter/drop-tank-press-on</property>
+    <property value="0">systems/starter/emerg-engine</property>
+    <property value="0">systems/starter/emerg-engine-pos</property>
+    <property value="0">systems/starter/emerg-engine-on-lg</property>
+    <property value="0">systems/starter/emerg-engine-on-lg-transparent</property>
+    <property value="0">systems/starter/electric-ok</property>
+    
+    
+    <channel name="starter switch" execrate="8">
+        
+        
+        
+        <switch>
+            <output>systems/starter/ignition-on-throttle-togle</output>
+            <default value="systems/starter/ignition-on-throttle-togle" />
+            <test logic="AND" value="0">
+                systems/starter/ignition-on-throttle-togle == 1
+                systems/starter/start-process-terminated == 1
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/starter/ignition-on-throttle-washed">
+            <input>systems/starter/ignition-on-throttle-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/starter/ignition-on-throttle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/starter/ignition-on-throttle-togle LT 0.6
+                systems/starter/ignition-on-throttle-togle GT -0.6
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/starter/ignition-on-throttle-pos">
+            <input>systems/starter/ignition-on-throttle-norm</input>
+            <c1>1.0</c1>
+        </lag_filter>
+        
+        <pure_gain name="systems/starter/ignition-set-throttle-pos">
+            <input>systems/starter/ignition-on-throttle-pos</input>
+            <gain>0.1</gain>
+        </pure_gain>
+        
+        <switch>
+            <output>/controls/engines/engine[0]/throttle</output>
+            <default value="/controls/engines/engine[0]/throttle" />
+            <test logic="AND" value="systems/starter/ignition-set-throttle-pos">
+                systems/starter/ignition-on-throttle-norm == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/starter/high-energy-lighter-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/electric-ok == 1
+                systems/electric/bus[1]/ignition-cartridge-starting-fuse == 1
+                systems/starter/ignition-on-throttle-norm == 1
+                systems/starter/NE-on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/high-energy-lighter/I">
+            <default value="0" />
+            <test logic="AND" value="5">
+                systems/starter/high-energy-lighter-on == 1
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/starter/sw-cover-togle-washed">
+            <input>systems/starter/sw-cover-togle</input>
+            <c1>2.0</c1>
+        </washout_filter>
+        
+        <lag_filter name="systems/starter/sw-cover-pos">
+            <input>systems/starter/sw-cover-togle-on</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/sw-cover-togle-on">
+            <default value="systems/starter/sw-cover-togle-on" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/starter/sw-cover-togle-washed GT 0.9
+                    systems/starter/sw-cover-togle-washed LT -0.9
+                </test>
+                <test logic="AND">
+                    systems/starter/sw-cover-togle-on == 0
+                    systems/starter/sw-cover-pos LE 0.1
+                </test>
+            </test>
+            <test logic="AND" value="0">
+                <test logic="OR">
+                    systems/starter/sw-cover-togle-washed GT 0.9
+                    systems/starter/sw-cover-togle-washed LT -0.9
+                </test>
+                <test logic="AND">
+                    systems/starter/sw-cover-togle-on == 1
+                    systems/starter/sw-cover-pos GE 0.9
+                </test>
+            </test>
+            <test logic="OR" value="0">
+                <test logic="AND">
+                    systems/starter/sw-push-togle-washed GE 0.1
+                    systems/starter/sw-push-togle-washed LE 0.2
+                </test>
+                <test logic="AND">
+                    systems/starter/sw-push-togle-washed LE -0.1
+                    systems/starter/sw-push-togle-washed GE -0.2
+                </test>
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/starter/sw-push-togle-washed">
+            <input>systems/starter/sw-push-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/starter/sw-push-togle-norm">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/starter/sw-push-togle-washed GT 0.5
+                systems/starter/sw-push-togle-washed LT -0.5
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/starter/sw-push-pos">
+            <input>systems/starter/sw-push-togle-norm</input>
+            <c1>4.0</c1>
+        </lag_filter>
+
+        <lag_filter name="systems/starter/sw-push-trigger">
+            <input>systems/starter/sw-push-togle-norm</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/sw-pushed">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/sw-push-pos GT 0.05
+                systems/starter/sw-push-pos LT 0.95
+            </test>
+        </switch>
+        
+        
+        
+        <switch name="systems/starter/sw-push-trigger-rele">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/electric-ok == 1
+                systems/electric/bus[1]/ignition-cartridge-starting-fuse == 1
+                systems/starter/sw-push-trigger GT 0.8
+                systems/starter/sw-push-rele-deleyed-on == 0
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/starter/sw-push-rele-deleyed">
+            <input>systems/starter/sw-push-trigger-rele</input>
+            <c1>0.01</c1> 
+        </lag_filter>
+        
+        <switch name="systems/starter/sw-push-rele-deleyed-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/sw-push-rele-deleyed LT 0.9
+                systems/starter/sw-push-rele-deleyed GT 0.001
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/starter/reset-cartridge-washed">
+            <input>systems/starter/reset-cartridge</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/starter/sw-push-rele-deleyed-cartridge-washed">
+            <input>systems/starter/sw-push-rele-deleyed-cartridge</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/starter/sw-push-rele-deleyed-cartridge">
+            <default value="systems/starter/sw-push-rele-deleyed-cartridge" />
+            <test logic="AND" value="0">
+                systems/starter/reset-cartridge-washed GT 0.5
+                systems/starter/reset-cartridge-washed LT -0.5
+            </test>
+            <test logic="AND" value="1">
+                systems/starter/sw-push-trigger GT 0.5
+                systems/starter/sw-push-rele-deleyed-on == 0
+                systems/starter/sw-push-rele-deleyed-cartridge == 0
+                systems/starter/sw-push-rele-deleyed-cartridge-washed GT -0.5
+                systems/starter/sw-push-rele-deleyed-cartridge-washed LT 0.5
+            </test>
+            <test logic="AND" value="2">
+                systems/starter/sw-push-trigger GT 0.5
+                systems/starter/sw-push-rele-deleyed-on == 0
+                systems/starter/sw-push-rele-deleyed-cartridge == 1
+                systems/starter/sw-push-rele-deleyed-cartridge-washed GT -0.5
+                systems/starter/sw-push-rele-deleyed-cartridge-washed LT 0.5
+            </test>
+            <test logic="AND" value="9">
+                systems/starter/sw-push-trigger GT 0.5
+                systems/starter/sw-push-rele-deleyed-on == 0
+                systems/starter/sw-push-rele-deleyed-cartridge == 2
+                systems/starter/sw-push-rele-deleyed-cartridge-washed GT -0.5
+                systems/starter/sw-push-rele-deleyed-cartridge-washed LT 0.5
+            </test>
+        </switch>
+        
+        
+        
+        
+
+        <switch name="systems/starter/start-process-active">
+            <default value="systems/starter/start-process-active" />
+            <test logic="AND" value="1">
+                <test logic="AND">
+                    systems/starter/sw-pushed == 1
+                    systems/starter/sw-push-rele-deleyed-on == 1
+                </test>
+                <test logic="OR">
+                    systems/starter/sw-push-rele-deleyed-cartridge == 1
+                    systems/starter/sw-push-rele-deleyed-cartridge == 2
+                </test>
+            </test>
+            <test logic="AND" value="0">
+                systems/starter/sw-push-rele-deleyed-on == 0
+            </test>
+        </switch>
+        
+        <switch>
+            <output>propulsion/active_engine</output>
+            <default value="propulsion/active_engine" />
+            <test logic="AND" value="0">
+                systems/starter/start-process-active == 1
+                systems/starter/high-energy-lighter-on == 1
+            </test>
+            <test logic="AND" value="-1">
+                systems/starter/start-process-active == 0
+                propulsion/active_engine == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/starter/active_engine-sw">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/sw-pushed == 1
+                systems/starter/sw-push-rele-deleyed-on == 1
+                systems/starter/high-energy-lighter-on == 1
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/starter/active_engine-wa">
+            <input>systems/starter/active_engine-sw</input>
+            <c1>0.01</c1>
+        </washout_filter>
+        
+        <switch name="systems/starter/startup-sound">
+            <default value="systems/starter/startup-sound" />
+            <test logic="AND" value="0">
+                systems/starter/startup-sound-lag GT 0.1
+                systems/starter/startup-sound-lag LT 0.2
+                systems/starter/startup-sound == 1
+            </test>
+            <test logic="AND" value="0">
+                propulsion/active_engine == -1
+            </test>
+            <test logic="AND" value="1">
+                systems/starter/active_engine-wa GT 0.2
+            </test>
+            <test logic="AND" value="1">
+                systems/starter/start-starter-gas-test GE 1
+                systems/starter/startup-sound == 0
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/starter/startup-sound-lag">
+            <input>systems/starter/startup-sound</input>
+            <c1>0.3</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/start-starter-gas">
+            <default value="systems/starter/start-starter-gas" />
+            <test logic="AND" value="0">
+                systems/starter/start-starter-gas-lag GT 0.1
+                systems/starter/start-starter-gas-lag LT 0.2
+                systems/starter/start-starter-gas == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/starter/active_engine-wa GT 0.2
+            </test>
+            <test logic="AND" value="1">
+                systems/starter/start-starter-gas-test GE 1
+                systems/starter/start-starter-gas == 0
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/starter/start-starter-gas-lag">
+            <input>systems/starter/start-starter-gas</input>
+            <c1>0.3</c1>
+        </lag_filter>
+        
+        <switch>
+            <output>propulsion/starter_cmd</output>
+            <default value="propulsion/starter_cmd" />
+            <test logic="AND" value="0">
+                propulsion/active_engine NE 0
+            </test>
+            <test logic="AND" value="1">
+                propulsion/active_engine EQ 0
+            </test>
+        </switch>
+        
+        <switch>
+            <output>propulsion/cutoff_cmd</output>
+            <default value="propulsion/cutoff_cmd" />
+            <test logic="AND" value="0">
+                propulsion/active_engine NE 0
+            </test>
+            <test logic="AND" value="1">
+                propulsion/active_engine EQ 0
+                propulsion/engine[0]/n2 LT 20
+            </test>
+            <test logic="AND" value="0">
+                propulsion/active_engine EQ 0
+                propulsion/engine[0]/n2 GT 20
+            </test>
+        </switch>
+        
+        <switch>
+            <output>propulsion/engine[0]/n1</output>
+            <default value="propulsion/engine[0]/n1" />
+            <test logic="AND" value="20">
+                systems/starter/sw-pushed == 1
+                systems/starter/fuel-booster-pump-on == 1
+                propulsion/active_engine EQ 0
+            </test>
+        </switch>
+        
+        <switch name="systems/starter/start-process-terminated">
+            <default value="systems/starter/start-process-terminated" />
+            <test logic="AND" value="1">
+                propulsion/active_engine EQ 0
+                propulsion/engine[0]/n2 GT 40
+                systems/starter/start-process-terminated == 0
+                systems/starter/start-process-active == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/starter/start-process-active == 0
+                systems/starter/start-process-terminated == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="starter electric" execrate="16">
+        
+        <switch name="systems/starter/electric-ok">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/V GT 18.0
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/starter/I">
+            <default value="0" />
+            <test logic="AND" value="6.1">
+                systems/starter/sw-push-rele-deleyed-on GE 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="starter fuel shut off valve" execrate="16">
+        
+        <lag_filter name="systems/starter/fuel-shut-off-valve-lock-pos">
+            <input>systems/starter/fuel-shut-off-valve-lock</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/starter/fuel-shut-off-valve-pos">
+            <input>systems/starter/fuel-shut-off-valve</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/fuel-shut-off-valve-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/fuel-shut-off-valve-pos GT 0.9
+                systems/electric/bus[1]/fuel-shut-off/fuse == 1
+                systems/electric/bus[1]/V GE 18.0
+            </test>
+        </switch>
+        
+    </channel>
+    
+        
+    <channel name="starter fuel booster pump" execrate="16">
+        
+        <lag_filter name="systems/starter/fuel-booster-pump-pos">
+            <input>systems/starter/fuel-booster-pump</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/fuel-booster-pump-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/fuel-booster-pump-pos GT 0.9
+                systems/electric/bus[1]/BP-fuel/fuse == 1
+                systems/electric/bus[1]/V GE 18.0
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/BP-fuel/I">
+            <default value="0" />
+            <test logic="AND" value="9">
+                systems/starter/fuel-booster-pump-on == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="starter NE" execrate="16">
+        
+        <lag_filter name="systems/starter/NE-pos">
+            <input>systems/starter/NE</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/NE-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/NE-pos GT 0.9
+                systems/electric/bus[1]/V GE 16.0
+                systems/electric/bus[1]/turbojet-start-up/fuse == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="starter engine JPTL" execrate="16">
+        
+        <lag_filter name="systems/starter/engine-JPTL-pos">
+            <input>systems/starter/engine-JPTL</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/engine-JPTL-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/engine-JPTL-pos GT 0.9
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/bus[1]/fuel-JPTL/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/fuel-JPTL/I">
+            <default value="0" />
+            <test logic="AND" value="0.6">
+                systems/starter/engine-JPTL-on == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="starter engine droppable fuel tabk pressure" execrate="16">
+        
+        <lag_filter name="systems/starter/drop-tank-press-pos">
+            <input>systems/starter/drop-tank-press</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/drop-tank-press-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/drop-tank-press-pos GT 0.9
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/bus[1]/drop-tank-press-on/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/drop-tank-press-on/I">
+            <default value="0" />
+            <test logic="AND" value="0.5">
+                systems/starter/drop-tank-press-on == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="starter emerg engine" execrate="16">
+        
+        <lag_filter name="systems/starter/emerg-engine-pos">
+            <input>systems/starter/emerg-engine</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/starter/emerg-engine-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/emerg-engine-pos GT 0.9
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/bus[1]/fuel-AP-emergency/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/fuel-AP-emergency/I">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/starter/emerg-engine-on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/starter/emerg-engine-on-lg">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/starter/emerg-engine-on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/starter/emerg-engine-on-lg-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/starter/emerg-engine-on == 1
+            </test>
+        </switch>
+        
+    </channel>
+        
+        
+</system>

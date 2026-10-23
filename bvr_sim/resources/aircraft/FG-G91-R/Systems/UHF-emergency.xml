@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="UHF emergency">
+
+    
+    <property value="0.0">systems/gauges/radio/UHF-Emerg/wl-uhf-emerg-on</property>
+    <property value="0.0">systems/gauges/radio/UHF-Emerg/wl-uhf-emerg-on-transparent</property>
+    <property value="0.0">systems/gauges/radio/UHF-Emerg/sw-uhf-on-off</property>
+    <property value="0.0">systems/gauges/radio/UHF-Emerg/sw-uhf-on-off-pos</property>
+    <property value="0.0">systems/gauges/radio/UHF-Emerg/sw-uhf-function-select</property>
+    <property value="0.0">systems/gauges/radio/UHF-Emerg/sw-uhf-function-select-pos</property>
+</system>

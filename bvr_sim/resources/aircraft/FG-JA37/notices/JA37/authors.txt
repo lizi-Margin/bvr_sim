@@ -1,0 +1,118 @@
+Authors of the Saab 37 Viggen aircraft for the Flightgear simulator:
+
+Anders Lejczak - anders.lejczak at colacola.se
+====================================
+Original exterior 3D model
+Original 2 liveries and bumpmap
+
+Nikolai V. Chr. - emptyyetfull at gmail.com - Forum name: Necolatis - Callsign: Leto
+==================================
+Maintainer
+Aerodynamics
+Flight control system
+Sounds
+HUD
+Canvas displays
+Animations
+Nasal
+Effects
+Instruments
+Systems
+XML
+Various modelling and texturing
+
+Justin Nicholson - Forum name: Pinto
+====================================
+Most armament textures and models.
+AJ37/AJS37 variant models.
+Cannon spam filter defeating.
+Many cockpit improvements (radio, datapanel, etc..)
+Misc. model improvements. (optimizations, adjustments, UV mappings, engine plus much more)
+Grey/black camo livery.
+Radar RCS system.
+Plus many other changes.
+
+Colin Geniet
+============
+New exterior lightning
+Nasal bugfixes
+HUD parallax
+Checklists
+Direct corsor control for joystick mapping
+Plus various other fixes and improvements
+
+Nicola B. Bernardelli - nbb.musica at gmail.com - Forum name: JazzTp
+====================================
+Cockpit sidepanels, switches, knobs and throttle.
+Continuous testing of all aspects of the aircraft
+Tons of feedback and suggestions
+
+Isaac Protiva - isaacprotiva at gmail.com - Forum name: Firefly
+====================================
+Canopy & mirrors
+Afterburner lightmap
+Drop-tank and reverser texturing
+Front-panel sunshield
+Ambient occlusion cockpit textures
+
+Enrico Castaldi - Forum name: Spectre
+===================
+Many of the liveries.
+
+Josh Davidson - Forum name: Octal450
+========================================
+Flight Control System/Autopilot
+Modified the view system.
+
+Onox - Forum name: onox
+====
+View system
+Misc. small improvements
+
+Steve Brown - Forum name: swampthing - Callsign: swamp
+======================
+KSUU Crew 1 livery.
+2 exterior engine sounds.
+
+Richard Harrison - Forum name: Richard
+================
+Misc fixes and improvements.
+
+
+Thanks
+======
+Thanks to all the patient people on the forums, especially those who helped with understanding aerodynamics.
+Thanks to forum user jam007 for inspirational pictures of the real aircraft.
+Thanks to the test-pilots; JazzTp, Pinto in particular for feedback and suggestions.
+Thanks to the Flightgear project people for a great simulator.
+Thanks to NASA for translating and declassifiying original Saab windtunnel data.
+
+Note
+====
+Various stuff adapted from other aircrafts:
+
+F16 - Afterburner flame (non ALS). Engine smoke and heat distortion. Texture for Strake-vortex. Cannon stuff. Chronometer. Pedals.
+J35F - 8 instruments
+Mig-15 - Crash code
+Buccaneer - Flight path indicator code in HUD
+TU-154B - Remove delay when switching to external view
+Mig29 - Nav. light glow
+F-14b (yasim) - Guided missiles, seat
+BAC-TSR2-GR3 - G-force breathing sounds
+Zero - Performance monitor
+F15C - Stick
+Alphajet - Adapted aerobatic smoke
+pa24-250 - Glare texture for landing lights
+F-14b (jsb) - Hydraulics inspiration. Pilot. 3 sounds.
+l39 - Strobe light texture.
+C172p - Some sound settings. Thunder and rain sounds and most of their code from that.
+707 - External power supply truck.
+M2000-5 - Code to stop radar from looking through terrain and pulse doppler functionality. Buffeting of view. Loop for iterating through menubar.
+Saunders-Roe-Princess - Speedbrake sound.
+Pond-racer: speedbrake wind sound.
+A32xx: Throttle detent sound.
+PC-9: Throttle idle sound.
+CRJ700: gear lever sound.
+SR-71 (Gerard Robin): parachute model for ejecting
+
+Might have forgotten some.

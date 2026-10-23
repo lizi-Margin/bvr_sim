@@ -1,0 +1,26 @@
+{
+  "set": "Heinkel-He-178/he178-set.xml",
+  "name": "Heinkel He 178 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Heinkel-He-178/Systems/he178-yasim.xml",
+  "jets": 1,
+  "model": "Heinkel-He-178/Models/he178.xml",
+  "tags": [
+    "heinkel",
+    "1930s",
+    "experimental",
+    "prototype",
+    "jet",
+    "retractable-gear",
+    "tail-dragger",
+    "single-engine",
+    "compositor"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Heinkel-He-178.zip",
+  "archive_sha256": "5160c2edd6283034ff89087795ba3c86044ef8cf660e09c4b73f7b6cf02d414d",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Heinkel-He-178.zip"
+}

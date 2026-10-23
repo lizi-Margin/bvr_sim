@@ -1,0 +1,22 @@
+{
+  "set": "f-14b/f-14b-set.xml",
+  "name": "Grumman F-14B",
+  "fdm_type": "jsb",
+  "fdm": "f-14b/f-14b.xml",
+  "jets": 0,
+  "model": "f-14b/Models/f-14b.xml",
+  "tags": [
+    "fighter",
+    "jet",
+    "twin-engine",
+    "retractable-gear",
+    "ifr"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "f-14b.zip",
+  "archive_sha256": "32cdc2bfdf9c66b635e15005a2128c91d355c81a9b976b8ad5e71ae3129006de",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/f-14b.zip"
+}

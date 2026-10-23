@@ -1,0 +1,28 @@
+This is a second generation model of the 747-8.  The first generation of the
+747-8 Intercontinental by Grupo FGBr was based on the 747-400 model by Gijs
+de Rooy.  This version is derived from the FGBr version with modifications to
+the 3D models and FDM, and the addition of many systems.
+
+747-8i v2.0 by John Williams
+
+747-8F by John Williams
+
+Original cockpit model, landing gear, and many textures used in both the 
+Intercontinental (passenger) version and the Freigher come from the 747-400
+model by Gijs de Rooy (with the help of Ivan Ngeow, Jentron, Syd Adams,
+Torsten Dreyer, Markus Bulik).
+
+Wings, engines, original -8i fuselage model and FDM, and additional textures
+by Grupo FGBr (Aurino das Neves, Isaias Prestes, Rick Britto, Wagner Silva).
+
+Freighter fuselage model and FDM by John Williams, based on -8i models.
+
+With the exception of the wings, engines, and horizontal and vertical stabiliz-
+ers, all the models and systems have been modified from the original versions
+by John Williams.
+
+Authors of additional systems are noted in their .nas files, where applicable.
+        
+Released under the following license:
+GPL 2.0
+

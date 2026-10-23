@@ -1,0 +1,375 @@
+{
+  "files": [
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-context",
+      "source": "G91-R/Systems/G91-context.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-active-stability",
+      "source": "G91-R/Systems/G91-active-stability.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-fuel",
+      "source": "G91-R/Systems/G91-fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-electric",
+      "source": "G91-R/Systems/G91-electric.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-manual-switches",
+      "source": "G91-R/Systems/G91-manual-switches.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-handle-switches",
+      "source": "G91-R/Systems/G91-handle-switches.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-hydraulic",
+      "source": "G91-R/Systems/G91-hydraulic.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-gears",
+      "source": "G91-R/Systems/G91-gears.xml",
+      "label_repairs": [
+        {
+          "original": "Landing Gear[0] steer",
+          "normalized": "Landing Gear_0 steer"
+        }
+      ]
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-landing-gear",
+      "source": "G91-R/Systems/G91-landing-gear.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-brakes",
+      "source": "G91-R/Systems/G91-brakes.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-lightning",
+      "source": "G91-R/Systems/G91-lightning.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-canopy",
+      "source": "G91-R/Systems/G91-canopy.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-airbrake",
+      "source": "G91-R/Systems/G91-airbrake.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-JATO",
+      "source": "G91-R/Systems/G91-JATO.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-starter",
+      "source": "G91-R/Systems/G91-starter.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-engine",
+      "source": "G91-R/Systems/G91-engine.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-engine-sound",
+      "source": "G91-R/Systems/G91-engine-sound.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-servo-wings",
+      "source": "G91-R/Systems/G91-servo-wings.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-gauges",
+      "source": "G91-R/Systems/G91-gauges.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-warning-lights",
+      "source": "G91-R/Systems/G91-warning-lights.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-climate",
+      "source": "G91-R/Systems/G91-climate.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-autopilot",
+      "source": "G91-R/Systems/G91-autopilot.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-dragchute",
+      "source": "G91-R/Systems/G91-dragchute.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-oxygen",
+      "source": "G91-R/Systems/G91-oxygen.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-camera",
+      "source": "G91-R/Systems/G91-camera.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-guns",
+      "source": "G91-R/Systems/G91-guns.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-store",
+      "source": "G91-R/Systems/G91-store.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-stations",
+      "source": "G91-R/Systems/G91-stations.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-stations-hardpoint-hook",
+      "source": "G91-R/Systems/G91-stations-hardpoint-hook.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-army",
+      "source": "G91-R/Systems/G91-army.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-army",
+      "source": "G91-R/Systems/G91-army.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "G91-mass-balance-modifier",
+      "source": "G91-R/Systems/G91-mass-balance-modifier.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "PHI",
+      "source": "G91-R/Systems/PHI.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "radio-PTR175",
+      "source": "G91-R/Systems/radio-PTR175.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "UHF-emergency",
+      "source": "G91-R/Systems/UHF-emergency.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "ADF-MARCONI-8283",
+      "source": "G91-R/Systems/ADF-MARCONI-8283.xml",
+      "label_repairs": [
+        {
+          "original": "set instrumentation adf[0] frequencies selected-khz",
+          "normalized": "set instrumentation adf_0 frequencies selected-khz"
+        }
+      ]
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "TACAN-NAV-ARN-21",
+      "source": "G91-R/Systems/TACAN-NAV-ARN-21.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "gyrocompass",
+      "source": "G91-R/Systems/gyrocompass.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "compass-flux-gate",
+      "source": "G91-R/Systems/compass-flux-gate.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "ATC-transponder",
+      "source": "G91-R/Systems/ATC-transponder.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "AAU-37A",
+      "source": "G91-R/Systems/AAU-37A.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "AVU-8-B",
+      "source": "G91-R/Systems/AVU-8-B.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Altimeter-5934PA",
+      "source": "G91-R/Systems/Altimeter-5934PA.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-metrics",
+      "source": "G91-R/Systems/G91-metrics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-mass-balance",
+      "source": "G91-R/Systems/G91-mass-balance.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-ground-reactions",
+      "source": "G91-R/Systems/G91-ground-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-external-reactions",
+      "source": "G91-R/Systems/G91-external-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-propulsion",
+      "source": "G91-R/Systems/G91-propulsion.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-FCS",
+      "source": "G91-R/Systems/G91-FCS.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/G91-R-JSBSim.xml",
+      "reference": "Systems/G91-aerodynamics",
+      "source": "G91-R/Systems/G91-aerodynamics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "ORPHEUS_MK_803",
+      "source": "G91-R/Engines/ORPHEUS_MK_803.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "direct",
+      "source": "G91-R/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "JATO-M8-Engine",
+      "source": "G91-R/Engines/JATO-M8-Engine.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "direct",
+      "source": "G91-R/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "JATO-M8-Engine",
+      "source": "G91-R/Engines/JATO-M8-Engine.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "direct",
+      "source": "G91-R/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "JATO-M8-Engine",
+      "source": "G91-R/Engines/JATO-M8-Engine.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "direct",
+      "source": "G91-R/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "JATO-M8-Engine",
+      "source": "G91-R/Engines/JATO-M8-Engine.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "G91-R/Systems/G91-propulsion.xml",
+      "reference": "direct",
+      "source": "G91-R/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

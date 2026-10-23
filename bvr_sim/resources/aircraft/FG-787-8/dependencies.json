@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "from": "787-8/787-8.xml",
+      "reference": "trent_1000",
+      "source": "787-8/Engines/trent_1000.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "787-8/787-8.xml",
+      "reference": "direct",
+      "source": "787-8/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "787-8/787-8.xml",
+      "reference": "trent_1000",
+      "source": "787-8/Engines/trent_1000.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "787-8/787-8.xml",
+      "reference": "direct",
+      "source": "787-8/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

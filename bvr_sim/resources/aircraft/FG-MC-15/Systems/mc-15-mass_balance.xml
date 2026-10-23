@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mass_balance>
+	<ixx unit="KG*M2">     34.11 </ixx>
+	<iyy unit="KG*M2">     36.31 </iyy>
+	<izz unit="KG*M2">     76.40 </izz>
+	<emptywt unit="KG">     78.00 </emptywt>  
+	<location name="CG" unit="M"> 
+		<x>  0.0528 </x> 
+		<y>  0.0 </y> 
+		<z>  0.0 </z> 
+	</location>
+	
+	<pointmass name="Pilot">
+		<weight unit="KG"> 70 </weight>
+		<location name="POINTMASS" unit="M">
+			<x>  0.2862 </x>
+			<y>  0.0 </y> 
+			<z>  0.0 </z> 
+		</location>
+	</pointmass>
+	<pointmass name="Parachute">
+		<weight unit="KG"> 5 </weight>
+		<location name="POINTMASS" unit="M">
+			<x>  0.467 </x>
+			<y>  0.0 </y> 
+			<z>  0.0 </z> 
+		</location>
+	</pointmass>
+	<pointmass name="Baggage">
+		<weight unit="KG"> 3 </weight>
+		<location name="POINTMASS" unit="M">
+			<x>  0.6776 </x>
+			<y>  0.0 </y> 
+			<z>  0.0 </z> 
+		</location>
+	</pointmass>
+</mass_balance>

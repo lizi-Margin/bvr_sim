@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="instrumentation">
+	
+    <property value="1">systems/instrument/aoa-blip</property>
+    <property value="1">systems/hook/hook-override</property>
+    <channel execrate="8" name="AOA">
+	<fcs_function name="systems/instrument/aoa-unit-conversion">
+	    <function>
+		<sum>
+		    <product>
+			<property>aero/alpha-deg</property>
+			<value>1.4</value>
+		    </product>
+		    <value>6.32</value>
+		</sum>
+	    </function>
+	</fcs_function>
+	
+	<fcs_function name="systems/instrument/aoa-unit">
+	    <function>
+		<interpolate1d>
+		    <property>velocities/vtrue-kts</property>
+		    <value>0</value><value>0</value>
+		    <value>10</value><value>0</value>
+		    <value>15</value><property>systems/instrument/aoa-unit-conversion</property>
+		</interpolate1d>
+	    </function>
+	    <clipto>
+		<min>-10</min>
+		<max>30</max>
+	    </clipto>
+	</fcs_function>
+
+	<actuator name="systems/instrument/aoa-blip-act">
+	    <input>systems/instrument/aoa-blip</input>
+	    <rate_limit>2</rate_limit>
+	    <output>systems/instrument/aoa-blip-norm</output>
+	</actuator>
+
+	<switch name="systems/instrument/aoa-blip">
+	    <default value="systems/instrument/aoa-blip" />
+	    <test value="1">
+		systems/instrument/aoa-blip-act eq 0
+	    </test>
+	    <test value="0">
+		systems/instrument/aoa-blip-act eq 1
+	    </test>
+	</switch>
+
+	<switch name="systems/instrument/aoa-indexer-on">
+	    <default value="0" />
+	    <test logic="AND" value="1">
+		gear/gear-pos-norm eq 1
+		systems/instrument/aoa-blip eq 1
+		systems/hook/tailhook-pos-norm lt 1
+		systems/hook/hook-override eq 0
+	    </test>
+	    <test logic="AND" value="1">
+		gear/gear-pos-norm eq 1
+		<test logic="OR">
+		    systems/hook/hook-override eq 1
+		    systems/hook/tailhook-pos-norm eq 1
+		</test>
+	    </test>
+	</switch>
+
+	<switch name="systems/instrument/aoa-indexer">
+	    <default value="0" /> 
+	    <test logic="AND" value="1"> 
+		systems/instrument/aoa-indexer-on eq 1
+		systems/instrument/aoa-unit le 20
+	    </test>
+	    <test logic="AND" value="2"> 
+		systems/instrument/aoa-indexer-on eq 1
+		systems/instrument/aoa-unit gt 20
+		systems/instrument/aoa-unit le 21.5
+	    </test>
+	    <test logic="AND" value="3"> 
+		systems/instrument/aoa-indexer-on eq 1
+		systems/instrument/aoa-unit gt 21.5
+		systems/instrument/aoa-unit lt 22.5
+	    </test>
+	    <test logic="AND" value="4"> 
+		systems/instrument/aoa-indexer-on eq 1
+		systems/instrument/aoa-unit ge 22.5
+		systems/instrument/aoa-unit lt 24
+	    </test>
+	    <test logic="AND" value="5"> 
+		systems/instrument/aoa-indexer-on eq 1
+		systems/instrument/aoa-unit ge 24
+	    </test>
+	</switch>
+    </channel>
+
+    <property value="0">systems/instrument/fuel/damage-rate</property>
+    <property value="0">systems/instrument/fuel/gauge-damage</property>
+    <property value="6">systems/instrument/fuel/tank-select</property>
+    <property value="1">systems/instrument/fuel/power</property>
+    <channel execrate="8" name="fuel gauge">
+
+	<summer name="systems/instrument/fuel/main-lbs">
+	    <input>propulsion/tank/contents-lbs</input>
+	    <input>propulsion/tank[1]/contents-lbs</input>
+	    <input>propulsion/tank[2]/contents-lbs</input>
+	    <clipto>
+		<min>0</min>
+		<max>10000</max>
+	    </clipto>
+	</summer>
+
+	<summer name="systems/instrument/fuel/wing-lbs">
+	    <input>propulsion/tank[3]/contents-lbs</input>
+	    <input>propulsion/tank[4]/contents-lbs</input>
+	    <input>propulsion/tank[5]/contents-lbs</input>
+	    <input>propulsion/tank[6]/contents-lbs</input>
+	    <input>propulsion/tank[7]/contents-lbs</input>
+	    <clipto>
+		<min>0</min>
+		<max>10000</max>
+	    </clipto>
+	</summer>
+
+	<summer name="systems/instrument/fuel/total-lbs">
+	    <input>propulsion/tank/contents-lbs</input>
+	    <input>propulsion/tank[1]/contents-lbs</input>
+	    <input>propulsion/tank[2]/contents-lbs</input>
+	    <input>propulsion/tank[3]/contents-lbs</input>
+	    <input>propulsion/tank[4]/contents-lbs</input>
+	    <input>propulsion/tank[5]/contents-lbs</input>
+	    <input>propulsion/tank[6]/contents-lbs</input>
+	    <input>propulsion/tank[7]/contents-lbs</input>
+	    <input>propulsion/tank[8]/contents-lbs</input>
+	    <input>propulsion/tank[9]/contents-lbs</input>
+	    <input>propulsion/tank[10]/contents-lbs</input>
+	    <input>propulsion/tank[11]/contents-lbs</input>
+	    <input>propulsion/tank[12]/contents-lbs</input>
+	</summer>
+	
+	
+	<switch name="systems/instrument/fuel/select-lbs">
+	    <default value="0" />
+	    <test value="propulsion/tank[7]/contents-lbs">
+		systems/instrument/fuel/tank-select eq 1
+	    </test>
+	    <test value="propulsion/tank[5]/contents-lbs">
+		systems/instrument/fuel/tank-select eq 2
+	    </test>
+	    <test value="propulsion/tank[4]/contents-lbs">
+		systems/instrument/fuel/tank-select eq 3
+	    </test>
+	    <test value="propulsion/tank[5]/contents-lbs">
+		systems/instrument/fuel/tank-select eq 4
+	    </test>
+	    <test value="propulsion/tank[3]/contents-lbs">
+		systems/instrument/fuel/tank-select eq 5
+	    </test>
+	    <test value="systems/instrument/fuel/wing-lbs">
+		systems/instrument/fuel/tank-select eq 6
+	    </test>
+	    <test value="systems/instrument/fuel/main-lbs">
+		systems/instrument/fuel/tank-select eq 7
+	    </test>
+	</switch>
+
+	<switch name="systems/instrument/fuel/damage-cmd">
+	    <default value="0" />
+	    <test value="1" logic="AND">
+		systems/instrument/fuel/tank-select eq 0
+		systems/instrument/fuel/power ne 1
+	    </test>
+	</switch>
+
+	<actuator name="systems/instrument/fuel/select-damage">
+	    <input>systems/instrument/fuel/damage-cmd</input>
+	    <rate_limit>systems/instrument/fuel/damage-rate</rate_limit>				
+	</actuator>
+
+	<switch name="systems/instrument/fuel/select-rate">
+	    <default value="3000" />
+	    <test value="0" logic="OR">
+		systems/instrument/fuel/select-damage eq 1
+		systems/instrument/fuel/gauge-damage eq 1
+	    </test>
+	</switch>
+
+	<switch name="systems/instrument/fuel/gauge-rate">
+	    <default value="3000" />
+	    <test value="0" logic="AND">
+		systems/instrument/fuel/gauge-damage eq 1
+		systems/instrument/fuel/power eq 0
+	    </test>
+	</switch>
+	
+	<actuator name="systems/instrument/fuel/select-indicated">
+	    <input>systems/instrument/fuel/select-lbs</input>
+	    <rate_limit>systems/instrument/fuel/select-rate</rate_limit>
+	</actuator>
+
+	<actuator name="systems/instrument/fuel/main-indicated">
+	    <input>systems/instrument/fuel/main-lbs</input>
+	    <rate_limit>systems/instrument/fuel/gauge-rate</rate_limit>
+	</actuator>
+
+	<actuator name="systems/instrument/fuel/total-indicated">
+	    <input>systems/instrument/fuel/total-lbs</input>
+	    <rate_limit>systems/instrument/fuel/gauge-rate</rate_limit>
+	    <output>systems/instrument/fuel/total-indicated-debug</output>
+	</actuator>
+	
+    </channel>
+
+    <channel execrate="8" name="ground_reactions">
+
+	<switch name="simulation/terminate">
+	    <default value="0" />
+	    <test logic="AND" value="1">
+		sim-time-sec gt 0.5
+		<test logic="OR">
+		    simulation/terminate eq 1
+		    contact/unit[3]/compression-ft gt 1
+		    contact/unit[4]/compression-ft gt 1
+		    contact/unit[5]/compression-ft gt 1
+		    contact/unit[6]/compression-ft gt 1
+		    contact/unit[7]/compression-ft gt 1
+		    contact/unit[8]/compression-ft gt 1
+		    contact/unit[9]/compression-ft gt 1
+		    contact/unit[10]/compression-ft gt 1
+		    contact/unit[11]/compression-ft gt 1
+		    contact/unit[12]/compression-ft gt 1
+		</test>
+	    </test>
+	</switch>
+	
+	<fcs_function name="contact/unit[4]/y-position">
+	    <function>
+		<product>
+		    <sum>
+			<value>3.8</value>
+			<product>
+			    <cos>
+				<product>
+				    <value>2.460914</value> 
+				    <property>fcs/wing-fold-pos-norm</property>
+				</product>
+			    </cos>
+			    <value>4.2</value>
+			</product>
+		    </sum>
+		    <value>39.3701</value>
+		</product>
+	    </function>
+	</fcs_function>
+
+	<pure_gain value="contact/unit[3]/y-position">
+	    <input>contact/unit[4]/y-position</input>
+	    <gain>-1</gain>
+	</pure_gain>
+	
+	<fcs_function name="contact/unit[4]/z-position">
+	    <function>
+		<product>
+		    <sum>
+			<value>-0.1</value>
+			<product>
+			    <sin>
+				<product>
+				    <value>2.460914</value> 
+				    <property>fcs/wing-fold-pos-norm</property>
+				</product>
+			    </sin>
+			    <value>4.2</value>
+			</product>
+		    </sum>
+		    <value>39.3701</value>
+		</product>
+	    </function>
+	    <output>contact/unit[3]/z-position</output>
+	</fcs_function>
+    </channel>
+</system>

@@ -1,0 +1,29 @@
+{
+  "set": "MD-80/MD-81-set.xml",
+  "name": "McDonnell Douglas MD-81 (JT8D-209)",
+  "fdm_type": "jsb",
+  "fdm": "MD-80/FDE/MD-81.xml",
+  "jets": 0,
+  "model": "MD-80/Models/MD-81.xml",
+  "tags": [
+    "transport",
+    "douglas",
+    "mc-donnell-douglas",
+    "1980s",
+    "1990s",
+    "2000s",
+    "ifr",
+    "retractable-gear",
+    "glass-cockpit",
+    "pressurised",
+    "jet",
+    "2-engine"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "MD-80.zip",
+  "archive_sha256": "6d6d35b8d24c13426bb265c72a5302255343c7b16026bf0f0c835c91c4e6c290",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MD-80.zip"
+}

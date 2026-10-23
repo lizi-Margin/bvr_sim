@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="refuel">
+    
+    <property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+    <property>/systems/refuel/contact</property>
+    <property>propulsion/refuel-transfer</property>
+    <property value="20000">systems/tanker/distance</property>
+    <property value="5000">systems/tanker/altitude</property>
+    <property value="300">systems/tanker/speed</property>
+    <property value="0">systems/tanker/enable</property>
+    <property value="0">systems/tanker/done</property>
+    <property>propulsion/systems/tank/refuel-in_air</property>
+    
+
+    <channel name="refuel">
+        
+        <switch name="propulsion/systems/tank/refuel-on_ground">
+            <default value="propulsion/systems/refuel/refuel-on_ground-cmd" />
+            <test logic="OR" value="0">
+               gear/unit[2]/wheel-speed-fps gt 0.2
+               /position/altitude-agl-ft gt 10
+               propulsion/engine[0]/set-running == 1
+            </test>
+            <test logic="AND" value="0">
+                inertia/pointmass-weight-lbs ge 5678
+                propulsion/refuel-transfer == 1
+           </test>
+            <output>propulsion/systems/refuel/refuel-on_ground-cmd</output>
+       </switch>
+
+     
+       <switch name="propulsion/systems/refuel/refuel_switch">
+           <default value="0" />
+           <test logic="AND" value="1">
+               propulsion/systems/tank/refuel-on_ground  == 1
+               gear/unit[2]/wheel-speed-fps lt 0.2
+               /position/altitude-agl-ft lt 7
+               inertia/pointmass-weight-lbs lt 5678
+           </test>
+           <test logic="AND" value="2">
+               propulsion/systems/tank/refuel-in_air  == 1
+               /instrumentation/airspeed-indicator/indicated-speed-kt gt 200
+               /position/altitude-agl-ft gt 500
+               /surface-positions/refueling-pos-norm == 1
+               /systems/refuel/contact == 1
+               inertia/pointmass-weight-lbs lt 5678
+           </test>
+       </switch>
+
+       
+       <switch name="propulsion/systems/refuel/refuel_switch-air-grnd">
+           <default value="0" />
+           <test logic="OR" value="1">
+               propulsion/systems/refuel/refuel_switch == 1
+               propulsion/systems/refuel/refuel_switch == 2
+           </test>
+            <output>propulsion/refuel-transfer</output>
+        </switch>
+
+
+
+       
+
+
+
+
+       <switch name="propulsion/systems/refuel/transfer-refuelswitch">
+           <default value="0" />
+           <test logic="AND" value="1">
+               propulsion/refuel-transfer == 1
+           </test>
+       </switch>
+
+       <kinematic name="propulsion/systems/refuel/transfer-refueling">
+           <input>propulsion/systems/refuel/transfer-refuelswitch</input>
+           <traverse>
+               <setting>
+                   <position>0.0</position>
+                   <time>0.0</time>
+               </setting>
+               <setting>
+                   <position>1</position>
+                   <time>2</time>
+               </setting>
+           </traverse>
+        </kinematic>
+
+
+       <switch name="propulsion/systems/refuel/transfer-refueldone-qty">
+           <default value="propulsion/systems/refuel/transfer-refueldone-qty" />
+           <test logic="AND" value="propulsion/systems/refuel/transfer-refueling">
+               inertia/pointmass-weight-lbs lt 5678
+           </test>
+       </switch>
+
+
+
+        <switch name="propulsion/systems/refuel/transfer-tank_refueled">
+            <default value="0" />
+            <test logic="AND" value="propulsion/systems/refuel/transfer-refueldone-qty">
+                propulsion/refuel-transfer == 1
+            </test>
+       </switch>
+
+
+
+
+
+       
+
+       <pure_gain name="propulsion/systems/refuel/refuel-controls">
+           <input>propulsion/systems/tank/refuel-in_air</input>
+           <gain>1</gain>
+           <output>/controls/flight/probe-refuel</output>
+       </pure_gain>
+
+
+       <kinematic name="systems/payload/display-timing">
+           <input>systems/payload/display</input>
+           <traverse>
+               <setting>
+                   <position>0</position>
+                   <time>0</time>
+               </setting>
+               <setting>
+                   <position>1</position>
+                   <time>8</time>
+               </setting>
+           </traverse>
+       </kinematic>
+
+       <switch name="systems/payload/displaySW">
+           <default value="systems/payload/display" />
+           <test logic="AND" value="0">
+               systems/payload/display-timing == 1
+           </test>
+           <test logic="AND" value="1">
+               inertia/pointmass-weight-lbs ge 5678
+           </test>
+           <output>systems/payload/display</output>
+        </switch>
+
+
+       
+
+      
+
+
+
+    </channel>
+
+</system>

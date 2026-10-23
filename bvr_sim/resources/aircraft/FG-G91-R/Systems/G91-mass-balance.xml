@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mass_balance>
+    
+    <description>
+        CG Empty (39%) : 17.71 ft (5.40 m) or 212" - 211"
+        CG Full load (20%) : 15.16 ft (4.62 m) or 181"
+    </description>
+    
+    
+    
+    
+    <ixx unit="SLUG*FT2">10000</ixx>
+    <iyy unit="SLUG*FT2">15000</iyy>
+    <izz unit="SLUG*FT2">15000</izz>
+    <ixy unit="SLUG*FT2">0.0</ixy>
+    <ixz unit="SLUG*FT2">0.0</ixz>
+    <iyz unit="SLUG*FT2">0.0</iyz>
+    
+    <emptywt unit="LBS">6834.0</emptywt>
+    <location name="CG" unit="IN">
+        <x> 209.00 </x>
+        <y>   0.00 </y>
+        <z>  -0.10 </z>
+    </location>
+    
+    
+    <pointmass name="hardPointDxExternal">
+        <weight unit="LBS"> 0 </weight>
+        <form shape="cylinder">
+            <radius unit="M">0.2</radius>
+            <length unit="M">2.0</length>
+        </form> 
+        <location name="POINTMASS" unit="IN">
+            <x> 251.1 </x>
+            <y> 113.7 </y>
+            <z> -36.61 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="hardPointDxInternal">
+        <weight unit="LBS"> 0 </weight>
+        <form shape="cylinder">
+            <radius unit="M">0.2</radius>
+            <length unit="M">2.0</length>
+        </form> 
+        <location name="POINTMASS" unit="IN">
+            <x> 209.00 </x>
+            <y> 79.92 </y>
+            <z> -36.61 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="hardPointSxInternal">
+        <weight unit="LBS"> 0 </weight>
+        <form shape="cylinder">
+            <radius unit="M">0.2</radius>
+            <length unit="M">2.0</length>
+        </form> 
+        <location name="POINTMASS" unit="IN">
+            <x> 209.00 </x>
+            <y> -79.92 </y>
+            <z> -36.61 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="hardPointSxExternal">
+        <weight unit="LBS"> 0 </weight>
+        <form shape="cylinder">
+            <radius unit="M">0.2</radius>
+            <length unit="M">2.0</length>
+        </form> 
+        <location name="POINTMASS" unit="IN">
+            <x> 251.1 </x>
+            <y> -113.7 </y>
+            <z> -36.61 </z>
+        </location>
+    </pointmass>
+    
+    
+    
+    
+    <pointmass name="JATO M8 1 DRY">
+        <weight unit="LBS"> 0 </weight>
+        <location name="POINTMASS" unit="M">
+            <x> 6.1 </x>
+            <y> -0.34 </y>
+            <z> -0.83 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="JATO M8 2 DRY">
+        <weight unit="LBS"> 0 </weight>
+        <location name="POINTMASS" unit="M">
+            <x> 6.1 </x>
+            <y> -0.11 </y>
+            <z> -0.83 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="JATO M8 3 DRY">
+        <weight unit="LBS"> 0 </weight>
+        <location name="POINTMASS" unit="M">
+            <x> 6.1 </x>
+            <y> 0.34 </y>
+            <z> -0.83 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="JATO M8 4 DRY">
+        <weight unit="LBS"> 0 </weight>
+        <location name="POINTMASS" unit="M">
+            <x> 6.1 </x>
+            <y> 0.11 </y>
+            <z> -0.83 </z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="pm-cg-x-weight-pos-position">
+        <weight unit="LBS"> 0.0 </weight>
+        <location name="POINTMASS" unit="IN">
+            <x>1000</x>
+            <y>0</y>
+            <z>0</z>
+        </location>
+    </pointmass>
+    
+    
+    <pointmass name="pm-cg-x-weight-neg-position">
+        <weight unit="LBS"> 0.0 </weight>
+        <location name="POINTMASS" unit="IN">
+            <x>-1000</x>
+            <y>0</y>
+            <z>0</z>
+        </location>
+    </pointmass>
+    
+</mass_balance>

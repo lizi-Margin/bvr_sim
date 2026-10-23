@@ -1,0 +1,25 @@
+{
+  "set": "Coanda-1910/coanda1910-set.xml",
+  "name": "Coanda 1910 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Coanda-1910/coanda1910-yasim.xml",
+  "jets": 1,
+  "model": "Coanda-1910/Models/coanda1910.xml",
+  "tags": [
+    "1910s",
+    "fixed-gear",
+    "tail-dragger",
+    "experimental",
+    "biplane",
+    "piston",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Coanda-1910.zip",
+  "archive_sha256": "c49b09bdfbb671e908d9f2a5632e394db059cec66217a35dc05b915ed092e49c",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Coanda-1910.zip"
+}

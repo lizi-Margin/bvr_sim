@@ -1,0 +1,28 @@
+{
+  "set": "Pilatus-PC-24/pc24-set.xml",
+  "name": "Pilatus PC 24 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Pilatus-PC-24/Systems/pc24-yasim.xml",
+  "jets": 2,
+  "model": "Pilatus-PC-24/Models/pc24.xml",
+  "tags": [
+    "pilatus",
+    "business",
+    "2010s",
+    "2020s",
+    "retractable-gear",
+    "low-wing",
+    "ifr",
+    "jet",
+    "2-engines",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Pilatus-PC-24.zip",
+  "archive_sha256": "91f9ffd3a36c62d674bf82b15c2f8b3dbabbc3b520a7117fc822835996e026e2",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Pilatus-PC-24.zip"
+}

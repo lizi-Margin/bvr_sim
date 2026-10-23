@@ -1,0 +1,109 @@
+TACAN AN/ARN-118
+----------------
+	FIXME
+
+ILS
+---
+	FIXME
+
+
+VHF AM/FM Transceiver: Collins AN/ARC-186(V)
+--------------------------------------------
+
+
+	The Fairchild A-10 has two of them. Both remote control panels are mounted
+	on the left console. Each radio is identical but they are preseted
+	single-band to provide dedicated VHF/AM or VHF/FM operation. This is done by
+	an external switch located on the receiver-transceiver unit.
+
+	The forward one is tuned to operate in VHF/AM mode (RL):
+	normal range
+	116 to 151.975 MHz AM
+	receive only range
+	108 to 115.975 MHz AM
+
+	The aft one should be tuned to operate in VHF/FM mode for homing capability
+	at 30 to 76 MHz FM but is currently disabled in the model.
+
+	For conveniance purposes, I decided to let the forward one work in the both
+    ranges for homing mode (which in RL should be reserved to FM).
+	The homing is displayed on the ADI (Attitude Indicator). There is no Course
+	setting and no Radials caculation when using AM/FM homing on the ADI.
+
+
+	Controls and indicators:
+	------------------------
+ 
+	Left side:
+		VOL control knob - not yet used
+
+		Squelch disable/tone switch - not used yet
+
+		Frequency control/emrgency select knob:
+		- EMER FM       - not used yet (cyphered coms)
+		- EMER AM       - not used yet (cyphered coms)
+		- MAN           - Enables manual frequency selection.
+		- PRE           - Enables preset chanel selection.
+
+		Load pushbutton - Inserts manualy selected frequency into selected
+		preseted channel. 
+
+	Center:
+		Frequency indicator - displays the frequency selected by the frequency
+		selector   knobs. (in some case it doesn't reflect the frequency in use)
+
+		Frequency selector buttons - select frequency.
+		(Left mouse button rotates CW, center mouse button (linux) rotates CCW)
+
+		Preset chanel indicator - indicates the preset number (1-20)
+
+		Preset chanel selector - selects the presets channels.
+		(Left mouse button forward, center mouse button (linux) backward)
+
+	Right:
+		Mode selector knob:
+		- OFF - Disables the receiver-transceiver.
+		- TR  - Enable the tramsmit/receive mode.
+		- DF  - Enable FM Homing (VHF/FM radio only).
+
+
+	Operation:
+	----------
+
+	Manual frequency selection:
+		- Mode selector knob - TR
+		- Frequency control/emergency select knob - MAN
+		- Frequency selector knobs - set desired frequency.
+
+	Loading preset channels:
+		- Mode selector knob - TR
+		- Frequency control/emergency select knob - MAN
+		- Frequency selector knobs - set desired frequency
+		- Preset chanel selector - click until the desired channel number is
+		obtained. (If the button doesn't move, review the step before).
+
+	Preset channel selection:
+		- Mode selector knob - TR
+		- Frequency control/emergency select knob - PRE
+		- Frequency selector knobs - click until desired channel number is
+		obtained. (It works also with Frequency control/emergency select
+		knob - MAN, but loading isn't possible in PRE mode).
+
+	FM (and AM) Homing:
+		- Navigation Mode Panel - TISL mode - UNSELECTED (not implemented yet)
+		- Navigation Mode Panel - FM button - PUSHED
+		- Mode selector knob - DF
+		- Frequency control/emergency select knob - MAN or PRE
+		
+		When the signal is strong enough (in range) the course warning flag is
+		stowed away. then the bank steering bar of the ADI will indicate course
+		deviation to the left or right of the center line, relative to the
+		selected station.
+		Turning the aircraft toward the bank steering bar will correct the
+		deviation. As the aircraft approaches the station, the pitch steering
+		bar will move up toward the centerline in accordance with the increasing
+		strengh of the received signal. If the station is in the opposite
+		direction (aircraft flying away from station), the pitch steering bar
+		will move down from the center bar to the bottom of the ADI.
+		When not in the DF mode, the ADI bank and pitch steering bars and course
+		warning flag are stowed out of view.

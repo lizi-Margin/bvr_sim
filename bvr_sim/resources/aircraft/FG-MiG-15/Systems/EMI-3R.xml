@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="EMI-3R combined engine indicator">
+ 
+
+
+ 
+ <property>/engines/engine/oil-pressure-psi</property>
+ <channel name="placeholder" execrate="2">
+  <pure_gain name="systems/instr/EMI-3R/placeholder/fuel-pressure-kgf_cm2">
+   <input>/engines/engine/fuel-flow_pph</input>
+   
+   <gain>100.0</gain>
+  </pure_gain>
+  <pure_gain name="systems/instr/EMI-3R/placeholder/oil-pressure-kgf_cm2">
+   <input>/engines/engine/oil-pressure-psi</input>
+   <gain>0.143</gain>
+  </pure_gain>
+  <pure_gain name="systems/instr/EMI-3R/placeholder/oil-temperature-degC">
+   <input>/engines/engine/egt-degc</input>
+   <gain>0.150</gain>
+  </pure_gain>
+ </channel>
+
+
+ <property>systems/elec/output/EMI-3R/DC27-V</property>
+ <property>systems/elec/output/EMI-3R/DC27-ok</property>
+
+
+ <channel name="EMI-3R slow" execrate="8">
+
+  <fcs_function name="systems/elec/output/EMI-3R/DC27-A">
+   <function>
+    <product>
+     <p>systems/elec/output/EMI-3R/DC27-V</p>
+     
+     <v>0.0111</v>
+    </product>
+   </function>
+  </fcs_function>
+
+ </channel>
+
+
+ <channel name="EMI-3R" execrate="2">
+
+  
+
+  <switch name="systems/instr/EMI-3R/gauge/fuel-pressure-kgf_cm2">
+   <default value="-16.6667" />
+   <test value="systems/instr/EMI-3R/placeholder/fuel-pressure-kgf_cm2">
+    systems/elec/output/EMI-3R/DC27-ok NE 0
+   </test>
+  </switch>
+
+  <switch name="systems/instr/EMI-3R/gauge/oil-pressure-kgf_cm2">
+   <default value="-1.1111" />
+   <test value="systems/instr/EMI-3R/placeholder/oil-pressure-kgf_cm2">
+    systems/elec/output/EMI-3R/DC27-ok NE 0
+   </test>
+  </switch>
+
+  <switch name="systems/instr/EMI-3R/gauge/oil-temperature-degC">
+   <default value="-50.0" />
+   <test value="systems/instr/EMI-3R/placeholder/oil-temperature-degC">
+    systems/elec/output/EMI-3R/DC27-ok NE 0
+   </test>
+  </switch>
+
+ </channel>
+
+
+</system>

@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="dragchute">
+    
+    <property value="0">systems/dragchute/status</property>
+    <property value="0">systems/dragchute/active</property>
+    <property value="0">systems/dragchute/activate</property>
+    <property value="0">systems/dragchute/sw-reset</property>
+    <property value="0">systems/dragchute/reset</property>
+    <property value="0">systems/dragchute/door-chute</property>
+    <property value="75">systems/dragchute/chute-area-sqft</property>
+    <property value="0">systems/dragchute/magnitude</property>
+    <property value="0">systems/dragchute/open-big-chute</property>
+    <property value="0">systems/dragchute/open-little-chute</property>
+    <property value="0">systems/dragchute/active-view</property>
+    <property value="0">systems/dragchute/rnd-number-alpha</property>
+    <property value="0">systems/dragchute/rnd-number-beta</property>
+    <property value="3.0">systems/dragchute/deg-rnd-scale</property>
+    <property value="1.0">systems/dragchute/deg-rnd-lag-coefficient</property>
+    <property value="0">systems/dragchute/beta-deg</property>
+    <property value="0">systems/dragchute/alpha-deg</property>
+    
+
+    <channel name="handle dragchute" execrate="16">
+
+        <washout_filter name="systems/dragchute/sw-handle-dragchute-washed">
+            <input>systems/handle-switches/sw-handle-dragchute-status</input>
+            <c1>1.0</c1>
+        </washout_filter>
+
+        <switch name="systems/dragchute/activate">
+            <default value="systems/dragchute/activate" />
+            <test logic="AND" value="1">
+                systems/dragchute/sw-handle-dragchute-washed GT 0.5
+                systems/dragchute/activate == 0
+            </test>
+        </switch>
+
+        <switch name="systems/dragchute/reset">
+            <default value="systems/dragchute/reset" />
+            <test logic="AND" value="1">
+                systems/dragchute/reset == 0
+                systems/dragchute/sw-handle-dragchute-washed LT -0.2
+                systems/dragchute/status == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/dragchute/status">
+            <default value="systems/dragchute/status" />
+            <test logic="AND" value="1">
+                systems/dragchute/door-chute LT 0.1
+                systems/dragchute/status == 0
+                systems/dragchute/reset == 0
+                systems/dragchute/activate == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/dragchute/reset == 1
+            </test>
+            <test logic="AND" value="2">
+                systems/dragchute/active == 1
+                systems/dragchute/reset == 0
+                velocities/vc-kts GE 220
+            </test>
+        </switch>
+        
+        <switch name="systems/dragchute/active">
+            <default value="systems/dragchute/active" />
+            <test logic="OR" value="0">
+                systems/dragchute/reset == 1
+                velocities/vtrue-kts LT 25
+                systems/dragchute/status == 2
+            </test>
+            <test logic="AND" value="1">
+                systems/dragchute/status GE 1
+                velocities/vtrue-kts GE 40
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/dragchute/active-view">
+            <input>systems/dragchute/active</input>
+            <c1>0.2</c1>
+        </lag_filter>
+
+        <switch>
+            <default value="systems/handle-switches/sw-handle-dragchute-trigger" />
+            <test logic="AND" value="0">
+                systems/dragchute/reset == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/dragchute/activate == 1
+                systems/dragchute/reset == 0
+            </test>
+            <output>systems/handle-switches/sw-handle-dragchute-trigger</output>
+        </switch>
+
+        <switch>
+            <default value="systems/dragchute/activate" />
+            <test logic="AND" value="0">
+                systems/dragchute/activate == 1
+                systems/dragchute/status GT 0
+            </test>
+            <output>systems/dragchute/activate</output>
+        </switch>
+
+        <washout_filter name="systems/dragchute/sw-reset-washed">
+            <input>systems/dragchute/sw-reset</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/dragchute/reset">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/dragchute/sw-reset-washed LT 0.6
+                systems/dragchute/sw-reset-washed GT -0.6
+            </test>
+        </switch>
+
+        <switch name="systems/handle-switches/sw-handle-dragchute-status">
+            <default value="systems/handle-switches/sw-handle-dragchute-status" />
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-dragchute-status == 1
+                systems/dragchute/reset == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/dragchute/door-chute">
+            <input>systems/dragchute/status</input>
+            <c1>4.0</c1>
+            <clipto>
+                <min>0.0</min>
+                <max>1.0</max>
+            </clipto>
+        </lag_filter>
+        
+        <lag_filter name="systems/dragchute/open-little-chute">
+            <input>systems/dragchute/active</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/dragchute/open-big-chute-start">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/dragchute/open-little-chute GT 0.8
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/dragchute/open-big-chute">
+            <input>systems/dragchute/open-big-chute-start</input>
+            <c1>0.3</c1>
+        </lag_filter>
+        
+        <fcs_function name="systems/dragchute/magnitude">
+            <function>
+                <description>Induced drag by tail chute</description>
+                <ifthen>
+                    <p>systems/dragchute/active</p>
+                    <product>
+                        <p>aero/qbar-psf</p>
+                        <p>systems/dragchute/chute-area-sqft</p>
+                        <p>systems/dragchute/open-big-chute</p>
+                        <v>0.5</v>
+                    </product>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+            <output>external_reactions/DragChute/magnitude</output>
+        </fcs_function>
+        
+    </channel>
+    
+    
+    <channel name="handle dragchute random effect" execrate="30">
+        
+        <fcs_function name="systems/dragchute/beta-deg-rnd">
+            <function>
+                <product>
+                    <random mean="0.0" stddev="2.0" />
+                    <product>
+                        <quotient>
+                            <sum>
+                                <p>systems/autopilot/speed-cas-on-air</p>
+                                <v>-250.0</v>
+                            </sum>
+                            <v>-250.0</v>
+                        </quotient>
+                        <p>systems/dragchute/deg-rnd-scale</p>
+                    </product>
+                </product>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/dragchute/alpha-deg-rnd">
+            <function>
+                <product>
+                    <random mean="0.0" stddev="2.0" />
+                    <product>
+                        <quotient>
+                            <sum>
+                                <p>systems/autopilot/speed-cas-on-air</p>
+                                <v>-250.0</v>
+                            </sum>
+                            <v>-250.0</v>
+                        </quotient>
+                        <p>systems/dragchute/deg-rnd-scale</p>
+                    </product>
+                </product>
+            </function>
+        </fcs_function>
+        
+    </channel>
+
+    
+    <channel name="handle dragchute alpha and beta" execrate="4">
+        
+        <summer name="systems/dragchute/alpha-deg-rnd-sum">
+            <input>aero/alpha-deg</input>
+            <input>systems/dragchute/alpha-deg-rnd</input>
+        </summer>
+        
+        <summer name="systems/dragchute/beta-deg-rnd-sum">
+            <input>aero/beta-deg</input>
+            <input>systems/dragchute/beta-deg-rnd</input>
+        </summer>
+        
+        <lag_filter name="systems/dragchute/beta-deg">
+            <input>systems/dragchute/beta-deg-rnd</input>
+            <c1>systems/dragchute/deg-rnd-lag-coefficient</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/dragchute/alpha-deg">
+            <input>systems/dragchute/alpha-deg-rnd</input>
+            <c1>systems/dragchute/deg-rnd-lag-coefficient</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+</system>

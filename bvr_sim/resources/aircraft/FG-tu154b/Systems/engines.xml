@@ -1,0 +1,342 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Engines">
+  
+  <property>propulsion/engine[0]/egt-degc</property>
+  <property>propulsion/engine[1]/egt-degc</property>
+  <property>propulsion/engine[2]/egt-degc</property>
+  
+  <property>propulsion/engine[0]/egt-power</property>
+  <property>propulsion/engine[0]/egt-check</property>
+
+  <property>propulsion/engine[1]/egt-power</property>
+  <property>propulsion/engine[1]/egt-check</property>
+  
+  <property>propulsion/engine[2]/egt-power</property>
+  <property>propulsion/engine[2]/egt-check</property>
+
+  <property>fcs/at-throttle-cmd-norm[0]</property>
+  <property>fcs/at-throttle-cmd-norm[1]</property>
+  <property>fcs/at-throttle-cmd-norm[2]</property>
+  
+  <property>systems/engine-control-lamps</property>
+  
+  <channel name="Engine_1">
+    
+    <summer name="propulsion/engine[0]/thr-delta">
+      <input>propulsion/engine[0]/thrust-lbs</input>
+      <bias>-22472</bias>
+      <clipto>
+        <min>0.0</min>
+        <max>100000.0</max>
+      </clipto>
+    </summer>
+    
+    <pid name="propulsion/engine[0]/thr-pid">
+      <input>propulsion/engine[0]/thr-delta</input>
+      <kp> 0.00006 </kp>	 
+      <ki> 0.0 </ki>
+      <kd> 0.0 </kd>
+    </pid>
+
+    <summer name="propulsion/engine[0]/thr">
+      <input>fcs/at-throttle-cmd-norm[0]</input>
+      <input>-propulsion/engine[0]/thr-pid</input>
+      <output>fcs/throttle-pos-norm[0]</output>
+    </summer> 
+   
+   
+   
+   <switch name="propulsion/engine[0]/n1-rna-gain">
+      <default value="1.0" />
+      <test value="0.94">
+        propulsion/engine[0]/n1 lt 43.0
+      </test>
+   </switch>
+   
+   <pure_gain name="propulsion/engine[0]/n1-rna">
+      <input>propulsion/engine[0]/n1</input>
+      <gain>propulsion/engine[0]/n1-rna-gain</gain>
+   </pure_gain>
+    
+   <lag_filter name="propulsion/engine[0]/n1-rna-filtered">
+      <input>propulsion/engine[0]/n1-rna</input>
+      <c1>1.0</c1>
+   </lag_filter>
+   
+   <switch name="propulsion/engine[0]/rna-lamp">
+     <default value="0.0" />
+     <test value="systems/electrical-ok">
+       systems/engine-control-lamps == 1
+     </test>
+     <test value="systems/electrical-ok">
+       propulsion/engine[0]/n1-rna-gain lt 0.95
+     </test>
+   </switch>
+
+   
+    
+    <switch name="propulsion/engine[0]/bypass-valve">
+      <default value="1.0" />
+      <test value="0.0">
+        propulsion/engine[0]/n2 gt 74.5
+      </test>
+    </switch>
+    <switch name="propulsion/engine[0]/bypass-switched">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        systems/engine-control-lamps == 1
+      </test>
+      <test value="propulsion/engine[0]/bypass-valve">
+        systems/electrical-ok == 1
+      </test>
+    </switch>    
+    
+    
+    
+    <switch name="propulsion/engine[0]/egt-powered">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        propulsion/engine[0]/egt-power == 1
+      </test>
+    </switch>
+
+    <switch name="propulsion/engine[0]/egt-checked">
+      <default value="propulsion/engine[0]/egt-degc" />
+      <test value="150.0">
+        propulsion/engine[0]/egt-check == 1
+      </test>
+    </switch>
+
+    <switch name="propulsion/engine[0]/egt-checked-powered">
+      <default value="0.0" />
+      <test value="propulsion/engine[0]/egt-checked">
+        propulsion/engine[0]/egt-powered == 1
+      </test>
+    </switch>
+
+    <lag_filter name="propulsion/engine[0]/egt-filtered">
+      <input>propulsion/engine[0]/egt-checked-powered</input>
+      <c1>0.4</c1>
+    </lag_filter>
+
+      
+  </channel>
+ 
+  <channel name="Engine_2">
+    
+    <summer name="propulsion/engine[1]/thr-delta">
+      <input>propulsion/engine[1]/thrust-lbs</input>
+      <bias>-22472</bias>
+      <clipto>
+        <min>0.0</min>
+        <max>100000.0</max>
+      </clipto>
+    </summer>
+    
+    <pid name="propulsion/engine[1]/thr-pid">
+      <input>propulsion/engine[1]/thr-delta</input>
+      <kp> 0.00006 </kp>	      
+      <ki> 0.0 </ki>
+      <kd> 0.0 </kd>
+    </pid>
+    
+    <summer name="propulsion/engine[1]/thr">
+      <input>fcs/at-throttle-cmd-norm[1]</input>
+      <input>-propulsion/engine[1]/thr-pid</input>
+      <output>fcs/throttle-pos-norm[1]</output>
+    </summer>
+    
+    
+    
+    <switch name="propulsion/engine[1]/n1-rna-gain">
+      <default value="1.0" />
+      <test value="0.94">
+        propulsion/engine[1]/n1 lt 43.0
+      </test>
+    </switch>
+    
+    <pure_gain name="propulsion/engine[1]/n1-rna">
+      <input>propulsion/engine[1]/n1</input>
+      <gain>propulsion/engine[1]/n1-rna-gain</gain>
+    </pure_gain>
+    
+    <lag_filter name="propulsion/engine[1]/n1-rna-filtered">
+      <input>propulsion/engine[1]/n1-rna</input>
+      <c1>1.0</c1>
+    </lag_filter>
+    
+    <switch name="propulsion/engine[1]/rna-lamp">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        systems/engine-control-lamps == 1
+      </test>
+      <test value="systems/electrical-ok">
+        propulsion/engine[1]/n1-rna-gain lt 0.95
+      </test>
+    </switch>
+    
+    
+    
+    <switch name="propulsion/engine[1]/bypass-valve">
+      <default value="1.0" />
+      <test value="0.0">
+        propulsion/engine[1]/n2 gt 74.5
+      </test>
+    </switch>
+    <switch name="propulsion/engine[1]/bypass-switched">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        systems/engine-control-lamps == 1
+      </test>
+      <test value="propulsion/engine[1]/bypass-valve">
+        systems/electrical-ok == 1
+      </test>
+    </switch>    
+    
+    
+    
+    <switch name="propulsion/engine[1]/egt-powered">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        propulsion/engine[1]/egt-power == 1
+      </test>
+    </switch>
+    
+    <switch name="propulsion/engine[1]/egt-checked">
+      <default value="propulsion/engine[1]/egt-degc" />
+      <test value="150.0">
+        propulsion/engine[1]/egt-check == 1
+      </test>
+    </switch>
+    
+    <switch name="propulsion/engine[1]/egt-checked-powered">
+      <default value="0.0" />
+      <test value="propulsion/engine[1]/egt-checked">
+        propulsion/engine[1]/egt-powered == 1
+      </test>
+    </switch>
+    
+    <lag_filter name="propulsion/engine[1]/egt-filtered">
+      <input>propulsion/engine[1]/egt-checked-powered</input>
+      <c1>0.4</c1>
+    </lag_filter>
+    
+      
+
+  </channel>
+  
+  <channel name="Engine_3">
+    
+    <summer name="propulsion/engine[2]/thr-delta">
+      <input>propulsion/engine[2]/thrust-lbs</input>
+      <bias>-22472</bias>
+      <clipto>
+        <min>0.0</min>
+        <max>100000.0</max>
+      </clipto>
+    </summer>
+    
+    <pid name="propulsion/engine[2]/thr-pid">
+      <input>propulsion/engine[2]/thr-delta</input>
+      <kp> 0.00006 </kp>	      
+      <ki> 0.0 </ki>
+      <kd> 0.0 </kd>
+    </pid>
+    
+    <summer name="propulsion/engine[2]/thr">
+      <input>fcs/at-throttle-cmd-norm[2]</input>
+      <input>-propulsion/engine[2]/thr-pid</input>
+      <output>fcs/throttle-pos-norm[2]</output>
+    </summer>
+    
+    
+    <switch name="propulsion/engine[2]/n1-rna-gain">
+      <default value="1.0" />
+      <test value="0.94">
+        propulsion/engine[2]/n1 lt 43.0
+      </test>
+    </switch>
+    
+    <pure_gain name="propulsion/engine[2]/n1-rna">
+      <input>propulsion/engine[2]/n1</input>
+      <gain>propulsion/engine[2]/n1-rna-gain</gain>
+    </pure_gain>
+    
+    <lag_filter name="propulsion/engine[2]/n1-rna-filtered">
+      <input>propulsion/engine[2]/n1-rna</input>
+      <c1>1.0</c1>
+    </lag_filter>
+    
+    <switch name="propulsion/engine[2]/rna-lamp">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        systems/engine-control-lamps == 1
+      </test>
+      <test value="systems/electrical-ok">
+        propulsion/engine[2]/n1-rna-gain lt 0.95
+      </test>
+    </switch>
+    
+    
+    
+    <switch name="propulsion/engine[2]/bypass-valve">
+      <default value="1.0" />
+      <test value="0.0">
+        propulsion/engine[2]/n2 gt 74.5
+      </test>
+    </switch>
+    <switch name="propulsion/engine[2]/bypass-switched">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        systems/engine-control-lamps == 1
+      </test>
+      <test value="propulsion/engine[2]/bypass-valve">
+        systems/electrical-ok == 1
+      </test>
+    </switch>    
+    
+    
+    
+    <switch name="propulsion/engine[2]/egt-powered">
+      <default value="0.0" />
+      <test value="systems/electrical-ok">
+        propulsion/engine[2]/egt-power == 1
+      </test>
+    </switch>
+    
+    <switch name="propulsion/engine[2]/egt-checked">
+      <default value="propulsion/engine[2]/egt-degc" />
+      <test value="150.0">
+        propulsion/engine[2]/egt-check == 1
+      </test>
+    </switch>
+    
+    <switch name="propulsion/engine[2]/egt-checked-powered">
+      <default value="0.0" />
+      <test value="propulsion/engine[2]/egt-checked">
+        propulsion/engine[2]/egt-powered == 1
+      </test>
+    </switch>
+    
+    <lag_filter name="propulsion/engine[2]/egt-filtered">
+      <input>propulsion/engine[2]/egt-checked-powered</input>
+      <c1>0.4</c1>
+    </lag_filter>
+    
+      
+
+  </channel>
+  
+  <channel name="APU">
+    
+    <switch name="propulsion/engine[3]/thr">
+      <default value="0.0" />
+      <test value="0.97">
+        propulsion/engine[3]/n2 &gt; 22.0
+      </test>
+      <output>fcs/throttle-pos-norm[3]</output>
+    </switch>
+
+  </channel>
+  
+</system>

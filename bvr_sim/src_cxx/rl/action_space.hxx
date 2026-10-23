@@ -14,7 +14,7 @@ namespace action_space_check {
 
 inline bool has_possible_action(const Register& register_) {
     return register_.has("delta_heading") || register_.has("delta_altitude") || register_.has("delta_speed") || register_.has("fire") ||
-           register_.has("aileron_cmd") || register_.has("elevator_cmd") || register_.has("rudder_cmd") || register_.has("throttle_cmd");
+           register_.has("aileron_cmd") || register_.has("elevator_cmd") || register_.has("rudder_cmd") || register_.has("throttle_cmd") || register_.has("roll_rate_cmd");
 }
 
 inline void wipe_out_action(Register& register_) { 
@@ -26,6 +26,7 @@ inline void wipe_out_action(Register& register_) {
     register_.pop("elevator_cmd");
     register_.pop("rudder_cmd");
     register_.pop("throttle_cmd");
+    register_.pop("roll_rate_cmd");
     // legacy
     register_.pop("shoot");
     
@@ -50,6 +51,7 @@ inline void check_action_json(const json::JSON& action_json) {
     check_optional_number_or_null("elevator_cmd");
     check_optional_number_or_null("rudder_cmd");
     check_optional_number_or_null("throttle_cmd");
+    check_optional_number_or_null("roll_rate_cmd");
     if (action_json.hasKey("fire", json::JSON::Class::Object)) {
         auto fire_json = action_json.at("fire");
         check(fire_json.hasKey_checkTypeIfExist("target_uid", json::JSON::Class::String), "fire.target_uid");
@@ -104,6 +106,7 @@ public:
         auto elevator_cmd = register_.get("elevator_cmd");
         auto rudder_cmd = register_.get("rudder_cmd");
         auto throttle_cmd = register_.get("throttle_cmd");
+        auto roll_rate_cmd = register_.get("roll_rate_cmd");
         
 
         // lambda to retrieve the float value from the register, with error checking
@@ -134,6 +137,7 @@ public:
         get_float_from_register(elevator_cmd, "elevator_cmd");
         get_float_from_register(rudder_cmd, "rudder_cmd");
         get_float_from_register(throttle_cmd, "throttle_cmd");
+        get_float_from_register(roll_rate_cmd, "roll_rate_cmd");
 
         auto fire = register_.get("fire");
         if (fire.has_value()) {
@@ -207,6 +211,13 @@ public:
             return std::nullopt;
         }
         return action_json.at("elevator_cmd").ToFloat();
+    }
+
+    // YASim interactive rate assist, radians/second. Explicit aileron wins.
+    std::optional<double> roll_rate_cmd() const {
+        if (!action_json.hasKey("roll_rate_cmd") || action_json.at("roll_rate_cmd").JSONType() == json::JSON::Class::Null)
+            return std::nullopt;
+        return action_json.at("roll_rate_cmd").ToFloat();
     }
 
     std::optional<double> rudder_cmd() const {

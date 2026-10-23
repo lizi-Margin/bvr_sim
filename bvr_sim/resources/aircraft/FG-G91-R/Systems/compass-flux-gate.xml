@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="compass flux gate">
+    
+    
+    <property value="0.0">systems/gauges/compass-flux-gate/indicated-bearing-deg</property>
+    <property value="0.0">systems/gauges/compass-flux-gate/operative-start-stop</property>
+    <property value="0.0">systems/gauges/compass-flux-gate/operative-heating</property>
+    <property value="0.0">systems/gauges/compass-flux-gate/operative</property>
+    <property value="1.0">systems/gauges/compass-flux-gate/isNotOperative</property>
+
+    
+    <channel name="compass flux gate electric" execrate="32">
+        
+        <switch name="systems/gauges/compass-flux-gate/operative-start-stop">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/NAV/fuse == 1
+                systems/electric/bus[1]/V GE 24.0
+                systems/electric/inv-primary/V GE 100.0
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/compass-flux-gate/I">
+            <default value="0.0" />
+            <test logic="AND" value="4.0">
+                systems/gauges/compass-flux-gate/operative-start-stop == 1
+            </test>
+        </switch>
+        
+        
+        <lag_filter name="systems/gauges/compass-flux-gate/operative-heating">
+            <input>systems/gauges/compass-flux-gate/operative-start-stop</input>
+            <c1>0.1</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/compass-flux-gate/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/compass-flux-gate/operative-heating GT 0.9
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/compass-flux-gate/isNotOperative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/compass-flux-gate/operative == 0.0
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="compass flux gate magnetic" execrate="4">
+        
+        <linear_actuator name="systems/gauges/compass-flux-gate/indicated-bearing-deg-la">
+            <input>/orientation/heading-magnetic-deg</input>
+            <gain>-1.0</gain>
+            <module>360</module>
+            <reset>systems/gauges/compass-flux-gate/isNotOperative</reset>
+        </linear_actuator>
+        
+        <actuator name="systems/gauges/compass-flux-gate/indicated-bearing-deg">
+            <input>systems/gauges/compass-flux-gate/indicated-bearing-deg-la</input>
+            <lag>1.0</lag>
+            <rate_limit> 180.0 </rate_limit>
+            <deadband_width> 0.1 </deadband_width>
+            <hysteresis_width> 0.1 </hysteresis_width>
+        </actuator>
+        
+    </channel>
+        
+        
+</system>

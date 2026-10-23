@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MiG-15 helper functions">
+
+
+ <channel name="AI correction, slip-skid ball">
+
+  <fcs_function name="accelerations/pendulum-pitch-deg">
+   <function>
+    <todegrees>
+     <atan>
+      <quotient>
+       <product>
+        <property>accelerations/n-pilot-x-norm</property>
+        <v>-1.0</v>
+       </product>
+       <property>accelerations/n-pilot-z-norm</property>
+      </quotient>
+     </atan>
+    </todegrees>
+   </function>
+  </fcs_function>
+
+  <fcs_function name="accelerations/pendulum-pitch-error-deg">
+   <function>
+    
+    <product>
+     <asin>
+      <sin>
+       <product>
+        <difference>
+         <p>accelerations/pendulum-pitch-deg</p>
+         <p>attitude/theta-deg</p>
+        </difference>
+        
+        <v>0.0175</v>
+       </product>
+      </sin>
+     </asin>
+     
+     <v>57.2975</v>
+    </product>
+   </function>
+  </fcs_function>
+
+  
+  <fcs_function name="accelerations/pendulum-roll-deg">
+   <function>
+    <difference>
+     <todegrees>
+      <atan2>
+       <property>accelerations/n-pilot-y-norm</property>
+       <property>accelerations/n-pilot-z-norm</property>
+      </atan2>
+     </todegrees>
+     <v>180.0</v>
+    </difference>
+   </function>
+   <clipto type="cyclic">
+    <min>-180.0</min>
+    <max>180.0</max>
+   </clipto>
+  </fcs_function>
+
+  <summer name="accelerations/pendulum-roll-error-deg">
+   <input>accelerations/pendulum-roll-deg</input>
+   <input>-attitude/phi-deg</input>
+   <clipto type="cyclic">
+    <min>-180.0</min>
+    <max>180.0</max>
+   </clipto>
+  </summer>
+
+ </channel>
+
+
+ <channel name="Geography" execrate="4">
+
+  <summer name="attitude/mag-variation-deg">
+   <input>attitude/psi-deg</input>
+   <input>-attitude/psi-mag-deg</input>
+   <clipto type="cyclic">
+    <min>-180.0</min>
+    <max>180.0</max>
+   </clipto>
+  </summer>
+
+ </channel>
+
+
+</system>

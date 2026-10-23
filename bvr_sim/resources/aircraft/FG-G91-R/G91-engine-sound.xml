@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="engine-sound">
+
+    <channel name="engine sound">
+        
+        <pure_gain>
+            <input>propulsion/engine/n1</input>
+            <gain>0.01</gain>
+            <output>tweak_factors/vol_engine_total</output>
+        </pure_gain>
+
+    </channel>
+
+</system>

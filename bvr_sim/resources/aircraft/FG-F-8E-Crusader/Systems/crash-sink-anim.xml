@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Crash_nd_Sink">
+
+    <property> /gear/gear[9]/compression-norm</property>
+    <property> /gear/gear[3]/compression-norm</property>
+    <property> /gear/gear[4]/compression-norm</property>
+    <property> /gear/gear[5]/compression-norm</property>
+    <property> /gear/gear[6]/compression-norm</property>
+    <property> /gear/gear[11]/compression-norm</property>
+    <property>/gear/gear[9]//wow</property>
+    <property>/gear/gear[5]/wow</property>
+    <property>/gear/gear[6]/wow</property>
+    <property>/gear/gear[11]/wow</property>
+    <property value="10">systems/crash/adverse-max-g</property>
+    <property value="-4.5">systems/crash/adverse-min-g</property>
+
+
+    <channel name="crash">
+
+        
+        <switch name="systems/crash/fire-on-crash">
+            <default value="0" />
+            <test value="0">
+                /environment/wildfire/fire-on-crash == 1
+            </test>
+            <output>/environment/wildfire/fire-on-crash</output>
+        </switch>
+
+        <switch name="systems/crash/switch-sw">
+            <default value="systems/crash/switch" />
+            <test logic="OR" value="0">
+                simulation/sim-time-sec lt 1.0
+                systems/hook/tailhook-pos-norm == 1
+            </test>
+            <test logic="OR" value="1">
+                /gear/gear[9]/compression-norm gt 0.05
+                /gear/gear[3]/compression-norm gt 0.01
+                /gear/gear[4]/compression-norm gt 0.01
+                /gear/gear[5]/compression-norm gt 0.05
+                /gear/gear[6]/compression-norm gt 0.05
+                /gear/gear[11]/compression-norm gt 0.05
+                systems/crash-detect/crashed == 1
+            </test>
+            <output>systems/crash/switch</output>
+        </switch>
+
+        <kinematic name="Crash Control">
+            <input>systems/crash/switch</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>1</position>
+                    <time>1</time>
+                </setting>
+            </traverse>
+            <output>systems/crash/switch_timer</output>
+        </kinematic>
+
+        <switch name="systems/crash/switch_belly">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /gear/gear[9]/compression-norm gt 0.05
+                /gear/gear[9]/wow == 1
+            </test>
+            <output>systems/crash/cpbelly</output>
+        </switch>
+        <switch name="systems/crash/switch_w-left">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /gear/gear[5]/compression-norm gt 0.05
+                /gear/gear[5]/wow == 1
+            </test>
+            <output>systems/crash/cpw-left</output>
+        </switch>
+        <switch name="systems/crash/switch_w-right">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /gear/gear[6]/compression-norm gt 0.05
+                /gear/gear[6]/wow == 1
+            </test>
+            <output>systems/crash/cpw-right</output>
+        </switch>
+        <switch name="systems/crash/switch_nozzle">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /gear/gear[11]/compression-norm gt 0.05
+                /gear/gear[11]/wow == 1
+            </test>
+            <output>systems/crash/cpnozzle</output>
+        </switch>
+
+        <switch name="systems/crash/switch_propulsion">
+            <default value="fcs/cutoff-switch" />
+            <test logic="OR" value="0">
+                systems/crash/switch_timer  != 0
+                systems/crash-detect/crashed == 1
+            </test>
+            <output>fcs/cutoff-switch</output>
+        </switch>
+
+        <switch name="systems/crash/switch_electric">
+            <default value="/controls/electric/master-switch" />
+            <test logic="OR" value="0">
+                systems/crash/switch_timer  != 0
+                systems/crash-detect/crashed == 1
+            </test>
+            <output>/controls/electric/master-switch</output>
+        </switch>
+
+    </channel>
+
+    <channel name="aero-breakage">
+
+        <kinematic name="systems/crash-detect/aero">
+            <input>systems/crash-detect/over-g</input>
+            <traverse>
+                <setting>
+                    <position> 0 </position>
+                    <time>  0 </time>
+                </setting>
+                <setting>
+                    <position> 1 </position>
+                    <time> 1.5</time>
+                </setting>
+            </traverse>
+      </kinematic>
+
+        <switch name="systems/crash-detect/aero-sw">
+            <default value="systems/crash-detect/aero-on" />
+            <test logic="OR" value="0">
+                
+                systems/crash-detect/crashed-sw == 1
+                systems/crash/switch_timer  == 1
+            </test>
+            <test logic="AND" value="1">
+                simulation/sim-time-sec lt 1.0
+            </test>
+            <output>systems/crash-detect/aero-on</output>
+      </switch>
+
+    </channel>
+
+
+    <channel name="Sink">
+
+
+
+           
+
+           <switch name="systems/sinking/switch">
+               <default value="0" />
+               <test logic="AND" value="1">
+                   /environment/terrain-solid  == 0
+                   position/h-agl-ft lt 7
+                   velocities/vc-fps lt 50
+                   position/h-sl-ft  lt position/h-agl-ft
+               </test>
+            </switch>
+
+           <kinematic name="Sinking Control">
+               <input>systems/sinking/switch</input>
+               <traverse>
+                   <setting>
+                       <position>0</position>
+                       <time>0</time>
+                   </setting>
+                   <setting>
+                       <position>1</position>
+                       <time>20</time>
+                   </setting>
+               </traverse>
+               <output>systems/sinking/timer</output>
+           </kinematic>
+
+           <switch name="Belly">
+               <default value="1" />
+               <test value="0">
+                   systems/sinking/timer gt 0.10
+               </test>
+               <output>systems/sinking/cpbelly</output>
+            </switch>
+
+            <actuator name="Cp Belly">
+                <input>systems/sinking/cpbelly</input>
+                <rate_limit>0.1</rate_limit>
+                <output>gear/unit[9]/pos-norm</output>
+                <output>contact/unit[9]/pos-norm</output>
+            </actuator>
+
+            <switch name="Nose">
+                <default value="1" />
+                <test value="0">
+                    systems/sinking/timer gt 0.20
+                </test>
+                <output>systems/sinking/cpnose</output>
+            </switch>
+
+            <actuator name="Cp Nose">
+                <input>systems/sinking/cpnose</input>
+                <rate_limit>0.1</rate_limit>
+                <output>gear/unit[10]/pos-norm</output>
+                <output>contact/unit[10]/pos-norm</output>
+            </actuator>
+
+            <switch name="Radom">
+                <default value="1" />
+                <test value="0">
+                    systems/sinking/timer gt 0.30
+                </test>
+                <output>systems/sinking/cpradom</output>
+            </switch>
+
+            <actuator name="Cp Radom">
+                <input>systems/sinking/cpradom</input>
+                <rate_limit>0.1</rate_limit>
+                <output>gear/unit[8]/pos-norm</output>
+                <output>contact/unit[8]/pos-norm</output>
+            </actuator>
+
+            <switch name="Nozzle">
+                <default value="1" />
+                <test value="0">
+                    systems/sinking/timer gt 0.40
+                </test>
+                <output>systems/sinking/cpnozzle</output>
+            </switch>
+
+            <actuator name="Cp Nozzle">
+                <input>systems/sinking/cpnozzle</input>
+                <rate_limit>0.1</rate_limit>
+                <output>gear/unit[11]/pos-norm</output>
+                <output>contact/unit[11]/pos-norm</output>
+            </actuator>
+
+            
+
+    </channel>
+
+
+
+
+
+</system>

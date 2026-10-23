@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Warning lights"> 
+    
+    
+    <channel name="cockpit electric system" execrate="16">
+        
+        <switch name="systems/warning-lights/cockpit/wl-bus0-bus1-battery-out">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-battery-tension">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-bus0-bus1-battery-out-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-battery-tension">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-internal-power-generator-inverted-current-rele-off">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-internal-power-generator-inverted-current-rele-off-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-inverter-primary-off">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/electric/inv-primary/V LT 110
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-inverter-primary-off-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/electric/inv-primary/V LT 110
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-inverter-secondary-off">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/electric/inv-secondary/V LT 110
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/wl-inverter-secondary-off-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/electric/inv-secondary/V LT 110
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg_canopy_light">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-battery-tension">
+                systems/canopy/warning-light == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg_collect_tank_2_all_tank">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/electric/bus[1]/fuel-level-indicator/sw == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg_collect_tank_2_all_tank-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/electric/bus[1]/fuel-level-indicator/sw == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg_hydraulic_low_press">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/hydraulics/low_press_on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg_hydraulic_low_press-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/hydraulics/low_press_on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg-elevator_servo_ctrl-off">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-battery-tension">
+                systems/servo-wings/elevator/operative == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/warning-lights/cockpit/lg-elevator_servo_ctrl-off-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-battery-tension">
+                systems/servo-wings/elevator/operative == 0
+            </test>
+        </switch>
+        
+    </channel>
+
+    <function name="systems/warning-lights/light-intensity-by-battery-tension">
+        <table>
+            <independentVar>systems/electric/bus[0]/V</independentVar>
+            <tableData>
+                0.0     0.0
+                12.0    0.1
+                30.0    1.0
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/warning-lights/transparent-by-battery-tension">
+        <table>
+            <independentVar>systems/electric/bus[0]/V</independentVar>
+            <tableData>
+                0.0     0.85
+                18.0    0.85
+                30.0    0.2
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/warning-lights/light-intensity-by-bus1-tension">
+        <table>
+            <independentVar>systems/electric/bus[1]/V</independentVar>
+            <tableData>
+                0.0     0.0
+                12.0    0.1
+                30.0    1.0
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/warning-lights/transparent-by-bus1-tension">
+        <table>
+            <independentVar>systems/electric/bus[1]/V</independentVar>
+            <tableData>
+                0.0     0.85
+                18.0    0.85
+                30.0    0.2
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/warning-lights/light-intensity-by-bus2-tension">
+        <table>
+            <independentVar>systems/electric/bus[2]/V</independentVar>
+            <tableData>
+                0.0     0.0
+                12.0    0.1
+                30.0    1.0
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/warning-lights/transparent-by-bus2-tension">
+        <table>
+            <independentVar>systems/electric/bus[2]/V</independentVar>
+            <tableData>
+                0.0     0.85
+                18.0    0.85
+                30.0    0.2
+            </tableData>
+        </table>
+    </function>
+    
+</system>

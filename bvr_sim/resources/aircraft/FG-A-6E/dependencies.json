@@ -1,0 +1,83 @@
+{
+  "files": [
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "Systems/jsb-propulsion.xml",
+      "source": "A-6E/Systems/jsb-propulsion.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "Systems/ground_reactions.xml",
+      "source": "A-6E/Systems/ground_reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "Propulsion.xml",
+      "source": "A-6E/Systems/Propulsion.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "Catapult.xml",
+      "source": "A-6E/Systems/Catapult.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "jsb-instruments.xml",
+      "source": "A-6E/Systems/jsb-instruments.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "jsb-hook.xml",
+      "source": "A-6E/Systems/jsb-hook.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "jsb-holdback.xml",
+      "source": "A-6E/Systems/jsb-holdback.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "Systems/fcs.xml",
+      "source": "A-6E/Systems/fcs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/A-6E.xml",
+      "reference": "A-6E_vspaero.xml",
+      "source": "A-6E/A-6E_vspaero.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/Systems/jsb-propulsion.xml",
+      "reference": "J52-P8",
+      "source": "A-6E/Engines/J52-P8.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/Systems/jsb-propulsion.xml",
+      "reference": "direct",
+      "source": "A-6E/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/Systems/jsb-propulsion.xml",
+      "reference": "J52-P8",
+      "source": "A-6E/Engines/J52-P8.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A-6E/Systems/jsb-propulsion.xml",
+      "reference": "direct",
+      "source": "A-6E/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

@@ -1,0 +1,25 @@
+{
+  "set": "777/777-200-set.xml",
+  "name": "Boeing 777-200",
+  "fdm_type": "yasim",
+  "fdm": "777/777-200.xml",
+  "jets": 2,
+  "model": "777/Models/777-200.xml",
+  "tags": [
+    "transport",
+    "boeing",
+    "jet",
+    "twin-engine",
+    "retractable-gear",
+    "etops",
+    "glass-cockpit",
+    "ifr"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 4,
+  "variant_of": "",
+  "archive": "777.zip",
+  "archive_sha256": "3e3608769e6aa3a4106f092168cc24dd63531f4eaa470ba6bc3b397bcf13d06e",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/777.zip"
+}

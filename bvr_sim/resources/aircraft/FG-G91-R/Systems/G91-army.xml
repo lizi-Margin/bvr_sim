@@ -1,0 +1,293 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="bombs"> 
+    
+    
+
+    <property value="0">systems/stations/stationSxExternal/armyType-mod</property>
+    <property value="0">systems/stations/stationSxInternal/armyType-mod</property>
+    <property value="0">systems/stations/stationDxInternal/armyType-mod</property>
+    <property value="0">systems/stations/stationDxExternal/armyType-mod</property>
+    
+    <property value="0">systems/stations/stationSxExternal/armyType</property>
+    <property value="0">systems/stations/stationSxExternal/armyTypeFuse</property>
+    <property value="0">systems/stations/stationSxExternal/armyTypeSpecial</property>
+    <property value="0">systems/stations/stationSxInternal/armyType</property>
+    <property value="0">systems/stations/stationSxInternal/armyTypeFuse</property>
+    <property value="0">systems/stations/stationSxInternal/armyTypeSpecial</property>
+    <property value="0">systems/stations/stationDxInternal/armyType</property>
+    <property value="0">systems/stations/stationDxInternal/armyTypeFuse</property>
+    <property value="0">systems/stations/stationDxInternal/armyTypeSpecial</property>
+    <property value="0">systems/stations/stationDxExternal/armyType</property>
+    <property value="0">systems/stations/stationDxExternal/armyTypeFuse</property>
+    <property value="0">systems/stations/stationDxExternal/armyTypeSpecial</property>
+
+    
+    <channel name="external tanks" execrate="16">
+        
+        
+
+        <washout_filter name="systems/stations/stationSxExternal/armyType-wa">
+            <input>systems/stations/stationSxExternal/armyType-mod</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/stations/stationSxInternal/armyType-wa">
+            <input>systems/stations/stationSxInternal/armyType-mod</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/stations/stationDxInternal/armyType-wa">
+            <input>systems/stations/stationDxInternal/armyType-mod</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/stations/stationDxExternal/armyType-wa">
+            <input>systems/stations/stationDxExternal/armyType-mod</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        
+        
+        <switch name="systems/fuel/external-tank-active">
+            <default value="systems/fuel/external-tank-active" />
+            <test logic="OR" value="0">
+                systems/stations/stationSxInternal/armyType-wa GE 0.1
+                systems/stations/stationDxInternal/armyType-wa GE 0.1
+            </test>
+        </switch>
+        
+        
+        
+        <switch name="systems/store/stations/sx/external/type">
+            <default value="systems/store/stations/sx/external/type" />
+            <test logic="AND" value="20">
+                systems/stations/stationSxExternal/armyType-wa GT 0.1
+                systems/stations/stationSxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxExternal/Weight">
+            <default value="systems/stations/stationSxExternal/Weight" />
+            <test logic="AND" value="250">
+                systems/stations/stationSxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxExternal/Count">
+            <default value="systems/stations/stationSxExternal/Count" />
+            <test logic="AND" value="1">
+                systems/stations/stationSxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxExternal/Cd-base">
+            <default value="systems/stations/stationSxExternal/Cd-base" />
+            <test logic="AND" value="0.1">
+                systems/stations/stationSxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxExternal/Cd-fuse-factor">
+            <default value="1" />
+            <test logic="AND" value="1.5">
+                systems/stations/stationSxExternal/armyTypeFuse == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/stations/stationSxExternal/Cd">
+            <input>systems/stations/stationSxExternal/Cd-base</input>
+            <gain>systems/stations/stationSxExternal/Cd-fuse-factor</gain>
+        </pure_gain>
+        
+        
+        
+        <switch name="systems/store/stations/sx/internal/type">
+            <default value="systems/store/stations/sx/internal/type" />
+            <test logic="AND" value="20">
+                systems/stations/stationSxInternal/armyType-wa GT 0.1
+                systems/stations/stationSxInternal/armyType == 1
+            </test>
+            <test logic="AND" value="21">
+                systems/stations/stationSxInternal/armyType-wa GT 0.1
+                systems/stations/stationSxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxInternal/Count">
+            <default value="systems/stations/stationSxInternal/Count" />
+            <test logic="OR" value="1">
+                systems/stations/stationSxInternal/armyType == 1
+                systems/stations/stationSxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxInternal/Weight">
+            <default value="systems/stations/stationSxInternal/Weight" />
+            <test logic="AND" value="250">
+                systems/stations/stationSxInternal/armyType == 1
+            </test>
+            <test logic="AND" value="500">
+                systems/stations/stationSxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxInternal/Cd-base">
+            <default value="systems/stations/stationSxInternal/Cd-base" />
+            <test logic="AND" value="0.1">
+                systems/stations/stationSxInternal/armyType == 1
+            </test>
+            <test logic="AND" value="0.15">
+                systems/stations/stationSxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxInternal/Cd-fuse-factor">
+            <default value="1" />
+            <test logic="AND" value="1.5">
+                systems/stations/stationSxExternal/armyTypeFuse == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/stations/stationSxInternal/Cd">
+            <input>systems/stations/stationSxInternal/Cd-base</input>
+            <gain>systems/stations/stationSxInternal/Cd-fuse-factor</gain>
+        </pure_gain>
+        
+        
+        
+        <switch name="systems/store/stations/dx/internal/type">
+            <default value="systems/store/stations/dx/internal/type" />
+            <test logic="AND" value="20">
+                systems/stations/stationDxInternal/armyType-wa GT 0.1
+                systems/stations/stationDxInternal/armyType == 1
+            </test>
+            <test logic="AND" value="21">
+                systems/stations/stationDxInternal/armyType-wa GT 0.1
+                systems/stations/stationDxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/Count">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/stations/stationDxInternal/armyType == 1
+                systems/stations/stationDxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/Weight">
+            <default value="0" />
+            <test logic="AND" value="250">
+                systems/stations/stationDxInternal/armyType == 1
+            </test>
+            <test logic="AND" value="500">
+                systems/stations/stationDxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/Cd-base">
+            <default value="systems/stations/stationDxInternal/Cd-base" />
+            <test logic="AND" value="0.1">
+                systems/stations/stationDxInternal/armyType == 1
+            </test>
+            <test logic="AND" value="0.15">
+                systems/stations/stationDxInternal/armyType == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/Cd-fuse-factor">
+            <default value="1" />
+            <test logic="AND" value="1.5">
+                systems/stations/stationDxInternal/armyTypeFuse == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/stations/stationDxInternal/Cd">
+            <input>systems/stations/stationDxInternal/Cd-base</input>
+            <gain>systems/stations/stationDxInternal/Cd-fuse-factor</gain>
+        </pure_gain>
+        
+        
+        
+        <switch name="systems/store/stations/dx/external/type">
+            <default value="systems/store/stations/dx/external/type" />
+            <test logic="AND" value="20">
+                systems/stations/stationDxExternal/armyType-wa GT 0.1
+                systems/stations/stationDxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/Count">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/stations/stationDxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/Weight">
+            <default value="0" />
+            <test logic="AND" value="250">
+                systems/stations/stationDxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/Cd-base">
+            <default value="systems/stations/stationDxExternal/Cd-base" />
+            <test logic="AND" value="0.1">
+                systems/stations/stationSxExternal/armyType == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/Cd-fuse-factor">
+            <default value="1" />
+            <test logic="AND" value="1.5">
+                systems/stations/stationDxExternal/armyTypeFuse == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/stations/stationDxExternal/Cd">
+            <input>systems/stations/stationDxExternal/Cd-base</input>
+            <gain>systems/stations/stationDxExternal/Cd-fuse-factor</gain>
+        </pure_gain>
+        
+        
+        
+        <switch name="systems/stations/stationSxExternal/armyType-mod">
+            <default value="systems/stations/stationSxExternal/armyType-mod" />
+            <test logic="AND" value="0">
+                systems/stations/stationSxExternal/armyType-mod == 1
+                systems/stations/stationSxExternal/armyType-wa LT 0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationSxInternal/armyType-mod">
+            <default value="systems/stations/stationSxInternal/armyType-mod" />
+            <test logic="AND" value="0">
+                systems/stations/stationSxInternal/armyType-mod == 1
+                systems/stations/stationSxInternal/armyType-wa LT 0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/armyType-mod">
+            <default value="systems/stations/stationDxInternal/armyType-mod" />
+            <test logic="AND" value="0">
+                systems/stations/stationDxInternal/armyType-mod == 1
+                systems/stations/stationDxInternal/armyType-wa LT 0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/armyType-mod">
+            <default value="systems/stations/stationDxExternal/armyType-mod" />
+            <test logic="AND" value="0">
+                systems/stations/stationDxExternal/armyType-mod == 1
+                systems/stations/stationDxExternal/armyType-wa LT 0.1
+            </test>
+        </switch>
+        
+        
+        
+        
+        
+    </channel>
+    
+</system>

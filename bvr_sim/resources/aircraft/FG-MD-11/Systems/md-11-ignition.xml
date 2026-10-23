@@ -1,0 +1,342 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-11: Ignition">
+	
+	<channel name="Ignition" execrate="8">
+		
+		<switch name="/systems/ignition/ign-a">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/electrical/bus/l-emer-ac ge 112
+				/controls/ignition/ign-a eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/ign-b">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/electrical/bus/r-emer-ac ge 112
+				/controls/ignition/ign-b eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/ign-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/ignition/ign-a eq 1
+				/systems/ignition/ign-b eq 1
+			</test>
+			<output>/systems/pneumatics/esc/ign-avail</output>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Engine Start/Stop"> 
+		
+		
+		<switch name="/systems/ignition/can-run-1">
+			<default value="0" />
+			<test value="1">
+				propulsion/tank[8]/contents-lbs ge 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/cutoff-1">
+			<default value="1" />
+			<test logic="AND" value="0">
+				/controls/engines/engine[0]/cutoff-switch eq 0
+				/systems/ignition/can-run-1 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/start-valve-1-cmd">
+			<default value="/controls/engines/engine[0]/start-cmd" />
+			<test logic="OR" value="0">
+				/systems/pneumatics/bleed-1-psi lt 20
+				/systems/electrical/bus/dc-bat lt 24
+				/engines/engine[0]/n2-actual ge /systems/ignition/starter-cutoff-n2
+				/systems/ignition/ign-avail ne 1
+			</test>
+			<test logic="AND" value="0"> 
+				/systems/ignition/cutoff-1 eq 1
+				/engines/engine[0]/state ge 2
+			</test>
+			<output>/controls/engines/engine[0]/start-cmd</output>
+		</switch>
+		
+		<fcs_function name="/systems/ignition/start-switch-1">
+			<function>
+				<max>
+					<property>/controls/engines/engine[0]/start-switch</property>
+					<property>/systems/ignition/start-valve-1-cmd</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/systems/ignition/start-valve-1">
+			<input>/systems/ignition/start-valve-1-cmd</input>
+			<rate_limit sense="incr">1</rate_limit>
+			<rate_limit sense="decr">1000</rate_limit>
+		</actuator>
+		
+		<switch name="/systems/ignition/starter-1">
+			<default value="0" />
+			<test value="1">
+				/systems/ignition/start-valve-1 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/starter-jsb-1">
+			<default value="/systems/ignition/starter-1" />
+			<test logic="AND" value="1"> 
+				/engines/engine[0]/n2-actual ge /systems/ignition/starter-cutoff-n2
+				/systems/ignition/cutoff-1 eq 0
+				/systems/ignition/can-run-1 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/state-1">
+			<default value="0" />
+			<test logic="AND" value="3">
+				/systems/ignition/cutoff-1 eq 0
+				/engines/engine[0]/n2-actual ge 60
+			</test>
+			<test logic="AND" value="2">
+				/systems/ignition/cutoff-1 eq 0
+				/systems/ignition/starter-jsb-1 eq 1
+			</test>
+			<test value="1">
+				/systems/ignition/starter-jsb-1 eq 1
+			</test>
+			<output>/engines/engine[0]/state</output>
+		</switch>
+		
+		
+		<switch name="/systems/ignition/can-run-2">
+			<default value="0" />
+			<test value="1">
+				propulsion/tank[9]/contents-lbs ge 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/cutoff-2">
+			<default value="1" />
+			<test logic="AND" value="0">
+				/controls/engines/engine[1]/cutoff-switch eq 0
+				/systems/ignition/can-run-2 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/start-valve-2-cmd">
+			<default value="/controls/engines/engine[1]/start-cmd" />
+			<test logic="OR" value="0">
+				/systems/pneumatics/bleed-2-psi lt 20
+				/systems/electrical/bus/dc-bat lt 24
+				/engines/engine[1]/n2-actual ge /systems/ignition/starter-cutoff-n2
+				/systems/ignition/ign-avail ne 1
+			</test>
+			<test logic="AND" value="0"> 
+				/systems/ignition/cutoff-2 eq 1
+				/engines/engine[1]/state ge 2
+			</test>
+			<output>/controls/engines/engine[1]/start-cmd</output>
+		</switch>
+		
+		<fcs_function name="/systems/ignition/start-switch-2">
+			<function>
+				<max>
+					<property>/controls/engines/engine[1]/start-switch</property>
+					<property>/systems/ignition/start-valve-2-cmd</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/systems/ignition/start-valve-2">
+			<input>/systems/ignition/start-valve-2-cmd</input>
+			<rate_limit sense="incr">1</rate_limit>
+			<rate_limit sense="decr">1000</rate_limit>
+		</actuator>
+		
+		<switch name="/systems/ignition/starter-2">
+			<default value="0" />
+			<test value="1">
+				/systems/ignition/start-valve-2 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/starter-jsb-2">
+			<default value="/systems/ignition/starter-2" />
+			<test logic="AND" value="1"> 
+				/engines/engine[1]/n2-actual ge /systems/ignition/starter-cutoff-n2
+				/systems/ignition/cutoff-2 eq 0
+				/systems/ignition/can-run-2 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/state-2">
+			<default value="0" />
+			<test logic="AND" value="3">
+				/systems/ignition/cutoff-2 eq 0
+				/engines/engine[1]/n2-actual ge 60
+			</test>
+			<test logic="AND" value="2">
+				/systems/ignition/cutoff-2 eq 0
+				/systems/ignition/starter-jsb-2 eq 1
+			</test>
+			<test value="1">
+				/systems/ignition/starter-jsb-2 eq 1
+			</test>
+			<output>/engines/engine[1]/state</output>
+		</switch>
+		
+		
+		<switch name="/systems/ignition/can-run-3">
+			<default value="0" />
+			<test value="1">
+				propulsion/tank[10]/contents-lbs ge 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/cutoff-3">
+			<default value="1" />
+			<test logic="AND" value="0">
+				/controls/engines/engine[2]/cutoff-switch eq 0
+				/systems/ignition/can-run-3 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/start-valve-3-cmd">
+			<default value="/controls/engines/engine[2]/start-cmd" />
+			<test logic="OR" value="0">
+				/systems/pneumatics/bleed-3-psi lt 20
+				/systems/electrical/bus/dc-bat lt 24
+				/engines/engine[2]/n2-actual ge /systems/ignition/starter-cutoff-n2
+				/systems/ignition/ign-avail ne 1
+			</test>
+			<test logic="AND" value="0"> 
+				/systems/ignition/cutoff-3 eq 1
+				/engines/engine[2]/state ge 2
+			</test>
+			<output>/controls/engines/engine[2]/start-cmd</output>
+		</switch>
+		
+		<fcs_function name="/systems/ignition/start-switch-3">
+			<function>
+				<max>
+					<property>/controls/engines/engine[2]/start-switch</property>
+					<property>/systems/ignition/start-valve-3-cmd</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/systems/ignition/start-valve-3">
+			<input>/systems/ignition/start-valve-3-cmd</input>
+			<rate_limit sense="incr">1</rate_limit>
+			<rate_limit sense="decr">1000</rate_limit>
+		</actuator>
+		
+		<switch name="/systems/ignition/starter-3">
+			<default value="0" />
+			<test value="1">
+				/systems/ignition/start-valve-3 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/starter-jsb-3">
+			<default value="/systems/ignition/starter-3" />
+			<test logic="AND" value="1"> 
+				/engines/engine[2]/n2-actual ge /systems/ignition/starter-cutoff-n2
+				/systems/ignition/cutoff-3 eq 0
+				/systems/ignition/can-run-3 eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/state-3">
+			<default value="0" />
+			<test logic="AND" value="3">
+				/systems/ignition/cutoff-3 eq 0
+				/engines/engine[2]/n2-actual ge 60
+			</test>
+			<test logic="AND" value="2">
+				/systems/ignition/cutoff-3 eq 0
+				/systems/ignition/starter-jsb-3 eq 1
+			</test>
+			<test value="1">
+				/systems/ignition/starter-jsb-3 eq 1
+			</test>
+			<output>/engines/engine[2]/state</output>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Ignition 2" execrate="8">
+		
+		<switch name="/systems/ignition/cont-ign">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/instrumentation/airspeed-indicator/indicated-speed-kt lt 53
+				<test logic="OR">
+					fcs/flap-pos-deg ge 9.9
+					fcs/slat-pos-deg ge 30.9
+				</test>
+				<test logic="OR">
+					/systems/fadec/throttle-lever-feedback[0] ge 0.7
+					/systems/fadec/throttle-lever-feedback[1] ge 0.7
+				</test>
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/airspeed-indicator/indicated-speed-kt ge 53
+				<test logic="OR">
+					fcs/flap-pos-deg ge 9.9
+					fcs/slat-pos-deg ge 30.9
+				</test>
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/ign-1">
+			<default value="0" />
+			<test value="0">
+				/systems/ignition/ign-avail ne 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/ignition/state-1 eq 2
+				/systems/ignition/starter-1 eq 1
+			</test>
+			<test logic="OR" value="1">
+				/controls/ignition/ign-ovrd eq 1
+				/systems/ignition/cont-ign eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/ign-2">
+			<default value="0" />
+			<test value="0">
+				/systems/ignition/ign-avail ne 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/ignition/state-2 eq 2
+				/systems/ignition/starter-2 eq 1
+			</test>
+			<test logic="OR" value="1">
+				/controls/ignition/ign-ovrd eq 1
+				/systems/ignition/cont-ign eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/ignition/ign-3">
+			<default value="0" />
+			<test value="0">
+				/systems/ignition/ign-avail ne 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/ignition/state-3 eq 2
+				/systems/ignition/starter-3 eq 1
+			</test>
+			<test logic="OR" value="1">
+				/controls/ignition/ign-ovrd eq 1
+				/systems/ignition/cont-ign eq 1
+			</test>
+		</switch>
+	
+	</channel>
+
+</system>

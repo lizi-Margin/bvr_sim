@@ -2,6 +2,9 @@
 #include <cmath>
 #include <iostream>
 #include "c3utils/c3utils.hxx"
+#include "simulator/aircraft/base.hxx"
+#include "simulator/weapon_factory.hxx"
+#include "so_pool.hxx"
 
 namespace bvr_sim {
 
@@ -78,6 +81,21 @@ void SLAMRAAM::shoot(
 
 void SLAMRAAM::step() {
     _t += dt;
+    if(!environment || !is_alive)return;
+    search_radar.update(*this,*environment,search_range);
+    tracked_target.clear();
+    for(const auto& [id,observation]:search_radar.contacts) {
+        auto target=std::dynamic_pointer_cast<Aircraft>(SOPool::instance().get(id));
+        if(!target || !target->is_alive || !can_shoot_enm(target))continue;
+        tracked_target=id;
+        // One live missile per salvo. Original magazine, range, altitude/speed gates and interval remain.
+        bool airborne=false;
+        for(const auto& missile:launched_missiles)if(missile && missile->is_alive)airborne=true;
+        if(airborne)break;
+        auto missile=WeaponFactory::create_missile("AIM-120C7",shared_from_this(),target);
+        if(missile){shoot(missile,target);SOPool::instance().add(missile);}
+        break;
+    }
 }
 
 }

@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Canopy">
+
+    <channel name="Canopy">
+
+            <switch name="fcs/canopy-control-lock">
+            <default value="/controls/flight/canopy" />
+            <test logic="AND" value="0">
+               position/h-agl-ft gt 8
+            </test>
+            <output>systems/canopy/canopy-control</output>
+           </switch>
+
+           <switch name="fcs/canopy-jettison">
+               <default value="/controls/jettison/canopy" />
+               <test logic="AND" value="1">
+                   systems/canopy/canopy-control gt 0.5
+                   velocities/vc-kts gt 60
+               </test>
+               <output>/controls/jettison/canopy</output>
+           </switch>
+
+           <kinematic name="systems/jettison/canopy-pos-norm">
+               <input>fcs/canopy-jettison</input>
+               <traverse>
+                   <setting>
+                       <position>0.0000</position>
+                       <time>0</time>
+                   </setting>
+                   <setting>
+                       <position>1.0000</position>
+                       <time>5</time>
+                   </setting>
+               </traverse>
+           </kinematic>
+
+
+            <kinematic name="Canopy Control">
+                <input>systems/canopy/canopy-control</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>0.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>5.0000</time>
+                    </setting>
+                </traverse>
+                <output>fcs/canopy-pos-norm</output>
+            </kinematic>
+
+            <pure_gain name="Canopy surface">
+                <input>fcs/canopy-pos-norm</input>
+                <gain>1</gain>
+                <output>/surface-positions/canopy-pos-norm</output>
+                <output>/surface-positions/Cockpit-Step3-r1</output>
+                <output>/surface-positions/Cockpit-Step2</output>
+                <output>/surface-positions/Cockpit-Step1</output>
+            </pure_gain>
+
+
+    </channel>
+
+</system>

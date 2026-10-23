@@ -1,0 +1,24 @@
+{
+  "set": "He162/He162-set.xml",
+  "name": "Heinkel 162 - Salamander alias Volksjaeger",
+  "fdm_type": "yasim",
+  "fdm": "He162/He162-yasim.xml",
+  "jets": 1,
+  "model": "He162/Models/He162.xml",
+  "tags": [
+    "fighter",
+    "heinkel",
+    "1940s",
+    "ww2",
+    "retractable-gear",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "He162.zip",
+  "archive_sha256": "35f9d819e6fa5ae3f6310ea6278503f41f1cc4b4769a91274d4879de89bfce33",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/He162.zip"
+}

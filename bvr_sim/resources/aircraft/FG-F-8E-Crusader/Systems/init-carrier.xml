@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="">
+
+    <channel name="init-pa">
+        <switch name="systems/fictive-rear-lg">
+            
+            <test logic="AND" value="1">
+                simulation/sim-time-sec lt 3.0
+            </test>
+            <output>gear/unit[13]/pos-norm</output>
+     </switch>
+        
+
+    </channel>
+
+</system>

@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="mule">
+    
+
+  <channel name="Mule">
+
+      
+      <switch name="systems/mule/model-linked">
+          <default value="/sim/model/mule/linked" />
+          <test logic="AND" value="0">
+              fcs/cutoff-switch == 1
+          </test>
+          <output>/sim/model/mule/linked</output>
+       </switch>
+
+
+
+        <switch name="systems/mule/linked-sw">
+           <default value="0" />
+           <test logic="AND" value="1">
+                /sim/model/mule/linked == 1
+                fcs/cutoff-switch == 0
+		
+		
+           </test>
+       </switch>
+       
+       <kinematic name="systems/mule/linked">
+            <input>systems/mule/linked-sw</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>1</position>
+                    <time>2</time>
+                </setting>
+            </traverse>
+        </kinematic>
+
+       <switch name="systems/mule/pos-norm">
+           <default value="0" />
+           <test logic="AND" value="1">
+               systems/mule/linked == 1
+           </test>
+           <output>gear/unit[14]/pos-norm</output>
+       </switch>
+
+
+       <pure_gain name="systems/mule/mule-force">
+           <input>inertia/weight-lbs</input>
+           <gain>0.15</gain>
+       </pure_gain>
+
+       <pure_gain name="systems/mule/mule-forceback">
+           <input>inertia/weight-lbs</input>
+           <gain>-0.12</gain>
+       </pure_gain>
+
+       <switch name="systems/mule/magnitude">
+           <default value="/sim/model/mule/magnitude" />
+           <test value="systems/mule/mule-force">
+               /sim/model/mule/magnitude gt  systems/mule/mule-force
+           </test>
+           <test value="systems/mule/mule-forceback">
+               /sim/model/mule/magnitude lt  systems/mule/mule-forceback
+           </test>
+       </switch>
+
+
+       <pure_gain name="systems/mule/start-corrected-pos">
+           <input>inertia/weight-lbs</input>
+           <gain>0.90</gain>
+       </pure_gain>
+
+       <pure_gain name="systems/mule/compression-m">
+           <input>gear/unit[14]/compression-ft</input>
+           <gain>0.3048</gain>
+       </pure_gain>
+
+       <switch name="systems/mule/action">
+           <default value="0" />
+           <test logic="AND" value="systems/mule/magnitude">
+                systems/mule/linked == 1
+                gear/unit[14]/wheel-speed-fps lt 12
+                gear/unit[14]/wheel-speed-fps gt -10
+                gear/unit[14]/compression-ft gt 0
+           </test>
+           <output>external_reactions/mule/magnitude</output>
+       </switch>
+
+
+
+  </channel>
+
+
+
+  <property value="0">systems/testing/external-force</property>
+
+  <channel name="external-force">
+
+      <pure_gain name="systems/testing/force-magnitude">
+          <input>systems/testing/external-force</input>
+          <gain>1</gain>
+          <output>external_reactions/testing1/magnitude</output>
+          <output>external_reactions/testing2/magnitude</output>
+          <output>external_reactions/testing3/magnitude</output>
+          <output>external_reactions/testing4/magnitude</output>
+       </pure_gain>
+
+
+</channel>
+
+
+</system>

@@ -1,0 +1,554 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Manual switches"> 
+    
+    <property value="0">systems/manual-switches/cockpit/sw-canopy-togle-trigger</property>
+    <property value="0">systems/manual-switches/cockpit/sw-bus0-bus1-battery</property>
+    <property value="0">systems/manual-switches/cockpit/sw-bus0-bus1-battery-pos</property>
+    <property value="0">systems/manual-switches/cockpit/sw-internal-power-generator</property>
+    <property value="0">systems/manual-switches/cockpit/sw-internal-power-generator-pos</property>
+    <property value="0">systems/manual-switches/cockpit/sw-internal-power-generator-trigger</property>
+    <property value="0">systems/manual-switches/cockpit/sw-canopy-trigger</property>
+    <property value="0">systems/manual-switches/cockpit/sw-canopy-pos</property>
+    <property value="0">systems/manual-switches/cockpit/sw-canopy-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-hydraulic-emerg-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-hydraulic-emerg-top-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-elevator-servo-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-landing-light-test-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-emergency-release-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-landing-light</property>
+    <property value="0">systems/manual-switches/cockpit/sw-beacon-light</property>
+    <property value="0">systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-togle</property>
+    <property value="0">systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-pos</property>
+    <property value="0">systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-on</property>
+    <property value="0">systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-togle</property>
+    <property value="0">systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-pos</property>
+    <property value="0">systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-on</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-togle</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-pos</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-on</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-flasher-togle</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-flasher-pos</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-flasher-on</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-togle</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-pos</property>
+    <property value="0">systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-dimer-on</property>
+    <property value="0">systems/manual-switches/jato/sw-ready-togle</property>
+    <property value="0">systems/manual-switches/jato/sw-ignition-togle</property>
+    <property value="0">systems/manual-switches/jato/sw-jettinson-togle</property>
+    <property value="0">systems/manual-switches/jato/sw-ready-pos</property>
+    <property value="0">systems/manual-switches/jato/sw-ignition-pos</property>
+    <property value="0">systems/manual-switches/jato/sw-jettinson-pos</property>
+    <property value="0">systems/manual-switches/cockpit/sw-landing-light-test-pos</property>
+    <property value="0">systems/manual-switches/cockpit/sw-emergency-release-pos</property>
+    <property value="0">systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle</property>
+    <property value="0">systems/manual-switches/cockpit/sw-landing-gear-beeper-off</property>
+    <property value="0">systems/manual-switches/cockpit/sw-landing-gear-beeper-off-pos</property>
+    
+    
+    <channel name="cockpit switchs" execrate="8">
+        
+        
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-bus0-bus1-battery-pos">
+            <input>systems/manual-switches/cockpit/sw-bus0-bus1-battery</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        
+
+        <lag_filter name="systems/manual-switches/cockpit/sw-internal-power-generator-pos">
+            <input>systems/manual-switches/cockpit/sw-internal-power-generator-pos-status</input>
+            <c1>8.0</c1>
+        </lag_filter>
+
+        <switch name="systems/manual-switches/cockpit/sw-internal-power-generator-pos-status">
+            <default value="systems/manual-switches/cockpit/sw-internal-power-generator-pos-status" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-internal-power-generator-trigger == 1
+            </test>
+            <test logic="AND" value="-1">
+                systems/manual-switches/cockpit/sw-internal-power-generator-trigger == -1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-internal-power-generator-trigger == 0
+                <test logic="OR">
+                    systems/manual-switches/cockpit/sw-internal-power-generator-pos GE 0.9
+                    systems/manual-switches/cockpit/sw-internal-power-generator-pos LE -0.9
+                </test>
+            </test>
+        </switch>
+
+        <switch name="systems/manual-switches/cockpit/sw-internal-power-generator-trigger">
+            <default value="systems/manual-switches/cockpit/sw-internal-power-generator-trigger" />
+            <test logic="AND" value="0">
+                systems/electric/bus[1]/V LT 12.0
+            </test>
+        </switch>
+        
+        
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-primary-inverter-pos">
+            <input>systems/electric/bus[2]/primary-inverter/sw</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-primary-inverter-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-primary-inverter-pos GT 0.9
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-secondary-inverter-pos">
+            <input>systems/electric/bus[1]/secondary-inverter/sw</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-secondary-inverter-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-secondary-inverter-pos GT 0.9
+            </test>
+        </switch>
+        
+        
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-canopy-pos">
+            <input>systems/manual-switches/cockpit/sw-canopy-pos-status</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-canopy-pos-status">
+            <default value="systems/manual-switches/cockpit/sw-canopy-pos-status" />
+            <test logic="OR" value="0">
+                systems/canopy/position-go NE 0
+                systems/canopy/position-stopping-go EQ 1
+            </test>
+            <test logic="OR" value="1">
+                systems/manual-switches/cockpit/sw-canopy-trigger == 1
+                systems/manual-switches/cockpit/sw-canopy-togle-trigger == 1
+            </test>
+            <test logic="OR" value="-1">
+                systems/manual-switches/cockpit/sw-canopy-trigger == -1
+                systems/manual-switches/cockpit/sw-canopy-togle-trigger == -1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-canopy-trigger == 0
+                <test logic="OR">
+                    systems/manual-switches/cockpit/sw-canopy-pos GE 0.9
+                    systems/manual-switches/cockpit/sw-canopy-pos LE -0.9
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/cockpit/sw-canopy">
+            <default value="systems/manual-switches/cockpit/sw-canopy" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-canopy-pos GE 0.9
+                systems/canopy/lever-lock == 0
+            </test>
+            <test logic="AND" value="-1">
+                systems/manual-switches/cockpit/sw-canopy-pos LE -0.9
+                systems/canopy/lever-lock == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/external/sw-canopy-pos-open">
+            <default value="0" />
+            <test logic="AND" value="systems/manual-switches/cockpit/sw-canopy-pos">
+                systems/manual-switches/cockpit/sw-canopy-pos GE 0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/external/sw-canopy-pos-close">
+            <default value="0" />
+            <test logic="AND" value="systems/manual-switches/cockpit/sw-canopy-pos">
+                systems/manual-switches/cockpit/sw-canopy-pos LE -0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/cockpit/sw-canopy-togle-trigger">
+            <default value="0" />
+            <test logic="AND" value="-1">
+                systems/manual-switches/cockpit/sw-canopy-togle == 1
+                systems/manual-switches/cockpit/sw-canopy == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-canopy-togle == 1
+                systems/manual-switches/cockpit/sw-canopy LE 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-canopy-togle == 0
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/manual-switches/jato/sw-ready-togle-washed">
+            <input>systems/manual-switches/jato/sw-ready-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/manual-switches/jato/sw-ready-togle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ready-togle-washed LT 0.6
+                systems/manual-switches/jato/sw-ready-togle-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/jato/sw-ready-trigger">
+            <default value="systems/manual-switches/jato/sw-ready-trigger" />
+            <test logic="AND" value="1">
+                systems/manual-switches/jato/sw-ready-togle-norm == 1
+                systems/manual-switches/jato/sw-ready-pos LE 0.05
+                systems/manual-switches/jato/sw-ready-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ready-togle-norm == 1
+                systems/manual-switches/jato/sw-ready-pos GE 0.95
+                systems/manual-switches/jato/sw-ready-trigger == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ready-pos GE 0.8
+                systems/jato/electric-active == 0
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/jato/sw-ready-pos">
+            <input>systems/manual-switches/jato/sw-ready-trigger</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/jato/sw-ready">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/jato/sw-ready-trigger == 1
+                systems/manual-switches/jato/sw-ready-pos GT 0.95
+                systems/jato/electric-active == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ready-trigger == 0
+                systems/manual-switches/jato/sw-ready-pos LE 0.95
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/manual-switches/jato/sw-ignition-togle-washed">
+            <input>systems/manual-switches/jato/sw-ignition-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/manual-switches/jato/sw-ignition-togle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ignition-togle-washed LT 0.6
+                systems/manual-switches/jato/sw-ignition-togle-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/jato/sw-ignition-trigger">
+            <default value="systems/manual-switches/jato/sw-ignition-trigger" />
+            <test logic="AND" value="1">
+                systems/manual-switches/jato/sw-ignition-togle-norm == 1
+                systems/manual-switches/jato/sw-ignition-pos LE 0.05
+                systems/manual-switches/jato/sw-ignition-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ignition-pos GT 0.95
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/jato/sw-ignition-pos">
+            <input>systems/manual-switches/jato/sw-ignition-trigger</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/jato/sw-ignition">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/jato/sw-ignition-trigger == 1
+                systems/manual-switches/jato/sw-ignition-pos GT 0.50
+                systems/jato/electric-active == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-ignition-trigger == 0
+                systems/manual-switches/jato/sw-ignition-pos LE 0.50
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/manual-switches/jato/sw-jettinson-togle-washed">
+            <input>systems/manual-switches/jato/sw-jettinson-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/manual-switches/jato/sw-jettinson-togle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-jettinson-togle-washed LT 0.6
+                systems/manual-switches/jato/sw-jettinson-togle-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/jato/sw-jettinson-trigger">
+            <default value="systems/manual-switches/jato/sw-jettinson-trigger" />
+            <test logic="AND" value="1">
+                systems/manual-switches/jato/sw-jettinson-togle-norm == 1
+                systems/manual-switches/jato/sw-jettinson-pos LE 0.05
+                systems/manual-switches/jato/sw-jettinson-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-jettinson-pos GT 0.95
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/jato/sw-jettinson-pos">
+            <input>systems/manual-switches/jato/sw-jettinson-trigger</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/jato/sw-jettinson">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/jato/sw-jettinson-trigger == 1
+                systems/manual-switches/jato/sw-jettinson-pos GT 0.50
+                systems/jato/electric-active == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/jato/sw-jettinson-trigger == 0
+                systems/manual-switches/jato/sw-jettinson-pos LE 0.50
+            </test>
+        </switch>
+        
+        
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-landing-light-pos">
+            <input>systems/manual-switches/cockpit/sw-landing-light</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <washout_filter name="systems/manual-switches/cockpit/sw-landing-light-test-togle-washed">
+            <input>systems/manual-switches/cockpit/sw-landing-light-test-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-landing-light-test-togle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-landing-light-test-togle-washed LT 0.6
+                systems/manual-switches/cockpit/sw-landing-light-test-togle-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/cockpit/sw-landing-light-test-trigger">
+            <default value="systems/manual-switches/cockpit/sw-landing-light-test-trigger" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-landing-light-test-togle-norm == 1
+                systems/manual-switches/cockpit/sw-landing-light-test-pos LE 0.05
+                systems/manual-switches/cockpit/sw-landing-light-test-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-landing-light-test-pos GT 0.95
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-landing-light-test-pos">
+            <input>systems/manual-switches/cockpit/sw-landing-light-test-trigger</input>
+            <c1>0.5</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-landing-light-test">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-landing-light-test-trigger == 1
+                systems/manual-switches/cockpit/sw-landing-light-test-pos GT 0.10
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-landing-light-test-trigger == 0
+                systems/manual-switches/cockpit/sw-landing-light-test-pos LE 0.10
+            </test>
+        </switch>
+        
+        
+        
+        <lag_filter name="systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-pos">
+            <input>systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-togle</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-pos GE 0.9
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-pos">
+            <input>systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-togle</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-pos GE 0.9
+            </test>
+        </switch>
+        
+        
+
+        <lag_filter name="systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-pos">
+            <input>systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-togle</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-pos GE 0.9
+            </test>
+        </switch>
+
+        <lag_filter name="systems/manual-switches/lateral_panel_right/lightning/sw-flasher-pos">
+            <input>systems/manual-switches/lateral_panel_right/lightning/sw-flasher-togle</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/lateral_panel_right/lightning/sw-flasher-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/lateral_panel_right/lightning/sw-flasher-pos GE 0.9
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-pos">
+            <input>systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-togle</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-pos GE 0.9
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/manual-switches/cockpit/sw-emergency-release-togle-washed">
+            <input>systems/manual-switches/cockpit/sw-emergency-release-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-emergency-release-togle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-emergency-release-togle-washed LT 0.6
+                systems/manual-switches/cockpit/sw-emergency-release-togle-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/cockpit/sw-emergency-release-trigger">
+            <default value="systems/manual-switches/cockpit/sw-emergency-release-trigger" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-emergency-release-togle-norm == 1
+                systems/manual-switches/cockpit/sw-emergency-release-pos LE 0.05
+                systems/manual-switches/cockpit/sw-emergency-release-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-emergency-release-pos GT 0.95
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-emergency-release-pos">
+            <input>systems/manual-switches/cockpit/sw-emergency-release-trigger</input>
+            <c1>1.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-emergency-release">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-emergency-release-trigger == 1
+                systems/manual-switches/cockpit/sw-emergency-release-pos GT 0.50
+                systems/electric/bus[0]/emergency-release-of-external-loads/fuse == 1
+                systems/electric/bus[0]/V GT 18.0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-emergency-release-trigger == 0
+                systems/manual-switches/cockpit/sw-emergency-release-pos LE 0.50
+            </test>
+            <output>/sim/G91/stores/sw-emergency-release</output>
+        </switch>
+        
+        
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-hydraulic-emerg-pos">
+            <input>systems/manual-switches/cockpit/sw-hydraulic-emerg-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-hydraulic-emerg-top-pos">
+            <input>systems/manual-switches/cockpit/sw-hydraulic-emerg-top-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-elevator-servo-pos">
+            <input>systems/manual-switches/cockpit/sw-elevator-servo-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-elevator-servo-disengaged">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-elevator-servo-pos GT 0.9
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle-washed">
+            <input>systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle-norm">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle-washed LT 0.6
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/cockpit/sw-landing-gear-beeper-off-trigger">
+            <default value="systems/manual-switches/cockpit/sw-landing-gear-beeper-off-trigger" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-togle-norm == 1
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-pos LE 0.05
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-pos GT 0.95
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/manual-switches/cockpit/sw-landing-gear-beeper-off-pos">
+            <input>systems/manual-switches/cockpit/sw-landing-gear-beeper-off-trigger</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/manual-switches/cockpit/sw-landing-gear-beeper-off">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off-pos GT 0.8
+            </test>
+        </switch>
+        
+        
+    </channel>
+        
+</system>

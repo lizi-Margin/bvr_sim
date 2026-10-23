@@ -1,0 +1,32 @@
+{
+  "set": "mirage2000/mirage2000-set.xml",
+  "name": "Mirage 2000C/RDI",
+  "fdm_type": "jsb",
+  "fdm": "mirage2000/mirage2000.xml",
+  "jets": 0,
+  "model": "mirage2000/Models/mirage2000.xml",
+  "tags": [
+    "fighter",
+    "dassault",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s",
+    "delta",
+    "retractable-gear",
+    "hud",
+    "ifr",
+    "refuel",
+    "supersonic",
+    "afterburner",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "mirage2000.zip",
+  "archive_sha256": "7654376f37750fdeace4d07fdb0739a71fb8ed96c70ec90df6d9d8559a98ce19",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/mirage2000.zip"
+}

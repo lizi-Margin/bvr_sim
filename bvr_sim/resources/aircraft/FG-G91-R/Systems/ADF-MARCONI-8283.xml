@@ -1,0 +1,526 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="ADF Marconi 8283">
+    
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/indicated-bearing-deg</property>
+    <property value="1.0">systems/gauges/radio/ADF-Marconi-8283/isNotADFActive</property>
+    <property value="1.0">systems/gauges/radio/ADF-Marconi-8283/isServiceable</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-set</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-set-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash-clip</property>
+    <property value="-1.0">systems/gauges/radio/ADF-Marconi-8283/freq-imposed</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-proposed-freq</property>
+    <property value="1.0">systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash-delta-imposed</property>
+    <property value="2.0">systems/gauges/radio/ADF-Marconi-8283/freq-band-set</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-band-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/freq-band-id</property>
+    <property value="0.9">systems/gauges/radio/ADF-Marconi-8283/gain-set</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-on-togle</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-on-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-cw-togle</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-cw-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-cw-active</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-ADF-togle</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-ADF-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-ADF-active</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-dim-togle</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-dim-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/sw-dim-intensity</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/operative-start-stop</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/operative</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/operative-heating</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/vol-set</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/tune-arrow-pos</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/tune-intensity</property>
+    <property value="0.0">systems/gauges/radio/ADF-Marconi-8283/set-on-off</property>
+    
+    <channel name="systems gauges radio ADF Marconi 8283 electric" execrate="32">
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/operative-start-stop">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/UHF-radio/fuse == 1
+                systems/electric/bus[1]/V GE 24.0
+                systems/gauges/radio/ADF-Marconi-8283/sw-on-pos GE 0.9
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/radiogoniometer/I">
+            <default value="0.0" />
+            <test logic="AND" value="3.5">
+                systems/gauges/radio/ADF-Marconi-8283/operative-start-stop == 1
+            </test>
+        </switch>
+        
+        
+        <lag_filter name="systems/gauges/radio/ADF-Marconi-8283/operative-heating">
+            <input>systems/gauges/radio/ADF-Marconi-8283/operative-start-stop</input>
+            <c1>0.2</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/operative-heating GT 0.9
+            </test>
+        </switch>
+        
+        <switch name="/instrumentation/adf[0]/frequencies/serviceable">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/operative == 1
+            </test>
+        </switch>
+        
+        <scheduled_gain name="systems/gauges/radio/ADF-Marconi-8283/volume">
+            <input>systems/gauges/radio/ADF-Marconi-8283/vol-set</input>
+            <table>
+                <independentVar>systems/gauges/radio/ADF-Marconi-8283/operative-heating</independentVar>
+                <tableData>
+                    0.0     0.0
+                    0.5     0.0
+                    0.6     0.1
+                    1.0     1.0
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges radio ADF Marconi 8283 ADF indicated bearing and tune" execrate="8">
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/isServiceable">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/operative == 1
+                /instrumentation/adf[0]/in-range == 1
+                systems/gauges/radio/ADF-Marconi-8283/tune-intensity GE 0.2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/isNotADFActive">
+            <default value="1.0" />
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/isServiceable == 1
+                systems/gauges/radio/ADF-Marconi-8283/sw-ADF-active == 1
+            </test>
+        </switch>
+        
+        <linear_actuator name="systems/gauges/radio/ADF-Marconi-8283/indicated-bearing-deg-la">
+            <input>/instrumentation/adf[0]/indicated-bearing-deg</input>
+            <module>360</module>
+            <reset>systems/gauges/radio/ADF-Marconi-8283/isNotADFActive</reset>
+        </linear_actuator>
+        
+        <actuator name="systems/gauges/radio/ADF-Marconi-8283/indicated-bearing-deg">
+            <input>systems/gauges/radio/ADF-Marconi-8283/indicated-bearing-deg-la</input>
+            <lag>1.0</lag>
+            <rate_limit> 90.0 </rate_limit>
+            <deadband_width> 0.5 </deadband_width>
+            <hysteresis_width> 0.5 </hysteresis_width>
+        </actuator>
+        
+        <fcs_function name="systems/gauges/radio/ADF-Marconi-8283/tune-intensity">
+            <function>
+                <ifthen>
+                    <eq><p>systems/gauges/radio/ADF-Marconi-8283/isServiceable</p><v>1.0</v></eq>
+                    <product>
+                        <p>/instrumentation/adf[0]/in-range</p>
+                        <p>systems/gauges/radio/ADF-Marconi-8283/gain-set</p>
+                    </product>
+                    <ifthen>
+                        <eq><p>systems/gauges/radio/ADF-Marconi-8283/operative</p><v>1.0</v></eq>
+                        <product>
+                            <p>systems/gauges/radio/ADF-Marconi-8283/gain-set</p>
+                            <v>0.3</v>
+                        </product>
+                        <v>0.0</v>
+                    </ifthen>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <actuator name="systems/gauges/radio/ADF-Marconi-8283/tune-arrow-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/tune-intensity</input>
+            <lag>1.0</lag>
+            <rate_limit> 0.2 </rate_limit>
+            <deadband_width> 0.01 </deadband_width>
+            <hysteresis_width> 0.02 </hysteresis_width>
+        </actuator>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges radio ADF Marconi 8283 switches" execrate="4">
+        
+        <lag_filter name="systems/gauges/radio/ADF-Marconi-8283/sw-on-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/sw-on-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/radio/ADF-Marconi-8283/sw-cw-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/sw-cw-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/sw-cw-active">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/sw-cw-pos GT 0.9
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/radio/ADF-Marconi-8283/sw-ADF-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/sw-ADF-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/sw-ADF-active">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/sw-ADF-pos GT 0.9
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/radio/ADF-Marconi-8283/freq-band-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/freq-band-set</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/freq-band-id">
+            <default value="0.0" />
+            <test logic="AND" value="3.0">
+                systems/gauges/radio/ADF-Marconi-8283/freq-band-pos LT 0.2
+            </test>
+            <test logic="AND" value="2.0">
+                systems/gauges/radio/ADF-Marconi-8283/freq-band-pos GT 0.8
+                systems/gauges/radio/ADF-Marconi-8283/freq-band-pos LT 1.2
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/freq-band-pos GT 1.8
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/radio/ADF-Marconi-8283/sw-dim-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/sw-dim-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <fcs_function name="systems/gauges/radio/ADF-Marconi-8283/sw-dim-intensity">
+            <function>
+                <ifthen>
+                    <gt>
+                        <p>systems/gauges/radio/ADF-Marconi-8283/sw-dim-pos</p>
+                        <v>0.2</v>
+                    </gt>
+                    <quotient>
+                        <p>systems/warning-lights/light-intensity-by-bus1-tension</p>
+                        <v>2.0</v>
+                    </quotient>
+                    <p>systems/warning-lights/light-intensity-by-bus1-tension</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <linear_actuator name="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/freq-set</input>
+            <module>360</module>
+            <lag>16.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+        
+        <washout_filter name="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash">
+            <input>systems/gauges/radio/ADF-Marconi-8283/freq-set-pos</input>
+            <c1>0.5</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event">
+            <input>/instrumentation/adf[0]/frequencies/selected-khz</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq" />
+            <test logic="OR" value="/instrumentation/adf[0]/frequencies/selected-khz">
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GT 1.0
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LT -1.0
+            </test>
+            <test logic="OR" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash GT 0.5
+                systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash LT -0.5
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed">
+            <function>
+                <ifthen>
+                    <and>
+                        <ge><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>200.0</v></ge>
+                        <le><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>415.0</v></le>
+                    </and>
+                    <v>1.0</v>
+                    <ifthen>
+                        <and>
+                            <gt><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>415.0</v></gt>
+                            <le><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>840.0</v></le>
+                        </and>
+                        <v>2.0</v>
+                        <ifthen>
+                            <and>
+                                <gt><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>840.0</v></gt>
+                                <le><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>1700.0</v></le>
+                            </and>
+                            <v>3.0</v>
+                            <v>0.0</v>
+                        </ifthen>
+                    </ifthen>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/freq-band-set">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/freq-band-set" />
+            <test logic="AND" value="0">
+                <test logic="OR">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GT 1.0
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LT -1.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed == 3
+                </test>
+            </test>
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GT 1.0
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LT -1.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed == 2
+                </test>
+            </test>
+            <test logic="AND" value="2">
+                <test logic="OR">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GT 1.0
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LT -1.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed == 1
+                </test>
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gauges/radio/ADF-Marconi-8283/freq-imposed">
+            <function>
+                <ifthen>
+                    <gt><p>systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed</p><v>0.0</v></gt>
+                    <ifthen>
+                        <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed</p><v>1.0</v></eq>
+                        <product>
+                            <difference>
+                                <p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p>
+                                <v>200.0</v>
+                            </difference>
+                            <v>1.227272727</v>
+                        </product>
+                        <ifthen>
+                            <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-band-id-imposed</p><v>2.0</v></eq>
+                            <product>
+                                <difference>
+                                    <p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p>
+                                    <v>400.0</v>
+                                </difference>
+                                <v>0.6</v>
+                            </product>
+                            <product>
+                                <difference>
+                                    <p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p>
+                                    <v>800.0</v>
+                                </difference>
+                                <v>0.3</v>
+                            </product>
+                        </ifthen>
+                    </ifthen>
+                    <v>-1.0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <summer name="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash-delta-imposed">
+            <input>systems/gauges/radio/ADF-Marconi-8283/freq-imposed</input>
+            <input>-systems/gauges/radio/ADF-Marconi-8283/freq-pos</input>
+        </summer>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash-clip">
+            <default value="0.0" />
+            <test logic="AND" value="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash-delta-imposed">
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed GE 0.0
+            </test>
+            <test logic="AND" value="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash">
+                systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash GT 0.0
+                systems/gauges/radio/ADF-Marconi-8283/freq-pos LE 270.0
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed LT 0.0
+            </test>
+            <test logic="AND" value="systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash">
+                systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash LT 0.0
+                systems/gauges/radio/ADF-Marconi-8283/freq-pos GE 0.0
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed LT 0.0
+            </test>
+        </switch>
+        
+        <integrator name="systems/gauges/radio/ADF-Marconi-8283/freq-pos">
+            <input>systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash-clip</input>
+            <c1>1.0</c1>
+        </integrator>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges radio ADF Marconi 8283 autostart" execrate="32">
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/set-on-off">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/set-on-off" />
+            <test logic="AND" value="2.0">
+                systems/electric/bus[1]/UHF-radio/fuse == 1
+                systems/electric/bus[1]/V GE 24.0
+                <test logic="OR">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GE 0.8
+                    systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LE -0.8
+                </test>
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LT 0.8
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GT 0.1
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event GT -0.8
+                systems/gauges/radio/ADF-Marconi-8283/freq-imposed-new-event LT -0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/sw-on-togle">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/sw-on-togle" />
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 1
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/sw-on-togle">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/sw-on-togle" />
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 1
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/sw-cw-togle">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/sw-cw-togle" />
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 1
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/ADF-Marconi-8283/sw-ADF-togle">
+            <default value="systems/gauges/radio/ADF-Marconi-8283/sw-ADF-togle" />
+            <test logic="AND" value="0.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 1
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/ADF-Marconi-8283/set-on-off == 2
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges radio ADF Marconi 8283 set ADF freq" execrate="32">
+        
+        <fcs_function name="systems/gauges/radio/ADF-Marconi-8283/freq-proposed-freq">
+            <function>
+                <ifthen>
+                    <and>
+                        <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-band-id</p><v>1.0</v></eq>
+                        <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>0.0</v></eq>
+                    </and>
+                    <product>
+                        <integer>
+                            <sum>
+                                <product>
+                                    <p>systems/gauges/radio/ADF-Marconi-8283/freq-pos</p>
+                                    <v>81.4814815</v>
+                                </product>
+                                <v>20000.0</v>
+                            </sum>
+                        </integer>
+                        <v>0.01</v>
+                    </product>
+                    <ifthen>
+                        <and>
+                            <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-band-id</p><v>2.0</v></eq>
+                            <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>0.0</v></eq>
+                        </and>
+                        <product>
+                            <integer>
+                                <sum>
+                                    <product>
+                                        <p>systems/gauges/radio/ADF-Marconi-8283/freq-pos</p>
+                                        <v>166.6666666</v>
+                                    </product>
+                                    <v>40000.0</v>
+                                </sum>
+                            </integer>
+                            <v>0.01</v>
+                        </product>
+                        <ifthen>
+                            <and>
+                                <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-band-id</p><v>3.0</v></eq>
+                                <eq><p>systems/gauges/radio/ADF-Marconi-8283/freq-imposed-freq</p><v>0.0</v></eq>
+                            </and>
+                            <product>
+                                <integer>
+                                    <sum>
+                                        <product>
+                                            <p>systems/gauges/radio/ADF-Marconi-8283/freq-pos</p>
+                                            <v>333.33333</v>
+                                        </product>
+                                        <v>80000.0</v>
+                                    </sum>
+                                </integer>
+                                <v>0.01</v>
+                            </product>
+                            <v>0.0</v>
+                        </ifthen>
+                    </ifthen>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <switch name="set instrumentation adf_0 frequencies selected-khz">
+            <default value="/instrumentation/adf[0]/frequencies/selected-khz" />
+            <test logic="AND" value="systems/gauges/radio/ADF-Marconi-8283/freq-proposed-freq">
+                <test logic="AND">
+                    systems/gauges/radio/ADF-Marconi-8283/freq-proposed-freq GT 0.0
+                    systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash LT 0.1
+                    systems/gauges/radio/ADF-Marconi-8283/freq-set-pos-wash GT -0.1
+                    /instrumentation/adf[0]/frequencies/selected-khz NE systems/gauges/radio/ADF-Marconi-8283/freq-proposed-freq
+                </test>
+                systems/gauges/radio/ADF-Marconi-8283/freq-proposed-freq GT 0.0
+            </test>
+            <output>/instrumentation/adf[0]/frequencies/selected-khz</output>
+        </switch>
+        
+    </channel>
+    
+    
+</system>

@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+    
+    <property value="0.0">inertia/modifier/cg-x-weight-value-lib-default</property>
+    <property value="0.0">inertia/modifier/cg-x-shift-percent-default</property>
+    <property value="0.0">inertia/modifier/cg-x-shift-percent</property>
+    <property value="0.0">inertia/modifier/cg-x-weight-active-default</property>
+    <property value="0.0">inertia/modifier/cg-x-weight-active</property>
+    <property value="0.0">inertia/modifier/cg-x-weight-value-lib</property>
+    <property value="0.0">inertia/modifier/cg-x-weight-pos-value</property>
+    <property value="0.0">inertia/modifier/cg-x-weight-neg-value</property>
+    
+    <channel name="CG modifier with pointmass" execrate="32">
+        
+        
+        
+        <switch name="inertia/modifier/cg-x-weight-active-default">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                inertia/modifier/cg-x-shift-percent-default NE 0.0
+                inertia/modifier/cg-x-weight-value-lib-default NE 0.0
+            </test>
+        </switch>
+        
+        <switch name="inertia/modifier/cg-x-weight-value-lib-sw">
+            <default value="0.0" />
+            <test logic="AND" value="inertia/modifier/cg-x-weight-value-lib">
+                inertia/modifier/cg-x-weight-active GT 0.0
+            </test>
+            <test logic="AND" value="inertia/modifier/cg-x-weight-value-lib-default">
+                inertia/modifier/cg-x-weight-active == 0.0
+                inertia/modifier/cg-x-weight-active-default GT 0.0
+            </test>
+        </switch>
+        
+        <switch name="inertia/modifier/cg-x-shift-percent-sw">
+            <default value="0.0" />
+            <test logic="AND" value="inertia/modifier/cg-x-shift-percent">
+                inertia/modifier/cg-x-weight-active GT 0.0
+            </test>
+            <test logic="AND" value="inertia/modifier/cg-x-shift-percent-default">
+                inertia/modifier/cg-x-weight-active == 0.0
+                inertia/modifier/cg-x-weight-active-default GT 0.0
+            </test>
+        </switch>
+        
+        
+        
+        <fcs_function name="inertia/modifier/cg-x-weight-pos-position">
+            <function>
+                <ifthen>
+                    <or>
+                        <gt><p>inertia/modifier/cg-x-weight-active</p><v>0.5</v></gt>
+                        <gt><p>inertia/modifier/cg-x-weight-active-default</p><v>0.5</v></gt>
+                    </or>
+                    <ifthen>
+                        <gt><p>inertia/modifier/cg-x-shift-percent-sw</p><v>0.0</v></gt>
+                        <product>
+                            <p>inertia/modifier/cg-x-shift-percent-sw</p>
+                            <p>inertia/modifier/cg-x-weight-value-lib-sw</p>
+                            <v>0.01</v>
+                        </product>
+                        <ifthen>
+                            <eq><p>inertia/modifier/cg-x-shift-percent-sw</p><v>0.0</v></eq>
+                            <p>inertia/modifier/cg-x-weight-value-lib-sw</p>
+                            <v>0.0</v>
+                        </ifthen>
+                    </ifthen>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+            <output>inertia/pointmass-weight-lbs[8]</output>
+        </fcs_function>
+        
+        <fcs_function name="inertia/modifier/cg-x-weight-neg-position">
+            <function>
+                <ifthen>
+                    <or>
+                        <gt><p>inertia/modifier/cg-x-weight-active</p><v>0.5</v></gt>
+                        <gt><p>inertia/modifier/cg-x-weight-active-default</p><v>0.5</v></gt>
+                    </or>
+                    <ifthen>
+                        <lt><p>inertia/modifier/cg-x-shift-percent-sw</p><v>0.0</v></lt>
+                        <product>
+                            <p>inertia/modifier/cg-x-shift-percent-sw</p>
+                            <p>inertia/modifier/cg-x-weight-value-lib-sw</p>
+                            <v>-0.01</v>
+                        </product>
+                        <ifthen>
+                            <eq><p>inertia/modifier/cg-x-shift-percent-sw</p><v>0.0</v></eq>
+                            <p>inertia/modifier/cg-x-weight-value-lib-sw</p>
+                            <v>0.0</v>
+                        </ifthen>
+                    </ifthen>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+            <output>inertia/pointmass-weight-lbs[9]</output>
+        </fcs_function>
+        
+    </channel>
+
+</system>

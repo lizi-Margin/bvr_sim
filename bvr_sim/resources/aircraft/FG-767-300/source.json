@@ -1,0 +1,29 @@
+{
+  "set": "767-300/767-300-set.xml",
+  "name": "Boeing 767-300",
+  "fdm_type": "yasim",
+  "fdm": "767-300/767-300.xml",
+  "jets": 2,
+  "model": "767-300/Models/767-300.xml",
+  "tags": [
+    "transport",
+    "boeing",
+    "jet",
+    "retractable-gear",
+    "glass-cockpit",
+    "ifr",
+    "2010s",
+    "2000s",
+    "1990s",
+    "1980s",
+    "etops",
+    "twin-engine"
+  ],
+  "model_rating": 2,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "767-300.zip",
+  "archive_sha256": "31b973182205dd9782cd42cd3f43ec0a5f0cad1d785e6b99a57ed3edbe14ef4a",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/767-300.zip"
+}

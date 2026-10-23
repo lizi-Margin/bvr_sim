@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='utf-8'?>
+<external_reactions>
+    
+    <force name="JATO-rockets" frame="BODY">
+        <location unit="IN">
+            <x> -49.0 </x>
+            <y> 0.0 </y>
+            <z> -0.80 </z>
+        </location>
+        <direction>
+            <x> -1.0 </x>
+            <y> 0.0 </y>
+            <z> -0.25 </z>
+        </direction>
+    </force>
+    
+    <force name="Airbrake" frame="BODY">
+        <location unit="IN">
+            <x> 53.0 </x>
+            <y> 0.0 </y>
+            <z> 19.0 </z>
+        </location>
+        <direction>
+            <x> -1.0 </x>
+            <y> 0.0 </y>
+            <z> 0.0 </z>
+        </direction>
+    </force>
+    
+    <force name="LandingGearFrontAerodinamicDrag" frame="BODY">
+        <location unit="IN">
+            <x> 111.0 </x>
+            <y> 0.0 </y>
+            <z> -15.0 </z>
+        </location>
+        <direction>
+            <x> -1.0 </x>
+            <y> 0.0 </y>
+            <z> 0.0 </z>
+        </direction>
+    </force>
+    
+    <force name="LandingGearRightAerodinamicDrag" frame="BODY">
+        <location unit="IN">
+            <x> -13.0 </x>
+            <y> 54.4 </y>
+            <z> 0.0 </z>
+        </location>
+        <direction>
+            <x> -1.0 </x>
+            <y> 0.0 </y>
+            <z> 0.0 </z>
+        </direction>
+    </force>
+    
+    <force name="LandingGearLeftAerodinamicDrag" frame="BODY">
+        <location unit="IN">
+            <x> -13.0 </x>
+            <y> -54.4 </y>
+            <z> 0.0 </z>
+        </location>
+        <direction>
+            <x> -1.0 </x>
+            <y> 0.0 </y>
+            <z> 0.0 </z>
+        </direction>
+    </force>
+    
+    <force name="LandingGearSteerLimitationFx" frame="BODY">
+        <location unit="IN">
+            <x>124.31</x>
+            <y>0.0</y>
+            <z>95.3</z>
+        </location>
+        <direction>
+            <x>1</x>
+            <y>0</y>
+            <z>0</z>
+        </direction>
+    </force>
+    
+    <force name="LandingGearSteerLimitationFy" frame="BODY">
+        <location unit="IN">
+            <x>124.31</x>
+            <y>0.0</y>
+            <z>95.3</z>
+        </location>
+        <direction>
+            <x>0</x>
+            <y>1</y>
+            <z>0</z>
+        </direction>
+    </force>
+    
+    <force name="DragChute" frame="BODY">
+        <location unit="IN">
+            <x> 401.0 </x>
+            <y> 0.0 </y>
+            <z> 24.0 </z>
+        </location>
+        <direction>
+            <x> -1.0 </x>
+            <y> 0.0 </y>
+            <z> 0.0 </z>
+        </direction>
+    </force>
+    
+</external_reactions>

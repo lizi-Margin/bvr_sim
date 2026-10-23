@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Stores"> 
+    
+    <property value="0">systems/store/stations/sx/external/type</property>
+    <property value="0">systems/store/stations/sx/internal/type</property>
+    <property value="0">systems/store/stations/dx/internal/type</property>
+    <property value="0">systems/store/stations/dx/external/type</property>
+    
+    <property value="0">systems/store/stations/sx/external/drop</property>
+    <property value="0">systems/store/stations/sx/internal/drop</property>
+    <property value="0">systems/store/stations/dx/internal/drop</property>
+    <property value="0">systems/store/stations/dx/external/drop</property>
+    <property value="0">systems/store/stations/sx/external/drop-trigger</property>
+    <property value="0">systems/store/stations/sx/internal/drop-trigger</property>
+    <property value="0">systems/store/stations/dx/internal/drop-trigger</property>
+    <property value="0">systems/store/stations/dx/external/drop-trigger</property>
+    
+    <property value="0">systems/store/stations/salvo</property>
+
+    
+    <channel name="store salve" execrate="32">
+        
+        <washout_filter name="systems/store/stations/salvo-wa">
+            <input>systems/store/stations/salvo</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/salvo-trigger">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/salvo-wa GT 0.2
+                systems/store/stations/salvo-wa LT -0.2
+            </test>
+        </switch>
+        
+        <switch name="systems/store/stations/salvo">
+            <default value="systems/store/stations/salvo" />
+            <test logic="AND" value="0">
+                systems/store/stations/salvo == 1
+                systems/store/stations/salvo-trigger GE 1
+            </test>
+        </switch>
+        
+    </channel>
+
+    
+    <channel name="store sx external" execrate="32">
+        
+        <washout_filter name="systems/store/stations/sx/external/type-wa">
+            <input>systems/store/stations/sx/external/type</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/sx/external/type-loading">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/sx/external/type-wa GT 0.5
+                systems/store/stations/sx/external/type-wa LT -0.5
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/store/stations/sx/external/drop-wa">
+            <input>systems/store/stations/sx/external/drop</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/sx/external/drop-trigger">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/sx/external/drop-wa GT 0.2
+                systems/store/stations/sx/external/drop-wa LT -0.2
+                systems/store/stations/salvo-trigger == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/store/stations/sx/external/drop">
+            <default value="systems/store/stations/sx/external/drop" />
+            <test logic="AND" value="0">
+                systems/store/stations/sx/external/drop-trigger GE 1
+            </test>
+        </switch>
+
+    </channel>
+    
+    
+    <channel name="store sx internal" execrate="32">
+        
+        <washout_filter name="systems/store/stations/sx/internal/type-wa">
+            <input>systems/store/stations/sx/internal/type</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/sx/internal/type-loading">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/sx/internal/type-wa GT 0.5
+                systems/store/stations/sx/internal/type-wa LT -0.5
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/store/stations/sx/internal/drop-wa">
+            <input>systems/store/stations/sx/internal/drop</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/sx/internal/drop-trigger">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/sx/internal/drop-wa GT 0.2
+                systems/store/stations/sx/internal/drop-wa LT -0.2
+                systems/store/stations/salvo-trigger == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/store/stations/sx/internal/drop">
+            <default value="systems/store/stations/sx/internal/drop" />
+            <test logic="AND" value="0">
+                systems/store/stations/sx/internal/drop-trigger GE 1
+            </test>
+        </switch>
+
+    </channel>
+
+    
+    <channel name="store dx internal" execrate="32">
+        
+        <washout_filter name="systems/store/stations/dx/internal/type-wa">
+            <input>systems/store/stations/dx/internal/type</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/dx/internal/type-loading">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/dx/internal/type-wa GT 0.5
+                systems/store/stations/dx/internal/type-wa LT -0.5
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/store/stations/dx/internal/drop-wa">
+            <input>systems/store/stations/dx/internal/drop</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/dx/internal/drop-trigger">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/dx/internal/drop-wa GT 0.2
+                systems/store/stations/dx/internal/drop-wa LT -0.2
+                systems/store/stations/salvo-trigger == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/store/stations/dx/internal/drop">
+            <default value="systems/store/stations/dx/internal/drop" />
+            <test logic="AND" value="0">
+                systems/store/stations/dx/internal/drop-trigger GE 1
+            </test>
+        </switch>
+
+    </channel>
+    
+    
+    <channel name="store dx external" execrate="32">
+        
+        <washout_filter name="systems/store/stations/dx/external/type-wa">
+            <input>systems/store/stations/dx/external/type</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/dx/external/type-loading">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/dx/external/type-wa GT 0.2
+                systems/store/stations/dx/external/type-wa LT -0.2
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/store/stations/dx/external/drop-wa">
+            <input>systems/store/stations/dx/external/drop</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/store/stations/sx/external/drop-trigger">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/store/stations/dx/external/drop-wa GT 0.5
+                systems/store/stations/dx/external/drop-wa LT -0.5
+                systems/store/stations/salvo-trigger == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/store/stations/dx/external/drop">
+            <default value="systems/store/stations/dx/external/drop" />
+            <test logic="AND" value="0">
+                systems/store/stations/dx/external/drop-trigger GE 1
+            </test>
+        </switch>
+
+    </channel>
+
+    
+</system>

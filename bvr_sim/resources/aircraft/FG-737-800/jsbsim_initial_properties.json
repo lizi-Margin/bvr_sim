@@ -1,0 +1,13 @@
+{
+  "/controls/hydraulic/a-eng1-pump": 1.0,
+  "/controls/hydraulic/a-elec2-pump": 1.0,
+  "/controls/hydraulic/b-elec1-pump": 1.0,
+  "/controls/hydraulic/b-eng2-pump": 1.0,
+  "/systems/hydraulic/a-psi": 0.0,
+  "/systems/hydraulic/b-psi": 0.0,
+  "/systems/hydraulic/stby-psi": 0.0,
+  "/controls/hydraulic/fctl-a": 1.0,
+  "/controls/hydraulic/fctl-b": 1.0,
+  "/controls/hydraulic/spoiler-a": 1.0,
+  "/controls/hydraulic/spoiler-b": 1.0
+}

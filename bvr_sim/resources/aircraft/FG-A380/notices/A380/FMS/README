@@ -1,0 +1,22 @@
+
+This directory contains SID/STAR database files in 'Level-D 767' format from Flight1 Software http://www.flight1.com/products.asp?product=ld767fsx
+this software uses a GPL released parser for this format, written with permission of Flight1 Software. 
+
+Further SID/STAR databases can be downloaded from several Internet websites;
+
+http://www.navdata.at/php/sidstar/sidstar.php
+
+http://planepath.com/html/lds.html
+
+http://www.navigraph.com/www/fmsdata.asp
+
+http://www.simroutes.com/
+
+The most complete listing can be downloaded for free from http://www.navdata.at/php/sidstar/sidstar.php and then
+unzipped and added to this directory. 
+
+If you receive a encoding error during XML parsing at startup, check each XML file in this directory and either;
+  a) remove the encoding attribute on the <?xml version="1.0" ?> processing instruction, 
+  b) or change the encoding to "utf-8"
+
+

@@ -4,6 +4,8 @@
 #include <pybind11/eigen.h>
 
 #include "core.hxx"
+#include "simulator/aircraft/fdm/yasim_fdm.hxx"
+#include "simulator/aircraft/fdm/jsbsim_fdm.hxx"
 #include "simulator/simulator.hxx"
 #include "rl/rl_manager.hxx"
 #include "support/json.hpp"
@@ -94,6 +96,35 @@ json::JSON python_to_json(const py::handle& obj) {
 PYBIND11_MODULE(bvr_sim_cpp, m) {
     m.doc() = "BVR Sim C++ bindings";
     bind_game_api(m);
+    py::class_<AircraftFDM>(m, "AircraftFDM")
+        .def("reset",[](AircraftFDM& f,const std::array<double,3>& p,const std::array<double,3>& v,const std::array<double,3>& rpy){
+            f.reset({{"position",p},{"velocity",v},{"roll",rpy[0]},{"pitch",rpy[1]},{"yaw",rpy[2]}});
+        },py::arg("position"),py::arg("velocity"),py::arg("rpy")=std::array<double,3>{0,0,0})
+        .def("step",[](AircraftFDM& f,double a,double e,double r,double t){
+            json::JSON j=json::Object();j["delta_heading"]=json::Float(0.);j["delta_altitude"]=json::Float(0.);j["delta_speed"]=json::Float(0.);
+            j["aileron_cmd"]=json::Float(a);j["elevator_cmd"]=json::Float(e);j["rudder_cmd"]=json::Float(r);j["throttle_cmd"]=json::Float(t);f.step(ActionSpace(j));
+        },py::arg("aileron")=0.,py::arg("elevator")=0.,py::arg("rudder")=0.,py::arg("throttle")=.7)
+        .def("advance",[](AircraftFDM& f,double heading,double climb,double throttle,std::optional<double> roll_rate){
+            if(roll_rate&&!dynamic_cast<YASimFDM*>(&f))
+                throw std::invalid_argument("Roll-rate assist requires the YASim backend");
+            json::JSON j=json::Object();j["delta_heading"]=json::Float(heading);j["delta_altitude"]=json::Float(climb);j["delta_speed"]=json::Float(0.);
+            j["throttle_cmd"]=json::Float(throttle);
+            if(roll_rate)j["roll_rate_cmd"]=json::Float(*roll_rate);
+            f.step(ActionSpace(j));
+        },py::arg("heading")=0.,py::arg("climb")=0.,py::arg("throttle")=.7,py::arg("roll_rate")=std::nullopt)
+        .def_property_readonly("position",&AircraftFDM::get_position)
+        .def_property_readonly("velocity",&AircraftFDM::get_velocity)
+        .def_property_readonly("rpy",&AircraftFDM::get_rpy)
+        .def_property_readonly("terminated",&AircraftFDM::is_terminated)
+        .def("visual_properties",&AircraftFDM::visual_properties);
+    py::class_<YASimFDM,AircraftFDM>(m,"YASimFDM")
+        .def(py::init<double,const std::string&>(),py::arg("dt"),py::arg("xml_path"))
+        .def("property",&YASimFDM::property)
+        .def("set_property",&YASimFDM::set_property);
+    py::class_<JSBSimFDM,AircraftFDM>(m,"JSBSimFDM")
+        .def(py::init([](double dt,const std::string& model){
+            return std::make_unique<JSBSimFDM>(dt,std::map<std::string,std::string>{{"aircraft_model",model}});
+        }),py::arg("dt"),py::arg("model"));
 
     py::enum_<TeamColor>(m, "TeamColor")
         .value("Red", TeamColor::Red)

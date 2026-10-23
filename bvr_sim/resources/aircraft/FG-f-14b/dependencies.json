@@ -1,0 +1,83 @@
+{
+  "files": [
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "f-14b-hydraulic",
+      "source": "f-14b/Systems/f-14b-hydraulic.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "f-14b-electrics",
+      "source": "f-14b/Systems/f-14b-electrics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "f-14b-cadc",
+      "source": "f-14b/Systems/f-14b-cadc.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "f-14b-ecs.xml",
+      "source": "f-14b/Systems/f-14b-ecs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "f-14b-engines",
+      "source": "f-14b/Systems/f-14b-engines.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "hook",
+      "source": "f-14b/Systems/hook.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "catapult",
+      "source": "f-14b/Systems/catapult.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "holdback",
+      "source": "f-14b/Systems/holdback.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "f-14b-landing-gear",
+      "source": "f-14b/Systems/f-14b-landing-gear.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "F110-GE-400",
+      "source": "f-14b/Engines/F110-GE-400.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "direct",
+      "source": "f-14b/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "F110-GE-400",
+      "source": "f-14b/Engines/F110-GE-400.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f-14b/f-14b.xml",
+      "reference": "direct",
+      "source": "f-14b/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

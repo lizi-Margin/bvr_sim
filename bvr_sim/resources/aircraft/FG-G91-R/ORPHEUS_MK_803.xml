@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='utf-8'?>
+<turbine_engine name="ORPHEUS_MK_803">
+    
+    <milthrust> 5900 </milthrust>
+    <bypassratio> 0.1 </bypassratio>
+    <tsfc> 1.01 </tsfc>
+    <bleed> 0.05 </bleed>
+    <idlen1> 40.0 </idlen1>
+    <idlen2> 45.0 </idlen2>
+    <maxn1> 103.0 </maxn1>
+    <maxn2> 103.0 </maxn2>
+    <augmented> 0 </augmented>
+    <injected> 0 </injected>
+
+    <function name="N1SpoolUp">
+        <table>
+            <independentVar lookup="row">/engines/engine[0]/n1</independentVar>
+            <tableData>
+				 24   1.1
+				 28   2.9
+				 46   9.7
+				 68  15.4
+				 80  19.6
+				 94  21.4
+				105  23.6
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="N1SpoolDown">
+        <table>
+            <independentVar lookup="row">/engines/engine[0]/n1</independentVar>
+            <tableData>
+				 24   1.1
+				 28   2.9
+				 46   9.7
+				 68  15.4
+				 80  19.6
+				 94  21.4
+				105  23.6
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="N2SpoolUp">
+        <table>
+            <independentVar lookup="row">/engines/engine[0]/n2</independentVar>
+            <tableData>
+				 24   1.1
+				 28   2.9
+				 46   9.7
+				 68  15.4
+				 80  19.6
+				 94  21.4
+				105  23.6
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="N2SpoolDown">
+        <table>
+            <independentVar lookup="row">/engines/engine[0]/n2</independentVar>
+            <tableData>
+				 24   1.1
+				 28   2.9
+				 46   9.7
+				 68  15.4
+				 80  19.6
+				 94  21.4
+				105  23.6
+            </tableData>
+        </table>
+    </function>
+    
+    
+    
+    <function name="propulsion/engine[#]/TSFC_Calculate">
+        <description>
+            atmosphere/T-R 
+            The current modeled temperature in degrees Rankine.
+        </description>
+        <table>
+            <independentVar lookup="row">atmosphere/T-R</independentVar>
+            <tableData>
+                311.67	1.14
+                446.67	1.12
+                455.67	1.09
+                473.67	1.05
+                491.67	1.01
+                509.67	0.97
+                527.67	0.91
+                545.67	0.87
+                563.67	0.82
+                572.67	0.79
+                671.67	0.76
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="IdleThrust">
+        <description>
+            The engine data were derived from a publication:
+            ORPHEUS MARK 803 Lightwaight Turbojet Engine 1960 (Bristol Siddeley)
+            The tests were performed at 15 ° C under various conditions of air density to simulate the height.
+            This means that the power and temperature of the engine is not configured in the actual operating conditions,
+            so you need to make a correction data using the table "Estimated effect of ambient temperatures on take-off"
+            on p. 29 of the pdf document.
+            It was created a table with the hypothesis of a power of 5000 lib at 15 ° C.
+        </description>
+        <product>
+            <property>propulsion/engine[#]/TSFC_Calculate</property>
+            <table>
+                <independentVar lookup="row">velocities/mach</independentVar>
+                <independentVar lookup="column">atmosphere/density-altitude</independentVar>
+                <tableData>
+                    -10000	0	10000	20000	30000	40000	60000
+                    0	0.036	0.036	0.020	0.054	0.064	0.068	0.0
+                    0.1	0.036	0.036	0.020	0.054	0.060	0.068	0.0
+                    0.2	0.036	0.036	0.024	0.054	0.060	0.068	0.0
+                    0.3	0.032	0.032	0.030	0.048	0.060	0.068	0.0
+                    0.4	0.030	0.030	0.031	0.044	0.058	0.068	0.0
+                    0.5	0.030	0.030	0.032	0.046	0.058	0.064	0.0
+                    0.6	0.020	0.020	0.040	0.048	0.058	0.064	0.0
+                    0.7	0.010	0.010	0.000	0.052	0.060	0.064	0.0
+                    0.8	0.002	0.002	0.000	0.052	0.060	0.064	0.0
+                    0.9	0.000	0.000	0.000	0.052	0.060	0.066	0.0
+                    1	0.000	0.000	0.000	0.056	0.060	0.068	0.0
+                </tableData>
+            </table>
+        </product>
+    </function>
+    
+    <function name="MilThrust">
+        <description>
+            The engine data were derived from a publication:
+            ORPHEUS MARK 803 Lightwaight Turbojet Engine 1960 (Bristol Siddeley)
+            The tests were performed at 15 ° C under various conditions of air density to simulate the height.
+            This means that the power and temperature of the engine is not configured in the actual operating conditions,
+            so you need to make a correction data using the table "Estimated effect of ambient temperatures on take-off"
+            on p. 29 of the pdf document.
+            It was created a table with the hypothesis of a power of 5000 lib at 15 ° C.
+        </description>
+        <product>
+            <property>propulsion/engine[#]/TSFC_Calculate</property>
+            <table>
+                <independentVar lookup="row">velocities/mach</independentVar>
+                <independentVar lookup="column">atmosphere/density-altitude</independentVar>
+                <tableData>
+                    -10000	0	10000	20000	30000	40000	60000
+                    0	1	1	0.75	0	0	0	0
+                    0.1	0.95	0.95	0.72	0	0	0	0
+                    0.2	0.91	0.91	0.69	0.52	0	0	0
+                    0.3	0.89	0.89	0.68	0.512	0	0	0
+                    0.4	0.87	0.87	0.68	0.508	0	0	0
+                    0.5	0.87	0.87	0.68	0.512	0	0	0
+                    0.6	0.88	0.88	0.69	0.52	0	0.252	0
+                    0.7	0.9	0.9	0.71	0.54	0	0.268	0
+                    0.8	0.92	0.92	0.73	0.568	0.38	0.284	0
+                    0.9	0.95	0.95	0.77	0.596	0.444	0.304	0
+                    1	1	1	0.8	0.636	0.476	0.324	0
+                </tableData>
+            </table>
+        </product>
+    </function>
+    
+</turbine_engine>

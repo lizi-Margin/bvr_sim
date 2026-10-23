@@ -32,6 +32,29 @@ class StrikePilot:
         command={'throttle':.85,'pitch':0.,'heading':player.orientation[2]}
         if not self.released:
             command['heading']=math.atan2(self.target[1]-player.position[1],self.target[0]-player.position[0])
-            if frame.bomb_impact and math.dist(frame.bomb_impact,self.target)<25:
+            # Targets are declared at their base. The shared core predictor can
+            # intersect a warehouse roof above it; release over its footprint.
+            if frame.bomb_impact and math.dist(frame.bomb_impact[:2],self.target[:2])<25:
                 command['drop_bomb']=True;self.released=True
+        return command
+
+class ConvoyPilot(StrikePilot):
+    """Defensive strike using real missile warnings and observed missile positions."""
+    def command(self,frame,player):
+        threats=[e for e in frame.entities if e.kind=='missile' and e.team=='red' and e.alive]
+        if threats:
+            threat=min(threats,key=lambda m:math.dist(m.position,player.position))
+            if getattr(self,'evading_uid',None)!=threat.uid:
+                self.evading_uid=threat.uid
+                self.escape_heading=math.atan2(player.position[1]-threat.position[1],player.position[0]-threat.position[0])
+            return {'throttle':1.,'heading':self.escape_heading,'pitch':max(-.08,min(.22,(8500-player.position[2])*.0002+.08))}
+        command=super().command(frame,player)
+        ammunition_left=any(s.kind=='sam' and s.alive and s.missiles_left>0 for s in frame.ground_units)
+        if not ammunition_left and not self.released:
+            # Converge onto a declared northbound bombing line before release.
+            # Compensate observed sideslip rather than chasing the moving CCIP cross.
+            track=math.atan2(player.velocity[1],player.velocity[0])
+            slip=math.atan2(math.sin(player.orientation[2]-track),math.cos(player.orientation[2]-track))
+            command['heading']=math.atan2(self.target[1]-player.position[1],2000)+slip
+            command['pitch']=.02+.12*abs(player.orientation[0])
         return command

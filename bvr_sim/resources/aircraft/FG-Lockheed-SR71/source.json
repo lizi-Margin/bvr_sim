@@ -1,0 +1,25 @@
+{
+  "set": "Lockheed-SR71/sr71-set.xml",
+  "name": "Lockheed SR 71 Blackbird (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Lockheed-SR71/Systems/sr71-yasim.xml",
+  "jets": 2,
+  "model": "Lockheed-SR71/Models/sr71.xml",
+  "tags": [
+    "lockheed",
+    "jet",
+    "twin-engine",
+    "retractable-gear",
+    "supersonic",
+    "coldwar",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Lockheed-SR71.zip",
+  "archive_sha256": "fba97ba55d23567f0c590bd059a66ab0d67f521bdd8bdf8ebef1eb54869e85ed",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Lockheed-SR71.zip"
+}

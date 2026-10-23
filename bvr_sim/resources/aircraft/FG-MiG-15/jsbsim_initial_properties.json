@@ -1,0 +1,18 @@
+{
+  "fcs/throttle-cmd-norm-real": 0.3,
+  "fcs/pitch-trim-norm-real": 0.0,
+  "fcs/roll-trim-norm-real": 0.0,
+  "gtremble/on": 0.0,
+  "gtremble/way": 1.0,
+  "gtremble/max": 0.9,
+  "gtremble/step": 0.3,
+  "gtremble/current": 0.0,
+  "accelerations/Nz-max": 8.0,
+  "systems/instr/RV-2/tuning/H0-m": 1.2,
+  "systems/instr/UV-2/switch/power": 1.0,
+  "systems/instr/ARK-5/switch/mode": 1.0,
+  "systems/instr/ARK-5/switch/cw-ident": 1.0,
+  "systems/instr/ARK-5/pot/volume": 0.5,
+  "systems/instr/ARK-5/pot/light": 0.5,
+  "systems/instr/VD-17/pot/pressure-mmHg": 760.0
+}

@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="bellydrag">
+
+    <property>/gear/gear[9]/rollspeed-ms</property>
+
+
+  <channel name="cpbelly">
+
+     <switch name="systems/cpbelly/cpready">
+          <default value="0" />
+          <test logic="OR" value="1">
+              /gear/gear[9]/wow == 1
+          </test>
+     </switch>
+
+     <scheduled_gain name="systems/cpbelly/cp1belly-decel-multiplier">
+        <input>systems/cpbelly/cpready</input>
+        <table>
+            <independentVar lookup="row">/gear/gear[9]/rollspeed-ms</independentVar>
+            <tableData>
+                0     0.00
+                5       30
+                7     15.00
+                80    8.00
+            </tableData>
+        </table>
+     </scheduled_gain>
+
+     <pure_gain name="systems/cpbelly/cp1belly-decel-force">
+         <input>systems/cpbelly/cp1belly-decel-multiplier</input>
+        <gain>inertia/weight-lbs</gain>
+     </pure_gain>
+
+     <summer name="systems/cpdrag/cp1-force">
+         <input>systems/cpbelly/cp1belly-decel-force</input>
+        <output>external_reactions/cp1-bellydragx/magnitude</output>
+     </summer>
+
+
+
+
+
+  </channel>
+  <channel name="cpfuse">
+
+      <switch name="systems/cpfuse/cpready">
+          <default value="0" />
+          <test logic="OR" value="1">
+              systems/crash/switch_timer  == 1
+          </test>
+      </switch>
+
+      <switch name="systems/cpfuse/cprollspeed">
+          <default value="0" />
+          <test logic="AND" value="velocities/u-fps">
+              systems/crash/switch  == 1
+          </test>
+      </switch>
+
+
+
+      <scheduled_gain name="systems/cpfuse/cpfuse-decel-multiplier">
+          <input>systems/cpfuse/cpready</input>
+          <table>
+              <independentVar lookup="row">systems/cpfuse/cprollspeed</independentVar>
+              <tableData>
+                  -5     -30
+                  0     0.00
+                  5       30
+              </tableData>
+          </table>
+      </scheduled_gain>
+
+
+
+      <pure_gain name="systems/cpfuse/cpfuse-decel-force">
+          <input>systems/cpfuse/cpfuse-decel-multiplier</input>
+          <gain>inertia/weight-lbs</gain>
+      </pure_gain>
+
+      <summer name="systems/cpdrag/cpfuse-force">
+          <input>systems/cpfuse/cpfuse-decel-force</input>
+          <output>external_reactions/fusedragx/magnitude</output>
+      </summer>
+
+
+
+  </channel>
+
+
+
+
+</system>

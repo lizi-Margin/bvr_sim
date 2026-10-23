@@ -1,0 +1,33 @@
+{
+  "set": "A-6E/A-6E-set.xml",
+  "name": "Grumman A-6E",
+  "fdm_type": "jsb",
+  "fdm": "A-6E/A-6E.xml",
+  "jets": 0,
+  "model": "A-6E/Models/A-6E.xml",
+  "tags": [
+    "bomber",
+    "grumman",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+    "vietnam",
+    "gulfwar1",
+    "hud",
+    "ifr",
+    "refuel",
+    "retractable-gear",
+    "tail-hook",
+    "wing-fold",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 3,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "A-6E.zip",
+  "archive_sha256": "f8c5e2c0ad017a72485c5959389f7246c1f77c3ad82d3f3f27220a400890a586",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/A-6E.zip"
+}

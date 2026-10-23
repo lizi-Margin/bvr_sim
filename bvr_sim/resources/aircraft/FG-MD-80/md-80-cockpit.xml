@@ -1,0 +1,1152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-80: Cockpit"> 
+	
+	<property value="0">/controls/cockpit/overhead/battery-out</property>
+	
+	<channel name="Animations">
+		
+		
+		<lag_filter name="/controls/cockpit/art">
+			<input>/controls/dfgs/art</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/art-cover">
+			<input>/controls/dfgs/covers/art</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/brake-pedal-left">
+			<input>/controls/gear/brake-left</input>
+			<c1>5</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/brake-pedal-right">
+			<input>/controls/gear/brake-right</input>
+			<c1>5</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/capt-digital">
+			<input>/controls/lighting/capt-digital</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/capt-panel">
+			<input>/controls/lighting/capt-panel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/center-panel">
+			<input>/controls/lighting/center-panel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/efis/adf-1[0]">
+			<input>/instrumentation/efis[0]/inputs/lh-vor-adf</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/efis/adf-1[1]">
+			<input>/instrumentation/efis[1]/inputs/lh-vor-adf</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/efis/adf-2[0]">
+			<input>/instrumentation/efis[0]/inputs/rh-vor-adf</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/efis/adf-2[1]">
+			<input>/instrumentation/efis[1]/inputs/rh-vor-adf</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/efis/mode-1">
+			<input>/instrumentation/efis[0]/mode</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/efis/mode-2">
+			<input>/instrumentation/efis[1]/mode</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/controls/cockpit/efis/range-1-cmd">
+			<function>
+				<table>
+					<independentVar lookup="row">/instrumentation/efis[0]/inputs/range-nm</independentVar>
+					<tableData>
+						 10  0
+						 20  1
+						 40  2
+						 80  3
+						160  4
+						320  5
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/controls/cockpit/efis/range-1">
+			<input>/controls/cockpit/efis/range-1-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/controls/cockpit/efis/range-2-cmd">
+			<function>
+				<table>
+					<independentVar lookup="row">/instrumentation/efis[1]/inputs/range-nm</independentVar>
+					<tableData>
+						 10  0
+						 20  1
+						 40  2
+						 80  3
+						160  4
+						320  5
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/controls/cockpit/efis/range-2">
+			<input>/controls/cockpit/efis/range-2-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/active-ap">
+			<input>/it-autoflight/input/active-ap</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/controls/cockpit/fgcp/ap-cmd">
+			<function>
+				<max>
+					<property>/it-autoflight/output/ap1</property>
+					<property>/it-autoflight/output/ap2</property>
+					<property>/controls/cockpit/fgcp/ap-sw</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/controls/cockpit/fgcp/ap">
+			<input>/controls/cockpit/fgcp/ap-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/controls/cockpit/fgcp/ats-cmd">
+			<function>
+				<max>
+					<property>/it-autoflight/output/athr</property>
+					<property>/controls/cockpit/fgcp/ats-sw</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/controls/cockpit/fgcp/ats">
+			<input>/controls/cockpit/fgcp/ats-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/bank-limit">
+			<input>/it-autoflight/input/bank-limit-sw</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/beacon">
+			<input>/controls/lighting/beacon</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/digital">
+			<input>/controls/lighting/fgcp-digital</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/fd1">
+			<input>/it-autoflight/input/fd1</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/fd2">
+			<input>/it-autoflight/input/fd2</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/ground-flood-light-l">
+			<input>/controls/lighting/ground-flood-light-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/ground-flood-light-r">
+			<input>/controls/lighting/ground-flood-light-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/landing-light-l">
+			<input>/controls/lighting/landing-light-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/landing-light-n">
+			<input>/controls/lighting/landing-light-n</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/landing-light-r">
+			<input>/controls/lighting/landing-light-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/panel">
+			<input>/controls/lighting/fgcp-panel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/position-strobe-lights">
+			<input>/controls/lighting/position-strobe-lights</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fgcp/wing-lights">
+			<input>/controls/lighting/wing-lights</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fo-digital">
+			<input>/controls/lighting/fo-digital</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fo-panel">
+			<input>/controls/lighting/fo-panel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fu-reset">
+			<input>/controls/engines/fu-reset</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/fuel-channel-select">
+			<input>/controls/fuel/channel-select</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<actuator name="/controls/cockpit/gear-lever">
+			<input>/controls/gear/lever</input>
+			<rate_limit>4.5</rate_limit>
+			<lag>20</lag>
+		</actuator>
+		
+		<lag_filter name="/controls/cockpit/hyd-aux-pump">
+			<input>/controls/hydraulics/aux-pump</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/hyd-l-pump">
+			<input>/controls/hydraulics/l-pump</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/hyd-r-pump">
+			<input>/controls/hydraulics/r-pump</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/hyd-trans">
+			<input>/controls/hydraulics/trans</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/hyd-trans-cover">
+			<input>/controls/hydraulics/covers/trans</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/nd1-dimmer">
+			<input>/instrumentation/du/nd1-dimmer</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/nd2-dimmer">
+			<input>/instrumentation/du/nd2-dimmer</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/pedestal-digital">
+			<input>/controls/lighting/pedestal-digital</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/pedestal-panel">
+			<input>/controls/lighting/pedestal-panel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/pfd1-dimmer">
+			<input>/instrumentation/du/pfd1-dimmer</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/pfd2-dimmer">
+			<input>/instrumentation/du/pfd2-dimmer</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/tiller-handle">
+			<input>/systems/fcs/tiller/handle</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/vor-adf-1[0]">
+			<input>/instrumentation/rmi[0]/vor-adf-1</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/vor-adf-1[1]">
+			<input>/instrumentation/rmi[1]/vor-adf-1</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/vor-adf-2[0]">
+			<input>/instrumentation/rmi[0]/vor-adf-2</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/vor-adf-2[1]">
+			<input>/instrumentation/rmi[1]/vor-adf-2</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		
+		<lag_filter name="/controls/cockpit/abs-armed">
+			<input>/controls/abs/armed</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/abs-knob">
+			<input>/controls/abs/knob</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/aileron-trim">
+			<input>/controls/flight/aileron-trim</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<actuator name="/controls/cockpit/brake-lever">
+			<input>/controls/gear/brake-parking</input>
+			<rate_limit>2.5</rate_limit>
+			<lag>20</lag>
+		</actuator>
+		
+		<lag_filter name="/controls/cockpit/elevator-trim-lever">
+			<input>/controls/flight/elevator-trim-lever</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/engine-cutoff[0]">
+			<input>/controls/engines/engine[0]/cutoff-switch</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/engine-cutoff[1]">
+			<input>/controls/engines/engine[1]/cutoff-switch</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/dial-a-flap">
+			<input>/controls/flight/dial-a-flap</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/controls/cockpit/flaps-lever-input">
+			<function>
+				<sum>
+					<ifthen>
+						<eq>
+							<property>/systems/fcs/flaps/input</property>
+							<value>2</value>
+						</eq>
+						<table> 
+							<independentVar lookup="row">/controls/flight/dial-a-flap</independentVar>
+							<tableData>
+								 0  -1
+								10   1
+							</tableData>
+						</table>
+						<value>0</value>
+					</ifthen>
+					<ifthen>
+						<eq>
+							<property>/systems/fcs/flaps/input</property>
+							<value>4</value>
+						</eq>
+						<table> 
+							<independentVar lookup="row">/controls/flight/dial-a-flap</independentVar>
+							<tableData>
+								11  -1
+								15   1
+							</tableData>
+						</table>
+						<value>0</value>
+					</ifthen>
+					<ifthen>
+						<eq>
+							<property>/systems/fcs/flaps/input</property>
+							<value>6</value>
+						</eq>
+						<table> 
+							<independentVar lookup="row">/controls/flight/dial-a-flap</independentVar>
+							<tableData>
+								15  -1
+								28   1
+							</tableData>
+						</table>
+						<value>0</value>
+					</ifthen>
+					<property>/systems/fcs/flaps/input</property>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/controls/cockpit/flaps-lever-rotate">
+			<input>/controls/cockpit/flaps-lever-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/flaps-lever-translate">
+			<input>/controls/cockpit/flaps-lever-translate-cmd</input>
+			<c1>30</c1>
+		</lag_filter>
+		
+		<fcs_function name="/controls/cockpit/nlg-ind-cmd">
+			<function>
+				<table>
+					<independentVar lookup="row">/systems/gear/unit[0]/pos-actuator</independentVar>
+					<tableData>
+						0.8  0
+						1.0  1
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/controls/cockpit/nlg-ind">
+			<input>/controls/cockpit/nlg-ind-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/reverse-lever[0]">
+			<input>/systems/engines/reverse-1/throttle-lever</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/reverse-lever[1]">
+			<input>/systems/engines/reverse-2/throttle-lever</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/rudder-pwr">
+			<input>/controls/fcs/rudder-pwr</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/rudder-trim">
+			<input>/controls/flight/rudder-trim</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/spoilers-lever-rotate">
+			<input>/systems/fcs/spoilers/lever-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/spoilers-lever-translate">
+			<input>/controls/flight/speedbrake-arm</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/stab-cutout">
+			<input>/controls/fcs/stab-cutout</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/stab-cutout-cover">
+			<input>/controls/fcs/covers/stab-cutout</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/throttle-lever[0]">
+			<input>/systems/engines/control-1/throttle-pos</input>
+			<c1>20</c1>
+			<output>/systems/engines/throttle-lever-feedback[0]</output>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/throttle-lever[1]">
+			<input>/systems/engines/control-2/throttle-pos</input>
+			<c1>20</c1>
+			<output>/systems/engines/throttle-lever-feedback[1]</output>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/to-cg">
+			<input>/systems/performance/to-cg</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/to-flaps">
+			<input>/systems/performance/to-flaps</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/to-stab">
+			<input>/systems/performance/stabilizer-deg</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/transponder/alt">
+			<input>/instrumentation/transponder/input/alt-source</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/transponder/knob">
+			<input>/instrumentation/transponder/output/knob</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/transponder/tcas-dir">
+			<input>/instrumentation/transponder/input/tcas-dir</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/transponder/xpdr">
+			<input>/instrumentation/transponder/input/xpdr</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/x-bleed-l-lever">
+			<input>/controls/pneumatics/x-bleed-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/x-bleed-r-lever">
+			<input>/controls/pneumatics/x-bleed-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/x-feed-lever">
+			<input>/controls/fuel/x-feed</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		
+		<lag_filter name="/controls/cockpit/overhead/ac-tie">
+			<input>/controls/electrical/ac-tie</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/air-supply-l">
+			<input>/controls/pneumatics/supply-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/air-supply-r">
+			<input>/controls/pneumatics/supply-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/apu-bleed">
+			<input>/controls/pneumatics/bleed-apu</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/apu-gen">
+			<input>/controls/electrical/gen-apu</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/apu-master">
+			<input>/controls/apu/master</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/apu-pwr-gndsvc">
+			<input>/controls/electrical/apu-gndsvc</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/apu-pwr-l">
+			<input>/controls/electrical/apu-pwr-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/apu-pwr-r">
+			<input>/controls/electrical/apu-pwr-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/auto-pack-shutdown">
+			<input>/controls/pneumatics/auto-pack-shutdown</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/aux-trans-aft-a">
+			<input>/controls/fuel/aux-trans-aft-a</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/aux-trans-aft-b">
+			<input>/controls/fuel/aux-trans-aft-b</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/controls/cockpit/overhead/battery-in"> 
+			<default value="0" />
+			<test logic="AND" value="0.8">
+				/controls/electrical/battery eq 0
+				/controls/cockpit/overhead/battery-out gt 0.81
+			</test>
+			<test logic="AND" value="0.8">
+				/controls/electrical/battery eq 1
+				/controls/cockpit/overhead/battery-out lt 0.79
+			</test>
+			<test value="1">
+				/controls/electrical/battery eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/controls/cockpit/overhead/battery">
+			<input>/controls/cockpit/overhead/battery-in</input>
+			<c1>20</c1>
+			<output>/controls/cockpit/overhead/battery-out</output>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/cabin-temp">
+			<input>/controls/pneumatics/cabin-temp</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/cockpit-temp">
+			<input>/controls/pneumatics/cockpit-temp</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/csd-l">
+			<input>/controls/electrical/csd-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/csd-r">
+			<input>/controls/electrical/csd-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/dc-tie">
+			<input>/controls/electrical/dc-tie</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/elec-meters">
+			<input>/controls/electrical/meters</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/emer-lt">
+			<input>/controls/lighting/emer-lt</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/emer-pwr">
+			<input>/controls/electrical/emer-pwr</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/eng-sync">
+			<input>/controls/engines/eng-sync</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/ext-pwr-gndsvc">
+			<input>/controls/electrical/ext-gndsvc</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/ext-pwr-l">
+			<input>/controls/electrical/ext-pwr-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/ext-pwr-r">
+			<input>/controls/electrical/ext-pwr-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/aux-trans-fwd-a">
+			<input>/controls/fuel/aux-trans-fwd-a</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/aux-trans-fwd-b">
+			<input>/controls/fuel/aux-trans-fwd-b</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/galley-bus">
+			<input>/controls/electrical/galley</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/gen-l">
+			<input>/controls/electrical/gen-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/gen-r">
+			<input>/controls/electrical/gen-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/gpws">
+			<input>/controls/switches/gpws</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/gpws-cover">
+			<input>/controls/switches/gpws-cover</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/ign">
+			<input>/controls/ignition/ign</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/logo-lt">
+			<input>/controls/lighting/logo-lights</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/iru-knob[0]">
+			<input>/controls/iru[0]/knob</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/iru-knob[1]">
+			<input>/controls/iru[1]/knob</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/mach-trim">
+			<input>/controls/fcs/mach-trim</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/max-spd-warn-test">
+			<input>/controls/switches/max-spd-warn-test</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/no-smoke">
+			<input>/controls/switches/no-smoking-sign</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/overhead-panel">
+			<input>/controls/lighting/overhead-panel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/pump-aft-c">
+			<input>/controls/fuel/pump-aft-c</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/pump-aft-l">
+			<input>/controls/fuel/pump-aft-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/pump-aft-r">
+			<input>/controls/fuel/pump-aft-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/pump-fwd-c">
+			<input>/controls/fuel/pump-fwd-c</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/pump-fwd-l">
+			<input>/controls/fuel/pump-fwd-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/pump-fwd-r">
+			<input>/controls/fuel/pump-fwd-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/radio-rack">
+			<input>/controls/pneumatics/radio-rack</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/ram-air">
+			<input>/controls/pneumatics/ram-air</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/seatbelts">
+			<input>/controls/switches/seatbelt-sign</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/stall-test">
+			<input>/controls/switches/stall-test</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/start-cover-l">
+			<input>/controls/engines/covers/start-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/start-cover-r">
+			<input>/controls/engines/covers/start-r</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/start-pump">
+			<input>/controls/fuel/pump-start</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/start-switch-l">
+			<input>/controls/engines/engine[0]/start-switch</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/start-switch-r">
+			<input>/controls/engines/engine[1]/start-switch</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/temp-sel">
+			<input>/controls/pneumatics/temp-sel</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/thunderstorm">
+			<input>/controls/lighting/thunderstorm</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/wipers">
+			<input>/controls/switches/wipers</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/controls/cockpit/overhead/yaw-damper">
+			<input>/controls/fcs/yaw-damper</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Cockpit Lighting" execrate="2">
+		
+		<switch name="/systems/lighting/capt-digital">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/electrical/bus/ac-l ge 112
+				/controls/lighting/thunderstorm eq 1
+			</test>
+			<test value="/controls/lighting/capt-digital">
+				/systems/electrical/bus/ac-l ge 112
+			</test>
+		</switch>
+		
+		<switch name="/systems/lighting/capt-panel-cmd">
+			<default value="0" />
+			<test value="/controls/lighting/capt-panel">
+				/systems/electrical/bus/ac-l ge 112
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/lighting/capt-panel">
+			<input>/systems/lighting/capt-panel-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/systems/lighting/center-panel-cmd">
+			<default value="0" />
+			<test value="/controls/lighting/center-panel">
+				/systems/electrical/bus/ac-l ge 112
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/lighting/center-panel">
+			<input>/systems/lighting/center-panel-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/systems/lighting/fgcp-digital">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/electrical/bus/ac-r ge 112
+				/controls/lighting/thunderstorm eq 1
+			</test>
+			<test value="/controls/lighting/fgcp-digital">
+				/systems/electrical/bus/ac-r ge 112
+			</test>
+		</switch>
+		
+		<switch name="/systems/lighting/fgcp-panel-cmd">
+			<default value="0" />
+			<test value="/controls/lighting/fgcp-panel">
+				/systems/electrical/bus/ac-r ge 112
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/lighting/fgcp-panel">
+			<input>/systems/lighting/fgcp-panel-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/systems/lighting/fo-digital">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/electrical/bus/ac-r ge 112
+				/controls/lighting/thunderstorm eq 1
+			</test>
+			<test value="/controls/lighting/fo-digital">
+				/systems/electrical/bus/ac-r ge 112
+			</test>
+		</switch>
+		
+		<switch name="/systems/lighting/fo-panel-cmd">
+			<default value="0" />
+			<test value="/controls/lighting/fo-panel">
+				/systems/electrical/bus/ac-r ge 112
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/lighting/fo-panel">
+			<input>/systems/lighting/fo-panel-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/systems/lighting/overhead-panel-cmd">
+			<default value="0" />
+			<test value="/controls/lighting/overhead-panel">
+				/systems/electrical/bus/ac-l ge 112
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/lighting/overhead-panel">
+			<input>/systems/lighting/overhead-panel-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/systems/lighting/pedestal-digital">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/electrical/bus/ac-l ge 112
+				/controls/lighting/thunderstorm eq 1
+			</test>
+			<test value="/controls/lighting/pedestal-digital">
+				/systems/electrical/bus/ac-l ge 112
+			</test>
+		</switch>
+		
+		<switch name="/systems/lighting/pedestal-panel-cmd">
+			<default value="0" />
+			<test value="/controls/lighting/pedestal-panel">
+				/systems/electrical/bus/ac-l ge 112
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/lighting/pedestal-panel">
+			<input>/systems/lighting/pedestal-panel-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="OSG Text Emission" execrate="2"> 
+		
+		<fcs_function name="/systems/lighting/pedestal-osg-red">
+			<function>
+				<table>
+					<independentVar lookup="row">/systems/lighting/pedestal-panel</independentVar>
+					<tableData>
+						0  0.1
+						1  1.0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/lighting/pedestal-osg-green">
+			<function>
+				<table>
+					<independentVar lookup="row">/systems/lighting/pedestal-panel</independentVar>
+					<tableData>
+						0  0.1
+						1  0.9
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/lighting/pedestal-osg-blue">
+			<function>
+				<table>
+					<independentVar lookup="row">/systems/lighting/pedestal-panel</independentVar>
+					<tableData>
+						0  0.1
+						1  0.7
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Windshield Wipers" execrate="2">
+		
+		<switch name="/systems/cockpit/wipers/wipers-sw"> 
+			<default value="/controls/switches/wipers" />
+			<test logic="AND" value="0">
+				/controls/cockpit/overhead/wipers-held eq 0
+				/systems/cockpit/wipers/wiper-l-out eq 0
+				/systems/cockpit/wipers/wiper-r-out eq 0
+				/controls/switches/wipers eq -1
+			</test>
+			<output>/controls/switches/wipers</output>
+		</switch>
+		
+		
+		<switch name="/systems/cockpit/wipers/wiper-l-cmd">
+			<default value="/systems/cockpit/wipers/wiper-l-cmd" />
+			<test logic="OR" value="0">
+				/systems/acconfig/autoconfig-running eq 1
+				/systems/electrical/bus/dc-l lt 24
+				/systems/cockpit/wipers/wiper-l-out eq 1
+				/controls/switches/wipers eq -1
+			</test>
+			<test logic="AND" value="1">
+				/controls/switches/wipers gt 0
+				/systems/cockpit/wipers/wiper-l-out eq 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/cockpit/wipers/wiper-l-rate">
+			<default value="1" />
+			<test value="10">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="OR" value="0">
+				/systems/electrical/bus/dc-l lt 24
+				/controls/switches/wipers eq 0
+			</test>
+			<test value="2">
+				/controls/switches/wipers eq 2
+			</test>
+		</switch>
+		
+		<actuator name="/systems/cockpit/wipers/wiper-l">
+			<input>/systems/cockpit/wipers/wiper-l-cmd</input>
+			<rate_limit>/systems/cockpit/wipers/wiper-l-rate</rate_limit>
+			<output>/systems/cockpit/wipers/wiper-l-out</output>
+		</actuator>
+		
+		
+		<switch name="/systems/cockpit/wipers/wiper-r-cmd">
+			<default value="/systems/cockpit/wipers/wiper-r-cmd" />
+			<test logic="OR" value="0">
+				/systems/acconfig/autoconfig-running eq 1
+				/systems/electrical/bus/dc-r lt 24
+				/systems/cockpit/wipers/wiper-r-out eq 1
+				/controls/switches/wipers eq -1
+			</test>
+			<test logic="AND" value="1">
+				/controls/switches/wipers gt 0
+				/systems/cockpit/wipers/wiper-r-out eq 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/cockpit/wipers/wiper-r-rate">
+			<default value="1" />
+			<test value="10">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="OR" value="0">
+				/systems/electrical/bus/dc-l lt 24
+				/controls/switches/wipers eq 0
+			</test>
+			<test value="2">
+				/controls/switches/wipers eq 2
+			</test>
+		</switch>
+		
+		<actuator name="/systems/cockpit/wipers/wiper-r">
+			<input>/systems/cockpit/wipers/wiper-r-cmd</input>
+			<rate_limit>/systems/cockpit/wipers/wiper-r-rate</rate_limit>
+			<output>/systems/cockpit/wipers/wiper-r-out</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Glass Effects">
+		
+		<fcs_function name="glass-effects/airspeed-clamped-sqrt">
+			<function>
+				<sqrt>
+					<quotient>
+						<min>
+							<property>velocities/vc-kts</property>
+							<value>40</value>
+						</min>
+						<value>40</value>
+					</quotient>
+				</sqrt>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="glass-effects/splash-x">
+			<function>
+				<difference>
+					<value>-0.1</value>
+					<product>
+						<value>2</value>
+						<property>glass-effects/airspeed-clamped-sqrt</property>
+					</product>
+				</difference>
+			</function>
+			<output>/environment/aircraft-effects/splash-vector-x</output>
+		</fcs_function>
+		
+		<fcs_function name="glass-effects/splash-y">
+			<function>
+				<value>0</value>
+			</function>
+			<output>/environment/aircraft-effects/splash-vector-y</output>
+		</fcs_function>
+		
+		<fcs_function name="glass-effects/splash-z">
+			<function>
+				<difference>
+					<value>1</value>
+					<product>
+						<value>1.35</value>
+						<property>glass-effects/airspeed-clamped-sqrt</property>
+					</product>
+				</difference>
+			</function>
+			<output>/environment/aircraft-effects/splash-vector-z</output>
+		</fcs_function>
+	
+	</channel>
+
+</system>

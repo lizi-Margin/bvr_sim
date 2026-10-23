@@ -1,0 +1,89 @@
+{
+  "files": [
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Tumansky",
+      "source": "MiG-21bis/Engines/Tumansky.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "direct",
+      "source": "MiG-21bis/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Gear",
+      "source": "MiG-21bis/Systems/Gear.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Flaps",
+      "source": "MiG-21bis/Systems/Flaps.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Speedbrakes",
+      "source": "MiG-21bis/Systems/Speedbrakes.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "FCS-Pitch",
+      "source": "MiG-21bis/Systems/FCS-Pitch.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "FCS-Roll",
+      "source": "MiG-21bis/Systems/FCS-Roll.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "FCS-Yaw",
+      "source": "MiG-21bis/Systems/FCS-Yaw.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Alpha-Buffet",
+      "source": "MiG-21bis/Systems/Alpha-Buffet.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Chute",
+      "source": "MiG-21bis/Systems/Chute.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Dump",
+      "source": "MiG-21bis/Systems/Dump.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Armament",
+      "source": "MiG-21bis/Systems/Armament.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Canopy",
+      "source": "MiG-21bis/Systems/Canopy.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-21bis/MiG-21bis.xml",
+      "reference": "Particles",
+      "source": "MiG-21bis/Systems/Particles.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

@@ -1,0 +1,47 @@
+{
+  "files": [
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "RR-AVON-114",
+      "source": "Supermarine-Swift/Engines/RR-AVON-114.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "direct",
+      "source": "Supermarine-Swift/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "swift-flight-controls",
+      "source": "Supermarine-Swift/Systems/swift-flight-controls.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "swift-hydraulics",
+      "source": "Supermarine-Swift/Systems/swift-hydraulics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "swift-engines",
+      "source": "Supermarine-Swift/Systems/swift-engines.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "swift-ecs",
+      "source": "Supermarine-Swift/Systems/swift-ecs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Supermarine-Swift/swift-vsp.xml",
+      "reference": "swift-electrics",
+      "source": "Supermarine-Swift/Systems/swift-electrics.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

@@ -1,0 +1,16 @@
+{
+  "set": "KC135/KC135-set.xml",
+  "name": "Boeing KC-135E",
+  "fdm_type": "jsb",
+  "fdm": "KC135/KC135-E.xml",
+  "jets": 4,
+  "model": "KC135/Models/KC135.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "KC135.zip",
+  "archive_sha256": "078033ab57dab2fd7bd2412cc7555a8c08f66f858341d8be8ba1b1c2c04b3f26",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/KC135.zip"
+}

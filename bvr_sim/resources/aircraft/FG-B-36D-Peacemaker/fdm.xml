@@ -1,0 +1,373 @@
+<?xml version='1.0' encoding='utf-8'?>
+<airplane mass="166165" version="YASIM_VERSION_CURRENT" mtow-lbs="410000">
+
+  <approach speed="100" aoa="1" fuel="0.3">
+    <control-setting axis="/controls/engines/engine[0]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[1]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[2]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[3]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[4]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[5]/throttle" value="1" />
+
+    <control-setting axis="/controls/engines/engine[6]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[7]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[8]/throttle" value="1" />
+    <control-setting axis="/controls/engines/engine[9]/throttle" value="1" />
+
+    <control-setting axis="/controls/engines/engine[0]/mixture" value="1" />
+    <control-setting axis="/controls/engines/engine[1]/mixture" value="1" />
+    <control-setting axis="/controls/engines/engine[2]/mixture" value="1" />
+    <control-setting axis="/controls/engines/engine[3]/mixture" value="1" />
+    <control-setting axis="/controls/engines/engine[4]/mixture" value="1" />
+    <control-setting axis="/controls/engines/engine[5]/mixture" value="1" />
+
+    <control-setting axis="/controls/engines/engine[0]/propeller-pitch" value="0.77" />
+    <control-setting axis="/controls/engines/engine[1]/propeller-pitch" value="0.77" />
+    <control-setting axis="/controls/engines/engine[2]/propeller-pitch" value="0.77" />
+    <control-setting axis="/controls/engines/engine[3]/propeller-pitch" value="0.77" />
+    <control-setting axis="/controls/engines/engine[4]/propeller-pitch" value="0.77" />
+    <control-setting axis="/controls/engines/engine[5]/propeller-pitch" value="0.77" />
+
+    <control-setting axis="/controls/flight/flaps" value="1" />
+    <control-setting axis="/controls/gear/gear-down" value="1" />
+  </approach>
+
+  <cruise speed="200" alt="10000" fuel="0.5">
+    <control-setting axis="/controls/engines/engine[0]/throttle" value="0.7" />
+    <control-setting axis="/controls/engines/engine[1]/throttle" value="0.7" />
+    <control-setting axis="/controls/engines/engine[2]/throttle" value="0.7" />
+    <control-setting axis="/controls/engines/engine[3]/throttle" value="0.7" />
+    <control-setting axis="/controls/engines/engine[4]/throttle" value="0.7" />
+    <control-setting axis="/controls/engines/engine[5]/throttle" value="0.7" />
+
+    <control-setting axis="/controls/engines/engine[6]/throttle" value="0" />
+    <control-setting axis="/controls/engines/engine[7]/throttle" value="0" />
+    <control-setting axis="/controls/engines/engine[8]/throttle" value="0" />
+    <control-setting axis="/controls/engines/engine[9]/throttle" value="0" />
+
+    <control-setting axis="/controls/engines/engine[0]/mixture" value="0.3" />
+    <control-setting axis="/controls/engines/engine[1]/mixture" value="0.3" />
+    <control-setting axis="/controls/engines/engine[2]/mixture" value="0.3" />
+    <control-setting axis="/controls/engines/engine[3]/mixture" value="0.3" />
+    <control-setting axis="/controls/engines/engine[4]/mixture" value="0.3" />
+    <control-setting axis="/controls/engines/engine[5]/mixture" value="0.3" />
+
+    <control-setting axis="/controls/engines/engine[0]/propeller-pitch" value="1" />
+    <control-setting axis="/controls/engines/engine[1]/propeller-pitch" value="1" />
+    <control-setting axis="/controls/engines/engine[2]/propeller-pitch" value="1" />
+    <control-setting axis="/controls/engines/engine[3]/propeller-pitch" value="1" />
+    <control-setting axis="/controls/engines/engine[4]/propeller-pitch" value="1" />
+    <control-setting axis="/controls/engines/engine[5]/propeller-pitch" value="1" />
+
+    <control-setting axis="/controls/flight/flaps" value="0" />
+    <control-setting axis="/controls/gear/gear-down" value="0" />
+  </cruise>
+
+  <cockpit x="21.997" y="0.607" z="-1.371" />
+
+  
+  <fuselage ax=" 23.052" ay="  0.000" az=" -2.399" bx=" 22.707" by="  0.000" bz=" -2.399" width="2.387" taper="0.65" midpoint="1" />
+  <fuselage ax=" 22.707" ay="  0.000" az=" -2.399" bx=" 22.173" by="  0.000" bz=" -2.399" width="2.971" taper="0.80" midpoint="1" />
+  <fuselage ax=" 22.173" ay="  0.000" az=" -2.399" bx=" 21.346" by="  0.000" bz=" -2.399" width="3.323" taper="0.89" midpoint="1" />
+  <fuselage ax=" 21.346" ay="  0.000" az=" -2.399" bx=" 20.310" by="  0.000" bz=" -2.399" width="3.323" taper="0.89" midpoint="0" />
+  <fuselage ax=" 20.310" ay="  0.000" az=" -2.399" bx=" 19.673" by="  0.000" bz=" -2.399" width="2.971" taper="0.80" midpoint="0" />
+  <fuselage ax=" 19.673" ay="  0.000" az=" -2.399" bx=" 19.323" by="  0.000" bz=" -2.399" width="2.387" taper="0.65" midpoint="0" />
+  
+  <fuselage ax=" 25.016" ay="  0.000" az=" -3.370" bx=" 24.930" by="  0.000" bz=" -3.370" width="0.727" taper="0.25" midpoint="1" />
+  <fuselage ax=" 24.930" ay="  0.000" az=" -3.370" bx=" 24.702" by="  0.000" bz=" -3.370" width="1.540" taper="0.48" midpoint="1" />
+  <fuselage ax=" 24.702" ay="  0.000" az=" -3.370" bx=" 24.168" by="  0.000" bz=" -3.370" width="2.521" taper="0.60" midpoint="1" />
+  <fuselage ax=" 24.168" ay="  0.000" az=" -3.370" bx=" 22.982" by="  0.000" bz=" -3.370" width="3.549" taper="0.71" midpoint="1" />
+  <fuselage ax=" 22.982" ay="  0.000" az=" -3.370" bx=" 21.371" by="  0.000" bz=" -3.370" width="4.006" taper="0.89" midpoint="1" />
+  <fuselage ax=" 21.371" ay="  0.000" az=" -3.370" bx=" -9.866" by="  0.000" bz=" -3.370" width="4.006" taper="1.00" midpoint="1" />
+  <fuselage ax=" -9.866" ay="  0.000" az=" -3.370" bx="-15.892" by="  0.000" bz=" -2.958" width="4.006" taper="0.80" midpoint="0" />
+  <fuselage ax="-15.892" ay="  0.000" az=" -2.958" bx="-24.415" by="  0.000" bz=" -2.106" width="3.197" taper="0.47" midpoint="0" />
+  <fuselage ax="-24.415" ay="  0.000" az=" -2.106" bx="-24.672" by="  0.000" bz=" -2.078" width="1.503" taper="0.81" midpoint="0" />
+  <fuselage ax="-24.672" ay="  0.000" az=" -2.078" bx="-24.867" by="  0.000" bz=" -2.055" width="1.223" taper="0.68" midpoint="0" />
+  <fuselage ax="-24.867" ay="  0.000" az=" -2.055" bx="-24.982" by="  0.000" bz=" -2.041" width="0.813" taper="0.40" midpoint="0" />
+
+  
+  <fuselage ax="  5.392" ay=" 26.343" az=" -4.601" bx="  5.262" by=" 26.343" bz=" -4.601" width="0.895" taper="0.65" midpoint="1" />
+  <fuselage ax="  5.262" ay=" 26.343" az=" -4.601" bx="  4.867" by=" 26.343" bz=" -4.601" width="1.182" taper="0.76" midpoint="1" />
+  <fuselage ax="  4.867" ay=" 26.343" az=" -4.601" bx="  2.193" by=" 26.343" bz=" -4.601" width="1.182" taper="1.00" midpoint="1" />
+  <fuselage ax="  2.193" ay=" 26.343" az=" -4.601" bx="  0.577" by=" 26.343" bz=" -4.415" width="1.182" taper="0.50" midpoint="0" />
+
+  <fuselage ax="  5.392" ay=" 25.043" az=" -4.601" bx="  5.262" by=" 25.043" bz=" -4.601" width="0.895" taper="0.65" midpoint="1" />
+  <fuselage ax="  5.262" ay=" 25.043" az=" -4.601" bx="  4.867" by=" 25.043" bz=" -4.601" width="1.182" taper="0.76" midpoint="1" />
+  <fuselage ax="  4.867" ay=" 25.043" az=" -4.601" bx="  2.193" by=" 25.043" bz=" -4.601" width="1.182" taper="1.00" midpoint="1" />
+  <fuselage ax="  2.193" ay=" 25.043" az=" -4.601" bx="  0.577" by=" 25.043" bz=" -4.415" width="1.182" taper="0.50" midpoint="0" />
+
+  
+  <fuselage ax="  5.392" ay="-26.343" az=" -4.601" bx="  5.262" by="-26.343" bz=" -4.601" width="0.895" taper="0.65" midpoint="1" />
+  <fuselage ax="  5.262" ay="-26.343" az=" -4.601" bx="  4.867" by="-26.343" bz=" -4.601" width="1.182" taper="0.76" midpoint="1" />
+  <fuselage ax="  4.867" ay="-26.343" az=" -4.601" bx="  2.193" by="-26.343" bz=" -4.601" width="1.182" taper="1.00" midpoint="1" />
+  <fuselage ax="  2.193" ay="-26.343" az=" -4.601" bx="  0.577" by="-26.343" bz=" -4.415" width="1.182" taper="0.50" midpoint="0" />
+
+  <fuselage ax="  5.392" ay="-25.043" az=" -4.601" bx="  5.262" by="-25.043" bz=" -4.601" width="0.895" taper="0.65" midpoint="1" />
+  <fuselage ax="  5.262" ay="-25.043" az=" -4.601" bx="  4.867" by="-25.043" bz=" -4.601" width="1.182" taper="0.76" midpoint="1" />
+  <fuselage ax="  4.867" ay="-25.043" az=" -4.601" bx="  2.193" by="-25.043" bz=" -4.601" width="1.182" taper="1.00" midpoint="1" />
+  <fuselage ax="  2.193" ay="-25.043" az=" -4.601" bx="  0.577" by="-25.043" bz=" -4.415" width="1.182" taper="0.50" midpoint="0" />
+
+  
+  <fuselage ax="  0.888" ay=" 19.737" az=" -2.102" bx="  0.102" by=" 19.737" bz=" -2.102" width="1.761" taper="0.10" midpoint="1" />
+  <fuselage ax="  0.102" ay=" 19.737" az=" -2.102" bx=" -0.725" by=" 19.737" bz=" -2.102" width="2.167" taper="0.80" midpoint="1" />
+  <fuselage ax=" -0.725" ay=" 19.737" az=" -2.102" bx=" -1.911" by=" 19.737" bz=" -2.102" width="2.167" taper="0.94" midpoint="0" />
+  <fuselage ax=" -1.911" ay=" 19.737" az=" -2.102" bx=" -3.327" by=" 19.737" bz=" -2.102" width="2.037" taper="0.64" midpoint="0" />
+  <fuselage ax=" -3.327" ay=" 19.737" az=" -2.102" bx=" -3.910" by=" 19.737" bz=" -2.102" width="1.304" taper="0.72" midpoint="0" />
+  <fuselage ax=" -3.910" ay=" 19.737" az=" -2.102" bx=" -4.364" by=" 19.737" bz=" -2.102" width="0.948" taper="0.42" midpoint="0" />
+  <fuselage ax=" -4.364" ay=" 19.737" az=" -2.102" bx=" -4.540" by=" 19.737" bz=" -2.102" width="0.397" taper="0.10" midpoint="0" />
+
+  <fuselage ax="  1.517" ay=" 13.737" az=" -2.332" bx="  0.685" by=" 13.737" bz=" -2.332" width="1.761" taper="0.10" midpoint="1" />
+  <fuselage ax="  0.685" ay=" 13.737" az=" -2.332" bx=" -0.190" by=" 13.737" bz=" -2.332" width="2.167" taper="0.80" midpoint="1" />
+  <fuselage ax=" -0.190" ay=" 13.737" az=" -2.332" bx=" -1.445" by=" 13.737" bz=" -2.332" width="2.167" taper="0.94" midpoint="0" />
+  <fuselage ax=" -1.445" ay=" 13.737" az=" -2.332" bx=" -2.944" by=" 13.737" bz=" -2.332" width="2.037" taper="0.64" midpoint="0" />
+  <fuselage ax=" -2.944" ay=" 13.737" az=" -2.332" bx=" -3.561" by=" 13.737" bz=" -2.332" width="1.304" taper="0.72" midpoint="0" />
+  <fuselage ax=" -3.561" ay=" 13.737" az=" -2.332" bx=" -4.042" by=" 13.737" bz=" -2.332" width="0.948" taper="0.42" midpoint="0" />
+  <fuselage ax=" -4.042" ay=" 13.737" az=" -2.332" bx=" -4.228" by=" 13.737" bz=" -2.332" width="0.397" taper="0.10" midpoint="0" />
+
+  <fuselage ax="  2.152" ay="  7.737" az=" -2.569" bx="  1.274" by="  7.737" bz=" -2.569" width="1.761" taper="0.10" midpoint="1" />
+  <fuselage ax="  1.274" ay="  7.737" az=" -2.569" bx="  0.350" by="  7.737" bz=" -2.569" width="2.167" taper="0.80" midpoint="1" />
+  <fuselage ax="  0.350" ay="  7.737" az=" -2.569" bx=" -0.973" by="  7.737" bz=" -2.569" width="2.167" taper="0.94" midpoint="0" />
+  <fuselage ax=" -0.973" ay="  7.737" az=" -2.569" bx=" -2.555" by="  7.737" bz=" -2.569" width="2.037" taper="0.64" midpoint="0" />
+  <fuselage ax=" -2.555" ay="  7.737" az=" -2.569" bx=" -3.206" by="  7.737" bz=" -2.569" width="1.304" taper="0.72" midpoint="0" />
+  <fuselage ax=" -3.206" ay="  7.737" az=" -2.569" bx=" -3.714" by="  7.737" bz=" -2.569" width="0.948" taper="0.42" midpoint="0" />
+  <fuselage ax=" -3.714" ay="  7.737" az=" -2.569" bx=" -3.910" by="  7.737" bz=" -2.569" width="0.397" taper="0.10" midpoint="0" />
+
+  
+  <fuselage ax="  0.888" ay="-19.737" az=" -2.102" bx="  0.102" by="-19.737" bz=" -2.102" width="1.761" taper="0.10" midpoint="1" />
+  <fuselage ax="  0.102" ay="-19.737" az=" -2.102" bx=" -0.725" by="-19.737" bz=" -2.102" width="2.167" taper="0.80" midpoint="1" />
+  <fuselage ax=" -0.725" ay="-19.737" az=" -2.102" bx=" -1.911" by="-19.737" bz=" -2.102" width="2.167" taper="0.94" midpoint="0" />
+  <fuselage ax=" -1.911" ay="-19.737" az=" -2.102" bx=" -3.327" by="-19.737" bz=" -2.102" width="2.037" taper="0.64" midpoint="0" />
+  <fuselage ax=" -3.327" ay="-19.737" az=" -2.102" bx=" -3.910" by="-19.737" bz=" -2.102" width="1.304" taper="0.72" midpoint="0" />
+  <fuselage ax=" -3.910" ay="-19.737" az=" -2.102" bx=" -4.364" by="-19.737" bz=" -2.102" width="0.948" taper="0.42" midpoint="0" />
+  <fuselage ax=" -4.364" ay="-19.737" az=" -2.102" bx=" -4.540" by="-19.737" bz=" -2.102" width="0.397" taper="0.10" midpoint="0" />
+
+  <fuselage ax="  1.517" ay="-13.737" az=" -2.332" bx="  0.685" by="-13.737" bz=" -2.332" width="1.761" taper="0.10" midpoint="1" />
+  <fuselage ax="  0.685" ay="-13.737" az=" -2.332" bx=" -0.190" by="-13.737" bz=" -2.332" width="2.167" taper="0.80" midpoint="1" />
+  <fuselage ax=" -0.190" ay="-13.737" az=" -2.332" bx=" -1.445" by="-13.737" bz=" -2.332" width="2.167" taper="0.94" midpoint="0" />
+  <fuselage ax=" -1.445" ay="-13.737" az=" -2.332" bx=" -2.944" by="-13.737" bz=" -2.332" width="2.037" taper="0.64" midpoint="0" />
+  <fuselage ax=" -2.944" ay="-13.737" az=" -2.332" bx=" -3.561" by="-13.737" bz=" -2.332" width="1.304" taper="0.72" midpoint="0" />
+  <fuselage ax=" -3.561" ay="-13.737" az=" -2.332" bx=" -4.042" by="-13.737" bz=" -2.332" width="0.948" taper="0.42" midpoint="0" />
+  <fuselage ax=" -4.042" ay="-13.737" az=" -2.332" bx=" -4.228" by="-13.737" bz=" -2.332" width="0.397" taper="0.10" midpoint="0" />
+
+  <fuselage ax="  2.152" ay=" -7.737" az=" -2.569" bx="  1.274" by=" -7.737" bz=" -2.569" width="1.761" taper="0.10" midpoint="1" />
+  <fuselage ax="  1.274" ay=" -7.737" az=" -2.569" bx="  0.350" by=" -7.737" bz=" -2.569" width="2.167" taper="0.80" midpoint="1" />
+  <fuselage ax="  0.350" ay=" -7.737" az=" -2.569" bx=" -0.973" by=" -7.737" bz=" -2.569" width="2.167" taper="0.94" midpoint="0" />
+  <fuselage ax=" -0.973" ay=" -7.737" az=" -2.569" bx=" -2.555" by=" -7.737" bz=" -2.569" width="2.037" taper="0.64" midpoint="0" />
+  <fuselage ax=" -2.555" ay=" -7.737" az=" -2.569" bx=" -3.206" by=" -7.737" bz=" -2.569" width="1.304" taper="0.72" midpoint="0" />
+  <fuselage ax=" -3.206" ay=" -7.737" az=" -2.569" bx=" -3.714" by=" -7.737" bz=" -2.569" width="0.948" taper="0.42" midpoint="0" />
+  <fuselage ax=" -3.714" ay=" -7.737" az=" -2.569" bx=" -3.910" by=" -7.737" bz=" -2.569" width="0.397" taper="0.10" midpoint="0" />
+
+  
+  <wing x="3.203" y="0" z="-2.463613" chord="10.350" length="35.216" taper="0.26" sweep="9" incidence="1" dihedral="1" camber="0.07">
+        <stall aoa="20" width="1" peak="1.5" />
+        <flap0 start="0.058" end="0.525" lift="1.8" drag="1.6" />
+        <flap1 start="0.587" end="1.000" lift="1.2" drag="1.2" />
+
+        <control-input control="FLAP0" axis="/controls/flight/flaps" />
+        <control-input control="FLAP1" axis="/controls/flight/aileron" split="true" />
+        <control-input control="FLAP1" axis="/controls/flight/aileron-trim" split="true" />
+
+        <control-output control="FLAP0" prop="/surface-positions/flap-pos-norm" />
+        <control-output control="FLAP1" prop="/surface-positions/left-aileron-pos-norm" side="left" />
+        <control-output control="FLAP1" prop="/surface-positions/right-aileron-pos-norm" side="right" />
+
+        <control-speed control="FLAP0" transition-time="5" />
+  </wing>
+
+  
+  <hstab x="-20.149" y="0.0" z="-2.307" chord="6.206" length="11.139" taper="0.34" sweep="3">
+         <stall aoa="18" width="1" peak="1.5" />
+         <flap0 start="0" end="0.95" lift="1.4" drag="1.2" />
+
+         <control-input control="FLAP0" axis="/controls/flight/elevator" />
+         <control-input control="FLAP0" axis="/controls/flight/elevator-trim" />
+
+         <control-output control="FLAP0" prop="/surface-positions/elevator-pos-norm" />
+  </hstab>
+
+  
+  <vstab x="-20.135" y="0.0" z="-1.483" chord="8.577" length="8.963" taper="0.34" sweep="10">
+         <stall aoa="16" width="1" peak="1.5" />
+         <flap0 start="0" end="1" lift="1.2" drag="1.2" />
+
+         <control-input control="FLAP0" axis="/controls/flight/rudder" invert="true" />
+         <control-input control="FLAP0" axis="/controls/flight/rudder-trim" invert="true" />
+
+         <control-output control="FLAP0" prop="/surface-positions/rudder-pos-norm" />
+  </vstab>
+
+  <vstab x=" 3.034" y=" 25.693" z="-4.526" chord="4.180" length="4.5" taper="0.7" sweep="56">
+  </vstab>
+
+  <vstab x=" 3.034" y="-25.693" z="-4.526" chord="4.180" length="4.5" taper="0.7" sweep="56">
+  </vstab>
+
+  
+  
+  <jet x="3.004" y="26.335" z="-4.598" mass="2707" thrust="5200" n1-idle="30" n1-max="100" n2-idle="55" n2-max="100" tsfc="0.79">
+       <actionpt x="0.612" y="26.335" z="-4.598" />
+       <control-input control="THROTTLE" axis="/controls/engines/engine[0]/throttle" />
+  </jet>
+
+  
+  <jet x="3.004" y="25.025" z="-4.598" mass="2707" thrust="5200" n1-idle="30" n1-max="100" n2-idle="55" n2-max="100" tsfc="0.79">
+       <actionpt x="0.612" y="25.025" z="-4.598" />
+       <control-input control="THROTTLE" axis="/controls/engines/engine[1]/throttle" />
+  </jet>
+
+  
+  <jet x="3.004" y="-25.025" z="-4.598" mass="2707" thrust="5200" n1-idle="30" n1-max="100" n2-idle="55" n2-max="100" tsfc="0.79">
+       <actionpt x="0.612" y="-25.025" z="-4.598" />
+       <control-input control="THROTTLE" axis="/controls/engines/engine[2]/throttle" />
+  </jet>
+
+  
+  <jet x="3.004" y="-26.335" z="-4.598" mass="2707" thrust="5200" n1-idle="30" n1-max="100" n2-idle="55" n2-max="100" tsfc="0.79">
+       <actionpt x="0.612" y="-26.335" z="-4.598" />
+       <control-input control="THROTTLE" axis="/controls/engines/engine[3]/throttle" />
+  </jet>
+
+  
+  
+  <propeller x="-2.011" y="19.737" z="-2.102" mass="3870" moment="110" radius="3" cruise-speed="200" cruise-rpm="956" cruise-power="2500" cruise-alt="10000" takeoff-power="3800" takeoff-rpm="1012" min-rpm="210" max-rpm="1012" fine-stop="0.25" coarse-stop="4" gear-ratio="0.375">
+             <actionpt x="-3.712" y="19.737" z="-2.102" />
+             <control-input control="ADVANCE" axis="/controls/engines/engine[4]/propeller-pitch" />
+             <piston-engine eng-power="3800" eng-rpm="2700" displacement="4362.5" compression="6.7" turbo-mul="1.75" wastegate-mp="52">
+                            <control-input control="THROTTLE" axis="/controls/engines/engine[4]/throttle" />
+                            <control-input control="STARTER" axis="/controls/engines/engine[4]/starter" />
+                            <control-input control="MAGNETOS" axis="/controls/engines/engine[4]/magnetos" />
+                            <control-input control="MIXTURE" axis="/controls/engines/engine[4]/mixture" />
+                            <control-input control="BOOST" axis="/controls/engines/engine[4]/boost" />
+             </piston-engine>
+  </propeller>
+
+  
+  <propeller x="-1.617" y="13.737" z="-2.232" mass="3870" moment="110" radius="3" cruise-speed="200" cruise-rpm="956" cruise-power="2500" cruise-alt="10000" takeoff-power="3800" takeoff-rpm="1012" min-rpm="210" max-rpm="1012" fine-stop="0.25" coarse-stop="4" gear-ratio="0.375">
+             <actionpt x="-3.439" y="13.737" z="-2.232" />
+             <control-input control="ADVANCE" axis="/controls/engines/engine[5]/propeller-pitch" />
+             <piston-engine eng-power="3800" eng-rpm="2700" displacement="4362.5" compression="6.7" turbo-mul="1.75" wastegate-mp="52">
+                            <control-input control="THROTTLE" axis="/controls/engines/engine[5]/throttle" />
+                            <control-input control="STARTER" axis="/controls/engines/engine[5]/starter" />
+                            <control-input control="MAGNETOS" axis="/controls/engines/engine[5]/magnetos" />
+                            <control-input control="MIXTURE" axis="/controls/engines/engine[5]/mixture" />
+                            <control-input control="BOOST" axis="/controls/engines/engine[5]/boost" />
+             </piston-engine>
+  </propeller>
+
+  
+  <propeller x="-1.263" y="7.737" z="-2.569" mass="3870" moment="110" radius="3" cruise-speed="200" cruise-rpm="956" cruise-power="2500" cruise-alt="10000" takeoff-power="3800" takeoff-rpm="1012" min-rpm="210" max-rpm="1012" fine-stop="0.25" coarse-stop="4" gear-ratio="0.375">
+             <actionpt x="-3.114" y="7.737" z="-2.569" />
+             <control-input control="ADVANCE" axis="/controls/engines/engine[6]/propeller-pitch" />
+             <piston-engine eng-power="3800" eng-rpm="2700" displacement="4362.5" compression="6.7" turbo-mul="1.75" wastegate-mp="52">
+                            <control-input control="THROTTLE" axis="/controls/engines/engine[6]/throttle" />
+                            <control-input control="STARTER" axis="/controls/engines/engine[6]/starter" />
+                            <control-input control="MAGNETOS" axis="/controls/engines/engine[6]/magnetos" />
+                            <control-input control="MIXTURE" axis="/controls/engines/engine[6]/mixture" />
+                            <control-input control="BOOST" axis="/controls/engines/engine[6]/boost" />
+             </piston-engine>
+  </propeller>
+
+  
+  <propeller x="-1.263" y="-7.737" z="-2.569" mass="3870" moment="110" radius="3" cruise-speed="200" cruise-rpm="956" cruise-power="2500" cruise-alt="10000" takeoff-power="3800" takeoff-rpm="1012" min-rpm="210" max-rpm="1012" fine-stop="0.25" coarse-stop="4" gear-ratio="0.375">
+             <actionpt x="-3.114" y="-7.737" z="-2.569" />
+             <control-input control="ADVANCE" axis="/controls/engines/engine[7]/propeller-pitch" />
+             <piston-engine eng-power="3800" eng-rpm="2700" displacement="4362.5" compression="6.7" turbo-mul="1.75" wastegate-mp="52">
+                            <control-input control="THROTTLE" axis="/controls/engines/engine[7]/throttle" />
+                            <control-input control="STARTER" axis="/controls/engines/engine[7]/starter" />
+                            <control-input control="MAGNETOS" axis="/controls/engines/engine[7]/magnetos" />
+                            <control-input control="MIXTURE" axis="/controls/engines/engine[7]/mixture" />
+                            <control-input control="BOOST" axis="/controls/engines/engine[7]/boost" />
+             </piston-engine>
+  </propeller>
+
+  
+  <propeller x="-1.617" y="-13.737" z="-2.232" mass="3870" moment="110" radius="3" cruise-speed="200" cruise-rpm="956" cruise-power="2500" cruise-alt="10000" takeoff-power="3800" takeoff-rpm="1012" min-rpm="210" max-rpm="1012" fine-stop="0.25" coarse-stop="4" gear-ratio="0.375">
+             <actionpt x="-3.439" y="-13.737" z="-2.232" />
+             <control-input control="ADVANCE" axis="/controls/engines/engine[8]/propeller-pitch" />
+             <piston-engine eng-power="3800" eng-rpm="2700" displacement="4362.5" compression="6.7" turbo-mul="1.75" wastegate-mp="52">
+                            <control-input control="THROTTLE" axis="/controls/engines/engine[8]/throttle" />
+                            <control-input control="STARTER" axis="/controls/engines/engine[8]/starter" />
+                            <control-input control="MAGNETOS" axis="/controls/engines/engine[8]/magnetos" />
+                            <control-input control="MIXTURE" axis="/controls/engines/engine[8]/mixture" />
+                            <control-input control="BOOST" axis="/controls/engines/engine[8]/boost" />
+             </piston-engine>
+  </propeller>
+
+  
+  <propeller x="-2.011" y="-19.737" z="-2.102" mass="3870" moment="110" radius="3" cruise-speed="200" cruise-rpm="956" cruise-power="2500" cruise-alt="10000" takeoff-power="3800" takeoff-rpm="1012" min-rpm="210" max-rpm="1012" fine-stop="0.25" coarse-stop="4" gear-ratio="0.375">
+             <actionpt x="-3.712" y="-19.737" z="-2.102" />
+             <control-input control="ADVANCE" axis="/controls/engines/engine[9]/propeller-pitch" />
+             <piston-engine eng-power="3800" eng-rpm="2700" displacement="4362.5" compression="6.7" turbo-mul="1.75" wastegate-mp="52">
+                            <control-input control="THROTTLE" axis="/controls/engines/engine[9]/throttle" />
+                            <control-input control="STARTER" axis="/controls/engines/engine[9]/starter" />
+                            <control-input control="MAGNETOS" axis="/controls/engines/engine[9]/magnetos" />
+                            <control-input control="MIXTURE" axis="/controls/engines/engine[9]/mixture" />
+                            <control-input control="BOOST" axis="/controls/engines/engine[9]/boost" />
+             </piston-engine>
+  </propeller>
+
+  
+  <gear x="19.268" y="0.000" z="-7.074" compression="0.2" spring="1.0" stction="1">
+        <control-input control="STEER" axis="/controls/flight/rudder" square="true" src0="-1.0" src1="1.0" dst0="-0.8" dst1="0.8" />
+        <control-input control="EXTEND" axis="/controls/gear/gear-down" />
+
+        <control-output control="EXTEND" prop="/gear/gear[0]/position-norm" />
+
+        <control-speed control="EXTEND" transition-time="5" />
+  </gear>
+
+  
+  <gear x="2.080" y="7.011" z="-7.395" compression="0.2" spring="3.0" stction="1">
+        <control-input control="BRAKE" axis="/controls/gear/brake-left" />
+        <control-input control="BRAKE" axis="/controls/gear/brake-parking" />
+        <control-input control="EXTEND" axis="/controls/gear/gear-down" />
+
+        <control-output control="EXTEND" prop="/gear/gear[1]/position-norm" />
+
+        <control-speed control="EXTEND" transition-time="5.1" />
+  </gear>
+
+  
+  <gear x="0.390" y="7.011" z="-7.457" compression="0.2" spring="3.0" stction="1">
+        <control-input control="BRAKE" axis="/controls/gear/brake-left" />
+        <control-input control="BRAKE" axis="/controls/gear/brake-parking" />
+        <control-input control="EXTEND" axis="/controls/gear/gear-down" />
+
+        <control-output control="EXTEND" prop="/gear/gear[2]/position-norm" />
+
+        <control-speed control="EXTEND" transition-time="5.1" />
+  </gear>
+
+  
+  <gear x="2.080" y="-7.011" z="-7.395" compression="0.2" spring="3.0" stction="1">
+        <control-input control="BRAKE" axis="/controls/gear/brake-right" />
+        <control-input control="BRAKE" axis="/controls/gear/brake-parking" />
+        <control-input control="EXTEND" axis="/controls/gear/gear-down" />
+
+        <control-output control="EXTEND" prop="/gear/gear[3]/position-norm" />
+
+        <control-speed control="EXTEND" transition-time="5.1" />
+  </gear>
+
+  
+  <gear x="0.390" y="-7.011" z="-7.457" compression="0.2" spring="3.0" stction="1">
+        <control-input control="BRAKE" axis="/controls/gear/brake-right" />
+        <control-input control="BRAKE" axis="/controls/gear/brake-parking" />
+        <control-input control="EXTEND" axis="/controls/gear/gear-down" />
+
+        <control-output control="EXTEND" prop="/gear/gear[4]/position-norm" />
+
+        <control-speed control="EXTEND" transition-time="5.1" />
+  </gear>
+
+  <tank x="1.703" y=" 20.000" z="-2.530" capacity=" 8000" />
+  <tank x="4.203" y=" 12.000" z="-2.400" capacity="10000" />
+  <tank x="6.000" y="  4.400" z="-2.400" capacity="15000" />
+  <tank x="6.000" y=" -4.400" z="-2.400" capacity="15000" />
+  <tank x="4.203" y="-12.000" z="-2.400" capacity="10000" />
+  <tank x="1.703" y="-20.000" z="-2.530" capacity=" 8000" />
+
+  
+  <ballast x=" 24" y="0" z="-4.5" mass="42000" />
+
+</airplane>

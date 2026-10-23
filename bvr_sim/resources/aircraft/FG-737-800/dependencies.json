@@ -1,0 +1,59 @@
+{
+  "files": [
+    {
+      "from": "737-800/738.xml",
+      "reference": "CFM56",
+      "source": "737-800/Engines/CFM56.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "direct",
+      "source": "737-800/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "CFM56",
+      "source": "737-800/Engines/CFM56.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "direct",
+      "source": "737-800/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "pushback",
+      "source": "737-800/Systems/pushback.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "steering",
+      "source": "737-800/Systems/steering.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "fuel",
+      "source": "737-800/Systems/fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "hydraulics-jsb",
+      "source": "737-800/Systems/hydraulics-jsb.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "737-800/738.xml",
+      "reference": "fmc",
+      "source": "737-800/Systems/fmc.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

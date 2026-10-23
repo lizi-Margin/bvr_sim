@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="sys-annunciator">
+    <property>propulsion/systems/tank/level-lb</property>
+    <property>propulsion/systems/tank/refuel_switch</property>
+    
+    <channel name="annunciator">
+        <switch name="propulsion/systems/tank/refuel_pump-pos-norm">
+            <default value="0" />
+            <test logic="AND" value="1">
+                propulsion/systems/tank/transfer-switch == 1
+            </test>
+            <test logic="AND" value="propulsion/systems/tank/refuel-on_ground">
+                propulsion/systems/tank/level-lb lt 9165
+                propulsion/systems/tank/refuel_switch == 1
+            </test>
+            <test logic="AND" value="propulsion/systems/tank/refuel-in_air">
+                propulsion/systems/tank/level-lb lt 9165
+                propulsion/systems/tank/refuel_switch == 2
+            </test>
+            <output>/instrumentation/annunciator/refuel-pump</output>
+        </switch>
+        
+        
+        <switch name="propulsion/systems/tank/refuel_annunciator-overload">
+            <default value="0" />
+            <test logic="AND" value="1">
+                propulsion/systems/tank/refuel_switch == 2
+                propulsion/systems/tank/level-lb gt 9065
+                propulsion/systems/tank/level-lb lt 9165
+            </test>
+            <output>/instrumentation/annunciator/refuel-overload</output>
+       </switch>
+        
+
+    </channel>
+
+</system>

@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Ignition button </description>
+	</fileheader>
+
+
+	<channel name="Ignitionbutton">
+
+
+
+		<switch name="calculations/ignitionbutton/button-allowed">
+			<default value="systems/ignitionbutton/button-command" />
+			<test logic="AND" value="systems/ignitionbutton/button-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/ignitionbutton/button-command</output>
+		</switch>
+
+		<switch name="calculations/ignitionbutton/button-not-allowed">
+			<default value="systems/ignitionbutton/button-input" />
+			<test logic="AND" value="systems/ignitionbutton/button-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/ignitionbutton/button-input</output>
+		</switch>
+
+		<switch name="calculations/ignitionbutton/safer-command">
+			<default value="systems/ignitionbutton/safer-command" />
+			<test logic="AND" value="systems/ignitionbutton/button-command">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/ignitionbutton/safer-command</output>
+		</switch>
+
+		<kinematic name="calculations/ignitionbutton/safer-pos">
+			<input>systems/ignitionbutton/safer-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/ignitionbutton/safer-pos</output>
+		</kinematic>
+
+		<switch name="calculations/ignitionbutton/safer-switch">
+			<default value="systems/ignitionbutton/safer-switch" />
+			<test logic="AND" value="1">
+				systems/ignitionbutton/safer-pos ge 0.9
+			</test>
+			<test logic="AND" value="0">
+				systems/ignitionbutton/safer-pos lt 0.9
+			</test>
+			<output>systems/ignitionbutton/safer-switch</output>
+		</switch>
+
+		<kinematic name="calculations/ignitionbutton/button-pos">
+			<input>systems/ignitionbutton/safer-switch</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/ignitionbutton/button-pos</output>
+		</kinematic>
+
+		<switch name="calculations/ignitionbutton/button-switch">
+			<default value="systems/ignitionbutton/button-switch" />
+			<test logic="AND" value="1">
+				systems/ignitionbutton/button-pos ge 0.9
+			</test>
+			<test logic="AND" value="0">
+				systems/ignitionbutton/button-pos lt 0.9
+			</test>
+			<output>systems/ignitionbutton/button-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/ignitionbutton/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/ignitionbutton/button-pos ge 0.25
+				systems/ignitionbutton/button-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/ignitionbutton/safer-pos ge 0.25
+				systems/ignitionbutton/safer-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

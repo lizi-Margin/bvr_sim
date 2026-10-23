@@ -1,0 +1,26 @@
+{
+  "set": "SeaVixen/sea-vixen-set.xml",
+  "name": "de Havilland SeaVixen FAW2 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "SeaVixen/seavixen-yasim.xml",
+  "jets": 2,
+  "model": "SeaVixen/Models/sea-vixen-model.xml",
+  "tags": [
+    "fighter",
+    "1950s",
+    "1960s",
+    "1970s",
+    "retractable-gear",
+    "tail-hook",
+    "t-tail",
+    "jet",
+    "twin-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "SeaVixen.zip",
+  "archive_sha256": "59c11a328af5e7377e7a7ab0e7306ee0b3a21a1d48b01962d92ada286534f37a",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/SeaVixen.zip"
+}

@@ -1,0 +1,16 @@
+{
+  "set": "victor/victor-set.xml",
+  "name": "Handley Page Victor",
+  "fdm_type": "jsb",
+  "fdm": "victor/victor.xml",
+  "jets": 4,
+  "model": "victor/Models/victor.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "victor.zip",
+  "archive_sha256": "54fdd518f9f1b237e294181d5d6bffa2e48d4cca55f6cad8186f05adfad0ae48",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/victor.zip"
+}

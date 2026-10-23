@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Probe-Refuel">
+
+    <channel name="Probe Refuel">
+
+            <kinematic name="Probe Refueling Control">
+                <input>/controls/flight/probe-refuel</input>
+                <traverse>
+                    <setting>
+                        <position>0.0000</position>
+                        <time>5.0000</time>
+                    </setting>
+                    <setting>
+                        <position>1.0000</position>
+                        <time>5.0000</time>
+                    </setting>
+                </traverse>
+                <output>fcs/refueling-pos-norm</output>
+            </kinematic>
+
+            <pure_gain name="Probe Refueling surface">
+                <input>fcs/refueling-pos-norm</input>
+                <gain>1</gain>
+                <output>/surface-positions/refueling-pos-norm</output>
+            </pure_gain>
+            
+    </channel>
+
+</system>

@@ -1,0 +1,718 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-04 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Headsight </description>
+	</fileheader>
+
+
+
+	<channel name="Headsight">
+
+		<fcs_function name="calculations/headsight/sight-angle-source">
+		<function>
+			<quotient>
+				<property>systems/headsight/target-size</property>
+				<product>
+					<property>systems/headsight/target-distance</property>
+					<value>2.0</value>
+				</product>
+			</quotient>
+		</function>
+			<output>systems/headsight/sight-angle-source</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/sight-angle">
+		<function>
+			<atan2>
+				<property>systems/headsight/sight-angle-source</property>
+				<value>1.0</value>
+			</atan2>
+		</function>
+			<output>systems/headsight/sight-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/sight-size">
+		<function>
+			<product>
+				<property>systems/headsight/from-eye-to-sight</property>
+				<sin>
+					<property>systems/headsight/sight-angle</property>
+				</sin>
+				<quotient>
+					<value>1.0</value>
+					<cos>
+						<property>systems/headsight/sight-angle</property>
+					</cos>
+				</quotient>
+			</product>
+		</function>
+			<output>systems/headsight/sight-size</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/sight-scale-factor">
+		<function>
+			<quotient>
+				<property>systems/headsight/sight-size</property>
+				<property>systems/headsight/sight-source-size</property>
+			</quotient>
+		</function>
+			<output>systems/headsight/sight-scale-factor</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/time-to-target">
+		<function>
+			<quotient>
+				<property>systems/headsight/target-distance</property>
+				<property>systems/headsight/bullet-speed</property>
+			</quotient>
+		</function>
+			<output>systems/headsight/time-to-target</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/pitch-shift-angle">
+		<function>
+			<product>
+				<property>systems/headsight/time-to-target</property>
+				<property>velocities/q-rad_sec</property>
+			</product>
+		</function>
+			<output>systems/headsight/pitch-shift-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/yaw-shift-angle">
+		<function>
+			<product>
+				<property>systems/headsight/time-to-target</property>
+				<property>velocities/r-rad_sec</property>
+			</product>
+		</function>
+			<output>systems/headsight/yaw-shift-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/pitch-shift">
+		<function>
+			<product>
+				<property>systems/headsight/from-eye-to-sight</property>
+				<sin>
+					<property>systems/headsight/pitch-shift-angle</property>
+				</sin>
+				<quotient>
+					<value>1.0</value>
+					<cos>
+						<property>systems/headsight/pitch-shift-angle</property>
+					</cos>
+				</quotient>
+			</product>
+		</function>
+			<output>systems/headsight/pitch-shift</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/yaw-shift">
+		<function>
+			<product>
+				<property>systems/headsight/from-eye-to-sight</property>
+				<sin>
+					<property>systems/headsight/yaw-shift-angle</property>
+				</sin>
+				<quotient>
+					<value>1.0</value>
+					<cos>
+						<property>systems/headsight/yaw-shift-angle</property>
+					</cos>
+				</quotient>
+			</product>
+		</function>
+			<output>systems/headsight/yaw-shift</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/sight-side-size">
+		<function>
+			<quotient>
+				<property>systems/headsight/sight-size</property>
+				<value>2.0</value>
+			</quotient>
+		</function>
+			<output>systems/headsight/sight-side-size</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/sight-corner-size">
+		<function>
+			<product>
+				<property>systems/headsight/sight-side-size</property>
+				<value>0.7071</value>
+			</product>
+		</function>
+			<output>systems/headsight/sight-corner-size</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/pitch-shift-edge-negative">
+		<function>
+			<product>
+				<property>systems/headsight/pitch-shift-edge</property>
+				<value>-1.0</value>
+			</product>
+		</function>
+			<output>systems/headsight/pitch-shift-edge-negative</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/yaw-shift-edge-negative">
+		<function>
+			<product>
+				<property>systems/headsight/yaw-shift-edge</property>
+				<value>-1.0</value>
+			</product>
+		</function>
+			<output>systems/headsight/yaw-shift-edge-negative</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-s-d">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<property>systems/headsight/sight-side-size</property>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/p-s-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-ms-md">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<product>
+					<property>systems/headsight/sight-side-size</property>
+					<value>-1.0</value>
+				</product>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/p-ms-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-s-md">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<property>systems/headsight/sight-side-size</property>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/p-s-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-ms-d">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<product>
+					<property>systems/headsight/sight-side-size</property>
+					<value>-1.0</value>
+				</product>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/p-ms-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-s">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<property>systems/headsight/sight-side-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/p-s</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-ms">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<product>
+					<property>systems/headsight/sight-side-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/p-ms</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-d">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/p-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-md">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/p-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-c-d">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<property>systems/headsight/sight-corner-size</property>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/p-c-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-mc-md">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<product>
+					<property>systems/headsight/sight-corner-size</property>
+					<value>-1.0</value>
+				</product>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/p-mc-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-c-md">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<property>systems/headsight/sight-corner-size</property>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/p-c-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/p-mc-d">
+		<function>
+			<sum>
+				<property>systems/headsight/pitch-shift</property>
+				<product>
+					<property>systems/headsight/sight-corner-size</property>
+					<value>-1.0</value>
+				</product>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/p-mc-d</output>
+		</fcs_function>
+
+
+		<fcs_function name="calculations/headsight/y-s-d">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<property>systems/headsight/sight-side-size</property>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/y-s-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-ms-md">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<product>
+					<property>systems/headsight/sight-side-size</property>
+					<value>-1.0</value>
+				</product>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/y-ms-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-s-md">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<property>systems/headsight/sight-side-size</property>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/y-s-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-ms-d">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<product>
+					<property>systems/headsight/sight-side-size</property>
+					<value>-1.0</value>
+				</product>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/y-ms-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-s">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<property>systems/headsight/sight-side-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/y-s</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-ms">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<product>
+					<property>systems/headsight/sight-side-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/y-ms</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-d">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/y-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-md">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/y-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-c-d">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<property>systems/headsight/sight-corner-size</property>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/y-c-d</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-mc-md">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<product>
+					<property>systems/headsight/sight-corner-size</property>
+					<value>-1.0</value>
+				</product>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/y-mc-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-c-md">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<property>systems/headsight/sight-corner-size</property>
+				<product>
+					<property>systems/headsight/sight-dot-size</property>
+					<value>-1.0</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/headsight/y-c-md</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/headsight/y-mc-d">
+		<function>
+			<sum>
+				<property>systems/headsight/yaw-shift</property>
+				<product>
+					<property>systems/headsight/sight-corner-size</property>
+					<value>-1.0</value>
+				</product>
+				<property>systems/headsight/sight-dot-size</property>
+			</sum>
+		</function>
+			<output>systems/headsight/y-mc-d</output>
+		</fcs_function>
+
+		<switch name="calculations/headsight/sight-visible">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-s-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-ms-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-s-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-ms-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-visible</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-up">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-s-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-s-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-up</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-down">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-ms-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-ms-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-down</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-right">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-s-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-s-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-right</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-left">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-ms-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-ms-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-left</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-up-right">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-c-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-c-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-c-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-c-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-up-right</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-down-left">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-mc-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-mc-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-mc-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-mc-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-down-left</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-up-left">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-c-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-c-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-mc-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-mc-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-up-left</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-down-right">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-mc-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-mc-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-c-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-c-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-down-right</output>
+		</switch>
+
+		<switch name="calculations/headsight/sight-center">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/headsight/p-d lt systems/headsight/pitch-shift-edge
+				systems/headsight/p-md gt systems/headsight/pitch-shift-edge-negative
+				systems/headsight/y-d lt systems/headsight/yaw-shift-edge
+				systems/headsight/y-md gt systems/headsight/yaw-shift-edge-negative
+			</test>
+			<output>systems/headsight/sight-center</output>
+		</switch>
+
+		
+
+		<kinematic name="calculations/headsight/up-pos">
+			<input>systems/headsight/up-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/headsight/up-pos</output>
+		</kinematic>
+
+		
+
+		<kinematic name="calculations/headsight/gyro-pos">
+			<input>systems/headsight/gyro-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/headsight/gyro-pos</output>
+		</kinematic>
+
+		
+
+		<kinematic name="calculations/headsight/frame-pos">
+			<input>systems/headsight/frame-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/headsight/frame-pos</output>
+		</kinematic>
+
+		
+
+		<switch name="calculations/headsight/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/headsight/up-pos ge 0.25
+				systems/headsight/up-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/headsight/gyro-pos ge 0.25
+				systems/headsight/gyro-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/headsight/frame-pos ge 0.25
+				systems/headsight/frame-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+		
+
+		<fcs_function name="calculations/headsight/lamp-brightness">
+		<function>
+			<product>
+				<property>systems/headsight/on</property>
+				<property>systems/headsight/brightness</property>
+			</product>
+		</function>
+			<output>systems/headsight/lamp-brightness</output>
+		</fcs_function>
+
+		<switch name="calculations/headsight/cross-lamp">
+			<default value="0" />
+			<test logic="AND" value="systems/headsight/lamp-brightness">
+				systems/headsight/on gt 0.9
+				systems/headsight/up-pos gt 0.9
+				systems/headsight/gyro-pos gt 0.9
+				systems/headsight/serviceable eq 1
+			</test>
+			<output>systems/headsight/cross-lamp</output>
+		</switch>
+
+		<switch name="calculations/headsight/ring-lamp">
+			<default value="0" />
+			<test logic="AND" value="systems/headsight/lamp-brightness">
+				systems/headsight/on gt 0.9
+				systems/headsight/up-pos gt 0.9
+				systems/headsight/gyro-pos lt 0.1
+				systems/headsight/serviceable eq 1
+			</test>
+			<output>systems/headsight/ring-lamp</output>
+		</switch>
+
+		<switch name="calculations/headsight/lamp">
+			<default value="0" />
+			<test logic="AND" value="systems/headsight/lamp-brightness">
+				systems/headsight/on gt 0.9
+				systems/headsight/up-pos lt 0.1
+				systems/headsight/serviceable eq 1
+			</test>
+			<output>systems/headsight/lamp</output>
+		</switch>
+
+	</channel>
+
+</system>

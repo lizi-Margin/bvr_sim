@@ -1,0 +1,1214 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="FCS F15">
+
+   <property value="1">gear/serviceable</property>
+	<property value="0">systems/hydraulics/emerg-gear-bleed</property>
+	<property value="0">gear/damage-reset</property>
+	<property value="2">position/aircraft-on-ground-last-value</property>
+	<property value="0">systems/cadc/pitch-ratio-emergency</property>
+	<property value="0">systems/cadc/roll-ratio-emergency</property>
+  
+  
+  
+	
+	<channel name="Common">
+    
+
+    <fcs_function name="fcs/elevator-cmd-norm-trim">
+      <description>
+      </description>
+      <function>
+        <sum>
+          <p>fcs/pitch-trim-cmd-norm</p>
+          <p>fcs/elevator-cmd-norm</p>
+        </sum>
+      </function>
+    </fcs_function>
+		
+		<switch name="fcs/stick-pitch">
+			<default value="0" />
+      <test value="fcs/elevator-cmd-norm-trim">
+				autoflight/input/pitch-switch ne 1
+			</test>
+		</switch>
+		
+        
+		
+		<fcs_function name="fcs/stick-pitch-scheduled">
+			<description>
+				Longitudinal position adjusted for position instead of force
+				(fig 17 - NASA TM 72861)
+			</description>
+      <function>
+				<table>
+					<independentVar lookup="row">fcs/stick-pitch</independentVar>
+					<tableData>
+						-1.000 -1.00000
+						-0.188 -0.06729
+						-0.001  0.00000
+						 0.003  0.00000
+						 0.351  0.19635
+						 1.000  1.00000
+					</tableData>
+				</table>
+      </function>
+		</fcs_function>
+
+        <fcs_function name="fcs/stick-commanded-g">
+            <description>
+                Longitudinal CAS feel characteristics. Stick Force / command normal load factor G
+                Adjusted from force to position based on applied force (as we have no way of measuring
+                applied force)
+                
+                (fig 18 - NASA TM 72861)
+            </description>
+            <function>
+                <table>
+                    <independentVar lookup="row">fcs/stick-pitch-scheduled</independentVar>
+                    <tableData>
+                        -1.000	 8
+                        -0.188	 4
+                        -0.001	 1
+                        -0.000	 1
+                         0.003	 1
+                         0.351	-2
+                         1.000	-4
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+    <switch name="fcs/css-pitch">
+			<default value="0" />
+			<test logic="AND" value="autoflight/ss/elevator-norm">
+				autoflight/input/pitch-switch eq 1
+				autoflight/ss/elevator-norm ne 0
+			</test>
+		</switch>
+		
+		<fcs_function name="fcs/css-pitch-scheduled">
+			<description>
+				Longitudinal position adjusted for position instead of force
+				(fig 17 - NASA TM 72861)
+			</description>
+			<function>
+				<table>
+					<independentVar lookup="row">fcs/css-pitch</independentVar>
+					<tableData>
+						-1.000 -1.00000
+						-0.188 -0.06729
+						-0.001  0.00000
+						 0.003  0.00000
+						 0.351  0.19635
+						 1.000  1.00000
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<switch name="fcs/stick-roll">
+			<default value="0" />
+			<test value="fcs/aileron-cmd-norm">
+				autoflight/input/roll-switch ne 1
+			</test>
+		</switch>
+
+		<switch name="fcs/css-roll">
+			<default value="0" />
+			<test logic="AND" value="autoflight/ss/aileron-norm">
+				autoflight/input/roll-switch eq 1
+				autoflight/ss/aileron-norm ne 0
+			</test>
+		</switch>
+		
+		<fcs_function name="fcs/aileron-droop">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						13  20
+						20   0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Elevons">
+		<fcs_function name="fcs/pitch-trim-compensation">
+            
+			<function>
+                <product>
+                    <v>1</v>
+                    <description>PTC PRESET ELEVATOR TRIM(DEGREES) DUE TO AIRSPEED AND MAC% F(VC, MAC%)</description>
+                        
+				<table>
+					<independentVar lookup="row">velocities/vc-kts</independentVar>
+                            <independentVar lookup="column">inertia/cg-x-mac-percent</independentVar>
+					<tableData>
+                                             20         20.5           21         21.5           22         22.5           23         23.5           24
+                                190    0.000000    0.000000    0.000000    0.000000    0.000000    0.000000    0.000000    0.000000    0.000000
+                                200   -0.222270   -0.222450   -0.228983   -0.244722   -0.273146   -0.174354   -0.161585   -0.141665   -0.141665
+                                250   -0.130184   -0.130167   -0.131723   -0.143852   -0.157158   -0.097033   -0.091520   -0.088460   -0.088460
+                                300   -0.081073   -0.081589   -0.083858   -0.089115   -0.090965   -0.060288   -0.055246   -0.051484   -0.051484
+                                350   -0.041472   -0.039374   -0.041562   -0.045228   -0.030029   -0.030701   -0.024068   -0.007630   -0.007630
+                                400   -0.005571   -0.005793   -0.006567   -0.009482   -0.008097    0.000238    0.000490   -0.091142   -0.091142
+                                450   -0.089492   -0.009026   -0.037256    0.009159   -0.010570   -0.014307    0.041271    0.077493    0.077493
+                                500   -0.001433   -0.017378    0.003975    0.017936    0.001710    0.019385   -0.048416   -0.003933   -0.003933
+                                550    0.005941    0.005865    0.004781    0.003436    0.002097    0.008851    0.009415    0.009179    0.009179
+                                600    0.007333    0.007319    0.006506    0.004324    0.002039    0.010335    0.010754    0.011601    0.011601
+                                650    0.008539    0.008577    0.007756    0.006156    0.001042    0.011200    0.011478    0.012558    0.014850
+                                700    0.009650    0.009592    0.008659    0.008208   -0.000520    0.012253    0.012234    0.013363    0.015417
+                                750    0.010604    0.010639    0.009652    0.008640   -0.000261    0.013003    0.013216    0.013684    0.015810
+                                800    0.011343    0.011484    0.010651    0.009110    0.000741    0.013402    0.013718    0.014097    0.018045
+                                850    0.012020    0.011978    0.011257    0.010100    0.002525    0.013404    0.014234    0.005660    0.018137
+                                900    0.012484    0.012571    0.011734    0.010210    0.002257    0.014227    0.014565    0.011387    0.011881
+                                950    0.016950    0.016950    0.016950    0.016950    0.004375    0.023752    0.022349    0.020946    0.019544
+                                1000    0.017255    0.017255    0.017255    0.017074    0.017542    0.018216    0.018889    0.019563    0.020236
+                                1050    0.017623    0.017623    0.017565    0.017419    0.017982    0.018546    0.019109    0.019673    0.020236
+                                1100    0.017846    0.017842    0.018017    0.018201    0.018440    0.019031    0.019625    0.020220    0.020814
+                                1150    0.018443    0.018443    0.018443    0.018443    0.018443    0.018609    0.018764    0.018839    0.019496
+          </tableData>
+				</table>
+                </product>
+			</function>
+		</fcs_function>
+		
+		<summer name="fcs/pitch-input-sum">
+			<input>fcs/stick-pitch-scheduled</input> 
+			<input>fcs/css-pitch-scheduled</input> 
+			<input>autoflight/pitch/pitch-rate-demand</input> 
+			<input>fcs/pitch-trim-compensation</input> 
+			<input>cas/pitch-output</input> 
+			<clipto>
+				<min>-1.0</min>
+				<max>0.51724</max>
+			</clipto>
+		</summer>
+		
+		<fcs_function name="fcs/pitch-ratio-calc-0">
+			<description>
+				RJH: 
+            Pitch Ratio: 
+            - - - - - - - - - - -  - - - - - - - 
+            This device adjusts the amount of collective (pitch)
+            stabilator deflection available for a given longitudinal stick
+            motion.  The ratio is scheduled to produce essentially the same
+            stick travel per "g" throughout the flight envelope.  Since the
+            longitudinal feel system is just a simple spring cartridge, this
+            then relates to a constant stick force per "g" (Fs/g) (about 4.25
+            lb/g).  It is scheduled by Mach number and altitude and does a
+            rather good job; however, it won't quite cover the full range of
+            aircraft and stabilator power and there is some scatter of the
+            Fs/g, i.e., some mild increase in sensitivity during low
+            altitude/high speed flight, and some decrease in sensitivity at
+            low speeds.
+
+
+      This is based on a description of how the pitch ratio works, together with  Tuned based on aircraft performance; mostly standard day. 
+      
+      ref: NASA TM 72861 : Precision controllability of the F-15 airplane
+      
+      ref: F-15 Flight Control System Part IV - Longitudinal Control, 
+               By B. P. "PERRY" HOFFMAN/Senior Engineer, 
+               Flight Control Section, Avionics Engineering Laboratories, 
+               https://www.f15sim.com/operation/f15_longitudinal_control.html
+               
+                  PRCA 
+                  - - - - - - - - - - -  - - - - - - - 
+                  To begin with, let's break the PRCA pitch channel into its
+                  components (Figure 2) and see how each affects the longitudinal
+                  controls. The input rod offers two linkage paths with the main path
+                  tying directly into the ratio changer linkage, and a second input
+                  being supplied to the Load Factor Sensor portion of the Pitch Trim
+                  Controller.
+
+                  Pitch Ratio Changer
+                  - - - - - - - - - - -  - - - - - - - 
+                  The pitch ratio changer utilizes dual redundant
+                  parallelogram linkage identical in operation to the roll ratio changer
+                  described in our last DIGEST article on lateral controls. The only
+                  operational difference is that the pitch ratio changer gearing
+                  utilizes a 6:1 ratio, where the roll ratio changer utilizes a 4:1
+                  ratio.
+
+
+                  Pitot (Pt) and static (Ps) information is supplied from the left-hand
+                  probe to the ratio controller bellows assembly, repositioning a
+                  cam-operated valve supplying hydraulic pressure to the ratio changer
+                  actuator. The ratio changer actuator then drives the changer linkage,
+                  varying the stick-to-stabilator gearing as required.
+
+                  If hydraulics are lost to the PRCA, or if the pilot selects the EMERC
+                  position of the pitch ratio changer by actuation of the Pitch Ratio
+                  switch, the pitch ratio changer will drive to its failed position. In
+                  the failed mode, the gearing ratio is one-half of its maximum value
+                  and all other functions (PTC and Boost) are inoperative.
+
+                  Two additional functions are associated with the ratio changer (one is
+                  no longer used, but a note of explanation is in order in case you see
+                  it on a schematic diagram). Early in the program there was a gear down
+                  valve which drove the pitch ratio changer to maximum (for landing
+                  control) when the nose gear proximity switch actuated. The
+                  disadvantages seemed to outweigh the advantages, so the valve has been
+                  deactivated on current Eagles and the valve will not be in future
+                  PRCA's. For the maintenance man, this is a great help since he can
+                  simply place the Pitch Ratio switch to emergency and check the fail
+                  mode without having to simulate a gear up condition.
+
+                  The second function is a safety feature controlled by the pitch ratio
+                  changer actuator. If a hardover failure of the pitch trim controller
+                  occurs at low pitch ratios, the pitch CAS is inoperative, longitudinal
+                  control could be lost. To guard against this possibility, a valve
+                  within the ratio changer actuator is opened when the actuator
+                  approaches the minimum ratio position. This valve supplies hydraulic
+                  pressure to an interlock piston within the pitch trim compensator,
+                  keeping it at a position where adequate control is always available.
+
+                  The output of the pitch ratio changer is fed to the pitch boost
+                  actuator servo valve. The boost actuator output is mechanically linked
+                  back to the servo valve input, closing the loop. The boost actuator
+                  output also feeds the downstream linkage, which deflects the
+                  stabilators and drives the linkage scheduling the roll ratio
+                  controller and the ARI. As you will recall from our previous articles,
+                  the pitch output is used in roll to schedule the roll ratio as a
+                  function of angle of attack. Yaw is affected by this also, since yaw
+                  gain increases as roll gain decreases. No more rudder rolls, guys; all
+                  you need for high angle of attack
+
+                    2019-08-17 : retuned with new PTC; it's now around 8g at all airspeeds (where there
+                                 is sufficient energy to sustain this)
+                    2019-08-18 : based on a better understanding of the above the PRCA is now a simple
+                                 1:1 at low qbar going to 1:6 at high qbar.
+                                 Values of low and high qbar are somewhat estimated based on 800kts
+                                 "pitch ratio changer gearing utilizes a 6:1 ratio" 
+                                    ref: https://www.f15sim.com/operation/f15_longitudinal_control.html
+			</description>
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+          <tableData>
+                        300  1.00000
+                        1300 0.16667
+          </tableData>
+				</table>
+			</function>
+			<clipto>
+				<min>0.166667</min>
+				<max>1.0</max>
+			</clipto>
+		</fcs_function>
+        <fcs_function name="fcs/pitch-ratio-calc-1">
+            <function>
+                <table>
+                    <independentVar lookup="row">inertia/cg-x-mac-percent</independentVar>
+                    <tableData>
+                        0.15 0.90
+                        0.25 1.0
+                    </tableData>
+                </table>
+            </function>
+            <clipto>
+                <min>0.65</min>
+                <max>1.0</max>
+            </clipto>
+        </fcs_function>
+
+        <fcs_function name="fcs/pitch-ratio-calc">
+            <function>
+                <product>
+                    <p>fcs/pitch-ratio-calc-0</p>
+                    <p>fcs/pitch-ratio-calc-1</p>
+                </product>
+            </function>
+        </fcs_function>
+		
+		<switch name="fcs/pitch-ratio">
+			<default value="fcs/pitch-ratio-calc" />
+			<test logic="OR" value="0.5">
+				systems/hydraulics/flight-system-pressure ne 1
+				systems/cadc/pitch-ratio-emergency ne 0
+			</test>
+		</switch>
+		
+		<pure_gain name="fcs/pitch-ratio-input">
+			<input>fcs/pitch-input-sum</input>
+			<gain>fcs/pitch-ratio</gain>
+		</pure_gain>
+		
+		<pure_gain name="fcs/pitch-input-deg">
+			<input>fcs/pitch-ratio-input</input>
+			<gain>29.0</gain>
+			<clipto>
+				<min>-29.0</min>
+				<max>15.0</max>
+			</clipto>
+		</pure_gain>
+		
+		<summer name="fcs/roll-elevon-input-sum">
+			<input>fcs/stick-roll</input> 
+			<input>fcs/css-roll</input> 
+			<input>fcs/roll-trim-cmd-norm</input> 
+			<input>autoflight/roll/roll-rate-demand</input> 
+			<input>cas/roll-output</input> 
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<fcs_function name="fcs/roll-ratio-calc"> 
+			<function>
+				<table>
+					<independentVar lookup="row">velocities/mach</independentVar>
+					<independentVar lookup="column">atmosphere/density-altitude</independentVar>
+					<tableData>
+							  0      15000  30000  45000  65000
+						0.15  1.000  1.000  1.000  1.000  1.000
+						0.25  0.541  0.617  0.650  0.739  0.779
+						0.30  0.501  0.547  0.596  0.652  0.694
+						0.50  0.311  0.364  0.379  0.421  0.426
+						0.70  0.210  0.244  0.292  0.314  0.338
+						0.90  0.151  0.167  0.200  0.255  0.283
+						1.10  0.123  0.128  0.140  0.167  0.251
+						1.30  0.104  0.108  0.116  0.129  0.197
+						1.50  0.091  0.096  0.100  0.108  0.156
+						1.75  0.080  0.083  0.085  0.091  0.117
+						2.00  0.069  0.072  0.076  0.079  0.094
+						2.25  0.060  0.064  0.067  0.070  0.076
+						2.50  0.054  0.056  0.061  0.064  0.071
+						2.75  0.050  0.053  0.056  0.058  0.066
+					</tableData>
+				</table>
+			</function>
+			<clipto>
+				<min>0.01</min>
+				<max>1.0</max>
+			</clipto>
+		</fcs_function>
+		
+		<switch name="fcs/roll-ratio">
+			<default value="fcs/roll-ratio-calc" />
+			<test logic="OR" value="0.5">
+				systems/cadc/roll-ratio-emergency ne 0
+				systems/hydraulics/flight-system-pressure ne 1
+			</test>
+		</switch>
+		
+		<fcs_function name="fcs/roll-elevon-input-deg">
+			<description>
+				http://www.f15sim.com/operation/f15_lat_control.html
+				Figure 4 Mechanmical lateral control authority.
+					** iv; Vc Kts
+					** stabilator maximum
+					** dv: full stock aileron deflection degrees
+			</description>
+			<function>
+				<product>
+					<property>fcs/roll-elevon-input-sum</property>
+					<value>9.66666667</value> 
+					<property>fcs/roll-ratio</property>
+					<table>
+						<independentVar lookup="row">fcs/pitch-input-deg</independentVar>
+						<independentVar lookup="column">velocities/vc-kts</independentVar>
+						<tableData>
+							     635.0 664.3 668.2 714.8 741.3 768.0 794.7
+							-24  0.16  0.16  0.16  0.16  0.16  0.16  0.16
+							-23  0.16  0.16  0.16  0.16  0.16  0.16  0.16
+							-22  0.16  0.16  0.16  0.16  0.16  0.15  0.16
+							-21  0.16  0.16  0.16  0.16  0.16  0.15  0.16
+							-20  0.16  0.16  0.16  0.16  0.16  0.15  0.16
+							-19  0.16  0.16  0.16  0.16  0.16  0.15  0.16
+							-18  0.19  0.19  0.20  0.20  0.19  0.19  0.19
+							-17  0.29  0.30  0.30  0.30  0.30  0.29  0.24
+							-16  0.39  0.40  0.40  0.40  0.40  0.38  0.24
+							-15  0.50  0.50  0.51  0.50  0.50  0.38  0.24
+							-14  0.60  0.60  0.61  0.61  0.50  0.38  0.24
+							-13  0.70  0.70  0.71  0.63  0.50  0.38  0.24
+							-12  0.80  0.81  0.75  0.63  0.50  0.38  0.24
+							-11  0.91  0.87  0.75  0.63  0.50  0.38  0.25
+							-10  1.00  0.87  0.75  0.63  0.50  0.38  0.25
+							 -9  1.00  0.87  0.75  0.63  0.50  0.38  0.25
+							 -8  1.00  0.87  0.75  0.63  0.50  0.38  0.25
+							 -7  1.00  0.88  0.75  0.63  0.50  0.38  0.25
+							 -6  1.00  0.88  0.75  0.63  0.50  0.38  0.25
+							 -5  1.00  0.88  0.75  0.63  0.50  0.38  0.25
+							 -4  0.90  0.88  0.75  0.63  0.50  0.38  0.25
+							 -3  0.79  0.80  0.75  0.63  0.50  0.38  0.25
+							 -2  0.69  0.69  0.69  0.63  0.50  0.38  0.25
+							 -1  0.58  0.59  0.59  0.59  0.50  0.38  0.25
+							  0  0.47  0.49  0.48  0.49  0.48  0.38  0.25
+							  1  0.37  0.39  0.38  0.40  0.38  0.38  0.25
+							  2  0.26  0.28  0.27  0.30  0.28  0.28  0.25
+							  3  0.25  0.25  0.24  0.25  0.25  0.24  0.25
+							  4  0.25  0.25  0.24  0.25  0.24  0.24  0.25
+							  5  0.25  0.25  0.24  0.25  0.24  0.24  0.25
+							  6  0.24  0.25  0.24  0.25  0.24  0.24  0.25
+							  7  0.24  0.25  0.24  0.25  0.24  0.24  0.25
+							  8  0.24  0.25  0.24  0.25  0.24  0.24  0.25
+							  9  0.24  0.25  0.24  0.25  0.24  0.24  0.25
+							 10  0.24  0.25  0.24  0.25  0.24  0.24  0.25
+							 11  0.24  0.25  0.24  0.25  0.24  0.24  0.25
+							 12  0.24  0.24  0.24  0.24  0.24  0.24  0.25
+							 13  0.24  0.24  0.24  0.24  0.24  0.24  0.25
+							 14  0.24  0.24  0.24  0.24  0.24  0.24  0.25
+							 15  0.24  0.24  0.24  0.24  0.24  0.24  0.24
+							 16  0.24  0.24  0.24  0.24  0.24  0.24  0.24
+						</tableData>
+					</table>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<summer name="fcs/elevon-left-input">
+			<input>fcs/pitch-input-deg</input>
+			<input>fcs/roll-elevon-input-deg</input>
+			<clipto>
+				<min>-29.0</min>
+				<max>15.0</max>
+			</clipto>
+		</summer>
+		
+		<switch name="fcs/elevon-left-cmd">
+			<default value="0" /> 
+			<test value="fcs/elevon-left-input">
+				systems/hydraulics/flight-system-pressure eq 1
+			</test>
+		</switch>
+		
+		<actuator name="fcs/elevon-left">
+			<input>fcs/elevon-left-cmd</input>
+			<rate_limit>46</rate_limit>
+			<lag>26.7</lag>
+		</actuator>
+		
+		<aerosurface_scale name="fcs/elevon-left-norm">
+			<input>fcs/elevon-left</input>
+			<domain>
+				<min>-29.0</min>
+				<max>29.0</max>
+			</domain>
+			<range>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</range>
+			<output>/sim/multiplay/generic/float[4]</output>
+		</aerosurface_scale>
+		
+		<summer name="fcs/elevon-right-input">
+			<input>fcs/pitch-input-deg</input>
+			<input>-fcs/roll-elevon-input-deg</input>
+			<clipto>
+				<min>-29.0</min>
+				<max>15.0</max>
+			</clipto>
+		</summer>
+		
+		<switch name="fcs/elevon-right-cmd">
+			<default value="0" /> 
+			<test value="fcs/elevon-right-input">
+				systems/hydraulics/flight-system-pressure eq 1
+			</test>
+		</switch>
+		
+		<actuator name="fcs/elevon-right">
+			<input>fcs/elevon-right-cmd</input>
+			<rate_limit>46</rate_limit>
+			<lag>26.7</lag>
+		</actuator>
+		
+		<aerosurface_scale name="fcs/elevon-right-norm">
+			<input>fcs/elevon-right</input>
+			<domain>
+				<min>-29.0</min>
+				<max>29.0</max>
+			</domain>
+			<range>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</range>
+			<output>/sim/multiplay/generic/float[5]</output>
+		</aerosurface_scale>
+		
+		<fcs_function name="fcs/elevon-diff-aero-deg">
+			<function>
+				<sum>
+					<property>fcs/elevon-left</property>
+					<product>
+						<property>fcs/elevon-right</property>
+						<value>-1.0</value>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		
+		
+		
+		
+		
+		<switch name="fcs/elevon-f-r">
+			<default value="46" />
+			<test value="250">
+				autoflight/output/pitch-master eq 1
+			</test>
+		</switch>
+		
+		<actuator name="fcs/elevon-left-f">
+			<input>fcs/elevon-left-cmd</input>
+			<rate_limit>fcs/elevon-f-r</rate_limit>
+			<lag>26.7</lag>
+		</actuator>
+		
+		<actuator name="fcs/elevon-right-f">
+			<input>fcs/elevon-right-cmd</input>
+			<rate_limit>fcs/elevon-f-r</rate_limit>
+			<lag>26.7</lag>
+		</actuator>
+		
+		<fcs_function name="fcs/elevon-aero-deg">
+			<function>
+				<sum>
+					<product>
+						<property>fcs/elevon-left-f</property>
+						<value>0.5</value>
+					</product>
+					<product>
+						<property>fcs/elevon-right-f</property>
+						<value>0.5</value>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		
+	
+	</channel>
+	
+	<channel name="Ailerons">
+		
+		<summer name="fcs/roll-aileron-input-sum">
+			<input>fcs/stick-roll</input> 
+			<input>fcs/css-roll</input> 
+			<input>fcs/roll-trim-cmd-norm</input> 
+			<input>autoflight/roll/roll-rate-demand</input> 
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<pure_gain name="fcs/roll-aileron-ratio-input">
+			<input>fcs/roll-aileron-input-sum</input>
+			<gain>fcs/roll-ratio</gain>
+		</pure_gain>
+		
+		<pure_gain name="fcs/aileron-input-deg">
+			<input>fcs/roll-aileron-ratio-input</input>
+			<gain>20.0</gain>
+		</pure_gain>
+		
+		<switch name="fcs/aileron-left-cmd">
+			<default value="fcs/aileron-droop" />
+			<test value="fcs/aileron-input-deg">
+				systems/hydraulics/flight-system-pressure eq 1
+			</test>
+		</switch>
+		
+		<actuator name="fcs/aileron-left">
+			<input>fcs/aileron-left-cmd</input>
+			<rate_limit>100</rate_limit>
+			<lag>26.7</lag>
+		</actuator>
+		
+		<aerosurface_scale name="fcs/aileron-left-norm">
+			<input>fcs/aileron-left</input>
+			<domain>
+				<min>-20.0</min>
+				<max>20.0</max>
+			</domain>
+			<range>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</range>
+			<output>/sim/multiplay/generic/float[2]</output>
+		</aerosurface_scale>
+		
+		<switch name="fcs/aileron-right-cmd">
+			<default value="fcs/aileron-droop" />
+			<test value="-fcs/aileron-input-deg">
+				systems/hydraulics/flight-system-pressure eq 1
+			</test>
+		</switch>
+		
+		<actuator name="fcs/aileron-right">
+			<input>fcs/aileron-right-cmd</input>
+			<rate_limit>100</rate_limit>
+			<lag>26.7</lag>
+			<output>/sim/multiplay/generic/float[3]</output>
+		</actuator>
+		
+		<aerosurface_scale name="fcs/aileron-right-norm">
+			<input>fcs/aileron-right</input>
+			<domain>
+				<min>-20.0</min>
+				<max>20.0</max>
+			</domain>
+			<range>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</range>
+			<output>/sim/multiplay/generic/float[3]</output>
+		</aerosurface_scale>
+		
+		<fcs_function name="fcs/aileron-aero-deg">
+			<function>
+				<sum>
+					<product>
+						<property>fcs/aileron-left</property>
+						<value>0.5</value>
+					</product>
+					<product>
+						<property>fcs/aileron-right</property>
+						<value>-0.5</value>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Yaw">
+		
+		<switch name="fcs/ari-mach-switch"> 
+			<default value="fcs/ari-mach-switch" />
+			<test value="1">
+				velocities/mach le 0.9925
+			</test>
+			<test value="0">
+				velocities/mach ge 1.0075
+			</test>
+		</switch>
+		
+		<switch name="fcs/ari-lateral-enabled">
+			<default value="0" />
+			<test logic="AND" value="1">
+        position/aircraft-on-ground eq 0
+        autoflight/output/roll-master ne 1
+        systems/hydraulics/flight-system-pressure eq 1
+        fcs/ari-mach-switch eq 1
+        cas/yaw-cas-active ne 1
+        aero/alpha-deg lt 30
+        aero/alpha-deg gt -30
+      </test>
+		</switch>
+		
+		<pure_gain name="fcs/ari-aileron-input">
+			<input>fcs/aileron-cmd-norm</input>
+			<gain>fcs/roll-ratio</gain>
+		</pure_gain>
+		
+		<fcs_function name="fcs/rudder-ari">
+			<description>
+				This is the amount of rudder per inch of lateral stick. NASA-TM-72861, Figure 23
+				The tables have been normalized to remove the inches of stick movement, based on my understanding that there is about 4inches of stick deflection.
+			</description>
+			<function>
+				<product>
+					<property>fcs/ari-aileron-input</property>
+					<property>fcs/ari-lateral-enabled</property>
+					<table>
+						<independentVar lookup="row">fcs/elevon-aero-deg</independentVar>
+						<independentVar lookup="column">fcs/flap-pos-deg</independentVar>
+						<tableData>
+							     0      30
+							-24 -0.923 -0.818
+							  0 -0.105  0.000
+							 15  0.406  0.511
+						</tableData>
+					</table>
+				</product>
+			</function>
+			<output>cas/ari-input</output>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</fcs_function>
+		
+		<switch name="fcs/rudder-gain"> 
+			<default value="fcs/rudder-gain" />
+			<test value="0.5"> 
+				velocities/mach le 1.4925
+			</test>
+			<test value="0.166666666"> 
+				velocities/mach ge 1.5075
+			</test>
+		</switch>
+		
+		<fcs_function name="fcs/rudder-input-limited">
+			<function>
+				<product>
+					<sum>
+						<property>fcs/rudder-cmd-norm</property>
+						<property>fcs/yaw-trim-cmd-norm</property>
+					</sum>
+					<property>fcs/rudder-gain</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<summer name="fcs/yaw-input-sum">
+			<input>fcs/rudder-input-limited</input> 
+			<input>fcs/rudder-ari</input> 
+			<input>-cas/yaw-output</input> 
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<pure_gain name="fcs/rudder-input-deg">
+			<input>fcs/yaw-input-sum</input>
+			<gain>30.0</gain>
+			<clipto>
+				<min>-30.0</min>
+				<max>30.0</max>
+			</clipto>
+		</pure_gain>
+		
+		<switch name="fcs/rudder-input-deg-cmd">
+			<default value="0" />
+			<test value="fcs/rudder-input-deg">
+				systems/hydraulics/flight-system-pressure eq 1
+			</test>
+		</switch>
+		
+		<actuator name="fcs/rudder-aero-deg">
+			<input>fcs/rudder-input-deg-cmd</input>
+			<rate_limit>105</rate_limit>
+			<lag>22.7</lag>
+		</actuator>
+		
+		<aerosurface_scale name="fcs/rudder-aero-norm">
+			<input>fcs/rudder-aero-deg</input>
+			<domain>
+				<min>-30.0</min>
+				<max>30.0</max>
+			</domain>
+			<range>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</range>
+			<output>/sim/multiplay/generic/float[1]</output>
+		</aerosurface_scale>
+	
+	</channel>
+	
+	
+
+    <channel name="Flaps">
+        <switch name="fcs/flap-total-dmd">
+            <default value="0" />
+            <test value="fcs/flap-total-dmd">
+                systems/hydraulics/combined-system-pressure ne 1
+            </test>
+            <test value="fcs/flap-cmd-norm">
+                fcs/flap-cmd-norm ne 0
+                systems/hydraulics/combined-system-pressure ne 0
+            </test>
+            <clipto>
+                <min> 0 </min>
+                <max>  1 </max>
+            </clipto>
+            <output>fcs/flap-total-dmd</output>
+        </switch>
+
+        <kinematic name="Flaps Control">
+            <input>fcs/flap-total-dmd</input>
+            <traverse>
+                <setting>
+                    <position>  0 </position>
+                    <time>      0 </time>
+                </setting>
+                <setting>
+                    <position> 30 </position>
+                    <time>    1.944</time>
+                </setting>
+            </traverse>
+            <output>fcs/flap-pos-deg</output>
+        </kinematic>
+
+        <aerosurface_scale name="flap normalization">
+            <input>fcs/flap-pos-deg</input>
+            <domain>
+                <min>  0 </min>
+                <max> 30 </max>
+            </domain>
+            <range>
+                <min> 0 </min>
+                <max> 1 </max>
+            </range>
+            <output>fcs/flap-pos-norm</output>
+        </aerosurface_scale>
+
+
+    </channel>
+
+    <channel name="Landing Gear">
+
+        
+
+        
+        <switch name="systems/hydraulics/emerg-gear-unlocked">
+            <default value="0" />
+            <test value="1">
+                systems/hydraulics/util-system-accumulator-psi gt 200
+                gear/emergency-handle gt 0.7
+                gear/unit[0]/locked ne 0
+            </test>
+            <test value="systems/hydraulics/emerg-gear-unlocked">
+                gear/emergency-handle gt 0.7
+            </test>            
+        </switch>
+        <switch name="systems/hydraulics/emerg-gear-bleed">
+            <default value="0" />
+            <test value="10000">
+                systems/hydraulics/emerg-gear-unlocked ne 0
+                gear/unit[0]/locked ne 0
+            </test>
+        </switch>
+
+        <switch name="gear/unit[0]/locked">
+            <default value="-1" />
+            <test value="0">
+                systems/hydraulics/emerg-gear-unlocked ne 0
+                
+                gear/emergency-handle gt 0.7
+                gear/emerg-pos lt 1
+            </test>
+            <test value="0">
+                
+              gear/unit[0]/pos-norm gt 0
+              gear/unit[0]/pos-norm lt 1
+            </test>
+            <test value="1">
+              gear/unit[0]/pos-norm le 0
+            </test>
+            <test value="-1">
+              gear/unit[0]/pos-norm ge 1
+            </test>
+        </switch>
+        <switch name="gear/unit[1]/locked">
+            <default value="-1" />
+            <test value="0">
+                
+                
+                gear/emergency-handle gt 0.7
+                gear/emerg-pos lt 1
+            </test>
+            <test value="0">
+                
+                gear/unit[1]/pos-norm gt 0
+                gear/unit[1]/pos-norm lt 1
+            </test>
+            <test value="1">
+                gear/unit[1]/pos-norm le 0
+            </test>
+            <test value="-1">
+                gear/unit[1]/pos-norm ge 1
+            </test>
+        </switch>
+        <switch name="gear/unit[2]/locked">
+            <default value="-1" />
+            <test value="0">
+                
+                
+                gear/emergency-handle gt 0.7
+                gear/emerg-pos lt 1
+            </test>
+            <test value="0">
+                
+                gear/unit[2]/pos-norm gt 0
+                gear/unit[2]/pos-norm lt 1
+            </test>
+            <test value="1">
+                gear/unit[2]/pos-norm le 0
+            </test>
+            <test value="-1">
+                gear/unit[2]/pos-norm ge 1
+            </test>
+        </switch>
+        <switch name="gear/emerg-pos">
+            <default value="gear/emerg-pos-dmd" />
+        </switch>
+        <fcs_function name="gear/emerg-pos-dmd">
+            <function>
+                <ifthen>
+                    <and>
+                        <ge>
+                            <property>gear/emergency-handle</property>
+                            <value>0.9</value>
+                        </ge>
+                        <or>
+                            <eq>
+                                <property>gear/unit[0]/locked</property>
+                                <value>-1.0</value>
+                            </eq>
+                            <and>
+                                <eq>
+                                    <property>contact/unit[9]/WOW</property>
+                                    <value>0</value>
+                                </eq>
+                                <eq>
+                                    <property>contact/unit[10]/WOW</property>
+                                    <value>0</value>
+                                </eq>
+                            </and>
+                        </or>
+                    </and>
+                    <sum>
+                        <property>gear/emerg-pos</property>
+                        <ifthen><not><eq><property>gear/unit[0]/locked</property><value>1.0</value></eq></not>
+                            <table>
+                                <independentVar lookup="row">gear/emerg-pos</independentVar>
+                                <independentVar lookup="column">accelerations/Nz</independentVar>
+                                <tableData>
+                                               -3.0     0.0     0.5     1.0     1.2     2.0     5.0    10.0
+                                   -0.00001  0.00000 0.00100 0.00000 0.00090 0.00090 0.00090 0.00090 0.00400
+                                    0.0     -0.00400 0.00000 0.00000 0.00090 0.00090 0.00090 0.00090 0.00400
+                                    0.90     0.00000 0.00000 0.00000 0.00090 0.00090 0.00090 0.00090 0.00400
+                                    0.98     0.11000 0.00000 0.00000 0.00000 0.00000 0.09000 0.11090 0.00400
+                                    1.0      0.00000 0.00000 0.00000 0.00090 0.00090 0.00090 0.00090 0.00400
+                                </tableData>
+                            </table>
+                            <value>0</value>
+                    </ifthen>
+                    </sum>
+                    <value>0</value>
+                </ifthen>
+            </function>
+        </fcs_function>
+
+        <switch name="gear/unit[0]/damaged">
+            <default value="gear/unit[0]/damaged" />
+            <test logic="AND" value="0">
+                gear/damage-reset ne 0
+            </test>
+                <test logic="AND" value="1">
+                position/aircraft-on-ground ne 0
+                position/aircraft-on-ground-last-value ne position/aircraft-on-ground
+                velocities/h-dot-fps le -20
+                gear/unit[0]/WOW ne 0
+            </test>
+        </switch>
+        <switch name="gear/unit[1]/damaged">
+            <default value="gear/unit[1]/damaged" />
+            <test logic="AND" value="0">
+                gear/damage-reset ne 0
+            </test>
+            <test logic="AND" value="1">
+                position/aircraft-on-ground ne 0
+                position/aircraft-on-ground-last-value ne position/aircraft-on-ground
+                velocities/h-dot-fps le -20
+                gear/unit[1]/WOW ne 0
+            </test>
+        </switch>
+        <switch name="gear/unit[2]/damaged">
+            <default value="gear/unit[2]/damaged" />
+            <test logic="AND" value="0">
+                gear/damage-reset ne 0
+            </test>
+            <test logic="AND" value="1">
+                position/aircraft-on-ground ne 0
+                position/aircraft-on-ground-last-value ne position/aircraft-on-ground
+                velocities/h-dot-fps le -20
+                gear/unit[2]/WOW ne 0
+            </test>
+        </switch>
+        <switch name="Gear Unit 0 Z">
+            <default value="-77.6496063" />
+            <test value="-20">
+                gear/unit[0]/damaged eq 1
+            </test>
+            <output>gear/unit[0]/z-position</output>
+        </switch>
+        <switch name="Gear Unit 1 Z">
+            <default value="-84.3385827" />
+            <test value="-30">
+                gear/unit[1]/damaged eq 1
+            </test>
+            <output>gear/unit[1]/z-position</output>
+        </switch>
+        <switch name="Gear Unit 2 Z">
+            <default value="-84.3385827" />
+            <test value="-30">
+                gear/unit[2]/damaged eq 1
+            </test>
+            <output>gear/unit[2]/z-position</output>
+        </switch>
+
+        <switch name="Contact Unit 3 Z nose door">
+            <default value="-30.6496063" />
+            <test value="-55">
+                gear/unit[0]/damaged eq 1
+            </test>
+            <output>contact/unit[3]/z-position</output>
+        </switch>
+        <switch name="Contact Unit 4 Z nose door">
+            <default value="-30" />
+            <test value="-55">
+                gear/unit[1]/damaged eq 1
+            </test>
+            <output>contact/unit[4]/z-position</output>
+        </switch>
+        <switch name="Contact Unit 5 Z nose door">
+            <default value="-30" />
+            <test value="-55">
+                gear/unit[2]/damaged eq 1
+            </test>
+            <output>contact/unit[5]/z-position</output>
+        </switch>
+        <switch name="tied/aircraft-on-ground-last-value">
+            <default value="position/aircraft-on-ground" />
+            <output>position/aircraft-on-ground-last-value</output>
+            
+        </switch>
+        
+        
+        <fcs_function name="tied/fcs-gear-0-pos-norm">
+            <function>
+                <ifthen>
+                        <gt>
+                            <p>gear/unit[0]/damaged</p>
+                            <v>0</v>
+                        </gt>
+                    <v>0.5</v>
+                    <p>gear/gear-command-position-norm</p>
+                </ifthen>
+            </function>
+            <output>gear/unit[0]/pos-norm</output>
+        </fcs_function>
+
+        <fcs_function name="tied/fcs-gear-1-pos-norm">
+            <function>
+                <ifthen>
+                        <gt>
+                            <p>gear/unit[1]/damaged</p>
+                            <v>0</v>
+                        </gt>
+                    <v>0.5</v>
+                    <p>gear/gear-command-position-norm</p>
+                </ifthen>
+            </function>
+            <output>gear/unit[1]/pos-norm</output>
+        </fcs_function>
+        
+        <fcs_function name="tied/fcs-gear-2-pos-norm">
+            <function>
+                <ifthen>
+                        <gt>
+                            <p>gear/unit[2]/damaged</p>
+                            <v>0</v>
+                        </gt>
+                    <v>0.5</v>
+                    <p>gear/gear-command-position-norm</p>
+                </ifthen>
+            </function>
+            <output>gear/unit[2]/pos-norm</output>
+        </fcs_function>
+        
+
+        <switch name="tied/gear-dmd-norm">
+            <default value="1" />
+            <test value="1">
+                
+              position/aircraft-on-ground ne 0
+            </test>
+            <test value="gear/emerg-pos">
+              gear/emergency-handle ne 0
+            </test>
+            <test value="gear/gear-command-position-norm">
+                gear/serviceable ne 1
+                gear/emergency-handle lt 1
+            </test>
+            <test value="gear/gear-dmd-norm">
+                systems/hydraulics/combined-system-pressure ne 1
+            </test>
+            <test value="gear/gear-cmd-norm">
+                systems/hydraulics/combined-system-pressure ne 0
+            </test>
+            <clipto>
+                <min> 0 </min>
+                <max>  1 </max>
+            </clipto>
+            <output>gear/gear-dmd-norm</output>
+        </switch>
+
+        <kinematic name="Gear Control">
+            <input>gear/gear-dmd-norm</input>
+            <traverse>
+                <setting>
+                    <position> 0 </position>
+                    <time>     0 </time>
+                </setting>
+                <setting>
+                    <position> 1 </position>
+                    <time>     1.8 </time>
+                </setting>
+            </traverse>
+            <output>gear/gear-command-position-norm</output>
+        </kinematic>
+
+        
+    </channel>
+
+    <channel name="Speedbrake">
+        <switch name="fcs/speedbrake-dmd-norm">
+            <default value="0" />
+            <test value="fcs/speedbrake-dmd-norm">
+                systems/hydraulics/combined-system-pressure ne 1
+            </test>
+            <test value="fcs/speedbrake-cmd-norm">
+                systems/hydraulics/combined-system-pressure ne 0
+            </test>
+            <clipto>
+                <min> 0 </min>
+                <max>  1 </max>
+            </clipto>
+            <output>fcs/speedbrake-dmd-norm</output>
+        </switch>
+
+        <kinematic name="Speedbrake Control">
+            <input>fcs/speedbrake-dmd-norm</input>
+            <traverse>
+                <setting>
+                    <position> 0 </position>
+                    <time>     0 </time>
+                </setting>
+                <setting>
+                    <position> 1 </position>
+                    <time>     1.5 </time>
+                </setting>
+            </traverse>
+            <output>fcs/speedbrake-pos-norm</output>
+        </kinematic>
+    </channel>
+
+    <channel name="Hook">
+        <kinematic name="fcs/hook-control">
+            <input>fcs/hook-engage</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>1</position>
+                    <time>2.5</time>
+                </setting>
+            </traverse>
+            <output>fcs/hook-pos-norm</output>
+        </kinematic>
+    </channel>
+</system>

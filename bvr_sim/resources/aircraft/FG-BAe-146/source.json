@@ -1,0 +1,30 @@
+{
+  "set": "BAe-146/bae146-set.xml",
+  "name": "BAe 146 100 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "BAe-146/Systems/bae146-yasim.xml",
+  "jets": 4,
+  "model": "BAe-146/Models/bae146.xml",
+  "tags": [
+    "British-Aerospace",
+    "regional-jet",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s",
+    "2020s",
+    "tricycle",
+    "retractable-gear",
+    "4-engine",
+    "jet",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "BAe-146.zip",
+  "archive_sha256": "525f452cfdb5e4fa56206d6956aa7a40afa8c70334f05cc9e62a5f8a8414f139",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/BAe-146.zip"
+}

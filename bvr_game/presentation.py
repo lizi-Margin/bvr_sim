@@ -9,6 +9,18 @@ def safe_aim(x,y,width,height):
     return (min(max(x,420/1920*width),1500/1920*width),
             min(max(y,230/1080*height),780/1080*height))
 
+def mouse_pitch(y,height):
+    # Normalize to the actual asymmetric aiming rectangle, not the full window.
+    center=height*.5
+    extent=height*((540-230) if y<center else (780-540))/1080
+    return -curve((y-center)/extent,limit=math.pi/4)
+
+def mouse_roll_rate(x,width):
+    """YASim rate assist: reachable left/right aim edges give +/-60 deg/s."""
+    dx=(x/width-.5)*2
+    edge=(1500/1920-.5)*2
+    return max(-1.,min(1.,curve(dx)/curve(edge)))*math.pi/3
+
 def overlap(a,b):
     return a[0]<b[2] and a[2]>b[0] and a[1]<b[3] and a[3]>b[1]
 
@@ -40,10 +52,11 @@ class ChaseCamera:
         self.roll+=(max(-.25,min(.25,entity.orientation[0]*.18))-self.roll)*alpha
         self.fov+=((.72 if zoom else 1.0)-self.fov)*(1-math.exp(-dt*9))
         yaw=self.yaw+self.free[0];pitch=math.atan2(entity.velocity[2],math.hypot(*entity.velocity[:2]))
-        north,west,alt=entity.position;distance=33 if not zoom else 28
-        forward=(-math.sin(yaw),math.cos(yaw));lift=8+math.sin(self.free[1])*distance
+        scale=getattr(self,'scale',1.)
+        north,west,alt=entity.position;distance=(33 if not zoom else 28)*scale
+        forward=(-math.sin(yaw),math.cos(yaw));lift=8*scale+math.sin(self.free[1])*distance
         eye=[-west-forward[0]*distance,alt+lift-math.sin(pitch)*distance*.4,north-forward[1]*distance]
-        target=[-west+forward[0]*24,alt+2+math.sin(pitch)*12,north+forward[1]*24]
+        target=[-west+forward[0]*24*scale,alt+2*scale+math.sin(pitch)*12,north+forward[1]*24*scale]
         current=[-west,alt,north]
         if self.eye is None:self.eye=eye;self.target=target
         elif self.last_position is not None:

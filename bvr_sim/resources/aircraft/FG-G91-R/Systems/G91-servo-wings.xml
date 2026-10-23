@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Servo Wings">
+    
+    <property value="5.0">systems/servo-wings/elevator/servo-force-amplifier</property>
+    <property value="0.05">systems/servo-wings/elevator/elevator-required-force-k</property>
+    <property value="1.0">systems/servo-wings/elevator/pilot-force</property>
+    <property value="1.0">systems/servo-wings/elevator/operative</property>
+    
+    <channel name="Servo Elevator">
+        
+
+        
+        <switch name="systems/servo-wings/elevator/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/electric/bus[0]/V GE 18.0
+                systems/electric/bus[0]/horizontal-stabilizer-actuator/fuse == 1
+                systems/manual-switches/cockpit/sw-elevator-servo-disengaged == 0
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/servo-wings/elevator-pilot-actuator-force">
+            <function>
+                <sum>
+                    <p>systems/servo-wings/elevator/pilot-force</p>
+                    <product>
+                        <p>systems/servo-wings/elevator/pilot-force</p>
+                        <p>systems/servo-wings/elevator/servo-force-amplifier</p>
+                        <p>systems/hydraulics/flight-system-norm</p>
+                        <p>systems/servo-wings/elevator/operative</p>
+                    </product>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/servo-wings/elevator-required-force">
+            <function>
+                <abs>
+                    <product>
+                        <p>fcs/elevator-pos-rad</p>
+                        <p>aero/qbar-psf</p>
+                        <p>systems/servo-wings/elevator/elevator-required-force-k</p>
+                    </product>
+                </abs>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/servo-wings/elevator-pos-rad-correction">
+            <function>
+                <ifthen>
+                    <gt>
+                        <p>systems/servo-wings/elevator-pilot-actuator-force</p>
+                        <p>systems/servo-wings/elevator-required-force</p>
+                    </gt>
+                    <v>1.0</v>
+                    <quotient>
+                        <p>systems/servo-wings/elevator-pilot-actuator-force</p>
+                        <p>systems/servo-wings/elevator-required-force</p>
+                    </quotient>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <switch name="systems/servo-wings/elevator/lag-c1">
+            <default value="20.0" />
+            <test logic="AND" value="10.0">
+                systems/servo-wings/elevator/operative == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/servo-wings/elevator-pos-rad-correction-lag">
+            <input>systems/servo-wings/elevator-pos-rad-correction</input>
+            <c1>systems/servo-wings/elevator/lag-c1</c1>
+        </lag_filter>
+
+    </channel>
+    
+    
+</system>

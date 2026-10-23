@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Airbrake">
+    
+    
+    <property value="0.0">systems/airbrake/automatic-cmd</property>
+    <property value="0.0">systems/airbrake/manual-cmd</property>
+    <property value="1.94">systems/airbrake/surfice-cmd-sqft</property>
+    <property value="0.8">systems/airbrake/cd_coefficient</property>
+    <property value="1.0">systems/airbrake/position_max</property>
+    <property value="4.0">systems/airbrake/jack-section</property>
+    <property value="10.0">systems/airbrake/jack-stroke</property>
+    
+    <property value="0.0">systems/airbrake/induced-turbulence</property>
+    <property value="0.002">systems/airbrake/induced-turbulence-intensity</property>
+    <property value="8.0">systems/airbrake/induced-turbulence-lag-C1</property>
+    <property value="0.0">systems/airbrake/induced-turbulence-lag</property>
+    
+    <channel name="Airbrake control" execrate="8">
+        
+        
+        <washout_filter name="fcs/spoiler-cmd-norm-wa">
+            <input>fcs/spoiler-cmd-norm</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="fcs/spoiler-cmd-norm-action">
+            <default value="fcs/spoiler-cmd-norm-action" />
+            <test logic="OR" value="0">
+                fcs/speedbrake-cmd-norm-sw GT 0.1
+                systems/airbrake/automatic-cmd GT 0.1
+                systems/airbrake/manual-cmd GT 0.1
+            </test>
+            <test logic="AND" value="1">
+                fcs/spoiler-cmd-norm-wa GT 0.01
+                systems/airbrake/speedbrake-pos-norm LE 0.1
+            </test>
+            <test logic="AND" value="0">
+                fcs/spoiler-cmd-norm-wa LT -0.01
+                systems/airbrake/speedbrake-pos-norm GT 0.1
+            </test>
+        </switch>
+        
+        
+        <switch name="fcs/speedbrake-cmd-norm-sw">
+            <default value="0" />
+            <test logic="AND" value="1">
+                fcs/speedbrake-cmd-norm GT 0.1
+            </test>
+        </switch>
+        
+        
+        <summer name="systems/airbrake/command">
+            <input>fcs/speedbrake-cmd-norm-sw</input>
+            <input>systems/airbrake/automatic-cmd</input>
+            <input>systems/airbrake/manual-cmd</input>
+            <input>fcs/spoiler-cmd-norm-action</input>
+            <clipto>
+                <min>0.0</min>
+                <max>1.0</max>
+            </clipto>
+        </summer>
+        
+        <kinematic name="systems/airbrake/speedbrake-pos-norm">
+            <input>systems/airbrake/command</input>
+            <noscale />
+            <traverse>
+                <setting>
+                    <position> 0 </position>
+                    <time>     0 </time>
+                </setting>
+                <setting>
+                    <position> 1 </position>
+                    <time>     3 </time>
+                </setting>
+            </traverse>
+        </kinematic>
+        
+        <fcs_function name="airbrake sound roumble">
+            <function>
+                <product>
+                    <p>systems/airbrake/speedbrake-pos-norm</p>
+                    <p>aero/qbar-psf</p>
+                    <v>0.002</v>
+                </product>
+            </function>
+            <output>systems/airbrake/sound-roumble</output>
+        </fcs_function>
+        
+        <summer>
+            <input>systems/airbrake/speedbrake-pos-norm</input>
+            <input>systems/airbrake/hydraulics_flux</input>
+            <output>systems/airbrake/hydraulics_vol</output>
+        </summer>
+        
+        <integrator>
+            <c1> 0.1 </c1>
+            <input>systems/airbrake/hydraulics_vol</input>
+            <output>systems/airbrake/hydraulics_flux</output>
+        </integrator>
+        
+        <integrator name="systems/airbrake/position">
+            <input>systems/airbrake/hydraulics_flux</input>
+            <c1> 0.03 </c1>
+            <clipto>
+                <min> 0.0 </min>
+                <max>systems/airbrake/position_max</max>
+            </clipto>
+        </integrator>
+        
+        <scheduled_gain name="systems/airbrake/speedbrake-magnitude">
+            <input>aero/qbar-psf</input>
+            <gain>1.2</gain>
+            <table>
+                <independentVar>systems/airbrake/speedbrake-pos-norm</independentVar>
+                <tableData>
+                    0 0.00
+                    0.125 0.56
+                    0.25 1.12
+                    0.375 1.67
+                    0.5 2.2
+                    0.625 2.72
+                    0.75 3.22
+                    0.875 3.7
+                    1 4.14
+                </tableData>
+            </table>
+            <output>external_reactions/Airbrake/magnitude</output>
+        </scheduled_gain>
+        
+        <fcs_function name="location-z-in">
+            <function>
+                <product>
+                    <v>-1.0</v>
+                    <table>
+                        <independentVar>systems/airbrake/speedbrake-pos-norm</independentVar>
+                        <tableData>
+                            0 19.7
+                            0.125 21.2
+                            0.25 22.8
+                            0.375 24.3
+                            0.5 25.7
+                            0.625 27.2
+                            0.75 28.5
+                            0.875 29.8
+                            1 31.1
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+            <output>external_reactions/Airbrake/location-z-in</output>
+        </fcs_function>
+        
+    </channel>
+    
+    
+    <channel name="Airbrake induced turbulence" execrate="4">
+    
+        <fcs_function name="systems/airbrake/induced-turbulence">
+            <function>
+                <product>
+                    <product>
+                        <p>systems/airbrake/speedbrake-pos-norm</p>
+                        <p>aero/qbar-psf</p>
+                        <random mean="0.0" stddev="1.0" />
+                        <p>systems/airbrake/induced-turbulence-intensity</p>
+                    </product>
+                    <table>
+                        <independentVar>aero/qbar-psf</independentVar>
+                        <tableData>
+                            0.0 0
+                            6.53 0.008
+                            26.1 0.004
+                            104.0 0.002
+                            418.0 0.001
+                            1671.0 0.0005
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+        </fcs_function>
+        
+        <lag_filter name="systems/airbrake/induced-turbulence-lag">
+            <input>systems/airbrake/induced-turbulence</input>
+            <c1>systems/airbrake/induced-turbulence-lag-C1</c1>
+        </lag_filter>
+    
+    </channel>
+    
+    
+</system>

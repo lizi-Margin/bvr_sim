@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Catapult">
+    <property value="0">systems/catapult/cat-pos-norm</property>
+    <property value="0">systems/catapult/cat-launch-cmd</property>
+    <property value="0">systems/catapult/cat-force</property>
+    <property value="15">systems/catapult/excess-speed-kt</property>
+    <property value="91">systems/catapult/catapult-length-m</property> 
+    
+    
+    <channel name="Catapult">
+	<switch name="systems/catapult/cat-launching">
+            <default value="systems/catapult/cat-launch-cmd" />
+            <test value="1">
+		systems/catapult/cat-launch-cmd == 1
+            </test>
+	    <test value="0">
+		systems/catapult/cat-pos-norm == 1
+            </test>
+        </switch>
+	
+	
+	
+	
+	
+	<switch name="systems/catapult/config">
+	    <default value="0" />
+	    <test logic="AND" value="1">
+		fcs/flaps/flaps-deg-cmd == 30
+		/payload/weight[0]/count == 0
+		/payload/weight[1]/count == 0
+		/payload/weight[2]/count == 0
+		/payload/weight[3]/count == 0
+		/payload/weight[4]/count == 0
+	    </test>
+	    <test logic="AND" value="2">
+		fcs/flaps/flaps-deg-cmd == 30
+		<test logic="OR">
+		    /payload/weight[0]/count != 0
+		    /payload/weight[1]/count != 0
+		    /payload/weight[2]/count != 0
+		    /payload/weight[3]/count != 0
+		    /payload/weight[4]/count != 0
+		</test>
+	    </test>
+	</switch>
+	
+	
+	<fcs_function name="systems/catapult/catapult-end-speed">
+	    <function>
+		<sum>
+		    <table>
+			<independentVar lookup="column">inertia/weight-lbs</independentVar>
+			<independentVar lookup="row">systems/catapult/config</independentVar>
+			<tableData>
+			           0   1   2
+			     32000 119  94 100 
+			     58500 156 138 144 
+			</tableData>
+		    </table>
+		    <property>systems/catapult/excess-speed-kt</property>
+		</sum>
+	    </function>
+	</fcs_function>
+
+	<fcs_function name="systems/catapult/launch-rate">
+	    <function>
+		<quotient>
+		    <property>systems/catapult/catapult-end-speed</property>
+		    <product>
+			<property>systems/catapult/catapult-length-m</property>
+			<value>2</value>
+		    </product>
+		</quotient>
+	    </function>
+	</fcs_function>
+
+	<actuator name="systems/catapult/cat-pos-norm">
+	    <input>systems/catapult/cat-launching</input>
+	    <rate_limit sense="incr">systems/catapult/launch-rate</rate_limit>
+	    <rate_limit sense="decr">120</rate_limit>
+	    <output>systems/catapult/cat-pos-norm</output>
+	</actuator>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	<fcs_function name="systems/catapult/cat-acc">
+	    <function>
+		<quotient>
+		    <product>
+			<value>0.4535924</value> 
+			<value>8</value>
+			<pow>
+			    <property>systems/catapult/catapult-length-m</property>
+			    <value>3</value>
+			</pow>
+		    </product>
+		    <pow>
+			<product>
+			    <property>systems/catapult/catapult-end-speed</property>
+			    <value>0.5144447</value> 
+			</product>
+			<value>2</value>
+		    </pow>
+ 		</quotient>
+	    </function>
+	</fcs_function>
+	     
+	<fcs_function name="systems/catapult/cat-force">
+	    <function>
+		<sum>
+		    <product>
+			<property>inertia/weight-lbs</property>
+			<value>5.5</value>
+		    </product>
+		    <value>-38700</value> 
+		</sum>
+	    </function>
+	</fcs_function>
+
+	<fcs_function name="systems/catapult/cat-z-gain">
+	    <function>
+		<ifthen>
+		    <eq>
+			<property>systems/catapult/cat-launching</property>
+			<value>0</value>
+		    </eq>
+		    <value>0</value>
+		    <value>0.1</value>
+		</ifthen>
+	    </function>
+	</fcs_function>	
+
+	<switch name="Catapult Final">
+	    <default value="0" />
+	    <test logic="AND" value="systems/catapult/cat-force">
+		systems/catapult/cat-launching == 1
+		systems/catapult/cat-pos-norm lt 0.999
+		systems/catapult/cat-pos-norm gt 0.0
+		gear/unit[0]/WOW ne 0
+	    </test>
+	    <output>external_reactions/catapult/magnitude</output>
+	</switch>
+
+	<pure_gain name="external_reactions/catapult_vertical/magnitude">
+	    <input>external_reactions/catapult/magnitude</input>
+	    <gain>systems/catapult/cat-z-gain</gain>
+	</pure_gain>
+	
+    </channel>
+
+</system>

@@ -1,10 +1,17 @@
 #pragma once
 
 #include "aa.hxx"
+#include "simulator/environment.hxx"
+#include "simulator/sense/ground_radar.hxx"
 
 namespace bvr_sim {
 
 class SLAMRAAM : public AA {
+public:
+    std::shared_ptr<const Terrain> environment;
+    GroundSearchRadar search_radar;
+    std::string tracked_target;
+    bool tracks(const std::string& uid) const {return is_alive && search_radar.contacts.count(uid)>0;}
 private:
     double search_range;
     double height_gate;

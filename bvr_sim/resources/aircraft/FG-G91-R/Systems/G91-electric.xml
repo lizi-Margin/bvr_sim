@@ -1,0 +1,578 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="electric-system">
+    
+    <property value="0">systems/electric/bus[0]/battery-V</property>
+    <property value="34">systems/electric/bus[0]/battery-AH</property>
+    <property value="2937600">systems/electric/bus[0]/battery-capacity-initial-J</property>
+    <property value="2937600">systems/electric/bus[0]/battery-capacity-max-J</property>
+    <property value="0">systems/electric/bus-link/relay-bus0-bus1-battery</property>
+    <property value="0">systems/electric/bus-link/relay-bus1-bus2-secondary</property>
+    <property value="0.0">systems/electric/bus[2]/I</property>
+    <property value="0">systems/electric/bus[1]/external-power-generator-on</property>
+    <property value="1">systems/electric/bus[0]/fire-warning/fuse</property>
+    <property value="0">systems/electric/bus[0]/fire-warning/sw</property>
+    <property value="1">systems/electric/bus[0]/emergency-canopy-light/fuse</property>
+    <property value="0.0">systems/electric/bus[0]/emergency-canopy-light/I</property>
+    <property value="1">systems/electric/bus[0]/horizontal-stabilizer-actuator/fuse</property>
+    <property value="1">systems/electric/bus[0]/emergency-stabilizer-corrector/fuse</property>
+    <property value="1">systems/electric/bus[0]/emergency-radio/fuse</property>
+    <property value="0">systems/electric/bus[0]/emergency-radio/sw</property>
+    <property value="0.0">systems/electric/bus[0]/emergency-radio/I</property>
+    <property value="1">systems/electric/bus[0]/emergency-release-of-external-loads/fuse</property>
+    <property value="1">systems/electric/bus[0]/emergency-release-of-external-loads-SALVO/fuse</property>
+    <property value="1">systems/electric/bus[0]/LADD-command/fuse</property>
+    <property value="1">systems/electric/bus[0]/canopy-command/fuse</property>
+    <property value="1">systems/electric/bus[1]/JATO-ignition/fuse</property>
+    <property value="0">systems/electric/bus[1]/JATO-ignition/sw</property>
+    <property value="0.0">systems/electric/bus[1]/JATO-ignition/I</property>
+    <property value="1">systems/electric/bus[1]/lower-weapons/fuse</property>
+    <property value="1">systems/electric/bus[1]/upper-weapons/fuse</property>
+    <property value="1">systems/electric/bus[1]/turbojet-start-up/fuse</property>
+    <property value="0">systems/electric/bus[1]/turbojet-start-up/sw</property>
+    <property value="1">systems/electric/bus[1]/normal-bombs/fuse</property>
+    <property value="1">systems/electric/bus[1]/special-bombs/fuse</property>
+    <property value="1">systems/electric/bus[1]/BP-fuel/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/BP-fuel/I</property>
+    <property value="1">systems/electric/bus[1]/BP-oil/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/BP-oil/I</property>
+    <property value="1">systems/electric/bus[1]/landig-gear-command/fuse</property>
+    <property value="1">systems/electric/bus[1]/air-conditioning-pressurization/fuse</property>
+    <property value="1">systems/electric/bus[1]/air-conditioning-pressurization/I</property>
+    <property value="1">systems/electric/bus[1]/air-conditioning-temperature/fuse</property>
+    <property value="1">systems/electric/bus[1]/air-conditioning-temperature/I</property>
+    <property value="1">systems/electric/bus[1]/horizontal-stabilization-corrector/fuse</property>
+    <property value="1">systems/electric/bus[1]/vertical-tail-corrector/fuse</property>
+    <property value="0">systems/electric/bus[1]/fuel-level-indicator/sw</property>
+    <property value="1">systems/electric/bus[1]/fuel-pump/fuse</property>
+    <property value="1">systems/electric/bus[1]/fuel-AP-emergency/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/fuel-AP-emergency/I</property>
+    <property value="1">systems/electric/bus[1]/aileron-servocontrol-emergency/fuse</property>
+    <property value="1">systems/electric/bus[1]/landing-light/fuse</property>
+    <property value="1">systems/electric/bus[1]/aerodynamic-brakes/fuse</property>
+    <property value="0">systems/electric/bus[1]/aerodynamic-brakes/sw</property>
+    <property value="1">systems/electric/bus[1]/gyrocompass/fuse</property>
+    <property value="1">systems/electric/bus[1]/gyrocompass/sw</property>
+    <property value="1">systems/electric/bus[1]/gyrocompass/I</property>
+    <property value="1">systems/electric/bus[1]/compass-flux-gate/fuse</property>
+    <property value="0">systems/electric/bus[1]/compass-flux-gate/I</property>
+    <property value="1">systems/electric/bus[1]/IFF/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/IFF/I</property>
+    <property value="1">systems/electric/bus[1]/NAV/fuse</property>
+    <property value="1">systems/electric/bus[1]/NAV/sw</property>
+    <property value="0.0">systems/electric/bus[1]/NAV/I</property>
+    <property value="1">systems/electric/bus[1]/collimator-lighting/fuse</property>
+    <property value="0">systems/electric/bus[1]/collimator-lighting/sw</property>
+    <property value="0">systems/electric/bus[1]/collimator-lighting/I</property>
+    <property value="1">systems/electric/bus[1]/hydraulic-system-flight-controls/fuse</property>
+    <property value="1">systems/electric/bus[1]/hydraulic-system-general-utilities/fuse</property>
+    <property value="1">systems/electric/bus[1]/fuel-level-indicator/fuse</property>
+    <property value="0">systems/electric/bus[1]/fuel-level-indicator/on</property>
+    <property value="0.0">systems/electric/bus[1]/fuel-level-indicator/I</property>
+    <property value="1">systems/electric/bus[1]/fuel-interception-BP/fuse</property>
+    <property value="1">systems/electric/bus[1]/secondary-inverter/fuse</property>
+    <property value="0">systems/electric/bus[1]/secondary-inverter/sw</property>
+    <property value="1">systems/electric/bus[1]/wing-flap/fuse</property>
+    <property value="0">systems/electric/bus[1]/wing-flap/sw</property>
+    <property value="0.0">systems/electric/bus[1]/wing-flap/I</property>
+    <property value="1">systems/electric/bus[1]/electric-limiter-tamper-jet/fuse</property>
+    <property value="1">systems/electric/bus[1]/anti-collision-light/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/anti-collision-light/I</property>
+    <property value="1">systems/electric/bus[1]/beacon-light/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/beacon-light/I</property>
+    <property value="1">systems/electric/bus[1]/instrument-panel-emerg-lights/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/instrument-panel-emerg-lights/I</property>
+    <property value="1">systems/electric/bus[1]/instrument-flood-lights/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/instrument-flood-lights/I</property>
+    <property value="1">systems/electric/bus[1]/console-lights/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/console-lights/I</property>
+    <property value="1">systems/electric/bus[1]/additional-tank-pressurization/fuse</property>
+    <property value="1">systems/electric/bus[1]/radiogoniometer/fuse</property>
+    <property value="0">systems/electric/bus[1]/radiogoniometer/sw</property>
+    <property value="0.0">systems/electric/bus[1]/radiogoniometer/I</property>
+    <property value="1">systems/electric/bus[1]/UHF-radio/fuse</property>
+    <property value="0">systems/electric/bus[1]/UHF-radio/sw</property>
+    <property value="0.0">systems/electric/bus[1]/UHF-radio/I</property>
+    <property value="1">systems/electric/bus[1]/UHF-radio-emergency/fuse</property>
+    <property value="0">systems/electric/bus[1]/UHF-radio-emergency/sw</property>
+    <property value="0.0">systems/electric/bus[1]/UHF-radio-emergency/I</property>
+    <property value="1">systems/electric/bus[1]/rockets-on-stations/fuse</property>
+    <property value="1">systems/electric/bus[1]/rockets-on-rafters/fuse</property>
+    <property value="1">systems/electric/bus[1]/pitot-heating/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/pitot-heating/I</property>
+    <property value="1">systems/electric/bus[1]/JATO-plate-release/fuse</property>
+    <property value="0">systems/electric/bus[1]/JATO-plate-release/sw</property>
+    <property value="1">systems/electric/bus[1]/safe-landing-geta-on-ground/fuse</property>
+    <property value="1">systems/electric/bus[1]/safe-special-bombs/fuse</property>
+    <property value="1">systems/electric/bus[1]/shoot-on-ground/fuse</property>
+    <property value="1">systems/electric/bus[1]/turn-indicator/fuse</property>
+    <property value="1">systems/electric/bus[1]/fuel-JPTL/fuse</property>
+    <property value="1">systems/electric/bus[1]/fuel-JPTL/I</property>
+    <property value="1">systems/electric/bus[1]/drop-tank-press-on/fuse</property>
+    <property value="0.0">systems/electric/bus[1]/drop-tank-press-on/I</property>
+    <property value="1">systems/electric/bus[1]/fuel-shut-off/fuse</property>
+    <property value="1">systems/electric/bus[1]/ignition-cartridge-starting-fuse</property>
+    <property value="0.0">systems/electric/bus[1]/high-energy-lighter/I</property>
+    <property value="1">systems/electric/bus[2]/featuring-gun/fuse</property>
+    <property value="1">systems/electric/bus[2]/doppler/fuse</property>
+    <property value="0.0">systems/electric/bus[2]/doppler/I</property>
+    <property value="1">systems/electric/bus[2]/inverter-missiles/fuse</property>
+    <property value="1">systems/electric/bus[2]/primary-inverter/fuse</property>
+    <property value="0">systems/electric/bus[2]/primary-inverter/sw</property>
+    <property value="1">systems/electric/bus[2]/position-lights/fuse</property>
+    <property value="0.0">systems/electric/bus[2]/position-lights/I</property>
+    <property value="0.0">systems/electric/bus[2]/cockpit-lights/I</property>
+    <property value="1">systems/electric/bus[2]/cameras/fuse</property>
+    <property value="0">systems/electric/bus[2]/cameras/camera[1]/sw</property>
+    <property value="0.0">systems/electric/bus[2]/cameras/camera[1]/I</property>
+    <property value="0">systems/electric/bus[2]/cameras/camera[1]/film</property>
+    <property value="0">systems/electric/bus[2]/cameras/camera[2]/sw</property>
+    <property value="0.0">systems/electric/bus[2]/cameras/camera[2]/I</property>
+    <property value="0">systems/electric/bus[2]/cameras/camera[2]/film</property>
+    <property value="0">systems/electric/bus[2]/cameras/camera[3]/sw</property>
+    <property value="0.0">systems/electric/bus[2]/cameras/camera[3]/I</property>
+    <property value="0">systems/electric/bus[2]/cameras/camera[3]/film</property>
+    <property value="1">systems/electric/bus[2]/as20-missiles/fuse</property>
+    <property value="1">systems/electric/bus[2]/PHI/fuse</property>
+    <property value="0.0">systems/electric/bus[2]/PHI/I</property>
+    <property value="1">systems/electric/bus[2]/generator-emergency-relay/fuse</property>
+    <property value="0">systems/electric/bus[2]/generator-emergency-relay/sw</property>
+    <property value="1">systems/electric/bus[2]/magnetic-tape/fuse</property>
+    <property value="1">systems/electric/bus[2]/magnetic-tape/sw</property>
+    <property value="0.0">systems/electric/bus[2]/magnetic-tape/I</property>
+    <property value="1">systems/electric/bus[2]/overheating-cameras/fuse</property>
+    <property value="1">systems/electric/bus[2]/overheating-guns/fuse</property>
+    <property value="1">systems/electric/bus[2]/servo-horizontal-rudder/fuse</property>
+    <property value="1">systems/electric/bus[2]/pitch-damper/fuse</property>
+    <property value="1">systems/electric/bus[2]/yaw-damper/fuse</property>
+    <property value="1">systems/electric/bus[2]/aileron-vibrator/fuse</property>
+    <property value="1">systems/electric/bus[2]/cockpit-vibrator/fuse</property>
+    <property value="1">systems/electric/bus[2]/panel-lights/fuse</property>
+    <property value="0.0">systems/electric/bus[2]/panel-lights/I</property>
+    <property value="10">systems/electric/inv-primary/I0</property>
+    <property value="10">systems/electric/inv-secondary/I0</property>
+    <property value="1">systems/electric/inv-primary/cockpit-air-temp/fuse</property>
+    <property value="0">systems/electric/inv-primary/cockpit-air-temp/I</property>
+    <property value="0">systems/electric/bus[1]/sound-lag</property>
+    
+    <channel name="Calculate loads on bus" execrate="8">
+        
+        <summer name="systems/electric/bus[0]/I">
+            <input>systems/electric/bus[0]/emergency-canopy-light/I</input>
+            <input>systems/electric/bus[0]/emergency-radio/I</input>
+            <input>systems/electric/bus[0]/canopy-command/I</input>
+        </summer>
+        
+        <summer name="systems/electric/bus[1]/I">
+            <input>systems/electric/bus[1]/internal-power-generator-I-Fiels</input>
+            <input>systems/electric/bus[1]/JATO-ignition/I</input>
+            <input>systems/electric/bus[1]/landing-light/I</input>
+            <input>systems/electric/bus[1]/gyrocompass/I</input>
+            <input>systems/electric/bus[1]/IFF/I</input>
+            <input>systems/electric/bus[1]/NAV/I</input>
+            <input>systems/electric/bus[1]/wing-flap/I</input>
+            <input>systems/electric/bus[1]/anti-collision-light/I</input>
+            <input>systems/electric/bus[1]/radiogoniometer/I</input>
+            <input>systems/electric/bus[1]/UHF-radio/I</input>
+            <input>systems/electric/bus[1]/UHF-radio-emergency/I</input>
+            <input>systems/electric/bus[1]/pitot-heating/I</input>
+            <input>systems/electric/bus[1]/beacon/I</input>
+            <input>systems/electric/bus[1]/anticollision/I</input>
+            <input>systems/electric/bus[1]/beacon-light/I</input>
+            <input>systems/electric/bus[1]/starter/I</input>
+            <input>systems/electric/bus[1]/primary-inverter/I</input>
+            <input>systems/electric/bus[1]/secondary-inverter/I</input>
+            <input>systems/electric/bus[1]/collimator-lighting/I</input>
+            <input>systems/electric/bus[1]/BP-fuel/I</input>
+            <input>systems/electric/bus[1]/fuel-AP-emergency/I</input>
+            <input>systems/electric/bus[1]/fuel-level-indicator/I</input>
+            <input>systems/electric/bus[1]/fuel-JPTL/I</input>
+            <input>systems/electric/bus[1]/drop-tank-press-on/I</input>
+            <input>systems/electric/bus[1]/compass-flux-gate/I</input>
+            <input>systems/electric/bus[1]/air-conditioning-pressurization/I</input>
+            <input>systems/electric/bus[1]/air-conditioning-temperature/I</input>
+            <input>systems/electric/bus[1]/instrument-panel-emerg-lights/I</input>
+            <input>systems/electric/bus[1]/instrument-flood-lights/I</input>
+            <input>systems/electric/bus[1]/console-lights/I</input>
+            <input>systems/electric/bus[1]/high-energy-lighter/I</input>
+        </summer>
+        
+        <summer name="systems/electric/bus[2]/I">
+            <input>systems/electric/bus[2]/doppler/I</input>
+            <input>systems/electric/bus[2]/position-lights/I</input>
+            <input>systems/electric/bus[2]/panel-lights/I</input>
+            <input>systems/electric/bus[2]/cameras/camera[1]/I</input>
+            <input>systems/electric/bus[2]/cameras/camera[2]/I</input>
+            <input>systems/electric/bus[2]/cameras/camera[3]/I</input>
+            <input>systems/electric/bus[2]/PHI/I</input>
+            <input>systems/electric/bus[2]/magnetic-tape/I</input>
+            <input>systems/electric/bus[2]/primary-inverter/I</input>
+            <input>systems/electric/bus[2]/pitch-damper/I</input>
+            <input>systems/electric/bus[2]/yaw-damper/I</input>
+        </summer>
+        
+    </channel>
+    
+    
+    <channel name="Bus 0 - Battery" execrate="8">
+        
+        <fcs_function name="systems/electric/bus[0]/I-To-Battery">
+            <function>
+                <ifthen>
+                    <p>systems/manual-switches/cockpit/sw-bus0-bus1-battery</p>
+                    <sum>
+                        <p>systems/electric/bus[0]/I</p>
+                        <p>systems/electric/bus[1]/I</p>
+                        <p>systems/electric/bus[2]/I</p>
+                    </sum>
+                    <p>systems/electric/bus[0]/I</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/electric/bus[0]/V">
+            <function>
+                <ifthen>
+                    <p>systems/manual-switches/cockpit/sw-bus0-bus1-battery</p>
+                    <ifthen>
+                        <gt>
+                            <p>systems/electric/bus[1]/V</p>
+                            <p>systems/electric/bus[0]/battery-V</p>
+                        </gt>
+                        <p>systems/electric/bus[1]/V</p>
+                        <p>systems/electric/bus[0]/battery-V</p>
+                    </ifthen>
+                    <p>systems/electric/bus[0]/battery-V</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/electric/bus[0]/W-To-Battery">
+            <function>
+                <ifthen>
+                    <p>systems/manual-switches/cockpit/sw-bus0-bus1-battery</p>
+                    <ifthen>
+                        <p>systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on</p>
+                        <product>
+                            <v>250.0</v>
+                            <quotient>
+                                <difference>
+                                    <p>systems/electric/bus[1]/internal-power-generator-V</p>
+                                    <p>systems/electric/bus[0]/battery-V</p>
+                                </difference>
+                                <p>systems/electric/bus[1]/internal-power-generator-V</p>
+                            </quotient>
+                        </product>
+                        <product>
+                            <p>systems/electric/bus[0]/I-To-Battery</p>
+                            <p>systems/electric/bus[0]/V</p>
+                            <v>-1.0</v>
+                        </product>
+                    </ifthen>
+                    <product>
+                        <p>systems/electric/bus[0]/I-To-Battery</p>
+                        <p>systems/electric/bus[0]/V</p>
+                        <v>-1.0</v>
+                    </product>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <integrator name="systems/electric/bus[0]/battery-energy-change-J">
+            <input>systems/electric/bus[0]/W-To-Battery</input>
+            <c1>1.0</c1>
+        </integrator>
+        
+        <summer name="systems/electric/bus[0]/battery-capacity-J">
+            <input>systems/electric/bus[0]/battery-capacity-initial-J</input>
+            <input>systems/electric/bus[0]/battery-energy-change-J</input>
+            <clipto>
+                <min>0.0</min>
+                <max>systems/electric/bus[0]/battery-capacity-max-J</max>
+            </clipto>
+        </summer>
+        
+        <fcs_function name="systems/electric/bus[0]/battery-charge-norm">
+            <function>
+                <quotient>
+                    <p>systems/electric/bus[0]/battery-capacity-J</p>
+                    <p>systems/electric/bus[0]/battery-capacity-max-J</p>
+                </quotient>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/electric/bus[0]/battery-V">
+            <function>
+                <table>
+                    <independentVar lookup="row">systems/electric/bus[0]/battery-charge-norm</independentVar>
+                    <tableData>
+                        0.0     0.0
+                        0.02    21.0
+                        0.1     22.5
+                        0.2     23.0
+                        0.5     24.0
+                        0.8     24.8
+                        0.9     25.0
+                        1.0     25.4
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+        
+    </channel>
+    
+    
+    <channel name="Bus Primary" execrate="8">
+        
+        <switch name="systems/electric/bus[1]/V">
+            <default value="0" />
+            <test logic="AND" value="28.0">
+                systems/electric/bus[1]/external-power-generator-on == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 0
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 0
+            </test>  
+            <test logic="AND" value="systems/electric/bus[0]/battery-V">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 1
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 0
+            </test>
+            <test logic="AND" value="systems/electric/bus[1]/internal-power-generator-V">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 0
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 1
+            </test>
+            <test logic="AND" value="systems/electric/bus[1]/internal-power-generator-V">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 1
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 1
+            </test> 
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on">
+            <default value="0" />
+            <test logic="AND" value="0">
+                systems/electric/bus[1]/internal-power-generator-V LT 18
+            </test>
+            <test logic="AND" value="1">
+                systems/manual-switches/cockpit/sw-internal-power-generator == 1
+                systems/electric/bus[1]/internal-power-generator-V GE 18
+                <test logic="OR">
+                    <test logic="AND">
+                        systems/manual-switches/cockpit/sw-bus0-bus1-battery == 0
+                    </test>
+                    <test logic="AND">
+                        systems/manual-switches/cockpit/sw-bus0-bus1-battery == 1
+                        systems/electric/bus[1]/internal-power-generator-V GT systems/electric/bus[0]/battery-V
+                    </test>
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/internal-power-generator-I">
+            <default value="0" />
+            <test logic="AND" value="systems/electric/bus[1]/internal-power-generator-I-Allload">
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/electric/bus[1]/internal-power-generator-W-All-Load">
+            <input>systems/electric/bus[1]/internal-power-generator-I-Allload</input>
+            <gain>systems/electric/bus[1]/V</gain>
+        </pure_gain>
+        
+        <fcs_function name="systems/electric/bus[1]/internal-power-generator-I-Fiels">
+            <function>
+                <ifthen>
+                    <p>systems/manual-switches/cockpit/sw-internal-power-generator</p>
+                    <quotient>
+                        <p>systems/electric/bus[1]/V</p>
+                        <v>2.6</v>
+                    </quotient>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/electric/bus[1]/internal-power-generator-Vout-Potenzial">
+            <function>
+                <ifthen>
+                    <ifthen>
+                        <gt>
+                            <p>systems/electric/bus[1]/V</p>
+                            <v>18.0</v>
+                        </gt>
+                        <p>systems/manual-switches/cockpit/sw-internal-power-generator</p>
+                        <v>0</v>
+                    </ifthen>
+                    <product>
+                        <table>
+                            <independentVar>propulsion/engine/n1</independentVar>
+                            <tableData>
+                                0.0   0.0
+                                10.0  12.0
+                                20.0  18.0
+                                35.0  28.0
+                                100.0 30.0
+                            </tableData>
+                        </table>
+                        <table>
+                            <independentVar>systems/electric/bus[1]/internal-power-generator-I</independentVar>
+                            <tableData>
+                                0.0    1.0
+                                200.0  1.0
+                                300.0  0.9
+                                400.0  0.6
+                                1000.0 0.0
+                            </tableData>
+                        </table>
+                    </product>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <lag_filter name="systems/electric/bus[1]/internal-power-generator-V">
+            <input>systems/electric/bus[1]/internal-power-generator-Vout-Potenzial</input>
+            <c1>1.0</c1>
+        </lag_filter>
+        
+        <summer name="systems/electric/bus[1]/internal-power-generator-I-Allload">
+            <input>systems/electric/bus[1]/I-bus0-to-bus1</input>
+            <input>systems/electric/bus[1]/I</input>
+            <input>systems/electric/bus[2]/I</input>
+        </summer>
+        
+        <switch name="systems/electric/bus[1]/I-bus0-to-bus1">
+            <default value="0" />
+            <test logic="AND" value="systems/electric/bus[0]/I">
+                systems/manual-switches/cockpit/sw-bus0-bus1-battery == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus-link/relay-bus1-bus2-secondary">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/electric/bus[1]/internal-power-generator-inverted-current-rele-on == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/electric/bus[1]/W">
+            <input>systems/electric/bus[1]/I</input>
+            <gain>systems/electric/bus[1]/V</gain>
+        </pure_gain>
+        
+        <lag_filter name="systems/electric/bus[1]/sound-lag">
+            <input>systems/electric/bus[1]/V</input>
+            <c1>0.5</c1>
+        </lag_filter>
+        
+        
+    </channel>
+    
+    
+    <channel name="Bus Secondary" execrate="8">
+        
+        <switch name="systems/electric/bus[2]/V">
+            <default value="0" />
+            <test logic="AND" value="systems/electric/bus[1]/V">
+                systems/electric/bus-link/relay-bus1-bus2-secondary == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/electric/bus[2]/W">
+            <input>systems/electric/bus[2]/I</input>
+            <gain>systems/electric/bus[2]/V</gain>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <channel name="Inverters" execrate="32">
+        
+        
+        
+        <switch name="systems/electric/inv-primary/active">
+            <default value="0" />
+            <test logic="AND" value="115">
+                systems/electric/bus[2]/primary-inverter/fuse == 1
+                systems/manual-switches/cockpit/sw-primary-inverter-on == 1
+                systems/electric/bus[2]/V GE 26
+                systems/electric/inv-primary/emergency-on-bus1 == 0
+            </test>
+            <test logic="AND" value="115">
+                systems/electric/bus[2]/primary-inverter/fuse == 1
+                systems/manual-switches/cockpit/sw-primary-inverter-on == 1
+                systems/electric/bus[2]/V LT 26
+                systems/electric/inv-primary/emergency-on-bus1 == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/electric/inv-primary/V">
+            <input>systems/electric/inv-primary/active</input>
+            <c1>0.5</c1>
+        </lag_filter>
+        
+        <switch name="systems/electric/bus[2]/primary-inverter/I">
+            <default value="0" />
+            <test logic="AND" value="systems/electric/inv-primary/I">
+                systems/electric/inv-primary/emergency-on-bus1 == 0
+                systems/electric/inv-primary/active GE 10
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/primary-inverter/I">
+            <default value="0" />
+            <test logic="AND" value="systems/electric/inv-primary/I">
+                systems/electric/inv-primary/emergency-on-bus1 == 1
+                systems/electric/inv-primary/active GE 10
+            </test>
+        </switch>
+        
+        <summer name="systems/electric/inv-primary/I">
+            <input>systems/electric/inv-primary/I0</input>
+            <input>systems/electric/bus[1]/turn-indicator/I</input>
+            <input>systems/electric/bus[1]/attitude-indicator/I</input>
+            <input>systems/electric/inv-primary/cockpit-air-temp/I</input>
+        </summer>
+        
+        
+        
+        <switch name="systems/electric/inv-primary/emergency-on-bus1">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[2]/primary-inverter/fuse == 1
+                systems/manual-switches/cockpit/sw-primary-inverter-on == 1
+                systems/electric/bus[2]/V LT 26
+                systems/electric/bus[1]/V GE 26
+            </test>
+        </switch>
+        
+        
+        
+        <switch name="systems/electric/inv-secondary/active">
+            <default value="0" />
+            <test logic="AND" value="115">
+                systems/electric/bus[1]/secondary-inverter/fuse == 1
+                systems/manual-switches/cockpit/sw-secondary-inverter-on == 1
+                systems/electric/bus[1]/V GE 26
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/secondary-inverter/I">
+            <default value="0" />
+            <test logic="AND" value="systems/electric/inv-secondary/I">
+                systems/electric/inv-secondary/active GE 10
+            </test>
+        </switch>
+        
+        <summer name="systems/electric/inv-secondary/I">
+            <input>systems/electric/inv-secondary/I0</input>
+        </summer>
+        
+        <lag_filter name="systems/electric/inv-secondary/V">
+            <input>systems/electric/inv-secondary/active</input>
+            <c1>0.5</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+</system>

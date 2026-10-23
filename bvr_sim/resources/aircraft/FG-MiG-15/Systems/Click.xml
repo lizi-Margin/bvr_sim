@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-04 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Click sound </description>
+	</fileheader>
+
+
+	<channel name="Click sound">
+
+		<kinematic name="calculations/sounds/click/time-pos">
+			<input>systems/sounds/click/on</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.06</time>
+			</setting>
+			</traverse>
+			<output>systems/sounds/click/time-pos</output>
+		</kinematic>
+
+		<switch name="calculations/sounds/click/off">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="0">
+				systems/sounds/click/time-pos ge 0.9
+				systems/sounds/click/on == 1
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

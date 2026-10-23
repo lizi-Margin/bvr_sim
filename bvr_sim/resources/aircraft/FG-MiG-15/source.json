@@ -1,0 +1,31 @@
+{
+  "set": "MiG-15/MiG-15bis-set.xml",
+  "name": "MiG-15bis",
+  "fdm_type": "jsb",
+  "fdm": "MiG-15/MiG-15bis.xml",
+  "jets": 0,
+  "model": "MiG-15/Models/MiG-15bis.xml",
+  "tags": [
+    "1940s",
+    "1950s",
+    "coldwar",
+    "combat",
+    "fighter",
+    "interceptor",
+    "jet",
+    "mikoyan-gurevich",
+    "retractable-gear",
+    "single-engine",
+    "tricycle",
+    "castering-wheel",
+    "low-wing",
+    "t-tail"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 4,
+  "variant_of": "",
+  "archive": "MiG-15.zip",
+  "archive_sha256": "d783d019aab8a41592c1ad90e9bcc4ef64a7fce9eddfdef3d3c620daacd72e01",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MiG-15.zip"
+}

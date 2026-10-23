@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Canopy </description>
+	</fileheader>
+
+
+
+	<channel name="Canopy">
+
+		
+
+		<switch name="calculations/canopy/command-serviceabled">
+			<default value="systems/canopy/pos" />
+			<test logic="AND" value="systems/canopy/command">
+				systems/canopy/serviceable eq 1.0
+			</test>
+			<output>systems/canopy/command-serviceabled</output>
+		</switch>
+
+		
+
+		<switch name="calculations/canopy/command-matched">
+			<default value="systems/canopy/command-serviceabled" />
+			<test logic="AND" value="1.0">
+				velocities/mach gt 0.2
+				systems/canopy/pos gt 0.01
+			</test>
+			<output>systems/canopy/command-matched</output>
+		</switch>
+
+		<switch name="calculations/canopy/match-feedback">
+			<default value="systems/canopy/command" />
+			<test logic="AND" value="1.0">
+				velocities/mach gt 0.2
+				systems/canopy/pos gt 0.01
+				systems/canopy/serviceable eq 1.0
+			</test>
+			<output>systems/canopy/command</output>
+		</switch>
+
+		
+
+		<fcs_function name="calculations/canopy/lock-command">
+			<function>
+				<table>
+					<independentVar lookup="column">systems/canopy/command-matched</independentVar>
+					<independentVar lookup="row">systems/canopy/pos</independentVar>
+				<tableData>
+						0.0	1.0
+					0.0	0.0	1.0
+					0.1	1.0	1.0
+					0.2	1.0	1.0
+					0.21	0.0	1.0
+					0.99	0.0	1.0
+					1.0	0.0	0.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/canopy/lock-command</output>
+		</fcs_function>
+
+		<kinematic name="calculations/canopy/lock-pos">
+			<input>systems/canopy/lock-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/canopy/lock-pos</output>
+		</kinematic>
+
+		
+
+		<kinematic name="calculations/canopy/pos">
+			<input>systems/canopy/command-matched</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.5</time>
+			</setting>
+			</traverse>
+			<output>systems/canopy/pos</output>
+		</kinematic>
+
+		
+
+		<fcs_function name="calculations/canopy/lock-click">
+			<function>
+				<table>
+					<independentVar lookup="column">systems/canopy/command-matched</independentVar>
+					<independentVar lookup="row">systems/canopy/pos</independentVar>
+				<tableData>
+						0.0	1.0
+					0.0	0.0	0.0
+					0.15	1.0	0.0
+					0.3	0.0	0.0
+					1.0	0.0	0.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/sounds/canopy-lock-click/on</output>
+		</fcs_function>
+
+	</channel>
+
+</system>

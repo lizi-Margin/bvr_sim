@@ -1,0 +1,16 @@
+{
+  "aero/adragscale": 1.0,
+  "gear/unit[0]/wheel-circumfence-ft": 1.191,
+  "gear/unit[1]/wheel-circumfence-ft": 2.502,
+  "gear/unit[2]/wheel-circumfence-ft": 2.502,
+  "metrics/reference-datum-m": 11.905,
+  "metrics/leading-edge-arm-m": 10.0895,
+  "metrics/base-arm-m": 10.594,
+  "/systems/fuel/fuel-pump[0]/serviceable": 1.0,
+  "/systems/fuel/fuel-pump[1]/serviceable": 1.0,
+  "/systems/fuel/fuel-pump[2]/serviceable": 1.0,
+  "/systems/fuel/fuel-pump[3]/serviceable": 1.0,
+  "/systems/fuel/fuel-pump[4]/serviceable": 1.0,
+  "/systems/fuel/fuel-pump[5]/serviceable": 1.0,
+  "/systems/fuel/fuel-pump[6]/serviceable": 1.0
+}

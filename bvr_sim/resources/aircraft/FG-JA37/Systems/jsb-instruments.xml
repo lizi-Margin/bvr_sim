@@ -1,0 +1,1363 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="instruments">
+    <channel execrate="4" name="engine-instruments">
+        
+        <fcs_function name="propulsion/engine/mil-rate">
+            <function>
+                
+                <product>
+                    <table>
+                        <independentVar lookup="row">propulsion/engine/n2</independentVar>
+                        <tableData>
+                             56.9 0
+                             57   1
+                        </tableData>
+                    </table>
+                    <sum>
+                        <product>
+                            <p>propulsion/engine/IdleThrust</p>
+                            <v>72100</v>
+                        </product>
+                        <product>
+                            <product>
+                                <difference>
+                                    <v>72100</v>
+                                    <product>
+                                        <p>propulsion/engine/IdleThrust</p>
+                                        <v>72100</v>
+                                    </product>
+                                </difference>
+                                <p>propulsion/engine/MilThrust</p>
+                            </product>
+                            <quotient>
+                                <difference>
+                                    <p>propulsion/engine/n2</p>
+                                    <v>57</v>
+                                </difference>
+                                <v>43</v>
+                            </quotient>
+                            <quotient>
+                                <difference>
+                                    <p>propulsion/engine/n2</p>
+                                    <v>57</v>
+                                </difference>
+                                <v>43</v>
+                            </quotient>
+                        </product>
+                    </sum>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="propulsion/engine/p7-p2">
+            <function>
+                <table>
+                    <independentVar lookup="row">propulsion/engine/mil-rate</independentVar>
+                    <tableData>
+                         1650     1.00 
+                         3000     1.02
+                        72100     2.06 
+                       115000    2.705 
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <switch name="instruments/engine/epr-raw">
+            <default value="propulsion/engine/p7-p2" />
+            <test value="/engines/engine/epr-gauge">
+                /ja37/elec/ac-bus-main-bool == 0
+            </test>
+        </switch>
+
+        <actuator name="instruments/engine/epr">
+            <input>instruments/engine/epr-raw</input>
+            <rate_limit>4</rate_limit>
+            <clipto>
+                <min>1</min>
+                <max>3</max>
+            </clipto>
+            <output>/engines/engine/epr-gauge</output>
+        </actuator>
+
+        
+        <switch name="instruments/engine/rpm-raw">
+            <default value="propulsion/engine/n2" />
+            <test value="/engines/engine/rpm-gauge">
+              /ja37/elec/ac-bus-main-bool == 0
+            </test>
+        </switch>
+
+        <actuator name="instruments/engine/rpm">
+            <input>instruments/engine/rpm-raw</input>
+            <rate_limit>200</rate_limit>
+            <clipto>
+                <min>0</min>
+                <max>110</max>
+            </clipto>
+            <output>/engines/engine/rpm-gauge</output>
+        </actuator>
+    </channel>
+
+
+    <channel execrate="4" name="altimeters">
+        
+        <pure_gain name="instruments/altimeter/altitude-m">
+            <input>/instrumentation/altimeter/indicated-altitude-ft</input>
+            <gain>0.3048</gain>
+            <output>/instrumentation/altimeter/indicated-altitude-meter</output>
+        </pure_gain>
+
+        <pure_gain name="instruments/altimeter-backup/altitude-m">
+            <input>/instrumentation/altimeter[1]/indicated-altitude-ft</input>
+            <gain>0.3048</gain>
+            <output>/instrumentation/altimeter[1]/indicated-altitude-meter</output>
+        </pure_gain>
+
+        <pure_gain name="instruments/altimeter/pressure-altitude-m">
+            <input>/instrumentation/altimeter/pressure-alt-ft</input>
+            <gain>0.3048</gain>
+            <output>/instrumentation/altimeter/pressure-alt-meter</output>
+        </pure_gain>
+
+        
+        <switch name="instruments/radar-altimeter/functional">
+            <default value="1" />
+            <test logic="OR" value="0">
+                /instrumentation/radar-altimeter/serviceable == 0
+                /ja37/elec/dc-bus-main-bool == 0
+                /controls/altimeter-radar == 0
+            </test>
+            <output>/instrumentation/radar-altimeter/functional</output>
+        </switch>
+
+        <switch name="instruments/radar-altimeter/enabled">
+            <default value="1" />
+            <test logic="OR" value="0">
+                instruments/radar-altimeter/functional == 0
+                gear/unit[1]/WOW == 1
+                /instrumentation/attitude-indicator/indicated-pitch-deg gt 45
+                /instrumentation/attitude-indicator/indicated-pitch-deg lt -45
+                /instrumentation/attitude-indicator/indicated-roll-deg gt 45
+                /instrumentation/attitude-indicator/indicated-roll-deg lt -45
+            </test>
+            <output>/instrumentation/radar-altimeter/enabled</output>
+        </switch>
+
+        <pure_gain name="instruments/radar-altimeter/radar-altitude-m">
+            <input>/instrumentation/radar-altimeter/radar-altitude-ft</input>
+            <gain>0.3048</gain>
+            <output>/instrumentation/radar-altimeter/radar-altitude-m</output>
+        </pure_gain>
+
+        
+        <switch name="instruments/radar-altimeter/ready">
+            <default value="1" />
+            <test logic="OR" value="0">
+                instruments/radar-altimeter/enabled == 0
+                instruments/radar-altimeter/radar-altitude-m &gt; /instrumentation/radar-altimeter/max-usable-altitude-m
+                /instrumentation/attitude-indicator/indicated-pitch-deg gt 40
+                /instrumentation/attitude-indicator/indicated-pitch-deg lt -40
+                /instrumentation/attitude-indicator/indicated-roll-deg gt 40
+                /instrumentation/attitude-indicator/indicated-roll-deg lt -40
+            </test>
+            <output>/instrumentation/radar-altimeter/ready</output>
+        </switch>
+
+        
+
+        
+        <summer name="instruments/altimeter/ground-delta-raw-m">
+            <input>instruments/altimeter/pressure-altitude-m</input>
+            <input>-instruments/radar-altimeter/radar-altitude-m</input>
+        </summer>
+
+        <switch name="instruments/altimeter/ground-delta-switched-m">
+            
+            <test logic="AND" value="instruments/altimeter/ground-delta-raw-m">
+                /ja37/hud/switch-hojd eq 1
+                instruments/radar-altimeter/ready eq 1
+            </test>
+            
+            <default value="instruments/altimeter/ground-delta-filtered-m" />
+        </switch>
+
+        <lag_filter name="instruments/altimeter/ground-delta-filtered-m">
+            <input>instruments/altimeter/ground-delta-switched-m</input>
+            <c1>2</c1>
+        </lag_filter>
+
+        
+        <summer name="instruments/altimeter/ground-corrected-altitude-m">
+            <input>instruments/altimeter/pressure-altitude-m</input>
+            <input>-instruments/altimeter/ground-delta-filtered-m</input>
+        </summer>
+
+        
+        <switch name="instruments/altimeter/displays-altitude-m">
+            <default value="instruments/altimeter/altitude-m" />
+            <test value="instruments/altimeter/ground-corrected-altitude-m">
+                /ja37/hud/switch-hojd eq 1
+            </test>
+            <output>/instrumentation/altimeter/displays-altitude-meter</output>
+        </switch>
+
+        
+
+        <pure_gain name="instruments/altimeter/airbase-altitude-m">
+            <input>/instrumentation/altimeter/airbase-altitude-meter</input>
+            <gain>1</gain>
+        </pure_gain>
+
+        <pure_gain name="instruments/altimeter/airbase-altitude-ft">
+            <input>instruments/altimeter/airbase-altitude-m</input>
+            <gain>3.2808399</gain>
+            <output>/instrumentation/altimeter/airbase-altitude-ft</output>
+        </pure_gain>
+
+        
+
+        <summer name="instruments/altimeter/pressure-alt-offset-m">
+            <input>instruments/altimeter/airbase-altitude-m</input>
+            <input>-instruments/altimeter/pressure-altitude-m</input>
+        </summer>
+
+        
+        <switch name="instruments/altimeter/departure-pressure-alt-offset-m">
+            <test value="instruments/altimeter/pressure-alt-offset-m">
+                gear/unit[0]/WOW eq 1
+            </test>
+            <default value="instruments/altimeter/departure-pressure-alt-offset-m" />
+        </switch>
+
+        <summer name="instruments/altimeter/calculated-QNH-altitude-m">
+            <input>instruments/altimeter/pressure-altitude-m</input>
+            <input>instruments/altimeter/departure-pressure-alt-offset-m</input>
+        </summer>
+
+        <summer name="instruments/altimeter/calculated-QFE-altitude-m">
+            <input>instruments/altimeter/calculated-QNH-altitude-m</input>
+            <input>-instruments/altimeter/airbase-altitude-m</input>
+        </summer>
+
+        
+
+        <switch name="instruments/altimeter/altitude-aal-correction-m">
+            <test logic="AND" value="-instruments/altimeter/airbase-altitude-m">
+                <test logic="OR">
+                    /ja37/hud/landing-mode eq 1
+                    /ja37/mode/takeoff eq 1
+                </test>
+                /ja37/hud/units-metric eq 0
+                /ja37/hud/qnh-mode eq 1
+                
+                /instrumentation/altimeter/setting-std eq 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <summer name="instruments/altimeter/altitude-aal-m">
+            <input>instruments/altimeter/altitude-m</input>
+            <input>instruments/altimeter/altitude-aal-correction-m</input>
+            <output>/instrumentation/altimeter/indicated-altitude-aal-meter</output>
+        </summer>
+
+        <pure_gain name="instruments/altimeter/altitude-aal-ft">
+            <input>instruments/altimeter/altitude-aal-m</input>
+            <gain>3.2808399</gain>
+            <output>/instrumentation/altimeter/indicated-altitude-aal-ft</output>
+        </pure_gain>
+
+        
+
+        <summer name="instruments/altimeter/altitude-asl-from-aal-m">
+            <input>instruments/altimeter/altitude-m</input>
+            <input>instruments/altimeter/airbase-altitude-m</input>
+        </summer>
+
+        <switch name="instruments/altimeter/altitude-asl-m">
+            
+            <test logic="AND" value="instruments/altimeter/altitude-m">
+                /ja37/hud/units-metric eq 0
+                /ja37/hud/qnh-mode eq 1
+                /instrumentation/altimeter/setting-std eq 0
+            </test>
+            
+            <test logic="AND" value="instruments/altimeter/altitude-asl-from-aal-m">
+                <test logic="OR">
+                    /ja37/hud/landing-mode eq 1
+                    /ja37/mode/takeoff eq 1
+                </test>
+                <test logic="OR">
+                    /ja37/hud/units-metric ne 0
+                    /ja37/hud/qnh-mode ne 1
+                </test>
+                /instrumentation/altimeter/setting-std eq 0
+            </test>
+            <default value="instruments/altimeter/calculated-QNH-altitude-m" />
+            <output>/instrumentation/altimeter/indicated-altitude-asl-m</output>
+        </switch>
+
+        <pure_gain name="instruments/altimeter/altitude-asl-ft">
+            <input>instruments/altimeter/altitude-asl-m</input>
+            <gain>3.2808399</gain>
+            <output>/instrumentation/altimeter/indicated-altitude-asl-ft</output>
+        </pure_gain>
+    </channel>
+
+    <channel execrate="4" name="airspeed-indicators">
+        <pure_gain name="instruments/airspeed/airspeed-kmh">
+            <input>/instrumentation/airspeed-indicator/indicated-speed-kt</input>
+            <gain>1.852</gain>
+            <output>/instrumentation/airspeed-indicator/indicated-speed-kmh</output>
+        </pure_gain>
+
+        <switch name="instruments/airspeed/mach-indicator-raw">
+            <default value="/instrumentation/airspeed-indicator/indicated-mach" />
+            <test value="/instrumentation/airspeed-indicator/mach-indicator">
+                /ja37/elec/ac-bus-main-bool == 0
+            </test>
+        </switch>
+
+        <actuator name="instruments/airspeed/mach-indicator">
+            <input>instruments/airspeed/mach-indicator-raw</input>
+            <rate_limit>0.5</rate_limit>
+            <clipto>
+                <min>0</min>
+                <max>2.5</max>
+            </clipto>
+            <output>/instrumentation/airspeed-indicator/mach-indicator</output>
+        </actuator>
+
+        <actuator name="instruments/airspeed/power-flag">
+            <input>/ja37/elec/ac-bus-main-bool</input>
+            <rate_limit>10</rate_limit>
+            <output>/instrumentation/airspeed-indicator/power-flag</output>
+        </actuator>
+
+        <pure_gain name="instruments/airspeed-backup/airspeed-kmh">
+            <input>/instrumentation/airspeed-indicator[1]/indicated-speed-kt</input>
+            <gain>1.852</gain>
+            <output>/instrumentation/airspeed-indicator[1]/indicated-speed-kmh</output>
+        </pure_gain>
+    </channel>
+
+
+    <channel execrate="4" name="heading-indicators">
+        <pure_gain name="instruments/heading-backup/gyro-power">
+            <input>/ja37/elec/ac-bus-main-norm</input>
+            <gain>5</gain>
+            <output>/instrumentation/heading-indicator[1]/power</output>
+        </pure_gain>
+
+        <switch name="instruments/heading/ja-indicated-heading">
+            <test value="/instrumentation/heading-indicator[1]/indicated-heading-deg">
+                /ja37/avionics/reservkurs eq 1
+            </test>
+            <default value="/instrumentation/heading-indicator/indicated-heading-deg" />
+            <output>/instrumentation/heading-indicator/ja-indicated-heading-deg</output>
+        </switch>
+
+        <switch name="instruments/heading/indicator-goal-deg">
+            <test logic="OR" value="/instrumentation/heading-indicator/indicator-pos-deg">
+                /ja37/elec/ac-bus-main-bool == 0
+                /instrumentation/heading-indicator/serviceable == 0
+            </test>
+            <test value="instruments/heading/ja-indicated-heading">
+                /ja37/systems/variant eq 0
+            </test>
+            <default value="/instrumentation/heading-indicator/indicated-heading-deg" />
+            <output>/instrumentation/heading-indicator/indicator-goal-deg</output>
+        </switch>
+    </channel>
+
+
+    <channel execrate="4" name="attitude-indicators">
+        <pure_gain name="instruments/attitude-backup/gyro-power">
+            <input>/ja37/elec/ac-bus-main-norm</input>
+            <gain>5</gain>
+            <output>/instrumentation/attitude-indicator[1]/power</output>
+        </pure_gain>
+
+        <actuator name="instruments/attitude-backup/power-flag">
+            <input>/ja37/elec/ac-bus-main-bool</input>
+            <rate_limit>10</rate_limit>
+            <output>/instrumentation/attitude-indicator[1]/power-flag</output>
+        </actuator>
+    </channel>
+
+
+    <channel execrate="4" name="waypoint-indicators">
+        
+
+        <switch name="instruments/waypoint/ajs-bearing-index-goal">
+            <test logic="OR" value="/instrumentation/waypoint-indicator/bearing-index">
+                /ja37/elec/ac-bus-main-bool == 0
+                /instrumentation/heading-indicator/serviceable == 0
+                /autopilot/route-manager/active == 0
+                /autopilot/route-manager/current-wp lt 0
+            </test>
+            <default value="/autopilot/route-manager/wp/true-bearing-deg" />
+        </switch>
+
+        <switch name="instruments/waypoint/ja-bearing-index-goal">
+            <test logic="OR" value="/instrumentation/waypoint-indicator/bearing-index">
+                /ja37/elec/ac-bus-main-bool == 0
+                /instrumentation/heading-indicator/serviceable == 0
+            </test>
+            
+            <default value="/instrumentation/waypoint-indicator/ja-bearing-deg" />
+        </switch>
+
+        <switch name="instruments/waypoint/bearing-index-goal">
+            <test value="instruments/waypoint/ja-bearing-index-goal">
+                /ja37/systems/variant eq 0
+            </test>
+            <default value="instruments/waypoint/ajs-bearing-index-goal" />
+            <output>/instrumentation/waypoint-indicator/bearing-index-goal</output>
+        </switch>
+
+        <switch name="instruments/waypoint/target-heading-index-goal">
+            <test logic="OR" value="/instrumentation/waypoint-indicator/bearing-index">
+                /ja37/elec/ac-bus-main-bool == 0
+                /instrumentation/heading-indicator/serviceable == 0
+            </test>
+            
+            <default value="/instrumentation/waypoint-indicator/ja-tgt-heading-deg" />
+            <output>/instrumentation/waypoint-indicator/tgt-heading-index-goal</output>
+        </switch>
+
+
+        
+
+        
+
+        <pure_gain name="instruments/waypoint/distance-km">
+          <input>/autopilot/route-manager/wp/dist</input>
+          <gain>1.852</gain>
+          <output>/autopilot/route-manager/wp/dist-km</output>
+        </pure_gain>
+
+        
+        <pure_gain name="instruments/waypoint/distance-mil">
+            <input>instruments/waypoint/distance-km</input>
+            <gain>0.1</gain>
+        </pure_gain>
+
+        <switch name="instruments/waypoint/distance-unit">
+            <default value="0" /> 
+            <test logic="AND" value="1"> 
+                /ja37/elec/ac-bus-main-bool == 1
+                /autopilot/route-manager/active == 1
+                /autopilot/route-manager/current-wp ge 0
+                instruments/waypoint/distance-km gt 40
+            </test>
+        </switch>
+
+        <switch name="instruments/waypoint/distance-needle-raw">
+            <test value="/instrumentation/waypoint-indicator/distance-needle">
+                /ja37/elec/ac-bus-main-bool == 0
+            </test>
+            <test logic="OR" value="-5">
+                /autopilot/route-manager/active == 0
+                /autopilot/route-manager/current-wp lt 0
+            </test>
+            <test value="instruments/waypoint/distance-mil">
+                instruments/waypoint/distance-unit == 1
+            </test>
+            <default value="instruments/waypoint/distance-km" />
+            <clipto>
+                <min>-5</min>
+                <max>40</max>
+            </clipto>
+        </switch>
+
+        <actuator name="instruments/waypoint/distance-needle">
+            <input>instruments/waypoint/distance-needle-raw</input>
+            <rate_limit>80</rate_limit>
+            <clipto>
+                <min>-5</min>
+                <max>40</max>
+            </clipto>
+            <output>/instrumentation/waypoint-indicator/distance-needle</output>
+        </actuator>
+
+        <actuator name="instruments/waypoint/distance-unit-flag">
+            <input>instruments/waypoint/distance-unit</input>
+            <rate_limit>10</rate_limit>
+            <output>/instrumentation/waypoint-indicator/distance-unit-flag</output>
+        </actuator>
+
+        <fcs_function name="instruments/waypoint/eta">
+            <function>
+                <quotient>
+                    <product>
+                        <property>/autopilot/route-manager/wp/dist</property>
+                        <value>3600</value>
+                    </product>
+                    <product>
+                        <property>/velocities/groundspeed-kt</property>
+                        <cos>
+                            <toradians>
+                                <difference>
+                                    <property>/autopilot/route-manager/wp/true-bearing-deg</property>
+                                    <property>instruments/fpv/track-true-deg-raw</property>
+                                </difference>
+                            </toradians>
+                        </cos>
+                    </product>
+                </quotient>
+            </function>
+            <output>/instrumentation/waypoint-indicator/eta-s</output>
+        </fcs_function>
+    </channel>
+
+
+    <channel execrate="4" name="accelerometer">
+        <accelerometer name="instruments/accelerometer/a-z-ft_sec2">
+            <location unit="M">
+                <x>-4.05</x>
+                <y>0</y> 
+                <z>0.43</z>
+            </location>
+            <axis>Z</axis>
+            <lag>5</lag>
+            <noise variation="ABSOLUTE" distribution="GAUSSIAN">0.2</noise>
+        </accelerometer>
+
+        <pure_gain name="instruments/accelerometer/indicated-g">
+            <input>instruments/accelerometer/a-z-ft_sec2</input>
+            <gain>-0.031081</gain>
+            <clipto>
+                <min>-2</min>
+                <max>9</max>
+            </clipto>
+            <output>/instrumentation/accelerometer/g-force-indicated</output>
+        </pure_gain>
+
+        <switch name="instruments/accelerometer/max-g-raw">
+            <default value="instruments/accelerometer/max-g-raw" />
+            <test logic="OR" value="instruments/accelerometer/indicated-g">
+                instruments/accelerometer/indicated-g gt instruments/accelerometer/max-g-raw
+                /instrumentation/accelerometer/reset-button == 1
+                
+                sim-time-sec lt 1
+            </test>
+        </switch>
+
+        <actuator name="instruments/accelerometer/max-g">
+            <input>instruments/accelerometer/max-g-raw</input>
+            <rate_limit sense="decr">20</rate_limit>
+            <clipto>
+                <min>-2</min>
+                <max>9</max>
+            </clipto>
+            <output>/instrumentation/accelerometer/g-force-max</output>
+        </actuator>
+
+        <pure_gain name="instruments/g-force">
+            <input>accelerations/a-pilot-z-ft_sec2</input>
+            <gain>-0.031081</gain>
+            <output>/ja37/accelerations/pilot-G</output>
+        </pure_gain>
+    </channel>
+
+
+    <channel name="aoa-indicator">
+        <sensor name="instruments/aoa/alpha-deg">
+            <input>aero/alpha-deg</input>
+            <lag>5</lag>
+            <noise variation="ABSOLUTE" distribution="GAUSSIAN">0.02</noise>
+            <clipto>
+                <min>-10</min>
+                <max>40</max>
+            </clipto>
+        </sensor>
+
+        <switch name="instruments/aoa/indicator-target-deg">
+            <default value="instruments/aoa/alpha-deg" />
+            <test value="-4">
+                /ja37/elec/dc-bus-main-bool == 0
+            </test>
+            <test value="/instrumentation/attitude-indicator/indicated-pitch-deg">
+                gear/unit[0]/WOW == 1
+            </test>
+        </switch>
+
+        <actuator name="instruments/aoa/indicator-deg">
+            <input>instruments/aoa/indicator-target-deg</input>
+            <rate_limit>100</rate_limit>
+            <clipto>
+                <min>-4</min>
+                <max>30</max>
+            </clipto>
+            <output>/instrumentation/aoa-indicator/indicated-aoa</output>
+        </actuator>
+    </channel>
+
+
+    <channel execrate="4" name="chronometer">
+        
+        <summer name="instruments/clock/chrono-ref-feedback">
+            <input>sim-time-sec</input>
+            <input>-/instrumentation/clock/chronometer-time-sec</input>
+        </summer>
+
+        <switch name="instruments/clock/chrono-ref-sec">
+            <default value="instruments/clock/chrono-ref-feedback" />
+            
+            <test logic="AND" value="instruments/clock/chrono-ref-sec">
+                /instrumentation/clock/chronometer-state == 1
+                
+                sim-time-sec gt 0.1
+            </test>
+        </switch>
+
+        <summer name="instruments/clock/chrono-ref-diff">
+            <input>sim-time-sec</input>
+            <input>-instruments/clock/chrono-ref-sec</input>
+        </summer>
+
+        <fcs_function name="instruments/clock/chrono-ref-diff-integer">
+            <function>
+                <integer><property>instruments/clock/chrono-ref-diff</property></integer>
+            </function>
+        </fcs_function>
+
+        <switch name="instruments/clock/chrono-time-sec">
+            <default value="/instrumentation/clock/chronometer-time-sec" />
+            <test value="0">
+                /instrumentation/clock/chronometer-state == 0
+            </test>
+            <test value="instruments/clock/chrono-ref-diff-integer">
+                /instrumentation/clock/chronometer-state == 1
+            </test>
+            <output>/instrumentation/clock/chronometer-time-sec</output>
+        </switch>
+
+        <actuator name="instruments/clock/chrono-needle-pos">
+            <input>instruments/clock/chrono-time-sec</input>
+            <rate_limit>100</rate_limit>
+            <output>/instrumentation/clock/chronometer-needle-pos-sec</output>
+        </actuator>
+    </channel>
+
+
+    <channel execrate="4" name="fuel">
+        <pure_gain name="instruments/fuel/true-ratio">
+            <input>/consumables/fuel/total-fuel-norm</input>
+            <gain>/instrumentation/fuel/indicated-ratio-factor</gain>
+        </pure_gain>
+
+        <switch name="instruments/fuel/ratio">
+            <default value="instruments/fuel/true-ratio" />
+            <test value="0">
+              /ja37/elec/ac-bus-main-bool == 0
+            </test>
+            <output>/instrumentation/fuel/ratio</output>
+        </switch>
+
+        <switch name="instruments/fuel/needle-raw">
+            <default value="instruments/fuel/ratio" />
+            <test value="/instrumentation/fuel/needle">
+              /ja37/elec/ac-bus-main-bool == 0
+            </test>
+        </switch>
+
+        <actuator name="instruments/fuel/needle">
+            <input>instruments/fuel/needle-raw</input>
+            <rate_limit>2</rate_limit>
+            <clipto>
+                <min>0</min>
+                <max>1.4</max>
+            </clipto>
+            <output>/instrumentation/fuel/needle</output>
+        </actuator>
+    </channel>
+
+    <channel name="flight path vector">
+        
+        <fcs_function name="instruments/fpv/angle-up-deg-raw">
+            <function>
+                <todegrees>
+                    <atan2>
+                        <property>-velocities/w-fps</property>
+                        <property>velocities/u-fps</property>
+                    </atan2>
+                </todegrees>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="instruments/fpv/angle-right-deg-raw">
+            <function>
+                <todegrees>
+                    <atan2>
+                        <property>velocities/v-fps</property>
+                        <property>velocities/u-fps</property>
+                    </atan2>
+                </todegrees>
+            </function>
+        </fcs_function>
+
+        
+        <fcs_function name="instruments/fpv/pitch-deg-raw">
+            <function>
+                <todegrees>
+                    <atan2>
+                        <property>-velocities/v-down-fps</property>
+                        <pow>
+                            <sum>
+                                <product>
+                                    <property>velocities/v-north-fps</property>
+                                    <property>velocities/v-north-fps</property>
+                                </product>
+                                <product>
+                                    <property>velocities/v-east-fps</property>
+                                    <property>velocities/v-east-fps</property>
+                                </product>
+                            </sum>
+                            <value>0.5</value>
+                        </pow>
+                    </atan2>
+                </todegrees>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="instruments/fpv/track-true-deg-raw">
+            <function>
+                <todegrees>
+                    <atan2>
+                        <property>velocities/v-east-fps</property>
+                        <property>velocities/v-north-fps</property>
+                    </atan2>
+                </todegrees>
+            </function>
+        </fcs_function>
+
+        
+        <switch name="instruments/fpv/angle-up-deg">
+            <default value="instruments/fpv/angle-up-deg-raw" />
+            <test logic="AND" value="0">
+                gear/unit[0]/WOW eq 1
+                velocities/u-fps le 10
+            </test>
+            <output>/instrumentation/fpv/angle-up-deg</output>
+        </switch>
+
+        <switch name="instruments/fpv/angle-right-deg">
+            <default value="instruments/fpv/angle-right-deg-raw" />
+            <test logic="AND" value="0">
+                gear/unit[0]/WOW eq 1
+                velocities/u-fps le 10
+            </test>
+            <output>/instrumentation/fpv/angle-right-deg</output>
+        </switch>
+
+        <switch name="instruments/fpv/pitch-deg">
+            <default value="instruments/fpv/pitch-deg-raw" />
+            <test logic="AND" value="/orientation/pitch-deg">
+                gear/unit[0]/WOW eq 1
+                velocities/u-fps le 10
+            </test>
+            <output>/instrumentation/fpv/pitch-deg</output>
+        </switch>
+
+        <switch name="instruments/fpv/track-true-deg">
+            <default value="instruments/fpv/track-true-deg-raw" />
+            <test logic="AND" value="/orientation/heading-deg">
+                gear/unit[0]/WOW eq 1
+                velocities/u-fps le 10
+            </test>
+            <output>/instrumentation/fpv/track-true-deg</output>
+        </switch>
+    </channel>
+
+    <channel execrate="4" name="transponder">
+        <switch name="instruments/transponder/time-power">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test value="instruments/transponder/time-power">
+                /ja37/elec/ac-bus-main-bool eq 1
+            </test>
+        </switch>
+
+        <summer name="instruments/transponder/time-on">
+            <input>instruments/transponder/time-power</input>
+            <bias>75</bias>
+        </summer>
+
+        <switch name="instruments/transponder/mode">
+            <test value="0">
+                /ja37/elec/ac-bus-main-bool eq 0
+            </test>
+            <test logic="OR" value="1">
+                /instrumentation/transponder/switch-power eq 0
+                sim-time-sec lt instruments/transponder/time-on
+            </test>
+            <test value="5">    
+                /instrumentation/transponder/switch-mode eq 1
+            </test>
+            <default value="4" />
+            <output>/instrumentation/transponder/inputs/knob-mode</output>
+        </switch>
+    </channel>
+
+    <channel execrate="4" name="brake pressure">
+        <pure_gain name="instruments/brake-pressure/pressure-kp_cm2">
+            <input>systems/hydraulics/brakes/psi</input>
+            <gain>0.0703</gain>
+        </pure_gain>
+
+        <lag_filter name="instruments/brake-pressure/indicated-pressure-kp_cm2">
+            <input>instruments/brake-pressure/pressure-kp_cm2</input>
+            <c1>10</c1>
+        </lag_filter>
+    </channel>
+
+    <channel execrate="4" name="instruments">
+
+        <switch name="systems/ins/time-steady">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="AND" value="sim-time-sec">
+                /ja37/avionics/button-snabbresn == 1
+            </test>
+            <test logic="AND" value="systems/ins/time-steady">
+                /ja37/elec/ac-bus-main-bool == 1
+                /ja37/elec/dc-bus-main-bool == 1
+                /ja37/avionics/ins-cmd == 1
+            </test>
+            <test logic="AND" value="-1000">
+                /ja37/avionics/init-done == 1
+                sim-time-sec lt 300
+            </test>
+        </switch>
+
+        <fcs_function name="systems/ins/time-init">
+            <function>
+                <sum>
+                    <p>systems/ins/time-steady</p>
+                    <v>140</v>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <switch name="systems/ins/init">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /ja37/elec/dc-bus-main-bool == 1
+                sim-time-sec le systems/ins/time-init
+                /ja37/avionics/ins-cmd == 1
+            </test>
+            <output>/ja37/avionics/ins-init</output>
+        </switch>
+
+        <switch name="systems/ins/running">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /ja37/elec/dc-bus-main-bool == 1
+                /ja37/avionics/ins-init == 0
+                /ja37/avionics/ins-cmd == 1
+                sim-time-sec gt systems/ins/time-init
+            </test>
+            <output>/ja37/avionics/ins</output>
+        </switch>
+
+        <switch name="systems/gps/time-steady">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="AND" value="systems/gps/time-steady">
+                /ja37/avionics/gps-cmd == 1
+                /ja37/navigation/gps-installed == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/gps/time-bit">
+            <function>
+                <sum>
+                    <p>systems/gps/time-steady</p>
+                    <v>10</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/gps/time-init">
+            <function>
+                <sum>
+                    <p>systems/gps/time-steady</p>
+                    <v>40</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/gps/bit">
+            <default value="0" />
+            <test logic="AND" value="1">
+                sim-time-sec lt systems/gps/time-bit
+                /ja37/avionics/gps-cmd == 1
+                /ja37/navigation/gps-installed == 1
+            </test>
+            <output>/ja37/avionics/gps-bit</output>
+        </switch>
+
+        <switch name="systems/gps/init">
+            <default value="0" />
+            <test logic="AND" value="1">
+                sim-time-sec lt systems/gps/time-init
+                systems/gps/bit == 0
+                /ja37/avionics/gps-cmd == 1
+                /ja37/navigation/gps-installed == 1
+            </test>
+            <output>/ja37/avionics/gps-init</output>
+        </switch>
+
+        <switch name="systems/gps/nav">
+            <default value="0" />
+            <test logic="OR" value="1">
+                sim-time-sec gt systems/gps/time-init
+            </test>
+            <output>/ja37/avionics/gps-nav</output>
+        </switch>
+
+
+        
+
+        <fcs_function name="names/throttle/nozzle-zone">
+            <function>
+                <table>
+                    <independentVar lookup="row">propulsion/engine/zone-scaled</independentVar>
+                    <tableData>
+                        0.00       0.15
+                        0.25       0.38
+                        0.50       0.60
+                        1.00       1.00
+                    </tableData>
+                </table>
+            </function>
+            <output>propulsion/engine/zone-instr</output>
+        </fcs_function>
+
+        <switch name="names/throttle/nozzle-direct">
+            <default value="propulsion/engine/zone-instr" />
+            <test logic="OR" value="0">
+              /ja37/elec/dc-bus-main-bool == 0
+            </test>
+            <test logic="OR" value="/engines/engine/nozzle-pos-norm">
+              propulsion/engine/zone == 0
+              propulsion/engine/augmentation == 0
+            </test>
+            <output>propulsion/engine/nozzle-direct</output>
+        </switch>
+
+        <lag_filter name="names/throttle/nozzle">
+            <input> propulsion/engine/nozzle-direct </input>
+            <c1> 5 </c1>
+            <output>propulsion/engine/nozzle</output>
+        </lag_filter>
+
+
+        
+
+        
+
+        <fcs_function name="propulsion/engine/aj37-n2-rpm_r-s">
+            <function>
+                <table>
+                    <independentVar lookup="row">propulsion/engine/n2</independentVar>
+                    <tableData>
+                        0.0        0.00
+                       59.0      120.83
+                       74.0      151.33
+                       93.3      190.83
+                       96.5      197.50
+                       97.3      199.17
+                      100.0      204.63
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="propulsion/engine/ja37-n2-rpm_r-s">
+            <function>
+                <table>
+                    <independentVar lookup="row">propulsion/engine/n2</independentVar>
+                    <tableData>
+                        0.0         0
+                       57.0       118
+                       70.5       149
+                       88.5       181
+                       93.9       192
+                       94.8       194
+                      100.0       204.6
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <switch name="propulsion/engine/n2-rpm_r-s">
+            <default value="0" />
+            <test logic="OR" value="propulsion/engine/ja37-n2-rpm_r-s">
+                /ja37/systems/variant == 0
+            </test>
+            <test logic="OR" value="propulsion/engine/aj37-n2-rpm_r-s">
+                /ja37/systems/variant gt 0
+            </test>
+        </switch>
+
+        <fcs_function name="propulsion/engine/n2-rpm_r-min">
+            <function>
+                <product>
+                    <property>propulsion/engine/n2-rpm_r-s</property>
+                    <value>60</value>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="propulsion/engine/n1-rpm_r-min">
+            <function>
+                <product>
+                    <property>propulsion/engine/n1</property>
+                    <value>88</value>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="propulsion/engine/n1-rpm_r-s">
+            <function>
+                <quotient>
+                    <property>propulsion/engine/n1-rpm_r-min</property>
+                    <value>60</value>
+                </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="propulsion/engine/outlet-temperature-degc">
+            <function>
+                <quotient>
+                    <difference>
+                        <property>/engines/engine/egt-degf</property>
+                        <value>32</value>
+                    </difference>
+                    <value>1.8</value>
+                </quotient>
+                
+            </function>
+        </fcs_function>
+
+        
+        <fcs_function name="systems/flight/oxygen-pressure-kPa">
+            <function>
+                <product>
+                    <property>/controls/oxygen</property>
+                    <table>
+                        <independentVar lookup="row">atmosphere/density-altitude</independentVar>
+                        <tableData>
+                                  0.0         0.1
+                              59055.1         0.4 
+                              85301.8         6.7 
+                        </tableData>
+                    </table>
+                    <table>
+                        <independentVar lookup="row">/ja37/systems/oxygen-bottle-pressure</independentVar>
+                        <tableData>
+                            
+                                 15.0         0.0
+                                 40.0         1.0
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/instr/oxygen-manometer-pre">
+            <function>
+                <product>
+                    <property>/ja37/systems/oxygen-bottle-pressure</property>
+                    <table>
+                        <independentVar lookup="row">/ja37/elec/ac-bus-main-volt</independentVar>
+                        <tableData>
+                                 99.0         0.0
+                                100.0         1.0
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+        </fcs_function>
+
+        <lag_filter name="systems/flight/instr/oxygen-manometer">
+            <input> systems/flight/instr/oxygen-manometer-pre </input>
+            <c1> 5 </c1>
+            <output> /ja37/systems/oxygen-manometer </output>
+        </lag_filter>
+
+        <fcs_function name="systems/flight/environment-pressure-kPa">
+            <function>
+                <product>
+                    <property>atmosphere/P-psf</property>
+                    <value>0.047880258888979</value>
+                </product>
+            </function>
+        </fcs_function>
+
+        
+        <fcs_function name="systems/flight/closed-canopy-cabin-pressure-kPa">
+            <function>
+                <sum>
+                    <property>systems/flight/environment-pressure-kPa</property>
+                    <table>
+                        <independentVar lookup="row">atmosphere/density-altitude</independentVar>
+                        <tableData>
+                                  0.0         0.0
+                               8500.0         0.0
+                              16404.2        19.6 
+                              65616.8        23.5 
+                        </tableData>
+                    </table>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/flight/cabin-pressure-tmp-kPa">
+            <default value="systems/flight/closed-canopy-cabin-pressure-kPa" />
+            <test logic="OR" value="systems/flight/environment-pressure-kPa">
+              fcs/canopy/pos-norm ne 0
+              fcs/canopy/hinges/serviceable ne 1
+            </test>
+            <test logic="AND" value="systems/flight/cabin-pressure-tmp-kPa">
+              gear/gear-pos-norm == 1
+              gear/unit[0]/WOW ne 1
+            </test>
+        </switch>
+
+        <lag_filter name="systems/flight/cabin-pressure-kPa">
+            <input> systems/flight/cabin-pressure-tmp-kPa </input>
+            <c1> 0.5 </c1>
+        </lag_filter>
+
+        <fcs_function name="systems/flight/cabin-pressure-kpm2">
+            
+            <function>
+                <product>
+                    <property>systems/flight/cabin-pressure-kPa</property>
+                    <value>0.010197162129779</value>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/cabin-diff-pressure-kpm2">
+            
+            <function>
+                <difference>
+                    <property>systems/flight/cabin-pressure-kpm2</property>
+                    <product>
+                        <property>systems/flight/environment-pressure-kPa</property>
+                        <value>0.010197162129779</value>
+                    </product>
+                </difference>
+            </function>
+        </fcs_function>
+    </channel>
+
+    
+    <channel execrate="8" name="performance">
+        
+        <pure_gain name="inertia/weight-kg">
+            <input>inertia/weight-lbs</input>
+            <gain>0.45359237</gain>
+        </pure_gain>
+
+        
+        <fcs_function name="inertia/corrected-cg-x-mm">
+            <function>
+                <sum>
+                    <product>
+                        <property>inertia/cg-x-in</property>
+                        <value>25.4</value>
+                    </product>
+                    
+                    <ifthen>
+                        <eq>
+                            <property>/ja37/systems/variant</property>
+                            <value>0</value>
+                        </eq>
+                        <value>10846</value>
+                        <value>10763</value>
+                    </ifthen>
+                </sum>
+            </function>
+        </fcs_function>
+
+
+        <pure_gain name="/environment/pressure-hpa">
+            <input>/environment/pressure-inhg</input>
+            <gain>33.863886</gain>
+        </pure_gain>
+
+        
+        <fcs_function name="systems/flight/rotation-speed-kmh">
+            <function>
+                <table>
+                    <independentVar lookup="row">inertia/weight-kg</independentVar>
+                    <independentVar lookup="column">/environment/temperature-degc</independentVar>
+                    <independentVar lookup="table">propulsion/engine/zone-scaled</independentVar>
+                    <tableData breakPoint="0">
+                                -15.0   0.0     15.0    30.0
+                        13000   247     254     265     280
+                        14000   258     265     274     289
+                        15000   267     274     282     296
+                        16000   275     281     289     302
+                        17000   280     285     293     305
+                    </tableData>
+                    <tableData breakPoint="0.56">
+                                -15.0   0.0     15.0    30.0
+                        13000   192     195     201     217
+                        14000   205     207     212     229
+                        15000   216     218     223     240
+                        16000   226     228     232     250
+                        17000   235     237     240     257
+                        18000   244     245     249     265
+                        19000   251     252     255     270
+                    </tableData>
+                    <tableData breakPoint="1">
+                                -15.0   0.0     15.0    30.0
+                        13000   122     133     149     167
+                        14000   139     150     163     181
+                        15000   154     165     177     194
+                        16000   168     178     190     206
+                        17000   181     191     202     216
+                        18000   192     201     212     225
+                        19000   201     209     220     233
+                    </tableData>
+                </table>
+            </function>
+            <clipto>
+                <min>250</min>
+                <max>320</max>
+            </clipto>
+        </fcs_function>
+
+        
+        <fcs_function name="systems/flight/approach-max-weight-kg">
+            <function>
+                <table>
+                    <independentVar lookup="row">/environment/temperature-degc</independentVar>
+                    <independentVar lookup="column">/environment/pressure-hpa</independentVar>
+                    <tableData>
+                                950     980     1013
+                        -30     15300   15800   16300
+                        -15     15000   15500   15800
+                        0       14500   14900   15300
+                        15      13800   14200   14500
+                        30      12500   12900   13200
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/approach-high-alpha-max-weight-kg">
+            <function>
+                <table>
+                    <independentVar lookup="row">/environment/temperature-degc</independentVar>
+                    <independentVar lookup="column">/environment/pressure-hpa</independentVar>
+                    <tableData>
+                                950     980     1013
+                        -30     14100   14550   15000
+                        -15     13800   14250   14700
+                        0       13300   13750   14200
+                        15      12700   13000   13400
+                        30      11550   11850   12150
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        
+        <fcs_function name="systems/flight/approach-alpha-base">
+            
+            
+            <function>
+                <sum>
+                    <value>12</value>
+                    <product>
+                        <quotient>
+                            <difference>
+                                <property>inertia/weight-kg</property>
+                                <property>systems/flight/approach-max-weight-kg</property>
+                            </difference>
+                            <difference>
+                                <property>systems/flight/approach-high-alpha-max-weight-kg</property>
+                                <property>systems/flight/approach-max-weight-kg</property>
+                            </difference>
+                        </quotient>
+                        <value>3.5</value>
+                    </product>
+                </sum>
+            </function>
+            <clipto>
+                <min>9</min>
+                <max>20</max>
+            </clipto>
+        </fcs_function>
+
+        
+        <switch name="systems/flight/approach-alpha-cap">
+            <default value="12" />
+            <test value="15.5">
+                autoflight/high-alpha eq 1
+            </test>
+        </switch>
+
+        <pure_gain name="systems/flight/approach-alpha-capped">
+            <input>systems/flight/approach-alpha-base</input>
+            <gain>1</gain>
+            <clipto>
+                <min>9</min>
+                <max>systems/flight/approach-alpha-cap</max>
+            </clipto>
+        </pure_gain>
+
+        
+        <switch name="systems/flight/approach-alpha">
+            <default value="systems/flight/approach-alpha-capped" />
+            
+            <test value="systems/flight/approach-alpha-cap">
+                /ja37/systems/variant ne 0
+            </test>
+        </switch>
+
+        
+        <fcs_function name="systems/flight/stable-flight-alpha">
+            <function>
+                <product>
+                    
+                    <table name="systems/flight/alpha-at-15000kg">
+                        <independentVar lookup="row">instruments/airspeed/airspeed-kmh</independentVar>
+                        <tableData>
+                            300     13.5
+                            350     10.7
+                            400     8.48
+                            450     6.91
+                            500     5.78
+                            550     4.95
+                            600     4.22
+                            700     3.13
+                            800     2.42
+                            900     1.89
+                            1000    1.57
+                        </tableData>
+                    </table>
+                    <quotient>
+                        <property>inertia/weight-kg</property>
+                        <value>15000</value>
+                    </quotient>
+                </product>
+            </function>
+        </fcs_function>
+    </channel>
+</system>

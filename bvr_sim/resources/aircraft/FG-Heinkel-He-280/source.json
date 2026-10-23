@@ -1,0 +1,27 @@
+{
+  "set": "Heinkel-He-280/he280-set.xml",
+  "name": "Heinkel He 280 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Heinkel-He-280/Systems/he280-yasim.xml",
+  "jets": 2,
+  "model": "Heinkel-He-280/Models/he280.xml",
+  "tags": [
+    "fighter",
+    "heinkel",
+    "1940s",
+    "ww2",
+    "prototype",
+    "retractable-gear",
+    "jet",
+    "twin-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Heinkel-He-280.zip",
+  "archive_sha256": "244fc0173c23269d240685a387a232c87b3ccb8dd0d00a6e301948ba0bc6051d",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Heinkel-He-280.zip"
+}

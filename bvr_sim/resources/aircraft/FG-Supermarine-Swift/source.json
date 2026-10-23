@@ -1,0 +1,21 @@
+{
+  "set": "Supermarine-Swift/SwiftFR5-set.xml",
+  "name": "Supermarine Swift FR.5",
+  "fdm_type": "jsb",
+  "fdm": "Supermarine-Swift/swift-vsp.xml",
+  "jets": 0,
+  "model": "Supermarine-Swift/Models/Swift-FR5.xml",
+  "tags": [
+    "fighter",
+    "jet",
+    "single-engine",
+    "retractable-gear"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "Supermarine-Swift.zip",
+  "archive_sha256": "2dfd696078617c388d6e875c10fc309cbfd38c80400a15fc56f0f8329d7935a3",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Supermarine-Swift.zip"
+}

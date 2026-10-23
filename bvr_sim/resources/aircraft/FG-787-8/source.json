@@ -1,0 +1,28 @@
+{
+  "set": "787-8/787-8-set.xml",
+  "name": "Boeing 787-8",
+  "fdm_type": "jsb",
+  "fdm": "787-8/787-8.xml",
+  "jets": 0,
+  "model": "787-8/Models/787-8.xml",
+  "tags": [
+    "transport",
+    "boeing",
+    "2010s",
+    "etops",
+    "glass-cockpit",
+    "hud",
+    "ifr",
+    "retractable-gear",
+    "tricycle",
+    "jet",
+    "twin-engine"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 4,
+  "variant_of": "",
+  "archive": "787-8.zip",
+  "archive_sha256": "b60adb36a29e5ad314f17cbb591a12e6c35eeb235afd537989c94600f87aa97c",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/787-8.zip"
+}

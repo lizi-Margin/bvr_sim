@@ -1,0 +1,2179 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="indicators">
+
+    
+
+    
+
+
+    <channel execrate="4" name="Indicator panel logic">
+
+        
+        <switch name="systems/indicators/reset-acknowledged-condition">
+            <test logic="AND" value="1">
+                /ja37/systems/variant == 0
+                /canopy/position-norm gt 0
+                fcs/throttle-pos-deg lt 50
+            </test>
+            <test logic="AND" value="1">
+                /ja37/systems/variant ne 0
+                /canopy/position-norm gt 0
+                /ja37/mode/selector-ajs == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/reset-acknowledged">
+            <test logic="AND" value="1">
+                systems/indicators/reset-acknowledged-condition == 1
+                systems/indicators/reset-acknowledged-condition-old == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/reset-acknowledged-condition-old">
+            <default value="systems/indicators/reset-acknowledged-condition" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/fire-primary">
+            <function>
+                <eq>
+                    <property>/engines/engine[0]/fire/serviceable</property>
+                    <value>0</value>
+                </eq>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/fire-level">
+            <test logic="AND" value="0">
+                systems/indicators/fire-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/fire-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/fire-level" />
+        </switch>
+
+        <switch name="systems/indicators/fire">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/fire-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/fire-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/fuel-flow-secondary">
+            <function>
+                <and>
+                    <p>systems/indicators/hydr-1-primary</p>
+                    <gt>
+                        <property>instruments/fuel/ratio</property>
+                        <value>0.40</value>
+                    </gt>
+                </and>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/indicators/fuel-flow-primary-1">
+            <function>
+                    <and>
+                        <gt>
+                            <property>instruments/fuel/ratio</property>
+                            <value>0.43</value>
+                        </gt>
+                        <eq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>1</value>
+                        </eq>
+                        <eq>
+                            <property>systems/fuel/pneumatic-low-pressure</property>
+                            <value>0</value>
+                        </eq>
+                    </and>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/indicators/fuel-flow-primary-2">
+            <function>
+                <and>
+                    <eq>
+                        <property>systems/fuel/fuel-flow/serviceable</property>
+                        <value>0</value>
+                    </eq>
+                    <gt>
+                        <property>instruments/fuel/ratio</property>
+                        <value>0.43</value>
+                    </gt>
+                    <gt>
+                        <product>
+                            <property>/consumables/fuel/tank[3]/level-gal_us</property>
+                            <v>3.785</v>
+                        </product>
+                        <value>130</value>
+                    </gt>
+                    <or>
+                        <nq>
+                            <property>/gear/gear[0]/wow</property>
+                            <value>1</value>
+                        </nq>
+                        <p>systems/indicators/hydr-1-primary</p>
+                    </or>                
+                </and>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/fuel-flow-primary-2-time">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="OR" value="systems/indicators/fuel-flow-primary-2-time">
+                systems/indicators/fuel-flow-primary-2 == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/indicators/fuel-flow-primary-2-time-blinking">
+            <function>
+                <sum>
+                    <p>systems/indicators/fuel-flow-primary-2-time</p>
+                    <v>10</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/fuel-flow-primary">
+            <test logic="AND" value="0">
+                /ja37/systems/variant == 0
+                systems/indicators/hydr-1-primary == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/fuel-flow-primary-1 == 1
+                sim-time-sec gt systems/indicators/fuel-flow-primary-2-time-blinking
+                systems/indicators/hydr-1-primary == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/fuel-flow-level">
+            <test logic="AND" value="0">
+                systems/indicators/fuel-flow-primary == 0
+                systems/indicators/fuel-flow-secondary == 0
+            </test>
+            <test value="1">
+                systems/indicators/fuel-flow-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/fuel-flow-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/fuel-flow-level" />
+        </switch>
+
+        <switch name="systems/indicators/fuel-flow">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/fuel-flow-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/fuel-flow-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/xtank">
+            <test value="1">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="AND" value="1">
+                /consumables/fuel/tank[8]/jettisoned == 0
+                /consumables/fuel/tank[8]/level-gal_us gt 45
+                <test logic="OR">
+                    propulsion/engine[0]/n2 lt 70
+                    systems/fuel/pneumatics/serviceable == 0
+                </test>
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/fuel-pump-secondary">
+            <default value="systems/indicators/electrical-primary" />
+        </switch>
+
+        <switch name="systems/indicators/fuel-pump-primary">
+            <test logic="AND" value="0">
+                /ja37/systems/variant == 0
+                systems/indicators/electrical-primary == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/fuel/fuel-pumps/serviceable == 0
+                systems/indicators/electrical-primary == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/fuel-pump-level">
+            <test logic="AND" value="0">
+                systems/indicators/fuel-pump-primary == 0
+                systems/indicators/fuel-pump-secondary == 0
+            </test>
+            <test value="1">
+                systems/indicators/fuel-pump-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/fuel-pump-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/fuel-pump-level" />
+        </switch>
+
+        <switch name="systems/indicators/fuel-pump">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/fuel-pump-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/fuel-pump-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/gears-primary-1">
+            <function>
+                <and>
+                    <or>
+                        
+                        <eq>
+                            <property>gear/unit[0]/z-position</property>
+                            <value>0.001</value>
+                        </eq>
+                        <eq>
+                            <property>gear/unit[1]/z-position</property>
+                            <value>0.001</value>
+                        </eq>
+                        <eq>
+                            <property>gear/unit[2]/z-position</property>
+                            <value>0.001</value>
+                        </eq>
+                        <nq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>1</value>
+                        </nq>
+                    </or>
+                    <lt>
+                        <property>propulsion/engine[0]/n2</property>
+                        <value>87</value>
+                    </lt>
+                    <lt>
+                        <property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+                        <value>202.5</value>
+                    </lt>
+                    <lt>
+                        <property>/instrumentation/altimeter/indicated-altitude-aal-meter</property>
+                        <value>500</value>
+                    </lt>
+                </and>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/indicators/gears-secondary">
+            <function>
+                <or>
+                    <and>
+                        <nq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>1</value>
+                        </nq>
+                        <nq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>0</value>
+                        </nq>
+                    </and>
+                    <and>
+                        <eq>
+                            <property>gear/gear-cmd-norm</property>
+                            <value>0</value>
+                        </eq>
+                        <eq>
+                            <property>/gear/gear[1]/wow</property>
+                            <value>1</value>
+                        </eq>
+                    </and>
+                    <and>
+                        <or>
+                            <eq>
+                                <property>gear/unit[1]/z-position</property>
+                                <value>0.001</value>
+                            </eq>
+                            <eq>
+                                <property>gear/unit[2]/z-position</property>
+                                <value>0.001</value>
+                            </eq>
+                            <eq>
+                                <property>gear/unit[0]/z-position</property>
+                                <value>0.001</value>
+                            </eq>
+                        </or>
+                        <eq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>1</value>
+                        </eq>
+                    </and>
+                </or>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/gears-time-steady">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="OR" value="systems/indicators/gears-time-steady">
+                systems/indicators/gears-secondary == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/indicators/gears-time-blinking">
+            <function>
+                <sum>
+                    <p>systems/indicators/gears-time-steady</p>
+                    <v>10</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/gears-primary">
+            <test logic="OR" value="1">
+                systems/indicators/gears-primary-1 == 1
+                sim-time-sec gt systems/indicators/gears-time-blinking
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/gears-level">
+            <test logic="AND" value="0">
+                systems/indicators/gears-primary == 0
+                systems/indicators/gears-secondary == 0
+            </test>
+            <test value="1">
+                systems/indicators/gears-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/gears-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/gears-level" />
+        </switch>
+
+        <switch name="systems/indicators/gears">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/gears-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/gears-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+       
+
+        <switch name="systems/indicators/no-reverse-preselect">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/gear-nose">
+            <function>
+                <or>
+                    <and>
+                        <eq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>1</value>
+                        </eq>
+                        <nq>
+                            <property>gear/unit[0]/z-position</property>
+                            <value>0.001</value>
+                        </nq>
+                    </and>
+                    <property>/controls/lighting/test-indicator-panels</property>
+                </or>
+            </function>
+        </fcs_function>
+
+
+        
+
+        <fcs_function name="systems/indicators/gear-left">
+            <function>
+                <or>
+                    <and>
+                        <eq>
+                            <property>/gear/gear[1]/position-norm</property>
+                            <value>1</value>
+                        </eq>
+                        <nq>
+                            <property>gear/unit[1]/z-position</property>
+                            <value>0.001</value>
+                        </nq>
+                    </and>
+                    <property>/controls/lighting/test-indicator-panels</property>
+                </or>
+            </function>
+        </fcs_function>
+
+
+        
+
+        <fcs_function name="systems/indicators/gear-right">
+            <function>
+                <or>
+                    <and>
+                        <eq>
+                            <property>/gear/gear[2]/position-norm</property>
+                            <value>1</value>
+                        </eq>
+                        <nq>
+                            <property>gear/unit[2]/z-position</property>
+                            <value>0.001</value>
+                        </nq>
+                    </and>
+                    <property>/controls/lighting/test-indicator-panels</property>
+                </or>
+            </function>
+        </fcs_function>
+
+
+        
+
+        <switch name="systems/indicators/electrical-primary">
+            <test logic="OR" value="1">
+                
+                systems/electrical/generator-state == -1
+                
+                systems/electrical/relay-rectifiers-undercurrent == 0
+                
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/electrical-level">
+            <test logic="AND" value="0">
+                systems/indicators/electrical-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/electrical-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/electrical-level" />
+        </switch>
+
+        <switch name="systems/indicators/electrical">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/electrical-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/electrical-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/electrical-reserve-primary">
+            <test value="0">
+                /ja37/systems/variant ne 0
+            </test>
+            <test logic="AND" value="1">
+                systems/electrical/generator-reserve-supplying == 0
+                systems/electrical/generator-state == -1
+            </test>
+            <test logic="AND" value="1">
+                
+                systems/electrical/generator-reserve-deploy-emergency-cmd == 1
+                systems/electrical/generator-output == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/electrical/generator-reserve-pos-norm lt 1
+                propulsion/starter_cmd == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/electrical/generator-reserve-supplying == 0
+                gear/unit[0]/WOW == 0
+                gear/gear-pos-norm == 1
+                propulsion/starter_cmd == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/electrical-reserve-level">
+            <test logic="AND" value="0">
+                systems/indicators/electrical-reserve-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/electrical-reserve-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/electrical-reserve-level" />
+        </switch>
+
+        <switch name="systems/indicators/electrical-reserve">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/electrical-reserve-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/electrical-reserve-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/reserve-primary">
+            <test value="0">
+                /ja37/systems/variant eq 0
+            </test>
+            
+            <test logic="AND" value="1">
+                systems/hydraulics/system2/pressure-reserve == 0
+            </test>
+            
+            <test logic="AND" value="1">
+                gear/gear-pos-norm lt 1
+                systems/electrical/generator-reserve-pos-norm == 1
+                /ja37/elec/ac-bus-secondary-bool == 1
+            </test>
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    /ja37/elec/ac-bus-secondary-bool lt 1
+                    propulsion/starter_cmd == 1
+                </test>
+                <test logic="OR">
+                    systems/electrical/generator-reserve-pos-norm lt 1
+                    <test logic="AND">
+                        gear/unit[0]/WOW == 0
+                        systems/electrical/generator-reserve-supplying == 0
+                    </test>
+                </test>
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/reserve-level">
+            <test logic="AND" value="0">
+                systems/indicators/reserve-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/reserve-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/reserve-level" />
+        </switch>
+
+        <switch name="systems/indicators/reserve">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/reserve-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/reserve-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/hydr-2-primary">
+            <test value="1">
+                systems/hydraulics/system2/pressure-main == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/hydr-2-level">
+            <test logic="AND" value="0">
+                systems/indicators/hydr-2-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/hydr-2-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/hydr-2-level" />
+        </switch>
+
+        <switch name="systems/indicators/hydr-2">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/hydr-2-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/hydr-2-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/hydr-1-primary">
+            <test value="1">
+                systems/hydraulics/system1/pressure == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/hydr-1-level">
+            <test logic="AND" value="0">
+                systems/indicators/hydr-1-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/hydr-1-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/hydr-1-level" />
+        </switch>
+
+        <switch name="systems/indicators/hydr-1">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/hydr-1-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/hydr-1-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/auto-throttle-secondary">
+            <default value="autoflight/athr-disengaged-normal" />
+        </switch>
+
+        <switch name="systems/indicators/auto-throttle-primary">
+            <default value="autoflight/athr-disengaged-failure" />
+            <test logic="AND" value="1">
+                autoflight/ac-bus-main-bool-timer-2s eq 0
+                autoflight/athr-pos eq 1
+                autoflight/athr-disengaged-normal eq 0
+            </test>
+        </switch>
+
+        <switch name="systems/indicators/auto-throttle-level">
+            <test logic="AND" value="0">
+                systems/indicators/auto-throttle-primary == 0
+                systems/indicators/auto-throttle-secondary == 0
+            </test>
+            <test value="1">
+                systems/indicators/auto-throttle-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/auto-throttle-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/auto-throttle-level" />
+        </switch>
+
+        <switch name="systems/indicators/auto-throttle">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/auto-throttle-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/auto-throttle-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/no-reverse-tertiary">
+            <function>
+                <and>
+                    <or>
+                        <nq>
+                            <property>/gear/gear[0]/position-norm</property>
+                            <value>0</value>
+                        </nq>
+                        <lt>
+                            <property>velocities/mach</property>
+                            <value>0.64</value>
+                        </lt>
+                    </or>
+                    <nq>
+                        <property>/ja37/systems/tertiary-opening</property>
+                        <value>1</value>
+                    </nq>
+                </and>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/no-reverse-tertiary-time">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="OR" value="systems/indicators/no-reverse-tertiary-time">
+                systems/indicators/no-reverse-tertiary == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/indicators/no-reverse-tertiary-times-up">
+            <function>
+                <sum>
+                    <p>systems/indicators/no-reverse-tertiary-time</p>
+                    <v>12</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/no-reverse-primary">
+            <test logic="AND" value="1">
+                /controls/engines/engine/reverse-system/serviceable == 0
+                /controls/engines/engine[0]/reverser-cmd == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/indicators/no-reverse-tertiary-times-up lt sim-time-sec
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/no-reverse-level">
+            <test logic="AND" value="0">
+                systems/indicators/no-reverse-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/no-reverse-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/no-reverse-level" />
+        </switch>
+
+        <switch name="systems/indicators/no-reverse">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/no-reverse-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/no-reverse-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/hydr-reserve-primary">
+            <test logic="AND" value="1">
+                systems/hydraulics/system2/pressure-reserve == 0
+                /ja37/systems/variant == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/hydr-reserve-level">
+            <test logic="AND" value="0">
+                systems/indicators/hydr-reserve-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/hydr-reserve-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/hydr-reserve-level" />
+        </switch>
+
+        <switch name="systems/indicators/hydr-reserve">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/hydr-reserve-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/hydr-reserve-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/oil-pressure-primary">
+            <function>
+                <or>
+                    <lt>
+                        <property>propulsion/engine/oil-pressure-psi</property>
+                        <value>15.0</value>
+                    </lt>
+                    <gt>
+                        <property>systems/flight/oil/pressure-drop-norm</property>
+                        <value>0.5</value>
+                    </gt>
+                </or>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/oil-pressure-level">
+            <test logic="AND" value="0">
+                systems/indicators/oil-pressure-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/oil-pressure-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/oil-pressure-level" />
+        </switch>
+
+        <switch name="systems/indicators/oil-pressure">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/oil-pressure-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/oil-pressure-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/oil-temperature">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+
+        
+
+        
+        <switch name="systems/indicators/autoflight-suppress-blinking">
+            <test value="0">
+                /ja37/systems/variant ne 0
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/hydr-1-primary == 1
+                systems/indicators/primary-data-primary == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        
+        <switch name="systems/indicators/autoflight-spak-only">
+            <test value="1">
+                autoflight/ac-bus-main-bool-timer-6s == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        <switch name="systems/indicators/flightstick-level">
+            
+            <test logic="AND" value="4">
+                systems/indicators/flightstick-level == 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            
+            <test logic="AND" value="2">
+                systems/indicators/flightstick-level == 4
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            
+            <test logic="AND" value="2">
+                systems/indicators/flightstick-level == 4
+                systems/indicators/autoflight-suppress-blinking == 1
+            </test>
+            
+            <default value="systems/indicators/flightstick-level" />
+        </switch>
+
+        <switch name="systems/indicators/flightstick">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/flightstick-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/flightstick-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        <switch name="systems/indicators/auto-attitude-level">
+            
+            <test value="0">
+                systems/indicators/autoflight-spak-only == 1
+            </test>
+            
+            <test logic="AND" value="4">
+                systems/indicators/auto-attitude-level == 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            
+            <test logic="AND" value="2">
+                systems/indicators/auto-attitude-level == 4
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            
+            <test logic="AND" value="2">
+                systems/indicators/flightstick-level == 4
+                systems/indicators/autoflight-suppress-blinking == 1
+            </test>
+            
+            <default value="systems/indicators/auto-attitude-level" />
+        </switch>
+
+        <switch name="systems/indicators/auto-attitude">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/auto-attitude-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/auto-attitude-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        <switch name="systems/indicators/auto-altitude-level">
+            
+            <test value="0">
+                systems/indicators/autoflight-spak-only == 1
+            </test>
+            
+            <test logic="AND" value="4">
+                systems/indicators/auto-altitude-level == 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            
+            <test logic="AND" value="2">
+                systems/indicators/auto-altitude-level == 4
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            
+            <test logic="AND" value="2">
+                systems/indicators/flightstick-level == 4
+                systems/indicators/autoflight-suppress-blinking == 1
+            </test>
+            
+            <default value="systems/indicators/auto-altitude-level" />
+        </switch>
+
+        <switch name="systems/indicators/auto-altitude">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/auto-altitude-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/auto-altitude-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+
+        
+
+        <switch name="systems/indicators/radar-altimeter-primary">
+            <test logic="AND" value="1">
+                instruments/radar-altimeter/functional == 0
+                /ja37/systems/variant ne 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/radar-altimeter-level">
+            <test logic="AND" value="0">
+                systems/indicators/radar-altimeter-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/radar-altimeter-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/radar-altimeter-level" />
+        </switch>
+
+        <switch name="systems/indicators/radar-altimeter">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/radar-altimeter-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/radar-altimeter-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/fire-in-starter">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/pitch-gearing-primary">
+            <function>
+                <eq>
+                    <property>fcs/elevator/gearing-enable</property>
+                    <value>0</value>
+                </eq>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/pitch-gearing-level">
+            <test logic="AND" value="0">
+                systems/indicators/pitch-gearing-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/pitch-gearing-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/pitch-gearing-level" />
+        </switch>
+
+        <switch name="systems/indicators/pitch-gearing">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/pitch-gearing-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/pitch-gearing-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/roll-gearing">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/cabin-pressure-primary">
+            <function>
+                <lt>
+                    <property>systems/flight/cabin-pressure-kpm2</property>
+                    <value>0.15</value>
+                </lt>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/cabin-pressure-level">
+            <test logic="AND" value="0">
+                systems/indicators/cabin-pressure-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/cabin-pressure-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/cabin-pressure-level" />
+        </switch>
+
+        <switch name="systems/indicators/cabin-pressure">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/cabin-pressure-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/cabin-pressure-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        
+        <switch name="systems/indicators/canopy-and-seat-restart-condition">
+            <test logic="AND" value="1">
+                /ja37/systems/variant == 0
+                fcs/throttle-pos-deg gt 50
+            </test>
+            <test logic="AND" value="1">
+                /ja37/systems/variant ne 0
+                /ja37/mode/selector-ajs ne 1
+            </test>
+        </switch>
+
+        <switch name="systems/indicators/canopy-and-seat-restart">
+            <test logic="AND" value="1">
+                systems/indicators/canopy-and-seat-restart-condition == 1
+                systems/indicators/canopy-and-seat-restart-condition-old == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/canopy-and-seat-restart-condition-old">
+            <default value="systems/indicators/canopy-and-seat-restart-condition" />
+        </switch>
+
+        <switch name="systems/indicators/canopy-and-seat-primary">
+            <test logic="OR" value="1">
+                /canopy/position-norm gt 0
+                fcs/canopy/serviceable == 0
+                fcs/canopy/hinges/serviceable == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/canopy-and-seat-level">
+            <test logic="AND" value="0">
+                systems/indicators/canopy-and-seat-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/canopy-and-seat-level lt 2
+                systems/indicators/reset-acknowledged == 1
+                systems/indicators/canopy-and-seat-restart == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/canopy-and-seat-level" />
+        </switch>
+
+        <switch name="systems/indicators/canopy-and-seat">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/canopy-and-seat-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/canopy-and-seat-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/ignition-system-primary">
+            <test logic="AND" value="1">
+                propulsion/engine/cutoff-low-pressure == 0
+                propulsion/engine[0]/n2 lt 50
+                propulsion/engine[0]/n2 gt 16
+                /engines/engine/thrust_lb == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/ignition-system-level">
+            <test logic="AND" value="0">
+                systems/indicators/ignition-system-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/ignition-system-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/ignition-system-level" />
+        </switch>
+
+        <switch name="systems/indicators/ignition-system">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/ignition-system-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/ignition-system-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/start-system">
+            <function>
+                <or>
+                    <and>
+                        <eq>
+                            <property>/controls/engines/engine[0]/starter-cmd</property>
+                            <value>1</value>
+                        </eq>
+                        <lt>
+                            <property>propulsion/engine[0]/n2</property>
+                            <value>50</value>
+                        </lt>
+                        <eq>
+                            <property>/engines/engine/thrust_lb</property>
+                            <value>0</value>
+                        </eq>
+                    </and>
+                    <property>/controls/lighting/test-indicator-panels</property>
+                </or>
+            </function>
+        </fcs_function>
+
+
+        
+
+        <fcs_function name="systems/indicators/manual-fuel-regulation">
+            <function>
+                <or>
+                    <lt>
+                        <property>propulsion/engine[0]/n2</property>
+                        <value>9</value>
+                    </lt>
+                    <eq>
+                        <property>/controls/fuel/auto</property>
+                        <value>0</value>
+                    </eq>
+                    <property>/controls/lighting/test-indicator-panels</property>
+                </or>
+            </function>
+        </fcs_function>
+
+
+        
+
+        <switch name="systems/indicators/central-cpu-primary">
+            
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/central-cpu">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/primary-data-secondary">
+            <default value="systems/indicators/central-cpu-primary" />
+        </switch>
+
+        <switch name="systems/indicators/primary-data-primary">
+            <test logic="OR" value="0">
+                /ja37/systems/variant ne 0
+                systems/indicators/primary-data-secondary == 1
+            </test>
+            <default value="/ja37/avionics/primaryData" />
+        </switch>
+
+        <switch name="systems/indicators/primary-data-level">
+            <test logic="AND" value="0">
+                systems/indicators/primary-data-primary == 0
+                systems/indicators/primary-data-secondary == 0
+            </test>
+            <test logic="AND" value="1">
+                systems/indicators/primary-data-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/primary-data-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/primary-data-level" />
+        </switch>
+
+        <switch name="systems/indicators/primary-data">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/primary-data-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/primary-data-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+
+        
+
+        <switch name="systems/indicators/inertia-navigation">
+            <test logic="OR" value="1">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/radar-secondary">
+            <test value="0">
+                /ja37/systems/variant ne 0
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/electrical-primary == 1
+                systems/indicators/central-cpu-primary == 1
+                systems/indicators/primary-data-primary == 1
+                systems/indicators/hydr-1-primary == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/radar-primary">
+            <test logic="OR" value="0">
+                /ja37/systems/variant ne 0
+                systems/indicators/radar-secondary == 1
+            </test>
+            <test logic="AND" value="1">
+                /instrumentation/radar/serviceable == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/radar-level">
+            <test logic="AND" value="0">
+                systems/indicators/radar-primary == 0
+                systems/indicators/radar-secondary == 0
+            </test>
+            <test value="1">
+                systems/indicators/radar-primary == 0
+            </test>
+            <test logic="OR" value="3">
+                systems/indicators/radar-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/radar-level" />
+        </switch>
+
+        <switch name="systems/indicators/radar">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/radar-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/radar-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/transponder">
+            <function>
+                <property>/controls/lighting/test-indicator-panels</property>
+            </function>
+        </fcs_function>
+
+
+        
+
+        <switch name="systems/indicators/alpha">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <fcs_function name="systems/indicators/oxygen-primary">
+            <function>
+                <or>
+                    <eq>
+                        <property>/controls/oxygen</property>
+                        <value>0</value>
+                    </eq>
+                    <lt>
+                        <property>/ja37/systems/oxygen-bottle-pressure</property>
+                        <value>41</value>
+                    </lt>
+                </or>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/oxygen-level">
+            <test logic="AND" value="0">
+                systems/indicators/oxygen-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/oxygen-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/oxygen-level" />
+        </switch>
+
+        <switch name="systems/indicators/oxygen">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/oxygen-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/oxygen-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/outlet-temperature-primary">
+            <test logic="AND" value="1">
+                
+                propulsion/engine/outlet-temperature-degc gt 890
+                /ja37/systems/variant == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/outlet-temperature-level">
+            <test logic="AND" value="0">
+                systems/indicators/outlet-temperature-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/outlet-temperature-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/outlet-temperature-level" />
+        </switch>
+
+        <switch name="systems/indicators/outlet-temperature">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/outlet-temperature-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/outlet-temperature-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/low-fuel-extra-percent">
+            
+            <test logic="AND" value="0">
+                systems/indicators/low-fuel-level ge 3
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="/ja37/systems/fuel-warning-extra-percent" />
+            <output>/ja37/systems/fuel-warning-extra-percent</output>
+        </switch>
+
+        <fcs_function name="systems/indicators/low-fuel-limit-ratio">
+            <function>
+                <sum>
+                    <product>
+                        <property>systems/indicators/low-fuel-extra-percent</property>
+                        <value>0.01</value>
+                    </product>
+                    <value>0.24</value>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/low-fuel-primary">
+            <default value="0" />
+            <test logic="AND" value="1">
+                instruments/fuel/ratio lt systems/indicators/low-fuel-limit-ratio
+                gear/gear-pos-norm == 0
+            </test>
+        </switch>
+
+        <switch name="systems/indicators/low-fuel-level">
+            <test logic="AND" value="0">
+                systems/indicators/low-fuel-primary == 0
+            </test>
+            <test logic="OR" value="4">
+                systems/indicators/low-fuel-level lt 2
+                systems/indicators/reset-acknowledged == 1
+            </test>
+            <test value="2">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/low-fuel-level" />
+        </switch>
+
+        <switch name="systems/indicators/low-fuel">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/low-fuel-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/low-fuel-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/weapons">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/navigation-systems">
+            <test logic="OR" value="1">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        
+        <switch name="systems/indicators/flares-out-primary">
+            <test logic="OR" value="0">
+                /ja37/systems/variant == 0
+                /ai/submodels/submodel[0]/count gt 6
+                /ai/submodels/submodel[0]/count eq 0
+            </test>
+            <test value="2">
+                systems/indicators/flares-out-primary == 0
+            </test>
+            
+            <test logic="AND" value="1">
+                systems/indicators/flares-out-primary == 2
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <default value="systems/indicators/flares-out-primary" />
+        </switch>
+
+        <switch name="systems/indicators/flares-out-secondary">
+            <test logic="OR" value="0">
+                /ja37/systems/variant == 0
+            </test>
+            <test value="1">
+                /ai/submodels/submodel[0]/count eq 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/flares-out-level">
+            <test value="4">
+                systems/indicators/flares-out-primary == 2
+            </test>
+            <test value="1">
+                systems/indicators/flares-out-secondary == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/flares-out">
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                systems/indicators/flares-out-level ge 3
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test value="1">
+                systems/indicators/flares-out-level ge 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/countermeasures">
+            <test logic="OR" value="1">
+                /controls/lighting/test-indicator-panels == 1
+                /ai/submodels/submodel[0]/flare-release-snd == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+
+        
+
+        <switch name="systems/indicators/speedbrake">
+            <test logic="OR" value="1">
+                fcs/speedbrake-pos-norm gt 0
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+    </channel>
+
+
+
+
+
+
+
+
+
+    <channel execrate="4" name="Misc indicator lights logic">
+
+        <switch name="systems/indicators/dc-light-tenHz">
+            <default value="0" />
+            <test logic="AND" value="/systems/electrical/dc-light">               
+                /ja37/blink/four-Hz/state == 1
+            </test>
+        </switch>
+
+        <switch name="systems/indicators/dc-light-fiveHz">
+            <default value="0" />
+            <test logic="AND" value="/systems/electrical/dc-light">               
+                /ja37/blink/five-Hz/state == 1
+            </test>
+        </switch>
+
+        <switch name="systems/indicators/dc-light-twoHz">
+            <default value="0" />
+            <test logic="AND" value="/systems/electrical/dc-light">               
+                /ja37/blink/two-Hz/state == 1
+            </test>
+        </switch>
+
+        
+
+        <fcs_function name="systems/indicators/transonic">
+            <function>
+                <and>
+                    <gt>
+                        <property>/instrumentation/airspeed-indicator/indicated-mach</property>
+                        <value>0.97</value>
+                    </gt>
+                    <lt>
+                        <property>/instrumentation/airspeed-indicator/indicated-mach</property>
+                        <value>1.05</value>
+                    </lt>
+                </and>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/indicators/transonic-warning">
+            <function>
+                <or>
+                    <eq>
+                        <property>systems/indicators/transonic</property>
+                        <value>1</value>
+                    </eq>
+                    <and>
+                        <eq>
+                            <property>/engines/engine/is-reversed</property>
+                            <value>1</value>
+                        </eq>
+                        <lt>
+                            <property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+                            <value>64.8</value>
+                        </lt>
+                    </and>
+                </or>
+            </function>
+        </fcs_function>
+
+        <switch name="/instrumentation/indicators/transonic">
+            <default value="0" />
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /controls/lighting/test-indicator-panels == 1
+                systems/indicators/transonic-warning == 1
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/indicators/reverse">
+            <default value="0" />
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /controls/lighting/test-indicator-panels == 1
+                /controls/engines/engine[0]/reverser-cmd == 1
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/indicators/cutoff">
+            <default value="0" />
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /controls/lighting/test-indicator-panels == 1
+                propulsion/engine/cutoff-low-pressure == 1
+                /controls/engines/engine[0]/cutoff-augmentation == 1
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/indicators/roll-trim-centered">
+            <default value="0" />
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /controls/flight/aileron-trim lt 0.025
+                /controls/flight/aileron-trim gt -0.025
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/indicators/yaw-trim-centered">
+            <default value="0" />
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /controls/flight/rudder-trim lt 0.025
+                /controls/flight/rudder-trim gt -0.025
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/indicators/reservkurs">
+            <default value="0" />
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/avionics/reservkurs == 1
+            </test>
+        </switch>
+
+        <switch name="instruments/indicators/released-failed">
+            <default value="/instrumentation/indicators/release-failed" />
+            <test value="0">
+                /ja37/avionics/master-warning-button == 1
+            </test>
+            <output>/instrumentation/indicators/release-failed</output>
+        </switch>
+
+        <switch name="/instrumentation/indicators/release">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">
+                /instrumentation/indicators/release-failed == 1
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test logic="OR" value="/systems/electrical/dc-light">
+                /instrumentation/indicators/release-complete == 1
+            </test>
+        </switch>
+
+        <fcs_function name="/instrumentation/terrain-warning-hold">
+            <function>
+                <or>
+                    <and>
+                        <eq>
+                            <property>autoflight/mode</property>
+                            <v>3</v>
+                        </eq>
+                        <lt>
+                            <quotient>
+                                <property>/instrumentation/altimeter/indicated-altitude-ft</property>
+                                <property>autoflight/pitch/alt/target</property>
+                            </quotient>
+                            <v>0.8</v>
+                        </lt>
+                    </and>
+                    <p>systems/indicators/flashing-mkv</p>
+                </or>
+            </function>
+        </fcs_function>
+        
+        
+        
+        <switch name="systems/indicators/flashing-alt-bars">
+            <default value="0" />
+            
+            <test logic="AND" value="1">
+                autoflight/mode ge 1
+                /ja37/avionics/lost-dc-sec gt 6
+            </test>
+            
+            <test logic="AND" value="1">
+                autoflight/mode ge 2
+                autoflight/temp-mode-active eq 1
+            </test>
+        </switch>
+
+        <switch name="systems/indicators/flashing-mkv">
+            <default value="0" />
+            <test logic="AND" value="1">
+                autoflight/mode ge 2
+                /ja37/avionics/lost-dc-sec gt 6
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/terrain-warning-secondary">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /instrumentation/terrain-warning-hold == 1
+            </test>
+        </switch>
+
+        <switch name="/instrumentation/TLS-light-steady-time">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="AND" value="/instrumentation/TLS-light-steady-time">
+                /ja37/hud/TILS-on == 0
+                /instrumentation/nav[0]/has-gs == 1
+            </test>
+        </switch>
+
+        <fcs_function name="/instrumentation/TLS-light-steady-hyst">
+            <function>
+                <sum>
+                    <p>/instrumentation/TLS-light-steady-time</p>
+                    <v>7</v>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <switch name="/instrumentation/TLS-light-blink-time">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="OR" value="/instrumentation/TLS-light-blink-time">
+                /ja37/hud/TILS-on == 0
+            </test>
+        </switch>
+
+        <fcs_function name="/instrumentation/TLS-light-blink-hyst">
+            <function>
+                <sum>
+                    <p>/instrumentation/TLS-light-blink-time</p>
+                    <v>7</v>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <switch name="/instrumentation/TLS-light-steady">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /ja37/hud/TILS-on == 1
+                /instrumentation/nav[0]/gs-in-range == 1
+                /instrumentation/nav[0]/has-gs == 1
+            </test>
+            <test logic="AND" value="0">
+                /instrumentation/TLS-light-steady-hyst lt sim-time-sec
+            </test>
+            <test logic="AND" value="1">
+                /instrumentation/TLS-light-steady-hyst gt sim-time-sec
+                /instrumentation/TLS-light-steady == 1
+            </test>
+        </switch>
+        
+        <switch name="/instrumentation/TLS-light-blink">
+            <default value="0" />
+            <test logic="OR" value="1">
+                /ja37/hud/TILS-on == 1
+            </test>
+            <test logic="AND" value="0">
+                /instrumentation/TLS-light-blink-hyst lt sim-time-sec
+            </test>
+            <test logic="AND" value="1">
+                /instrumentation/TLS-light-blink-hyst gt sim-time-sec
+                /instrumentation/TLS-light-blink == 1
+            </test>
+        </switch>
+        
+        <switch name="/instrumentation/TLS-light">
+            <default value="/instrumentation/TLS-light-steady" />
+            <test logic="OR" value="/ja37/blink/four-Hz/state">
+                /instrumentation/TLS-light-blink == 1
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+        </switch>
+        
+    </channel>    
+
+
+
+
+
+
+    <channel execrate="4" name="Test indicator lights logic">
+
+        <switch name="/ja37/test/button-ym-tp">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">               
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/test/ym-flash == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /ja37/test/ym-steady == 1
+            </test>
+        </switch>
+
+        <switch name="/ja37/test/button-start-tp">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">               
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/test/start-flash == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /ja37/test/start-steady == 1
+            </test>
+        </switch>
+
+        <switch name="/ja37/test/button-rep-tp">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">               
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/test/rep-flash == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /ja37/test/rep-steady == 1
+            </test>
+        </switch>
+
+        <switch name="/ja37/test/button-ipk-tp">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">               
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/test/ipk-flash == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /ja37/test/ipk-steady == 1
+            </test>
+        </switch>
+
+        <switch name="/ja37/test/button-fk-tp">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">               
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/test/fk-flash == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /ja37/test/fk-steady == 1
+            </test>
+        </switch>
+
+        <switch name="/ja37/test/button-fel-tp">
+            <default value="0" />
+            <test logic="OR" value="systems/indicators/dc-light-twoHz">               
+                /controls/lighting/test-indicator-panels == 1
+                /ja37/test/fel-flash == 1
+            </test>
+            <test logic="AND" value="/systems/electrical/dc-light">
+                /ja37/test/fel-steady == 1
+            </test>
+        </switch>
+
+    </channel>
+
+
+
+
+
+
+
+
+
+
+
+    <channel execrate="4" name="Master warning logic">
+
+        
+
+        
+
+        
+        <switch name="systems/indicators/master-warning/ap-downgrade-level">
+            <test logic="OR" value="0">
+                /ja37/avionics/master-warning-button == 1
+                /ja37/systems/variant ne 0
+            </test>
+            <test value="4">
+                autoflight/mode lt autoflight/mode-last
+            </test>
+            <default value="systems/indicators/master-warning/ap-downgrade-level" />
+        </switch>
+
+        <pure_gain name="autoflight/mode-last">
+            <input>autoflight/mode</input>
+            <gain>1.0</gain>
+        </pure_gain>
+
+        <switch name="systems/indicators/master-warning/engine-startup">
+            <description>
+                            Engine is starting up
+
+                            Maybe make more detailed check in future.
+            </description>
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/electrical/starter-relay-R1 == 1
+                /controls/engines/engine[0]/starter-cmd == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/indicators/master-warning/max-level">
+            <function>
+                <max>
+                    <property>systems/indicators/fire-level</property>
+                    <property>systems/indicators/fuel-flow-level</property>
+                    <property>systems/indicators/fuel-pump-level</property>
+                    <property>systems/indicators/gears-level</property>
+                    <property>systems/indicators/electrical-level</property>
+                    <property>systems/indicators/electrical-reserve-level</property>
+                    <property>systems/indicators/reserve-level</property>
+                    <property>systems/indicators/hydr-2-level</property>
+                    <property>systems/indicators/hydr-1-level</property>
+                    <property>systems/indicators/auto-throttle-level</property>
+                    <property>systems/indicators/no-reverse-level</property>
+                    <property>systems/indicators/hydr-reserve-level</property>
+                    <property>systems/indicators/oil-pressure-level</property>
+                    <property>systems/indicators/flightstick-level</property>
+                    <property>systems/indicators/auto-attitude-level</property>
+                    <property>systems/indicators/auto-altitude-level</property>
+                    <property>systems/indicators/radar-altimeter-level</property>
+                    <property>systems/indicators/pitch-gearing-level</property>
+                    <property>systems/indicators/cabin-pressure-level</property>
+                    <property>systems/indicators/canopy-and-seat-level</property>
+                    <property>systems/indicators/ignition-system-level</property>
+                    <property>systems/indicators/primary-data-level</property>
+                    <property>systems/indicators/radar-level</property>
+                    <property>systems/indicators/oxygen-level</property>
+                    <property>systems/indicators/outlet-temperature-level</property>
+                    <property>systems/indicators/low-fuel-level</property>
+                    <property>systems/indicators/flares-out-level</property>
+                    <property>systems/indicators/master-warning/ap-downgrade-level</property>
+                </max>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/indicators/master-warning/visual">
+            <test value="1">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test value="0">
+                systems/indicators/master-warning/engine-startup == 1
+            </test>
+            <test value="1">
+                systems/indicators/master-warning/max-level ge 3
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/master-warning/lamp1">
+            <test logic="AND" value="1">
+                systems/indicators/master-warning/visual == 1
+                /ja37/elec/dc-bus-main-bool == 1
+                /ja37/blink/four-Hz/state == 1
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/master-warning/lamp2">
+            <test logic="AND" value="1">
+                systems/indicators/master-warning/visual == 1
+                /ja37/elec/dc-bus-main-bool == 1
+                /ja37/blink/four-Hz/state == 0
+            </test>
+            <default value="0" />
+        </switch>
+
+        <switch name="systems/indicators/master-warning/audio">
+            <test value="1">
+                /controls/lighting/test-indicator-panels == 1
+            </test>
+            <test value="0">
+                systems/indicators/master-warning/engine-startup == 1
+            </test>
+            <test logic="OR" value="1">
+                systems/indicators/master-warning/max-level ge 4
+            </test>
+            
+            <test logic="AND" value="1">
+                /ja37/systems/variant ne 0
+                systems/indicators/master-warning/max-level ge 3
+            </test>
+            <default value="0" />
+        </switch>
+
+    </channel>
+
+</system>

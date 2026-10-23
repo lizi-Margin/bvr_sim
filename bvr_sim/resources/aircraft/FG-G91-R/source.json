@@ -1,0 +1,30 @@
+{
+  "set": "G91-R/G91-R-set.xml",
+  "name": "Fiat G.91-R (JSBSim)",
+  "fdm_type": "jsb",
+  "fdm": "G91-R/G91-R-JSBSim.xml",
+  "jets": 0,
+  "model": "G91-R/Models/G91-R.xml",
+  "tags": [
+    "FIAT",
+    "single-engine",
+    "turbine",
+    "fighter",
+    "1950s",
+    "coldwar",
+    "combat",
+    "low-wing",
+    "ifr",
+    "retractable-gear",
+    "tricycle",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "G91-R.zip",
+  "archive_sha256": "fc49fee8e11db74393acb0a6c7fe381448fd648596ad00be7bd662c8b92e337b",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/G91-R.zip"
+}

@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="canopy">
+    
+    <property value="0">systems/canopy/lever-trigger</property>
+    <property value="0">systems/canopy/warning-light</property>
+    <property value="0">systems/canopy/electric-ok</property>
+    <property value="0">systems/canopy/canopy-close</property>
+    
+
+    <channel name="cockpit switchs" execrate="4">
+        
+        <integrator name="systems/canopy/position">
+            <input>systems/canopy/position-go</input>
+            <c1>0.15</c1>
+        </integrator>
+        
+        <pure_gain name="systems/canopy/position-deg">
+            <input>systems/canopy/position</input>
+            <gain>45.0</gain>
+        </pure_gain>
+
+        <switch name="systems/canopy/position-go">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/canopy/electric-ok == 1
+                systems/manual-switches/cockpit/sw-canopy == 1
+                systems/canopy/position LT 1
+            </test>
+            <test logic="AND" value="-1">
+                systems/canopy/electric-ok == 1
+                systems/manual-switches/cockpit/sw-canopy == -1
+                systems/canopy/position GT 0.005
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/canopy/position-stopping">
+            <input>systems/canopy/position-go</input>
+            <c1>0.3</c1>
+        </washout_filter>
+        
+        <switch name="systems/canopy/position-stopping-go">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/canopy/position-stopping GT 0.2
+                systems/canopy/position-go == 0
+            </test>
+            <test logic="AND" value="1">
+                systems/canopy/position-stopping LE -0.2
+                systems/canopy/position-go == 0
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="canopy lever" execrate="8">
+        
+        <lag_filter name="systems/canopy/lever-pos">
+            <input>systems/canopy/lever-trigger-on</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/canopy/lever-trigger-on">
+            <default value="0" />
+            <test logic="AND" value="systems/canopy/lever-trigger">
+                systems/canopy/canopy-close == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/canopy/canopy-close">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/canopy/position LE 0.015
+            </test>
+        </switch>
+        
+        <switch name="systems/canopy/lever-lock">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/canopy/lever-pos GE 0.95
+            </test>
+        </switch>
+        
+    </channel>
+    
+    <channel name="canopy electric" execrate="8">
+        
+        <switch name="systems/canopy/electric-ok">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[0]/canopy-command/fuse == 1
+                systems/electric/bus[0]/V GT 18.0
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[0]/canopy-command/I">
+            <default value="0" />
+            <test logic="OR" value="6.0">
+                systems/canopy/position-go GE 0.01
+                systems/canopy/position-go LE -0.01
+            </test>
+        </switch>
+        
+        <switch name="systems/canopy/warning-light">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/canopy/lever-lock == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+</system>

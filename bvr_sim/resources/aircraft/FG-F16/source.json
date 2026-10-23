@@ -1,0 +1,24 @@
+{
+  "set": "f16/f16-block-52-set.xml",
+  "name": "General Dynamics F-16CJ Block 52",
+  "fdm_type": "jsb",
+  "fdm": "f16/f16b52.xml",
+  "jets": 0,
+  "model": "f16/Models/F-16.xml",
+  "tags": [
+    "f-16",
+    "jet",
+    "single-engine",
+    "retractable-gear",
+    "ifr",
+    "hud",
+    "refuel"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "f16.zip",
+  "archive_sha256": "7e399f0d620df6a1eefc30b0aac29e36a4256b5c8c74983f5e505b1789f0fa32",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/f16.zip"
+}

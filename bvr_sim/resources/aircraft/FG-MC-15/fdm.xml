@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fdm_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="MC-15" version="2.0" release="ALPHA" xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd">
+	
+	<fileheader>
+		<author> Bea Wolf (D-ECHO); using AeromatiC++ version 3.3.20 </author>
+		<filecreationdate> 03 Mar 2024 </filecreationdate>
+		<version>03/2024</version>
+		<description> MC-15 CriCri with 2 AMT Olympus Jet Engines</description>
+	</fileheader>
+	
+	
+	
+	
+	
+	<metrics file="Systems/mc-15-metrics" />
+	
+	<mass_balance file="Systems/mc-15-mass_balance" />
+	
+	<propulsion>
+		
+		<engine file="AMT_Olympus_HP">
+			<feed> 0 </feed>
+			
+			<thruster file="direct">
+				<location unit="M">
+					<x> -0.99  </x>
+					<y> -0.454 </y>
+					<z>  0.168 </z>
+				</location>
+				<orient unit="DEG">
+					<pitch>     0.00 </pitch>
+					<roll>     0.00 </roll>
+					<yaw>     0.00 </yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		<engine file="AMT_Olympus_HP">
+			<feed> 0 </feed>
+			
+			<thruster file="direct">
+				<location unit="M">
+					<x> -0.99  </x>
+					<y>  0.454 </y>
+					<z>  0.168 </z>
+				</location>
+				<orient unit="DEG">
+					<pitch>     0.00 </pitch>
+					<roll>     0.00 </roll>
+					<yaw>     0.00 </yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		
+		
+		
+		
+		<tank type="FUEL" number="0">
+			<location unit="M">
+				<x> -0.01936 </x> 
+				<y>  0.0 </y> 
+				<z>  0.0 </z> 
+			</location>
+			<capacity unit="KG"> 25  </capacity>
+			<contents unit="KG"> 15.0 </contents>
+			<density unit="KG/L">  0.758 </density> 
+			<unusable unit="LTR">  0.2  </unusable> 
+		</tank>
+		
+	</propulsion>
+	
+	<ground_reactions file="Systems/mc-15-ground_reactions" />
+	
+	<flight_control file="Systems/mc-15-fcs" />
+	
+	<aerodynamics file="Systems/mc-15-aerodynamics" />
+	
+	<external_reactions />
+	
+</fdm_config>

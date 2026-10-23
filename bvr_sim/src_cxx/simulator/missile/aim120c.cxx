@@ -3,6 +3,7 @@
 #include "../sense/base.hxx"
 #include "../ground/base.hxx"
 #include "../ground/aa.hxx"
+#include "../ground/slamraam.hxx"
 #include "support/support.hxx"
 #include "c3utils/c3utils.hxx"
 #include "support/interp_table.hxx"
@@ -141,6 +142,8 @@ bool AIM120C::_can_track_from(const std::shared_ptr<SimulatedObject>& friend_) c
     if (!friend_) {
         return false;
     }
+    if(auto launcher=std::dynamic_pointer_cast<SLAMRAAM>(friend_))
+        return target && launcher->tracks(target->uid);
 
     if (friend_->Type == SOT::Aircraft){
         auto aircraft = std::dynamic_pointer_cast<Aircraft>(friend_);

@@ -70,3 +70,20 @@ TEST(SensorManager, KeepsHighestLevelTrackPerTarget) {
     ASSERT(track->best_observation != nullptr);
     ASSERT(track->observations_by_sensor.size() == 2);
 }
+
+TEST(SensorNoise, SeedReplaysNonzeroPositionAndVelocityNoise) {
+    auto source=std::make_shared<DummyObject>("noise_source",TeamColor::Red);
+    DataObj::set_noise_seed(7);
+    DataObj a(source,200,3), b(source,200,3);
+    ASSERT(a.position != source->position);
+    ASSERT(a.velocity != source->velocity);
+    ASSERT(a.position != b.position);
+    DataObj::set_noise_seed(7);
+    DataObj again(source,200,3), second(source,200,3);
+    ASSERT(a.position == again.position); ASSERT(a.velocity == again.velocity);
+    ASSERT(b.position == second.position); ASSERT(b.velocity == second.velocity);
+    DataObj::set_noise_seed(8);
+    DataObj changed(source,200,3);
+    ASSERT(a.position != changed.position);
+    DataObj::set_noise_seed(std::nullopt);
+}

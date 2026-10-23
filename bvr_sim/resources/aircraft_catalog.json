@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "ordinary_selection_policy": "Five requested variants only; original aliases and AJ37/JA37 excluded from normal selection.",
+  "aircraft": [
+    {
+      "id": "F22",
+      "display_name": "F-22A Raptor",
+      "variant": "F-22A Raptor",
+      "simulation_model": "F22",
+      "fdm": {
+        "type": "jsbsim",
+        "model": "f22",
+        "file": "jsbsim/aircraft/f22/f22.xml",
+        "sha256": "1508b06f96be5b0e3a9518ab0e6cad37b4152bfb72215c61951b7dd50269ad2b"
+      },
+      "flight_controller": {
+        "profile": "f22",
+        "source": "src_cxx/simulator/aircraft/fc/flight_controller_params.hxx",
+        "approximation": "Existing controller profile; response validation required, not claimed independently calibrated."
+      },
+      "radar": {
+        "profile": "F16",
+        "range_m": 110000,
+        "approximation": "Existing common F-16 radar parameters; no independent real radar calibration."
+      },
+      "appearance": {
+        "asset_id": "F22",
+        "variant_note": "Current Alpha modern weapons approximation; no authentic station/weight simulation."
+      },
+      "max_missiles": 8,
+      "max_bombs": 4,
+      "supported_weapons": [
+        "AIM-120C7",
+        "Mk-82"
+      ],
+      "legal_loadouts": [
+        {
+          "id": "mixed",
+          "missiles": 4,
+          "bombs": 2
+        },
+        {
+          "id": "intercept",
+          "missiles": 6,
+          "bombs": 0
+        },
+        {
+          "id": "strike",
+          "missiles": 0,
+          "bombs": 4
+        },
+        {
+          "id": "clean",
+          "missiles": 0,
+          "bombs": 0
+        }
+      ],
+      "default_loadout": "mixed",
+      "missions": [
+        "intercept_patrol",
+        "air",
+        "strike",
+        "combined",
+        "convoy",
+        "training"
+      ],
+      "hangar_camera": {
+        "length_scale": 1.0,
+        "fov": 0.92
+      },
+      "flight_camera": {
+        "distance_scale": 1.0,
+        "fov": 1.0
+      },
+      "provenance": {
+        "fdm": "Existing repository JSBSim data; embedded source notices apply",
+        "limitations": "Current Alpha modern weapons approximation; no authentic station/weight simulation."
+      },
+      "validation": {
+        "flight": "Response tested (Alpha)",
+        "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
+      }
+    },
+    {
+      "id": "F16",
+      "display_name": "F-16 Fighting Falcon",
+      "variant": "F-16 Fighting Falcon",
+      "simulation_model": "F16",
+      "fdm": {
+        "type": "jsbsim",
+        "model": "f16",
+        "file": "jsbsim/aircraft/f16/f16.xml",
+        "sha256": "779c3f58d0836be4fe2e6db0e783fea2a2d22cdefd8e7e6940cc12b1e5eec488"
+      },
+      "flight_controller": {
+        "profile": "f16",
+        "source": "src_cxx/simulator/aircraft/fc/flight_controller_params.hxx",
+        "approximation": "Existing controller profile; response validation required, not claimed independently calibrated."
+      },
+      "radar": {
+        "profile": "F16",
+        "range_m": 110000,
+        "approximation": "Existing common F-16 radar parameters; no independent real radar calibration."
+      },
+      "appearance": {
+        "asset_id": "F16",
+        "variant_note": "Existing F-16A Block-32 JSBSim file with game modern missile integration; not a surveyed block-specific loadout."
+      },
+      "max_missiles": 8,
+      "max_bombs": 4,
+      "supported_weapons": [
+        "AIM-120C7",
+        "Mk-82"
+      ],
+      "legal_loadouts": [
+        {
+          "id": "mixed",
+          "missiles": 4,
+          "bombs": 2
+        },
+        {
+          "id": "intercept",
+          "missiles": 6,
+          "bombs": 0
+        },
+        {
+          "id": "strike",
+          "missiles": 0,
+          "bombs": 4
+        },
+        {
+          "id": "clean",
+          "missiles": 0,
+          "bombs": 0
+        }
+      ],
+      "default_loadout": "mixed",
+      "missions": [
+        "intercept_patrol",
+        "air",
+        "strike",
+        "combined",
+        "convoy",
+        "training"
+      ],
+      "hangar_camera": {
+        "length_scale": 1.0,
+        "fov": 0.92
+      },
+      "flight_camera": {
+        "distance_scale": 1.0,
+        "fov": 1.0
+      },
+      "provenance": {
+        "fdm": "Existing repository JSBSim data; embedded source notices apply",
+        "limitations": "Existing F-16A Block-32 JSBSim file with game modern missile integration; not a surveyed block-specific loadout."
+      },
+      "validation": {
+        "flight": "Response tested (Alpha)",
+        "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
+      }
+    },
+    {
+      "id": "F15",
+      "display_name": "F-15C Eagle",
+      "variant": "F-15C Eagle",
+      "simulation_model": "F15",
+      "fdm": {
+        "type": "jsbsim",
+        "model": "FG-F15C",
+        "file": "aircraft/FG-F15C/fdm.xml",
+        "sha256": "76ac97c0347db4a8cf03082f3717fc7a83d22e68d097744f2ce6ce0b5714b147"
+      },
+      "flight_controller": {
+        "profile": "f16",
+        "source": "src_cxx/simulator/aircraft/fc/flight_controller_params.hxx",
+        "approximation": "Same approximate F-16 host controller as imported FG-F15C; source FlightGear systems and aerodynamic tables are retained."
+      },
+      "radar": {
+        "profile": "F16",
+        "range_m": 110000,
+        "approximation": "Existing common F-16 radar parameters; no independent real radar calibration."
+      },
+      "appearance": {
+        "asset_id": "FG-F15C",
+        "variant_note": "Conservative air-to-air configuration; Mk-82 disabled for this F-15C appearance."
+      },
+      "max_missiles": 8,
+      "max_bombs": 0,
+      "supported_weapons": [
+        "AIM-120C7"
+      ],
+      "legal_loadouts": [
+        {
+          "id": "intercept",
+          "missiles": 6,
+          "bombs": 0
+        },
+        {
+          "id": "clean",
+          "missiles": 0,
+          "bombs": 0
+        }
+      ],
+      "default_loadout": "intercept",
+      "missions": [
+        "air",
+        "training"
+      ],
+      "hangar_camera": {
+        "length_scale": 1.0,
+        "fov": 0.92
+      },
+      "flight_camera": {
+        "distance_scale": 1.0,
+        "fov": 1.0
+      },
+      "provenance": {
+        "fdm": "FlightGear F-15/f15a.xml from Aircraft-2024 F-15.zip, shared with imported FG-F15C; see aircraft/FG-F15C/source.json and package notices.",
+        "limitations": "Conservative air-to-air configuration; Mk-82 disabled for this F-15C appearance."
+      },
+      "validation": {
+        "flight": "Imported FG-F15C dynamics; ordinary/imported trajectory equivalence covered by regression tests.",
+        "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
+      }
+    },
+    {
+      "id": "F18",
+      "display_name": "CF-18 / F-18 Hornet",
+      "variant": "CF-18 / F-18 Hornet",
+      "simulation_model": "F18",
+      "fdm": {
+        "type": "jsbsim",
+        "model": "f18",
+        "file": "jsbsim/aircraft/f18/f18.xml",
+        "sha256": "74edb371fb6a6b5f00f09d66aa74c02334dedc8c4944ec9bf80228abff8eb5c7"
+      },
+      "flight_controller": {
+        "profile": "f18",
+        "source": "src_cxx/simulator/aircraft/fc/flight_controller_params.hxx",
+        "approximation": "Existing controller profile; response validation required, not claimed independently calibrated."
+      },
+      "radar": {
+        "profile": "F16",
+        "range_m": 110000,
+        "approximation": "Existing common F-16 radar parameters; no independent real radar calibration."
+      },
+      "appearance": {
+        "asset_id": "FG-F18-CAF",
+        "variant_note": "Existing JSBSim Hornet file retains F-16-derived references/metrics; game weapon stations are explicit approximations."
+      },
+      "max_missiles": 8,
+      "max_bombs": 4,
+      "supported_weapons": [
+        "AIM-120C7",
+        "Mk-82"
+      ],
+      "legal_loadouts": [
+        {
+          "id": "mixed",
+          "missiles": 4,
+          "bombs": 2
+        },
+        {
+          "id": "intercept",
+          "missiles": 6,
+          "bombs": 0
+        },
+        {
+          "id": "strike",
+          "missiles": 0,
+          "bombs": 4
+        },
+        {
+          "id": "clean",
+          "missiles": 0,
+          "bombs": 0
+        }
+      ],
+      "default_loadout": "mixed",
+      "missions": [
+        "air",
+        "strike",
+        "combined",
+        "convoy",
+        "training"
+      ],
+      "hangar_camera": {
+        "length_scale": 1.0,
+        "fov": 0.92
+      },
+      "flight_camera": {
+        "distance_scale": 1.0,
+        "fov": 1.0
+      },
+      "provenance": {
+        "fdm": "Existing repository JSBSim data; embedded source notices apply",
+        "limitations": "Existing JSBSim Hornet file retains F-16-derived references/metrics; game weapon stations are explicit approximations. Heading pilot oscillates on the strike run; bomb qualification uses neutral manual aileron on the declared straight approach."
+      },
+      "validation": {
+        "flight": "Response tested (Alpha)",
+        "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
+      }
+    },
+    {
+      "id": "F4N",
+      "display_name": "F-4N Phantom II",
+      "variant": "F-4N Phantom II",
+      "simulation_model": "F4N",
+      "fdm": {
+        "type": "jsbsim",
+        "model": "F4N",
+        "file": "jsbsim/aircraft/F4N/F4N.xml",
+        "sha256": "8c06075827d766800997121b8382f73f3d189575028b9a1643ac4a1289a2077c"
+      },
+      "flight_controller": {
+        "profile": "f16",
+        "source": "src_cxx/simulator/aircraft/fc/flight_controller_params.hxx",
+        "approximation": "F-4N FDM reuses the F-16 controller. FG appearance is generic F-4 Phantom II, not verified F-4N geometry. No AIM-120 capability."
+      },
+      "radar": {
+        "profile": "F16",
+        "range_m": 110000,
+        "approximation": "Existing common F-16 radar parameters; no independent real radar calibration."
+      },
+      "appearance": {
+        "asset_id": "FG-F4",
+        "variant_note": "F-4N FDM reuses the F-16 controller. FG appearance is generic F-4 Phantom II, not verified F-4N geometry. No AIM-120 capability."
+      },
+      "max_missiles": 0,
+      "max_bombs": 4,
+      "supported_weapons": [
+        "Mk-82"
+      ],
+      "legal_loadouts": [
+        {
+          "id": "strike",
+          "missiles": 0,
+          "bombs": 4
+        },
+        {
+          "id": "clean",
+          "missiles": 0,
+          "bombs": 0
+        }
+      ],
+      "default_loadout": "strike",
+      "missions": [
+        "strike",
+        "convoy",
+        "training"
+      ],
+      "hangar_camera": {
+        "length_scale": 1.0,
+        "fov": 0.92
+      },
+      "flight_camera": {
+        "distance_scale": 1.0,
+        "fov": 1.0
+      },
+      "provenance": {
+        "fdm": "Existing repository JSBSim data; embedded source notices apply",
+        "limitations": "F-4N FDM reuses the F-16 controller. FG appearance is generic F-4 Phantom II, not verified F-4N geometry. No AIM-120 capability."
+      },
+      "validation": {
+        "flight": "Response tested (Alpha)",
+        "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
+      }
+    }
+  ]
+}

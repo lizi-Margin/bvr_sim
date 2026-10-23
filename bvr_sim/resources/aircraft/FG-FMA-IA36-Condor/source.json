@@ -1,0 +1,27 @@
+{
+  "set": "FMA-IA36-Condor/FMA-IA36-set.xml",
+  "name": "FMA-IA36 Condor (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "FMA-IA36-Condor/Systems/FMA-IA36-yasim.xml",
+  "jets": 5,
+  "model": "FMA-IA36-Condor/Models/FMA-IA36.xml",
+  "tags": [
+    "FMA",
+    "IAME",
+    "transport",
+    "prototype",
+    "1950s",
+    "retractable-gear",
+    "jet",
+    "5-engines",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "FMA-IA36-Condor.zip",
+  "archive_sha256": "16aef383a30b2533fc9485bdea472dc88f9e98e8ca17f2317bd1fd76a31b742b",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/FMA-IA36-Condor.zip"
+}

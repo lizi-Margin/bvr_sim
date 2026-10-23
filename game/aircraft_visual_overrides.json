@@ -1,0 +1,33 @@
+{
+  "FG-Hunter": {
+    "reason": "Source hides the fuselage in view-number 0; select its declared exterior view for the standalone viewer.",
+    "properties": {"sim/current-view/view-number": 1}
+  },
+  "FG-G91-R": {
+    "reason": "Exterior import: omit cockpit furniture and controls; source vasca.ac has a cylinder 83 m above the airframe.",
+    "exclude_paths": [
+      "G91-R/Models/Parts/Canopy/bath.xml",
+      "G91-R/Models/Parts/Canopy/Lateral_Panels_Left/",
+      "G91-R/Models/Parts/Canopy/Lateral_Panels_Right/",
+      "G91-R/Models/Parts/Canopy/Components/"
+    ]
+  },
+  "FG-Hansajet": {
+    "reason": "Omit root-folder cockpit panels and switch assemblies from the exterior import.",
+    "exclude_paths": [
+      "Hansajet/Models/HiResInstrumentPanel.xml",
+      "Hansajet/Models/OverheadPanel.xml",
+      "Hansajet/Models/RadioPanel",
+      "Hansajet/Models/FuelHydraulicPanel.xml",
+      "Hansajet/Models/TrimPanel.xml",
+      "Hansajet/Models/AudioPanel/",
+      "Hansajet/Models/Navitec",
+      "Hansajet/Models/SlatSwitch.xml",
+      "Hansajet/Models/BleedAir"
+    ]
+  },
+  "FG-CanberraBI8": {
+    "reason": "Unwired internal bomb-door meshes are parked outside the fuselage in the source AC file; retain exterior doors and archive the originals.",
+    "hide_nodes": ["FUS-LI-Bomb-Door", "FUS-LO-Bomb-Door"]
+  }
+}

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="EUP-46 electrical turn indicator">
+ 
+
+
+ <property>systems/elec/output/EUP-46/DC27-V</property>
+ <property>systems/elec/output/EUP-46/DC27-ok</property>
+
+
+ <channel name="EUP-46 slow" execrate="8">
+
+  <fcs_function name="systems/elec/output/EUP-46/DC27-A">
+   <function>
+    <product>
+     <p>systems/elec/output/EUP-46/DC27-V</p>
+     
+     <v>0.00481</v>
+    </product>
+   </function>
+  </fcs_function>
+
+ </channel>
+
+
+ <channel name="EUP-46" execrate="2">
+
+  <fcs_function name="systems/instr/EUP-46/gauge/yaw-rate-needledeg">
+   <function>
+    <product>
+     <p>systems/elec/output/EUP-46/DC27-ok</p>
+     <table>
+      <independentVar lookup="row">velocities/r-rad_sec</independentVar>
+      <tableData>
+       -0.3142  -30.0
+       -0.1047  -20.0
+       -0.0105   -2.0
+        0.0105    2.0
+        0.1047   20.0
+        0.3142   30.0
+      </tableData>
+     </table>
+    </product>
+   </function>
+  </fcs_function>
+
+  
+
+ </channel>
+
+
+</system>

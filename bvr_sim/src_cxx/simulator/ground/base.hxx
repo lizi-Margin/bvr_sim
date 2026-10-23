@@ -32,6 +32,8 @@ public:
     virtual void step() override;
 
     void hit(double damage = 0.0);
+    double health() const noexcept { return bloods; }
+    const std::string& model_id() const noexcept { return model; }
 
     bool check_collision(const std::array<double, 3>& point) const noexcept;
 

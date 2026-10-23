@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "from": "T37/T37.xml",
+      "reference": "J69-T25",
+      "source": "T37/Engines/J69-T25.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "direct",
+      "source": "T37/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "J69-T25",
+      "source": "T37/Engines/J69-T25.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "direct",
+      "source": "T37/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "Propulsion.xml",
+      "source": "T37/Systems/Propulsion.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "Conventional Controls.xml",
+      "source": "T37/Systems/Conventional Controls.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "Landing Gear.xml",
+      "source": "T37/Systems/Landing Gear.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "T37/T37.xml",
+      "reference": "Flaps.xml",
+      "source": "T37/Systems/Flaps.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

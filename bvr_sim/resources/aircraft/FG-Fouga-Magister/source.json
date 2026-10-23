@@ -1,0 +1,32 @@
+{
+  "set": "Fouga-Magister/fouga-set.xml",
+  "name": "Fouga Magister (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Fouga-Magister/Systems/fouga-yasim.xml",
+  "jets": 2,
+  "model": "Fouga-Magister/Models/fouga.xml",
+  "tags": [
+    "Aerospatiale-Potez",
+    "trainer",
+    "aerobatic",
+    "1950s",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+    "jet",
+    "tricycle",
+    "twin-engine",
+    "retractable-gear",
+    "ifr",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Fouga-Magister.zip",
+  "archive_sha256": "8a0814c774f200bf0cbcef4fccd497336548f439f5bdeb6dd3fef176056cfdcf",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Fouga-Magister.zip"
+}

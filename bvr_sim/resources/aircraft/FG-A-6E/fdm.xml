@@ -1,0 +1,202 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fdm_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="A-6E" version="2.0" release="ALPHA" xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd">
+
+    <fileheader>
+	<author> Aeromatic v 3.3.0 </author>
+	<filecreationdate> 03 Apr 2019 </filecreationdate>
+	<version>$Revision: 1.68 $</version>
+	<description> Models a A-6E. </description>
+    </fileheader>
+
+    
+
+    <metrics>
+	<wingarea unit="M2">49.14</wingarea> 
+	<wingspan unit="M">15.54</wingspan>
+	<wing_incidence>           2.00 </wing_incidence>
+	<chord unit="M">   3.2569 </chord>
+	<htailarea unit="FT2">   117.00 </htailarea>
+	<htailarm unit="FT">    24.90 </htailarm>
+	<vtailarea unit="FT2">   79.25 </vtailarea>
+	<vtailarm unit="FT">    24.90 </vtailarm>
+	<location name="AERORP" unit="M">
+	    <x> 1.808 </x>
+	    <y> 0.000 </y>
+	    <z> 0.000 </z>
+	</location>
+	<location name="EYEPOINT" unit="IN">
+	    <x>   130.80 </x>
+	    <y>     0.00 </y>
+	    <z>    38.00 </z>
+	</location>
+	<location name="VRP" unit="IN">
+	    <x>     0.0 </x>
+	    <y>     0.0 </y>
+	    <z>     0.0 </z>
+	</location>
+    </metrics>
+    
+    <mass_balance>
+	<ixx unit="SLUG*FT2">  53320.00 </ixx>
+	<iyy unit="SLUG*FT2">  87273.00 </iyy>
+	<izz unit="SLUG*FT2">  139927.00 </izz>
+	<emptywt unit="LBS">29600</emptywt>
+	<location name="CG" unit="M">
+	    <x> 1.81 </x>
+	    <y> 0.00 </y>
+	    <z> 0.00 </z>
+	</location>
+	
+	<pointmass name="Pylon 1">
+	    <description>left outboard pylon</description>
+	    <weight unit="LBS"> 0 </weight>
+	    <location name="POINTMASS" unit="M">
+		<x> 1.56</x>
+		<y>-3.66</y>
+		<z>-0.73</z>
+	    </location>
+	</pointmass>
+	<pointmass name="Pylon 2">
+	    <description>left inboard pylon</description>
+	    <weight unit="LBS"> 0 </weight>
+	    <location name="POINTMASS" unit="M">
+		<x> 1.56</x>
+		<y>-2.48</y>
+		<z>-0.73</z>
+	    </location>
+	</pointmass>
+	
+	<pointmass name="Pylon 3">
+	    <description>center pylon</description>
+	    <weight unit="LBS"> 0 </weight>
+	    <location name="POINTMASS" unit="M">
+		<x> 1.03</x>
+		<y> 0.00</y>
+		<z>-1.29</z>
+	    </location>
+	</pointmass>
+
+	<pointmass name="Pylon 4">
+	    <description>right inboard pylon</description>
+	    <weight unit="LBS"> 0 </weight>
+	    <location name="POINTMASS" unit="M">
+		<x> 1.56</x>
+		<y> 2.48</y>
+		<z>-0.73</z>
+	    </location>
+	</pointmass>
+
+	<pointmass name="Pylon 5">
+	    <description>right outboard pylon</description>
+	    <weight unit="LBS"> 0 </weight>
+	    <location name="POINTMASS" unit="M">
+		<x> 1.90</x>
+		<y> 3.66</y>
+		<z>-0.73</z>
+	    </location>
+	</pointmass>
+    </mass_balance>
+
+    <propulsion file="Systems/jsb-propulsion.xml" />
+    <ground_reactions file="Systems/ground_reactions.xml" />
+    <system file="Propulsion.xml" />
+    <system file="Catapult.xml" />
+    <system file="jsb-instruments.xml" />
+    <system file="jsb-hook.xml" />
+    <system file="jsb-holdback.xml" />
+     
+    
+    <flight_control file="Systems/fcs.xml" />
+
+    <aerodynamics file="A-6E_vspaero.xml" />
+
+    <output name="/tmp/JSBout.csv" type="CSV" rate="10">
+	<property caption="Mach">velocities/mach</property>
+	<property caption="alpha">aero/alpha-deg</property>
+	<property caption="beta">aero/beta-deg</property>
+	<property caption="pdot_rad_sec2">accelerations/pdot-rad_sec2</property>
+	<property caption="qdot_rad_sec2">accelerations/qdot-rad_sec2</property>
+	<property caption="rdot_rad_sec2">accelerations/rdot-rad_sec2</property>
+	<property caption="p_rad_sec">velocities/p-rad_sec</property>
+	<property caption="q_rad_sec">velocities/q-rad_sec</property>
+	<property caption="r_rad_sec">velocities/r-rad_sec</property>
+	<property caption="CMz_base">aero/CMz_base</property>
+	<property caption="CMz">aero/moment/CMz</property>
+	
+	<property caption="cmnp">aero/s/cmnp</property>
+	<property caption="CMz_rudder">aero/CMz_rudder</property>
+	<property caption="rudder">fcs/rudder-cmd-norm</property>
+	<property caption="elevator">fcs/elevator-cmd-norm</property>
+	
+    </output>
+    
+    <external_reactions>
+
+	<force name="hook" frame="BODY">
+	    <location unit="M">
+		<x>1.5</x>
+		<y>0</y>
+		<z>0</z>
+	    </location>
+	    <direction>
+		<x>-0.9995</x>
+		<y> 0 </y>
+		<z> 0.01 </z>
+	    </direction>
+	</force>
+
+	<force name="catapult" frame="BODY">
+	    <location unit="M">
+		<x>-2.84</x>
+		<y> 0.00</y>
+		<z> 0.00</z>
+	    </location>
+	    <direction>
+		<x>1</x>
+		<y>0</y>
+		<z>0</z>
+	    </direction>
+	</force>
+
+	<force name="catapult_vertical" frame="BODY">
+	    <location unit="M">
+		<x>-2.84</x>
+		<y> 0.00</y>
+		<z> 0.00</z>
+	    </location>
+	    <direction>
+		<x>0</x>
+		<y>0</y>
+		<z>1</z>
+	    </direction>
+	</force>
+
+	<force name="holdback" frame="BODY">
+	    <location unit="M">
+		<x>-2.84</x>
+		<y> 0.00</y>
+		<z>-2.44</z>
+	    </location>
+	    <direction>
+		<x>-1</x>
+		<y>0</y>
+		<z>0</z>
+	    </direction>
+	</force>
+	
+	<force name="strut-lock" frame="BODY" unit="N">
+	    <location unit="M">
+		<x>-2.84</x>
+		<y> 0.00</y>
+		<z> 0.00</z>
+	    </location>
+	    <direction>
+		<x>0</x>
+		<y>0</y>
+		<z>1</z>
+	    </direction>
+	</force>
+
+    </external_reactions>
+
+</fdm_config>

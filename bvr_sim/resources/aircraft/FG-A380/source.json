@@ -1,0 +1,27 @@
+{
+  "set": "A380/A380-set.xml",
+  "name": "Airbus A380",
+  "fdm_type": "jsb",
+  "fdm": "A380/A380_RJ.xml",
+  "jets": 0,
+  "model": "A380/XML/A380.xml",
+  "tags": [
+    "transport",
+    "airbus",
+    "2000s",
+    "2010s",
+    "ifr",
+    "tricycle",
+    "jet",
+    "retractable-gear",
+    "glass-cockpit",
+    "ifr"
+  ],
+  "model_rating": 2,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "A380.zip",
+  "archive_sha256": "acde60dc1e5c77a785df050a462fb628e0252df84579b2da12075dfcceae70bc",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/A380.zip"
+}

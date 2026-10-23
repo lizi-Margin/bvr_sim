@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Booster control </description>
+	</fileheader>
+
+
+	<channel name="boostercontrol">
+
+
+
+		<switch name="calculations/boostercontrol/control-allowed">
+			<default value="systems/boostercontrol/control-command" />
+			<test logic="AND" value="systems/boostercontrol/control-input">
+				systems/boostercontrol/serviceable eq 1
+			</test>
+			<output>systems/boostercontrol/control-command</output>
+		</switch>
+
+		<switch name="calculations/boostercontrol/control-not-allowed">
+			<default value="systems/boostercontrol/control-input" />
+			<test logic="AND" value="systems/boostercontrol/control-command">
+				systems/boostercontrol/serviceable eq 0
+			</test>
+			<output>systems/boostercontrol/control-input</output>
+		</switch>
+
+		<kinematic name="calculations/boostercontrol/control-pos">
+			<input>systems/boostercontrol/control-command</input>
+			<traverse>
+			<setting>
+				<position>0.0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>0.5</position>
+				<time>0.2</time>
+			</setting>
+			<setting>
+				<position>1.0</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/boostercontrol/control-pos</output>
+		</kinematic>
+
+		<switch name="calculations/boostercontrol/control-switch">
+			<default value="systems/boostercontrol/control-switch" />
+			<test logic="AND" value="0">
+				systems/boostercontrol/control-pos lt 0.25
+			</test>
+			<test logic="AND" value="0.5">
+				systems/boostercontrol/control-pos ge 0.25
+				systems/boostercontrol/control-pos lt 0.75
+			</test>
+			<test logic="AND" value="1.0">
+				systems/boostercontrol/control-pos ge 0.75
+			</test>
+			<output>systems/boostercontrol/control-switch</output>
+		</switch>
+
+		
+
+		<fcs_function name="calculations/boostercontrol/fix-pos">
+			<function>
+				<table>
+					<independentVar lookup="row">systems/boostercontrol/control-pos</independentVar>
+				<tableData>
+					0.0	1.0
+					0.02	0.0
+					0.48	0.0
+					0.5	1.0
+					0.52	0.0
+					0.98	0.0
+					1.0	1.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/boostercontrol/fix-pos</output>
+		</fcs_function>
+
+		
+
+		<switch name="calculations/boostercontrol/aileron-boost">
+			<default value="systems/boostercontrol/control-pos" />
+			<test logic="OR" value="0.2">
+				systems/boostercontrol/control-pos lt 0.25
+				systems/pump/on eq 0
+			</test>
+			<output>fcs/aileron-boost</output>
+		</switch>
+
+		
+
+		<fcs_function name="calculations/boostercontrol/pressure-pos">
+			<function>
+				<sum>
+					<value>0.2</value>
+					<product>
+						<value>0.2</value>
+						<property>systems/boostercontrol/control-pos</property>
+					</product>
+					<product>
+						<value>0.1</value>
+						<abs>
+							<difference>
+								<property>fcs/roll-trim-sum</property>
+								<property>fcs/roll-trim-sum-timed</property>
+							</difference>
+						</abs>
+					</product>
+				</sum>
+			</function>
+				<output>systems/boostercontrol/pressure-pos</output>
+		</fcs_function>
+
+		<switch name="calculations/boostercontrol/pressure-stored">
+			<default value="0" />
+			<test logic="AND" value="systems/boostercontrol/pressure-pos">
+				systems/pump/on eq 1
+			</test>
+			<output>systems/boostercontrol/pressure-stored</output>
+		</switch>
+
+		<switch name="calculations/boostercontrol/pressure-indicated">
+			<default value="systems/boostercontrol/pressure-indicated" />
+			<test logic="AND" value="systems/boostercontrol/pressure-stored">
+				systems/boostercontrol/serviceable eq 1
+			</test>
+			<output>systems/boostercontrol/pressure-indicated</output>
+		</switch>
+
+
+
+		<fcs_function name="calculations/boostercontrol/click-command">
+			<function>
+				<table>
+					<independentVar lookup="column">systems/boostercontrol/control-command</independentVar>
+					<independentVar lookup="row">systems/boostercontrol/control-pos</independentVar>
+				<tableData>
+						0.0	0.5	1.0
+					0.0	0.0	0.0	0.0
+					0.02	1.0	0.0	0.0
+					0.48	0.0	1.0	1.0
+					0.5	0.0	0.0	0.0
+					0.52	1.0	1.0	0.0
+					0.98	0.0	0.0	1.0
+					1.0	0.0	0.0	0.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/flapscontrol/click-command</output>
+		</fcs_function>&gt;
+
+		<switch name="calculations/boostercontrol/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/boostercontrol/click-command gt 0.9
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

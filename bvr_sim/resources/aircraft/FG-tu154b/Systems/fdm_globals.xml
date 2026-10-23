@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Globals">
+          
+        
+        <property>fcs/absu-pitch</property>
+        <property>fcs/absu-roll</property>
+        <property>fcs/absu-yaw</property>
+
+
+        <property>fcs/stab-manu-switch</property>
+        
+	<property value="0.0">fcs/met-cmd</property>	
+	
+        
+        <property>fcs/elevator-pos-static</property>
+        <property>fcs/aileron-pos-static</property>
+        <property>fcs/rudder-pos-static</property>
+        <property>fcs/flap-cmd-static</property>
+        <property>fcs/speedbrake-cmd-static</property>
+        
+        
+        <property>gear/brake-left</property>
+        <property>gear/brake-right</property>
+        <property>gear/brake-parking</property>
+        
+        
+        <property>gear/steering</property>
+        <property>gear/nose-wheel-steering</property>
+	
+
+        
+        <property>systems/electrical-ok</property>
+	
+	
+      <property>tu154/systems/flight/fl</property>
+      <property>tu154/systems/flight/dist</property>
+
+      
+      
+
+
+</system>

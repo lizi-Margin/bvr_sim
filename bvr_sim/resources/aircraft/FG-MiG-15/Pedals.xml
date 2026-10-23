@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-04 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Pedals </description>
+	</fileheader>
+
+
+
+	<channel name="Pedals">
+
+
+
+		<switch name="calculations/pedals/rudder-command-allowed">
+			<default value="fcs/rudder-cmd-norm-real" />
+			<test logic="AND" value="fcs/rudder-cmd-norm">
+				systems/pedals/serviceable eq 1
+			</test>
+			<output>fcs/rudder-cmd-norm-real</output>
+		</switch>
+
+		<switch name="calculations/pedals/rudder-command-not-allowed">
+			<default value="fcs/rudder-cmd-norm" />
+			<test logic="AND" value="fcs/rudder-cmd-norm-real">
+				systems/pedals/serviceable eq 0
+			</test>
+			<output>fcs/rudder-cmd-norm</output>
+		</switch>
+
+		<fcs_function name="calculations/pedals/shift-x">
+		<function>
+			<product>
+				<property>fcs/rudder-cmd-norm-real</property>
+				<value>-0.0882</value>
+			</product>
+		</function>
+			<output>systems/pedals/shift-x</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/pedals/tubes-source-angle">
+		<function>
+			<quotient>
+				<atan2>
+					<value>0.0</value>
+					<value>0.087</value>
+				</atan2>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/pedals/tubes-source-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/pedals/tubes-angle">
+		<function>
+			<quotient>
+				<atan2>
+					<property>systems/pedals/shift-x</property>
+					<value>0.087</value>
+				</atan2>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/pedals/tubes-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/pedals/shift-angle">
+		<function>
+			<difference>
+				<property>systems/pedals/tubes-source-angle</property>
+				<property>systems/pedals/tubes-angle</property>
+			</difference>
+		</function>
+			<output>systems/pedals/tubes-shift-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/pedals/tubes-shift-rod-x">
+		<function>
+			<quotient>
+				<product>
+					<property>systems/pedals/shift-x</property>
+					<value>0.057</value>
+				</product>
+				<value>0.087</value>
+			</quotient>
+		</function>
+			<output>systems/pedals/tubes-shift-rod-x</output>
+		</fcs_function>
+
+	</channel>
+
+</system>

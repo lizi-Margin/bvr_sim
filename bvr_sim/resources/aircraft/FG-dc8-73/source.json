@@ -1,0 +1,16 @@
+{
+  "set": "dc8-73/dc8-73-set.xml",
+  "name": "Douglas DC-8-73",
+  "fdm_type": "jsb",
+  "fdm": "dc8-73/dc8-73.xml",
+  "jets": 4,
+  "model": "dc8-73/Models/dc8-73.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "dc8-73.zip",
+  "archive_sha256": "d7a559468ad4f0f29b82443c2c5f2c0efba39aafc5c04e9109ebc00a4a56a067",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/dc8-73.zip"
+}

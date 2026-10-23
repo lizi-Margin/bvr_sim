@@ -11,3 +11,6 @@ __pycache__
 !/src_cxx/extern/cpptrace
 !/src_cxx/extern/eigen
 !/src_cxx/extern/pybind11
+
+# Vendored standalone FlightGear YASim (pinned, licensed sources).
+!/src_cxx/extern/yasim/

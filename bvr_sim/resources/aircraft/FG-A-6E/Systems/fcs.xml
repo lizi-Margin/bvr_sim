@@ -1,0 +1,593 @@
+<?xml version='1.0' encoding='utf-8'?>
+<flight_control name="FCS A-6E">
+  <property value="30">fcs/rate-limits/elevator</property> 
+  <property value="0">fcs/surfaces/flap-pos-norm</property>
+  <channel name="Pitch">
+
+    <aerosurface_scale name="fcs/elevator/pitch-trim-full">
+      <input>fcs/pitch-trim-cmd-norm</input>
+      <range>
+	<min>-1</min>
+	<max>0.916</max> 
+      </range>
+    </aerosurface_scale>
+
+    <fcs_function name="fcs/elevator/pitch-trim-sum">
+	<function>
+	    <interpolate1d>
+		<property>fcs/elevator-cmd-norm</property>
+		<value>-1</value><value>-1</value>
+		<value>0</value><property>fcs/elevator/pitch-trim-full</property>
+		<value>1</value><value>1</value>
+	    </interpolate1d>
+	</function>
+    </fcs_function>
+    
+    <fcs_function name="fcs/elevator/elevator-limit-deg">
+	<function>
+	    <table>
+		<independentVar lookup="row">fcs/elevator/pitch-trim-sum</independentVar>
+		<tableData>
+		    -1 -9.5
+		    0   -3
+		    1   1.5
+		</tableData>
+	    </table>
+	</function>
+    </fcs_function>
+    
+    <fcs_function name="fcs/elevator/elevator-full-deg">
+	<function>
+	    <table>
+		<independentVar lookup="row">fcs/elevator/pitch-trim-sum</independentVar>
+		<tableData>
+		    -1.0 -24
+		    0.0 -3
+		    1.0 1.5
+		</tableData>
+	    </table>
+	</function>
+    </fcs_function>
+    
+    <fcs_function name="fcs/elevator/elevator-cmd-deg">
+	<function>
+	    <ifthen>
+		<eq>
+		    <property>fcs/spin-assist</property>
+		    <value>1</value>
+		</eq>
+		<property>fcs/elevator/elevator-full-deg</property>
+		<interpolate1d>
+		    <property>fcs/flap-pos-norm</property>
+		    <value>0</value> <property>fcs/elevator/elevator-limit-deg</property>
+		    <value>1</value> <property>fcs/elevator/elevator-full-deg</property>
+		</interpolate1d>
+	    </ifthen>
+	</function>
+    </fcs_function>
+    
+    <actuator name="fcs/surfaces/elevator-pos-deg">
+      <input>fcs/elevator/elevator-cmd-deg</input>
+      <rate_limit>fcs/rate-limits/elevator</rate_limit>
+      <output>fcs/elevator-pos-deg</output>
+    </actuator>
+
+    <aerosurface_scale name="fcs/surfaces/elevator-pos-norm">
+      <input>fcs/surfaces/elevator-pos-deg</input>
+      <domain>
+        <min> -24.0 </min>
+	<max>   1.5 </max>
+      </domain>
+      <range>
+        <min> -1 </min>
+	<max>  1 </max>
+      </range>
+      <zero_centered>false</zero_centered>
+      <output>fcs/elevator-pos-norm</output>
+    </aerosurface_scale>
+    
+  </channel>
+
+  <property value="350">fcs/rate-limits/flaperon</property>
+  <channel name="Roll">
+
+    <aerosurface_scale name="fcs/flaperon/roll-trim-limited">
+      <input>fcs/roll-trim-cmd-norm</input>
+      <range>
+	<min>-0.1764</min> 
+	<max>0.1764</max>
+      </range>
+    </aerosurface_scale>
+
+    <summer name="fcs/flaperon/roll-trim-sum">
+      <input>fcs/aileron-cmd-norm</input>
+      <input>fcs/flaperon/roll-trim-limited</input>
+      <clipto>
+        <min> -1 </min>
+        <max>  1 </max>
+      </clipto>
+    </summer>
+
+    <pure_gain name="fcs/flaperon/left-flaperon-cmd-deg">
+      <input>fcs/flaperon/roll-trim-sum</input>
+      <gain>51</gain>
+      <clipto>
+	<min> -51 </min>
+	<max>  0  </max>
+      </clipto>
+    </pure_gain>
+
+    <switch name="fcs/flaperon/left-flaperon-sum-deg">
+      <default value="fcs/flaperon/left-flaperon-cmd-deg" />
+      <test value="-39" logic="AND">
+	fcs/flaperon/gnd-spoiler-arm == 1
+	gear/unit[1]/WOW == 1
+	fcs/throttle-cmd-norm == 0
+	fcs/throttle-cmd-norm[1] == 0
+      </test>
+      <test logic="OR" value="0">
+	  fcs/flaperon/roll-trim-sum gt 0
+	  fcs/wing-fold/handle ne 0
+      </test>
+    </switch>
+
+    <actuator name="fcs/surfaces/left-flaperon-pos-deg">
+      <input>fcs/flaperon/left-flaperon-sum-deg</input>
+      <rate_limit>fcs/rate-limits/flaperon</rate_limit>
+      <output>fcs/left-aileron-pos-deg</output>
+    </actuator>
+
+    <aerosurface_scale name="fcs/surfaces/left-flaperon-pos-norm">
+      <input>fcs/surfaces/left-flaperon-pos-deg</input>
+      <domain>
+	<min>-51</min>
+	<max>0</max>
+      </domain>
+      <range>
+	<min>-1</min>
+	<max>0</max>
+      </range>
+      <output>fcs/left-aileron-pos-norm</output>
+    </aerosurface_scale>
+
+    <pure_gain name="fcs/flaperon/right-flaperon-cmd-deg">
+      <input>fcs/flaperon/roll-trim-sum</input>
+      <gain>-51</gain>
+      <clipto>
+	<min> -51 </min>
+	<max>  0  </max>
+      </clipto>
+    </pure_gain>
+
+    <switch name="fcs/flaperon/right-flaperon-sum-deg">
+      <default value="fcs/flaperon/right-flaperon-cmd-deg" />
+      <test value="-39" logic="AND">
+	fcs/flaperon/gnd-spoiler-arm == 1
+	gear/unit[1]/WOW == 1
+	fcs/throttle-cmd-norm == 0
+	fcs/throttle-cmd-norm[1] == 0
+      </test>
+      <test logic="OR" value="0">
+	  fcs/flaperon/roll-trim-sum lt 0
+	  fcs/wing-fold/handle ne 0
+      </test>
+    </switch>
+
+    <actuator name="fcs/surfaces/right-flaperon-pos-deg">
+      <input>fcs/flaperon/right-flaperon-sum-deg</input>
+      <rate_limit>fcs/rate-limits/flaperon</rate_limit>
+      <output>fcs/surfaces/right-flaperon-pos-deg</output>
+      <output>fcs/right-aileron-pos-deg</output>
+    </actuator>
+
+    <aerosurface_scale name="fcs/surfaces/right-flaperon-pos-norm">
+      <input>fcs/surfaces/right-flaperon-pos-deg</input>
+      <domain>
+	<min>-51</min>
+	<max>0</max>
+      </domain>
+      <range>
+	<min>-1</min>
+	<max>0</max>
+      </range>
+      <output>fcs/right-aileron-pos-norm</output>
+    </aerosurface_scale>
+
+  </channel>
+
+  
+  <property value="60">fcs/rate-limits/rudder</property>
+  <channel name="Yaw">
+
+    <aerosurface_scale name="fcs/rudder/rudder-trim-limited">
+      <input>fcs/yaw-trim-cmd-norm</input>
+      <range>
+	<min>-0.0784</min>
+	<max>0.0784</max>
+      </range>
+    </aerosurface_scale>
+
+    <aerosurface_scale name="fcs/rudder/rudder-trim-full">
+      <input>fcs/yaw-trim-cmd-norm</input>
+      <range>
+	<min>-0.2</min>
+	<max>0.2</max>
+      </range>
+    </aerosurface_scale>
+
+    <switch name="fcs/rudder/rudder-trim-norm">
+      <default value="fcs/rudder/rudder-trim-limited" />
+      <test value="fcs/rudder/rudder-trim-full">
+	fcs/flap-pos-norm != 0
+      </test>
+    </switch>
+    
+    <summer name="fcs/rudder/rudder-cmd-sum">
+      <input>fcs/rudder-cmd-norm</input>
+      <input>fcs/yaw-trim-cmd-norm</input>
+      <clipto>
+        <min> -1 </min>
+        <max>  1 </max>
+      </clipto>
+    </summer>
+
+    <fcs_function name="fcs/rudder/rudder-sum-deg">
+	<function>
+	    <ifthen>
+		<eq>
+		    <property>fcs/spin-assist</property>
+		    <value>1</value>
+		</eq>
+		<product>
+		    <property>fcs/rudder/rudder-cmd-sum</property>
+		    <value>35</value>
+		</product>
+		<product>
+		    <property>fcs/rudder/rudder-cmd-sum</property>
+		    <table>
+			<independentVar lookup="row">fcs/flap-pos-norm</independentVar>
+			<tableData>
+			    0.0 4
+			    1.0 35
+			</tableData>&gt;
+		    </table>
+		</product>
+	    </ifthen>
+	</function>
+    </fcs_function>
+
+    <actuator name="fcs/surfaces/rudder-pos-deg">
+      <input>fcs/rudder/rudder-sum-deg</input>
+      <rate_limit>fcs/rate-limits/rudder</rate_limit>
+      <output>fcs/rudder-pos-deg</output>
+    </actuator>
+    
+    <aerosurface_scale name="fcs/surfaces/rudder-pos-norm">
+      <input>fcs/rudder-pos-deg</input>
+      <domain>
+        <min>-35 </min>
+        <max> 35 </max>
+      </domain>
+      <range>
+        <min> -1 </min>
+        <max>  1 </max>
+      </range>
+      <output>fcs/rudder-pos-norm</output>
+    </aerosurface_scale>
+
+  </channel>
+
+  <property value="2.666666666">fcs/rate-limits/flaps</property>
+  <channel name="Flap">
+      <switch name="fcs/flaps/flap-cmd">
+	  <default value="fcs/flap-cmd-norm" />
+	  <test value="0">
+	      fcs/wing-fold/handle ne 0
+	  </test>
+      </switch>
+      
+      <switch name="fcs/flaps/flaps-deg-cmd">
+	  <default value="0" />
+	  <test value="20" logic="AND">
+	      fcs/flaps/flap-cmd ge 0.25
+	      fcs/flaps/flap-cmd le 0.75
+	  </test>
+	  <test value="30" logic="AND">
+	      fcs/flaps/flap-cmd gt 0.75
+	  </test>
+      </switch>
+
+      <actuator name="fcs/flaps/flaps-pos-deg">
+	  <input>fcs/flaps/flaps-deg-cmd</input>
+	  <rate_limit>fcs/rate-limits/flaps</rate_limit>
+	  <output>fcs/surfaces/flaps-pos-deg</output>
+      </actuator>
+      
+      <aerosurface_scale name="fcs/surfaces/flap-pos-norm">
+	  <input>fcs/surfaces/flaps-pos-deg</input>
+	  <domain>
+	      <min>  0 </min>
+	      <max> 30 </max>
+	  </domain>
+	  <range>
+	      <min> 0 </min>
+	      <max> 1 </max>
+	  </range>
+	  <output>fcs/flap-pos-norm</output>
+      </aerosurface_scale>
+  </channel>
+
+  
+  <property value="4.58333">fcs/rate-limits/slats</property>
+  
+  <channel name="Slat">
+    <switch name="fcs/slats/slats-cmd-deg">
+      <default value="0" />
+      <test value="27.5">
+	fcs/flaps/flap-cmd ge 0.25
+      </test>
+    </switch>
+
+    <actuator name="fcs/slats/slats-pos-deg">
+      <input>fcs/slats/slats-cmd-deg</input>
+      <rate_limit>fcs/rate-limits/slats</rate_limit>
+      <output>fcs/surfaces/slats-pos-deg</output>
+    </actuator>
+    
+    <aerosurface_scale name="fcs/surfaces/slats-pos-norm">
+      <input>fcs/slats/slats-pos-deg</input>
+      <domain>
+	<min>  0 </min>
+	<max> 27.5 </max>
+      </domain>
+      <range>
+	<min> 0 </min>
+	<max> 1 </max>
+      </range>
+      <output>fcs/slats-pos-norm</output>
+    </aerosurface_scale>
+  </channel>
+
+  <property value="80">fcs/rate-limits/nsw-steer</property>
+  
+  <channel name="Landing Gear">
+    <kinematic name="Gear Control">
+      <input>gear/gear-cmd-norm</input>
+      <traverse>
+	<setting>
+          <position> 0 </position>
+          <time>     0 </time>
+	</setting>
+	<setting>
+          <position> 1 </position>
+          <time>     7 </time>
+	</setting>
+      </traverse>
+      <output>gear/gear-pos-norm</output>
+    </kinematic>
+
+    <fcs_function name="fcs/steer-cmd">
+	<function>
+	    <ifthen>
+		<eq>
+		    <property>/controls/gear/nose-wheel-steering</property>
+		    <value>1</value>
+		</eq>
+		<product>
+		    <property>fcs/rudder-cmd-norm</property>
+		    <value>-56</value>
+		</product>
+		<value>0</value>
+	    </ifthen>
+	</function>
+	<clipto>
+	    <min>-63</min>
+	    <max>63</max>
+	</clipto>
+    </fcs_function>
+	    
+    <actuator name="trash/fcs/steer-pos-deg">
+	<input>fcs/steer-cmd</input>
+	<rate_limit>fcs/rate-limits/nsw-steer</rate_limit>
+	<output>fcs/steer-pos-deg</output>
+    </actuator>
+    
+  </channel>
+
+  <property value="12">fcs/rate-limits/speedbrake-ext</property>
+  <property value="24">fcs/rate-limits/speedbrake-rtr</property>
+  <channel name="Speedbrake">
+    <pure_gain name="fcs/speedbrake/speedbrake-cmd-deg">
+      <input>fcs/speedbrake-cmd-norm</input>      
+      <gain>60</gain>
+      <clipto>
+	<min>0</min>
+	<max>60</max>
+      </clipto>
+    </pure_gain>
+
+    <switch name="fcs/speedbrake/speedbrake-sum-deg">
+      <default value="fcs/speedbrake/speedbrake-cmd-deg" />
+      <test value="0">
+	fcs/speedbrake/speedbrake-test == 1
+      </test>
+    </switch>
+    
+    <actuator name="fcs/surfaces/speedbrake-pos-deg">
+      <input>fcs/speedbrake/speedbrake-sum-deg</input>
+      <rate_limit sense="incr">fcs/rate-limits/speedbrake-ext</rate_limit>
+      <rate_limit sense="decr">fcs/rate-limits/speedbrake-rtr</rate_limit>
+      <output>fcs/speedbrake-pos-deg</output>
+      <output>fcs/surfaces/speedbrake-upper-pos-deg</output>
+    </actuator>
+
+    <pure_gain name="fcs/surfaces/speedbrake-lower-pos-deg">
+	<input>fcs/surfaces/speedbrake-upper-pos-deg</input>
+	<gain>-1</gain>
+    </pure_gain>
+    
+    <aerosurface_scale name="fcs/surfaces/speedbrake-pos-norm">
+      <input>fcs/surfaces/speedbrake-pos-deg</input>
+      <domain>
+	<min>0</min>
+	<max>60</max>
+      </domain>
+      <range>
+	<min>0</min>
+	<max>1</max>
+      </range>
+      <output>fcs/speedbrake-pos-norm</output>
+    </aerosurface_scale>
+
+  </channel>
+
+  
+  <channel name="Wing fold">
+    <fcs_function name="fcs/wing-fold/handle-l">
+      <function>
+    	<ifthen>
+    	  <eq>
+    	    <property>fcs/wing-fold/handle-cmd</property>
+    	    <value>1</value>
+    	  </eq>
+    	  <ifthen>
+    	    <and>
+    	      <eq>
+    		<property>fcs/wing-fold/handle-l</property>
+    		<value>0</value>
+    	      </eq>
+    	      <eq>
+    		<property>fcs/aileron-cmd-norm</property>
+    		<value>0</value>
+    	      </eq>
+    	      <eq>
+    		<property>fcs/surfaces/flap-pos-norm</property>
+    		<value>0</value>
+    	      </eq>
+    	      <eq>
+    		<property>fcs/surfaces/slats-pos-norm</property>
+    		<value>0</value>
+    	      </eq>
+    	    </and>
+    	    <value>1</value>
+    	    <ifthen>
+    	      <and>
+    		<eq>
+    		  <property>fcs/wing-fold/handle-l</property>
+    		  <value>1</value>
+    		</eq>
+    		<eq>
+    		  <property>fcs/wing-fold/lockpin</property>
+    		  <value>0</value>
+    		</eq>
+    	      </and>
+    	      <value>2</value>
+    	      <property>fcs/wing-fold/handle-l</property>
+    	    </ifthen>
+    	  </ifthen>
+    	  <ifthen>
+    	    <eq>
+    	      <property>fcs/wing-fold/handle-cmd</property>
+    	      <value>-1</value>
+    	    </eq>
+    	    <ifthen>
+    	      <eq>
+    		<property>fcs/wing-fold/handle-l</property>
+    		<value>2</value>
+    	      </eq>
+    	      <value>1</value>
+    	      <ifthen>
+    		<and>
+    		  <eq>
+    		    <property>fcs/wing-fold/handle-l</property>
+    		    <value>1</value>
+    		  </eq>
+    		  <eq>
+    		    <property>fcs/wing-fold/lockpin</property>
+    		    <value>1</value>
+    		  </eq>
+    		</and>
+    		<value>0</value>
+    		<property>fcs/wing-fold/handle-l</property>
+    	      </ifthen>
+	    </ifthen>
+	    <property>fcs/wing-fold/handle-l</property>
+    	  </ifthen>
+    	</ifthen>
+      </function>
+    </fcs_function>
+
+    <actuator name="fcs/wing-fold/handle">
+      <input>fcs/wing-fold/handle-l</input>
+      <rate_limit>2</rate_limit>
+    </actuator>
+
+    <fcs_function name="fcs/wing-fold/lockpin">
+      <function>
+	<ifthen>
+	  <and>
+	    <eq>
+	      <property>fcs/wing-fold/lockpin-cmd</property>
+	      <value>1</value>
+	    </eq>
+	    <eq>
+	      <property>fcs/wing-fold/handle</property>
+	      <value>1</value>
+	    </eq>
+	  </and>
+	  <value>1</value>
+	  <ifthen>
+	    <and>
+	      <eq>
+		<property>fcs/wing-fold/lockpin-cmd</property>
+		<value>-1</value>
+	      </eq>
+	      <eq>
+		<property>fcs/wing-fold/handle</property>
+		<value>1</value>
+	      </eq>
+	    </and>
+	    <value>0</value>
+	    <property>fcs/wing-fold/lockpin</property>
+	  </ifthen>
+	</ifthen>
+      </function>
+    </fcs_function>
+
+    <switch name="fcs/wing-fold/wing-fold-cmd">
+      <default value="0" />
+      <test value="1">
+	fcs/wing-fold/handle == 2
+      </test>
+    </switch>
+
+    <actuator name="fcs/wing-fold/wing-fold-pos">
+      <input>fcs/wing-fold/wing-fold-cmd</input>
+      <rate_limit>0.1</rate_limit>
+      <output>fcs/wing-fold-pos-norm</output>
+    </actuator>
+  </channel>
+
+  <property>fcs/hook-engage</property>
+  <property value="2.5">fcs/rate-limits/hook-up</property>
+  <property value="2.5">fcs/rate-limits/hook-down</property>
+  <channel name="hook">
+      <actuator name="fcs/hook-pos-norm">
+	  <input>fcs/hook-engage</input>
+	  <rate_limit sense="incr">fcs/rate-limits/hook-down</rate_limit>
+	  <rate_limit sense="decr">fcs/rate-limits/hook-up</rate_limit>
+      </actuator>
+  </channel>
+
+  <channel name="misc">
+      <switch name="position/aircraft-on-ground">
+	  <default value="0" />
+	  <test logic="OR" value="1">
+	      gear/unit[0]/WOW ne 0
+	      gear/unit[1]/WOW ne 0
+	      gear/unit[2]/WOW ne 0
+	  </test>
+      </switch>
+  </channel>
+       
+</flight_control>

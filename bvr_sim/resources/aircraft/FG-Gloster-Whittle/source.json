@@ -1,0 +1,26 @@
+{
+  "set": "Gloster-Whittle/whittle-set.xml",
+  "name": "Gloster E28/39 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Gloster-Whittle/Systems/whittle-yasim.xml",
+  "jets": 1,
+  "model": "Gloster-Whittle/Models/whittle.xml",
+  "tags": [
+    "gloster",
+    "experimental",
+    "prototype",
+    "1940s",
+    "retractable-gear",
+    "jet",
+    "single-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Gloster-Whittle.zip",
+  "archive_sha256": "028a493d35a55677e933bc7c360a48dd58f56d9a813f54944a59d4e447965f2e",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Gloster-Whittle.zip"
+}

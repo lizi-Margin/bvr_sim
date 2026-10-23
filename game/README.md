@@ -124,7 +124,8 @@ AI weapons (`G`) and quality (`Q`). Enter or the sortie button starts the flight
 | Input | Action |
 |---|---|
 | Mouse | Command heading and climb through the real bvr_sim flight controller |
-| W / S | Increase / decrease throttle |
+| Mouse wheel | Increase / decrease throttle (5 percentage points per notch) |
+| W / S | Push down / pull up elevator override; release restores mouse aim |
 | A / D | Manual aileron assistance |
 | Hold C | Free observation; stop changing the pilot's aim while held |
 | Hold right mouse | Zoom |
@@ -291,3 +292,31 @@ large battle/map performance. See `game/captures/validation/checks.json` and eac
 This is a playable first prototype. Remaining visual limitations include the
 limited map detail, old source aircraft art, static aircraft parts, simple missile/bomb
 meshes, simple engine/impact effects and no cockpit/audio/landing workflow.
+
+
+## Multi-aircraft and ground Alpha
+
+The ordinary hangar now uses one catalog for F22/F16/F15/F18/F4N, clickable and scrollable selection, legal loadouts, real preview meshes and repeat sorties. The v3 recipe adds a 5 m industrial sample, shared physical bridge/contact data, core-driven Jeep routes and a real SLAMRAAM convoy mission. See [build, Agent commands, recipes and approximations](docs/multi-aircraft-ground-alpha.md) for the current workflow and verification commands. Run game/Launch-Game.cmd for the v3 map.
+
+The same hangar also includes all 147 imported FlightGear aircraft as unarmed
+training flights (152 entries including the five combat configurations). Use the
+mouse wheel/arrows or Page Up/Down to browse; click the search field or press `/`,
+type an aircraft name/ID, then Enter to finish searching. Click a card and Enter
+to fly. Source FDM backend and host-assist limitations remain visible. Aircraft
+without validated combat integration do not receive invented weapons or radar.
+
+Mouse pitch uses the full aiming rectangle for ±45° climb-angle assist. W pushes
+down and S pulls up through a direct normalized elevator override; releasing
+them returns to mouse assist. Pure pitch input does not invoke automatic inverted
+roll. A/D and horizontal mouse sensitivity are unchanged. The dedicated radar
+range/azimuth panel and RWR/SA ring are displayed simultaneously.
+
+## Visual / Agent beta
+
+The current main client adds an armed three-wave Intercept Patrol, resident typed
+Agent host, reproducible input tapes, physical sky/aerial perspective, repeating
+terrain detail and F22/F16 material approximations. Every formal departure records
+real core ACMI/logs; F9 opens the current/previous sortie folder in Explorer.
+See [controls, logging, evaluation, replay and visual recipes](docs/visual-agent-beta.md)
+for commands, observation boundaries and known approximations. Existing tasks and
+all 147 imported training entries remain in the same 152-entry searchable hangar.

@@ -1,0 +1,892 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-04 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Stick </description>
+	</fileheader>
+
+
+
+	<channel name="Stick">
+
+
+
+		<switch name="calculations/stick/drop-button-command-resulted">
+			<default value="0" />
+			<test logic="OR" value="1">
+				systems/stick/drop-button-input eq 1
+				systems/stick/drop-button-command eq 1
+			</test>
+			<output>systems/stick/drop-button-command-resulted</output>
+		</switch>
+
+		<switch name="calculations/stick/drop-button-allowed">
+			<default value="0" />
+			<test logic="AND" value="systems/stick/drop-button-command-resulted">
+				systems/stick/serviceable eq 1
+			</test>
+			<output>systems/stick/drop-button-command-internal</output>
+		</switch>
+
+		<kinematic name="calculations/stick/drop-button-pos">
+			<input>systems/stick/drop-button-command-internal</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/stick/drop-button-pos</output>
+		</kinematic>
+
+		<switch name="calculations/stick/drop-button-not-allowed">
+			<default value="systems/stick/drop-button-input" />
+			<test logic="AND" value="0">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>systems/stick/drop-button-input</output>
+		</switch>
+
+		<switch name="calculations/stick/drop-button-command-not-allowed">
+			<default value="systems/stick/drop-button-command" />
+			<test logic="AND" value="0">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>systems/stick/drop-button-command</output>
+		</switch>
+
+		<switch name="calculations/stick/drop-button-switch">
+			<default value="systems/stick/drop-button-switch" />
+			<test logic="AND" value="1">
+				systems/stick/drop-button-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/stick/drop-button-pos lt 0.5
+			</test>
+			<output>systems/stick/drop-button-switch</output>
+		</switch>
+
+		<switch name="calculations/stick/drop-button-command-off">
+			<default value="systems/stick/drop-button-command" />
+			<test logic="AND" value="0">
+				systems/stick/drop-button-pos ge 0.95
+			</test>
+			<output>systems/stick/drop-button-command</output>
+		</switch>
+
+
+
+		<switch name="calculations/stick/safer-allowed">
+			<default value="systems/stick/safer-command" />
+			<test logic="AND" value="systems/stick/safer-input">
+				systems/stick/serviceable eq 1
+			</test>
+			<output>systems/stick/safer-command</output>
+		</switch>
+
+		<kinematic name="calculations/stick/safer-pos">
+			<input>systems/stick/safer-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/stick/safer-pos</output>
+		</kinematic>
+
+		<switch name="calculations/stick/safer-not-allowed">
+			<default value="systems/stick/safer-input" />
+			<test logic="AND" value="systems/stick/safer-command">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>systems/stick/safer-input</output>
+		</switch>
+
+		<switch name="calculations/stick/safer-switch">
+			<default value="systems/stick/safer-switch" />
+			<test logic="AND" value="1">
+				systems/stick/safer-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/stick/safer-pos lt 0.5
+			</test>
+			<output>systems/stick/safer-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/stick/fire-button-command-resulted">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/controls/armament/trigger eq 1
+				systems/stick/fire-button-command eq 1
+			</test>
+			<output>systems/stick/fire-button-command-resulted</output>
+		</switch>
+
+		<switch name="calculations/stick/fire-button-allowed">
+			<default value="0" />
+			<test logic="AND" value="systems/stick/fire-button-command-resulted">
+				systems/stick/serviceable eq 1
+				systems/stick/safer-switch eq 0
+			</test>
+			<output>systems/stick/fire-button-command-internal</output>
+		</switch>
+
+		<kinematic name="calculations/stick/fire-button-pos">
+			<input>systems/stick/fire-button-command-internal</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/stick/fire-button-pos</output>
+		</kinematic>
+
+		<switch name="calculations/stick/fire-button-not-allowed">
+			<default value="/controls/armament/trigger" />
+			<test logic="OR" value="0">
+				systems/stick/serviceable eq 0
+				systems/stick/safer-switch eq 1
+			</test>
+			<output>/controls/armament/trigger</output>
+		</switch>
+
+		<switch name="calculations/stick/fire-button-command-not-allowed">
+			<default value="systems/stick/fire-button-command" />
+			<test logic="OR" value="0">
+				systems/stick/serviceable eq 0
+				systems/stick/safer-switch eq 1
+			</test>
+			<output>systems/stick/fire-button-command</output>
+		</switch>
+
+		<switch name="calculations/stick/fire-button-switch">
+			<default value="systems/stick/fire-button-switch" />
+			<test logic="AND" value="1">
+				systems/stick/fire-button-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/stick/fire-button-pos lt 0.5
+			</test>
+			<output>systems/stick/fire-button-switch</output>
+		</switch>
+
+		<switch name="calculations/stick/fire-button-command-off">
+			<default value="systems/stick/fire-button-command" />
+			<test logic="AND" value="0">
+				systems/stick/fire-button-pos ge 0.95
+			</test>
+			<output>systems/stick/fire-button-command</output>
+		</switch>
+
+
+
+		<switch name="calculations/stick/aileron-cmd-norm-real">
+			<default value="fcs/aileron-cmd-norm" />
+			<test logic="AND" value="fcs/aileron-cmd-norm-real">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>fcs/aileron-cmd-norm-real</output>
+		</switch>
+
+		<switch name="calculations/stick/aileron-cmd-norm">
+			<default value="fcs/aileron-cmd-norm" />
+			<test logic="AND" value="fcs/aileron-cmd-norm-real">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>fcs/aileron-cmd-norm</output>
+		</switch>
+
+		<switch name="calculations/stick/elevator-cmd-norm-real">
+			<default value="fcs/elevator-cmd-norm" />
+			<test logic="AND" value="fcs/elevator-cmd-norm-real">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>fcs/elevator-cmd-norm-real</output>
+		</switch>
+
+		<switch name="calculations/stick/elevator-cmd-norm">
+			<default value="fcs/elevator-cmd-norm" />
+			<test logic="AND" value="fcs/elevator-cmd-norm-real">
+				systems/stick/serviceable eq 0
+			</test>
+			<output>fcs/elevator-cmd-norm</output>
+		</switch>
+
+		<fcs_function name="calculations/stick/elevator-stick-deg">
+		<function>
+			<product>
+				<property>fcs/elevator-cmd-norm-real</property>
+				<value>-4.0</value>
+			</product>
+		</function>
+			<output>systems/stick/elevator-stick-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-stick-deg">
+		<function>
+			<product>
+				<property>fcs/aileron-cmd-norm-real</property>
+				<value>-5.0</value>
+			</product>
+		</function>
+			<output>systems/stick/aileron-stick-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/elevator-rod-shift-x">
+		<function>
+			<product>
+				<value>-0.088</value>
+				<sin>
+					<product>
+						<property>systems/stick/elevator-stick-deg</property>
+						<value>0.017453</value>
+					</product>
+				</sin>
+			</product>
+		</function>
+			<output>systems/stick/elevator-rod-shift-x</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/elevator-rod-shift-y">
+		<function>
+			<product>
+				<value>0.088</value>
+				<sin>
+					<product>
+						<property>systems/stick/aileron-stick-deg</property>
+						<value>0.017453</value>
+					</product>
+				</sin>
+			</product>
+		</function>
+			<output>systems/stick/elevator-rod-shift-y</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/elevator-rod-shift-z">
+		<function>
+			<product>
+				<value>0.088</value>
+				<sum>
+					<value>-1.0</value>
+					<cos>
+						<product>
+							<property>systems/stick/elevator-stick-deg</property>
+							<value>0.017453</value>
+						</product>
+					</cos>
+				</sum>
+			</product>
+		</function>
+			<output>systems/stick/elevator-rod-shift-z</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-first-rod-shift-y">
+		<function>
+			<product>
+				<value>0.088</value>
+				<sin>
+					<product>
+						<property>systems/stick/aileron-stick-deg</property>
+						<value>0.017453</value>
+					</product>
+				</sin>
+			</product>
+		</function>
+			<output>systems/stick/aileron-first-rod-shift-y</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-rocker-source-angle">
+		<function>
+			<quotient>
+				<atan2>
+					<difference>
+						<value>0.200</value>
+						<value>0.168</value>
+					</difference>
+					<difference>
+						<value>0.068</value>
+						<value>0.036</value>
+					</difference>
+				</atan2>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/stick/aileron-rocker-source-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-rocker-next-angle">
+		<function>
+			<quotient>
+				<atan2>
+					<difference>
+						<value>0.032</value>
+						<property>systems/stick/aileron-first-rod-shift-y</property>
+					</difference>
+					<difference>
+						<value>0.068</value>
+						<value>0.036</value>
+					</difference>
+				</atan2>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/stick/aileron-rocker-next-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-rocker-shift-angle">
+		<function>
+			<difference>
+				<property>systems/stick/aileron-rocker-next-angle</property>
+				<property>systems/stick/aileron-rocker-source-angle</property>
+			</difference>
+		</function>
+			<output>systems/stick/aileron-rocker-shift-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-second-rod-source-angle">
+		<function>
+			<quotient>
+				<atan2>
+					<difference>
+						<value>0.230</value>
+						<value>0.200</value>
+					</difference>
+					<difference>
+						<value>0.036</value>
+						<value>0.007</value>
+					</difference>
+				</atan2>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/stick/aileron-second-rod-source-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-second-rod-next-angle">
+		<function>
+			<sum>
+				<property>systems/stick/aileron-second-rod-source-angle</property>
+				<property>systems/stick/aileron-rocker-shift-angle</property>
+			</sum>
+		</function>
+			<output>systems/stick/aileron-second-rod-next-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/aileron-second-rod-shift-x">
+		<function>
+			<product>
+				<value>0.041725</value>
+				<difference>
+					<sin>
+						<product>
+							<property>systems/stick/aileron-second-rod-next-angle</property>
+							<value>0.017453</value>
+						</product>
+					</sin>
+					<sin>
+						<product>
+							<property>systems/stick/aileron-second-rod-source-angle</property>
+							<value>0.017453</value>
+						</product>
+					</sin>
+				</difference>
+			</product>
+		</function>
+			<output>systems/stick/aileron-second-rod-shift-x</output>
+		</fcs_function>
+
+
+
+		<fcs_function name="calculations/stick/brake-middle-angle-deg">
+			<function>
+				<product>
+					<sum>
+						<property>/controls/gear/brake-left</property>
+						<property>/controls/gear/brake-right</property>
+					</sum>
+					<value>8</value>
+				</product>
+			</function>
+			<output>systems/stick/brake-middle-angle-deg</output>
+			<output>systems/stick/brake-angle-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-middle-x">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.005</value>
+							<value>0.016</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-middle-x</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-middle-y">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.011</value>
+							<value>0.002</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-middle-y</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-middle-x">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.032</value>
+							<value>0.049</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-saxle-middle-x</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-middle-y">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.038</value>
+							<value>0.018</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-saxle-middle-y</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-middle-x">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.038</value>
+							<value>0.043</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-blocker-middle-x</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-middle-y">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.031</value>
+							<value>0.026</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-blocker-middle-y</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-middle-x">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.020</value>
+							<value>0.031</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-rod-middle-x</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-middle-y">
+			<function>
+				<abs>
+					<quotient>
+						<difference>
+							<value>-0.023</value>
+							<value>0.010</value>
+						</difference>
+						<value>2</value>
+					</quotient>
+				</abs>
+			</function>
+			<output>systems/stick/brake-rod-middle-y</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-shoulder-xy">
+			<function>
+				<pow>
+					<sum>
+						<product>
+							<difference>
+								<property>systems/stick/brake-middle-x</property>
+								<property>systems/stick/brake-saxle-middle-x</property>
+							</difference>
+							<difference>
+								<property>systems/stick/brake-middle-x</property>
+								<property>systems/stick/brake-saxle-middle-x</property>
+							</difference>
+						</product>
+						<product>
+							<difference>
+								<property>systems/stick/brake-middle-y</property>
+								<property>systems/stick/brake-saxle-middle-y</property>
+							</difference>
+							<difference>
+								<property>systems/stick/brake-middle-y</property>
+								<property>systems/stick/brake-saxle-middle-y</property>
+							</difference>
+						</product>
+					</sum>
+					<value>0.5</value>
+				</pow>
+			</function>
+			<output>systems/stick/brake-saxle-shoulder-xy</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-shoulder-z">
+			<function>
+				<abs>
+					<difference>
+						<property>systems/stick/brake-z</property>
+						<property>systems/stick/brake-saxle-z</property>
+					</difference>
+				</abs>
+			</function>
+			<output>systems/stick/brake-saxle-shoulder-z</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-source-angle">
+			<function>
+				<atan2>
+					<abs>
+						<difference>
+							<property>systems/stick/brake-z</property>
+							<property>systems/stick/brake-saxle-z</property>
+						</difference>
+					</abs>
+					<property>systems/stick/brake-saxle-shoulder-xy</property>
+				</atan2>
+			</function>
+			<output>systems/stick/brake-saxle-source-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-source-angle-deg">
+		<function>
+			<quotient>
+				<property>systems/stick/brake-saxle-source-angle</property>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/stick/brake-saxle-source-angle-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-angle">
+		<function>
+			<sum>
+				<property>systems/stick/brake-saxle-source-angle</property>
+				<product>
+					<property>systems/stick/brake-angle-deg</property>
+					<value>0.017453</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/stick/brake-saxle-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-angle-deg">
+		<function>
+			<quotient>
+				<property>systems/stick/brake-saxle-angle</property>
+				<value>0.017453</value>
+			</quotient>
+		</function>
+			<output>systems/stick/brake-saxle-angle-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-shoulder">
+			<function>
+				<pow>
+					<sum>
+						<product>
+							<property>systems/stick/brake-saxle-shoulder-xy</property>
+							<property>systems/stick/brake-saxle-shoulder-xy</property>
+						</product>
+						<product>
+							<property>systems/stick/brake-saxle-shoulder-z</property>
+							<property>systems/stick/brake-saxle-shoulder-z</property>
+						</product>
+					</sum>
+					<value>0.5</value>
+				</pow>
+			</function>
+			<output>systems/stick/brake-saxle-shoulder</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-pos-xy">
+			<function>
+				<product>
+					<property>systems/stick/brake-saxle-shoulder</property>
+					<cos>
+						<property>systems/stick/brake-saxle-angle</property>
+					</cos>
+				</product>
+			</function>
+			<output>systems/stick/brake-saxle-pos-xy</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-saxle-pos-z">
+			<function>
+				<sum>
+					<property>systems/stick/brake-z</property>
+					<product>
+						<property>systems/stick/brake-saxle-shoulder</property>
+						<sin>
+							<property>systems/stick/brake-saxle-angle</property>
+						</sin>
+					</product>
+				</sum>
+			</function>
+			<output>systems/stick/brake-saxle-pos-z</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-source-xy">
+			<function>
+				<pow>
+					<sum>
+						<product>
+							<difference>
+								<property>systems/stick/brake-middle-x</property>
+								<property>systems/stick/brake-blocker-middle-x</property>
+							</difference>
+							<difference>
+								<property>systems/stick/brake-middle-x</property>
+								<property>systems/stick/brake-blocker-middle-x</property>
+							</difference>
+						</product>
+						<product>
+							<difference>
+								<property>systems/stick/brake-middle-y</property>
+								<property>systems/stick/brake-blocker-middle-y</property>
+							</difference>
+							<difference>
+								<property>systems/stick/brake-middle-y</property>
+								<property>systems/stick/brake-blocker-middle-y</property>
+							</difference>
+						</product>
+					</sum>
+					<value>0.5</value>
+				</pow>
+			</function>
+			<output>systems/stick/brake-blocker-source-xy</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-shoulder-xy">
+			<function>
+				<abs>
+					<difference>
+						<property>systems/stick/brake-blocker-source-xy</property>
+						<property>systems/stick/brake-saxle-pos-xy</property>
+					</difference>
+				</abs>
+			</function>
+			<output>systems/stick/brake-blocker-shoulder-xy</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-shoulder-z">
+			<function>
+				<abs>
+					<difference>
+						<property>systems/stick/brake-blocker-z</property>
+						<property>systems/stick/brake-saxle-pos-z</property>
+					</difference>
+				</abs>
+			</function>
+			<output>systems/stick/brake-blocker-shoulder-z</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-angle">
+			<function>
+				<atan2>
+					<property>systems/stick/brake-blocker-shoulder-xy</property>
+					<property>systems/stick/brake-blocker-shoulder-z</property>
+				</atan2>
+			</function>
+			<output>systems/stick/brake-blocker-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-blocker-angle-deg">
+			<function>
+				<quotient>
+					<property>systems/stick/brake-blocker-angle</property>
+					<value>0.017453</value>
+				</quotient>
+			</function>
+			<output>systems/stick/brake-blocker-angle-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-shoulder-xy">
+			<function>
+				<pow>
+					<sum>
+						<product>
+							<difference>
+								<property>systems/stick/brake-middle-x</property>
+								<property>systems/stick/brake-rod-middle-x</property>
+							</difference>
+							<difference>
+								<property>systems/stick/brake-middle-x</property>
+								<property>systems/stick/brake-rod-middle-x</property>
+							</difference>
+						</product>
+						<product>
+							<difference>
+								<property>systems/stick/brake-middle-y</property>
+								<property>systems/stick/brake-rod-middle-y</property>
+							</difference>
+							<difference>
+								<property>systems/stick/brake-middle-y</property>
+								<property>systems/stick/brake-rod-middle-y</property>
+							</difference>
+						</product>
+					</sum>
+					<value>0.5</value>
+				</pow>
+			</function>
+			<output>systems/stick/brake-rod-shoulder-xy</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-shoulder-z">
+			<function>
+				<abs>
+					<difference>
+						<property>systems/stick/brake-z</property>
+						<property>systems/stick/brake-rod-z</property>
+					</difference>
+				</abs>
+			</function>
+			<output>systems/stick/brake-rod-shoulder-z</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-source-angle">
+			<function>
+				<atan2>
+					<property>systems/stick/brake-rod-shoulder-z</property>
+					<property>systems/stick/brake-rod-shoulder-xy</property>
+				</atan2>
+			</function>
+			<output>systems/stick/brake-rod-source-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-angle">
+			<function>
+				<sum>
+					<property>systems/stick/brake-rod-source-angle</property>
+					<product>
+						<property>systems/stick/brake-angle-deg</property>
+						<value>0.017453</value>
+					</product>
+				</sum>
+			</function>
+			<output>systems/stick/brake-rod-angle</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-angle-deg">
+			<function>
+				<quotient>
+					<property>systems/stick/brake-rod-angle</property>
+					<value>0.017453</value>
+				</quotient>
+			</function>
+			<output>systems/stick/brake-rod-angle-deg</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-account-z">
+			<function>
+				<quotient>
+					<product>
+						<property>systems/stick/brake-rod-shoulder-xy</property>
+						<sin>
+							<property>systems/stick/brake-rod-angle</property>
+						</sin>
+					</product>
+					<cos>
+						<property>systems/stick/brake-rod-angle</property>
+					</cos>
+				</quotient>
+			</function>
+			<output>systems/stick/brake-rod-account-z</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/stick/brake-rod-shift-z">
+			<function>
+				<difference>
+					<property>systems/stick/brake-rod-account-z</property>
+					<property>systems/stick/brake-rod-shoulder-z</property>
+				</difference>
+			</function>
+			<output>systems/stick/brake-rod-shift-z</output>
+		</fcs_function>
+
+		
+
+		<switch name="calculations/stick/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/stick/drop-button-pos ge 0.25
+				systems/stick/drop-button-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/stick/safer-pos ge 0.25
+				systems/stick/safer-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/stick/fire-button-pos ge 0.25
+				systems/stick/fire-button-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

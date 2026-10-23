@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="G91 Landing Gear">
+    
+    <property value="0.0">systems/landing-gear/gear-down-command</property>
+    <property value="0.0">systems/landing-gear/gear-down-manual-command-filtered</property>
+    <property value="0.0">systems/landing-gear/gear-command-open</property>
+    <property value="0.0">systems/landing-gear/gear-command-close</property>
+    <property value="0.0">systems/landing-gear/gear-down-command-filtered</property>
+    <property value="0.0">systems/landing-gear/gear-down-status</property>
+    <property value="1200.0">systems/landing-gear/hydraulic-min-psi</property>
+    <property value="0.0">systems/landing-gear/allarm-active</property>
+    
+    
+    <channel name="Landing gear activate" execrate="16">
+        
+        <switch name="systems/landing-gear/gear-down-manual-command-filtered">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/landing-gear/gear-down-command GE 0.5
+            </test>
+            <test logic="AND" value="-1">
+                systems/landing-gear/gear-down-command LE -0.5
+            </test>
+        </switch>
+        
+        <switch name="systems/landing-gear/gear-down-command-filtered">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/landing-gear/gear-down-manual-command-filtered == 1
+                systems/hydraulics/flight-system-psi GE systems/landing-gear/hydraulic-min-psi
+            </test>
+            <test logic="AND" value="-1">
+                systems/landing-gear/gear-down-manual-command-filtered == -1
+                systems/hydraulics/flight-system-psi GE systems/landing-gear/hydraulic-min-psi
+            </test>
+            <test logic="AND" value="1">
+                systems/landing-gear/gear-command-open == 1
+                systems/landing-gear/gear-command-close == 0
+                systems/hydraulics/flight-system-psi GE systems/landing-gear/hydraulic-min-psi
+            </test>
+            <test logic="AND" value="-1">
+                systems/landing-gear/gear-command-open == 0
+                systems/landing-gear/gear-command-close == 1
+                systems/hydraulics/flight-system-psi GE systems/landing-gear/hydraulic-min-psi
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/landing-gear/gear-down-command-lag">
+            <input>systems/landing-gear/gear-down-command-filtered</input>
+            <c1>1.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/landing-gear/gear-down-status">
+            <default value="/controls/gear/gear-down" />
+            <test logic="AND" value="/controls/gear/gear-down">
+                systems/landing-gear/gear-down-command-lag GT -0.9
+                systems/landing-gear/gear-down-command-lag LT 0.9
+            </test>
+            <test logic="AND" value="1">
+                systems/landing-gear/gear-down-command-lag GE 0.9
+            </test>
+            <test logic="AND" value="0">
+                systems/landing-gear/gear-down-command-lag LE -0.9
+            </test>
+            <output>/controls/gear/gear-down</output>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="Landing gear allarm" execrate="16">
+        
+        <switch name="systems/landing-gear/allarm-active-set">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/landing-gear/gear-down-status == 0
+                /controls/engines/engine/throttle LE 0.20
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/landing-gear/allarm-active-lag">
+            <input>systems/landing-gear/allarm-active-set</input>
+            <c1>0.3</c1>
+        </lag_filter>
+        
+        <switch name="systems/landing-gear/allarm-active">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/landing-gear/allarm-active-lag GT 0.9
+                systems/electric/bus[1]/landig-gear-command/fuse == 1
+                systems/electric/bus[1]/V GT 18.0
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/landing-gear/allarm-active-washed">
+            <input>systems/landing-gear/allarm-active</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/landing-gear/allarm-active-washed-event">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/landing-gear/allarm-active-washed LT 0.6
+                systems/landing-gear/allarm-active-washed GT -0.6
+            </test>
+        </switch>
+        
+        <switch name="systems/landing-gear/allarm-beep-active">
+            <default value="systems/landing-gear/allarm-beep-active" />
+            <test logic="AND" value="1">
+                systems/landing-gear/allarm-active-washed-event == 1
+                systems/landing-gear/allarm-beep-active == 0
+                systems/landing-gear/allarm-active == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/landing-gear/allarm-beep-active == 1
+                systems/landing-gear/allarm-active == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/landing-gear/allarm-beep-active == 1
+                systems/manual-switches/cockpit/sw-landing-gear-beeper-off == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+</system>

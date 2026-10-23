@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="EM-10 electrical manometer">
+ 
+
+
+ 
+ <channel name="placeholder" execrate="2">
+  <pure_gain name="systems/instr/EM-10/placeholder/fuel-pressure-kgf_cm2">
+   <input>/engines/engine/fuel-flow_pph</input>
+   
+   <gain>100.0</gain>
+  </pure_gain>
+ </channel>
+
+
+ <property>systems/elec/output/EM-10/DC27-V</property>
+ <property>systems/elec/output/EM-10/DC27-ok</property>
+
+
+ <channel name="EM-10 slow" execrate="8">
+
+  <fcs_function name="systems/elec/output/EM-10/DC27-A">
+   <function>
+    <product>
+     <p>systems/elec/output/EM-10/DC27-V</p>
+     
+     <v>0.0111</v>
+    </product>
+   </function>
+  </fcs_function>
+
+ </channel>
+
+
+ <channel name="EM-10" execrate="2">
+
+  
+
+  <switch name="systems/instr/EM-10/gauge/fuel-pressure-kgf_cm2">
+   <default value="-8.8" />
+   <test value="systems/instr/EM-10/placeholder/fuel-pressure-kgf_cm2">
+    systems/elec/output/EM-10/DC27-ok NE 0
+   </test>
+  </switch>
+
+ </channel>
+
+
+</system>

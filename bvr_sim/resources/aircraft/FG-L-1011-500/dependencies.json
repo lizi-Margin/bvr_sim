@@ -1,0 +1,41 @@
+{
+  "files": [
+    {
+      "from": "L-1011-500/L-1011-500.xml",
+      "reference": "RB211-524B",
+      "source": "L-1011-500/Engines/RB211-524B.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "L-1011-500/L-1011-500.xml",
+      "reference": "direct",
+      "source": "L-1011-500/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "L-1011-500/L-1011-500.xml",
+      "reference": "RB211-524B",
+      "source": "L-1011-500/Engines/RB211-524B.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "L-1011-500/L-1011-500.xml",
+      "reference": "direct",
+      "source": "L-1011-500/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "L-1011-500/L-1011-500.xml",
+      "reference": "RB211-524B",
+      "source": "L-1011-500/Engines/RB211-524B.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "L-1011-500/L-1011-500.xml",
+      "reference": "direct",
+      "source": "L-1011-500/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

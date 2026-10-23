@@ -1,0 +1,26 @@
+{
+  "set": "Stiletto/stiletto-set.xml",
+  "name": "Douglas X 3 Stiletto (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Stiletto/Systems/stiletto-yasim.xml",
+  "jets": 2,
+  "model": "Stiletto/Models/stiletto.xml",
+  "tags": [
+    "douglas",
+    "experimental",
+    "1950s",
+    "mid-wing",
+    "tricycle",
+    "retractable-gear",
+    "twin-engine",
+    "jet",
+    "compositor"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Stiletto.zip",
+  "archive_sha256": "725ae8e7fa737478663575aed77650a266889b8e55f57039d7b2d73724274459",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Stiletto.zip"
+}

@@ -1,0 +1,29 @@
+{
+  "set": "A320-family/A320-200-IAE-set.xml",
+  "name": "Airbus A320-232 (IAE V2527-A5)",
+  "fdm_type": "jsb",
+  "fdm": "A320-family/FDE/A320-200-IAE.xml",
+  "jets": 0,
+  "model": "A320-family/Models/A320-200-IAE.xml",
+  "tags": [
+    "transport",
+    "airbus",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s",
+    "ifr",
+    "retractable-gear",
+    "glass-cockpit",
+    "pressurised",
+    "jet",
+    "2-engine"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "A320-family.zip",
+  "archive_sha256": "bc9b3902793fc640fc224f228febcfd3ba99d8a5b3ea2618a6909f0b6d4044d9",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/A320-family.zip"
+}

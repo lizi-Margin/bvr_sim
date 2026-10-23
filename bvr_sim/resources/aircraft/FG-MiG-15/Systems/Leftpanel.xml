@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Left panel </description>
+	</fileheader>
+
+
+	<channel name="Leftpanel">
+
+
+
+		<switch name="calculations/leftpanel/pump-allowed">
+			<default value="systems/leftpanel/pump-command" />
+			<test logic="AND" value="systems/leftpanel/pump-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/leftpanel/pump-command</output>
+		</switch>
+
+		<kinematic name="calculations/leftpanel/pump-pos">
+			<input>systems/leftpanel/pump-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/leftpanel/pump-pos</output>
+		</kinematic>
+
+		<switch name="calculations/leftpanel/pump-not-allowed">
+			<default value="systems/leftpanel/pump-input" />
+			<test logic="AND" value="systems/leftpanel/pump-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/leftpanel/pump-input</output>
+		</switch>
+
+		<switch name="calculations/leftpanel/pump-switch">
+			<default value="systems/leftpanel/pump-switch" />
+			<test logic="AND" value="1">
+				systems/leftpanel/pump-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/leftpanel/pump-pos lt 0.5
+			</test>
+			<output>systems/leftpanel/pump-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/leftpanel/isolation-valve-allowed">
+			<default value="systems/leftpanel/isolation-valve-command" />
+			<test logic="AND" value="systems/leftpanel/isolation-valve-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/leftpanel/isolation-valve-command</output>
+		</switch>
+
+		<kinematic name="calculations/leftpanel/isolation-valve-pos">
+			<input>systems/leftpanel/isolation-valve-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/leftpanel/isolation-valve-pos</output>
+		</kinematic>
+
+		<switch name="calculations/leftpanel/isolation-valve-not-allowed">
+			<default value="systems/leftpanel/isolation-valve-input" />
+			<test logic="AND" value="systems/leftpanel/isolation-valve-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/leftpanel/isolation-valve-input</output>
+		</switch>
+
+		<switch name="calculations/leftpanel/isolation-valve-switch">
+			<default value="systems/leftpanel/isolation-valve-switch" />
+			<test logic="AND" value="1">
+				systems/leftpanel/isolation-valve-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/leftpanel/isolation-valve-pos lt 0.5
+			</test>
+			<output>systems/leftpanel/isolation-valve-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/leftpanel/ignition-type-allowed">
+			<default value="systems/leftpanel/ignition-type-command" />
+			<test logic="AND" value="systems/leftpanel/ignition-type-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/leftpanel/ignition-type-command</output>
+		</switch>
+
+		<kinematic name="calculations/leftpanel/ignition-type-pos">
+			<input>systems/leftpanel/ignition-type-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/leftpanel/ignition-type-pos</output>
+		</kinematic>
+
+		<switch name="calculations/leftpanel/ignition-type-not-allowed">
+			<default value="systems/leftpanel/ignition-type-input" />
+			<test logic="AND" value="systems/leftpanel/ignition-type-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/leftpanel/ignition-type-input</output>
+		</switch>
+
+		<switch name="calculations/leftpanel/ignition-type-switch">
+			<default value="systems/leftpanel/ignition-type-switch" />
+			<test logic="AND" value="1">
+				systems/leftpanel/ignition-type-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/leftpanel/ignition-type-pos lt 0.5
+			</test>
+			<output>systems/leftpanel/ignition-type-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/leftpanel/ignition-allowed">
+			<default value="systems/leftpanel/ignition-command" />
+			<test logic="AND" value="systems/leftpanel/ignition-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/leftpanel/ignition-command</output>
+		</switch>
+
+		<kinematic name="calculations/leftpanel/ignition-pos">
+			<input>systems/leftpanel/ignition-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/leftpanel/ignition-pos</output>
+		</kinematic>
+
+		<switch name="calculations/leftpanel/ignition-not-allowed">
+			<default value="systems/leftpanel/ignition-input" />
+			<test logic="AND" value="systems/leftpanel/ignition-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/leftpanel/ignition-input</output>
+		</switch>
+
+		<switch name="calculations/leftpanel/ignition-switch">
+			<default value="systems/leftpanel/ignition-switch" />
+			<test logic="AND" value="1">
+				systems/leftpanel/ignition-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/leftpanel/ignition-pos lt 0.5
+			</test>
+			<output>systems/leftpanel/ignition-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/leftpanel/engine-control-allowed">
+			<default value="systems/leftpanel/engine-control-command" />
+			<test logic="AND" value="systems/leftpanel/engine-control-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/leftpanel/engine-control-command</output>
+		</switch>
+
+		<kinematic name="calculations/leftpanel/engine-control-pos">
+			<input>systems/leftpanel/engine-control-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/leftpanel/engine-control-pos</output>
+		</kinematic>
+
+		<switch name="calculations/leftpanel/engine-control-not-allowed">
+			<default value="systems/leftpanel/engine-control-input" />
+			<test logic="AND" value="systems/leftpanel/engine-control-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/leftpanel/engine-control-input</output>
+		</switch>
+
+		<switch name="calculations/leftpanel/engine-control-switch">
+			<default value="systems/leftpanel/engine-control-switch" />
+			<test logic="AND" value="1">
+				systems/leftpanel/engine-control-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/leftpanel/engine-control-pos lt 0.5
+			</test>
+			<output>systems/leftpanel/engine-control-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/leftpanel/third-tank-pump-allowed">
+			<default value="systems/leftpanel/third-tank-pump-command" />
+			<test logic="AND" value="systems/leftpanel/third-tank-pump-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/leftpanel/third-tank-pump-command</output>
+		</switch>
+
+		<kinematic name="calculations/leftpanel/third-tank-pump-pos">
+			<input>systems/leftpanel/third-tank-pump-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/leftpanel/third-tank-pump-pos</output>
+		</kinematic>
+
+		<switch name="calculations/leftpanel/third-tank-pump-not-allowed">
+			<default value="systems/leftpanel/third-tank-pump-input" />
+			<test logic="AND" value="systems/leftpanel/third-tank-pump-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/leftpanel/third-tank-pump-input</output>
+		</switch>
+
+		<switch name="calculations/leftpanel/third-tank-pump-switch">
+			<default value="systems/leftpanel/third-tank-pump-switch" />
+			<test logic="AND" value="1">
+				systems/leftpanel/third-tank-pump-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/leftpanel/third-tank-pump-pos lt 0.5
+			</test>
+			<output>systems/leftpanel/third-tank-pump-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/leftpanel/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/leftpanel/pump-pos ge 0.25
+				systems/leftpanel/pump-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/leftpanel/isolation-valve-pos ge 0.25
+				systems/leftpanel/isolation-valve-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/leftpanel/ignition-type-pos ge 0.25
+				systems/leftpanel/ignition-type-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+
+			<test logic="AND" value="1">
+				systems/leftpanel/ignition-pos ge 0.25
+				systems/leftpanel/ignition-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+
+			<test logic="AND" value="1">
+				systems/leftpanel/engine-control-pos ge 0.25
+				systems/leftpanel/engine-control-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+
+			<test logic="AND" value="1">
+				systems/leftpanel/third-tank-pump-pos ge 0.25
+				systems/leftpanel/third-tank-pump-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

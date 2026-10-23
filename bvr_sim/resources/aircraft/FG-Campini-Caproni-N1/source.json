@@ -1,0 +1,23 @@
+{
+  "set": "Campini-Caproni-N1/ccn1-set.xml",
+  "name": "Campini Caproni N-1 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Campini-Caproni-N1/Systems/ccn1-yasim.xml",
+  "jets": 1,
+  "model": "Campini-Caproni-N1/Models/ccn1.xml",
+  "tags": [
+    "1940s",
+    "prototype",
+    "retractable-gear",
+    "tail-dragger",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Campini-Caproni-N1.zip",
+  "archive_sha256": "3439199b5bb0769ce4b55d58923640fabe797a4bca45f3d471ed975358b23e03",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Campini-Caproni-N1.zip"
+}

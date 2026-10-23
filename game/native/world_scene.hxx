@@ -3,13 +3,16 @@
 #include <unordered_set>
 #include <set>
 #include <map>
+#include <bit>
 struct ScenePlacement {
     std::string id, model, chunk, category, target_uid;
     std::array<double, 3> position{};
     float yaw = 0, scale = 1, lod_distance = 1700, cull_distance = 35000;
 };
 struct SceneMaterial {
-    std::string id, base_color, normal;
+    std::string id, base_color, normal, roughness_map;
+    std::string detail_color,detail_normal,detail_roughness;
+    float detail_tile_m=3,detail_mean_linear=.2f,detail_strength=0;
     std::array<float, 4> color{1, 1, 1, 1};
     float tile_m = 2, roughness = .9f;
     bool water = false;
@@ -18,6 +21,7 @@ struct SceneSurface {
     std::string id, material;
     std::vector<std::array<float, 3>> vertices;
     std::vector<uint32_t> indices;
+    bool drivable = true;
 };
 struct SceneStats {
     uint64_t unique_models = 0, imported_glbs = 0, mesh_resources = 0, material_resources = 0;
@@ -42,13 +46,19 @@ class WorldScene {
         std::vector<wi::ecs::Entity> children;
         int lod = -1;
         bool shown = true;
+        bool has_lod = false;
     };
     struct TerrainMesh {
         wi::ecs::Entity entity;
         double n, w, spacing;
         int columns, rows;
     };
+    struct SurfaceMesh {
+        wi::ecs::Entity entity;
+        std::array<double, 4> bounds;
+    };
     wi::scene::Scene &scene;
+    float detail_tile_m_=3;
     const std::unordered_map<std::string, std::string> &model_files;
     std::map<std::string, Prototype> prototypes;
     std::map<std::string, uint64_t> import_counts;
@@ -56,6 +66,7 @@ class WorldScene {
     std::unordered_map<wi::ecs::Entity, size_t> child_instances;
     std::vector<wi::ecs::Entity> world_geometry;
     std::vector<TerrainMesh> terrain_meshes;
+    std::vector<SurfaceMesh> contact_meshes;
     std::map<std::string, wi::ecs::Entity> materials;
     Prototype &prototype(const std::string &model) {
         auto found = prototypes.find(model);
@@ -116,6 +127,31 @@ class WorldScene {
             slot.resource = wi::resourcemanager::Load(spec.normal);
             m->normalMapStrength = .45f;
         }
+        if (!spec.roughness_map.empty()) {
+            if (!std::filesystem::exists(spec.roughness_map))
+                throw std::runtime_error("Missing roughness texture: " + spec.roughness_map);
+            // Source maps are grayscale, so G is roughness in Wicked's surface map.
+            // Disable the unused R occlusion and B metalness channels explicitly.
+            auto &slot = m->textures[wi::scene::MaterialComponent::SURFACEMAP];
+            slot.name = spec.roughness_map;
+            slot.resource = wi::resourcemanager::Load(spec.roughness_map);
+            m->SetOcclusionEnabled_Primary(false);
+            m->SetMetalness(0);
+        }
+        if(!spec.detail_color.empty()&&spec.detail_strength>0){
+            detail_tile_m_=spec.detail_tile_m;
+            auto& detail=m->textures[wi::scene::MaterialComponent::EMISSIVEMAP];
+            detail.name=spec.detail_color;detail.resource=wi::resourcemanager::Load(spec.detail_color);detail.uvset=1;
+            m->SetEmissiveColor({0,0,0,0}); // shader uses this slot as albedo detail only
+            m->userdata.x=0x42565244u;
+            m->userdata.y=std::bit_cast<uint32_t>(1.f/std::max(.001f,spec.detail_mean_linear));
+            m->userdata.z=std::bit_cast<uint32_t>(spec.detail_strength);
+            auto& normal=m->textures[wi::scene::MaterialComponent::NORMALMAP];
+            normal.name=spec.detail_normal;normal.resource=wi::resourcemanager::Load(spec.detail_normal,wi::resourcemanager::Flags::IMPORT_NORMALMAP);normal.uvset=1;
+            auto& rough=m->textures[wi::scene::MaterialComponent::SURFACEMAP];
+            rough.name=spec.detail_roughness;rough.resource=wi::resourcemanager::Load(spec.detail_roughness);rough.uvset=1;
+            m->SetOcclusionEnabled_Primary(false);m->SetMetalness(0);m->normalMapStrength=.5f;
+        }
         if (spec.water) {
             m->shaderType = wi::scene::MaterialComponent::SHADERTYPE_WATER;
             m->refraction = .1f;
@@ -127,7 +163,8 @@ class WorldScene {
         return e;
     }
     void terrain_patch(const bvr_sim::TerrainTile &patch, int chunk_cells, const std::vector<int> &cover,
-                       const std::vector<std::array<float, 4>> &colors, const std::array<double, 4> &cutout) {
+                       const std::vector<std::array<float, 4>> &colors, const std::array<double, 4> &cutout,
+                       const std::string &override_material = "",const bvr_sim::GameTerrain* full_terrain=nullptr) {
         using namespace DirectX;
         // Macro colors and land-use tints are baked per cell. Interpolate them at
         // mesh vertices so the 2 km regional colors and 50 m biome edges do not
@@ -156,6 +193,8 @@ class WorldScene {
                     rows = std::min(chunk_cells, patch.rows - 1 - row0) + 1;
                 wi::vector<XMFLOAT3> positions;
                 wi::vector<XMFLOAT2> uvs;
+                wi::vector<XMFLOAT2> detail_uvs;
+                wi::vector<XMFLOAT3> smooth_normals;
                 wi::vector<uint32_t> vertex_colors;
                 for (int row = 0; row < rows; ++row)
                     for (int col = 0; col < cols; ++col) {
@@ -164,7 +203,17 @@ class WorldScene {
                         positions.push_back({float(-w),
                                              float(patch.heights[(row0 + row) * patch.columns + col0 + col]),
                                              float(n)});
-                        uvs.push_back({float(col * patch.spacing / 2), float(row * patch.spacing / 2)});
+                        uvs.push_back(
+                            {float((override_material.empty() ? col : col0 + col) * patch.spacing / 2),
+                             float((override_material.empty() ? row : row0 + row) * patch.spacing / 2)});
+                        detail_uvs.push_back({float(n/detail_tile_m_),float(w/detail_tile_m_)});
+                        if(full_terrain){
+                            double step=std::min(50.,patch.spacing);
+                            double dn=(full_terrain->height(n+step,w)-full_terrain->height(n-step,w))/(2*step);
+                            double dw=(full_terrain->height(n,w+step)-full_terrain->height(n,w-step))/(2*step);
+                            double inv=1/std::sqrt(1+dn*dn+dw*dw);
+                            smooth_normals.push_back({float(dw*inv),float(inv),float(-dn*inv)});
+                        }
                         std::array<float, 4> c{1, 1, 1, 1};
                         if (!colors.empty())
                             c = sample_color(row0 + row, col0 + col);
@@ -201,13 +250,16 @@ class WorldScene {
                         wi::scene::MeshComponent::MeshSubset subset;
                         subset.indexOffset = offset;
                         subset.indexCount = uint32_t(grouped[i].size());
-                        subset.materialID = materials.at(names[i]);
+                        subset.materialID =
+                            materials.at(override_material.empty() ? names[i] : override_material);
                         mesh->subsets.push_back(subset);
                         offset += subset.indexCount;
                     }
                 scene.materials.Remove(e);
                 mesh->SetQuantizedPositionsDisabled(true);
                 mesh->vertex_uvset_0 = std::move(uvs);
+                mesh->vertex_uvset_1 = std::move(detail_uvs);
+                if(!smooth_normals.empty())mesh->vertex_normals=std::move(smooth_normals);
                 mesh->vertex_colors = std::move(vertex_colors);
                 mesh->CreateRenderData();
                 scene.layers.GetComponent(e)->layerMask = 1;
@@ -238,6 +290,7 @@ class WorldScene {
             scene.Entity_Remove(e);
         world_geometry.clear();
         terrain_meshes.clear();
+        contact_meshes.clear();
         for (auto [_, e] : materials)
             scene.Entity_Remove(e);
         materials.clear();
@@ -264,10 +317,24 @@ class WorldScene {
             cut = {t.origin_north, t.origin_west, t.origin_north + (t.columns - 1) * t.spacing,
                    t.origin_west + (t.rows - 1) * t.spacing};
         }
-        terrain_patch(base, 16, outer_cover, outer_colors, cut);
-        for (const auto &fine : terrain.detail_tiles)
-            terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), cover, colors, {0, 0, 0, 0});
+        terrain_patch(base, 16, outer_cover, outer_colors, cut,"",&terrain);
+        for (size_t i = 0; i < terrain.detail_tiles.size(); ++i) {
+            const auto &fine = terrain.detail_tiles[i];
+            std::array<double, 4> inner{0, 0, 0, 0};
+            if (i + 1 < terrain.detail_tiles.size()) {
+                const auto &t = terrain.detail_tiles[i + 1];
+                inner = {t.origin_north, t.origin_west, t.origin_north + (t.columns - 1) * t.spacing,
+                         t.origin_west + (t.rows - 1) * t.spacing};
+            }
+            const std::string material_name = "detail_" + std::to_string(i);
+            if (i > 0 && materials.count(material_name))
+                terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), {}, {}, inner, material_name,&terrain);
+            else
+                terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), cover, colors, inner,"",&terrain);
+        }
         for (const auto &surface : surfaces) {
+            if (surface.indices.empty())
+                continue;
             wi::vector<XMFLOAT3> vertices;
             wi::vector<XMFLOAT2> uvs;
             wi::vector<uint32_t> indices(surface.indices.begin(), surface.indices.end());
@@ -285,6 +352,16 @@ class WorldScene {
             scene.layers.GetComponent(e)->layerMask = 1;
             scene.objects.GetComponent(e)->SetCastShadow(false);
             world_geometry.push_back(e);
+            if (surface.material == "pavement" && surface.drivable) {
+                std::array<double, 4> bounds{INFINITY, INFINITY, -INFINITY, -INFINITY};
+                for (auto p : surface.vertices) {
+                    bounds[0] = std::min(bounds[0], double(p[0]));
+                    bounds[1] = std::min(bounds[1], double(p[1]));
+                    bounds[2] = std::max(bounds[2], double(p[0]));
+                    bounds[3] = std::max(bounds[3], double(p[1]));
+                }
+                contact_meshes.push_back({e, bounds});
+            }
         }
         for (const auto &spec : placements) {
             prototype(spec.model);
@@ -296,6 +373,7 @@ class WorldScene {
                 count = std::max(count, prototypes.at(spec.model + "::lod1").parts.size());
             Instance instance;
             instance.spec = spec;
+            instance.has_lod = prototypes.count(spec.model+"::lod1")!=0;
             instance.root = scene.Entity_CreateTransform(spec.id);
             scene.layers.Create(instance.root).layerMask = 1;
             auto t = scene.transforms.GetComponent(instance.root);
@@ -318,10 +396,12 @@ class WorldScene {
         using namespace DirectX;
         for (auto &instance : instances) {
             auto &p = instance.spec;
-            double distance =
-                std::hypot(std::hypot(eye.x + p.position[1], eye.y - p.position[2]), eye.z - p.position[0]);
-            int lod = distance > p.lod_distance && prototypes.count(p.model + "::lod1") ? 1 : 0;
-            bool shown = distance < p.cull_distance;
+            const double x=eye.x+p.position[1],y=eye.y-p.position[2],z=eye.z-p.position[0];
+            const double distance_squared=x*x+y*y+z*z;
+            // The thresholds and visible content are identical. Avoid two
+            // square roots and a string allocation/map lookup per placement.
+            int lod = distance_squared > double(p.lod_distance)*p.lod_distance && instance.has_lod ? 1 : 0;
+            bool shown = distance_squared < double(p.cull_distance)*p.cull_distance;
             if (lod != instance.lod || shown != instance.shown) {
                 auto &parts = prototypes.at(p.model + (lod ? "::lod1" : "")).parts;
                 for (size_t i = 0; i < instance.children.size(); ++i) {
@@ -385,6 +465,34 @@ class WorldScene {
             result.visible_chunks[instances[index].spec.chunk]++;
         }
         result.visible_mesh_subset_groups = groups.size();
+        return result;
+    }
+    double render_surface_height(double north, double west, double reference = INFINITY) const {
+        double result = render_height(north, west);
+        for (const auto &surface : contact_meshes) {
+            const auto &r = surface.bounds;
+            if (north < r[0] || west < r[1] || north > r[2] || west > r[3])
+                continue;
+            auto mesh = scene.meshes.GetComponent(surface.entity);
+            if (!mesh)
+                continue;
+            for (size_t i = 0; i + 2 < mesh->indices.size(); i += 3) {
+                auto a = mesh->vertex_positions[mesh->indices[i]],
+                     b = mesh->vertex_positions[mesh->indices[i + 1]],
+                     c = mesh->vertex_positions[mesh->indices[i + 2]];
+                // Wicked (-west,up,north) -> the NWU plane, independent of core surface sampling.
+                double det = (b.z - a.z) * (-c.x + a.x) - (c.z - a.z) * (-b.x + a.x);
+                if (std::abs(det) < 1e-10)
+                    continue;
+                double u = ((north - a.z) * (-c.x + a.x) - (west + a.x) * (c.z - a.z)) / det;
+                double v = ((b.z - a.z) * (west + a.x) - (-b.x + a.x) * (north - a.z)) / det;
+                if (u >= -1e-8 && v >= -1e-8 && u + v <= 1 + 1e-8) {
+                    double h = a.y + u * (b.y - a.y) + v * (c.y - a.y);
+                    if (h <= reference + .6)
+                        result = std::max(result, h);
+                }
+            }
+        }
         return result;
     }
     double render_height(double north, double west) const {

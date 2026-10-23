@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="fuel">
+
+  
+
+  <channel name="Tank_0">
+
+    
+    <fcs_function>
+      <function>
+        <difference>
+          <property>/fdm/jsbsim/fuel/fuel_flow-kg-h</property>
+          <property>/fdm/jsbsim/fuel/fuel_flow_according_to_FGTurbine-kg-h</property>
+        </difference>
+      </function>
+      <output>/fdm/jsbsim/fuel/fuel_flow_difference-kg-h</output>
+    </fcs_function>
+
+    <pure_gain>
+      <input>/fdm/jsbsim/fuel/fuel_flow_difference-kg-h</input>
+      <gain>-6.1239517e-4</gain> 
+      <output>/fdm/jsbsim/fuel/fuel_flow_correction-pps</output>
+    </pure_gain>
+
+    
+    <summer>
+      <input>/fdm/jsbsim/fuel/fuel_flow_correction-pps</input>
+      <input>-/fdm/jsbsim/fuel/fuel_flow_tank1_to_tank0-pps</input>
+      <output>/fdm/jsbsim/propulsion/tank[0]/external-flow-rate-pps</output>      
+    </summer>
+
+  </channel>
+
+  <channel name="Tank_1">
+
+    
+    <switch>
+      <default value="0" />
+      <test logic="AND" value="-13.0"> 
+        /consumables/fuel/tank[0]/level-kg LE 21.4 
+        /consumables/fuel/tank[1]/level-kg GE 0.2
+        /fdm/jsbsim/accelerations/Nz       GE 0
+      </test>
+      <output>/fdm/jsbsim/fuel/fuel_flow_tank1_to_tank0-pps</output>
+    </switch>
+
+    
+    <summer name="/fdm/jsbsim/fuel/net_flow_to_tank1">
+      <input>  fuel/fuel_flow_tank1_to_tank0-pps</input>
+      <input> -propulsion/tank[2]/external-flow-rate-pps</input>
+      <input> -propulsion/tank[3]/external-flow-rate-pps</input>
+      <input> -propulsion/tank[4]/external-flow-rate-pps</input>
+      <output> propulsion/tank[1]/external-flow-rate-pps</output>
+    </summer>
+
+  </channel>
+
+  <channel name="Tank_2">
+
+    
+    <switch>
+      <default value="0" />
+      <test logic="AND" value="-1.5"> 
+        /consumables/fuel/tank[1]/level-kg LE 730 
+        /consumables/fuel/tank[2]/level-kg GE 0.05
+        systems/fuelcontrol/control-input == 1
+      </test>
+      <output>/fdm/jsbsim/propulsion/tank[2]/external-flow-rate-pps</output>
+    </switch>
+
+  </channel>
+
+  <channel name="Tank_3">
+
+    
+    <switch>
+      <default value="0" />
+      <test logic="AND" value="-0.6"> 
+        /consumables/fuel/tank[1]/level-kg LE 930
+        /consumables/fuel/tank[3]/level-kg GE 0.05
+        /engines/engine/running == 1
+      </test>
+      <output>/fdm/jsbsim/propulsion/tank[3]/external-flow-rate-pps</output>
+    </switch>
+    
+  </channel>
+
+  <channel name="Tank_4">
+
+    
+    <switch>
+      <default value="0" />
+      <test logic="AND" value="-0.6"> 
+        /consumables/fuel/tank[1]/level-kg LE 930
+        /consumables/fuel/tank[4]/level-kg GE 0.05
+        /engines/engine/running == 1
+      </test>
+      <output>propulsion/tank[4]/external-flow-rate-pps</output>
+    </switch>
+
+  </channel>
+
+
+<property>/systems/electrical-real/inputs/battery</property>
+
+  <channel name="Drop_tank_panel_instruments">
+
+    <fcs_function name="/fdm/jsbsim/fuel/drop_tanks_empty_signal">
+      
+      <function>
+        <product>
+          
+          <difference>
+            <abs>
+              <random />
+            </abs>
+            <product>
+              <sum>
+                <property>/consumables/fuel/tank[3]/level-kg</property>
+                <property>/consumables/fuel/tank[4]/level-kg</property>
+                <value>-0.1</value>
+              </sum>
+              <property>/fdm/jsbsim/fuel/random_0_treshold</property>
+            </product>
+          </difference>
+          
+          <integer>
+            <quotient>
+              <property>/engines/engine/rpm</property>
+              <value>6500</value>
+            </quotient>
+          </integer>
+        </product>
+      </function>
+    </fcs_function>
+
+    <fcs_function name="/fdm/jsbsim/fuel/random_1">
+      <function>
+        <abs>
+          <random />
+        </abs>
+      </function>
+    </fcs_function>
+
+    <switch name="/fdm/jsbsim/fuel/drop_tanks_empty_signal_slow">
+      <default value="/fdm/jsbsim/fuel/drop_tanks_empty_signal_slow" />
+      <test value="/fdm/jsbsim/fuel/drop_tanks_empty_signal">
+        /fdm/jsbsim/fuel/random_1 GT /fdm/jsbsim/fuel/random_1_treshold
+      </test>
+    </switch>
+
+    <switch name="/fdm/jsbsim/fuel/drop_tanks_light">
+      <default value="0" />
+      <test logic="AND" value="1">
+        /fdm/jsbsim/fuel/drop_tanks_light_switch EQ 1
+        /systems/electrical-real/inputs/battery EQ 1
+        /fdm/jsbsim/fuel/drop_tanks_empty_signal_slow GE 0
+      </test>
+    </switch>
+
+  </channel>
+
+</system>

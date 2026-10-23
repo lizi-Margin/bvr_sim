@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="AVU-8-B">
+
+    <property value="0.0">systems/gauges/pneumatic/AVU-8-B/on</property>
+    <property value="0.0">systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed</property>
+    <property value="0.0">systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-deg</property>
+    <property value="0.0">systems/gauges/pneumatic/AVU-8-B/CAS-to-gauge-deg</property>
+    <property value="0.0">systems/gauges/pneumatic/AVU-8-B/mach-deg-offset</property>
+
+
+    <channel name="AVU-8-B electric" execrate="16">
+
+        <switch name="systems/gauges/pneumatic/AVU-8-B/on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/inv-primary/V GT 110.0
+                systems/electric/bus[1]/turn-indicator/fuse == 1
+            </test>
+        </switch>
+
+        
+
+    </channel>
+
+
+    <channel name="AVU-8-B set CAS and Target speed" execrate="4">
+
+        <washout_filter name="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa">
+            <input>systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <washout_filter name="systems/gauges/pneumatic/AVU-8-B/system-target-speed-kt-wa">
+            <input>/autopilot/settings/target-speed-kt</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <switch>
+            <default value="/autopilot/settings/target-speed-kt" />
+            <test logic="OR" value="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed">
+                systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa GT 0.01
+                systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa LT -0.01
+            </test>
+            <output>/autopilot/settings/target-speed-kt</output>
+        </switch>
+
+        <switch>
+            <default value="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed" />
+            <test locic="AND" value="/autopilot/settings/target-speed-kt">
+                <test logic="OR">
+                    systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa LE 0.01
+                    systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa GE -0.01
+                </test>
+                <test logic="OR">
+                    systems/gauges/pneumatic/AVU-8-B/system-target-speed-kt-wa GT 0.01
+                    systems/gauges/pneumatic/AVU-8-B/system-target-speed-kt-wa LT -0.01
+                </test>
+            </test>
+            <output>systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed</output>
+        </switch>
+
+        <fcs_function name="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-deg">
+            <description>Convert CAS Target speed to angular gauge deg</description>
+            <function>
+                <table>
+                    <independentVar lookup="row">systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed</independentVar>
+                    <tableData>
+                          0.0    0.0
+                         25.0   24.0
+                        100.0   43.0
+                        200.0  136.0
+                        300.0  187.0
+                        400.0  227.0
+                        500.0  258.0
+                        600.0  287.0
+                        700.0  311.0
+                        800.0  331.0
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/gauges/pneumatic/AVU-8-B/CAS-to-gauge-deg">
+            <description>Convert CAS to angular gauge deg</description>
+            <function>
+                <table>
+                    <independentVar lookup="row">/instrumentation/airspeed-indicator/indicated-speed-kt</independentVar>
+                    <tableData>
+                          0.0    0.0
+                         25.0   24.0
+                        100.0   43.0
+                        200.0  136.0
+                        300.0  187.0
+                        400.0  227.0
+                        500.0  258.0
+                        600.0  287.0
+                        700.0  311.0
+                        800.0  331.0
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/gauges/pneumatic/AVU-8-B/mach-deg">
+            <description>Convert CAS to angular gauge deg</description>
+            <function>
+                <difference>
+                    <sum>
+                        <p>systems/gauges/pneumatic/AVU-8-B/mach-deg-offset</p>
+                        <p>systems/gauges/pneumatic/AVU-8-B/CAS-to-gauge-deg</p>
+                    </sum>
+                    <table>
+                        <independentVar lookup="row">/instrumentation/airspeed-indicator/indicated-mach</independentVar>
+                        <tableData>
+                            0.0    0.0
+                            0.5   96.0
+                            0.6  118.0
+                            0.7  138.0
+                            0.8  162.0
+                            0.9  184.0
+                            1.0  206.0
+                            1.2  228.0
+                            1.4  250.0
+                            1.6  272.0
+                            1.8  294.0
+                            2.0  316.0
+                            2.2  338.0
+                            2.4  360.0
+                        </tableData>
+                    </table>
+                </difference>
+            </function>
+        </fcs_function>
+
+    </channel>
+
+
+    <channel name="AVU-8-B set Target speed" execrate="16">
+
+        <washout_filter name="systems/gauges/pneumatic/AVU-8-B/speed-value-wa">
+            <input>systems/autopilot/gui/speed-value</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <switch name="systems/gauges/pneumatic/AVU-8-B/speed-value-chg">
+            <default value="0" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa GT 0.01
+                    systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa LT -0.01
+                </test>
+                <test logic="OR">
+                    systems/gauges/pneumatic/AVU-8-B/speed-value-wa LE 0.01
+                    systems/gauges/pneumatic/AVU-8-B/speed-value-wa GE -0.01
+                </test>
+            </test>
+            <test logic="AND" value="2">
+                <test logic="OR">
+                    systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa LE 0.01
+                    systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed-wa GE -0.01
+                </test>
+                <test logic="OR">
+                    systems/gauges/pneumatic/AVU-8-B/speed-value-wa GT 0.01
+                    systems/gauges/pneumatic/AVU-8-B/speed-value-wa LT -0.01
+                </test>
+            </test>
+        </switch>
+
+        <switch name="systems/autopilot/gui/speed-value">
+            <default value="systems/autopilot/gui/speed-value" />
+            <test logic="AND" value="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed">
+                systems/gauges/pneumatic/AVU-8-B/speed-value-chg == 1
+            </test>
+        </switch>
+
+        <switch name="systems/autopilot/gui/speed-set-cas">
+            <default value="systems/autopilot/gui/speed-set-cas" />
+            <test logic="OR" value="1">
+                systems/gauges/pneumatic/AVU-8-B/speed-value-chg == 1
+            </test>
+        </switch>
+
+        <switch name="systems/autopilot/gui/speed-set-mph">
+            <default value="systems/autopilot/gui/speed-set-mph" />
+            <test logic="OR" value="0">
+                systems/gauges/pneumatic/AVU-8-B/speed-value-chg == 1
+            </test>
+        </switch>
+
+        <switch name="systems/autopilot/gui/speed-set-mach">
+            <default value="systems/autopilot/gui/speed-set-mach" />
+            <test logic="OR" value="0">
+                systems/gauges/pneumatic/AVU-8-B/speed-value-chg == 1
+            </test>
+        </switch>
+
+        <switch name="systems/autopilot/gui/speed-set-best-by-altitude">
+            <default value="systems/autopilot/gui/speed-set-best-by-altitude" />
+            <test logic="OR" value="0">
+                systems/gauges/pneumatic/AVU-8-B/speed-value-chg == 1
+            </test>
+        </switch>
+
+        <switch name="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed">
+            <default value="systems/gauges/pneumatic/AVU-8-B/pin-set-target-speed" />
+            <test logic="OR" value="systems/autopilot/gui/speed-value">
+                systems/gauges/pneumatic/AVU-8-B/speed-value-chg == 2
+                systems/autopilot/gui/speed-set-cas == 1
+            </test>
+        </switch>
+
+    </channel>
+
+</system>

@@ -1,0 +1,3 @@
+[
+  "Removed unwired INCIDENCE control-speed on hstab: zero-input output prevented solver tail trim; aerodynamic parameters unchanged"
+]

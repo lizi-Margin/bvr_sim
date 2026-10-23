@@ -1,0 +1,26 @@
+{
+  "set": "Tu-22-Blinder/tu22-set.xml",
+  "name": "Tupolev Tu-22 Blinder (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Tu-22-Blinder/Systems/tu22-yasim.xml",
+  "jets": 2,
+  "model": "Tu-22-Blinder/Models/tu22.xml",
+  "tags": [
+    "Tupolev",
+    "supersonic-bomber",
+    "1960s",
+    "low-wing",
+    "retractable-gear",
+    "jet",
+    "twin-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Tu-22-Blinder.zip",
+  "archive_sha256": "e085e37f3366a31d0b86041218facbc257cf5842f42724557cfc7d949dd445fb",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Tu-22-Blinder.zip"
+}

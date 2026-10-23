@@ -8,24 +8,43 @@ inline void bind_game_api(pybind11::module_ &m) {
     namespace py = pybind11;
 #define RW(T, field) .def_readwrite(#field, &T::field)
 #define RO(T, field) .def_readonly(#field, &T::field)
+    py::class_<VehicleRoute>(m, "VehicleRoute")
+        .def(py::init<>()) RW(VehicleRoute, points) RW(VehicleRoute, speed) RW(VehicleRoute, loop);
+    py::class_<GroundUnitSpec>(m, "GroundUnitSpec")
+        .def(py::init<>()) RW(GroundUnitSpec, uid) RW(GroundUnitSpec, model) RW(GroundUnitSpec, kind)
+            RW(GroundUnitSpec, team) RW(GroundUnitSpec, position) RW(GroundUnitSpec, route)
+                RW(GroundUnitSpec, missiles) RW(GroundUnitSpec, mission_target);
+    py::class_<GroundState>(m, "GroundState") RO(GroundState, uid) RO(GroundState, model)
+        RO(GroundState, kind) RO(GroundState, motion) RO(GroundState, blocked_reason)
+            RO(GroundState, contact_surface) RO(GroundState, position) RO(GroundState, velocity)
+                RO(GroundState, orientation) RO(GroundState, health) RO(GroundState, speed)
+                    RO(GroundState, waypoint) RO(GroundState, route) RO(GroundState, alive)
+                        RO(GroundState, parking) RO(GroundState, missiles_left)
+                            RO(GroundState, sensor_contacts);
     py::class_<GameConfig>(m, "GameConfig")
         .def(py::init<>()) RW(GameConfig, player_model) RW(GameConfig, enemy_model) RW(GameConfig, mission)
-            RW(GameConfig, fdm) RW(GameConfig, seed) RW(GameConfig, dt) RW(GameConfig, enemy_range)
-                RW(GameConfig, altitude) RW(GameConfig, speed) RW(GameConfig, enemy_attacks)
-                    RW(GameConfig, enemy_evasion) RW(GameConfig, player_north) RW(GameConfig, player_west)
-                        RW(GameConfig, ground_north) RW(GameConfig, ground_west) RW(GameConfig, missiles)
-                            RW(GameConfig, bombs);
+            RW(GameConfig, fdm) RW(GameConfig, library_aircraft) RW(GameConfig, seed) RW(GameConfig, dt)
+                RW(GameConfig, enemy_range) RW(GameConfig, altitude) RW(GameConfig, speed)
+                    RW(GameConfig, enemy_attacks) RW(GameConfig, enemy_evasion) RW(GameConfig, player_north)
+                        RW(GameConfig, player_west) RW(GameConfig, ground_north) RW(GameConfig, ground_west)
+                            RW(GameConfig, missiles) RW(GameConfig, bombs) RW(GameConfig, ground_units)
+                                RW(GameConfig, intercept_waves) RW(GameConfig, intercept_interval) RW(GameConfig, intercept_timeout);
     py::class_<PilotCommand>(m, "PilotCommand")
         .def(py::init<>()) RW(PilotCommand, uid) RW(PilotCommand, heading) RW(PilotCommand, pitch)
             RW(PilotCommand, throttle) RW(PilotCommand, roll_input) RW(PilotCommand, manual_roll)
+                RW(PilotCommand, roll_rate)
+                RW(PilotCommand, pitch_input) RW(PilotCommand, manual_pitch)
                 RW(PilotCommand, fire) RW(PilotCommand, drop_bomb) RW(PilotCommand, lock)
                     RW(PilotCommand, target_uid) RW(PilotCommand, weapon);
     py::class_<GameContact>(m, "GameContact") RO(GameContact, uid) RO(GameContact, sensor)
         RO(GameContact, position) RO(GameContact, velocity) RO(GameContact, locked);
+    py::class_<GameWarning>(m, "GameWarning") RO(GameWarning, uid) RO(GameWarning, bearing)
+        RO(GameWarning, range) RO(GameWarning, localized) RO(GameWarning, missile);
     py::class_<GameEntity>(m, "GameEntity") RO(GameEntity, uid) RO(GameEntity, model) RO(GameEntity, kind)
         RO(GameEntity, team) RO(GameEntity, alive) RO(GameEntity, position) RO(GameEntity, velocity)
             RO(GameEntity, orientation) RO(GameEntity, health) RO(GameEntity, mach) RO(GameEntity, pylons)
-                RO(GameEntity, throttle) RO(GameEntity, weapon_age) RO(GameEntity, motor_burning);
+                RO(GameEntity, throttle) RO(GameEntity, weapon_age) RO(GameEntity, motor_burning)
+                    RO(GameEntity, animation_properties);
     py::class_<LaunchEnvelope>(m, "LaunchEnvelope") RO(LaunchEnvelope, target_uid) RO(LaunchEnvelope, range)
         RO(LaunchEnvelope, closing_speed) RO(LaunchEnvelope, bearing) RO(LaunchEnvelope, rmax)
             RO(LaunchEnvelope, rtr) RO(LaunchEnvelope, eta) RO(LaunchEnvelope, in_range);
@@ -39,11 +58,26 @@ inline void bind_game_api(pybind11::module_ &m) {
     py::class_<GameFrame>(m, "GameFrame") RO(GameFrame, tick) RO(GameFrame, applied_command_tick)
         RO(GameFrame, sim_time) RO(GameFrame, paused) RO(GameFrame, mission) RO(GameFrame, result)
             RO(GameFrame, selected_target) RO(GameFrame, entities) RO(GameFrame, contacts)
-                RO(GameFrame, events) RO(GameFrame, missiles_left) RO(GameFrame, bombs_left)
-                    RO(GameFrame, air_kills) RO(GameFrame, ground_kills) RO(GameFrame, radar_warning)
-                        RO(GameFrame, missile_warning) RO(GameFrame, bomb_impact) RO(GameFrame, radar_mode)
-                            RO(GameFrame, rwr_mode) RO(GameFrame, enemy_behavior) RO(GameFrame, radar_range)
-                                RO(GameFrame, envelope) RO(GameFrame, missiles);
+                RO(GameFrame, warnings) RO(GameFrame, ground_units) RO(GameFrame, events)
+                    RO(GameFrame, missiles_left) RO(GameFrame, bombs_left) RO(GameFrame, air_kills)
+                        RO(GameFrame, ground_kills) RO(GameFrame, radar_warning)
+                            RO(GameFrame, missile_warning) RO(GameFrame, bomb_impact)
+                                    RO(GameFrame, mission_wave) RO(GameFrame, mission_total) RO(GameFrame, mission_kills_required) RO(GameFrame, next_wave_time)
+                                    RO(GameFrame, radar_mode) RO(GameFrame, rwr_mode)
+                                    RO(GameFrame, enemy_behavior) RO(GameFrame, radar_range)
+                                        RO(GameFrame, envelope) RO(GameFrame, missiles);
+    py::class_<ContactSurface>(m, "ContactSurface")
+        .def(py::init<>()) RW(ContactSurface, id) RW(ContactSurface, material) RW(ContactSurface, vertices)
+            RW(ContactSurface, indices) RW(ContactSurface, drivable)
+        .def("height", &ContactSurface::height)
+        .def("prepare", &ContactSurface::prepare);
+    py::class_<CollisionBox>(m, "CollisionBox")
+        .def(py::init<>()) RW(CollisionBox, id) RW(CollisionBox, center) RW(CollisionBox, half_size)
+            RW(CollisionBox, yaw);
+    py::class_<WaterRegion>(m, "WaterRegion").def(py::init<>()) RW(WaterRegion, id) RW(WaterRegion, polygon);
+    py::class_<GroundContact>(m, "GroundContact") RO(GroundContact, height) RO(GroundContact, pitch)
+        RO(GroundContact, roll) RO(GroundContact, grade) RO(GroundContact, water) RO(GroundContact, supported)
+            RO(GroundContact, surface_id);
     py::class_<TerrainTile>(m, "TerrainTile")
         .def(py::init<>()) RW(TerrainTile, origin_north) RW(TerrainTile, origin_west) RW(TerrainTile, spacing)
             RW(TerrainTile, columns) RW(TerrainTile, rows) RW(TerrainTile, heights)
@@ -53,7 +87,13 @@ inline void bind_game_api(pybind11::module_ &m) {
         .def(py::init<>()) RW(GameTerrain, origin_north) RW(GameTerrain, origin_west) RW(GameTerrain, spacing)
             RW(GameTerrain, columns) RW(GameTerrain, rows) RW(GameTerrain, heights)
                 RW(GameTerrain, detail_tiles) RO(GameTerrain, maximum_height)
+                    RW(GameTerrain, contact_surfaces) RW(GameTerrain, obstacles)
+                        RW(GameTerrain, water_regions)
         .def("height", &GameTerrain::height)
+        .def("collision_height", &GameTerrain::collision_height)
+        .def("contact", &GameTerrain::contact, py::arg("north"), py::arg("west"), py::arg("yaw") = 0,
+             py::arg("reference_height") = INFINITY, py::arg("max_step") = .6)
+        .def("prepare_surfaces", &GameTerrain::prepare_surfaces)
         .def("line_of_sight", &GameTerrain::line_of_sight);
     py::class_<GameSession>(m, "GameSession")
         .def(py::init<const std::string &>(), py::arg("log_path") = "bvr_game.log")
@@ -66,6 +106,12 @@ inline void bind_game_api(pybind11::module_ &m) {
         .def("frame", &GameSession::frame)
         .def("terrain", &GameSession::terrain)
         .def("set_terrain", &GameSession::set_terrain)
+        .def("spawn_ground", &GameSession::spawn_ground)
+        .def("set_ground_route", &GameSession::set_ground_route)
+        .def("park_ground", &GameSession::park_ground)
+        .def("begin_recording", &GameSession::begin_recording)
+        .def("end_recording", &GameSession::end_recording)
+        .def("flush_recording", &GameSession::flush_recording)
         .def("close", &GameSession::close)
         .def(
             "__enter__", [](GameSession &self) -> GameSession & { return self; },

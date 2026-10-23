@@ -1,0 +1,31 @@
+{
+  "defaults": {
+    "sim/virtual-cockpit": 0,
+    "sim/fuel-fraction": 1.0,
+    "sim/hud/visibility[1]": 1,
+    "sim/panel/visibility": 0,
+    "sim/view/internal": 1,
+    "sim/view/config/x-offset-m": 0.0,
+    "sim/view/config/y-offset-m": 0.795,
+    "sim/view/config/z-offset-m": -4.2,
+    "sim/view/config/pitch-offset-deg": -7.0,
+    "sim/view/config/default-field-of-view-deg": 60.0,
+    "sim/current-view/field-of-view": 60.0,
+    "sim/aoa-indexer/too-slow-deg": 15.0,
+    "sim/aoa-indexer/slow-deg": 14.0,
+    "sim/aoa-indexer/fast-deg": 13.0,
+    "sim/aoa-indexer/too-fast-deg": 12.0,
+    "autopilot/config/min-climb-speed-kt": 200.0,
+    "autopilot/config/best-climb-speed-kt": 300.0,
+    "autopilot/config/target-climb-rate-fpm": 3000.0,
+    "autopilot/config/target-descent-rate-fpm": 1500.0,
+    "autopilot/config/elevator-adj-factor": 5500.0,
+    "autopilot/config/integral-contribution": 0.007,
+    "autopilot/config/zero-pitch-throttle": 0.6,
+    "autopilot/config/zero-pitch-trim-full-throttle": 0.14,
+    "autopilot/config/max-roll-deg": 45.0,
+    "autopilot/config/max-aileron": 0.1
+  },
+  "external_inputs": [],
+  "policy": "source defaults; otherwise zero external inputs; no Nasal execution"
+}

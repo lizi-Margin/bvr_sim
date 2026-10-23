@@ -1,0 +1,19 @@
+{
+  "defaults": {
+    "sim/fuel-fraction": 1.0,
+    "sim/panel/visibility": 0,
+    "sim/view/internal": 1,
+    "sim/view/config/x-offset-m": 0.0,
+    "sim/view/config/y-offset-m": 0.25,
+    "sim/view/config/z-offset-m": -1.85,
+    "sim/view/config/pitch-offset-deg": -2.0,
+    "sim/submodels/serviceable": 1,
+    "yasim/he162/pilot-lb": 128.0,
+    "controls/gear/brake-parking": 1.0,
+    "controls/armament/trigger": 0,
+    "controls/armament/gunsight/power-on": 0,
+    "controls/armament/gunsight/intensity": 0.5
+  },
+  "external_inputs": [],
+  "policy": "source defaults; otherwise zero external inputs; no Nasal execution"
+}

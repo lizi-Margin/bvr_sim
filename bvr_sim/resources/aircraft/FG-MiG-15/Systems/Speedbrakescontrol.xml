@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Speed brakes control </description>
+	</fileheader>
+
+
+	<channel name="Speedbrakescontrol">
+
+
+
+		<switch name="calculations/speedbrakescontrol/control-allowed">
+			<default value="systems/speedbrakescontrol/control-command" />
+			<test logic="AND" value="systems/speedbrakescontrol/control-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/speedbrakescontrol/control-command</output>
+		</switch>
+
+		<kinematic name="calculations/speedbrakescontrol/control-pos">
+			<input>systems/speedbrakescontrol/control-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/speedbrakescontrol/control-pos</output>
+		</kinematic>
+
+		<switch name="calculations/speedbrakescontrol/control-not-allowed">
+			<default value="systems/speedbrakescontrol/control-input" />
+			<test logic="AND" value="systems/speedbrakescontrol/control-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/speedbrakescontrol/control-input</output>
+		</switch>
+
+		<switch name="calculations/speedbrakescontrol/control-switch">
+			<default value="systems/speedbrakescontrol/control-switch" />
+			<test logic="AND" value="1">
+				systems/speedbrakescontrol/control-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/speedbrakescontrol/control-pos lt 0.5
+			</test>
+			<output>systems/speedbrakescontrol/control-switch</output>
+		</switch>
+
+		<switch name="calculations/speedbrakescontrol/speedbrake-cmd-norm-real">
+			<default value="fcs/speedbrake-cmd-norm-real" />
+			<test logic="AND" value="systems/speedbrakescontrol/control-switch">
+				systems/leftpanel/serviceable eq 1
+				systems/bus/on eq 1
+			</test>
+			<output>fcs/speedbrake-cmd-norm-real</output>
+		</switch>
+
+		<switch name="calculations/speedbrakescontrol/light-pos">
+			<default value="0" />
+			<test logic="AND" value="fcs/speedbrake-pos-norm">
+				systems/leftpanel/serviceable eq 1
+				systems/bus/on eq 1
+			</test>
+			<output>systems/speedbrakescontrol/light-pos</output>
+		</switch>
+
+
+
+		<switch name="calculations/speedbrakescontrol/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/speedbrakescontrol/control-pos ge 0.25
+				systems/speedbrakescontrol/control-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

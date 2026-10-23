@@ -21,6 +21,7 @@ configure_runtime_environment()
 import glob
 import importlib
 import importlib.util
+import sys
 # I know this is ugly, but...
 try_list = [
     "bvr_sim",
@@ -73,6 +74,9 @@ def _load_local_bvr_sim_cpp():
             continue
 
         module_path = matches[0]
+        existing=sys.modules.get('bvr_sim_cpp') or sys.modules.get('bvr_sim.bvr_sim_cpp')
+        if existing is not None and os.path.realpath(getattr(existing,'__file__',''))==os.path.realpath(module_path):
+            return existing
         spec = importlib.util.spec_from_file_location("bvr_sim.bvr_sim_cpp", module_path)
         if spec is None or spec.loader is None:
             print(f"Failed to create import spec for local bvr_sim_cpp: {module_path}")
@@ -81,6 +85,9 @@ def _load_local_bvr_sim_cpp():
         _add_dll_directories(module_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
+        # Both historical import forms must share one pybind11 type registry.
+        sys.modules['bvr_sim.bvr_sim_cpp']=module
+        sys.modules['bvr_sim_cpp']=module
         print(f"Successfully loaded local bvr_sim_cpp from {module_path}")
         return module
 

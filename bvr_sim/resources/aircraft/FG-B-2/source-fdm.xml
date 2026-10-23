@@ -1,0 +1,200 @@
+<!--  B-2 spirit yasim config
+      
+      B-2 with full fuel load, no weapon load: takeoff weight approx. 320000lb
+      typical: 335000 including up to 40000lb weapon load (max. 350000lb)
+
+-->
+<!-- airplane mass varies from 158000 to 162000lb -->
+<airplane mass="160000">
+
+<!-- Approach configuration -->
+  <approach speed="160" aoa="1.0" fuel="0.7">
+    <control-setting axis="/controls/engines/engine[0]/throttle" value="0.3"/>
+    <control-setting axis="/controls/engines/engine[1]/throttle" value="0.3"/>
+    <control-setting axis="/controls/engines/engine[2]/throttle" value="0.3"/>
+    <control-setting axis="/controls/engines/engine[3]/throttle" value="0.3"/>
+    <control-setting axis="/controls/flight/flaps" value="0"/>
+    <control-setting axis="/controls/flight/spoilers" value="0.80"/>
+    <control-setting axis="/controls/gear/gear-down" value="1"/>
+  </approach>
+
+<!-- Cruise configuration -->
+<!-- I found the following performance figures
+     140 mph (122 kt) approach
+     530 mph (460 kt) @ 40000 ft
+     515 mph (447 kt) @ 37000 ft (cruising speed)
+     485 mph (421 kt) @ sea level
+     
+-->
+  <cruise speed="460" alt="40000" fuel="0.5">
+    <control-setting axis="/controls/engines/engine[0]/throttle" value="0.6"/>
+    <control-setting axis="/controls/engines/engine[1]/throttle" value="0.6"/>
+    <control-setting axis="/controls/engines/engine[2]/throttle" value="0.6"/>
+    <control-setting axis="/controls/engines/engine[3]/throttle" value="0.6"/>
+    <control-setting axis="/controls/flight/flaps" value="0"/>
+    <control-setting axis="/controls/flight/spoilers" value="0.0"/>
+    <control-setting axis="/controls/gear/gear-down" value="0.0"/>
+  </cruise>
+
+  <cockpit x="-2.4" y="0.0" z="1.2"/>
+
+  <!-- the 3 fuselages below are used for the wide body-->
+  <fuselage ax="0" ay="0" az="0" bx="-20.90" by="0" bz="-0.2"
+            width="3.7" taper="0.3" midpoint="0.4"/>
+  <!--<fuselage ax="-4" ay="-3.3" az="-0.3" bx="-15" by="-3.3" bz="-0.3"
+	    width="2.4" taper="0.2" midpoint="0.3"/>
+  <fuselage ax="-4" ay="3.3" az="-0.3" bx="-15" by="3.3" bz="-0.3"
+	    width="2.4" taper="0.2" midpoint="0.3"/>-->
+  <!-- Engines left and right-->
+  <fuselage ax="-6.8" ay="3.8" az="1" bx="-13.2" by="3.8" bz="1"
+	    width="1.5" taper="0.35" midpoint="0.3"/>
+  <fuselage ax="-6.8" ay="-3.8" az="1" bx="-13.2" by="-3.8" bz="1"
+	    width="1.5" taper="0.35" midpoint="0.3"/>-->
+
+
+	  <!-- Wing idrag="0.03"-->
+
+<!-- Wing hosts 2 main controls: aileron and rudder(drag), and never ever get your hands off the rudder control since it is permanently in use to keep direction-->
+  <wing x="-5.0" y="1.6" z="0.0" taper="0.6" incidence="1" twist="-3"
+        length="27.5" chord="9.0" sweep="31.0" dihedral="1.0" camber="0.005">
+    <stall aoa="25.0" width="8" peak="1.4"/>
+    <flap0 start="0.5" end="0.7" lift="1.4" drag="1.3"/>
+    <flap1 start="0.7" end="0.95" lift="1.01" drag="9.0"/>
+    <spoiler start="0.7" end="0.95" lift="0.0" drag="6"/>
+    
+    <control-input axis="/controls/flight/aileron" control="FLAP0" split="true"/>
+    <control-input axis="/controls/flight/rudder" control="FLAP1" split="true" invert="true"/>
+    <control-input axis="/controls/flight/rudder-trim" control="FLAP1" split="true" invert="true"/>
+    <!-- rudder-trim used for yaw stability via autopilot -->
+    <control-input axis="/controls/flight/spoilers" control="SPOILER"/>
+
+    <control-output control="FLAP1" side="left" prop="/surface-positions/rudder-pos-norm"/>
+    <control-output control="FLAP1" side="right" prop="/surface-positions/rudder-pos-norm"/>
+    <control-output control="FLAP0" side="left" prop="/surface-positions/left-aileron-pos-norm"/>
+    <control-output control="FLAP0" side="right" prop="/surface-positions/right-aileron-pos-norm"/>
+    <control-output control="SPOILER" side="left" prop="/surface-positions/left-spoiler-pos-norm"/>
+    <control-output control="SPOILER" side="right" prop="/surface-positions/right-spoiler-pos-norm"/>
+
+    <control-speed control="FLAP0" transition-time="0.5"/>
+    <control-speed control="FLAP1" transition-time="0.5"/>
+    <control-speed control="SPOILER" transition-time="1.5"/>
+  </wing>
+
+<!-- Hstab -->
+  <hstab x="-13.0" y="1.0" z="0.0" taper="0.3" effectiveness="1.0" incidence="0"
+         length="9.0" chord="6.0" sweep="30.0" dihedral="0.0" camber="0.0">
+    <stall aoa="20.0" width="5" peak="1.5"/>
+    <flap0 start="0.3" end="1" lift="1.4" drag="1.4"/>
+
+    <control-input axis="/controls/flight/elevator" control="FLAP0"/>
+    <control-input axis="/controls/flight/elevator-trim" control="FLAP0"/>
+     <!--<control-input axis="/controls/flight/elevator-incidence-deg" src0="-1" src1="1" dst0="-4" dst1="9" control="INCIDENCE"/>-->
+
+    <control-output control="FLAP0" prop="/surface-positions/right-elevator-pos-norm"/>
+    <control-output control="FLAP0" prop="/surface-positions/left-elevator-pos-norm"/>
+    <!-- <control-output control="INCIDENCE" prop="/surface-positions/elevator-incidence-deg"/>-->
+
+    <control-speed control="FLAP0" transition-time="1.0"/>
+    <control-speed control="INCIDENCE" transition-time="0.05"/>
+  </hstab>
+
+
+  <!-- mstab used for the beaver tail, glas(flaps control) used to pitch down the aircraft -->
+  <mstab x="-19.0" y="0.0" z="-0.3" taper="0.3" incidence="0"
+	 length="5" chord="5.0" sweep="-20.0" dihedral="0.0" camber="0.0">
+	  <stall aoa="25.0" width="5" peak="1.5"/>
+	  
+	  <flap0 start="0.0" end="0.7" lift="1.3" drag="1.3"/>
+	  
+	  <control-input axis="/controls/flight/flaps" control="FLAP0"/>
+	  <control-output control="FLAP0" prop="/surface-positions/left-flap-pos-norm"/>
+	  <control-speed control="FLAP0" transition-time="1.5"/>
+  </mstab>
+
+  <!-- no vstab used, yaw controlled by drag using rudder input - "Look ma, no hands!" -->
+
+<!-- engines are rated 19000lb each (4x) -->
+
+<!-- left wing engines original - tsfc=0.67, but recalculated to meet range/fuel load data (>6000nm/160000lb) -->
+
+<jet x="-9.3" y="4.3" z="0.9" mass="3200" tsfc="0.44" thrust="19000">
+	<actionpt x="-13.1" y="4.3" z="0.1"/>
+	<control-input axis="/controls/engines/engine[0]/throttle" control="THROTTLE"/>
+</jet>
+
+<jet x="-9.3" y="3" z="0.9" mass="3200" tsfc="0.44" thrust="19000">
+	<actionpt x="-13.1" y="3" z="0.1"/>
+	<control-input axis="/controls/engines/engine[1]/throttle" control="THROTTLE"/>
+</jet>
+
+<!-- right wing engines -->
+
+<jet x="-9.3" y="-3" z="0.9" mass="3200" tsfc="0.44" thrust="19000">
+	<actionpt x="-13.1" y="-3" z="0.1"/>
+	<control-input axis="/controls/engines/engine[2]/throttle" control="THROTTLE"/>
+</jet>
+
+<jet x="-9.3" y="-4.3" z="0.9" mass="3200" tsfc="0.44" thrust="19000">
+	<actionpt x="-13.1" y="-4.3" z="0.1"/>
+	<control-input axis="/controls/engines/engine[3]/throttle" control="THROTTLE"/>
+  </jet>
+
+<!-- Landing Gear -->
+<!-- front -->
+  <gear x="-1.4" y="0.0" z="-2.90" retract-time="14" compression="1.0" spring="1.3">
+    <control-input axis="/controls/flight/rudder" control="STEER" square="true"/>
+    <control-input axis="/controls/gear/gear-down" control="EXTEND"/>
+    <control-input axis="/controls/gear/brake-left" control="BRAKE"/>
+    <control-input axis="/controls/gear/brake-right" control="BRAKE"/>
+    <control-input axis="/controls/gear/brake-parking" control="BRAKE"/>
+    <control-speed control="EXTEND" transition-time="14"/>
+    <control-speed control="BRAKE" transition-time="0.7"/>
+    <control-output control="EXTEND" prop="/gear/gear[0]/position-norm"/>
+  </gear>
+
+
+<!-- rear left -->
+  <gear x="-11.9" y="5.9" z="-2.8" retract-time="12" compression="0.9" spring="1.2">
+    <control-input axis="/controls/gear/gear-down" control="EXTEND"/>
+    <control-input axis="/controls/gear/brake-left" control="BRAKE"/>
+    <control-input axis="/controls/gear/brake-parking" control="BRAKE"/>
+    <control-speed control="EXTEND" transition-time="12"/>
+    <control-speed control="BRAKE" transition-time="0.7"/>
+    <control-output control="EXTEND" prop="/gear/gear[1]/position-norm"/>
+  </gear>
+
+<!-- rear right -->
+  <gear x="-11.9" y="-5.9" z="-2.8" retract-time="12" compression="0.9" spring="1.2">
+    <control-input axis="/controls/gear/gear-down" control="EXTEND"/>
+    <control-input axis="/controls/gear/brake-right" control="BRAKE"/>
+    <control-input axis="/controls/gear/brake-parking" control="BRAKE"/>
+    <control-speed control="EXTEND" transition-time="12"/>
+    <control-speed control="BRAKE" transition-time="0.7"/>
+    <control-output control="EXTEND" prop="/gear/gear[2]/position-norm"/>
+  </gear>
+  
+  <!-- Canopy / Cockpit access behind front gear
+  <gear x="-5.0" y="0.0" z="0.0" retract-time="6" compression="0.6">
+	  <control-input axis="/controls/gear/brake-parking" control="EXTEND"/>
+	  <control-speed control="EXTEND" transition-time="6"/>
+	  <control-output control="EXTEND" prop="/canopy/position-norm"/>
+  </gear>-->
+  
+
+
+<!-- Fuel tanks total 160000 (ground start) to 200000 (in flight refueling) -->
+<!-- I had no idea of their position,so I put main tank forward(to put CG forward) and the others into wings -->
+  <tank x="-9.0" y="8.0" z="-0.5" capacity="35000"/>
+  <tank x="-9.0" y="-8.0" z="-0.5" capacity="35000"/>
+  <tank x="-7.0" y="0.0" z="-0.5" capacity="30000"/>
+  <tank x="-7.0" y="0.0" z="-0.5" capacity="30000"/>
+  <tank x="-9.0" y="10.0" z="0.0" capacity="15000"/>
+  <tank x="-9.0" y="-10.0" z="0.0" capacity="15000"/>
+
+<!-- ballast used to trim the aircraft -->
+<ballast x="-20.0" y="0" z="0" mass="-10000"/>
+<ballast x="-5.0" y="0" z="-0.5" mass="40000"/>
+<ballast x="-8.0" y="2" z="0" mass="20000"/>
+<ballast x="-8.0" y="-2" z="0" mass="20000"/>
+
+</airplane>

@@ -1,0 +1,30 @@
+{
+  "set": "eurofighter/typhoon-set.xml",
+  "name": "EFA Typhoon: AP 2.0 compatible",
+  "fdm_type": "yasim",
+  "fdm": "eurofighter/typhoon-yasim.xml",
+  "jets": 2,
+  "model": "eurofighter/Models/Typhoon.xml",
+  "tags": [
+    "fighter",
+    "1990s",
+    "2000s",
+    "2010s",
+    "canard",
+    "delta",
+    "glass-cockpit",
+    "hud",
+    "ifr",
+    "retractable-gear",
+    "supersonic",
+    "afterburner",
+    "jet"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "eurofighter.zip",
+  "archive_sha256": "60ca2d2bebc2cfba62d29fde1672ec2e2c23738c9f3ce7b797c14eb3ba938824",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/eurofighter.zip"
+}

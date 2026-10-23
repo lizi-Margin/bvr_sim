@@ -1,0 +1,28 @@
+{
+  "set": "Embraer-ERJ-145/erj145-set.xml",
+  "name": "Embraer ERJ 145 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Embraer-ERJ-145/Systems/erj145-yasim.xml",
+  "jets": 2,
+  "model": "Embraer-ERJ-145/Models/erj145.xml",
+  "tags": [
+    "Embraer",
+    "transport",
+    "1990s",
+    "2000s",
+    "twin-engine",
+    "jet",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Embraer-ERJ-145.zip",
+  "archive_sha256": "23ae16d0b28ee841fcfe2adcef82d1b9189bd51c8af1cd4fcc652e0f5a1af3b2",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Embraer-ERJ-145.zip"
+}

@@ -1,0 +1,65 @@
+{
+  "files": [
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "cj610",
+      "source": "Hansajet/Engines/cj610.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "direct",
+      "source": "Hansajet/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "cj610",
+      "source": "Hansajet/Engines/cj610.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "direct",
+      "source": "Hansajet/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "pushback",
+      "source": "Hansajet/Systems/pushback.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "Fuel",
+      "source": "Hansajet/Systems/Fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "Engines",
+      "source": "Hansajet/Systems/Engines.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "DC",
+      "source": "Hansajet/Systems/DC.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "CG",
+      "source": "Hansajet/Systems/CG.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "Hansajet/Hansajet-jsbsim.xml",
+      "reference": "Gear",
+      "source": "Hansajet/Systems/Gear.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

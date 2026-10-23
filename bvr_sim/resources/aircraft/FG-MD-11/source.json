@@ -1,0 +1,28 @@
+{
+  "set": "MD-11/MD-11-GE-set.xml",
+  "name": "McDonnell Douglas MD-11 (CF6-80C2D1F)",
+  "fdm_type": "jsb",
+  "fdm": "MD-11/FDE/MD-11-GE.xml",
+  "jets": 0,
+  "model": "MD-11/Models/MD-11-GE.xml",
+  "tags": [
+    "transport",
+    "douglas",
+    "mc-donnell-douglas",
+    "1990s",
+    "2000s",
+    "ifr",
+    "retractable-gear",
+    "glass-cockpit",
+    "pressurised",
+    "jet",
+    "3-engine"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 5,
+  "variant_of": "",
+  "archive": "MD-11.zip",
+  "archive_sha256": "dd88a2b708a5ea41737852f66ce6e9dd2d30ca4d51565e403e28c66cc59d100e",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MD-11.zip"
+}

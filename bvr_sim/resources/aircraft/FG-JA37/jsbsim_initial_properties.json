@@ -1,0 +1,19 @@
+{
+  "instruments/gunsight[0]/GA": 0.0,
+  "instruments/gunsight[0]/VM": 3383.3,
+  "instruments/gunsight[0]/GAIN": 0.8,
+  "instruments/gunsight[0]/HUDY": 0.0,
+  "instruments/gunsight[0]/HUDZ": 5.3,
+  "instruments/gunsight[0]/KB": 0.00614,
+  "instruments/gunsight[1]/GA": 0.0,
+  "instruments/gunsight[1]/VM": 3383.3,
+  "instruments/gunsight[1]/GAIN": 0.8,
+  "instruments/gunsight[1]/HUDY": 0.0,
+  "instruments/gunsight[1]/HUDZ": 5.3,
+  "instruments/gunsight[1]/KB": 0.00614,
+  "fcs/elevon/pitch-gearing-feedback": 22.0,
+  "fcs/elevon/roll-gearing-feedback": 15.0,
+  "fcs/drivers/roll/stick-geared": 0.0,
+  "fcs/drivers/pitch/stick-geared": 0.0,
+  "fcs/drivers/series-trim/mach-switch-feedback": 0.0
+}

@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fdm_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="G91" version="2.0" release="ALPHA" xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd">
+    
+    
+    
+    <fileheader>
+        <author> Aeromatic v 0.95, Adriano Bassignana (abassign), Necolatis, Joshua Davidson (it0uchpods) </author>
+        <filecreationdate>2015-08-01</filecreationdate>
+        <version> ALPHA</version>
+        <description> G91 JSBsim </description>
+    </fileheader>
+    
+    
+    
+    
+    
+    <system file="G91-context" />
+    <system file="G91-active-stability" />
+    <system file="G91-fuel" />
+    <system file="G91-electric" />
+    <system file="G91-manual-switches" />
+    <system file="G91-handle-switches" />
+    <system file="G91-hydraulic" />
+    <system file="G91-gears" />
+    <system file="G91-landing-gear" />
+    <system file="G91-brakes" />
+    <system file="G91-lightning" />
+    <system file="G91-canopy" />
+    <system file="G91-airbrake" />
+    <system file="G91-JATO" />
+    <system file="G91-starter" />
+    <system file="G91-engine" />
+    <system file="G91-engine-sound" />
+    <system file="G91-servo-wings" />
+    <system file="G91-gauges" />
+    <system file="G91-warning-lights" />
+    <system file="G91-climate" />
+    <system file="G91-autopilot" />
+    <system file="G91-dragchute" />
+    <system file="G91-oxygen" />
+    <system file="G91-camera" />
+    <system file="G91-guns" />
+    <system file="G91-store" />
+    <system file="G91-stations" />
+    <system file="G91-stations-hardpoint-hook" />
+    <system file="G91-army" />
+    <system file="G91-army" />
+    <system file="G91-mass-balance-modifier" />
+    
+    
+    <system file="PHI" />
+    <system file="radio-PTR175" />
+    <system file="UHF-emergency" />
+    <system file="ADF-MARCONI-8283" />
+    <system file="TACAN-NAV-ARN-21" />
+    <system file="gyrocompass" />
+    <system file="compass-flux-gate" />
+    <system file="ATC-transponder" />
+    <system file="AAU-37A" />
+    <system file="AVU-8-B" />
+    <system file="Altimeter-5934PA" />
+
+    
+    <metrics file="Systems/G91-metrics" />
+    <mass_balance file="Systems/G91-mass-balance" />
+    <ground_reactions file="Systems/G91-ground-reactions" />
+    <external_reactions file="Systems/G91-external-reactions" />
+    
+    <propulsion file="Systems/G91-propulsion" />
+    <flight_control file="Systems/G91-FCS" />
+    <aerodynamics file="Systems/G91-aerodynamics" />
+
+</fdm_config>

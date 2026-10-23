@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-11: Libraries">
+	
+	<channel name="FDM Rate Libraries">
+		
+		<switch name="position/wow">
+			<default value="0" />
+			<test logic="OR" value="1">
+				gear/unit[0]/WOW eq 1
+				gear/unit[1]/WOW eq 1
+				gear/unit[2]/WOW eq 1
+			</test>
+			<output>/position/wow</output> 
+		</switch>
+		
+		<switch name="aero/alpha-deg-fixed">
+			<default value="0" />
+			<test value="aero/alpha-deg">
+				gear/unit[0]/WOW eq 0
+			</test>
+		</switch>
+		
+		<lag_filter name="aero/alpha-deg-damped">
+			<input>aero/alpha-deg-fixed</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<fcs_function name="position/gear-agl">
+			<function>
+				<difference>
+					<property>/position/altitude-agl-ft</property>
+					<value>17.1</value>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="position/gear-agl-ft">
+			<input>position/gear-agl</input>
+			<c1>20</c1>
+			<output>/position/gear-agl-ft</output> 
+		</lag_filter>
+		
+		<summer name="inertia/zfw-lbs">
+			<input>inertia/weight-lbs</input>
+			<input>-propulsion/total-fuel-lbs</input>
+		</summer>
+		
+		<pure_gain name="inertia/weight-kg">
+			<input>inertia/weight-lbs</input>
+			<gain>0.45359237</gain>
+		</pure_gain>
+		
+		<fcs_function name="inertia/cg-percent-mac">
+			<function>
+				<product>
+					<quotient>
+						<difference>
+							<product>
+								<property>inertia/cg-x-in</property>
+								<value>0.0254</value> 
+							</product>
+							<value>0.24116</value> 
+						</difference>
+						<value>7.68</value> 
+					</quotient>
+					<value>100</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="inertia/zfwcg-x-in">
+			<function>
+				<quotient> 
+					<sum>
+						<product>
+							<property>inertia/empty-weight-lbs</property>
+							<property>inertia/empty-weight-x-in</property>
+						</product>
+						<product>
+							<property>inertia/pointmass-weight-lbs[0]</property>
+							<property>inertia/pointmass-location-X-inches[0]</property>
+						</product>
+						<product>
+							<property>inertia/pointmass-weight-lbs[1]</property>
+							<property>inertia/pointmass-location-X-inches[1]</property>
+						</product>
+						<product>
+							<property>inertia/pointmass-weight-lbs[2]</property>
+							<property>inertia/pointmass-location-X-inches[2]</property>
+						</product>
+						<product>
+							<property>inertia/pointmass-weight-lbs[3]</property>
+							<property>inertia/pointmass-location-X-inches[3]</property>
+						</product>
+						<product>
+							<property>inertia/pointmass-weight-lbs[4]</property>
+							<property>inertia/pointmass-location-X-inches[4]</property>
+						</product>
+						<product>
+							<property>inertia/pointmass-weight-lbs[5]</property>
+							<property>inertia/pointmass-location-X-inches[5]</property>
+						</product>
+					</sum>
+					<sum>
+						<property>inertia/empty-weight-lbs</property>
+						<property>inertia/pointmass-weight-lbs[0]</property>
+						<property>inertia/pointmass-weight-lbs[1]</property>
+						<property>inertia/pointmass-weight-lbs[2]</property>
+						<property>inertia/pointmass-weight-lbs[3]</property>
+						<property>inertia/pointmass-weight-lbs[4]</property>
+						<property>inertia/pointmass-weight-lbs[5]</property>
+					</sum>
+				</quotient>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="inertia/zfwcg-percent-mac"> 
+			<function>
+				<product>
+					<quotient>
+						<difference>
+							<product>
+								<property>inertia/zfwcg-x-in</property>
+								<value>0.0254</value> 
+							</product>
+							<value>0.24116</value> 
+						</difference>
+						<value>7.68</value> 
+					</quotient>
+					<value>100</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/orientation/track-magnetic-deg-switched">
+			<default value="/orientation/heading-magnetic-deg" />
+			<test logic="AND" value="/orientation/track-magnetic-deg">
+				/velocities/groundspeed-kt ge 1
+			</test>
+		</switch>
+		
+		<switch name="/orientation/track-deg-switched">
+			<default value="/orientation/heading-deg" />
+			<test logic="AND" value="/orientation/track-deg">
+				/velocities/groundspeed-kt ge 1
+			</test>
+		</switch>
+		
+		<switch name="contact/any-wow"> 
+			<default value="0" />
+			<test logic="OR" value="1">
+				contact/unit[4]/WOW eq 1
+				contact/unit[5]/WOW eq 1
+				contact/unit[6]/WOW eq 1
+				contact/unit[7]/WOW eq 1
+				contact/unit[8]/WOW eq 1
+				contact/unit[9]/WOW eq 1
+				contact/unit[10]/WOW eq 1
+				contact/unit[11]/WOW eq 1
+				contact/unit[12]/WOW eq 1
+				contact/unit[13]/WOW eq 1
+				contact/unit[14]/WOW eq 1
+				contact/unit[15]/WOW eq 1
+				contact/unit[16]/WOW eq 1
+			</test>
+			<output>contact/any-wow-out</output>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Execrate 8 Libraries" execrate="8">
+		
+		<switch name="/systems/engines/any-engine-on">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/engines/engine[0]/state eq 3
+				/engines/engine[1]/state eq 3
+				/engines/engine[2]/state eq 3
+			</test>
+		</switch>
+		
+		<switch name="/systems/engines/any-engine-out">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/engines/engine[0]/state ne 3
+				/engines/engine[1]/state ne 3
+				/engines/engine[2]/state ne 3
+			</test>
+		</switch>
+		
+		<switch name="/systems/engines/multi-engine-out">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/engines/engine[0]/state ne 3
+				/engines/engine[1]/state ne 3
+			</test>
+			<test logic="AND" value="1">
+				/engines/engine[0]/state ne 3
+				/engines/engine[2]/state ne 3
+			</test>
+			<test logic="AND" value="1">
+				/engines/engine[1]/state ne 3
+				/engines/engine[2]/state ne 3
+			</test>
+		</switch>
+		
+		<switch name="/systems/engines/two-engine-on">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/engines/engine[0]/state eq 3
+				/engines/engine[1]/state eq 3
+			</test>
+			<test logic="AND" value="1">
+				/engines/engine[0]/state eq 3
+				/engines/engine[2]/state eq 3
+			</test>
+			<test logic="AND" value="1">
+				/engines/engine[1]/state eq 3
+				/engines/engine[2]/state eq 3
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/libraries/blink-fast">
+			<function>
+				<floor>
+					<mod>
+						<product>
+							<property>sim-time-sec</property>
+							<value>3.5</value>
+						</product>
+						<value>2</value>
+					</mod>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/libraries/blink-med">
+			<function>
+				<floor>
+					<mod>
+						<product>
+							<property>sim-time-sec</property>
+							<value>2.5</value>
+						</product>
+						<value>2</value>
+					</mod>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/libraries/blink-med-2">
+			<function>
+				<floor>
+					<mod>
+						<product>
+							<sum>
+								<property>sim-time-sec</property>
+								<value>1</value>
+							</sum>
+							<value>2.5</value>
+						</product>
+						<value>2</value>
+					</mod>
+				</floor>
+			</function>
+		</fcs_function>
+	
+	</channel>
+
+</system>

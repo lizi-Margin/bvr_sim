@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='utf-8'?>
+<propulsion>
+  <engine file="F100-PW-229">
+   
+   <feed>4</feed>
+   <feed>5</feed>
+   
+   
+   <thruster file="direct">
+    <location unit="M">
+     <x> 4.2077 </x>
+     <y> 0 </y>
+     <z> 0 </z>
+    </location>
+    <orient unit="DEG">
+     <roll> 0.0 </roll>
+     <pitch> 0.0 </pitch>
+     <yaw> 0.0 </yaw>
+    </orient>
+   </thruster>
+  </engine>
+  
+  <refuel-rate unit="LBS/MIN"> 6000 </refuel-rate>
+  <dump-rate unit="LBS/MIN"> 1000 </dump-rate>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> -51.5 </x>
+   <y> 0 </y>
+   <z> 0 </z>
+   </location>
+   <capacity unit="LBS"> 2550.0 </capacity>
+   <contents unit="LBS"> 2550.0 </contents>
+   <type>JP-8</type>
+   <priority> 5 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> 8.5 </x>
+   <y> -80 </y>
+   <z>   0 </z>
+   </location>
+   <capacity unit="LBS"> 550 </capacity>
+   <contents unit="LBS"> 550 </contents>
+   <type>JP-8</type>
+   <priority> 4 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> 8.5 </x>
+   <y>  80 </y>
+   <z>   0 </z>
+   </location>
+   <capacity unit="LBS"> 550 </capacity>
+   <contents unit="LBS"> 550 </contents>
+   <type>JP-8</type>
+   <priority> 4 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> 68.5 </x>
+   <y> 0 </y>
+   <z> 0 </z>
+   </location>
+   <capacity unit="LBS"> 2550.0 </capacity>
+   <contents unit="LBS"> 2550.0 </contents>
+   <type>JP-8</type>
+   <priority> 5 </priority>
+  </tank>
+  <tank type="FUEL"> 
+    <location unit="IN">
+    <x> -51.5 </x>
+   <y> 0 </y>
+   <z> 0 </z>
+   </location>
+   <capacity unit="LBS"> 480.0 </capacity>
+   <contents unit="LBS"> 480.0 </contents>
+   <type>JP-8</type>
+   <priority> 6 </priority>
+  </tank>
+  <tank type="FUEL"> 
+    <location unit="IN">
+    <x> 68.5 </x>
+   <y> 0 </y>
+   <z> 0 </z>
+   </location>
+   <capacity unit="LBS"> 480.0 </capacity>
+   <contents unit="LBS"> 480.0 </contents>
+   <type>JP-8</type>
+   <priority> 6 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> -16.5 </x>
+   <y> -64.129 </y>
+   <z> -40 </z>
+   </location>
+   <capacity unit="LBS"> 3996 </capacity>
+   <contents unit="LBS"> 0 </contents>
+   <type>JP-8</type>
+   <priority> 3 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> -16.5 </x>
+   <y> 64.129 </y>
+   <z> -40 </z>
+   </location>
+   <capacity unit="LBS"> 3996 </capacity>
+   <contents unit="LBS"> 0 </contents>
+   <type>JP-8</type>
+   <priority> 3 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+    <x> -16.5 </x>
+   <y>   0 </y>
+   <z> -50 </z>
+   </location>
+   <capacity unit="LBS"> 1998 </capacity>
+   <contents unit="LBS"> 0 </contents>
+   <type>JP-8</type>
+   <priority> 2 </priority>
+  </tank>
+  <tank type="FUEL"> 
+   <location unit="IN">
+   <x> 8.5 </x>
+   <y> 0 </y>
+   <z> 8.0 </z>
+   </location>
+   <capacity unit="LBS"> 3050 </capacity>
+   <contents unit="LBS"> 0 </contents>
+   <type>JP-8</type>
+   <priority> 2 </priority>
+  </tank>
+ </propulsion>

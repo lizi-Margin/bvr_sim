@@ -1,0 +1,2885 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-80: Instrumentation">
+	
+	<channel name="Airspeed Indicators" execrate="2">
+		
+		<fcs_function name="/it-autoflight/input/mach-kts-equiv">
+			<function>
+				<product>
+					<quotient>
+						<property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+						<max> 
+							<property>/instrumentation/airspeed-indicator/indicated-mach</property>
+							<value>0.0001</value>
+						</max>
+					</quotient>
+					<property>/it-autoflight/input/mach</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		
+		<switch name="/instrumentation/airspeed-indicator[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/airspeed-indicator[0]/speed-kt-input">
+			<default value="/instrumentation/airspeed-indicator[0]/speed-kt-input" />
+			<test value="/instrumentation/airspeed-indicator/indicated-speed-kt">
+				/instrumentation/airspeed-indicator[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/airspeed-indicator[0]/speed-kt-actuator">
+			<input>/instrumentation/airspeed-indicator[0]/speed-kt-input</input>
+			<rate_limit>100</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/speed-kt">
+			<input>/instrumentation/airspeed-indicator[0]/speed-kt-actuator</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/airspeed-indicator[0]/mach-input">
+			<default value="/instrumentation/airspeed-indicator[0]/mach-input" />
+			<test value="/instrumentation/airspeed-indicator/indicated-mach-slow">
+				/instrumentation/airspeed-indicator[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[0]/mach-digit-cmd">
+			<function>
+				<floor>
+					<sum>
+						<product>
+							<property>/instrumentation/airspeed-indicator[0]/mach-input</property>
+							<value>1000</value>
+						</product>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+			<clipto>
+				<min>150</min>
+				<max>999</max>
+			</clipto>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/mach-digit-input">
+			<input>/instrumentation/airspeed-indicator[0]/mach-digit-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[0]/mach-digit-d100">
+			<function>
+				<quotient>
+					<property>/instrumentation/airspeed-indicator[0]/mach-digit-input</property>
+					<value>100</value>
+				</quotient>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[0]/mach-digit-d10">
+			<function>
+				<product>
+					<fraction>
+						<quotient>
+							<property>/instrumentation/airspeed-indicator[0]/mach-digit-input</property>
+							<value>100</value>
+						</quotient>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[0]/mach-digit-d1">
+			<function>
+				<product>
+					<fraction>
+						<quotient>
+							<property>/instrumentation/airspeed-indicator[0]/mach-digit-input</property>
+							<value>10</value>
+						</quotient>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/instrumentation/airspeed-indicator[0]/vmo-mmo-input">
+			<default value="/instrumentation/airspeed-indicator[0]/vmo-mmo-input" />
+			<test value="/systems/dfgs/speeds/vmo-mmo">
+				/instrumentation/airspeed-indicator[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/vmo-mmo">
+			<input>/instrumentation/airspeed-indicator[0]/vmo-mmo-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/airspeed-indicator[0]/bug-kts-input">
+			<default value="/instrumentation/airspeed-indicator[0]/bug-kts-input" />
+			<test logic="AND" value="/it-autoflight/input/mach-kts-equiv">
+				/instrumentation/airspeed-indicator[0]/power-avail eq 1
+				/it-autoflight/input/kts-mach-fgcp eq 1
+			</test>
+			<test value="/it-autoflight/input/kts">
+				/instrumentation/airspeed-indicator[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/bug-kts">
+			<input>/instrumentation/airspeed-indicator[0]/bug-kts-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/pointer-1">
+			<input>/instrumentation/airspeed-indicator/pointer-1-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/pointer-2">
+			<input>/instrumentation/airspeed-indicator/pointer-2-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[0]/pointer-3">
+			<input>/instrumentation/airspeed-indicator/pointer-3-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/airspeed-indicator[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-radio-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/airspeed-indicator[1]/speed-kt-input">
+			<default value="/instrumentation/airspeed-indicator[1]/speed-kt-input" />
+			<test value="/instrumentation/airspeed-indicator/indicated-speed-kt">
+				/instrumentation/airspeed-indicator[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/airspeed-indicator[1]/speed-kt-actuator">
+			<input>/instrumentation/airspeed-indicator[1]/speed-kt-input</input>
+			<rate_limit>100</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/speed-kt">
+			<input>/instrumentation/airspeed-indicator[1]/speed-kt-actuator</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/airspeed-indicator[1]/mach-input">
+			<default value="/instrumentation/airspeed-indicator[1]/mach-input" />
+			<test value="/instrumentation/airspeed-indicator/indicated-mach-slow">
+				/instrumentation/airspeed-indicator[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[1]/mach-digit-cmd">
+			<function>
+				<floor>
+					<sum>
+						<product>
+							<property>/instrumentation/airspeed-indicator[1]/mach-input</property>
+							<value>1000</value>
+						</product>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+			<clipto>
+				<min>150</min>
+				<max>999</max>
+			</clipto>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/mach-digit-input">
+			<input>/instrumentation/airspeed-indicator[1]/mach-digit-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[1]/mach-digit-d100">
+			<function>
+				<quotient>
+					<property>/instrumentation/airspeed-indicator[1]/mach-digit-input</property>
+					<value>100</value>
+				</quotient>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[1]/mach-digit-d10">
+			<function>
+				<product>
+					<fraction>
+						<quotient>
+							<property>/instrumentation/airspeed-indicator[1]/mach-digit-input</property>
+							<value>100</value>
+						</quotient>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/airspeed-indicator[1]/mach-digit-d1">
+			<function>
+				<product>
+					<fraction>
+						<quotient>
+							<property>/instrumentation/airspeed-indicator[1]/mach-digit-input</property>
+							<value>10</value>
+						</quotient>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/instrumentation/airspeed-indicator[1]/vmo-mmo-input">
+			<default value="/instrumentation/airspeed-indicator[1]/vmo-mmo-input" />
+			<test value="/systems/dfgs/speeds/vmo-mmo">
+				/instrumentation/airspeed-indicator[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/vmo-mmo">
+			<input>/instrumentation/airspeed-indicator[1]/vmo-mmo-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/airspeed-indicator[1]/bug-kts-input">
+			<default value="/instrumentation/airspeed-indicator[1]/bug-kts-input" />
+			<test logic="AND" value="/it-autoflight/input/mach-kts-equiv">
+				/instrumentation/airspeed-indicator[1]/power-avail eq 1
+				/it-autoflight/input/kts-mach-fgcp eq 1
+			</test>
+			<test value="/it-autoflight/input/kts">
+				/instrumentation/airspeed-indicator[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/bug-kts">
+			<input>/instrumentation/airspeed-indicator[1]/bug-kts-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/pointer-1">
+			<input>/instrumentation/airspeed-indicator/pointer-1-input</input> 
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/pointer-2">
+			<input>/instrumentation/airspeed-indicator/pointer-2-input</input> 
+			<c1>20</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/airspeed-indicator[1]/pointer-3">
+			<input>/instrumentation/airspeed-indicator/pointer-3-input</input> 
+			<c1>20</c1>
+		</lag_filter>
+		
+		
+		<actuator name="/instrumentation/stby-asi/speed-kt-actuator">
+			<input>/instrumentation/airspeed-indicator/indicated-speed-kt</input>
+			<rate_limit>100</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/stby-asi/speed-kt">
+			<input>/instrumentation/stby-asi/speed-kt-actuator</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Attitude Indicators" execrate="2">
+		
+		
+		<switch name="/instrumentation/ai[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ai[0]/att-avail">
+			<default value="0" />
+			<test value="1">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/ai[0]/power-avail eq 1
+				/systems/platform[0]/aligned eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ai[0]/pitch-deg-cmd">
+			<default value="/instrumentation/ai[0]/pitch-deg-cmd" />
+			<test logic="AND" value="10">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/test-btn eq 1
+			</test>
+			<test logic="AND" value="0">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/att-avail eq 0
+			</test>
+			<test logic="AND" value="/orientation/pitch-deg">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/att-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/ai[0]/pitch-deg-pos">
+			<input>/instrumentation/ai[0]/pitch-deg-cmd</input>
+			<rate_limit>360</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/ai[0]/pitch-deg">
+			<input>/instrumentation/ai[0]/pitch-deg-pos</input>
+			<c1>40</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[0]/roll-deg-cmd">
+			<default value="/instrumentation/ai[0]/roll-deg-cmd" />
+			<test logic="AND" value="20">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/test-btn eq 1
+			</test>
+			<test logic="AND" value="-90">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/att-avail eq 0
+			</test>
+			<test logic="AND" value="/orientation/roll-deg">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/att-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/ai[0]/roll-deg-pos">
+			<input>/instrumentation/ai[0]/roll-deg-cmd</input>
+			<rate_limit>720</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/ai[0]/roll-deg">
+			<input>/instrumentation/ai[0]/roll-deg-pos</input>
+			<c1>40</c1>
+		</lag_filter>
+
+		<switch name="/instrumentation/ai[0]/fd-pitch-cmd">
+			<default value="35" /> 
+			<test value="35"> 
+				/systems/dfgs/bit-1/active eq 1
+			</test>
+			<test logic="AND" value="15">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/test-btn eq 1
+			</test>
+			<test logic="AND" value="/it-autoflight/fd/pitch-bar">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/att-avail eq 1
+				/it-autoflight/output/fd1 eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/fd-pitch">
+			<input>/instrumentation/ai[0]/fd-pitch-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+
+		<switch name="/instrumentation/ai[0]/fd-roll-cmd">
+			<default value="0" />
+			<test value="0">
+				/systems/dfgs/bit-1/active eq 1
+			</test>
+			<test logic="AND" value="30">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/test-btn eq 1
+			</test>
+			<test logic="AND" value="/it-autoflight/fd/roll-bar">
+				/instrumentation/ai[0]/power-avail eq 1
+				/instrumentation/ai[0]/att-avail eq 1
+				/it-autoflight/output/fd1 eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/fd-roll">
+			<input>/instrumentation/ai[0]/fd-roll-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[0]/loc-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/nav[0]/heading-needle-deflection">
+				/instrumentation/ai[0]/power-avail eq 1
+				/systems/electrical/outputs/nav[0] ge 24
+				/instrumentation/nav[0]/in-range eq 1
+				/instrumentation/nav[0]/signal-quality-norm gt 0.99
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/loc-deviation">
+			<input>/instrumentation/ai[0]/loc-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[0]/rising-runway-cmd">
+			<default value="200" />
+			<test logic="AND" value="/position/gear-agl-ft">
+				/instrumentation/ai[0]/power-avail eq 1
+				/systems/electrical/outputs/nav[0] ge 24
+				/instrumentation/nav[0]/in-range eq 1
+				/instrumentation/nav[0]/signal-quality-norm gt 0.99
+			</test>
+			<clipto>
+				<min>0</min>
+				<max>200</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/rising-runway">
+			<input>/instrumentation/ai[0]/rising-runway-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[0]/gs-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/nav[0]/gs-needle-deflection">
+				/instrumentation/ai[0]/power-avail eq 1
+				/systems/electrical/outputs/nav[0] ge 24
+				/instrumentation/nav[0]/gs-in-range eq 1
+				/instrumentation/nav[0]/has-gs eq 1
+				/instrumentation/nav[0]/signal-quality-norm gt 0.99
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/gs-deviation">
+			<input>/instrumentation/ai[0]/gs-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[0]/fast-slow-cmd">
+			<default value="0" />
+			<test logic="AND" value="/it-autoflight/output/fast-slow">
+				/instrumentation/ai[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/fast-slow">
+			<input>/instrumentation/ai[0]/fast-slow-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/ai[0]/slip-skid-Ny">
+			<input>accelerations/Ny</input>
+			<gain>-25</gain>
+		</pure_gain>
+		
+		<switch name="/instrumentation/ai[0]/slip-skid-cmd">
+			<default value="/fdm/jsbsim/aero/beta-deg" />
+			<test logic="OR" value="0">
+				/instrumentation/ai[0]/power-avail ne 1
+				/systems/platform[0]/aligned ne 1
+			</test>
+			<test value="/instrumentation/ai[0]/slip-skid-Ny">
+				position/wow eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[0]/slip-skid">
+			<input>/instrumentation/ai[0]/slip-skid-cmd</input>
+			<c1>5.0</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/ai[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-radio-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ai[1]/att-avail">
+			<default value="0" />
+			<test value="1">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/ai[1]/power-avail eq 1
+				/systems/platform[1]/aligned eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ai[1]/pitch-deg-cmd">
+			<default value="/instrumentation/ai[1]/pitch-deg-cmd" />
+			<test logic="AND" value="10">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/test-btn eq 1
+			</test>
+			<test logic="AND" value="0">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/att-avail eq 0
+			</test>
+			<test logic="AND" value="/orientation/pitch-deg">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/att-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/ai[1]/pitch-deg-pos">
+			<input>/instrumentation/ai[1]/pitch-deg-cmd</input>
+			<rate_limit>360</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/ai[1]/pitch-deg">
+			<input>/instrumentation/ai[1]/pitch-deg-pos</input>
+			<c1>40</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[1]/roll-deg-cmd">
+			<default value="/instrumentation/ai[1]/roll-deg-cmd" />
+			<test logic="AND" value="20">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/test-btn eq 1
+			</test>
+			<test logic="AND" value="-90">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/att-avail eq 0
+			</test>
+			<test logic="AND" value="/orientation/roll-deg">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/att-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/ai[1]/roll-deg-pos">
+			<input>/instrumentation/ai[1]/roll-deg-cmd</input>
+			<rate_limit>720</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/ai[1]/roll-deg">
+			<input>/instrumentation/ai[1]/roll-deg-pos</input>
+			<c1>40</c1>
+		</lag_filter>
+
+		<switch name="/instrumentation/ai[1]/fd-pitch-cmd">
+			<default value="35" /> 
+			<test value="35"> 
+				/systems/dfgs/bit-2/active eq 1
+			</test>
+			<test logic="AND" value="15">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/test-btn eq 1
+			</test>
+			<test logic="AND" value="/it-autoflight/fd/pitch-bar">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/att-avail eq 1
+				/it-autoflight/output/fd2 eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/fd-pitch">
+			<input>/instrumentation/ai[1]/fd-pitch-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+
+		<switch name="/instrumentation/ai[1]/fd-roll-cmd">
+			<default value="0" />
+			<test value="0">
+				/systems/dfgs/bit-2/active eq 1
+			</test>
+			<test logic="AND" value="30">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/test-btn eq 1
+			</test>
+			<test logic="AND" value="/it-autoflight/fd/roll-bar">
+				/instrumentation/ai[1]/power-avail eq 1
+				/instrumentation/ai[1]/att-avail eq 1
+				/it-autoflight/output/fd2 eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/fd-roll">
+			<input>/instrumentation/ai[1]/fd-roll-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[1]/loc-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/nav[1]/heading-needle-deflection">
+				/instrumentation/ai[1]/power-avail eq 1
+				/systems/electrical/outputs/nav[1] ge 24
+				/instrumentation/nav[1]/in-range eq 1
+				/instrumentation/nav[1]/signal-quality-norm gt 0.99
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/loc-deviation">
+			<input>/instrumentation/ai[1]/loc-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[1]/rising-runway-cmd">
+			<default value="200" />
+			<test logic="AND" value="/position/gear-agl-ft">
+				/instrumentation/ai[1]/power-avail eq 1
+				/systems/electrical/outputs/nav[1] ge 24
+				/instrumentation/nav[1]/in-range eq 1
+				/instrumentation/nav[1]/signal-quality-norm gt 0.99
+			</test>
+			<clipto>
+				<min>0</min>
+				<max>200</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/rising-runway">
+			<input>/instrumentation/ai[1]/rising-runway-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[1]/gs-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/nav[1]/gs-needle-deflection">
+				/instrumentation/ai[1]/power-avail eq 1
+				/systems/electrical/outputs/nav[1] ge 24
+				/instrumentation/nav[1]/gs-in-range eq 1
+				/instrumentation/nav[1]/has-gs eq 1
+				/instrumentation/nav[1]/signal-quality-norm gt 0.99
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/gs-deviation">
+			<input>/instrumentation/ai[1]/gs-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ai[1]/fast-slow-cmd">
+			<default value="0" />
+			<test logic="AND" value="/it-autoflight/output/fast-slow">
+				/instrumentation/ai[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/fast-slow">
+			<input>/instrumentation/ai[1]/fast-slow-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/ai[1]/slip-skid-Ny">
+			<input>accelerations/Ny</input>
+			<gain>-25</gain>
+		</pure_gain>
+		
+		<switch name="/instrumentation/ai[1]/slip-skid-cmd">
+			<default value="/fdm/jsbsim/aero/beta-deg" />
+			<test logic="OR" value="0">
+				/instrumentation/ai[1]/power-avail ne 1
+				/systems/platform[1]/aligned ne 1
+			</test>
+			<test value="/instrumentation/ai[1]/slip-skid-Ny">
+				position/wow eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ai[1]/slip-skid">
+			<input>/instrumentation/ai[1]/slip-skid-cmd</input>
+			<c1>5.0</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/stby-ai/spin-cmd">
+			<default value="0" />
+			<test value="1">
+				/systems/electrical/bus/dc-trans ge 24
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/stby-ai/spin-pos">
+			<input>/instrumentation/stby-ai/spin-cmd</input>
+			<rate_limit sense="incr">0.2</rate_limit>
+			<rate_limit sense="decr">0.04</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/stby-ai/spin">
+			<input>/instrumentation/stby-ai/spin-pos</input>
+			<c1>1.0</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/stby-ai/pitch-deg-cmd">
+			<function>
+				<sum>
+					<value>20</value>
+					<product>
+						<property>/instrumentation/stby-ai/spin</property>
+						<difference>
+							<property>/orientation/pitch-deg</property>
+							<value>20</value>
+						</difference>
+					</product>
+				</sum>
+			</function>
+			<clipto>
+				<min>-40</min>
+				<max>40</max>
+			</clipto>
+		</fcs_function>
+		
+		<actuator name="/instrumentation/stby-ai/pitch-deg-pos">
+			<input>/instrumentation/stby-ai/pitch-deg-cmd</input>
+			<rate_limit>360</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/stby-ai/pitch-deg">
+			<input>/instrumentation/stby-ai/pitch-deg-pos</input>
+			<c1>40</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/stby-ai/roll-deg-cmd">
+			<function>
+				<sum>
+					<value>40</value>
+					<product>
+						<property>/instrumentation/stby-ai/spin</property>
+						<difference>
+							<property>/orientation/roll-deg</property>
+							<value>40</value>
+						</difference>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/instrumentation/stby-ai/roll-deg-pos">
+			<input>/instrumentation/stby-ai/roll-deg-cmd</input>
+			<rate_limit>720</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/stby-ai/roll-deg">
+			<input>/instrumentation/stby-ai/roll-deg-pos</input>
+			<c1>40</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Radio Altimeters" execrate="2">
+		
+		<summer name="/systems/misc/minimums-diff">
+			<input>/position/gear-agl-ft</input>
+			<input>-/controls/switches/minimums</input>
+		</summer>
+		
+		
+		<switch name="/instrumentation/agl[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/agl[0]/altitude-ft-input">
+			<default value="/instrumentation/agl[0]/altitude-ft-input" />
+			<test value="/position/gear-agl-ft">
+				/instrumentation/agl[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/agl[0]/altitude-ft-actuator">
+			<input>/instrumentation/agl[0]/altitude-ft-input</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/agl[0]/altitude-ft">
+			<input>/instrumentation/agl[0]/altitude-ft-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/agl[0]/minimums-light">
+			<default value="0" />
+			<test value="0">
+				/instrumentation/agl[0]/power-avail ne 1
+			</test>
+			<test logic="OR" value="1">
+				/controls/switches/annun-test eq 1
+				<test logic="AND">
+					/systems/misc/minimums-latch eq 1
+					/position/gear-agl-ft le /controls/switches/minimums
+				</test>
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/agl[0]/minimums-actuator">
+			<input>/systems/misc/minimums-diff</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/agl[0]/minimums">
+			<input>/instrumentation/agl[0]/minimums-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/agl[0]/minimums-text">
+			<input>/controls/switches/minimums</input>
+			<c1>25</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/agl[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-radio-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/agl[1]/altitude-ft-input">
+			<default value="/instrumentation/agl[1]/altitude-ft-input" />
+			<test value="/position/gear-agl-ft">
+				/instrumentation/agl[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/agl[1]/altitude-ft-actuator">
+			<input>/instrumentation/agl[1]/altitude-ft-input</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/agl[1]/altitude-ft">
+			<input>/instrumentation/agl[1]/altitude-ft-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/agl[1]/minimums-light">
+			<default value="0" />
+			<test value="0">
+				/instrumentation/agl[1]/power-avail ne 1
+			</test>
+			<test logic="OR" value="1">
+				/controls/switches/annun-test eq 1
+				<test logic="AND">
+					/systems/misc/minimums-latch eq 1
+					/position/gear-agl-ft le /controls/switches/minimums
+				</test>
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/agl[1]/minimums-actuator">
+			<input>/systems/misc/minimums-diff</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/agl[1]/minimums">
+			<input>/instrumentation/agl[1]/minimums-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/agl[1]/minimums-text">
+			<input>/controls/switches/minimums</input>
+			<c1>25</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Altimeters" execrate="2">
+		
+		
+		<switch name="/instrumentation/altimeter[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/altimeter[0]/altitude-ft-input">
+			<default value="/instrumentation/altimeter[0]/altitude-ft-input" />
+			<test value="/instrumentation/altimeter[0]/indicated-altitude-ft">
+				/instrumentation/altimeter[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/altimeter[0]/altitude-ft-actuator">
+			<input>/instrumentation/altimeter[0]/altitude-ft-input</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/altimeter[0]/altitude-ft">
+			<input>/instrumentation/altimeter[0]/altitude-ft-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/altimeter[0]/setting-inhg-input">
+			<function>
+				<floor>
+					<sum>
+						<product>
+							<property>/instrumentation/altimeter[0]/setting-inhg</property>
+							<value>100</value>
+						</product>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/altimeter[0]/setting-inhg-text">
+			<input>/instrumentation/altimeter[0]/setting-inhg-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/altimeter[0]/setting-hpa-input">
+			<function>
+				<floor>
+					<sum>
+						<property>/instrumentation/altimeter[0]/setting-hpa</property>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/altimeter[0]/setting-hpa-text">
+			<input>/instrumentation/altimeter[0]/setting-hpa-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<linear_actuator name="/instrumentation/altimeter[0]/bug-linear-cmd">
+			<input>/instrumentation/altimeter[0]/bug-input</input>
+			<module>1000</module>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/altimeter[0]/bug-linear">
+			<input>/instrumentation/altimeter[0]/bug-linear-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/altimeter[0]/alert-light">
+			<default value="0" />
+			<test value="0">
+				/instrumentation/altimeter[0]/power-avail eq 0
+			</test>
+			<test logic="OR" value="1">
+				/controls/switches/annun-test eq 1
+				/systems/caws/logic/altitude-alert eq 1
+				<test logic="AND">
+					/systems/caws/logic/altitude-alert eq 2
+					/systems/libraries/blink-med eq 1
+				</test>
+			</test>
+		</switch>
+		
+		
+		<switch name="/instrumentation/altimeter[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-radio-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/altimeter[1]/altitude-ft-input">
+			<default value="/instrumentation/altimeter[1]/altitude-ft-input" />
+			<test value="/instrumentation/altimeter[0]/indicated-altitude-ft"> 
+				/instrumentation/altimeter[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/altimeter[1]/altitude-ft-actuator">
+			<input>/instrumentation/altimeter[1]/altitude-ft-input</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/altimeter[1]/altitude-ft">
+			<input>/instrumentation/altimeter[1]/altitude-ft-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/altimeter[1]/setting-inhg-input">
+			<function>
+				<floor>
+					<sum>
+						<product>
+							<property>/instrumentation/altimeter[0]/setting-inhg</property> 
+							<value>100</value>
+						</product>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/altimeter[1]/setting-inhg-text">
+			<input>/instrumentation/altimeter[1]/setting-inhg-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/altimeter[1]/setting-hpa-input">
+			<function>
+				<floor>
+					<sum>
+						<property>/instrumentation/altimeter[0]/setting-hpa</property> 
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/altimeter[1]/setting-hpa-text">
+			<input>/instrumentation/altimeter[1]/setting-hpa-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<linear_actuator name="/instrumentation/altimeter[1]/bug-linear-cmd">
+			<input>/instrumentation/altimeter[1]/bug-input</input>
+			<module>1000</module>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/altimeter[1]/bug-linear">
+			<input>/instrumentation/altimeter[1]/bug-linear-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/altimeter[1]/alert-light">
+			<default value="0" />
+			<test value="0">
+				/instrumentation/altimeter[1]/power-avail eq 0
+			</test>
+			<test logic="OR" value="1">
+				/controls/switches/annun-test eq 1
+				/systems/caws/logic/altitude-alert eq 1
+				<test logic="AND">
+					/systems/caws/logic/altitude-alert eq 2
+					/systems/libraries/blink-med eq 1
+				</test>
+			</test>
+		</switch>
+		
+		
+		<actuator name="/instrumentation/stby-alt/altitude-ft-actuator">
+			<input>/instrumentation/altimeter[0]/indicated-altitude-ft</input> 
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/stby-alt/altitude-ft">
+			<input>/instrumentation/stby-alt/altitude-ft-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/stby-alt/setting-inhg-input">
+			<function>
+				<floor>
+					<sum>
+						<product>
+							<property>/instrumentation/altimeter[0]/setting-inhg</property> 
+							<value>100</value>
+						</product>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/stby-alt/setting-inhg-text">
+			<input>/instrumentation/stby-alt/setting-inhg-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/stby-alt/setting-hpa-input">
+			<function>
+				<floor>
+					<sum>
+						<property>/instrumentation/altimeter[0]/setting-hpa</property> 
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/stby-alt/setting-hpa-text">
+			<input>/instrumentation/stby-alt/setting-hpa-input</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Radio Magnetic Indicators" execrate="2">
+		
+		
+		<switch name="/instrumentation/rmi[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-radio-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/rmi[0]/heading-avail">
+			<default value="0" />
+			<test value="1">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="1"> 
+				/instrumentation/rmi[0]/power-avail eq 1
+				/systems/platform[1]/aligned eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/rmi[0]/heading-input">
+			<default value="/instrumentation/rmi[0]/heading-input" />
+			<test value="/orientation/heading-magnetic-deg">
+				/instrumentation/rmi[0]/heading-avail eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/rmi[0]/heading-true-input">
+			<default value="/instrumentation/rmi[0]/heading-true-input" />
+			<test value="/orientation/heading-deg">
+				/instrumentation/rmi[0]/heading-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/rmi[0]/heading-linear-cmd">
+			<input>/instrumentation/rmi[0]/heading-input</input>
+			<module>360</module>
+		</linear_actuator>
+		
+		<actuator name="/instrumentation/rmi[0]/heading-linear-actuator">
+			<input>/instrumentation/rmi[0]/heading-linear-cmd</input>
+			<rate_limit>180</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/rmi[0]/heading-linear">
+			<input>/instrumentation/rmi[0]/heading-linear-actuator</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/rmi[0]/nav1-input">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/rmi[0]/nav1-error">
+				/instrumentation/rmi[0]/power-avail eq 1
+				/instrumentation/rmi[0]/vor-adf-1 eq 1
+			</test>
+			<test value="/instrumentation/rmi[0]/adf1-error">
+				/instrumentation/rmi[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/rmi[0]/nav1-linear-cmd">
+			<input>/instrumentation/rmi[0]/nav1-input</input>
+			<bias>180</bias>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<fcs_function name="/instrumentation/rmi[0]/nav1-linear-bias">
+			<function>
+				<difference>
+					<property>/instrumentation/rmi[0]/nav1-linear-cmd</property>
+					<value>180</value>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/rmi[0]/nav1-linear">
+			<input>/instrumentation/rmi[0]/nav1-linear-bias</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/rmi[0]/nav2-input">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/rmi[0]/nav2-error">
+				/instrumentation/rmi[0]/power-avail eq 1
+				/instrumentation/rmi[0]/vor-adf-2 eq 1
+			</test>
+			<test value="/instrumentation/rmi[0]/adf2-error">
+				/instrumentation/rmi[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/rmi[0]/nav2-linear-cmd">
+			<input>/instrumentation/rmi[0]/nav2-input</input>
+			<bias>180</bias>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<fcs_function name="/instrumentation/rmi[0]/nav2-linear-bias">
+			<function>
+				<difference>
+					<property>/instrumentation/rmi[0]/nav2-linear-cmd</property>
+					<value>180</value>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/rmi[0]/nav2-linear">
+			<input>/instrumentation/rmi[0]/nav2-linear-bias</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/rmi[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/rmi[1]/heading-avail">
+			<default value="0" />
+			<test value="1">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="1"> 
+				/instrumentation/rmi[1]/power-avail eq 1
+				/systems/platform[0]/aligned eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/rmi[1]/heading-input">
+			<default value="/instrumentation/rmi[1]/heading-input" />
+			<test value="/orientation/heading-magnetic-deg">
+				/instrumentation/rmi[1]/heading-avail eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/rmi[1]/heading-true-input">
+			<default value="/instrumentation/rmi[1]/heading-true-input" />
+			<test value="/orientation/heading-deg">
+				/instrumentation/rmi[1]/heading-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/rmi[1]/heading-linear-cmd">
+			<input>/instrumentation/rmi[1]/heading-input</input>
+			<module>360</module>
+		</linear_actuator>
+		
+		<actuator name="/instrumentation/rmi[1]/heading-linear-actuator">
+			<input>/instrumentation/rmi[1]/heading-linear-cmd</input>
+			<rate_limit>180</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/rmi[1]/heading-linear">
+			<input>/instrumentation/rmi[1]/heading-linear-actuator</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/rmi[1]/nav1-input">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/rmi[1]/nav1-error">
+				/instrumentation/rmi[1]/power-avail eq 1
+				/instrumentation/rmi[1]/vor-adf-1 eq 1
+			</test>
+			<test value="/instrumentation/rmi[1]/adf1-error">
+				/instrumentation/rmi[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/rmi[1]/nav1-linear-cmd">
+			<input>/instrumentation/rmi[1]/nav1-input</input>
+			<bias>180</bias>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<fcs_function name="/instrumentation/rmi[1]/nav1-linear-bias">
+			<function>
+				<difference>
+					<property>/instrumentation/rmi[1]/nav1-linear-cmd</property>
+					<value>180</value>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/rmi[1]/nav1-linear">
+			<input>/instrumentation/rmi[1]/nav1-linear-bias</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/rmi[1]/nav2-input">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/rmi[1]/nav2-error">
+				/instrumentation/rmi[1]/power-avail eq 1
+				/instrumentation/rmi[1]/vor-adf-2 eq 1
+			</test>
+			<test value="/instrumentation/rmi[1]/adf2-error">
+				/instrumentation/rmi[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/rmi[1]/nav2-linear-cmd">
+			<input>/instrumentation/rmi[1]/nav2-input</input>
+			<bias>180</bias>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<fcs_function name="/instrumentation/rmi[1]/nav2-linear-bias">
+			<function>
+				<difference>
+					<property>/instrumentation/rmi[1]/nav2-linear-cmd</property>
+					<value>180</value>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/rmi[1]/nav2-linear">
+			<input>/instrumentation/rmi[1]/nav2-linear-bias</input>
+			<c1>10</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Horizontal Situation Indicators" execrate="2">
+		
+		
+		<switch name="/instrumentation/hsi[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hsi[0]/heading-avail">
+			<default value="0" />
+			<test value="1">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/hsi[0]/power-avail eq 1
+				/systems/platform[0]/aligned eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hsi[0]/heading-input">
+			<default value="/instrumentation/hsi[0]/heading-input" />
+			<test value="/orientation/heading-magnetic-deg">
+				/instrumentation/hsi[0]/heading-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/hsi[0]/heading-linear-cmd">
+			<input>/instrumentation/hsi[0]/heading-input</input>
+			<module>360</module>
+		</linear_actuator>
+		
+		<actuator name="/instrumentation/hsi[0]/heading-linear-actuator">
+			<input>/instrumentation/hsi[0]/heading-linear-cmd</input>
+			<rate_limit>180</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/hsi[0]/heading-linear">
+			<input>/instrumentation/hsi[0]/heading-linear-actuator</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[0]/heading-bug-input">
+			<default value="/instrumentation/hsi[0]/heading-bug-input" />
+			<test value="/it-autoflight/input/hdg">
+				/instrumentation/hsi[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/hsi[0]/heading-bug-linear-cmd">
+			<input>/instrumentation/hsi[0]/heading-bug-input</input>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/hsi[0]/heading-bug-linear">
+			<input>/instrumentation/hsi[0]/heading-bug-linear-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[0]/course-input">
+			<default value="/instrumentation/hsi[0]/course-input" />
+			<test logic="AND" value="/instrumentation/nav[2]/radials/selected-deg">
+				/instrumentation/hsi[0]/power-avail eq 1
+				/instrumentation/hsi[0]/slaved-to-gps eq 1
+			</test>
+			<test value="/instrumentation/nav[0]/radials/selected-deg">
+				/instrumentation/hsi[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/hsi[0]/course-linear-cmd">
+			<input>/instrumentation/hsi[0]/course-input</input>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/hsi[0]/course-linear">
+			<input>/instrumentation/hsi[0]/course-linear-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[0]/loc-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/nav[2]/heading-needle-deflection">
+				/instrumentation/hsi[0]/power-avail eq 1
+				/instrumentation/hsi[0]/slaved-to-gps eq 1
+			</test>
+			<test value="/instrumentation/nav[0]/heading-needle-deflection">
+				/instrumentation/hsi[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hsi[0]/loc-deviation">
+			<input>/instrumentation/hsi[0]/loc-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[0]/gs-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="0">
+				/instrumentation/hsi[0]/power-avail eq 1
+				/instrumentation/hsi[0]/slaved-to-gps eq 1
+			</test>
+			<test value="/instrumentation/nav[0]/gs-needle-deflection">
+				/instrumentation/hsi[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hsi[0]/gs-deviation">
+			<input>/instrumentation/hsi[0]/gs-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/hsi[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-radio-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hsi[1]/heading-avail">
+			<default value="0" />
+			<test value="1">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/hsi[1]/power-avail eq 1
+				/systems/platform[1]/aligned eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hsi[1]/heading-input">
+			<default value="/instrumentation/hsi[1]/heading-input" />
+			<test value="/orientation/heading-magnetic-deg">
+				/instrumentation/hsi[1]/heading-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/hsi[1]/heading-linear-cmd">
+			<input>/instrumentation/hsi[1]/heading-input</input>
+			<module>360</module>
+		</linear_actuator>
+		
+		<actuator name="/instrumentation/hsi[1]/heading-linear-actuator">
+			<input>/instrumentation/hsi[1]/heading-linear-cmd</input>
+			<rate_limit>180</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/hsi[1]/heading-linear">
+			<input>/instrumentation/hsi[1]/heading-linear-actuator</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[1]/heading-bug-input">
+			<default value="/instrumentation/hsi[1]/heading-bug-input" />
+			<test value="/it-autoflight/input/hdg">
+				/instrumentation/hsi[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/hsi[1]/heading-bug-linear-cmd">
+			<input>/instrumentation/hsi[1]/heading-bug-input</input>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/hsi[1]/heading-bug-linear">
+			<input>/instrumentation/hsi[1]/heading-bug-linear-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[1]/course-input">
+			<default value="/instrumentation/hsi[1]/course-input" />
+			<test logic="AND" value="/instrumentation/nav[2]/radials/selected-deg">
+				/instrumentation/hsi[1]/power-avail eq 1
+				/instrumentation/hsi[1]/slaved-to-gps eq 1
+			</test>
+			<test value="/instrumentation/nav[1]/radials/selected-deg">
+				/instrumentation/hsi[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<linear_actuator name="/instrumentation/hsi[1]/course-linear-cmd">
+			<input>/instrumentation/hsi[1]/course-input</input>
+			<module>360</module>
+			<rate>0.5</rate>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/hsi[1]/course-linear">
+			<input>/instrumentation/hsi[1]/course-linear-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[1]/loc-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="/instrumentation/nav[2]/heading-needle-deflection">
+				/instrumentation/hsi[1]/power-avail eq 1
+				/instrumentation/hsi[1]/slaved-to-gps eq 1
+			</test>
+			<test value="/instrumentation/nav[1]/heading-needle-deflection">
+				/instrumentation/hsi[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hsi[1]/loc-deviation">
+			<input>/instrumentation/hsi[1]/loc-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/hsi[1]/gs-deviation-cmd">
+			<default value="0" />
+			<test logic="AND" value="0">
+				/instrumentation/hsi[1]/power-avail eq 1
+				/instrumentation/hsi[1]/slaved-to-gps eq 1
+			</test>
+			<test value="/instrumentation/nav[1]/gs-needle-deflection">
+				/instrumentation/hsi[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hsi[1]/gs-deviation">
+			<input>/instrumentation/hsi[1]/gs-deviation-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="DME Indicators">
+		
+		
+		<switch name="/instrumentation/dme[0]/available">
+			<default value="0" />
+			<test value="1">
+				/controls/switches/annun-test eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/hsi[0]/slaved-to-gps eq 0
+				/systems/electrical/outputs/nav[0] ge 24
+				/instrumentation/dme[0]/in-range eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/hsi[0]/slaved-to-gps eq 1
+				/autopilot/route-manager/active eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/instrumentation/dme[0]/indicated-distance-nm-x10">
+			<function>
+				<ifthen>
+					<eq>
+						<property>/controls/switches/annun-test</property>
+						<value>1</value>
+					</eq>
+					<value>8888</value>
+					<ifthen>
+						<eq>
+							<property>/instrumentation/hsi[0]/slaved-to-gps</property>
+							<value>1</value>
+						</eq>
+						<floor>
+							<sum>
+								<product>
+									<property>/autopilot/route-manager/wp[0]/dist</property>
+									<value>10</value>
+								</product>
+								<value>0.5</value>
+							</sum>
+						</floor>
+						<floor>
+							<sum>
+								<product>
+									<property>/instrumentation/dme[0]/indicated-distance-nm</property>
+									<value>10</value>
+								</product>
+								<value>0.5</value>
+							</sum>
+						</floor>
+					</ifthen>
+				</ifthen>
+			</function>
+			<clipto>
+				<min>0</min>
+				<max>9999</max>
+			</clipto>
+		</fcs_function>
+		
+		
+		<switch name="/instrumentation/dme[1]/available">
+			<default value="0" />
+			<test value="1">
+				/controls/switches/annun-test eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/hsi[1]/slaved-to-gps eq 0
+				/systems/electrical/outputs/nav[1] ge 24
+				/instrumentation/dme[1]/in-range eq 1
+			</test>
+			<test logic="AND" value="1">
+				/instrumentation/hsi[1]/slaved-to-gps eq 1
+				/autopilot/route-manager/active eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/instrumentation/dme[1]/indicated-distance-nm-x10">
+			<function>
+				<ifthen>
+					<eq>
+						<property>/controls/switches/annun-test</property>
+						<value>1</value>
+					</eq>
+					<value>8888</value>
+					<ifthen>
+						<eq>
+							<property>/instrumentation/hsi[1]/slaved-to-gps</property>
+							<value>1</value>
+						</eq>
+						<floor>
+							<sum>
+								<product>
+									<property>/autopilot/route-manager/wp[0]/dist</property>
+									<value>10</value>
+								</product>
+								<value>0.5</value>
+							</sum>
+						</floor>
+						<floor>
+							<sum>
+								<product>
+									<property>/instrumentation/dme[1]/indicated-distance-nm</property>
+									<value>10</value>
+								</product>
+								<value>0.5</value>
+							</sum>
+						</floor>
+					</ifthen>
+				</ifthen>
+			</function>
+			<clipto>
+				<min>0</min>
+				<max>9999</max>
+			</clipto>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Vertical Speed Indicators" execrate="2">
+		
+		
+		<lag_filter name="/instrumentation/vertical-speed-indicator/ground/rate-lag">
+			<input>/orientation/pitch-rate-degps</input>
+			<c1>5.0</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/vertical-speed-indicator/ground/rate">
+			<input>/instrumentation/vertical-speed-indicator/ground/rate-lag</input>
+			<gain>-75</gain>
+		</pure_gain>
+		
+		<switch name="/instrumentation/vertical-speed-indicator/vert-speed-fpm-switch">
+			<default value="/it-autoflight/internal/vert-speed-fpm" />
+			<test logic="OR" value="/instrumentation/vertical-speed-indicator/ground/rate">
+				position/wow eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/vertical-speed-indicator/vert-speed-fpm">
+			<input>/instrumentation/vertical-speed-indicator/vert-speed-fpm-switch</input>
+			<c1>1.0</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/vertical-speed-indicator[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/vertical-speed-indicator[0]/vs-fpm-input">
+			<default value="/instrumentation/vertical-speed-indicator[0]/vs-fpm-input" />
+			<test value="/instrumentation/vertical-speed-indicator/vert-speed-fpm">
+				/instrumentation/vertical-speed-indicator[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/vertical-speed-indicator[0]/vs-fpm-actuator">
+			<input>/instrumentation/vertical-speed-indicator[0]/vs-fpm-input</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/vertical-speed-indicator[0]/vs-fpm">
+			<input>/instrumentation/vertical-speed-indicator[0]/vs-fpm-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/vertical-speed-indicator[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/vertical-speed-indicator[1]/vs-fpm-input">
+			<default value="/instrumentation/vertical-speed-indicator[1]/vs-fpm-input" />
+			<test value="/instrumentation/vertical-speed-indicator/vert-speed-fpm">
+				/instrumentation/vertical-speed-indicator[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/vertical-speed-indicator[1]/vs-fpm-actuator">
+			<input>/instrumentation/vertical-speed-indicator[1]/vs-fpm-input</input>
+			<rate_limit>1500</rate_limit>
+		</actuator>
+		
+		<lag_filter name="/instrumentation/vertical-speed-indicator[1]/vs-fpm">
+			<input>/instrumentation/vertical-speed-indicator[1]/vs-fpm-actuator</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="EPR Gauges" execrate="2">
+		
+		
+		<switch name="/instrumentation/epr[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/epr[0]/epr-input">
+			<default value="/instrumentation/epr[0]/epr-input" />
+			<test value="/systems/engines/epr-actual-1">
+				/instrumentation/epr[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/epr[0]/epr">
+			<input>/instrumentation/epr[0]/epr-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/epr[0]/epr-d100">
+			<input>/instrumentation/epr[0]/epr-input</input>
+			<gain>1.0</gain>
+		</pure_gain>
+		
+		<fcs_function name="/instrumentation/epr[0]/epr-d10">
+			<function>
+				<product>
+					<difference>
+						<property>/instrumentation/epr[0]/epr-input</property>
+						<floor>
+							<property>/instrumentation/epr[0]/epr-input</property>
+						</floor>
+					</difference>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/epr[0]/epr-d1">
+			<function>
+				<product>
+					<fraction>
+						<product>
+							<property>/instrumentation/epr[0]/epr-input</property>
+							<value>10</value>
+						</product>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/epr[0]/cmd-input">
+			<input>/controls/engines/engine[0]/man-epr</input>
+			<c1>40</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/epr[0]/cmd-d100">
+			<input>/instrumentation/epr[0]/cmd-input</input>
+			<gain>1.0</gain>
+		</pure_gain>
+		
+		<fcs_function name="/instrumentation/epr[0]/cmd-d10">
+			<function>
+				<product>
+					<difference>
+						<property>/instrumentation/epr[0]/cmd-input</property>
+						<floor>
+							<property>/instrumentation/epr[0]/cmd-input</property>
+						</floor>
+					</difference>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/epr[0]/cmd-d1">
+			<function>
+				<product>
+					<fraction>
+						<product>
+							<property>/instrumentation/epr[0]/cmd-input</property>
+							<value>10</value>
+						</product>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/instrumentation/epr[0]/epr-bug-input">
+			<default value="/instrumentation/epr[0]/epr-bug-input" />
+			<test logic="AND" value="/controls/engines/engine[0]/man-epr">
+				/instrumentation/epr[0]/power-avail eq 1
+				/controls/engines/engine[0]/man-epr-set eq 1
+			</test>
+			<test value="/systems/engines/limit/active">
+				/instrumentation/epr[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/epr[0]/epr-bug">
+			<input>/instrumentation/epr[0]/epr-bug-input</input>
+			<rate_limit>1.25</rate_limit>
+			<lag>20</lag>
+		</actuator>
+		
+		
+		<switch name="/instrumentation/epr[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/epr[1]/epr-input">
+			<default value="/instrumentation/epr[1]/epr-input" />
+			<test value="/systems/engines/epr-actual-2">
+				/instrumentation/epr[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/epr[1]/epr">
+			<input>/instrumentation/epr[1]/epr-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/epr[1]/epr-d100">
+			<input>/instrumentation/epr[1]/epr-input</input>
+			<gain>1.0</gain>
+		</pure_gain>
+		
+		<fcs_function name="/instrumentation/epr[1]/epr-d10">
+			<function>
+				<product>
+					<difference>
+						<property>/instrumentation/epr[1]/epr-input</property>
+						<floor>
+							<property>/instrumentation/epr[1]/epr-input</property>
+						</floor>
+					</difference>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/epr[1]/epr-d1">
+			<function>
+				<product>
+					<fraction>
+						<product>
+							<property>/instrumentation/epr[1]/epr-input</property>
+							<value>10</value>
+						</product>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<lag_filter name="/instrumentation/epr[1]/cmd-input">
+			<input>/controls/engines/engine[1]/man-epr</input>
+			<c1>40</c1>
+		</lag_filter>
+		
+		<pure_gain name="/instrumentation/epr[1]/cmd-d100">
+			<input>/instrumentation/epr[1]/cmd-input</input>
+			<gain>1.0</gain>
+		</pure_gain>
+		
+		<fcs_function name="/instrumentation/epr[1]/cmd-d10">
+			<function>
+				<product>
+					<difference>
+						<property>/instrumentation/epr[1]/cmd-input</property>
+						<floor>
+							<property>/instrumentation/epr[1]/cmd-input</property>
+						</floor>
+					</difference>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/epr[1]/cmd-d1">
+			<function>
+				<product>
+					<fraction>
+						<product>
+							<property>/instrumentation/epr[1]/cmd-input</property>
+							<value>10</value>
+						</product>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/instrumentation/epr[1]/epr-bug-input">
+			<default value="/instrumentation/epr[1]/epr-bug-input" />
+			<test logic="AND" value="/controls/engines/engine[1]/man-epr">
+				/instrumentation/epr[1]/power-avail eq 1
+				/controls/engines/engine[1]/man-epr-set eq 1
+			</test>
+			<test value="/systems/engines/limit/active">
+				/instrumentation/epr[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/instrumentation/epr[1]/epr-bug">
+			<input>/instrumentation/epr[1]/epr-bug-input</input>
+			<rate_limit>1.25</rate_limit>
+			<lag>20</lag>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="N1/N2 Gauges" execrate="2"> 
+		
+		
+		<lag_filter name="/instrumentation/n[0]/n1">
+			<input>/systems/engines/n1-actual-1</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/n[0]/n2">
+			<input>/systems/engines/n2-actual-1</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<lag_filter name="/instrumentation/n[1]/n1">
+			<input>/systems/engines/n1-actual-2</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<lag_filter name="/instrumentation/n[1]/n2">
+			<input>/systems/engines/n2-actual-2</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<lag_filter name="/instrumentation/apu-n/n">
+			<input>/systems/apu/n1-actual</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="EGT Gauges" execrate="2">
+		
+		
+		<switch name="/instrumentation/egt[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-dc ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/egt[0]/egt-input">
+			<default value="/instrumentation/egt[0]/egt-input" />
+			<test value="/systems/engines/egt-actual-1">
+				/instrumentation/egt[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/egt[0]/egt">
+			<input>/instrumentation/egt[0]/egt-input</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/egt[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/dc-trans ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/egt[1]/egt-input">
+			<default value="/instrumentation/egt[1]/egt-input" />
+			<test value="/systems/engines/egt-actual-2">
+				/instrumentation/egt[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/egt[1]/egt">
+			<input>/instrumentation/egt[1]/egt-input</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/apu-egt/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/dc-bat ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/apu-egt/egt-input">
+			<default value="/instrumentation/apu-egt/egt-input" />
+			<test value="/systems/apu/egt-actual">
+				/instrumentation/apu-egt/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/apu-egt/egt">
+			<input>/instrumentation/apu-egt/egt-input</input>
+			<c1>10</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="FF Gauges" execrate="2"> 
+		
+		
+		<switch name="/instrumentation/ff[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-l ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ff[0]/ff-input">
+			<default value="/instrumentation/ff[0]/ff-input" />
+			<test value="/systems/engines/ff-actual-1">
+				/instrumentation/ff[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ff[0]/ff">
+			<input>/instrumentation/ff[0]/ff-input</input>
+			<c1>7.5</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ff[0]/fu-input">
+			<default value="/instrumentation/ff[0]/fu-input" />
+			<test value="propulsion/engine[0]/fuel-used-lbs">
+				/instrumentation/ff[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ff[0]/fu-reset-trim">
+			<default value="/instrumentation/ff[0]/fu-reset-trim" />
+			<test logic="AND" value="propulsion/engine[0]/fuel-used-lbs">
+				/instrumentation/ff[0]/power-avail eq 1
+				/controls/engines/fu-reset eq 1
+			</test>
+		</switch>
+		
+		<summer name="/instrumentation/ff[0]/fu-cmd">
+			<input>/instrumentation/ff[0]/fu-input</input>
+			<input>-/instrumentation/ff[0]/fu-reset-trim</input>
+		</summer>
+		
+		<lag_filter name="/instrumentation/ff[0]/fu">
+			<input>/instrumentation/ff[0]/fu-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/ff[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ff[1]/ff-input">
+			<default value="/instrumentation/ff[1]/ff-input" />
+			<test value="/systems/engines/ff-actual-2">
+				/instrumentation/ff[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ff[1]/ff">
+			<input>/instrumentation/ff[1]/ff-input</input>
+			<c1>7.5</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/ff[1]/fu-input">
+			<default value="/instrumentation/ff[1]/fu-input" />
+			<test value="propulsion/engine[1]/fuel-used-lbs">
+				/instrumentation/ff[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ff[1]/fu-reset-trim">
+			<default value="/instrumentation/ff[1]/fu-reset-trim" />
+			<test logic="AND" value="propulsion/engine[1]/fuel-used-lbs">
+				/instrumentation/ff[1]/power-avail eq 1
+				/controls/engines/fu-reset eq 1
+			</test>
+		</switch>
+		
+		<summer name="/instrumentation/ff[1]/fu-cmd">
+			<input>/instrumentation/ff[1]/fu-input</input>
+			<input>-/instrumentation/ff[1]/fu-reset-trim</input>
+		</summer>
+		
+		<lag_filter name="/instrumentation/ff[1]/fu">
+			<input>/instrumentation/ff[1]/fu-cmd</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Oil Pressure Gauges" execrate="2">
+		
+		
+		<switch name="/instrumentation/op[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-l ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/op[0]/op-input">
+			<default value="/instrumentation/op[0]/op-input" />
+			<test value="/engines/engine[0]/oil-psi">
+				/instrumentation/op[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/op[0]/op">
+			<input>/instrumentation/op[0]/op-input</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/op[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/ac-r ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/op[1]/op-input">
+			<default value="/instrumentation/op[1]/op-input" />
+			<test value="/engines/engine[1]/oil-psi">
+				/instrumentation/op[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/op[1]/op">
+			<input>/instrumentation/op[1]/op-input</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Oil Temperature Gauges" execrate="2">
+		
+		
+		<switch name="/instrumentation/ot[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/inst-ac-l ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ot[0]/ot-input">
+			<default value="/instrumentation/ot[0]/ot-input" />
+			<test value="/engines/engine[0]/oil-temp">
+				/instrumentation/ot[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ot[0]/ot">
+			<input>/instrumentation/ot[0]/ot-input</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/ot[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/inst-ac-r ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/ot[1]/ot-input">
+			<default value="/instrumentation/ot[1]/ot-input" />
+			<test value="/engines/engine[1]/oil-temp">
+				/instrumentation/ot[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/ot[1]/ot">
+			<input>/instrumentation/ot[1]/ot-input</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Oil Quantity Gauges" execrate="2">
+		
+		
+		<switch name="/instrumentation/oq[0]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/dc-l ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/oq[0]/oq-input">
+			<default value="/instrumentation/oq[0]/oq-input" />
+			<test value="/engines/engine[0]/oil-qty">
+				/instrumentation/oq[0]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/oq[0]/oq">
+			<input>/instrumentation/oq[0]/oq-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/oq[1]/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/dc-r ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/oq[1]/oq-input">
+			<default value="/instrumentation/oq[1]/oq-input" />
+			<test value="/engines/engine[1]/oil-qty">
+				/instrumentation/oq[1]/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/oq[1]/oq">
+			<input>/instrumentation/oq[1]/oq-input</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Flap and Slat Gauge" execrate="2">
+		
+		<switch name="/instrumentation/flap-slat/power-avail-l">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/dc-radio-l ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/flap-slat/flap-l-input">
+			<default value="/instrumentation/flap-slat/flap-l-input" />
+			<test value="fcs/flap-pos-deg">
+				/instrumentation/flap-slat/power-avail-l eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/flap-slat/flap-l">
+			<input>/instrumentation/flap-slat/flap-l-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/flap-slat/power-avail-r">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/dc-radio-r ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/flap-slat/flap-r-input">
+			<default value="/instrumentation/flap-slat/flap-r-input" />
+			<test value="fcs/flap-pos-deg">
+				/instrumentation/flap-slat/power-avail-r eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/flap-slat/flap-r">
+			<input>/instrumentation/flap-slat/flap-r-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/flap-slat/slat">
+			<default value="2" /> 
+			<test logic="AND" value="2"> 
+				/systems/fcs/flaps/cmd ge 13.5
+				/systems/fcs/flaps/cmd le 14.5
+			</test>
+			<test value="3"> 
+				/systems/dfgs/auto-slat-ext eq 1
+			</test>
+			<test logic="AND" value="4"> 
+				fcs/slat-pos-deg ge 19.9
+				/systems/fcs/flaps/input ge 7
+			</test>
+			<test logic="AND" value="1"> 
+				fcs/slat-pos-deg ge 9.9
+				fcs/slat-pos-deg le 10.1
+				/systems/fcs/slats/cmd eq 10
+			</test>
+			<test logic="AND" value="1"> 
+				fcs/slat-pos-deg ge 19.9
+				/systems/fcs/slats/cmd eq 20
+			</test>
+			<test logic="AND" value="0"> 
+				fcs/slat-pos-deg lt 0.1
+				/systems/fcs/flaps/input eq 0
+			</test>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Hydraulic Gauges" execrate="2">
+		
+		
+		<switch name="/instrumentation/hyd-press/power-avail-l">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/inst-ac-l ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hyd-press/psi-input-l">
+			<default value="/instrumentation/hyd-press/psi-input-l" />
+			<test value="/systems/hydraulics/sys-l-psi">
+				/instrumentation/hyd-press/power-avail-l eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hyd-press/psi-l">
+			<input>/instrumentation/hyd-press/psi-input-l</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/hyd-press/power-avail-r">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/inst-ac-r ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hyd-press/psi-input-r">
+			<default value="/instrumentation/hyd-press/psi-input-r" />
+			<test value="/systems/hydraulics/sys-r-psi">
+				/instrumentation/hyd-press/power-avail-r eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hyd-press/psi-r">
+			<input>/instrumentation/hyd-press/psi-input-r</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/hyd-qty/power-avail-l">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/inst-ac-l ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hyd-qty/qty-input-l">
+			<default value="/instrumentation/hyd-qty/qty-input-l" />
+			<test value="/systems/hydraulics/sys-l-qty">
+				/instrumentation/hyd-qty/power-avail-l eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hyd-qty/qty-l">
+			<input>/instrumentation/hyd-qty/qty-input-l</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		
+		<switch name="/instrumentation/hyd-qty/power-avail-r">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/inst-ac-r ge 24
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/hyd-qty/qty-input-r">
+			<default value="/instrumentation/hyd-qty/qty-input-r" />
+			<test value="/systems/hydraulics/sys-r-qty">
+				/instrumentation/hyd-qty/power-avail-r eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/hyd-qty/qty-r">
+			<input>/instrumentation/hyd-qty/qty-input-r</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="TRI and Assumed Temp" execrate="2">
+		
+		
+		<switch name="/instrumentation/tri/rat-cmd">
+			<default value="/instrumentation/tri/rat-cmd" />
+			<test logic="AND" value="12">
+				/systems/dfgs/power-avail eq 1
+				/systems/engines/limit/active-mode-int eq 6
+			</test>
+			<test logic="OR" value="propulsion/tat-c">
+				/systems/dfgs/power-avail eq 1
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/instrumentation/tri/rat-fixed">
+			<function>
+				<floor>
+					<sum>
+						<abs>
+							<property>/instrumentation/tri/rat-cmd</property>
+						</abs>
+						<value>0.5</value> 
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/instrumentation/tri/rat">
+			<input>/instrumentation/tri/rat-fixed</input>
+			<rate_limit>125</rate_limit>
+			<lag>15</lag>
+		</actuator>
+		
+		<fcs_function name="/instrumentation/tri/rat-d10">
+			<function>
+				<quotient>
+					<property>/instrumentation/tri/rat</property>
+					<value>10</value>
+				</quotient>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/tri/rat-d1">
+			<function>
+				<product>
+					<fraction>
+						<quotient>
+							<property>/instrumentation/tri/rat</property>
+							<value>10</value>
+						</quotient>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/instrumentation/tri/rat-polarity-raw">
+			<default value="1" />
+			<test logic="OR" value="0">
+				/instrumentation/tri/rat-cmd le -0.5
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/tri/rat-polarity">
+			<input>/instrumentation/tri/rat-polarity-raw</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/tri/limit-active">
+			<default value="/instrumentation/tri/limit-active" />
+			<test logic="OR" value="/systems/engines/limit/active-ind">
+				/systems/dfgs/power-avail eq 1
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<pure_gain name="/instrumentation/tri/limit-d100">
+			<input>/instrumentation/tri/limit-active</input>
+			<gain>1.0</gain>
+		</pure_gain>
+		
+		<fcs_function name="/instrumentation/tri/limit-d10">
+			<function>
+				<product>
+					<difference>
+						<property>/instrumentation/tri/limit-active</property>
+						<floor>
+							<property>/instrumentation/tri/limit-active</property>
+						</floor>
+					</difference>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/tri/limit-d1">
+			<function>
+				<product>
+					<fraction>
+						<product>
+							<property>/instrumentation/tri/limit-active</property>
+							<value>10</value>
+						</product>
+					</fraction>
+					<value>10</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/assumed-temp/input-fixed">
+			<function>
+				<sum>
+					<abs>
+						<property>/systems/engines/limit/flex-temp</property>
+					</abs>
+					<value>0.5</value> 
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/assumed-temp/input-d10">
+			<function>
+				<floor>
+					<quotient>
+						<property>/instrumentation/assumed-temp/input-fixed</property>
+						<value>10</value>
+					</quotient>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/instrumentation/assumed-temp/input-d1">
+			<function>
+				<floor>
+					<product>
+						<fraction>
+							<quotient>
+								<property>/instrumentation/assumed-temp/input-fixed</property>
+								<value>10</value>
+							</quotient>
+						</fraction>
+						<value>10</value>
+					</product>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<linear_actuator name="/instrumentation/assumed-temp/d1-linear">
+			<input>/instrumentation/assumed-temp/input-d1</input>
+			<module>10</module>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/assumed-temp/d1-lag">
+			<input>/instrumentation/assumed-temp/d1-linear</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/assumed-temp/d1"> 
+			<function> 
+				<difference>
+					<property>/instrumentation/assumed-temp/d1-lag</property>
+					<product>
+						<floor>
+							<quotient>
+								<property>/instrumentation/assumed-temp/d1-lag</property>
+								<value>10</value>
+							</quotient>
+						</floor>
+						<value>10</value>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<linear_actuator name="/instrumentation/assumed-temp/d10-linear">
+			<input>/instrumentation/assumed-temp/input-d10</input>
+			<module>6</module>
+		</linear_actuator>
+		
+		<lag_filter name="/instrumentation/assumed-temp/d10-lag">
+			<input>/instrumentation/assumed-temp/d10-linear</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/assumed-temp/d10"> 
+			<function> 
+				<difference>
+					<property>/instrumentation/assumed-temp/d10-lag</property>
+					<product>
+						<floor>
+							<sum>
+								<quotient>
+									<property>/instrumentation/assumed-temp/d10-lag</property>
+									<value>6</value>
+								</quotient>
+								<value>0.499999</value> 
+							</sum>
+						</floor>
+						<value>6</value>
+					</product>
+				</difference>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Fuel Gauge" execrate="8">
+		
+		<fcs_function name="/instrumentation/fuel/gw-lbs">
+			<function>
+				<ifthen>
+					<eq>
+						<property>/controls/switches/annun-test</property>
+						<value>1</value>
+					</eq>
+					<value>888888</value>
+					<product>
+						<floor>
+							<sum>
+								<quotient>
+									<sum>
+										<property>inertia/zfw-lbs</property>
+										<property>/systems/fuel/tank-a-lbs</property>
+									</sum>
+									<value>25</value>
+								</quotient>
+								<value>0.5</value>
+							</sum>
+						</floor>
+						<value>25</value>
+					</product>
+				</ifthen>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Pneumatic System Gauges" execrate="2">
+		
+		<switch name="/instrumentation/air-press-l/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/air-press-l/psi-input">
+			<default value="/instrumentation/air-press-l/psi-input" />
+			<test value="/systems/pneumatics/bleed-l-psi">
+				/instrumentation/air-press-l/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/air-press-l/psi">
+			<input>/instrumentation/air-press-l/psi-input</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/air-press-r/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/air-press-r/psi-input">
+			<default value="/instrumentation/air-press-r/psi-input" />
+			<test value="/systems/pneumatics/bleed-r-psi">
+				/instrumentation/air-press-r/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/air-press-r/psi">
+			<input>/instrumentation/air-press-r/psi-input</input>
+			<c1>15</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/pneu-press/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/electrical/bus/emer-ac ge 112
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/instrumentation/pneu-press/psi-input">
+			<default value="/instrumentation/pneu-press/psi-input" />
+			<test value="/systems/pneumatics/x-bleed/psi">
+				/instrumentation/pneu-press/power-avail eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/instrumentation/pneu-press/psi">
+			<input>/instrumentation/pneu-press/psi-input</input>
+			<c1>15</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Electrical Meters" execrate="2">
+		
+		<switch name="/instrumentation/elec-meters/ac-volt-input">
+			<default value="0" />
+			<test value="/systems/electrical/sources/apu/output-volt">
+				/controls/electrical/meters eq 0
+			</test>
+			<test value="/systems/electrical/sources/ext/output-volt">
+				/controls/electrical/meters eq 1
+			</test>
+			<test value="/systems/electrical/sources/idg-l/output-volt">
+				/controls/electrical/meters eq 2
+			</test>
+			<test value="/systems/electrical/sources/idg-r/output-volt">
+				/controls/electrical/meters eq 3
+			</test>
+			<clipto>
+				<min>0</min>
+				<max>150</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/instrumentation/elec-meters/ac-volt">
+			<input>/instrumentation/elec-meters/ac-volt-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<switch name="/instrumentation/elec-meters/ac-hertz-input">
+			<default value="0" />
+			<test value="/systems/electrical/sources/apu/output-hertz">
+				/controls/electrical/meters eq 0
+			</test>
+			<test value="/systems/electrical/sources/ext/output-hertz">
+				/controls/electrical/meters eq 1
+			</test>
+			<test value="/systems/electrical/sources/idg-l/output-hertz">
+				/controls/electrical/meters eq 2
+			</test>
+			<test value="/systems/electrical/sources/idg-r/output-hertz">
+				/controls/electrical/meters eq 3
+			</test>
+			<clipto>
+				<min>369</min>
+				<max>431</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/instrumentation/elec-meters/ac-hertz">
+			<input>/instrumentation/elec-meters/ac-hertz-input</input>
+			<c1>20</c1>
+		</lag_filter>
+		
+		<fcs_function name="/instrumentation/elec-meters/dc-bat-amp-converted"> 
+			<function>
+				<product>
+					<avg>
+						<property>/systems/electrical/sources/bat-1/amp</property>
+						<property>/systems/electrical/sources/bat-2/amp</property>
+					</avg>
+					<value>0.5</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/instrumentation/elec-meters/dc-volt-amp-input">
+			<default value="0" />
+			<test value="/systems/electrical/bus/dc-l">
+				/controls/electrical/meters eq 2
+			</test>
+			<test value="/systems/electrical/bus/dc-r">
+				/controls/electrical/meters eq 3
+			</test>
+			<test value="/systems/electrical/bus/dc-bat-direct">
+				/controls/electrical/meters eq 4
+			</test>
+			<test value="/instrumentation/elec-meters/dc-bat-amp-converted">
+				/controls/electrical/meters eq 5
+			</test>
+			<clipto>
+				<min>-50</min>
+				<max> 50</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/instrumentation/elec-meters/dc-volt-amp">
+			<input>/instrumentation/elec-meters/dc-volt-amp-input</input>
+			<c1>10</c1>
+		</lag_filter>
+	
+	</channel>
+
+</system>

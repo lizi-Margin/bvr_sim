@@ -1,0 +1,50 @@
+All models (AC3D format) and textures (PNG format or XCF format) are licensed
+under Creative Commons Attribution 4.0 Unported (CC-BY) or any later version.
+https://creativecommons.org/licenses/by/4.0/
+
+Exceptions: The following files are licensed under the GNU General Public
+License, version 2 or above.
+ * Models/Flightdeck/CRJ700-flightdeck.ac
+ * Models/Effects/fire.png
+ * Models/Effects/smoke.png
+ * Models/Lights/greennav.ac
+ * Models/Lights/landing-bare.ac
+ * Models/Lights/landing.ac
+ * Models/Lights/strobe.ac
+ * Models/Lights/rednav.ac
+ * Models/Lights/lights.png
+ * Models/Liveries/CRJ700/EXK.png
+ * Models/Liveries/CRJ700/DAN.png
+ * Models/Liveries/CRJ700ER/LRL.png
+ * Models/Liveries/CRJ700ER/SAL.png
+ * Models/Liveries/CRJ900/JZA.png
+ * Models/Liveries/CRJ900/JZA-1.png
+ * Models/Liveries/CRJ900/JZA-2.png
+ * Models/Liveries/CRJ900/JZA-3.png
+ * Models/Liveries/CRJ1000/BZH.png
+ * Models/Flightdeck/asilimits.png
+ * Models/Flightdeck/checklist.png
+ * Models/Flightdeck/warnings.png
+ * Models/wheel.png
+ * Models/Interior/bins.png
+ * Models/Instruments/MCP/hole.png
+ * Models/Instruments/MFD/mfd.png
+ * Models/Instruments/MFD/symbols.png
+ * Models/Instruments/MFD/wxradar/od_wxradar1.png
+ * Models/Instruments/MFD/wxradar/wxecho.png
+ * Models/Instruments/OHP/OHP_switch_knob.png
+ * Models/Instruments/PFD/pfd.png
+ * Models/Instruments/PFD/symbols.png
+ * Models/Instruments/PFD/spd-tape.png
+ * Models/Instruments/Standby/ati.png
+ * Models/Instruments/Standby/spd-tape.png
+ * Models/Instruments/UpperPanel/compassref.png
+ * Models/Instruments/UpperPanel/OHP_switch_knob.png
+
+All markup (XML), scripts (Nasal), and sounds (WAV) are licensed under the GNU
+General Public License, version 2 or above.
+https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+All documentation (Docs/ directory) is licensed under the GNU Free Documentation
+License, version 1.3 or above.
+https://www.gnu.org/copyleft/fdl.html

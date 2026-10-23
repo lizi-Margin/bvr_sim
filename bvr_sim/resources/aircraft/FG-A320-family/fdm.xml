@@ -1,0 +1,257 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fdm_config name="A320-200-IAE" version="2.0" release="BETA">
+
+	<aerodynamics file="FDE/Config/a320-aerodynamics.xml" />
+	<external_reactions file="FDE/Config/a320-external-reactions" />
+	<ground_reactions file="FDE/Config/a320-ground-reactions" />
+	<metrics file="FDE/Config/a320-metrics" />
+	
+	<system file="a320-libraries" />
+	<system file="glass-effect" />
+	<system file="a320-fbw" />
+	<system file="a320-fcs" />
+	<system file="a320-v2527-a5-engine-fadec" />
+	<system file="a320-fuel" />
+	<system file="a320-fwc" />
+	<system file="a320-fwc-phases" />
+	<system file="a320-spoilers" />
+	<system file="a320-electrical" />
+	<system file="a320-hydraulic" />
+	<system file="a320-pneumatic" />
+    <system file="a320-aircond" /> 
+	<system file="a320-ignition" />
+	<system file="a320-lights" />
+	<system file="a320-indicators" />
+	<system file="a320-engine-fire" />
+	<system file="a320-adr" />
+	<system file="a320-apu" />
+	<system file="a320-oxygen" />
+	<system file="a320-fmgc" />
+	<system file="a320-misc" />
+	<system file="a320-cockpit" />
+	
+	<mass_balance>
+		<ixx unit="SLUG*FT2">709691</ixx>
+		<iyy unit="SLUG*FT2">1837076</iyy>
+		<izz unit="SLUG*FT2">1392122</izz>
+		<ixy unit="SLUG*FT2">0</ixy>
+		<ixz unit="SLUG*FT2">0</ixz>
+		<iyz unit="SLUG*FT2">0</iyz>
+		<emptywt unit="LBS">95409.5</emptywt>
+		
+		<location name="CG" unit="M">
+			<x>-2.4335</x> 
+			<y>0</y>
+			<z>-0.934</z>
+		</location>
+		
+		<pointmass name="Cockpit Crew">
+			<weight unit="LBS">320</weight>
+			<location name="POINTMASS" unit="M">
+				<x>-15.44</x>
+				<y>0</y>
+				<z>0.39</z>
+			</location>
+		</pointmass>
+		
+		<pointmass name="Forward Cabin">
+			<weight unit="LBS">5896</weight>
+			<location name="POINTMASS" unit="M">
+				<x>-10.8</x>
+				<y>0</y>
+				<z>0.39</z>
+			</location>
+		</pointmass>
+		<pointmass name="Center Cabin">
+			<weight unit="LBS">7256</weight>
+			<location name="POINTMASS" unit="M">
+				<x>-3.3</x>
+				<y>0</y>
+				<z>0.39</z>
+			</location>
+		</pointmass>
+		<pointmass name="Aft Cabin">
+			<weight unit="LBS">6651</weight>
+			<location name="POINTMASS" unit="M">
+				<x>4.9</x>
+				<y>0</y>
+				<z>0.39</z>
+			</location>
+		</pointmass>
+		
+		<pointmass name="Fwd Cargo">
+			<weight unit="LBS">3000</weight>
+			<location name="POINTMASS" unit="M">
+				<x>-6.8</x>
+				<y>0</y>
+				<z>-1</z>
+			</location>
+		</pointmass>
+		<pointmass name="Aft Cargo">
+			<weight unit="LBS">3000</weight>
+			<location name="POINTMASS" unit="M">
+				<x>4.2</x>
+				<y>0</y>
+				<z>-1</z>
+			</location>
+		</pointmass>
+		<pointmass name="Aft Bulk Cargo">
+			<weight unit="LBS">0</weight>
+			<location name="POINTMASS" unit="M">
+				<x>8.2</x>
+				<y>0</y>
+				<z>-1</z>
+			</location>
+		</pointmass>
+	</mass_balance>
+	
+	<propulsion>
+		<engine file="v2527-a5_1">
+			<feed>5</feed>
+			<thruster file="direct">
+				<location unit="M">
+					<x>-5.34904</x>
+					<y>-2.8775</y>
+					<z>-1.04768</z>
+				</location>
+				<orient unit="DEG">
+					<roll>0.0</roll>
+					<pitch>2</pitch>
+					<yaw>1</yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		<engine file="v2527-a5_2">
+			<feed>6</feed>
+			<thruster file="direct">
+				<location unit="M">
+					<x>-5.34904</x>
+					<y>2.8775</y>
+					<z>-1.04768</z>
+				</location>
+				<orient unit="DEG">
+					<roll>0.0</roll>
+					<pitch>2</pitch>
+					<yaw>-1</yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		<engine file="APS3200">
+			<feed>7</feed>
+			<thruster file="direct">
+				<location unit="M">
+					<x>38.9</x>
+					<y>0</y>
+					<z>0.95</z>
+				</location>
+				<orient unit="DEG">
+					<roll>0.0</roll>
+					<pitch>0.0</pitch>
+					<yaw>0.0</yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>-7.0291</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">1523</capacity>
+			<contents unit="LBS">1523</contents>
+			<unusable-volume unit="LTR">4</unusable-volume>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>-4.1029</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">12272.9</capacity>
+			<contents unit="LBS">4477</contents>
+			<unusable-volume unit="LTR">28</unusable-volume>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>0</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">14623</capacity>
+			<contents unit="LBS">42</contents>
+			<unusable-volume unit="LTR">23.2</unusable-volume>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>4.1029</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">12272.9</capacity>
+			<contents unit="LBS">4477</contents>
+			<unusable-volume unit="LTR">28</unusable-volume>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>7.0291</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">1523</capacity>
+			<contents unit="LBS">1523</contents>
+			<unusable-volume unit="LTR">4</unusable-volume>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>0</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">10</capacity>
+			<contents unit="LBS">0</contents>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>0</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">10</capacity>
+			<contents unit="LBS">0</contents>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+		</tank>
+		<tank type="FUEL">	 
+			<location unit="M">
+				<x>-2.4335</x>
+				<y>0</y>
+				<z>-0.75</z>
+			</location>
+			<capacity unit="LBS">10</capacity>
+			<contents unit="LBS">0</contents>
+			<priority>1</priority>
+			<density unit="LBS/GAL">6.71</density>
+		</tank>
+	</propulsion>
+
+</fdm_config>

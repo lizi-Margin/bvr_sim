@@ -1,0 +1,434 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Instruments">
+    <property>/instrumentation/nav[0]/heading-deg</property>
+    <property value="0">/sim/model/navaid/input/chan-XX</property>
+    <property>/sim/model/navaid/input/selector</property>
+    <property>/sim/model/navaid/input/freqtype</property>
+    <property>/sim/model/navaid/input/store</property>
+    <property>instruments/heading-indicator/switch-autopilot</property>
+    <property>/sim/model/navaid/input/val-nnn-XX</property>
+    <property>/sim/model/navaid/input/val-nnX-nn</property>
+    <property>/sim/model/navaid/input/val-XXn-nn</property>
+    
+    
+    
+    <property value="0">instruments/autopilot-hold</property>
+    
+    <property>/instrumentation/heading-indicator/heading-marker</property>
+    <property>/instrumentation/heading-indicator/heading-bug-deg</property>
+    <property>/instrumentation/heading-indicator/course-pointer</property>
+    
+    
+    <property>/sim/model/navaid/presets[0]/selected/adf-freq-khz</property>
+    <property>/sim/model/navaid/presets[0]/selected/nav-freq-mhz</property>
+    <property>/sim/model/navaid/presets[0]/selected/dme-freq-mhz</property>
+    <property>/sim/model/navaid/presets[1]/selected/adf-freq-khz</property>
+    <property>/sim/model/navaid/presets[1]/selected/nav-freq-mhz</property>
+    <property>/sim/model/navaid/presets[1]/selected/dme-freq-mhz</property>
+    <property>/sim/model/navaid/presets[2]/selected/adf-freq-khz</property>
+    <property>/sim/model/navaid/presets[2]/selected/nav-freq-mhz</property>
+    <property>/sim/model/navaid/presets[2]/selected/dme-freq-mhz</property>
+    <property>/sim/model/navaid/presets[3]/selected/adf-freq-khz</property>
+    <property>/sim/model/navaid/presets[3]/selected/nav-freq-mhz</property>
+    <property>/sim/model/navaid/presets[3]/selected/dme-freq-mhz</property>
+    <property>/sim/model/navaid/presets[4]/selected/adf-freq-khz</property>
+    <property>/sim/model/navaid/presets[4]/selected/nav-freq-mhz</property>
+    <property>/sim/model/navaid/presets[4]/selected/dme-freq-mhz</property>
+    <property>/sim/model/navaid/presets[5]/selected/adf-freq-khz</property>
+    <property>/sim/model/navaid/presets[5]/selected/nav-freq-mhz</property>
+    <property>/sim/model/navaid/presets[5]/selected/dme-freq-mhz</property>
+    
+    
+    
+    
+    <channel name="AoA">
+
+        
+
+
+        
+
+        
+
+    </channel>
+    
+    <channel name="ILS">
+        
+        
+        
+        
+       
+        
+        
+       
+        
+        
+        <summer name="instruments/ils/fromto_pointer_val1">
+            <input>/orientation/heading-magnetic-deg</input>
+            <input>-/instrumentation/nav[0]/heading-deg</input>
+        </summer>
+        <fcs_function name="instruments/ils/fromto_pointer_val2">
+            <function>
+                <sum>
+                    <property>instruments/ils/fromto_pointer_val1</property>
+                    <value>360</value>
+                </sum>
+            </function>
+        </fcs_function>
+        <switch name="instruments/ils/fromto_pointer">
+            <default value="instruments/ils/fromto_pointer_val1" />
+            <test value="instruments/ils/fromto_pointer_val2">
+                instruments/ils/fromto_pointer_val1 lt 0
+            </test>
+        </switch>
+        
+        
+        <switch name="instruments/ils/fromto_pointer_ils">
+            <default value="instruments/ils/fromto_pointer" />
+            <test logic="AND" value="30">
+                instruments/ils/fromto_pointer gt 30
+                instruments/ils/fromto_pointer lt 90
+            </test>
+            <test logic="AND" value="150">
+                instruments/ils/fromto_pointer ge 90
+                instruments/ils/fromto_pointer lt 150
+            </test>
+            <test logic="AND" value="210">
+                instruments/ils/fromto_pointer le 270
+                instruments/ils/fromto_pointer gt 210
+            </test>
+            <test logic="AND" value="330">
+                instruments/ils/fromto_pointer gt 270
+                instruments/ils/fromto_pointer lt  330
+            </test>
+        </switch>
+        
+        <summer name="instruments/heading-indicator/fromto-pointer">
+            <input>instruments/ils/fromto_pointer_ils</input>
+        </summer>
+        
+    </channel>
+    
+    <channel name="AI">
+        
+        
+        <switch name="instruments/instrument-ignit-cmd">
+            <default value="0" />
+            <test logic="AND" value="30">
+                /systems/electrical/outputs/instr-ignition-switch  lt 27
+            </test>
+        </switch>
+        
+        
+       
+        
+        <kinematic name="instruments/ai/roll-deg-mute">
+            <input>instruments/instrument-ignit-cmd</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>30</position>
+                    <time>3</time>
+                </setting>
+            </traverse>
+        </kinematic>
+        
+        <kinematic name="instruments/ai/pitch-deg-mute">
+            <input>instruments/instrument-ignit-cmd</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>30</position>
+                    <time>3</time>
+                </setting>
+            </traverse>
+        </kinematic>
+        
+        <summer name="instruments/ai/roll-deg-on">
+            <input>/orientation/roll-deg</input>
+            <input>instruments/ai/roll-deg-mute</input>
+        </summer>
+        
+        <summer name="instruments/ai/pitch-deg-on">
+            <input>/orientation/pitch-deg</input>
+            <input>instruments/ai/pitch-deg-mute</input>
+        </summer>
+        
+        
+        
+      
+        
+        <switch name="instruments/ai/roll-deg">
+            <default value="instruments/ai/roll-deg-on" />
+            <test logic="AND" value="instruments/ai/roll-deg-mute">
+                instruments/ai/roll-deg-mute gt 1
+                /systems/electrical/outputs/instr-ignition-switch  lt 27
+            </test>
+        </switch>
+        
+        <switch name="instruments/ai/pitch-deg">
+            <default value="instruments/ai/pitch-deg-on" />
+            <test logic="AND" value="instruments/ai/pitch-deg-mute">
+                instruments/ai/pitch-deg-mute gt 1
+                /systems/electrical/outputs/instr-ignition-switch  lt 27
+            </test>
+        </switch>
+        
+    </channel>
+    
+    <channel name="TACAN">
+        
+        
+        
+   </channel>
+  
+   
+   <channel name="INPUT">
+       <fcs_function name="instruments/input/freq">
+           <function>
+               <sum>
+                   <product>
+                       <property>/sim/model/navaid/input/val-nnn-XX</property>
+                       <value>0.01</value>
+                   </product>
+                   <product>
+                       <property>/sim/model/navaid/input/val-nnX-nn</property>
+                       <value>1</value>
+                   </product>
+                   <product>
+                       <property>/sim/model/navaid/input/val-XXn-nn</property>
+                       <value>10</value>
+                   </product>
+               </sum>
+           </function>
+           <output>/sim/model/navaid/input/val-XXX-XX</output>
+        </fcs_function>
+        
+        <summer name="Index">
+            <input>/sim/model/navaid/input/chan-XX</input>
+        </summer>
+   </channel>
+   
+   <channel name="ADF">
+       <switch name="instruments/adf/sel-freq">
+           <default value="/instrumentation/adf/frequencies/selected-khz" />
+           <test logic="AND" value="/sim/model/navaid/presets[0]/selected/adf-freq-khz">
+               /sim/model/navaid/input/chan-XX == 0
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[1]/selected/adf-freq-khz">
+               /sim/model/navaid/input/chan-XX == 1
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[2]/selected/adf-freq-khz">
+               /sim/model/navaid/input/chan-XX == 2
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[3]/selected/adf-freq-khz">
+               /sim/model/navaid/input/chan-XX == 3
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[4]/selected/adf-freq-khz">
+               /sim/model/navaid/input/chan-XX == 4
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[5]/selected/adf-freq-khz">
+               /sim/model/navaid/input/chan-XX == 5
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/input/val-XXX-XX">
+               /sim/model/navaid/input/freqtype == 0
+               /sim/model/navaid/input/selector == 0
+               /sim/model/navaid/input/store == 1
+           </test>
+           <output>/instrumentation/adf/frequencies/selected-khz</output>
+        </switch>
+   </channel>
+   
+   <channel name="NAV">
+       <switch name="instruments/nav/sel-freq">
+           <default value="/instrumentation/nav/frequencies/selected-mhz" />
+           <test logic="AND" value="/sim/model/navaid/presets[0]/selected/nav-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 0
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[1]/selected/nav-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 1
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[2]/selected/nav-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 2
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[3]/selected/nav-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 3
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[4]/selected/nav-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 4
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[5]/selected/nav-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 5
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/input/val-XXX-XX">
+               /sim/model/navaid/input/freqtype == 2
+               /sim/model/navaid/input/selector == 0
+               /sim/model/navaid/input/store == 1
+           </test>
+           <output>/instrumentation/nav/frequencies/selected-mhz</output>
+       </switch>
+   </channel>
+   
+   <channel name="DME">
+       <switch name="instruments/dme/sel-freq">
+           <default value="/instrumentation/dme/frequencies/selected-mhz" />
+           <test logic="AND" value="/sim/model/navaid/presets[0]/selected/dme-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 0
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[1]/selected/dme-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 1
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[2]/selected/dme-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 2
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[3]/selected/dme-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 3
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[4]/selected/dme-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 4
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/presets[5]/selected/dme-freq-mhz">
+               /sim/model/navaid/input/chan-XX == 5
+               /sim/model/navaid/input/selector == 1
+           </test>
+           <test logic="AND" value="/sim/model/navaid/input/val-XXX-XX">
+               /sim/model/navaid/input/freqtype == 1
+               /sim/model/navaid/input/selector == 0
+               /sim/model/navaid/input/store == 1
+           </test>
+           <output>/instrumentation/dme/frequencies/selected-mhz</output>
+       </switch>
+      
+   </channel>
+   <channel name="AUTOPILOT">
+      
+       <switch name="instruments/autopilot/heading-bug">
+           <default value="0" />
+           <test logic="AND" value="55">
+               instruments/heading-indicator/switch-autopilot == 1
+           </test>
+           <output>instruments/autopilot/locks/heading</output>
+        </switch>
+   </channel>
+   
+   <property value="0">/autopilot/switch-heading</property>
+   <property value="0">/autopilot/switch-altitude</property>
+    <property value="0">/autopilot/switch-aoa</property>
+   <property value="0">/instrumentation/heading-indicator/switch-tacan-acls</property>
+   
+   <channel name="autopilot-switch">
+       
+       
+       
+       <switch name="/autopilot/switch-master">
+	   <default value="0" />
+	        <test logic="OR" value="1">
+		    /autopilot/switch-heading == 1
+		    /autopilot/switch-altitude == 1
+		    /autopilot/switch-aoa  == 1
+	        </test>
+		<output>instruments/autopilot-hold</output>
+	</switch> 
+	
+	<switch name="/autopilot/settings/heading-bug-deg">
+	    <default value="0" />
+	    <test logic="AND" value="/instrumentation/heading-indicator/heading-marker">
+		/autopilot/switch-heading == 1
+		/instrumentation/heading-indicator/switch-tacan-acls  == 1
+		/instrumentation/heading-indicator/nav-switch == 0
+	    </test>
+	    <test logic="AND" value="/instrumentation/heading-indicator/course-pointer">
+		/autopilot/switch-heading == 1
+		/instrumentation/heading-indicator/switch-tacan-acls  == 1
+		/instrumentation/heading-indicator/nav-switch != 0
+	    </test>
+	</switch> 
+	
+	<switch name="instruments/autopilot-lock-heading-bug">
+	    <default value="0" />
+	    <test logic="AND" value="1">
+		/autopilot/switch-heading == 1
+		/instrumentation/heading-indicator/switch-tacan-acls  == 1
+	    </test>
+	</switch>
+	
+	<switch name="/autopilot/settings/true-heading-deg">
+	    <default value="0" />
+	    <test logic="AND" value="/instrumentation/heading-indicator/course-pointer">
+		/autopilot/switch-heading == 1
+		/instrumentation/heading-indicator/switch-tacan-acls  == 0
+	    </test>
+	</switch>
+	
+	<switch name="instruments/autopilot-lock-true-heading">
+	    <default value="0" />
+	    <test logic="AND" value="1">
+		/autopilot/switch-heading == 1
+		/instrumentation/heading-indicator/switch-tacan-acls  == 0
+	    </test>
+	</switch>
+	
+	<switch name="instruments/autopilot-lock-altitude">
+	    <default value="0" />
+		 <test logic="AND" value="1">
+		      /autopilot/switch-altitude == 1
+		</test>
+	</switch>
+	
+	<switch name="instruments/autopilot-altitude-indicator-switch">
+	    <default value="/autopilot/settings/target-altitude-ft" />
+	    <test logic="AND" value="position/h-sl-ft">
+		instruments/autopilot-lock-altitude == 0
+	    </test>
+	    <test logic="AND" value="instruments/autopilot-altitude-indicator">
+		instruments/autopilot-lock-altitude == 1
+	    </test>
+	    <output>instruments/autopilot-altitude-indicator</output>
+	</switch>
+	
+	<switch name="instruments/autopilot-target-altitude">
+	    <default value="/autopilot/settings/target-altitude-ft" />
+	    <test logic="AND" value="instruments/autopilot-altitude-indicator">
+		/autopilot/switch-altitude == 1
+	    </test>
+	    <output>/autopilot/settings/target-altitude-ft</output>
+	</switch>
+     
+      
+	
+     
+     <switch name="instruments/autopilot-lock-aoa">
+         <default value="0" />
+	 <test logic="AND" value="1">
+            /autopilot/switch-aoa == 1
+         </test>
+     </switch>
+	
+	
+</channel>
+
+
+</system>

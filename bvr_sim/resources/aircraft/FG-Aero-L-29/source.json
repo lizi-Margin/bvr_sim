@@ -1,0 +1,33 @@
+{
+  "set": "Aero-L-29/aerol29-set.xml",
+  "name": "Aero L 29 Delfin (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Aero-L-29/Systems/aerol29-yasim.xml",
+  "jets": 1,
+  "model": "Aero-L-29/Models/aerol29.xml",
+  "tags": [
+    "Aero-Vodochody",
+    "trainer",
+    "1950s",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s",
+    "2020s",
+    "jet",
+    "tricycle",
+    "single-engine",
+    "retractable-gear",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Aero-L-29.zip",
+  "archive_sha256": "e3d19d442e63b08a75489059b618c22ccb98c08997a640b4df92f892ed67eae6",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Aero-L-29.zip"
+}

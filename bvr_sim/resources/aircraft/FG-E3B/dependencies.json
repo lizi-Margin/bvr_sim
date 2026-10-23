@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "JT3D",
+      "source": "E3B/Engines/JT3D.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "direct",
+      "source": "E3B/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "JT3D",
+      "source": "E3B/Engines/JT3D.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "direct",
+      "source": "E3B/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "JT3D",
+      "source": "E3B/Engines/JT3D.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "direct",
+      "source": "E3B/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "JT3D",
+      "source": "E3B/Engines/JT3D.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "E3B/E3B.xml",
+      "reference": "direct",
+      "source": "E3B/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

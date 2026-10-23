@@ -1,0 +1,266 @@
+<?xml version='1.0' encoding='utf-8'?>
+<flight_control name="MC-15: Flight Control System">
+	<channel name="Pitch">
+		<fcs_function name="Pitch Trim Sum">
+			<function>
+				<table>
+					<independentVar lookup="row">fcs/elevator-cmd-norm</independentVar>
+					<independentVar lookup="column">fcs/pitch-trim-cmd-norm</independentVar>
+					<tableData>
+							-1	1
+						-1	-1	-1
+						0	-0.5	0.5
+						1	1	1
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<aerosurface_scale name="Elevator Control">
+			<input>fcs/pitch-trim-sum</input>
+			<range>
+				<min> -0.244 </min> 
+				<max>  0.131 </max> 
+			</range>
+			<output>fcs/hstab-pos-rad</output>
+		</aerosurface_scale>
+		
+		<aerosurface_scale name="Elevator Normalization">
+			<input>fcs/hstab-pos-rad</input>
+			<domain>
+				<min> -0.244 </min>
+				<max>  0.244 </max>
+			</domain>
+			<range>
+				<min> -1 </min>
+				<max>  1 </max>
+			</range>
+			<output>fcs/hstab-pos-norm</output> 
+			<output>fcs/elevator-pos-norm</output> 
+		</aerosurface_scale>
+	</channel>
+	
+	
+	
+	
+	
+	
+	<channel name="Flaps">
+		<kinematic name="Flaps Control">
+			<input>fcs/flap-cmd-norm</input>
+			<traverse>
+				<setting>
+					<position>  3 </position>
+					<time>      0 </time>
+				</setting>
+				<setting>
+					<position> 12 </position>
+					<time>      0.5 </time>
+				</setting>
+				<setting>
+					<position> 27 </position>
+					<time>      0.5 </time>
+				</setting>
+			</traverse>
+			<output>fcs/flap-pos-deg</output>
+		</kinematic>
+	</channel>
+	
+	<channel name="Roll">
+		<fcs_function name="Roll Trim Sum">
+			<function>
+				<table>
+					<independentVar lookup="row">fcs/aileron-cmd-norm</independentVar>
+					<independentVar lookup="column">fcs/roll-trim-cmd-norm</independentVar>
+					<tableData>
+							-1	1
+						-1	-1	-1
+						0	-0.5	0.5
+						1	1	1
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<aerosurface_scale name="Left Aileron Control Deg">
+			<input>fcs/roll-trim-sum</input>
+			<range>
+				<min> -15 </min> 
+				<max>  15 </max> 
+			</range>
+		</aerosurface_scale>
+		
+		<summer name="Left Flaperon Pos Deg">
+			<input>fcs/left-aileron-control-deg</input>
+			<input>fcs/flap-pos-deg</input>
+			<clipto>
+				<min>-15</min>
+				<max> 35</max>
+			</clipto>
+		</summer>
+		
+		<aerosurface_scale name="Right Aileron Control Deg">
+			<input>-fcs/roll-trim-sum</input>
+			<range>
+				<min> -15 </min> 
+				<max>  15 </max> 
+			</range>
+		</aerosurface_scale>
+		
+		<summer name="Right Flaperon Pos Deg">
+			<input>fcs/right-aileron-control-deg</input>
+			<input>fcs/flap-pos-deg</input>
+			<clipto>
+				<min>-15</min>
+				<max> 35</max>
+			</clipto>
+		</summer>
+		
+		<aerosurface_scale name="Left Flaperon Pos Rad">
+			<input>fcs/left-flaperon-pos-deg</input>
+			<domain>
+				<min> -15 </min>
+				<max>  35 </max>
+			</domain>
+			<range>
+				<min> -0.2618 </min>
+				<max>  0.6109 </max>
+			</range>
+		</aerosurface_scale>
+		
+		<aerosurface_scale name="Left Flaperon Pos Norm">
+			<input>fcs/left-flaperon-pos-deg</input>
+			<domain>
+				<min> -15 </min>
+				<max>  35 </max>
+			</domain>
+			<range>
+				<min> -1 </min>
+				<max>  1 </max>
+			</range>
+			<output>fcs/left-aileron-pos-norm</output>
+		</aerosurface_scale>
+		
+		<aerosurface_scale name="Right Flaperon Pos Rad">
+			<input>fcs/right-flaperon-pos-deg</input>
+			<domain>
+				<min> -15 </min>
+				<max>  35 </max>
+			</domain>
+			<range>
+				<min> -0.2618 </min>
+				<max>  0.6109 </max>
+			</range>
+		</aerosurface_scale>
+		
+		<aerosurface_scale name="Right Flaperon Pos Norm">
+			<input>fcs/right-flaperon-pos-deg</input>
+			<domain>
+				<min> -15 </min>
+				<max>  35 </max>
+			</domain>
+			<range>
+				<min> -1 </min>
+				<max>  1 </max>
+			</range>
+			<output>fcs/right-aileron-pos-norm</output>
+		</aerosurface_scale>
+		
+	</channel>
+	
+	<channel name="Yaw">
+		<summer name="Rudder Command Sum">
+			<input>fcs/rudder-cmd-norm</input>
+			<input>fcs/yaw-trim-cmd-norm</input>
+			<clipto>
+				<min> -1 </min>
+				<max>  1 </max>
+			</clipto>
+		</summer>
+		
+		<aerosurface_scale name="Rudder Control">
+			<input>fcs/rudder-command-sum</input>
+			<range>
+				<min> -0.35 </min>
+				<max>  0.35 </max>
+			</range>
+			<output>fcs/rudder-pos-rad</output>
+		</aerosurface_scale>
+		
+		<aerosurface_scale name="Rudder Normalization">
+			<input>fcs/rudder-pos-rad</input>
+			<domain>
+				<min> -0.35 </min>
+				<max>  0.35 </max>
+			</domain>
+			<range>
+				<min> -1 </min>
+				<max>  1 </max>
+			</range>
+			<output>fcs/rudder-pos-norm</output>
+		</aerosurface_scale>
+	</channel>
+	
+	<channel name="Thruster">
+		<summer name="Thrust Coefficient Left">
+			<output>systems/propulsion/thrust-coefficient-left</output>
+		</summer>
+		<summer name="Thrust Coefficient Right">
+			<output>systems/propulsion/thrust-coefficient-right</output>
+		</summer>
+		<summer name="Thrust Coefficient Left-Right">
+			<input>systems/propulsion/thrust-coefficient-left</input>
+			<input>-systems/propulsion/thrust-coefficient-right</input>
+			<output>systems/propulsion/thrust-coefficient-left-right</output>
+		</summer>
+		<summer name="Thrust Coefficient">
+			<input>systems/propulsion/thrust-coefficient-left</input>
+			<input>systems/propulsion/thrust-coefficient-right</input>
+			<output>systems/propulsion/thrust-coefficient</output>
+		</summer>
+	</channel>
+	<channel name="Landing Gear">
+		<switch name="fcs/gear-no-wow">
+			<default value="1" />
+			<test logic="AND" value="0">
+				gear/unit[1]/WOW eq 1
+				gear/unit[2]/WOW eq 1
+			</test>
+		</switch>
+	</channel>
+	
+	<channel name="Engines">
+		<switch name="fcs/magnetos[0]">
+			<default value="0" />
+			<test value="3">
+				/systems/electrical/outputs/ignition[0] gt 10.0
+			</test>
+			<output>/controls/engines/engine[0]/magnetos</output>
+		</switch>
+		<switch name="fcs/magnetos[1]">
+			<default value="0" />
+			<test value="3">
+				/systems/electrical/outputs/ignition[1] gt 10.0
+			</test>
+			<output>/controls/engines/engine[1]/magnetos</output>
+		</switch>
+		
+	</channel>
+	<channel name="Canopy">
+		
+		<kinematic name="/sim/model/canopy-pos-norm">
+			<input>/sim/model/canopy-cmd</input>
+			<traverse>
+				<setting>
+					<position> 0 </position>
+					<time>     0 </time>
+				</setting>
+				<setting>
+					<position> 1 </position>
+					<time>     3 </time>
+				</setting>
+			</traverse>
+		</kinematic>
+	</channel>
+	
+</flight_control>

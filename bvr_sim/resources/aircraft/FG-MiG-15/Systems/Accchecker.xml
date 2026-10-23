@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Accchecker </description>
+	</fileheader>
+
+
+
+	<channel name="Accchecker">
+
+		
+
+		<switch name="calculations/accchecker/max-n-x">
+			<default value="systems/accchecker/max-n-x" />
+			<test logic="AND" value="accelerations/a-pilot-x-ft_sec2">
+				accelerations/a-pilot-x-ft_sec2 gt systems/accchecker/max-n-x
+			</test>
+			<output>systems/accchecker/max-n-x</output>
+		</switch>
+
+		<switch name="calculations/accchecker/max-n-y">
+			<default value="systems/accchecker/max-n-y" />
+			<test logic="AND" value="accelerations/a-pilot-y-ft_sec2">
+				accelerations/a-pilot-y-ft_sec2 gt systems/accchecker/max-n-y
+			</test>
+			<output>systems/accchecker/max-n-y</output>
+		</switch>
+
+		<switch name="calculations/accchecker/max-n-z">
+			<default value="systems/accchecker/max-n-z" />
+			<test logic="AND" value="accelerations/a-pilot-z-ft_sec2">
+				accelerations/a-pilot-z-ft_sec2 gt systems/accchecker/max-n-z
+			</test>
+			<output>systems/accchecker/max-n-z</output>
+		</switch>
+
+		<switch name="calculations/accchecker/max-n-p">
+			<default value="systems/accchecker/max-n-p" />
+			<test logic="AND" value="accelerations/pdot-rad_sec2">
+				accelerations/pdot-rad_sec2 gt systems/accchecker/max-n-p
+			</test>
+			<output>systems/accchecker/max-n-p</output>
+		</switch>
+
+		<switch name="calculations/accchecker/max-n-q">
+			<default value="systems/accchecker/max-n-q" />
+			<test logic="AND" value="accelerations/qdot-rad_sec2">
+				accelerations/qdot-rad_sec2 gt systems/accchecker/max-n-q
+			</test>
+			<output>systems/accchecker/max-n-q</output>
+		</switch>
+
+		<switch name="calculations/accchecker/max-n-r">
+			<default value="systems/accchecker/max-n-r" />
+			<test logic="AND" value="accelerations/rdot-rad_sec2">
+				accelerations/rdot-rad_sec2 gt systems/accchecker/max-n-r
+			</test>
+			<output>systems/accchecker/max-n-r</output>
+		</switch>
+
+	</channel>
+
+</system>

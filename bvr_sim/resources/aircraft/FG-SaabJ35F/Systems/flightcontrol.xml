@@ -1,0 +1,431 @@
+<?xml version='1.0' encoding='utf-8'?>
+<flight_control name="FCS: Draken J35F">
+
+  <function name="fcs/qbar-hydr-quot">
+    <description>effect from dynamic pressure and hydraulic pressure combined</description>
+    <quotient>
+      <property>aero/qbar-psf</property>
+      <property>systems/hydraulic/fsc-force-norm</property>
+    </quotient>
+  </function>  
+
+  <function name="fcs/qbar-hydI-quot">
+    <description>effect from dynamic pressure and hydraulic pressure combined</description>
+    <quotient>
+      <property>aero/qbar-psf</property>
+      <property>systems/hydraulic/hydI-force-norm</property>
+    </quotient>
+  </function>
+    
+  <function name="fcs/sp-drag-effect">
+    <description>Effect on max deflection of speedbrakes due to dragforces</description>
+      <table>
+        <independentVar>fcs/qbar-hydI-quot</independentVar>
+        <tableData>
+          0.0 1.0
+          600  1.0
+          900  0.8
+         1000  0.4
+         4000  0.1
+        </tableData>
+      </table>
+  </function>
+
+
+  <function name="fcs/rudder-speed-effect">
+    <description>Effect on max deflection of rudder due to dynamic forces</description>
+    <product>
+      <table>
+        <independentVar>fcs/qbar-hydr-quot</independentVar>
+        <tableData>
+          0.0 1.0
+          100  1.0
+          400  0.8
+          700  0.6
+         1000  0.4
+         1300  0.2
+         4000  0.1
+        </tableData>
+      </table>
+      
+      <min>
+        <property>systems/hydraulic/fsc-force-norm</property>
+        <value>0.4</value>
+      </min>
+      <value>2.5</value>
+    </product>
+  </function>
+ 
+  
+  <channel name="Power">
+  
+   <scheduled_gain name="Afterburner valve">
+      <input>fcs/throttle-cmd-norm</input>
+      <table>
+        <independentVar lookup="row">propulsion/afterburner-pump</independentVar>
+        <independentVar lookup="column">propulsion/afterburner-on</independentVar>
+         <tableData>
+                  0      1
+            0     0.99   0.99
+            1     0.99	 1.00
+         </tableData>
+      </table>
+      <output>fcs/throttle-pos-norm</output>
+   </scheduled_gain>
+   
+  </channel>
+
+  <property value="1">fcs/pitch-damper-enable</property>
+  
+  <channel name="Pitch">
+
+   <scheduled_gain name="pitch-damper-rate">
+      <input>velocities/q-aero-rad_sec</input>
+      <table>
+        <independentVar lookup="row">velocities/ve-kts</independentVar>
+         <tableData>
+             0     0.0
+           100     0.70
+           300     0.50
+           500     0.30
+         </tableData>
+      </table>
+      <gain>fcs/pitch-damper-enable</gain>
+   </scheduled_gain>
+
+
+    <fcs_function name="fcs/elevator-cmd-hyd">
+      <function>
+        <product>
+          <max>
+            <difference>
+              <value>0.2</value>
+              <property>systems/hydraulic/fsc-force-norm</property>
+            </difference>
+            <value>0</value>
+          </max>
+          <value>10</value>
+          <table>
+            <independentVar lookup="row">velocities/ve-kts</independentVar>
+            <tableData>
+             0     1
+            10     0.70
+            20     0.00
+            </tableData>
+          </table>  
+        </product>
+      </function>  
+    </fcs_function>
+     
+
+    <fcs_function name="fcs/elevator-pos-calc">
+      <function>
+        <product>
+          <sum>
+            <property>fcs/pitch-trim-cmd-norm</property>
+            <property>fcs/pitch-damper-rate</property>
+            <property>fcs/elevator-cmd-hyd</property>
+            <table>
+              <independentVar>fcs/elevator-cmd-norm</independentVar>
+              <tableData>
+              -1.0   -1.0
+              -0.4   -0.2
+              -0.23  -0.1
+               0.00   0.0
+               0.1    0.08
+               0.17   0.16
+               0.50   0.4
+              </tableData>
+            </table>
+          </sum>
+            
+            <table>
+              <independentVar>fcs/qbar-hydr-quot</independentVar>
+              <tableData>
+                   0    1.0
+                 780    0.7
+                 900    0.4
+                1600    0.3
+              </tableData>
+            </table>
+            
+            <table>
+              <independentVar lookup="row">velocities/mach</independentVar>
+              <tableData>
+                0.00      1.0
+                0.95      1.0
+                0.97      0.6
+                1.03      0.6
+                1.05      1.0
+                2.50      1.0
+              </tableData>
+            </table>
+        </product>      
+      </function>
+      <clipto>
+        <min>-1.0</min>
+        <max>0.4</max>
+      </clipto>
+      <output>fcs/pitch-trim-sum</output>
+    </fcs_function>
+
+
+   <aerosurface_scale name="elevator control">
+      <input>fcs/pitch-trim-sum</input>
+      <domain>
+        <min> -1 </min>
+        <max>  1 </max>
+      </domain>
+      <range>
+        <min> -0.44 </min>
+        <max>  0.44 </max>
+      </range>
+      <output>fcs/elevator-pos-rad</output>
+   </aerosurface_scale>
+   
+   <aerosurface_scale name="elevator normalization">
+      <input>fcs/elevator-pos-rad</input>
+      <domain>
+        <min> -0.44 </min>
+        <max>  0.44 </max>
+      </domain>
+      <range>
+        <min> -1 </min>
+        <max>  1 </max>
+      </range>
+      <output>fcs/elevator-pos-norm</output>
+   </aerosurface_scale>
+
+  </channel>
+
+  <property value="0">fcs/elevon-deflection-max</property>
+  
+  <channel name="Roll">
+
+   <summer name="Roll Trim Sum">
+      <input>fcs/aileron-cmd-norm</input>
+      <input>fcs/roll-trim-cmd-norm</input>
+      <clipto>
+        <min> -1 </min>
+        <max>  1 </max>
+      </clipto>
+   </summer>
+
+
+    <fcs_function name="fcs/elevon-defl-max">
+      <function>
+        <min>
+          <difference>
+            <value>0.4</value>
+            <property>fcs/elevator-pos-norm</property>
+          </difference>
+          <difference>
+            <property>fcs/elevator-pos-norm</property>
+            <value>-1</value>
+          </difference>           
+        </min>            
+      </function>
+    </fcs_function>
+    
+    <pure_gain name="Cliped deflection norm">
+      <input>fcs/roll-trim-sum</input>
+      <gain>1</gain>
+      <clipto>
+        <min>-fcs/elevon-defl-max</min>
+        <max>fcs/elevon-defl-max</max>
+      </clipto>
+   </pure_gain>
+
+    
+   <aerosurface_scale name="Left Aileron Control">
+      <input>fcs/cliped-deflection-norm</input>
+      <range>
+        <min> -0.22 </min>
+        <max>  0.22 </max>
+      </range>
+   </aerosurface_scale>
+
+   <summer name="Left elevon">
+     <input>fcs/left-aileron-control</input>
+     <input>fcs/elevator-pos-rad</input>
+     <output>fcs/left-aileron-pos-rad</output>
+   </summer>
+   
+   <aerosurface_scale name="Right Aileron Control">
+      <input>-fcs/cliped-deflection-norm</input>
+      <range>
+        <min> -0.22 </min>
+        <max>  0.22 </max>
+      </range>
+   </aerosurface_scale>
+
+   <summer name="Right elevon">
+     <input>fcs/right-aileron-control</input>
+     <input>fcs/elevator-pos-rad</input>
+     <output>fcs/right-aileron-pos-rad</output>
+   </summer>
+   
+   <aerosurface_scale name="left aileron normalization">
+      <input>fcs/left-aileron-pos-rad</input>
+      <domain>
+        <min> -0.44 </min>
+        <max>  0.44 </max>
+      </domain>
+      <range>
+        <min> -1 </min>
+        <max>  1 </max>
+      </range>
+      <output>fcs/left-aileron-pos-norm</output>
+   </aerosurface_scale>
+
+   <aerosurface_scale name="right aileron normalization">
+      <input>fcs/right-aileron-pos-rad</input>
+      <domain>
+        <min> -0.44 </min>
+        <max>  0.44 </max>
+      </domain>
+      <range>
+        <min> -1 </min>
+        <max>  1 </max>
+      </range>
+      <output>fcs/right-aileron-pos-norm</output>
+   </aerosurface_scale>
+
+  </channel>
+
+  <property value="1">fcs/yaw-damper-enable</property>
+  <channel name="Yaw">
+
+   <summer name="Rudder Command Sum">
+      <input>fcs/rudder-cmd-norm</input>
+      <input>fcs/yaw-trim-cmd-norm</input>
+      <clipto>
+        <min> -1 </min>
+        <max>  1 </max>
+      </clipto>
+   </summer>
+
+   <scheduled_gain name="Yaw Damper Rate">
+      <input>velocities/r-aero-rad_sec</input>
+      <table>
+        <independentVar lookup="row">velocities/ve-kts</independentVar>
+         <tableData>
+            30     0.00
+            60     2.00
+         </tableData>
+      </table>
+      <gain>fcs/yaw-damper-enable</gain>
+   </scheduled_gain>
+
+   <summer name="Rudder Sum">
+      <input>fcs/rudder-command-sum</input>
+      <input>fcs/yaw-damper-rate</input>
+      <clipto>
+        <min> -1.1 </min>
+        <max>  1.1 </max>
+      </clipto>
+   </summer>
+
+   <aerosurface_scale name="Rudder Control">
+      <input>fcs/rudder-sum</input>
+      <domain>
+        <min> -1.1 </min>
+        <max>  1.1 </max>
+      </domain>
+      <range>
+        <min> -0.35 </min>
+        <max>  0.35 </max>
+      </range>
+      <gain>fcs/rudder-speed-effect</gain>	
+      <output>fcs/rudder-pos-rad</output>
+   </aerosurface_scale>
+
+   <aerosurface_scale name="rudder normalization">
+      <input>fcs/rudder-pos-rad</input>
+      <domain>
+        <min> -0.35 </min>
+        <max>  0.35 </max>
+      </domain>
+      <range>
+        <min> -1 </min>
+        <max>  1 </max>
+      </range>
+      <output>fcs/rudder-pos-norm</output>
+   </aerosurface_scale>
+
+  </channel>
+
+  <channel name="Landing Gear">
+   <kinematic name="Gear Control">
+     <input>gear/gear-cmd-norm</input>
+     <traverse>
+       <setting>
+          <position> 0 </position>
+          <time>     0 </time>
+       </setting>
+       <setting>
+          <position> 1 </position>
+          <time>     5 </time>
+       </setting>
+     </traverse>
+     <output>gear/gear-pos-norm</output>
+   </kinematic>
+
+  </channel>
+
+  <channel name="Speedbrake">
+        
+    <fcs_function name="fcs/sp-hydro-control">
+    <function>
+    <description>Hydro control speedbrake deflection</description>
+      <product>
+        <table>
+          <independentVar>systems/hydraulic/hydI-force-norm</independentVar>
+          <tableData>
+            0.0 0
+            0.3 1.0
+            1.0 1.0
+          </tableData>
+        </table>
+        <property>fcs/spoiler-cmd-norm</property>
+        <property>fcs/sp-drag-effect</property>
+      </product>
+    </function>
+    <output>fcs/sp-hydro-control</output>
+  </fcs_function>
+  
+   <kinematic name="Speedbrake Control">
+     <input>fcs/sp-hydro-control</input>
+     <traverse>
+       <setting>
+          <position> 0 </position>
+          <time>     0 </time>
+       </setting>
+       <setting>
+          <position> 1 </position>
+          <time>     1 </time>
+       </setting>
+     </traverse>
+     <output>fcs/speedbrake-pos-norm</output>
+   </kinematic>
+
+  </channel>
+
+
+  <property value="0">fcs/drag-chute-deployed</property>
+  <property value="1">fcs/drag-chute-serviceable</property>
+
+  <channel name="Dragchute">
+
+    <switch>
+      <default value="fcs/drag-chute-serviceable" />
+      <test locic="AND" value="0">
+        aero/qbar-psf GE 206 
+        fcs/drag-chute-deployed EQ 1
+      </test>
+      <output>fcs/drag-chute-serviceable</output> 
+    </switch>
+
+  </channel>
+
+ </flight_control>

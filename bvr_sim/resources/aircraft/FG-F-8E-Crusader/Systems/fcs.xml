@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="fcs">
+
+   
+    
+    <channel name="Pitch">
+
+            <summer name="Pitch Trim Sum">
+                <input>fcs/elevator-cmd-norm</input>
+                <input>fcs/pitch-trim-cmd-norm</input>
+                <input>fcs/elevator-wings-balance-pos</input>
+                <clipto>
+                    <min>-1</min>
+                    <max>1</max>
+                </clipto>
+            </summer>
+
+            <aerosurface_scale name="Elevator Control">
+                <input>fcs/pitch-trim-sum</input>
+                <range>
+                    <min>-0.20</min>
+                    <max>0.22</max>
+                </range>
+                <output>fcs/elevator-pos-rad</output>
+            </aerosurface_scale>
+
+            <pure_gain name="Elevator Surface">
+                <input>fcs/elevator-pos-rad</input>
+                <gain>57.29578</gain>
+                <output>fcs/elevator-pos-norm</output>
+            </pure_gain>
+
+        </channel>
+
+        <channel name="Roll">
+            <summer name="Roll Trim Sum">
+                <input>fcs/aileron-cmd-norm</input>
+                <input>fcs/roll-trim-cmd-norm</input>
+                <clipto>
+                    <min>-1</min>
+                    <max>1</max>
+                </clipto>
+            </summer>
+
+            <aerosurface_scale name="Left Aileron Control">
+                <input>fcs/roll-trim-sum</input>
+                <range>
+                    <min>-0.35</min>
+                    <max>0.35</max>
+                </range>
+            </aerosurface_scale>
+
+            <aerosurface_scale name="Right Aileron Control">
+                <input>-fcs/roll-trim-sum</input>
+                <range>
+                    <min>-0.35</min>
+                    <max>0.35</max>
+                </range>
+            </aerosurface_scale>
+        </channel>
+
+        <channel name="Yaw">
+
+            <summer name="Rudder Command Sum">
+                <input>fcs/rudder-cmd-norm</input>
+                <input>fcs/yaw-trim-cmd-norm</input>
+                <limit>
+                    <min> -1.0 </min>
+                    <max>  1.0 </max>
+                </limit>
+            </summer>
+
+            <scheduled_gain name="fcs/yaw-damper-rate">
+                <input>velocities/r-aero-rad_sec</input>
+                <table>
+                    <independentVar lookup="row">aero/qbar-psf</independentVar>
+                    <tableData>
+                        3.0000	0.0000
+                        11.0000	2.0000
+                    </tableData>
+                </table>
+            </scheduled_gain>
+
+            <scheduled_gain name="fcs/yaw-damper-beta">
+                <input>aero/beta-rad</input>
+                <table>
+                    <independentVar lookup="row">aero/qbar-psf</independentVar>
+                    <tableData>
+                        3.0000	0.0000
+                        11.0000	0.0000
+                    </tableData>
+                </table>
+            </scheduled_gain>
+
+            <summer name="fcs/yaw-damper-sum">
+                <input>fcs/yaw-damper-beta</input>
+                <input>fcs/yaw-damper-rate</input>
+                <limit>
+                    <min>-0.2 </min>
+                    <max>0.2 </max>
+                </limit>
+            </summer>
+
+            <scheduled_gain name="fcs/yaw-damper-final">
+                <input>fcs/yaw-damper-sum</input>
+                <table>
+                    <independentVar lookup="row">aero/qbar-psf</independentVar>
+                    <tableData>
+                        2.9900	0.0000
+                        3.0000	1.0000
+                    </tableData>
+                </table>
+            </scheduled_gain>
+
+            <summer name="Rudder Sum">
+                <input>fcs/rudder-command-sum</input>
+                <input>fcs/yaw-damper-final</input>
+                <limit>
+                    <min> -1 </min>
+                    <max>  1 </max>
+                </limit>
+            </summer>
+
+
+            <aerosurface_scale name="Rudder Control">
+                <input>fcs/rudder-sum</input>
+                <range>
+                    <min>-0.3500</min>
+                    <max>0.3500</max>
+                </range>
+                <output>fcs/rudder-pos-rad</output>
+            </aerosurface_scale>
+
+            <pure_gain name="Rudder Surface">
+                <input>fcs/rudder-pos-rad</input>
+                <gain>57.29578</gain>
+                <output>fcs/rudder-pos-norm</output>
+            </pure_gain>
+        </channel>
+
+        <channel name="alpha-to-deg">
+            <pure_gain name="wing-incidence-deg">
+                <input>aero/alpha-rad-w-incidence</input>
+                <gain>57.29578</gain>
+                <output>aero/alpha-wing-deg</output>
+            </pure_gain>
+
+            <pure_gain name="alpha-deg">
+                <input>aero/alpha-rad</input>
+                <gain>57.29578</gain>
+                <output>aero/alpha-deg</output>
+            </pure_gain>
+       </channel>
+
+</system>

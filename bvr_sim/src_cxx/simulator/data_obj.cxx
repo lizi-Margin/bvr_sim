@@ -3,8 +3,23 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
+#include <mutex>
 
 namespace bvr_sim {
+namespace {
+std::mutex noise_mutex;
+std::optional<std::mt19937_64> seeded_position_noise, seeded_velocity_noise;
+}
+void DataObj::set_noise_seed(std::optional<uint64_t> seed) noexcept {
+    std::lock_guard<std::mutex> lock(noise_mutex);
+    if(seed) {
+        seeded_position_noise.emplace(*seed);
+        seeded_velocity_noise.emplace(*seed ^ 0x9e3779b97f4a7c15ULL);
+    } else {
+        seeded_position_noise.reset();
+        seeded_velocity_noise.reset();
+    }
+}
 
 DataObj::DataObj(
     const std::shared_ptr<SimulatedObject>& source_obj,
@@ -37,6 +52,10 @@ std::array<double, 3> DataObj::add_position_error(
     static thread_local std::mt19937 gen(rd());
     std::normal_distribution<double> dist(0.0, std_dev);
 
+    std::lock_guard<std::mutex> lock(noise_mutex);
+    if(seeded_position_noise)
+        return {true_pos[0]+dist(*seeded_position_noise),true_pos[1]+dist(*seeded_position_noise),true_pos[2]+dist(*seeded_position_noise)};
+
     std::array<double, 3> result;
     result[0] = true_pos[0] + dist(gen);
     result[1] = true_pos[1] + dist(gen);
@@ -56,6 +75,10 @@ std::array<double, 3> DataObj::add_velocity_error(
     static thread_local std::random_device rd;
     static thread_local std::mt19937 gen(rd());
     std::normal_distribution<double> dist(0.0, std_dev);
+
+    std::lock_guard<std::mutex> lock(noise_mutex);
+    if(seeded_velocity_noise)
+        return {true_vel[0]+dist(*seeded_velocity_noise),true_vel[1]+dist(*seeded_velocity_noise),true_vel[2]+dist(*seeded_velocity_noise)};
 
     std::array<double, 3> result;
     result[0] = true_vel[0] + dist(gen);

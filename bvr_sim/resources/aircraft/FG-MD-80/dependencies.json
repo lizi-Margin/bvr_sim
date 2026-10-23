@@ -1,0 +1,167 @@
+{
+  "files": [
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "FDE/Config/md-80-aerodynamics.xml",
+      "source": "MD-80/FDE/Config/md-80-aerodynamics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "FDE/Config/md-80-external-reactions",
+      "source": "MD-80/FDE/Config/md-80-external-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "FDE/Config/md-80-ground-reactions",
+      "source": "MD-80/FDE/Config/md-80-ground-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "FDE/Config/md-80-mass-balance",
+      "source": "MD-80/FDE/Config/md-80-mass-balance.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "FDE/Config/md-80-metrics",
+      "source": "MD-80/FDE/Config/md-80-metrics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-libraries",
+      "source": "MD-80/Systems/md-80-libraries.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-electrical",
+      "source": "MD-80/Systems/md-80-electrical.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-fuel",
+      "source": "MD-80/Systems/md-80-fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-hydraulics",
+      "source": "MD-80/Systems/md-80-hydraulics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-irs-ahrs",
+      "source": "MD-80/Systems/md-80-irs-ahrs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-pneumatics",
+      "source": "MD-80/Systems/md-80-pneumatics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-dfgs",
+      "source": "MD-80/Systems/md-80-dfgs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-fcs",
+      "source": "MD-80/Systems/md-80-fcs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-spoilers",
+      "source": "MD-80/Systems/md-80-spoilers.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-ignition",
+      "source": "MD-80/Systems/md-80-ignition.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-209-engine-thrlim",
+      "source": "MD-80/Systems/md-80-209-engine-thrlim.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-apu",
+      "source": "MD-80/Systems/md-80-apu.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-misc",
+      "source": "MD-80/Systems/md-80-misc.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-performance",
+      "source": "MD-80/Systems/md-80-performance.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-cockpit",
+      "source": "MD-80/Systems/md-80-cockpit.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "md-80-instrumentation",
+      "source": "MD-80/Systems/md-80-instrumentation.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "jt8d-209_1",
+      "source": "MD-80/Engines/jt8d-209_1.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "direct",
+      "source": "MD-80/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "jt8d-209_2",
+      "source": "MD-80/Engines/jt8d-209_2.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "direct",
+      "source": "MD-80/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "gtcp85-98dhf",
+      "source": "MD-80/Engines/gtcp85-98dhf.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-80/FDE/MD-81.xml",
+      "reference": "direct",
+      "source": "MD-80/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

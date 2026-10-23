@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="ARK-5 automatic direction finder">
+ 
+
+
+ 
+ <property value="1">systems/instr/ARK-5/switch/mode</property>
+ 
+ 
+ <property>systems/instr/ARK-5/pot/frame</property>
+ 
+ <property>systems/instr/ARK-5/switch/band</property>
+ 
+ <property value="1">systems/instr/ARK-5/switch/cw-ident</property>
+ 
+ <property>systems/instr/ARK-5/pot/tuning</property>
+ 
+ <property value="0.5">systems/instr/ARK-5/pot/volume</property>
+ 
+ <property value="0.5">systems/instr/ARK-5/pot/light</property>
+
+ 
+ <property>systems/instr/ARK-5/switch/inner</property>
+ 
+ <property>systems/instr/ARK-5/switch/band-inner</property>
+
+ <property>systems/elec/output/ARK-5/DC27-V</property>
+ <property>systems/elec/output/ARK-5/DC27-ok</property>
+
+
+ <channel name="ARK-5 slow" execrate="8">
+
+  <switch name="systems/instr/ARK-5/on">
+   <output>systems/instr/ARK-5/light/on</output>
+   <default value="systems/elec/output/ARK-5/DC27-ok" />
+   <test value="0">
+    systems/instr/ARK-5/switch/mode EQ 0
+   </test>
+  </switch>
+
+  <fcs_function name="systems/elec/output/ARK-5/DC27-A">
+   <function>
+    <product>
+     <p>systems/instr/ARK-5/on</p>
+     <p>systems/elec/output/ARK-5/DC27-V</p>
+     
+     <v>0.836</v>
+    </product>
+   </function>
+  </fcs_function>
+
+  <fcs_function name="systems/instr/ARK-5/volume-norm">
+   <output>systems/instr/ARK-5/backend/volume-norm</output>
+   <function>
+    <product>
+     <p>systems/instr/ARK-5/pot/volume</p>
+     <p>systems/instr/ARK-5/on</p>
+     
+     <p>systems/instr/ARK-5/switch/cw-ident</p>
+     <max>
+      <nq>
+       <p>systems/instr/ARK-5/switch/mode</p>
+       <v>3</v>
+      </nq>
+      <p>systems/instr/ARK-5/func/deltaA-volume</p>
+     </max>
+    </product>
+   </function>
+  </fcs_function>
+
+  <fcs_function name="systems/instr/ARK-5/f-kHz">
+   <output>systems/instr/ARK-5/backend/selected-khz</output>
+   <function>
+    <switch>
+     <ifthen>
+      <p>systems/instr/ARK-5/switch/inner</p>
+      <property>systems/instr/ARK-5/switch/band-inner</property>
+      <property>systems/instr/ARK-5/switch/band</property>
+     </ifthen>
+     <sum>
+      <v>130.0</v>
+      <product>
+       <property>systems/instr/ARK-5/pot/tuning</property>
+       <v>180.0</v>
+      </product>
+     </sum>
+     <sum>
+      <v>310.0</v>
+      <product>
+       <property>systems/instr/ARK-5/pot/tuning</property>
+       <v>330.0</v>
+      </product>
+     </sum>
+     <sum>
+      <v>640.0</v>
+      <product>
+       <property>systems/instr/ARK-5/pot/tuning</property>
+       <v>660.0</v>
+      </product>
+     </sum>
+    </switch>
+   </function>
+  </fcs_function>
+
+  <switch name="systems/instr/ARK-5/deltaA-ok">
+   <default value="systems/instr/ARK-5/backend/in-range" />
+   <test logic="OR" value="0">
+    systems/instr/ARK-5/switch/mode NE 1
+    systems/instr/ARK-5/on EQ 0
+   </test>
+  </switch>
+
+  <pure_gain name="systems/instr/ARK-5/gauge/signal-quality-norm">
+   <input>systems/instr/ARK-5/backend/in-range</input>
+   <gain>systems/instr/ARK-5/on</gain>
+  </pure_gain>
+
+  <pure_gain name="systems/instr/ARK-5/lightsrc/gauge-light-norm">
+   <input>systems/instr/ARK-5/pot/light</input>
+   <gain>systems/instr/ARK-5/on</gain>
+  </pure_gain>
+
+ </channel>
+
+
+ <channel name="ARK-5" execrate="2">
+
+  <summer name="systems/instr/ARK-5/func/deltaA-error-deg">
+   <input>systems/instr/ARK-5/backend/indicated-bearing-deg</input>
+   <input>-systems/instr/ARK-5/deltaA-deg</input>
+   <clipto type="cyclic">
+    <min>-180.0</min>
+    <max>180.0</max>
+   </clipto>
+  </summer>
+
+  <switch name="systems/instr/ARK-5/func/deltaA-error-deg-clip">
+   <default value="systems/instr/ARK-5/func/deltaA-error-deg" />
+   <clipto>
+    <min>-1.0</min>
+    <max>1.0</max>
+   </clipto>
+  </switch>
+
+  <fcs_function name="systems/instr/ARK-5/func/deltaA-volume">
+   <function>
+    <abs>
+     <sin>
+      <toradians>
+       <p>systems/instr/ARK-5/func/deltaA-error-deg</p>
+      </toradians>
+     </sin>
+    </abs>
+   </function>
+  </fcs_function>
+
+  <switch name="systems/instr/ARK-5/func/deltaA-input">
+   <default value="systems/instr/ARK-5/func/deltaA-error-deg-clip" />
+   <test value="0.0">
+    systems/instr/ARK-5/on EQ 0
+   </test>
+   <test value="systems/instr/ARK-5/pot/frame">
+    systems/instr/ARK-5/switch/mode EQ 3
+   </test>
+  </switch>
+
+  <switch name="systems/instr/ARK-5/func/deltaA-c1">
+   <default value="30.0" />
+   <test value="0.0">
+    systems/instr/ARK-5/on EQ 0
+   </test>
+   <test logic="AND" value="0.0">
+    systems/instr/ARK-5/switch/mode NE 3
+    systems/instr/ARK-5/deltaA-ok EQ 0
+   </test>
+  </switch>
+
+  <integrator name="systems/instr/ARK-5/deltaA-deg">
+   <output>systems/instr/BSUP-2/gauge/bearing-deg</output>
+   <input>systems/instr/ARK-5/func/deltaA-input</input>
+   <c1>systems/instr/ARK-5/func/deltaA-c1</c1>
+   <clipto type="cyclic">
+    <min>0.0</min>
+    <max>360.0</max>
+   </clipto>
+  </integrator>
+
+ </channel>
+
+
+</system>

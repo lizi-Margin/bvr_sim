@@ -1,0 +1,16 @@
+{
+  "set": "A300-600/A300-603-set.xml",
+  "name": "Airbus A300-603",
+  "fdm_type": "jsb",
+  "fdm": "A300-600/A300-603.xml",
+  "jets": 2,
+  "model": "A300-600/Models/A300-603.xml",
+  "tags": [],
+  "model_rating": 4,
+  "fdm_rating": 1,
+  "variant_of": "",
+  "archive": "A300-600.zip",
+  "archive_sha256": "19cfb9673f009abb458f6acfe9c18f17f46ba8c7b96f93cb9a07d16f972869b7",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/A300-600.zip"
+}

@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "CFM56",
+      "source": "dc8-73/Engines/CFM56.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "direct",
+      "source": "dc8-73/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "CFM56",
+      "source": "dc8-73/Engines/CFM56.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "direct",
+      "source": "dc8-73/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "CFM56",
+      "source": "dc8-73/Engines/CFM56.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "direct",
+      "source": "dc8-73/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "CFM56",
+      "source": "dc8-73/Engines/CFM56.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "dc8-73/dc8-73.xml",
+      "reference": "direct",
+      "source": "dc8-73/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

@@ -1,0 +1,29 @@
+{
+  "set": "ME-262/me262-set.xml",
+  "name": "Messerschmitt Me-262 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "ME-262/Systems/me262-yasim.xml",
+  "jets": 2,
+  "model": "ME-262/Models/me262.xml",
+  "tags": [
+    "messerschmitt",
+    "fighter",
+    "bomber",
+    "1940s",
+    "ww2",
+    "jet",
+    "twin-engine",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "ME-262.zip",
+  "archive_sha256": "7de78781058cfb3a9cd6f627924f9020aba3e2e6fd0175e815898c99e10d6843",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/ME-262.zip"
+}

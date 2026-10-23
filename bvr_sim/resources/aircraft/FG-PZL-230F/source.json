@@ -1,0 +1,27 @@
+{
+  "set": "PZL-230F/pzl230f-set.xml",
+  "name": "PZL 230 F Skorpion (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "PZL-230F/Systems/pzl230f-yasim.xml",
+  "jets": 2,
+  "model": "PZL-230F/Models/pzl230f.xml",
+  "tags": [
+    "pzl",
+    "fighter",
+    "1990s",
+    "twin-engine",
+    "jet",
+    "mid-wing",
+    "tricycle",
+    "retractable-gear",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "PZL-230F.zip",
+  "archive_sha256": "6cde7b6977d34be12f23345873e5c6595818678973d0b604798fa3353a90c09c",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/PZL-230F.zip"
+}

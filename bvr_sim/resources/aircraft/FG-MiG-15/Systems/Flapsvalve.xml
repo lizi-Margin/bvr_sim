@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-04 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Gear valve </description>
+	</fileheader>
+
+
+
+	<channel name="flapsvalve">
+
+
+
+		<switch name="calculations/flapsvalve/safer-allowed">
+			<default value="systems/flapsvalve/safer-command" />
+			<test logic="AND" value="systems/flapsvalve/safer-input">
+				systems/flapsvalve/serviceable eq 1
+			</test>
+			<output>systems/flapsvalve/safer-command</output>
+		</switch>
+
+		<kinematic name="calculations/flapsvalve/safer-pos">
+			<input>systems/flapsvalve/safer-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/flapsvalve/safer-pos</output>
+		</kinematic>
+
+		<switch name="calculations/flapsvalve/safer-not-allowed">
+			<default value="systems/flapsvalve/safer-input" />
+			<test logic="AND" value="systems/flapsvalve/safer-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/flapsvalve/safer-input</output>
+		</switch>
+
+		<switch name="calculations/flapsvalve/safer-switch">
+			<default value="systems/flapsvalve/safer-switch" />
+			<test logic="AND" value="1">
+				systems/flapsvalve/safer-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/flapsvalve/safer-pos lt 0.5
+			</test>
+			<output>systems/flapsvalve/safer-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/flapsvalve/valve-allowed">
+			<default value="systems/flapsvalve/valve-command" />
+			<test logic="AND" value="systems/flapsvalve/valve-input">
+				systems/flapsvalve/serviceable eq 1
+				systems/flapsvalve/safer-switch eq 1
+			</test>
+			<output>systems/flapsvalve/valve-command</output>
+		</switch>
+
+		<kinematic name="calculations/flapsvalve/valve-pos">
+			<input>systems/flapsvalve/valve-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/flapsvalve/valve-pos</output>
+		</kinematic>
+
+		<switch name="calculations/flapsvalve/valve-not-allowed">
+			<default value="systems/flapsvalve/valve-input" />
+			<test logic="OR" value="systems/flapsvalve/valve-command">
+				systems/flapsvalve/serviceable eq 0
+				systems/flapsvalve/safer-switch eq 0
+			</test>
+			<output>systems/flapsvalve/valve-input</output>
+		</switch>
+
+		<switch name="calculations/flapsvalve/valve-switch">
+			<default value="systems/flapsvalve/valve-switch" />
+			<test logic="AND" value="1">
+				systems/flapsvalve/valve-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/flapsvalve/valve-pos lt 0.5
+			</test>
+			<output>systems/flapsvalve/valve-switch</output>
+		</switch>
+
+		<switch name="calculations/flapsvalve/valve-pressure-switch">
+			<default value="systems/flapsvalve/valve-pressure-switch" />
+			<test logic="AND" value="1">
+				systems/flapsvalve/valve-switch eq 0.0
+			</test>
+			<test logic="AND" value="0">
+				systems/flapsvalve/valve-switch eq 1.0
+			</test>
+			<output>systems/flapsvalve/valve-pressure-switch</output>
+		</switch>
+
+		<kinematic name="calculations/flapsvalve/pressure-pos">
+			<input>systems/flapsvalve/valve-pressure-switch</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>5.0</time>
+			</setting>
+			</traverse>
+			<output>systems/flapsvalve/pressure-pos</output>
+		</kinematic>
+
+		<fcs_function name="calculations/flapsvalve/pressure-indicated">
+		<function>
+			<sum>
+				<value>0.3</value>
+				<product>
+					<property>systems/flapsvalve/pressure-pos</property>
+					<value>0.5</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/flapsvalve/pressure-indicated</output>
+		</fcs_function>
+
+		<switch name="calculations/flapsvalve/gear-down">
+			<default value="fcs/flap-cmd-norm-real" />
+			<test logic="AND" value="1">
+				fcs/flap-cmd-norm eq 1.0
+				fcs/flap-torn eq 0.0
+				systems/flapsvalve/safer-switch eq 1.0
+				systems/flapsvalve/valve-switch eq 1.0
+				systems/flapsvalve/pressure-pos gt 0.75
+			</test>
+			<output>fcs/flap-cmd-norm-real</output>
+		</switch>
+
+
+
+		<switch name="calculations/flapsvalve/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/flapsvalve/safer-pos ge 0.25
+				systems/flapsvalve/safer-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/flapsvalve/valve-pos ge 0.25
+				systems/flapsvalve/valve-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

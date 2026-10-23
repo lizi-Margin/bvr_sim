@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Gyrocompass">
+
+    
+    <property value="0.0">systems/gauges/gyrocompass/magnetic-deg-var-linear</property>
+    <property value="0.0">systems/gauges/gyrocompass/deg-var</property>
+    <property value="0.0">systems/gauges/gyrocompass/operative</property>
+    <property value="0.0">systems/gauges/gyrocompass/status-error</property>
+    <property value="0.0">systems/gauges/gyrocompass/light-error</property>
+    <property value="0.0">systems/gauges/gyrocompass/light-error-transparent</property>
+    <property value="0.0">systems/gauges/gyrocompass/syncro-with-flux-gate-operative</property>
+    <property value="0.01">systems/gauges/gyrocompass/syncro-with-flux-gate-delay</property>
+    <property value="0.5">systems/gauges/gyrocompass/syncro-with-flux-gate-fast</property>
+    <property value="0.0">systems/gauges/gyrocompass/syncro-with-flux-gate-fast-switch</property>
+    
+    
+    <channel name="systems gauges gyrocompass attitude gyrocompass status" execrate="16">
+        
+        <switch name="systems/gauges/gyrocompass/operative-start-stop">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/gyrocompass/fuse == 1
+                systems/electric/bus[1]/gyrocompass/sw == 1
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/inv-primary/V GT 110.0
+            </test>
+        </switch>
+        
+        
+        <lag_filter name="systems/gauges/gyrocompass/operative-heating">
+            <input>systems/gauges/gyrocompass/operative-start-stop</input>
+            <c1>0.05</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/gyrocompass/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/gyrocompass/operative-heating GT 0.9
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/gyrocompass/I">
+            <default value="0.0" />
+            <test logic="AND" value="0.7">
+                systems/gauges/gyrocompass/operative == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/gyrocompass/syncro-with-flux-gate">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/gyrocompass/operative == 1.0
+                systems/gauges/compass-flux-gate/operative == 1.0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/gyrocompass/syncro-with-flux-gate-time">
+            <default value="systems/gauges/gyrocompass/syncro-with-flux-gate-delay" />
+            <test logic="AND" value="systems/gauges/gyrocompass/syncro-with-flux-gate-fast">
+                systems/gauges/gyrocompass/syncro-with-flux-gate-fast-switch GT 0.1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/gyrocompass/syncro-with-flux-gate-time-lag">
+            <input>systems/gauges/gyrocompass/operative</input>
+            <c1>systems/gauges/gyrocompass/syncro-with-flux-gate-time</c1>
+        </lag_filter>
+        
+        
+        
+        <lag_filter name="systems/gauges/gyrocompass/deg-var">
+            <input>systems/gauges/compass-flux-gate/indicated-bearing-deg</input>
+            <c1>systems/gauges/gyrocompass/syncro-with-flux-gate-time</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/gyrocompass/status-error">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                <test logic="OR">
+                    systems/gauges/gyrocompass/operative == 0.0
+                    systems/gauges/compass-flux-gate/operative == 0.0
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/gyrocompass/light-error">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus1-tension">
+                systems/gauges/gyrocompass/status-error GT 0.0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/gyrocompass/light-error-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus1-tension">
+                systems/gauges/gyrocompass/status-error GT 0.0
+            </test>
+        </switch>
+        
+    </channel>
+    
+        
+    <channel name="systems gauges gyrocompass attitude gyrocompass operative" execrate="4">
+        
+        
+        
+        <switch name="systems/gauges/gyrocompass/magnetic-deg">
+            <default value="0" />
+            <test logic="AND" value="/orientation/heading-magnetic-deg">
+                systems/gauges/gyrocompass/operative == 1
+            </test>
+        </switch>
+        
+        
+        
+        <summer name="systems/gauges/gyrocompass/magnetic-deg-var">
+            <input>-systems/gauges/PHI/indicator/var-deg</input>
+            <input>systems/gauges/gyrocompass/magnetic-deg</input>
+        </summer>
+        
+        <linear_actuator name="systems/gauges/gyrocompass/magnetic-deg-var-linear-360">
+            <input>systems/gauges/gyrocompass/magnetic-deg-var</input>
+            <module>360</module>
+            <lag>2.0</lag>
+            <set>systems/gauges/gyrocompass/operative</set>
+        </linear_actuator>
+        
+        <fcs_function name="systems/gauges/gyrocompass/magnetic-deg-var-linear">
+            <function>
+                <difference>
+                    <p>systems/gauges/gyrocompass/magnetic-deg-var-linear-360</p>
+                    <product>
+                        <integer>
+                            <quotient>
+                                <p>systems/gauges/gyrocompass/magnetic-deg-var-linear</p>
+                                <v>360.0</v>
+                            </quotient>
+                        </integer>
+                        <v>360.0</v>
+                    </product>
+                </difference>
+            </function>
+        </fcs_function>
+        
+    </channel>
+    
+    
+</system>

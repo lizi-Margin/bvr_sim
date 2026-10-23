@@ -1,0 +1,28 @@
+{
+  "set": "717/717-200-set.xml",
+  "name": "Boeing 717-200 (Basic Gross Weight)",
+  "fdm_type": "yasim",
+  "fdm": "717/717-200.xml",
+  "jets": 2,
+  "model": "717/Models/717-200.xml",
+  "tags": [
+    "boeing",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "twin-engine",
+    "jet",
+    "transport",
+    "t-tail",
+    "1990s",
+    "2000s",
+    "ifr"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "717.zip",
+  "archive_sha256": "ff96e83ff661ac8f2ae94d932b411d1426217e5526034733da33d32f7a095663",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/717.zip"
+}

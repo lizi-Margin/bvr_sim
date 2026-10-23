@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="stations">
+    
+    <property value="0">systems/stations/hardPointSxExternal/Weight</property>
+    <property value="0">systems/stations/hardPointSxExternal/Cd</property>
+    <property value="0">systems/stations/hardPointSxExternal/Count</property>
+    <property value="0">systems/stations/hardPointSxInternal/Weight</property>
+    <property value="0">systems/stations/hardPointSxInternal/Cd</property>
+    <property value="0">systems/stations/hardPointSxInternal/Count</property>
+    <property value="0">systems/stations/hardPointDxInternal/Weight</property>
+    <property value="0">systems/stations/hardPointDxInternal/Cd</property>
+    <property value="0">systems/stations/hardPointDxInternal/Count</property>
+    <property value="0">systems/stations/hardPointDxExternal/Weight</property>
+    <property value="0">systems/stations/hardPointDxExternal/Cd</property>
+    <property value="0">systems/stations/hardPointDxExternal/Count</property>
+    
+    <property value="0">systems/stations/stationSxExternal/Weight</property>
+    <property value="0">systems/stations/stationSxExternal/Cd</property>
+    <property value="0">systems/stations/stationSxExternal/Count</property>
+    <property value="0">systems/stations/stationSxInternal/Weight</property>
+    <property value="0">systems/stations/stationSxInternal/Cd</property>
+    <property value="0">systems/stations/stationSxInternal/Count</property>
+    <property value="0">systems/stations/stationDxInternal/Weight</property>
+    <property value="0">systems/stations/stationDxInternal/Cd</property>
+    <property value="0">systems/stations/stationDxInternal/Count</property>
+    <property value="0">systems/stations/stationDxExternal/Weight</property>
+    <property value="0">systems/stations/stationDxExternal/Cd</property>
+    <property value="0">systems/stations/stationDxExternal/Count</property>
+    
+    
+    <channel name="drag stations" execrate="32">
+        
+        <switch name="stationSxExternal-drag">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationSxExternal/sumDrag">
+                systems/stations/hardPointSxExternal/Count GT 0
+            </test>
+        </switch>
+        
+        <switch name="stationSxInternal-drag">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationSxInternal/sumDrag">
+                systems/stations/hardPointSxInternal/Count GT 0
+            </test>
+        </switch>
+        
+        <switch name="stationDxInternal-drag">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationDxInternal/sumDrag">
+                systems/stations/hardPointDxInternal/Count GT 0
+            </test>
+        </switch>
+        
+        <switch name="stationDxExternal-drag">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationDxExternal/sumDrag">
+                systems/stations/hardPointDxExternal/Count GT 0
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="weight stations">
+        
+        <switch name="stationSxExternal-weight">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationSxExternal/sumWeight">
+                systems/stations/hardPointSxExternal/Count GT 0
+            </test>
+            <output>fdm/jsbsim/inertia/pointmass-weight-lbs[0]</output>
+        </switch>
+        
+        <switch name="stationSxInternal-weight">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationSxInternal/sumWeight">
+                systems/stations/hardPointSxInternal/Count GT 0
+            </test>
+            <output>fdm/jsbsim/inertia/pointmass-weight-lbs[1]</output>
+        </switch>
+        
+        <switch name="stationDxInternal-weight">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationDxInternal/sumWeight">
+                systems/stations/hardPointDxInternal/Count GT 0
+            </test>
+            <output>fdm/jsbsim/inertia/pointmass-weight-lbs[2]</output>
+        </switch>
+        
+        <switch name="stationDxExternal-weight">
+            <default value="0" />
+            <test logic="AND" value="systems/stations/stationDxExternal/sumWeight">
+                systems/stations/hardPointDxExternal/Count GT 0
+            </test>
+            <output>fdm/jsbsim/inertia/pointmass-weight-lbs[3]</output>
+        </switch>
+        
+    </channel>
+    
+    <function name="systems/stations/stationSxExternal/sumDrag">
+        <sum>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/hardPointSxExternal/Count</p>
+                    <p>systems/stations/hardPointSxExternal/Cd</p>
+                </product>
+            </product>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/stationSxExternal/Count</p>
+                    <p>systems/stations/stationSxExternal/Cd</p>
+                </product>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationSxExternal/sumWeight">
+        <sum>
+            <product>
+                <p>systems/stations/hardPointSxExternal/Count</p>
+                <p>systems/stations/hardPointSxExternal/Weight</p>
+            </product>
+            <product>
+                <p>systems/stations/stationSxExternal/Count</p>
+                <p>systems/stations/stationSxExternal/Weight</p>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationSxInternal/sumDrag">
+        <sum>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/hardPointSxInternal/Count</p>
+                    <p>systems/stations/hardPointSxInternal/Cd</p>
+                </product>
+            </product>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/stationSxInternal/Count</p>
+                    <p>systems/stations/stationSxInternal/Cd</p>
+                </product>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationSxInternal/sumWeight">
+        <sum>
+            <product>
+                <p>systems/stations/hardPointSxInternal/Count</p>
+                <p>systems/stations/hardPointSxInternal/Weight</p>
+            </product>
+            <product>
+                <p>systems/stations/stationSxInternal/Count</p>
+                <p>systems/stations/stationSxInternal/Weight</p>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationDxInternal/sumDrag">
+        <sum>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/hardPointDxInternal/Count</p>
+                    <p>systems/stations/hardPointDxInternal/Cd</p>
+                </product>
+            </product>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/stationDxInternal/Count</p>
+                    <p>systems/stations/stationDxInternal/Cd</p>
+                </product>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationDxInternal/sumWeight">
+        <sum>
+            <product>
+                <p>systems/stations/hardPointDxInternal/Count</p>
+                <p>systems/stations/hardPointDxInternal/Weight</p>
+            </product>
+            <product>
+                <p>systems/stations/stationDxInternal/Count</p>
+                <p>systems/stations/stationDxInternal/Weight</p>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationDxExternal/sumDrag">
+        <sum>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/hardPointDxExternal/Count</p>
+                    <p>systems/stations/hardPointDxExternal/Cd</p>
+                </product>
+            </product>
+            <product>
+                <p>aero/qbar-psf</p>
+                <product>
+                    <p>systems/stations/stationDxExternal/Count</p>
+                    <p>systems/stations/stationDxExternal/Cd</p>
+                </product>
+            </product>
+        </sum>
+    </function>
+    
+    <function name="systems/stations/stationDxExternal/sumWeight">
+        <sum>
+            <product>
+                <p>systems/stations/hardPointDxExternal/Count</p>
+                <p>systems/stations/hardPointDxExternal/Weight</p>
+            </product>
+            <product>
+                <p>systems/stations/stationDxExternal/Count</p>
+                <p>systems/stations/stationDxExternal/Weight</p>
+            </product>
+        </sum>
+    </function>
+
+</system>

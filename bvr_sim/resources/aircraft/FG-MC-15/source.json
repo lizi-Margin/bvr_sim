@@ -1,0 +1,30 @@
+{
+  "set": "MC-15/mc-15-jet-set.xml",
+  "name": "MC-15 Cri-Cri JET",
+  "fdm_type": "jsb",
+  "fdm": "MC-15/mc-15-jet.xml",
+  "jets": 0,
+  "model": "MC-15/Models/mc-15.xml",
+  "tags": [
+    "aerobatic",
+    "ga",
+    "ultralight",
+    "aerobatic",
+    "1970s",
+    "1980s",
+    "1990s",
+    "fixed-gear",
+    "low-wing",
+    "t-tail",
+    "tricycle",
+    "jet",
+    "twin-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "mc-15",
+  "archive": "MC-15.zip",
+  "archive_sha256": "be36d867faa27f8d64d5ed3100245d01734fc56c3af8512efabe7e341321628d",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MC-15.zip"
+}

@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "from": "MRJ/MRJ90-STD.xml",
+      "reference": "PW1000G-17K",
+      "source": "MRJ/Engines/PW1000G-17K.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MRJ/MRJ90-STD.xml",
+      "reference": "direct",
+      "source": "MRJ/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MRJ/MRJ90-STD.xml",
+      "reference": "PW1000G-17K",
+      "source": "MRJ/Engines/PW1000G-17K.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MRJ/MRJ90-STD.xml",
+      "reference": "direct",
+      "source": "MRJ/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

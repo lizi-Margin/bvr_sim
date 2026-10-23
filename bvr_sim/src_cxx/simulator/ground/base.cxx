@@ -65,6 +65,7 @@ void GroundUnit::hit(double damage) {
     }
     if (bloods <= 0.0) {
         is_alive = false;
+        velocity = {0.0,0.0,0.0};
     }
 }
 

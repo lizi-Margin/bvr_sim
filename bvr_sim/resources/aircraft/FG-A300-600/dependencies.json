@@ -1,0 +1,41 @@
+{
+  "files": [
+    {
+      "from": "A300-600/A300-603.xml",
+      "reference": "GE-CF6-80C2A3",
+      "source": "A300-600/Engines/GE-CF6-80C2A3.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A300-600/A300-603.xml",
+      "reference": "direct",
+      "source": "A300-600/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A300-600/A300-603.xml",
+      "reference": "GE-CF6-80C2A3",
+      "source": "A300-600/Engines/GE-CF6-80C2A3.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A300-600/A300-603.xml",
+      "reference": "direct",
+      "source": "A300-600/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A300-600/A300-603.xml",
+      "reference": "pushback",
+      "source": "A300-600/Systems/pushback.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A300-600/A300-603.xml",
+      "reference": "a306-fuel",
+      "source": "A300-600/Systems/a306-fuel.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

@@ -1,0 +1,16 @@
+{
+  "set": "Hansajet/Hansajet-set.xml",
+  "name": "Hamburger Flugzeugbau HFB Hansajet",
+  "fdm_type": "jsb",
+  "fdm": "Hansajet/Hansajet-jsbsim.xml",
+  "jets": 2,
+  "model": "Hansajet/Models/Hansajet.xml",
+  "tags": [],
+  "model_rating": 2,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Hansajet.zip",
+  "archive_sha256": "1ded4be838ffca3c2e3c1f2949cb6200214be3c17becd5121e18d8d13a85e997",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Hansajet.zip"
+}

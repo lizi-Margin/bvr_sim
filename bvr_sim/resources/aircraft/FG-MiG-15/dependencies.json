@@ -1,0 +1,227 @@
+{
+  "files": [
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "VK-1",
+      "source": "MiG-15/Engines/VK-1.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "direct",
+      "source": "MiG-15/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Accchecker",
+      "source": "MiG-15/Systems/Accchecker.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Boostercontrol",
+      "source": "MiG-15/Systems/Boostercontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Canopy",
+      "source": "MiG-15/Systems/Canopy.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Click",
+      "source": "MiG-15/Systems/Click.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Engine",
+      "source": "MiG-15/Systems/Engine.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Flapscontrol",
+      "source": "MiG-15/Systems/Flapscontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Flapsvalve",
+      "source": "MiG-15/Systems/Flapsvalve.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Fuelcontrol",
+      "source": "MiG-15/Systems/Fuelcontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Fuelsystem",
+      "source": "MiG-15/Systems/Fuelsystem.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Gascontrol",
+      "source": "MiG-15/Systems/Gascontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Gearcontrol",
+      "source": "MiG-15/Systems/Gearcontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Gearvalve",
+      "source": "MiG-15/Systems/Gearvalve.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Headsight",
+      "source": "MiG-15/Systems/Headsight.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Ignitionbutton",
+      "source": "MiG-15/Systems/Ignitionbutton.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Leftpanel",
+      "source": "MiG-15/Systems/Leftpanel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Pedals",
+      "source": "MiG-15/Systems/Pedals.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Rightpanel",
+      "source": "MiG-15/Systems/Rightpanel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Speedbrakescontrol",
+      "source": "MiG-15/Systems/Speedbrakescontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Stick",
+      "source": "MiG-15/Systems/Stick.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Stopcontrol",
+      "source": "MiG-15/Systems/Stopcontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "Brakes",
+      "source": "MiG-15/Systems/Brakes.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "functions",
+      "source": "MiG-15/Systems/functions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "TE-15",
+      "source": "MiG-15/Systems/TE-15.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "EMI-3R",
+      "source": "MiG-15/Systems/EMI-3R.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "EM-10",
+      "source": "MiG-15/Systems/EM-10.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "TGZ-47",
+      "source": "MiG-15/Systems/TGZ-47.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "KES-917B",
+      "source": "MiG-15/Systems/KES-917B.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "VD-17",
+      "source": "MiG-15/Systems/VD-17.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "AGI-1",
+      "source": "MiG-15/Systems/AGI-1.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "EUP-46",
+      "source": "MiG-15/Systems/EUP-46.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "ARK-5",
+      "source": "MiG-15/Systems/ARK-5.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "MRP-48P",
+      "source": "MiG-15/Systems/MRP-48P.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "RV-2",
+      "source": "MiG-15/Systems/RV-2.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "AChH",
+      "source": "MiG-15/Systems/AChH.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MiG-15/MiG-15bis.xml",
+      "reference": "DGMK-3",
+      "source": "MiG-15/Systems/DGMK-3.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

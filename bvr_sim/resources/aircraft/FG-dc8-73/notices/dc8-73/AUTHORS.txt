@@ -1,0 +1,17 @@
+3D model - Bob Faulkner, aka YOURGOD
+FDM - Bob Faulkner with input from Aeromatic and countless other aircraft
+      models used as sources and examples.
+
+Alpha release uses some xml as a template, and some sound files from the 777-200ER model:
+
+Boeing 777-200
+Authors
+Syd Adams - 3d Models and Yasim , research
+Justin Smithies - Nasal , yasim , general research
+
+Directional Gyro used from the DC-6 model
+Authors
+Syd Adams.Ron Jensen
+
+
+

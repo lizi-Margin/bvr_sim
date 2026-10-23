@@ -1,0 +1,16 @@
+{
+  "set": "j22/j22-set.xml",
+  "name": "Soko J-22 Orao / IAR-93",
+  "fdm_type": "yasim",
+  "fdm": "j22/j22-yasim.xml",
+  "jets": 2,
+  "model": "j22/Models/j22.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "j22.zip",
+  "archive_sha256": "5c08b5fb3bb7ace6b76431f2b70abddceee358c4146e24643b3d25162e940196",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/j22.zip"
+}

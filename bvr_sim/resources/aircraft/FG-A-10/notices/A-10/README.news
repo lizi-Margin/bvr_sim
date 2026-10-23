@@ -1,0 +1,105 @@
+TODOS:
+------
+- Handling the external fuel tanks in the new armament dialog, or better, merge
+it with the legacy 'fuel and payload' menu (if possible...).
+- Model the labels on the armament panel.
+- Code the submodels reloading.
+- Review sounds for start of the engines. "Blowf" sound of the ignition.
+- Canopy should fly away when open and wind > 130 kt
+- Work on the MP A-10 (second computer, FG lan-networked or both on MP).
+	- landing gear, lights.
+- AAR: Ctrl-F for disconnect_reset
+- Fuel: permit different positions for the gauges.
+- Pitch SAS.
+- Altitude warning system panel.
+- AIM-9 search sound based on AI or MP.
+
+
+11/10/2007
+----------
+- Fixed the Altimeter InGh setting (thanks to dabidB21).
+- Moved the AIM-9 related files under Models/Stores directory.
+- Fixed some bugs in the armament stuff.
+
+
+10/21/2007
+----------
+- Canopy's properties moved to /sim/model/A-10/.
+
+07/09/2007
+----------
+- Added explosion and smoke subsubmodels to the gun tracers.
+- Added a dialog (Tab key or Ctrl-i) to choose the external payload on each
+pylon. Several pylons are selectable together provided they are loaded with the
+same type of ordnance.
+- Added Willy Pete ammunitions.
+- Added the ripples and interval functions to the armament panel.
+- Added two more AIM-9s available on pylon #1.
+- Weapons weight is now substracted on release. 
+- Fixed the broken navigation instruments.
+
+01/09/2007
+---------
+- Replaced the 'Odd red thing feft side of the AoA gauge' by a green digital
+clock.
+- Better textures for the flaps. 
+- Coloured tracers.
+- AIM-9s can be fired from pylon #11, there is a special symbology on the hud
+and an apropriate sound when an AIM-9 is available and 'supposed' to be
+searching for a target.
+- Cosmetics change on the cockpit sides and the pilot seat.
+
+12/05/2006
+----------
+- Fuel receptacle control and light indicator (you will have to close and open
+again the fuel receptacle after a disconnection, like in the real Warthog).
+- TACAN works fine with AAR tankers.
+- Autopilot: setting Vertical Speed to 0 makes now a good autotrim, (first step
+to an pitch SAS). 
+- No Hud when no electrical power.
+- Nice texture on the cockpit sides.
+- Some more details on the external texture. (more to come).
+- Payload: ECM pod AN/ALQ-131-V, AIM-9M and dual lancher rails. (weight balance
+and AIM-9 shoot: next time).
+ 
+
+09/16/2006
+----------
+- Engines: A-10 now starts with engines stopped (except n1 and n2 props).
+Engines are started with 2 switches located near the throttle.
+- Canopy: easier to close, doesn't need any more to stay pushing down the switch
+until the canopy is completly closed. New 'C' key makes the canopy open or
+close.
+- Jetstream: done, should be more visible maybe.
+- Shadows: many improvements.
+
+
+
+09/03/2006
+----------
+- External lighting: position lights (steady or flashing), anti-collision light
+(white flashing), formation lights (electroluminescent stripes), landing and
+taxi lights.
+- Under carriage: new model.
+- Engines: the fans are now spining. (An 'alphaed' disk should be added to model
+the fan at high spinning speed).
+- Hud: use of the latest version.
+- Altitude warning: now blinking.
+- Canopy: wind sound when flying with the canopy open.
+
+
+
+06/18/2006
+----------
+- Removed all the leading slashes in xml and nasal files after being told that
+the A-10 makes trouble in others MP aircrafts nasal scripts (fuel.nas).
+
+
+
+06/09/2006
+----------
+Electrical scheme.
+
+- The switchs and the circuits are OK, the devices (generator, inverter, converters) are not totaly implemented but the skeleton is there.
+Few instruments are linked to the electrical circuit, the HSI and nav[0] are
+dependant on it, the AoA index (left of the HUD) is dependant too.

@@ -1,0 +1,16 @@
+{
+  "set": "harrier/harrier-set.xml",
+  "name": "British Aerospace Harrier (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "harrier/harrier.xml",
+  "jets": 1,
+  "model": "harrier/Models/harrier-model.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "harrier.zip",
+  "archive_sha256": "17215d4cc3d569fa314e2cd9a2a84e54a8b1efcde67ae5701720226565c2cdb0",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/harrier.zip"
+}

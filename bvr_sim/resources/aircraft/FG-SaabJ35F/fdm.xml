@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fdm_config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Draken J35F" version="2.0" release="ALPHA" xsi:noNamespaceSchemaLocation="http://jsbsim.sourceforge.net/JSBSim.xsd">
+
+ <fileheader>
+  <author> Aeromatic v 0.95 </author>
+  <filecreationdate>2013-01-05</filecreationdate>
+  <version>$Revision: 1.15 $</version>
+  <description> Models a Draken J35F. </description>
+ </fileheader>
+
+
+
+ <metrics>
+   <wingarea unit="FT2">  527.48 </wingarea>
+   <wingspan unit="FT">   30.84 </wingspan>
+   <wing_incidence>        0.0733 </wing_incidence>
+   <chord unit="FT">   17.10 </chord>
+   <htailarea unit="FT2">   0.00 </htailarea>
+   <htailarm unit="FT">   11.8 </htailarm>
+   <vtailarea unit="FT2">   48.5 </vtailarea>
+   <vtailarm unit="FT">   12.5 </vtailarm>
+   <location name="AERORP" unit="IN">
+     <x> 313.0 </x> 
+     <y>   0.00 </y>
+     <z>  20.00 </z>
+   </location>
+   <location name="EYEPOINT" unit="IN">
+     <x> 133.0 </x>
+     <y>   0.00 </y>
+     <z>  35.00 </z>
+   </location>
+   <location name="VRP" unit="IN">
+     <x>267.0</x>
+     <y>0.0</y>
+     <z>0.0</z>
+   </location>
+ </metrics>
+
+ <mass_balance>
+   <ixx unit="SLUG*FT2">     12571 </ixx>
+   <iyy unit="SLUG*FT2">     56332 </iyy>
+   <izz unit="SLUG*FT2">     47820 </izz>
+   <emptywt unit="LBS">     18100 </emptywt> 
+   <location name="CG" unit="IN">
+     <x> 315.8 </x> 
+     <y>   0.00 </y>
+     <z> 12.0 </z>
+   </location>
+
+   <pointmass name="DroptankL">
+    <weight unit="LBS">100</weight>
+    <location name="POINTMASS" unit="IN">
+      <x> 304 </x>
+      <y> -24.00 </y>
+      <z> -22.4 </z>
+    </location>
+  </pointmass>
+
+   <pointmass name="DroptankR">
+    <weight unit="LBS">100</weight>
+    <location name="POINTMASS" unit="IN">
+      <x> 304 </x>
+      <y>  24.00 </y>
+      <z> -22.4 </z>
+    </location>
+  </pointmass>
+
+ </mass_balance>
+
+ <ground_reactions file="DrakenJ35F-groundreactions.xml" />
+ <propulsion file="Systems/propulsion" />
+ <system file="fuel" />
+ <system file="hydraulic" />
+ <flight_control file="Systems/flightcontrol" />
+ <aerodynamics file="DrakenJ35F-aerodynamics.xml" />
+ <external_reactions file="DrakenJ35F-externalreactions" />
+ 
+</fdm_config>

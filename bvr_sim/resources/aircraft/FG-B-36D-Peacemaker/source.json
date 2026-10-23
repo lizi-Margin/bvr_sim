@@ -1,0 +1,26 @@
+{
+  "set": "B-36D-Peacemaker/b36d-set.xml",
+  "name": "Convair B36 D Peacemaker (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "B-36D-Peacemaker/Systems/b36d-yasim.xml",
+  "jets": 4,
+  "model": "B-36D-Peacemaker/Models/b36d.xml",
+  "tags": [
+    "convair",
+    "bomber",
+    "1940s",
+    "1950s",
+    "piston",
+    "jet",
+    "10-engines",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "B-36D-Peacemaker.zip",
+  "archive_sha256": "58a59d1aa58a5150cdfbaebb4ac629ad8c6a3a59f8905af66384fb7eee591372",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/B-36D-Peacemaker.zip"
+}

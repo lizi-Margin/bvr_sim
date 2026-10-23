@@ -1,0 +1,16 @@
+{
+  "set": "Mirage_F1/Mirage_F1-set.xml",
+  "name": "Mirage F1",
+  "fdm_type": "yasim",
+  "fdm": "Mirage_F1/Mirage_F1-yasim.xml",
+  "jets": 1,
+  "model": "Mirage_F1/Models/Mirage_F1-model.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "Mirage_F1.zip",
+  "archive_sha256": "4fae1d829ce178ef09bb5e02399e2f1a1616528b11ed5d42667fa3e556c57794",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Mirage_F1.zip"
+}

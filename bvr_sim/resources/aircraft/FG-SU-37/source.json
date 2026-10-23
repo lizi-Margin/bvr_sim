@@ -1,0 +1,16 @@
+{
+  "set": "SU-37/SU-37-set.xml",
+  "name": "Sukoi SU-37 type aircraft (YASim FDM)",
+  "fdm_type": "yasim",
+  "fdm": "SU-37/SU-37-yasim.xml",
+  "jets": 2,
+  "model": "SU-37/Models/SU-37-model.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "SU-37.zip",
+  "archive_sha256": "7ae571890e0c00de416297a5f1c9258d67a360217ea3dc4cf25b0b23a7e82555",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/SU-37.zip"
+}

@@ -1,0 +1,24 @@
+{
+  "set": "CRJ700-family/CRJ700-set.xml",
+  "name": "Bombardier CRJ700 (with tutorials)",
+  "fdm_type": "yasim",
+  "fdm": "CRJ700-family/CRJ700.xml",
+  "jets": 2,
+  "model": "CRJ700-family/Models/CRJ700.xml",
+  "tags": [
+    "transport",
+    "bombardier",
+    "jet",
+    "retractable-gear",
+    "ifr",
+    "twin-engine",
+    "glass-cockpit"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "CRJ700-family.zip",
+  "archive_sha256": "85d11c419dc5dd48d16a97e806577e169f94a2a59ca1b39415449912a5c8d214",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/CRJ700-family.zip"
+}

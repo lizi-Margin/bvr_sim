@@ -1,0 +1,23 @@
+{
+  "set": "MRJ/MRJ90-STD-set.xml",
+  "name": " MRJ90-STD (JSBSim) ",
+  "fdm_type": "jsb",
+  "fdm": "MRJ/MRJ90-STD.xml",
+  "jets": 0,
+  "model": "MRJ/Models/MRJ90.xml",
+  "tags": [
+    "passenger",
+    "mitsubishi",
+    "2010s",
+    "tricycle",
+    "jet",
+    "twin-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "MRJ.zip",
+  "archive_sha256": "dd34403d88153097d0e568fbf1cd32a95695e35ec80bcde6b3613193774c3eb2",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MRJ.zip"
+}

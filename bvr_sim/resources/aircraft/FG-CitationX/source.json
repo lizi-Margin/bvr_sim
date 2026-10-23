@@ -1,0 +1,24 @@
+{
+  "set": "CitationX/CitationX-set.xml",
+  "name": "Cessna Citation-X",
+  "fdm_type": "yasim",
+  "fdm": "CitationX/CitationX.xml",
+  "jets": 2,
+  "model": "CitationX/Models/Citation-X.xml",
+  "tags": [
+    "bizjet",
+    "cessna",
+    "jet",
+    "retractable-gear",
+    "ifr",
+    "twin-engine",
+    "glass-cockpit"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "CitationX.zip",
+  "archive_sha256": "7895f2075d9f5bb02137ba3c1463bf2fa74a82843503572d19d2a5a4883eee39",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/CitationX.zip"
+}

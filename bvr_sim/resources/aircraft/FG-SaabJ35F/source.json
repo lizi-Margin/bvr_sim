@@ -1,0 +1,25 @@
+{
+  "set": "SaabJ35F/SaabJ35F-set.xml",
+  "name": "Saab J35F Draken",
+  "fdm_type": "jsb",
+  "fdm": "SaabJ35F/DrakenJ35F.xml",
+  "jets": 0,
+  "model": "SaabJ35F/Model/draken.xml",
+  "tags": [
+    "fighter",
+    "saab",
+    "jet",
+    "supersonic",
+    "ifr",
+    "coldwar",
+    "1960s",
+    "1970s"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "SaabJ35F.zip",
+  "archive_sha256": "506d4f768c47ef1730c83ff887188641d507bb547ded2157d21f6d7413c40a3c",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/SaabJ35F.zip"
+}

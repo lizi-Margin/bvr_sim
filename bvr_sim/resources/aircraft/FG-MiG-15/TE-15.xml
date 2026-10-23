@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="TE-15 electrical remote tachometer">
+ 
+
+ 
+
+
+ <property>systems/instr/TE-15/rpm</property>
+
+
+ <channel name="DGMK-3" execrate="2">
+
+  <switch name="systems/instr/TE-15/gauge/rpm">
+   <default value="systems/instr/TE-15/rpm" />
+   <clipto>
+    <min>0.0</min>
+    <max>15000.0</max>
+   </clipto>
+  </switch>
+
+ </channel>
+
+
+</system>

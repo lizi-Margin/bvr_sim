@@ -1,0 +1,32 @@
+{
+  "set": "Aermacchi-MB-339/mb339-set.xml",
+  "name": "Aermacchi MB 339 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Aermacchi-MB-339/Systems/mb339-yasim.xml",
+  "jets": 1,
+  "model": "Aermacchi-MB-339/Models/mb339.xml",
+  "tags": [
+    "aermacchi",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "single-engine",
+    "jet",
+    "ifr",
+    "trainer",
+    "1970s",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2020s",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Aermacchi-MB-339.zip",
+  "archive_sha256": "0356807ea1b58189a38829fbdb3523f2ad9c8fb7e96827899626175e7e6e1efc",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Aermacchi-MB-339.zip"
+}

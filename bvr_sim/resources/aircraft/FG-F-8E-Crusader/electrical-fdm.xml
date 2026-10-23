@@ -1,0 +1,462 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="electrical-fdm-common">
+
+    <property>/controls/circuit-breakers/cabin-lights-pwr</property>
+    <property>/controls/circuit-breakers/instr-ignition-switch</property>
+    <property>/controls/circuit-breakers/flaps</property>
+    <property>/controls/circuit-breakers/turn-coordinator</property>
+    <property>/controls/switches/nav-lights</property>
+    <property>/controls/circuit-breakers/instrument-lights</property>
+    <property>/controls/switches/strobe-lights</property>
+    <property>/controls/switches/taxi-lights</property>
+    <property>/controls/switches/pitot-heat</property>
+
+
+<channel name="electrical">
+
+
+
+        
+        <switch name="electrical/supplier/battery-volts">
+            <default value="0" />
+            <test logic="AND" value="28">
+                electrical/supplier/battery-on == 1
+            </test>
+            <output>/systems/electrical/suppliers/battery</output>
+        </switch>
+        <switch name="electrical/supplier/alternator-volts">
+            <default value="0" />
+            <test logic="AND" value="28.7">
+                electrical/supplier/alternator-on == 1
+            </test>
+            <output>/systems/electrical/suppliers/alternator</output>
+        </switch>
+        <switch name="electrical/supplier/external-volts">
+            <default value="0" />
+            <test logic="AND" value="29">
+                electrical/supplier/external-on == 1
+            </test>
+            <output>/systems/electrical/suppliers/external</output>
+        </switch>
+        <switch name="electrical/supplier/emergency-volts">
+            <default value="0" />
+            <test logic="AND" value="28.7">
+                electrical/supplier/emergency-on == 1
+            </test>
+            <output>/systems/electrical/suppliers/emergency</output>
+        </switch>
+
+        <switch name="electrical/source-volts">
+            <default value="0" />
+            <test logic="AND" value="electrical/supplier/battery-volts">
+                electrical/supplier/battery-on == 1
+                electrical/supplier/battery-volts gt  electrical/supplier/alternator-volts
+                electrical/supplier/battery-volts gt  electrical/supplier/emergency-volts
+                electrical/supplier/battery-volts gt electrical/supplier/external-volts
+                /controls/electric/master-switch == 1
+            </test>
+            <test logic="AND" value="electrical/supplier/alternator-volts">
+                electrical/supplier/alternator-on == 1
+                /controls/electric/master-switch == 1
+            </test>
+            <test logic="AND" value="electrical/supplier/external-volts">
+                electrical/supplier/external-on == 1
+                /controls/electric/master-switch == 1
+            </test>
+            <test logic="AND" value="electrical/supplier/emergency-volts">
+                electrical/supplier/emergency-on == 1
+                /controls/electric/master-switch == 1
+            </test>
+        </switch>
+
+
+
+        
+        <switch name="electrical/bus/master-volts">
+            <default value="0" />
+            <test logic="AND" value="electrical/source-volts">
+                /controls/electric/master-switch == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/bus/master-avionic-volts">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                /controls/electric/master-switch == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/bus/auxiliary-volts">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                /controls/electric/master-switch == 1
+            </test>
+        </switch>
+
+       
+       <switch name="electrical/generic/outputs-on">
+           <default value="0" />
+           <test logic="AND" value="1">
+               /controls/electric/master-switch == 1
+           </test>
+        </switch>
+
+
+        <switch name="electrical/avionic/instruments-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/electric/master-switch == 1
+            </test>
+        </switch>
+
+        <switch name="master avionics">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/electric/master-switch == 1
+            </test>
+            <output>/controls/switches/master-avionics</output>
+        </switch>
+        
+        <switch name="electrical/generic/cabin-lights-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/circuit-breakers/cabin-lights-pwr == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/instrument-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/circuit-breakers/instr-ignition-switch == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/fuel-pump-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/engines/engine[0]/fuel-pump == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/landing-light-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/lighting/landing-lights == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/beacon-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/switches/flashing-beacon == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/flaps-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/circuit-breakers/flaps == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/turn-coordinator-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/circuit-breakers/turn-coordinator == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/map-lights-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/switches/nav-lights == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/instrument-lights-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/circuit-breakers/instrument-lights == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/strobe-lights-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/switches/strobe-lights == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/taxi-lights-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/switches/taxi-lights  == 1
+            </test>
+        </switch>
+
+        <switch name="electrical/generic/pitot-heat-power">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/switches/pitot-heat  == 1
+            </test>
+        </switch>
+
+        
+        
+
+
+        <switch name="electrical/generic/outputs-starter-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/starter[0]</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-cabin-l">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/cabin-lights</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-ignition-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/instr-ignition-switch</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-pump">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/fuel-pump</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-pump-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/refuel-pump</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-landing-l">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/landing-light</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-beacon-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/beacon</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-flaps-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/flaps</output>
+        </switch>
+
+
+        <switch name="electrical/generic/outputs-turn">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/turn-coordinator</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-map-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/map-lights</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-instrument-l">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/instrument-lights</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-strobe-l">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/strobe-lights</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-taxi-l">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/taxi-lights</output>
+        </switch>
+
+        <switch name="electrical/generic/outputs-pitot-h">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/generic/outputs-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/pitot-heat</output>
+        </switch>
+
+        
+
+        <switch name="electrical/avionic/instruments-radar-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/radar</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-fan-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/avionics-fan</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-mfd-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/gps-mfd</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-gps-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/gps</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-hsi-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/hsi</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-nav0-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/nav[0]</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-dme-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/dme</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-audio0-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/audio-panel[0]</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-nav1-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/nav[1]</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-audio1-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/audio-panel[1]</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-transponder-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/transponder</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-autopilot-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/autopilot</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-adf-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/adf</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-mk_vii-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/mk-viii</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-tacan-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/tacan</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments-comm1-v">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/comm</output>
+        </switch>
+
+        <switch name="electrical/avionic/instruments">
+            <default value="0" />
+            <test logic="AND" value="electrical/bus/master-volts">
+                electrical/avionic/instruments-on  == 1
+            </test>
+            <output>/systems/electrical/outputs/comm[1]</output>
+        </switch>
+
+    </channel>
+
+
+</system>

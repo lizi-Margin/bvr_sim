@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="aoa_indicator">
+
+    
+    
+
+    
+
+    <property value="5">systems/aoa/ref_approach_speed_add5</property>
+    <property value="3">systems/aoa/ref_approach_speed_add3</property>
+    <property value="-5">systems/aoa/ref_approach_speed_subs5</property>
+    <property value="-3">systems/aoa/ref_approach_speed_subs3</property>
+
+    <property value="1.5">systems/aoa/ref_approach_angle_add15</property>
+    <property value="0.5">systems/aoa/ref_approach_angle_add05</property>
+    <property value="-1.5">systems/aoa/ref_approach_angle_subs15</property>
+    <property value="-0.5">systems/aoa/ref_approach_angle_subs05</property>
+
+    <property value="1.5">systems/aoa/ref_approach_angle_coef</property>
+   
+    <property value="12.7">systems/aoa/ref_approach_angle_corr</property>
+
+    <channel name="aoa-indicator">
+	
+	
+
+        <summer name="systems/aoa/ref_approach_speed-pls5">
+            <input>/sim/aoa-indicator/speed</input>
+            <input>systems/aoa/ref_approach_speed_add5</input>
+            <output>/sim/aoa-indicator/ref-approach-speed-pls5</output>
+        </summer>
+
+        <summer name="systems/aoa/ref_approach_speed-mns5">
+            <input>/sim/aoa-indicator/speed</input>
+            <input>systems/aoa/ref_approach_speed_subs5</input>
+            <output>/sim/aoa-indicator/ref-approach-speed-mns5</output>
+        </summer>
+
+        <summer name="systems/aoa/ref_approach_speed-pls3">
+            <input>/sim/aoa-indicator/speed</input>
+            <input>systems/aoa/ref_approach_speed_add3</input>
+            <output>/sim/aoa-indicator/ref-approach-speed-pls3</output>
+        </summer>
+
+        <summer name="systems/aoa/ref_approach_speed-mns3">
+            <input>/sim/aoa-indicator/speed</input>
+            <input>systems/aoa/ref_approach_speed_subs3</input>
+            <output>/sim/aoa-indicator/ref-approach-speed-mns3</output>
+        </summer>
+
+        <fcs_function name="systems/aoa/ref_approach_angle">
+            <function>
+                <difference>
+                    <product>
+                        <property>/sim/aoa-indicator/units</property>
+                        <property>systems/aoa/ref_approach_angle_coef</property>
+                    </product>
+                    <property>systems/aoa/ref_approach_angle_corr</property>
+                </difference>
+            </function>
+            <output>/sim/aoa-indicator/ref-approach-angle</output>
+       </fcs_function>
+
+       <summer name="systems/aoa/ref_approach_angle-pls05">
+           <input>/sim/aoa-indicator/ref-approach-angle</input>
+           <input>systems/aoa/ref_approach_angle_add05</input>
+           <output>/sim/aoa-indicator/ref-approach-angle-pls05</output>
+        </summer>
+
+        <summer name="systems/aoa/ref_approach_angle-pls15">
+            <input>/sim/aoa-indicator/ref-approach-angle</input>
+            <input>systems/aoa/ref_approach_angle_add15</input>
+            <output>/sim/aoa-indicator/ref-approach-angle-pls15</output>
+        </summer>
+
+        <summer name="systems/aoa/ref_approach_angle-mns05">
+            <input>/sim/aoa-indicator/ref-approach-angle</input>
+            <input>systems/aoa/ref_approach_angle_subs05</input>
+            <output>/sim/aoa-indicator/ref-approach-angle-mns05</output>
+        </summer>
+
+        <summer name="systems/aoa/ref_approach_angle-mns15">
+            <input>/sim/aoa-indicator/ref-approach-angle</input>
+            <input>systems/aoa/ref_approach_angle_subs15</input>
+            <output>/sim/aoa-indicator/ref-approach-angle-mns15</output>
+        </summer>
+
+       <pure_gain name="systems/aoa/asi-marker">
+           <input>/sim/aoa-indicator/speed</input>
+           <gain>1</gain>
+           <output>/instrumentation/airspeed-indicator/landing-speed</output>
+       </pure_gain>
+
+
+       <switch name="systems/aoa/green-ext-annunciator">
+           <default value="0" />
+           <test logic="AND" value="1">
+               velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-pls5
+           </test>
+           <test logic="AND" value="1">
+               velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-mns3
+               aero/alpha-deg GT /sim/aoa-indicator/ref-approach-angle-pls05
+           </test>
+           <output>/sim/aoa-indicator/lg-green</output>
+        </switch>
+
+        <switch name="systems/aoa/green-annunciator">
+            <default value="0" />
+            <test logic="AND" value="1">
+                velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-pls5
+            </test>
+            <test logic="AND" value="1">
+                velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-mns3
+                aero/alpha-deg GT /sim/aoa-indicator/ref-approach-angle-pls15
+            </test>
+            <output>/sim/aoa-indicator/green</output>
+        </switch>
+
+        <switch name="systems/aoa/green-medium-annunciator">
+            <default value="0" />
+                <test logic="AND" value="1">
+                    velocities/vc-kts  GT /sim/aoa-indicator/ref-approach-speed-pls3
+                    velocities/vc-kts  LE /sim/aoa-indicator/ref-approach-speed-pls5
+                </test>
+                <test logic="AND" value="1">
+                    velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-mns3
+                    aero/alpha-deg GT /sim/aoa-indicator/ref-approach-angle-pls05
+                    aero/alpha-deg LE /sim/aoa-indicator/ref-approach-angle-pls15
+                </test>
+                <test logic="AND" value="1">
+                    velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-pls3
+                    velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-mns3
+                    aero/alpha-deg GT /sim/aoa-indicator/ref-approach-angle-pls15
+                </test>
+            <output>/sim/aoa-indicator/green-medium</output>
+        </switch>
+
+
+        <switch name="systems/aoa/red-ext-annunciator">
+            <default value="0" />
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-mns5
+            </test>
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-mns3
+                aero/alpha-deg LE /sim/aoa-indicator/ref-approach-angle-mns05
+            </test>
+            <output>/sim/aoa-indicator/lg-red</output>
+        </switch>
+
+        <switch name="systems/aoa/red-annunciator">
+            <default value="0" />
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-mns5
+            </test>
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-mns3
+                aero/alpha-deg LE /sim/aoa-indicator/ref-approach-angle-mns15
+            </test>
+            <output>/sim/aoa-indicator/red</output>
+        </switch>
+
+        <switch name="systems/aoa/red-medium-annunciator">
+            <default value="0" />
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-mns3
+                velocities/vc-kts  GT /sim/aoa-indicator/ref-approach-speed-mns5
+            </test>
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-pls3
+                aero/alpha-deg LE /sim/aoa-indicator/ref-approach-angle-mns05
+                aero/alpha-deg GT /sim/aoa-indicator/ref-approach-angle-mns15
+            </test>
+            <test logic="AND" value="1">
+                velocities/vc-kts LE /sim/aoa-indicator/ref-approach-speed-pls3
+                velocities/vc-kts GT /sim/aoa-indicator/ref-approach-speed-mns3
+                aero/alpha-deg LE /sim/aoa-indicator/ref-approach-angle-mns15
+            </test>
+            <output>/sim/aoa-indicator/red-medium</output>
+        </switch>
+
+        <switch name="systems/aoa/orange-annunciator">
+            <default value="0" />
+            <test logic="AND" value="1">
+                velocities/vc-kts GE /sim/aoa-indicator/ref-approach-speed-mns3
+                velocities/vc-kts LE  /sim/aoa-indicator/ref-approach-speed-pls3
+                aero/alpha-deg GE /sim/aoa-indicator/ref-approach-angle-mns05
+                aero/alpha-deg LE /sim/aoa-indicator/ref-approach-angle-pls05
+            </test>
+            <output>/sim/aoa-indicator/orange</output>
+        </switch>
+
+    </channel>
+
+    <channel name="aoa-iinstrument">
+
+        
+
+        <fcs_function name="systems/aoa/aoa-marker">
+            <function>
+                <difference>
+                    <product>
+                        <property>/sim/aoa-indicator/alpha-rad</property>
+                        <value>57.29578</value>
+                    </product>
+                    <product>
+                        <value>8</value>
+                        <property>fcs/wings-pos-norm</property>
+                    </product>
+                </difference>
+            </function>
+            <output>/autopilot/settings/target-aoa-deg</output>
+      </fcs_function>
+
+
+    </channel>
+
+</system>

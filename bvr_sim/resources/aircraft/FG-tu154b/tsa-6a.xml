@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<turbine_engine name="tsa-6a">
+  <milthrust> 100 </milthrust>
+  <bypassratio>     3.0 </bypassratio>
+  <tsfc>            5.2 </tsfc>
+  <bleed>           0.05</bleed>
+  <idlen1>        30.0 </idlen1>
+  <idlen2>        25.0 </idlen2>
+  <maxn1>         100.0 </maxn1>
+  <maxn2>         100.0 </maxn2>
+  <augmented>         0 </augmented>
+  <injected>          0 </injected>
+ 
+  <function name="IdleThrust">
+    <value>1.0</value>
+  </function>
+
+  <function name="MilThrust">
+    <value>1.0</value>
+  </function>
+
+
+</turbine_engine>

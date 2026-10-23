@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Manual handle switches"> 
+    
+    
+    <property value="0.0">systems/handle-switches/sw-handle-brake-trigger</property>
+    <property value="0.0">systems/handle-switches/sw-brake-parking</property>
+    <property value="0.0">systems/handle-switches/sw-handle-brake-pos-rotate</property>
+    <property value="0.0">systems/handle-switches/sw-handle-brake-extension</property>
+    <property value="0.0">systems/handle-switches/sw-handle-brake-activate</property>
+    <property value="0.0">systems/handle-switches/sw-handle-brake-release</property>
+    
+    <property value="0.0">systems/handle-switches/sw-handle-dragchute-trigger</property>
+    <property value="0.0">systems/handle-switches/sw-handle-dragchute-activate</property>
+    <property value="0.0">systems/handle-switches/sw-handle-dragchute-status</property>
+    <property value="0.0">systems/handle-switches/sw-handle-dragchute-pos</property>
+    
+    
+    <channel name="handle brake" execrate="16">
+        
+        <switch name="systems/handle-switches/sw-handle-brake-activate">
+            <default value="systems/handle-switches/sw-handle-brake-activate" />
+            <test logic="AND" value="1">
+                systems/handle-switches/sw-handle-brake-activate == 1
+                systems/handle-switches/sw-handle-brake-pos-status == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-brake-activate == 1
+                systems/handle-switches/sw-handle-brake-pos-status GT 0
+            </test>
+        </switch>
+        
+        <switch name="systems/handle-switches/sw-handle-brake-release">
+            <default value="systems/handle-switches/sw-handle-brake-release" />
+            <test logic="AND" value="1">
+                systems/handle-switches/sw-handle-brake-release == 1
+                systems/handle-switches/sw-handle-brake-pos-status GT 0
+            </test>
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-brake-release == 1
+                systems/handle-switches/sw-handle-brake-pos-status == 0
+            </test>
+        </switch>
+            
+        <washout_filter name="systems/handle-switches/sw-handle-brake-trigger-wa">
+            <input>systems/handle-switches/sw-handle-brake-trigger</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/handle-switches/sw-handle-brake-trigger-wa-sw">
+            <default value="1" />
+            <test logic="OR" value="1">
+                systems/handle-switches/sw-handle-brake-activate == 1
+                systems/handle-switches/sw-handle-brake-release == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-brake-trigger-wa LT 0.5
+                systems/handle-switches/sw-handle-brake-trigger-wa GT -0.5
+            </test>
+        </switch>
+            
+        <switch name="systems/handle-switches/sw-handle-brake-pos-status">
+            <default value="systems/handle-switches/sw-handle-brake-pos-status" />
+            <test logic="AND" value="0">
+                gear/unit[0]/wheel-speed-fps GT 0.5
+                systems/handle-switches/sw-handle-brake-trigger-wa-sw == 0
+                /controls/gear/brake-parking == 0
+            </test>
+            <test logic="AND" value="1">
+                gear/unit[0]/wheel-speed-fps GT 0.5
+                systems/handle-switches/sw-handle-brake-trigger-wa-sw == 1
+            </test>
+            <test logic="AND" value="0">
+                gear/unit[0]/wheel-speed-fps LE 0.5
+                systems/handle-switches/sw-handle-brake-trigger-wa-sw == 1
+                systems/handle-switches/sw-handle-brake-pos-rotate GT 0.20
+            </test>
+            <test logic="AND" value="2">
+                gear/unit[0]/wheel-speed-fps LE 0.5
+                systems/handle-switches/sw-handle-brake-trigger-wa-sw == 1
+            </test>
+            <test logic="AND" value="0">
+                /controls/gear/brake-parking == 0
+                systems/handle-switches/sw-handle-brake-pos-rotate GT 0.95
+            </test>
+            <test logic="AND" value="1">
+                gear/unit[0]/wheel-speed-fps GT 0.5
+                /controls/gear/brake-parking == 1
+            </test>
+            <test logic="AND" value="2">
+                gear/unit[0]/wheel-speed-fps LE 0.5
+                /controls/gear/brake-parking == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/handle-switches/sw-handle-brake-pos-rotate">
+            <input>systems/handle-switches/sw-handle-brake-pos-status-rotate</input>
+            <c1>3.0</c1>
+        </lag_filter>
+        
+        <switch name="set controls gear brake-parking">
+            <default value="/controls/gear/brake-parking" />
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-brake-pos-status == 0
+            </test>
+            <test logic="AND" value="1">
+                systems/handle-switches/sw-handle-brake-pos-status GT 0
+            </test>
+            <output>/controls/gear/brake-parking</output>
+        </switch>
+        
+        <switch name="systems/handle-switches/sw-handle-brake-pos-status-linear">
+            <default value="systems/handle-switches/sw-handle-brake-pos-status-linear" />
+            <test logic="AND" value="1">
+                systems/handle-switches/sw-handle-brake-pos-status GE 1
+            </test>
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-brake-pos-status == 0
+                systems/handle-switches/sw-handle-brake-pos-rotate LE 0.1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/handle-switches/sw-handle-brake-pos-linear">
+            <input>systems/handle-switches/sw-handle-brake-pos-status-linear</input>
+            <c1>1.5</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="handle brake extension handle" execrate="4">
+        
+        <lag_filter name="systems/handle-switches/sw-handle-brake-extension">
+            <input>systems/handle-switches/sw-handle-brake-pos-status-linear</input>
+            <c1>1.5</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/handle-switches/sw-handle-brake-pos-rotate">
+            <input>systems/handle-switches/sw-handle-brake-pos-status-rotate</input>
+            <c1>3.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/handle-switches/sw-handle-brake-pos-status-rotate">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/handle-switches/sw-handle-brake-pos-status == 2
+                systems/handle-switches/sw-handle-brake-pos-linear GT 0.9
+                systems/handle-switches/sw-handle-brake-extension GT 0.9
+            </test>
+            <test logic="AND" value="0">
+                systems/handle-switches/sw-handle-brake-pos-status LE 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="handle dragchute" execrate="16">
+    
+        <switch name="systems/handle-switches/sw-handle-dragchute-status">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/handle-switches/sw-handle-dragchute-pos GT 0.8
+            </test>
+        </switch>
+        
+        <switch name="systems/handle-switches/sw-handle-dragchute-command">
+            <default value="systems/handle-switches/sw-handle-dragchute-command" />
+            <test logic="OR" value="1">
+                systems/handle-switches/sw-handle-dragchute-trigger == 1
+                systems/handle-switches/sw-handle-dragchute-activate == 1
+            </test>
+            <test logic="OR" value="0">
+                systems/handle-switches/sw-handle-dragchute-trigger == 0
+                systems/handle-switches/sw-handle-dragchute-activate == 0
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/handle-switches/sw-handle-dragchute-pos">
+            <input>systems/handle-switches/sw-handle-dragchute-command</input>
+            <c1>1.5</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+</system>

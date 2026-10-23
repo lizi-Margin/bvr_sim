@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="FCS-pitch">
+
+  <channel name="Flaps">
+   <kinematic name="fcs/flaps-control">
+     <input>fcs/flap-cmd-norm</input>
+     <traverse>
+       <setting>
+         <position>0</position>
+         <time>0</time>
+       </setting>
+       <setting>
+         <position>8</position>
+         <time>3</time>
+       </setting>
+       <setting>
+         <position>15</position>
+         <time>3</time>
+       </setting>
+       <setting>
+         <position>25</position>
+         <time>4</time>
+       </setting>
+       <setting>
+         <position>42</position>
+         <time>4</time>
+       </setting>
+     </traverse>
+     <output>fcs/flap-pos-deg</output>
+   </kinematic>
+
+   <aerosurface_scale name="fcs/flap-normalization">
+      <input>fcs/flap-pos-deg</input>
+      <domain>
+        <min>0</min>
+        <max>42</max>
+      </domain>
+      <range>
+        <min>0</min>
+        <max>1</max>
+      </range>
+      <output>fcs/flap-pos-norm</output>
+   </aerosurface_scale>
+
+  </channel>
+
+</system>

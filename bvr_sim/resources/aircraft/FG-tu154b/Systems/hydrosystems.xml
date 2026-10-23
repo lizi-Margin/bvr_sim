@@ -1,0 +1,936 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Hydrosystems">
+
+  
+ 
+  <property>hs/hs1-i</property>
+  <property>hs/hs2-i</property>
+  <property>hs/hs3-i</property>
+  <property>hs/em-brake-i</property>
+  
+  <property>hs/ns46-1-n</property>
+  <property>hs/ns46-2-n</property>
+  <property>hs/ns46-3-n</property>
+  
+  <property>hs/hs2-to-1</property>
+  <property>hs/hs1-to-em-brake</property>
+  
+  <property>hs/buster-1-switch</property>
+  <property>hs/buster-2-switch</property>
+  <property>hs/buster-3-switch</property>
+        <channel name="hydrosystems">
+          
+
+          
+          <switch name="hs/sources/np89-1-pressure">
+            <default value="0.0" />
+            <test value="0.004762"> 
+              propulsion/engine[0]/n2 &gt; 20.0
+            </test>
+          </switch>
+          <scheduled_gain name="hs/sources/np89-1-flow">
+            <input>hs/sources/np89-1-pressure</input>
+            <table>
+              <independentVar> propulsion/engine[0]/n2 </independentVar>
+              <tableData>
+                15             0
+                20            4.2 	
+                30		  55.0	
+              </tableData>
+            </table>
+          </scheduled_gain>
+          
+          <switch name="hs/sources/np89-2-pressure">
+            <default value="0.0" />
+            <test value="0.004762"> 
+              propulsion/engine[1]/n2 &gt; 20.0
+            </test>
+          </switch>
+          <scheduled_gain name="hs/sources/np89-2-flow">
+            <input>hs/sources/np89-2-pressure</input>
+            <table>
+              <independentVar> propulsion/engine[1]/n2 </independentVar>
+              <tableData>
+                15             0
+                20            4.2 	
+                30		  55.0	
+              </tableData>
+            </table>
+          </scheduled_gain>
+          
+          <switch name="hs/sources/np89-3-pressure">
+            <default value="0.0" />
+            <test value="0.004762"> 
+              propulsion/engine[1]/n2 &gt; 20.0
+            </test>
+          </switch>
+          <scheduled_gain name="hs/sources/np89-3-flow">
+            <input>hs/sources/np89-3-pressure</input>
+            <table>
+              <independentVar> propulsion/engine[1]/n2 </independentVar>
+              <tableData>
+                15             0
+                20            4.2 	
+                30		  55.0	
+              </tableData>
+            </table>
+          </scheduled_gain>
+          
+          <switch name="hs/sources/np89-4-pressure">
+            <default value="0.0" />
+            <test value="0.004762"> 
+              propulsion/engine[2]/n2 &gt; 20.0
+            </test>
+          </switch>
+          <scheduled_gain name="hs/sources/np89-4-flow">
+            <input>hs/sources/np89-4-pressure</input>
+            <table>
+              <independentVar> propulsion/engine[2]/n2 </independentVar>
+              <tableData>
+                15             0
+                20            4.2 	
+                30		  55.0	
+              </tableData>
+            </table>
+          </scheduled_gain>
+          
+          <switch name="hs/sources/ns46-1-pressure">
+            <default value="0.0" />
+            <test value="0.004762"> 
+              hs/ns46-1-n &gt; 20.0
+            </test>
+          </switch>
+          <scheduled_gain name="hs/sources/ns46-1-flow">
+            <input>hs/sources/ns46-1-pressure</input>
+            <table>
+              <independentVar> hs/ns46-1-n </independentVar>
+              <tableData>
+                15             0
+                20            2.0 	
+                30		  20.0	
+              </tableData>
+            </table>
+          </scheduled_gain>
+          
+          
+          <switch name="hs/sources/ns46-2-pressure">
+            <default value="0.0" />
+            <test value="0.004762"> 
+              hs/ns46-2-n &gt; 20.0
+            </test>
+          </switch>
+          <scheduled_gain name="hs/sources/ns46-2-flow">
+            <input>hs/sources/ns46-2-pressure</input>
+            <table>
+              <independentVar> hs/ns46-2-n </independentVar>
+              <tableData>
+                15             0
+                20            2.0	
+                30		  20.0	
+              </tableData>
+            </table>
+          </scheduled_gain>
+          
+          
+          <integrator name="hs/hs1-pressure">
+            <input>hs/hs1-i</input>
+            <c1>1.5</c1>
+          </integrator>
+          <integrator name="hs/hs2-pressure">
+            <input>hs/hs2-i</input>
+            <c1>1.5</c1>
+          </integrator>
+          <integrator name="hs/hs3-pressure">
+            <input>hs/hs3-i</input>
+            <c1>1.5</c1>
+          </integrator>
+          <integrator name="hs/emergency-brake-pressure">
+            <input>hs/em-brake-i</input>
+            <c1>1.5</c1>
+          </integrator>
+          
+          
+          <switch name="hs/hs2-to-1-g">
+            <default value="0.0" />
+            <test value="0.3">
+              hs/hs2-to-1 == 1
+            </test>
+          </switch>
+          
+          
+          <switch name="hs/hs1-to-em-brake-g">
+            <default value="0.0" />
+            <test value="0.3">
+              hs/hs1-to-em-brake == 1
+            </test>
+          </switch>
+          
+          
+          
+          <switch name="hs/hs1-busters-ok">
+            <default value="0.0" />
+            <test value="1.0"> 
+              hs/hs1-pressure &gt; 80.0
+            </test>
+          </switch>    
+          <switch name="hs/hs2-busters-ok">
+            <default value="0.0" />
+            <test value="1.0"> 
+              hs/hs2-pressure &gt; 80.0
+            </test>
+          </switch>    
+          <switch name="hs/hs3-busters-ok">
+            <default value="0.0" />
+            <test value="1.0"> 
+              hs/hs3-pressure &gt; 80.0
+            </test>
+          </switch>    
+          
+          
+          <switch name="hs/buster-1">
+            <default value="0.0" />
+            <test value="hs/hs1-busters-ok"> 
+              hs/buster-1-switch == 1.0
+            </test>
+          </switch>
+          <switch name="hs/buster-2">
+            <default value="0.0" />
+            <test value="hs/hs2-busters-ok"> 
+              hs/buster-2-switch == 1.0
+            </test>
+          </switch>
+          <switch name="hs/buster-3">
+            <default value="0.0" />
+            <test value="hs/hs3-busters-ok"> 
+              hs/buster-3-switch == 1.0
+            </test>
+          </switch>
+          
+          
+          <summer name="hs/busters-serviceable">
+            <input>hs/buster-1</input>
+            <input>hs/buster-2</input>
+            <input>hs/buster-3</input>
+          </summer>
+          
+          <summer name="hs/flaps-serviceable">
+            <input>hs/hs1-busters-ok</input>
+            <input>hs/hs2-busters-ok</input>
+          </summer>
+          
+          
+          
+          <pure_gain name="hs/ra-56-p-1-s"> 
+            <input>hs/hs1-busters-ok</input>
+            <gain>hs/ra56-pitch-1</gain>
+          </pure_gain>
+          <pure_gain name="hs/ra-56-p-2-s"> 
+            <input>hs/hs2-busters-ok</input>
+            <gain>hs/ra56-pitch-2</gain>
+          </pure_gain>
+          <pure_gain name="hs/ra-56-p-3-s"> 
+            <input>hs/hs3-busters-ok</input>
+            <gain>hs/ra56-pitch-3</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/ra-56-r-1-s"> 
+            <input>hs/hs1-busters-ok</input>
+            <gain>hs/ra56-roll-1</gain>
+          </pure_gain>
+          <pure_gain name="hs/ra-56-r-2-s"> 
+            <input>hs/hs2-busters-ok</input>
+            <gain>hs/ra56-roll-2</gain>
+          </pure_gain>
+          <pure_gain name="hs/ra-56-r-3-s"> 
+            <input>hs/hs3-busters-ok</input>
+            <gain>hs/ra56-roll-3</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/ra-56-y-1-s"> 
+            <input>hs/hs1-busters-ok</input>
+            <gain>hs/ra56-yaw-1</gain>
+          </pure_gain>
+          <pure_gain name="hs/ra-56-y-2-s"> 
+            <input>hs/hs2-busters-ok</input>
+            <gain>hs/ra56-yaw-2</gain>
+          </pure_gain>
+          <pure_gain name="hs/ra-56-y-3-s"> 
+            <input>hs/hs3-busters-ok</input>
+            <gain>hs/ra56-yaw-3</gain>
+          </pure_gain>
+          
+          <summer name="hs/ra-56-pitch-serviceable">
+            <input>hs/ra-56-p-1-s</input>
+            <input>hs/ra-56-p-2-s</input>
+            <input>hs/ra-56-p-3-s</input>
+          </summer>
+          <summer name="hs/ra-56-roll-serviceable">
+            <input>hs/ra-56-r-1-s</input>
+            <input>hs/ra-56-r-2-s</input>
+            <input>hs/ra-56-r-3-s</input>
+          </summer>
+          <summer name="hs/ra-56-yaw-serviceable">
+            <input>hs/ra-56-y-1-s</input>
+            <input>hs/ra-56-y-2-s</input>
+            <input>hs/ra-56-y-3-s</input>
+          </summer>
+          
+          
+          <switch name="hs/hs1-p-clipped">
+            <default value="100.0" />
+            <test value="hs/hs1-pressure">
+              hs/hs1-pressure &gt; 100.0
+            </test>
+          </switch>
+          
+          <fcs_function name="hs/hs1-p-rev">
+            <description>1 divide by p-clipped</description>
+            <function>
+              <product>
+                <quotient>
+                  <value>1.0</value>
+                  <property>hs/hs1-p-clipped</property>
+                </quotient>
+                <value>1.0</value>
+              </product>
+            </function>
+          </fcs_function>
+          
+          <switch name="hs/hs2-p-clipped">
+            <default value="100.0" />
+            <test value="hs/hs2-pressure">
+              hs/hs2-pressure &gt; 100.0
+            </test>
+          </switch>
+          
+          <fcs_function name="hs/hs2-p-rev">
+            <description>1 divide by p-clipped</description>
+            <function>
+              <product>
+                <quotient>
+                  <value>1.0</value>
+                  <property>hs/hs2-p-clipped</property>
+                </quotient>
+                <value>1.0</value>
+              </product>
+            </function>
+          </fcs_function>
+          
+          <switch name="hs/hs3-p-clipped">
+            <default value="100.0" />
+            <test value="hs/hs3-pressure">
+              hs/hs3-pressure &gt; 100.0
+            </test>
+          </switch>
+          
+          <fcs_function name="hs/hs3-p-rev">
+            <description>1 divide by p-clipped</description>
+            <function>
+              <product>
+                <quotient>
+                  <value>1.0</value>
+                  <property>hs/hs3-p-clipped</property>
+                </quotient>
+                <value>1.0</value>
+              </product>
+            </function>
+          </fcs_function>
+          
+          <summer name="hs/hs1-inp-delta">
+            <input>hs/max-pressure</input>
+            <input>-hs/hs1-pressure</input>
+            <clipto>
+              <min>0.0</min>
+              <max>1000.0</max>
+            </clipto>
+          </summer>
+          
+          <pure_gain name="hs/hs1-inp1-flow"> 
+            <input>hs/hs1-inp-delta</input>
+            <gain>hs/sources/np89-1-flow</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-inp2-flow"> 
+            <input>hs/hs1-inp-delta</input>
+            <gain>hs/sources/np89-2-flow</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs1-crossfeed-delta">
+            <input>hs/hs2-pressure</input>
+            <input>-hs/hs1-pressure</input>
+            <clipto>
+              <min>0.0</min>
+              <max>1000.0</max>
+            </clipto>
+          </summer>
+          <pure_gain name="hs/hs1-inp3-flow"> 
+            <input>hs/hs1-crossfeed-delta</input>
+            <gain>hs/hs2-to-1-g</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs1-em-brake-delta">
+            <input>hs/hs1-pressure</input>
+            <input>-hs/emergency-brake-pressure</input>
+            <clipto>
+              <min>0.0</min>
+              <max>1000.0</max>
+            </clipto>
+          </summer>
+          <pure_gain name="hs/em-brake-inp1-flow"> 
+            <input>hs/hs1-em-brake-delta</input>
+            <gain>hs/hs1-to-em-brake-g</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs2-inp-delta">
+            <input>hs/max-pressure</input>
+            <input>-hs/hs2-pressure</input>
+            <clipto>
+              <min>0.0</min>
+              <max>1000.0</max>
+            </clipto>
+          </summer>
+          
+          <pure_gain name="hs/hs2-inp1-flow"> 
+            <input>hs/hs2-inp-delta</input>
+            <gain>hs/sources/np89-3-flow</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-inp2-flow"> 
+            <input>hs/hs2-inp-delta</input>
+            <gain>hs/sources/ns46-1-flow</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs3-inp-delta">
+            <input>hs/max-pressure</input>
+            <input>-hs/hs3-pressure</input>
+            <clipto>
+              <min>0.0</min>
+              <max>1000.0</max>
+            </clipto>
+          </summer>
+          
+          <pure_gain name="hs/hs3-inp1-flow"> 
+            <input>hs/hs3-inp-delta</input>
+            <gain>hs/sources/np89-4-flow</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-inp2-flow"> 
+            <input>hs/hs3-inp-delta</input>
+            <gain>hs/sources/ns46-2-flow</gain>
+          </pure_gain>
+          
+          
+          
+          <washout_filter name="hs/consumers/elevator-speed">
+            <input>fcs/elevator-pos-rad</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/elevator-e"> 
+            <input>hs/consumers/elevator-speed</input>
+            <gain>hs/consumers/elevator-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/aileron-speed">
+            <input>fcs/left-aileron-pos-rad</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/aileron-e"> 
+            <input>hs/consumers/aileron-speed</input>
+            <gain>hs/consumers/aileron-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/rudder-speed">
+            <input>fcs/rudder-pos-rad</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/rudder-e"> 
+            <input>hs/consumers/rudder-speed</input>
+            <gain>hs/consumers/rudder-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/flaps-speed">
+            <input>fcs/flap-pos-norm</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/flaps-e"> 
+            <input>hs/consumers/flaps-speed</input>
+            <gain>hs/consumers/flaps-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/spoilers-speed">
+            <input>fcs/speedbrake-pos-norm</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/spoilers-e"> 
+            <input>hs/consumers/spoilers-speed</input>
+            <gain>hs/consumers/spoilers-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/gear-speed">
+            <input>gear/gear-pos-norm</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/gear-e"> 
+            <input>hs/consumers/gear-speed</input>
+            <gain>hs/consumers/gear-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/left-brake-speed">
+            <input>fcs/left-brake-cmd-norm</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          
+          <pure_gain name="hs/consumers/left-brake-e"> 
+            <input>hs/consumers/left-brake-speed</input>
+            <gain>hs/consumers/left-brake-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/right-brake-speed">
+            <input>fcs/right-brake-cmd-norm</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          
+          <pure_gain name="hs/consumers/right-brake-e"> 
+            <input>hs/consumers/right-brake-speed</input>
+            <gain>hs/consumers/right-brake-speed</gain>
+          </pure_gain>
+          
+          
+          <washout_filter name="hs/consumers/ra56-pitch-speed">
+            <input>fcs/absu-pitch</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/ra56-pitch-e"> 
+            <input>hs/consumers/ra56-pitch-speed</input>
+            <gain>hs/consumers/ra56-pitch-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/ra56-roll-speed">
+            <input>fcs/absu-roll</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/ra56-roll-e"> 
+            <input>hs/consumers/ra56-roll-speed</input>
+            <gain>hs/consumers/ra56-roll-speed</gain>
+          </pure_gain>
+          
+          <washout_filter name="hs/consumers/ra56-yaw-speed">
+            <input>fcs/absu-yaw</input>
+            <c1> 1.0 </c1>
+          </washout_filter>
+          <pure_gain name="hs/consumers/ra56-yaw-e"> 
+            <input>hs/consumers/ra56-yaw-speed</input>
+            <gain>hs/consumers/ra56-yaw-speed</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-e-g">
+            <input>hs/consumers/elevator-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-elevator-g">
+            <input>hs/hs1-e-g</input>
+            <gain>100.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-elevator-g-switched">
+            <input>hs/hs1-elevator-g</input>
+            <gain>hs/buster-1</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-e-g">
+            <input>hs/consumers/elevator-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-elevator-g">
+            <input>hs/hs2-e-g</input>
+            <gain>100.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-elevator-g-switched">
+            <input>hs/hs2-elevator-g</input>
+            <gain>hs/buster-2</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-e-g">
+            <input>hs/consumers/elevator-e</input>
+            <gain>hs/hs3-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-elevator-g">
+            <input>hs/hs3-e-g</input>
+            <gain>100.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-elevator-g-switched">
+            <input>hs/hs3-elevator-g</input>
+            <gain>hs/buster-3</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-a-g">
+            <input>hs/consumers/aileron-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-aileron-g">
+            <input>hs/hs1-a-g</input>
+            <gain>70.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-aileron-g-switched">
+            <input>hs/hs1-aileron-g</input>
+            <gain>hs/buster-1</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-a-g">
+            <input>hs/consumers/aileron-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-aileron-g">
+            <input>hs/hs2-a-g</input>
+            <gain>70.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-aileron-g-switched">
+            <input>hs/hs2-aileron-g</input>
+            <gain>hs/buster-2</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-a-g">
+            <input>hs/consumers/aileron-e</input>
+            <gain>hs/hs3-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-aileron-g">
+            <input>hs/hs3-a-g</input>
+            <gain>70.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-aileron-g-switched">
+            <input>hs/hs3-aileron-g</input>
+            <gain>hs/buster-3</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-r-g">
+            <input>hs/consumers/rudder-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-rudder-g">
+            <input>hs/hs1-r-g</input>
+            <gain>120.0</gain> 
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-rudder-g-switched">
+            <input>hs/hs1-rudder-g</input>
+            <gain>hs/buster-1</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-r-g">
+            <input>hs/consumers/rudder-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-rudder-g">
+            <input>hs/hs2-r-g</input>
+            <gain>120.0</gain> 
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-rudder-g-switched">
+            <input>hs/hs2-rudder-g</input>
+            <gain>hs/buster-2</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-r-g">
+            <input>hs/consumers/rudder-e</input>
+            <gain>hs/hs3-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-rudder-g">
+            <input>hs/hs3-r-g</input>
+            <gain>120.0</gain> 
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-rudder-g-switched">
+            <input>hs/hs3-rudder-g</input>
+            <gain>hs/buster-3</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-f-g">
+            <input>hs/consumers/flaps-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-flap-g">
+            <input>hs/hs1-f-g</input>
+            <gain>10000.0</gain> 
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-f-g">
+            <input>hs/consumers/flaps-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-flap-g">
+            <input>hs/hs2-f-g</input>
+            <gain>10000.0</gain> 
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-s-g">
+            <input>hs/consumers/spoilers-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-spoilers-g">
+            <input>hs/hs1-s-g</input>
+            <gain>100.0</gain> 
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-g-g">
+            <input>hs/consumers/gear-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-gear-g">
+            <input>hs/hs1-g-g</input>
+            <gain>20000.0</gain> 
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-lb-g">
+            <input>hs/consumers/left-brake-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-left-brake-g">
+            <input>hs/hs1-lb-g</input>
+            <gain>50.0</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-rb-g">
+            <input>hs/consumers/right-brake-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs1-right-brake-g">
+            <input>hs/hs1-rb-g</input>
+            <gain>50.0</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-ra56-p-g">
+            <input>hs/consumers/ra56-pitch-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs1-ra56-pitch-g">
+            <input>hs/hs1-ra56-p-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs1-ra56-pitch-g-switched">
+            <input>hs/hs1-ra56-pitch-g</input>
+            <gain>hs/ra56-pitch-1</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-ra56-p-g">
+            <input>hs/consumers/ra56-pitch-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs2-ra56-pitch-g">
+            <input>hs/hs2-ra56-p-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs2-ra56-pitch-g-switched">
+            <input>hs/hs2-ra56-pitch-g</input>
+            <gain>hs/ra56-pitch-2</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-ra56-p-g">
+            <input>hs/consumers/ra56-pitch-e</input>
+            <gain>hs/hs3-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs3-ra56-pitch-g">
+            <input>hs/hs3-ra56-p-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs3-ra56-pitch-g-switched">
+            <input>hs/hs3-ra56-pitch-g</input>
+            <gain>hs/ra56-pitch-3</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-ra56-r-g">
+            <input>hs/consumers/ra56-roll-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs1-ra56-roll-g">
+            <input>hs/hs1-ra56-r-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs1-ra56-roll-g-switched">
+            <input>hs/hs1-ra56-roll-g</input>
+            <gain>hs/ra56-roll-1</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-ra56-r-g">
+            <input>hs/consumers/ra56-roll-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs2-ra56-roll-g">
+            <input>hs/hs2-ra56-r-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs2-ra56-roll-g-switched">
+            <input>hs/hs2-ra56-roll-g</input>
+            <gain>hs/ra56-roll-2</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-ra56-r-g">
+            <input>hs/consumers/ra56-roll-e</input>
+            <gain>hs/hs3-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs3-ra56-roll-g">
+            <input>hs/hs3-ra56-r-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs3-ra56-roll-g-switched">
+            <input>hs/hs3-ra56-roll-g</input>
+            <gain>hs/ra56-roll-3</gain>
+          </pure_gain>
+          
+          
+          <pure_gain name="hs/hs1-ra56-y-g">
+            <input>hs/consumers/ra56-yaw-e</input>
+            <gain>hs/hs1-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs1-ra56-yaw-g">
+            <input>hs/hs1-ra56-y-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs1-ra56-yaw-g-switched">
+            <input>hs/hs1-ra56-yaw-g</input>
+            <gain>hs/ra56-yaw-1</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs2-ra56-y-g">
+            <input>hs/consumers/ra56-yaw-e</input>
+            <gain>hs/hs2-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs2-ra56-yaw-g">
+            <input>hs/hs2-ra56-y-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs2-ra56-yaw-g-switched">
+            <input>hs/hs2-ra56-yaw-g</input>
+            <gain>hs/ra56-yaw-2</gain>
+          </pure_gain>
+          
+          <pure_gain name="hs/hs3-ra56-y-g">
+            <input>hs/consumers/ra56-yaw-e</input>
+            <gain>hs/hs3-p-rev</gain>
+          </pure_gain>
+          <pure_gain name="hs/hs3-ra56-yaw-g">
+            <input>hs/hs3-ra56-y-g</input>
+            <gain>30.0</gain> 
+          </pure_gain>
+          <pure_gain name="hs/hs3-ra56-yaw-g-switched">
+            <input>hs/hs3-ra56-yaw-g</input>
+            <gain>hs/ra56-yaw-3</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs1-g">
+            <input>hs/hs1-elevator-g-switched</input>
+            <input>hs/hs1-aileron-g-switched</input>
+            <input>hs/hs1-rudder-g-switched</input>
+            <input>hs/hs1-ra56-pitch-g-switched</input>
+            <input>hs/hs1-ra56-roll-g-switched</input>
+            <input>hs/hs1-ra56-yaw-g-switched</input>
+            <input>hs/hs1-flap-g</input>
+            <input>hs/hs1-gear-g</input>
+            <input>hs/hs1-spoilers-g</input>
+            <input>hs/hs1-left-brake-g</input>
+            <input>hs/hs1-right-brake-g</input>
+          </summer>
+          
+          <pure_gain name="hs/hs1-outp-flow"> 
+            <input>hs/hs1-pressure</input>
+            <gain>hs/hs1-g</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs2-g">
+            <input>hs/hs2-elevator-g-switched</input>
+            <input>hs/hs2-aileron-g-switched</input>
+            <input>hs/hs2-rudder-g-switched</input>
+            <input>hs/hs2-ra56-pitch-g-switched</input>
+            <input>hs/hs2-ra56-roll-g-switched</input>
+            <input>hs/hs2-ra56-yaw-g-switched</input>
+            <input>hs/hs2-flap-g</input>
+          </summer>
+          
+          <pure_gain name="hs/hs2-outp-flow"> 
+            <input>hs/hs2-pressure</input>
+            <gain>hs/hs2-g</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs3-g">
+            <input>hs/hs3-elevator-g-switched</input>
+            <input>hs/hs3-aileron-g-switched</input>
+            <input>hs/hs3-rudder-g-switched</input>
+            <input>hs/hs3-ra56-pitch-g-switched</input>
+            <input>hs/hs3-ra56-roll-g-switched</input>
+            <input>hs/hs3-ra56-yaw-g-switched</input>
+          </summer>
+          
+          <pure_gain name="hs/hs3-outp-flow"> 
+            <input>hs/hs3-pressure</input>
+            <gain>hs/hs3-g</gain>
+          </pure_gain>
+          
+          
+          <summer name="hs/hs1-flow-balance">
+            <input>hs/hs1-inp1-flow</input> 
+            <input>hs/hs1-inp2-flow</input> 
+            <input>hs/hs1-inp3-flow</input> 
+            <input>-hs/em-brake-inp1-flow</input>
+            <input>-hs/hs1-outp-flow</input>
+            <output>hs/hs1-i</output>
+          </summer>
+          
+          
+          <summer name="hs/hs2-flow-balance">
+            <input>hs/hs2-inp1-flow</input> 
+            <input>hs/hs2-inp2-flow</input> 
+            <input>-hs/hs1-inp3-flow</input> 
+            <input>-hs/hs2-outp-flow</input>
+            <output>hs/hs2-i</output>
+          </summer>
+          
+          
+          <summer name="hs/hs3-flow-balance">
+            <input>hs/hs3-inp1-flow</input> 
+            <input>hs/hs3-inp2-flow</input> 
+            <input>-hs/hs3-outp-flow</input>
+            <output>hs/hs3-i</output>
+          </summer>
+          
+          <summer name="hs/em-brake-flow-balance">
+            <input>hs/em-brake-inp1-flow</input>
+            
+            <output>hs/em-brake-i</output>
+          </summer>
+
+        </channel>
+</system>

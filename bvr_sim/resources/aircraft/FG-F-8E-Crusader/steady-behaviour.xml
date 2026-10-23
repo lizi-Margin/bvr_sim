@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="behaviour">
+
+    
+    <property value="9">/environment/terrain-solid</property>
+    <property value="9">/environment/terrain-bumpiness</property>
+    <property value="9">/environment/terrain-rolling-friction</property>
+    <property value="9">/environment/terrain-friction-factor</property>
+
+    <channel name="ground-under">
+
+        
+    </channel>
+
+    <channel name="on-ground">
+        <switch name="systems/behaviour/steady-onground">
+            <default value="9" />
+            <test logic="AND" value="1">
+               gear/unit[1]/pos-norm == 1
+               gear/unit[1]/wheel-speed-fps lt 1
+               gear/unit[1]/compression-ft != 0
+               gear/unit[1]/WOW == 1
+            </test>
+            <test logic="OR" value="0">
+                gear/unit[1]/pos-norm == 0
+                gear/unit[1]/wheel-speed-fps ge 1
+                gear/unit[1]/compression-ft == 0
+               gear/unit[1]/WOW == 0
+            </test>
+        </switch>
+
+        <switch name="gear-n-rolling">
+            <default value="0" />
+            <test value="1">
+                gear/unit[0]/wheel-speed-fps gt 0.6
+            </test>
+            <test value="-1">
+                gear/unit[0]/wheel-speed-fps lt -0.6
+            </test>
+        </switch>
+
+        <switch name="gear-l-rolling">
+            <default value="0" />
+            <test value="1">
+                gear/unit[1]/wheel-speed-fps gt 0.6
+            </test>
+            <test value="-1">
+                gear/unit[1]/wheel-speed-fps lt -0.6
+            </test>
+        </switch>
+
+        <switch name="gear-r-rolling">
+            <default value="0" />
+            <test value="1">
+                gear/unit[2]/wheel-speed-fps gt 0.6
+            </test>
+            <test value="-1">
+                gear/unit[2]/wheel-speed-fps lt -0.6
+            </test>
+        </switch>
+
+    </channel>
+
+    <channel name="taxiing">
+        <switch name="systems/behaviour/steady-taxi">
+            <default value="0" />
+            <test logic="AND" value="1">
+                gear/unit[1]/pos-norm == 1
+                gear/unit[1]/wheel-speed-fps lt 60
+                gear/unit[1]/compression-ft != 0
+                gear/unit[1]/WOW == 1
+            </test>
+        </switch>
+    </channel>
+
+    <channel name="in-air">
+        <switch name="systems/behaviour/steady-inair">
+            <default value="0" />
+            <test logic="OR" value="1">
+                gear/unit[1]/compression-ft == 0
+                gear/unit[1]/WOW == 0
+                position/h-agl-ft  gt  9
+            </test>
+        </switch>
+    </channel>
+
+
+
+</system>

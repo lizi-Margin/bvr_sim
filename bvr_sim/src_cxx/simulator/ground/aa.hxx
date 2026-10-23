@@ -36,6 +36,7 @@ public:
     ) noexcept;
 
     void step() override;
+    void clean_up() noexcept override;
 
     std::array<double, 3> get_launch_velocity(const std::shared_ptr<Aircraft>& target) const noexcept;
 

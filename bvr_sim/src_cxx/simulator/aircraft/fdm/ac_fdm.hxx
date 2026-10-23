@@ -18,6 +18,8 @@ public:
     explicit AircraftFDM(double dt = 0.1) noexcept;
 
     virtual void step(const ActionSpace& action) = 0;
+    // Presentation reads actual controls/outputs; it cannot mutate dynamics.
+    virtual std::map<std::string,double> visual_properties() const { return {}; }
 
     bool is_terminated() const noexcept { return terminate; };
 

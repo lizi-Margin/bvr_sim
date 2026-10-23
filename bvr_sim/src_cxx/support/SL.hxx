@@ -10,6 +10,9 @@
 #include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <filesystem>
+#include <cerrno>
+#include <system_error>
 #include "check.hxx"
 
 // #define DISABLE 1
@@ -21,7 +24,9 @@ private:
 public:
     static SL& init_instance(const std::string& file_path, bool append)
     {
-        instance_ = new SL(file_path, append);
+        auto next = new SL(file_path, append);
+        delete instance_;
+        instance_ = next;
         return *instance_;
     }
 
@@ -31,6 +36,17 @@ public:
     {
         check(instance_, "SL::get() before init_instance()");
         return *instance_;
+    }
+
+    // Physics adapters can run before a core/session establishes a log file.
+    static SL& optional() {
+        if (instance_) return *instance_;
+#ifdef _WIN32
+        static SL discard("NUL", false);
+#else
+        static SL discard("/dev/null", false);
+#endif
+        return discard;
     }
 
     SL(const SL&) = delete;
@@ -43,12 +59,18 @@ public:
         }
     }
 
+    void flush() {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_file.flush();unflushed_=0;
+        if(!m_file)throw std::runtime_error("Core log write/flush failed: "+path_+": "+std::error_code(errno,std::generic_category()).message());
+    }
+
     void print([[maybe_unused]] const std::string& msg)
     {
 #ifndef DISABLE
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_file << timestamp() << " " << msg << std::endl;
-        m_file.flush();
+        m_file << timestamp() << " " << msg << '\n';
+        if(++unflushed_>=256){m_file.flush();unflushed_=0;}
 #endif
     }
 
@@ -68,11 +90,11 @@ public:
         if (size > 0) {
             std::vector<char> buf(size + 1);
             std::vsnprintf(buf.data(), buf.size(), format, args);
-            m_file << timestamp() << " " << buf.data() << std::endl;
+            m_file << timestamp() << " " << buf.data() << '\n';
         }
 
         va_end(args);
-        m_file.flush();
+        if(++unflushed_>=256){m_file.flush();unflushed_=0;}
 #endif
     }
 
@@ -100,7 +122,7 @@ public:
 
 private:
     explicit SL(const std::string& file_path, bool append)
-        : m_buffer(5 * 1024 * 1024)
+        : path_(file_path), m_buffer(5 * 1024 * 1024)
     {
         std::ios_base::openmode mode = std::ios::out;
         if (append) {
@@ -111,12 +133,14 @@ private:
         }
 
         m_file.rdbuf()->pubsetbuf(m_buffer.data(), m_buffer.size());
-        m_file.open(file_path, mode);
+        m_file.open(std::filesystem::u8path(file_path), mode);
         if (!m_file.is_open()) {
-            throw std::runtime_error("Failed to open log file: " + file_path);
+            throw std::runtime_error("Failed to open log file: " + file_path+": "+std::error_code(errno,std::generic_category()).message());
         }
     }
 
+    std::string path_;
+    unsigned unflushed_=0;
     std::ofstream m_file;
     std::vector<char> m_buffer;
     std::mutex m_mutex;

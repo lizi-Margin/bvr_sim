@@ -1,0 +1,253 @@
+<?xml version='1.0' encoding='utf-8'?>
+<propulsion>
+    
+    <engine file="J52-P8">
+	<location unit="M">
+	    <x> 4.30</x>
+	    <y>-1.00</y>
+	    <z>-0.45</z>
+	</location>
+	<orient unit="DEG">
+	    <pitch>-12.00</pitch>
+	    <roll>0.00</roll>
+	    <yaw>0.00</yaw>
+	</orient>
+	<feed>0</feed>
+	<feed>1</feed>
+	<feed>2</feed>
+	<feed>3</feed>
+	<feed>4</feed>
+	<feed>5</feed>
+	<feed>6</feed>
+	<feed>7</feed>
+	<feed>8</feed>
+	<feed>9</feed>
+	<feed>10</feed>
+	<feed>11</feed>
+	<feed>12</feed>
+
+	<thruster file="direct">
+	    <sense> 1 </sense>
+	    <location unit="M">
+		<x> 4.30</x>
+		<y>-1.00</y>
+		<z>-0.45</z>
+	    </location>
+	    <orient unit="DEG">
+		<pitch>12.00</pitch>
+		<roll>0.00</roll>
+		<yaw>-6.00</yaw>
+	    </orient>
+	</thruster>
+    </engine>
+
+    <engine file="J52-P8">
+	<location unit="M">
+	    <x> 4.30</x>
+	    <y> 1.00</y>
+	    <z>-0.45</z>
+	</location>
+	<orient unit="DEG">
+	    <pitch>12.00</pitch>
+	    <roll>0.00</roll>
+	    <yaw>6.00</yaw>
+	</orient>
+	<feed>0</feed>
+	<feed>1</feed>
+	<feed>2</feed>
+	<feed>3</feed>
+	<feed>4</feed>
+	<feed>5</feed>
+	<feed>6</feed>
+	<feed>7</feed>
+	<feed>8</feed>
+	<feed>9</feed>
+	<feed>10</feed>
+	<feed>11</feed>
+	<feed>12</feed>
+
+	<thruster file="direct">
+	    <sense> 1 </sense>
+	    <location unit="M">
+		<x> 4.30</x>
+		<y> 1.00</y>
+		<z>-0.45</z>
+	    </location>
+	    <orient unit="DEG">
+		<pitch>12.00</pitch>
+		<roll>0.00</roll>
+		<yaw>6.00</yaw>
+	    </orient>
+	</thruster>
+    </engine>
+
+    
+    <tank type="FUEL" number="0">
+	<location unit="M">
+	    <x> 1.7 </x>
+	    <y> 0.0 </y>
+	    <z> 0.6 </z>
+	</location>
+	<capacity unit="LBS">1743</capacity>
+	<contents unit="LBS">1743</contents>
+	<type>JP-5</type>
+	<priority>3</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="1">
+	<location unit="M">
+	    <x>-0.3 </x>
+	    <y> 0.0 </y>
+	    <z> 0.1 </z>
+	</location>
+	<capacity unit="LBS">2908</capacity>
+	<contents unit="LBS">2908</contents>
+	<type>JP-5</type>
+	<priority>3</priority>
+    </tank>
+    
+    
+    <tank type="FUEL" number="2">
+	<location unit="M">
+	    <x>-0.3 </x>
+	    <y> 0.0 </y>
+	    <z> 0.1 </z>
+	</location>
+	<capacity unit="LBS">4379</capacity>
+	<contents unit="LBS">4379</contents>
+	<type>JP-5</type>
+	<priority>3</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="3">
+	<location unit="M">
+	    <x> 2.2 </x>
+	    <y> 0.0 </y>
+	    <z>-0.1 </z>
+	</location>
+	<capacity unit="LBS">2043</capacity>
+	<contents unit="LBS">2043</contents>
+	<type>JP-5</type>
+	<priority>2</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="4">
+	<location unit="M">
+	    <x> 2.2 </x>
+	    <y>-2.7 </y>
+	    <z>-0.1 </z>
+	</location>
+	<capacity unit="LBS">1539</capacity>
+	<contents unit="LBS">1539</contents>
+	<type>JP-5</type>
+	<priority>2</priority>
+    </tank>
+    
+    
+    <tank type="FUEL" number="5">
+	<location unit="M">
+	    <x> 3.0 </x>
+	    <y>-5.2 </y>
+	    <z>-0.15</z>
+	</location>
+	<capacity unit="LBS">934</capacity>
+	<contents unit="LBS">934</contents>
+	<type>JP-5</type>
+	<priority>2</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="6">
+	<location unit="M">
+	    <x> 2.2 </x>
+	    <y> 2.7 </y>
+	    <z>-0.1 </z>
+	</location>
+	<capacity unit="LBS">1539</capacity>
+	<contents unit="LBS">1539</contents>
+	<type>JP-5</type>
+	<priority>2</priority>
+    </tank>
+    
+    
+    <tank type="FUEL" number="7">
+	<location unit="M">
+	    <x> 3.0 </x>
+	    <y> 5.2 </y>
+	    <z>-0.15</z>
+	</location>
+	<capacity unit="LBS">934</capacity>
+	<contents unit="LBS">934</contents>
+	<type>JP-5</type>
+	<priority>2</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="8">
+	<location unit="M">
+	    <x> 1.90</x>
+	    <y>-3.66</y>
+	    <z>-0.93</z>
+	</location>
+	<capacity unit="LBS">2043</capacity>
+	<contents unit="LBS">0</contents>
+	<type>JP-5</type>
+	<priority>1</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="9">
+	<location unit="M">
+	    <x> 1.90</x>
+	    <y>-2.48</y>
+	    <z>-0.93</z>
+	</location>
+	<capacity unit="LBS">2043</capacity>
+	<contents unit="LBS">0</contents>
+	<type>JP-5</type>
+	<priority>1</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="10">
+	<location unit="M">
+	    <x> 1.40</x>
+	    <y> 0.00</y>
+	    <z>-1.52</z>
+	</location>
+	<capacity unit="LBS">2043</capacity>
+	<contents unit="LBS">0</contents>
+	<type>JP-5</type>
+	<priority>1</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="11">
+	<location unit="M">
+	    <x> 1.90</x>
+	    <y> 2.48</y>
+	    <z>-0.93</z>
+	</location>
+	<capacity unit="LBS">2043</capacity>
+	<contents unit="LBS">0</contents>
+	<type>JP-5</type>
+	<priority>1</priority>
+    </tank>
+
+    
+    <tank type="FUEL" number="12">
+	<location unit="M">
+	    <x> 1.90</x>
+	    <y> 3.66</y>
+	    <z>-0.93</z>
+	</location>
+	<capacity unit="LBS">2043</capacity>
+	<contents unit="LBS">0</contents>
+	<type>JP-5</type>
+	<priority>1</priority>
+    </tank>
+
+</propulsion>

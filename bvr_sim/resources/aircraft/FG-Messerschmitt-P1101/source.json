@@ -1,0 +1,27 @@
+{
+  "set": "Messerschmitt-P1101/p1101-set.xml",
+  "name": "Messerschmitt Me P1101 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Messerschmitt-P1101/p1101-yasim.xml",
+  "jets": 1,
+  "model": "Messerschmitt-P1101/Models/p1101.xml",
+  "tags": [
+    "messerschmitt",
+    "high-wing",
+    "tricycle",
+    "retractable-gear",
+    "single-engine",
+    "jet",
+    "fighter",
+    "prototype",
+    "1940s",
+    "ww2"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Messerschmitt-P1101.zip",
+  "archive_sha256": "0b2b2b2891466bb9cb7a21c41f932891a9a08a9a331ce37f4d4e143f66220917",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Messerschmitt-P1101.zip"
+}

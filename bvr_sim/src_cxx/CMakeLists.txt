@@ -53,6 +53,22 @@ set(BUILD_DOCS OFF CACHE BOOL "Disable JSBSim documentation" FORCE)
 # add_subdirectory("${JSBSIM_ROOT}" jsbsim_build)
 add_subdirectory("${JSBSIM_ROOT}" jsbsim_build EXCLUDE_FROM_ALL)
 
+# Standalone upstream YASim: no FlightGear executable, OSG or renderer required.
+file(GLOB YASIM_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/extern/yasim/*.cpp")
+list(FILTER YASIM_SOURCES EXCLUDE REGEX "/(FGGround|yasim-test|proptest)[.]cpp$")
+add_library(bvr_yasim STATIC ${YASIM_SOURCES}
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/yasim_host.cxx")
+target_include_directories(bvr_yasim PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/yasim_support"
+    "${JSBSIM_SRC_DIR}")
+target_precompile_headers(bvr_yasim PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/yasim_support/Main/fg_props.hxx")
+target_link_libraries(bvr_yasim PUBLIC libJSBSim)
+set_target_properties(bvr_yasim PROPERTIES POSITION_INDEPENDENT_CODE ON)
+if(MSVC)
+    target_compile_definitions(bvr_yasim PRIVATE _USE_MATH_DEFINES _CRT_SECURE_NO_WARNINGS NOMINMAX)
+endif()
+
 # ============================================================================
 # C++ Source Files
 # ============================================================================
@@ -62,6 +78,8 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/bsl_pool.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/core.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/gameplay/game_session.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/environment.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/bomb/mk82.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/resource_paths.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/global_config.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmd_handler.cxx"
@@ -90,12 +108,16 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/ac_fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/jsbsim_fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/simple_fdm.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fdm/yasim_fdm.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fc/fc_old.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/aircraft/fc/flight_controller_params.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/data_obj.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/weapon_factory.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/pylon_manager.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/base.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/vehicle.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/ground_factory.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/sense/ground_radar.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/aa.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/ground_static_target.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/slamraam.cxx"
@@ -249,7 +271,7 @@ target_include_directories(bvr_sim_cpp PRIVATE ${Python3_INCLUDE_DIRS})
 target_include_directories(bvr_sim_cpp PRIVATE ${EIGEN3_INCLUDE_DIR})
 target_link_libraries(bvr_sim_cpp PRIVATE c3utils)
 target_link_libraries(bvr_sim_cpp PRIVATE cpptrace::cpptrace)
-target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim)
+target_link_libraries(bvr_sim_cpp PRIVATE libJSBSim bvr_yasim)
 target_compile_definitions(bvr_sim_cpp PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
 if(BVR_SIM_ENABLE_OGRE_NEXT)
     if(NOT BVR_SIM_OGRE_NEXT_ROOT OR NOT BVR_SIM_OGRE_NEXT_BUILD_DIR OR NOT BVR_SIM_OGRE_NEXT_MEDIA_DIR)
@@ -315,6 +337,14 @@ endif()
 if(BVR_SIM_BUILD_TESTS)
     add_executable(bvr_sim_unit_tests
         test_main.cxx
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/aa.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/missile/base.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_ground_objects.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/environment.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/bomb/mk82.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/base.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/ground_static_target.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/simulator/ground/vehicle.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_types.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_snapshot_builder.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/telemetry/telemetry_command_queue.cxx"
@@ -340,13 +370,14 @@ if(BVR_SIM_BUILD_TESTS)
         "${CMAKE_CURRENT_SOURCE_DIR}/simulator/pylon_manager.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_pylon_manager.cxx"
         "${CMAKE_CURRENT_SOURCE_DIR}/test_sensor_manager.cxx"
+        "${CMAKE_CURRENT_SOURCE_DIR}/test_tactical_pilot.cxx"
     )
 
     # Link with main library dependencies
     target_include_directories(bvr_sim_unit_tests PRIVATE ${BVR_SIM_INCLUDE_DIRS})
     target_link_libraries(bvr_sim_unit_tests PRIVATE c3utils)
     target_link_libraries(bvr_sim_unit_tests PRIVATE cpptrace::cpptrace)
-    target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim)
+    target_link_libraries(bvr_sim_unit_tests PRIVATE libJSBSim bvr_yasim)
     target_compile_definitions(bvr_sim_unit_tests PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_)
     if(MSVC)
         target_link_libraries(bvr_sim_unit_tests PRIVATE ws2_32 wsock32)

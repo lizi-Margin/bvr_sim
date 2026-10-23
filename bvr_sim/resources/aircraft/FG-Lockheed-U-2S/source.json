@@ -1,0 +1,33 @@
+{
+  "set": "Lockheed-U-2S/u-2s-set.xml",
+  "name": "Lockheed U 2S (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Lockheed-U-2S/Systems/u-2s-yasim.xml",
+  "jets": 1,
+  "model": "Lockheed-U-2S/Models/u-2s.xml",
+  "tags": [
+    "reconnaissance",
+    "lockheed",
+    "1950s",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s",
+    "coldwar",
+    "retractable-gear",
+    "ifr",
+    "jet",
+    "single-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Lockheed-U-2S.zip",
+  "archive_sha256": "b2c12b48be80f8e9f7b9323a3645a61e718f31ec059bfdaa578bf4501913e3d0",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Lockheed-U-2S.zip"
+}

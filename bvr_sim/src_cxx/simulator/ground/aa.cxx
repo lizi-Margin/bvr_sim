@@ -65,6 +65,12 @@ void AA::shoot(
     }
 }
 
+void AA::clean_up() noexcept {
+    // Missile::parent is a shared_ptr. Break ownership cycles when the pool resets.
+    GroundUnit::clean_up();
+    launched_missiles.clear();
+}
+
 void AA::step() {
     _t += dt;
 }

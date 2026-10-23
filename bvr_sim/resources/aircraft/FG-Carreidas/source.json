@@ -1,0 +1,29 @@
+{
+  "set": "Carreidas/carreidas-set.xml",
+  "name": "Carreidas 160 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Carreidas/Systems/carreidas-yasim.xml",
+  "jets": 4,
+  "model": "Carreidas/Models/carreidas.xml",
+  "tags": [
+    "transport",
+    "fictional",
+    "supersonic",
+    "1960s",
+    "ifr",
+    "variable-geometry",
+    "retractable-gear",
+    "3-engine",
+    "jet",
+    "afterburner",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "Carreidas.zip",
+  "archive_sha256": "59868c249f9016657862a1c67896ecc5e4f327c91864982bc04e95cd5c4107ca",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Carreidas.zip"
+}

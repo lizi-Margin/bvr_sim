@@ -1,0 +1,91 @@
+EFA Typhoon - Eurofighter Typhoon
+
+This model is released under the terms of the GPLv2
+
+Model by Maverick Alex
+
+FDM by Detlef Faber
+don@sol2500.net
+
+On carrier options, FDM fixes, new textures by AlMurSi
+Nav Lights, MIDS, AP by Algernon
+
+Livery Spain from Moron Ala 11
+Livery Italy from ITAF EF2000 12 Squadron
+
+typhoon load autopilot 2.0 compatible
+typhoon-2 load autopilot 2.git compatible
+typhoonb load 1.9.1 compatible
+
+Provide two FDM with/out G-limitations
+
+***************************
+Release 1.4 (in progress)
+
+* New hook (more similar to real hook): done.
+* Testing new MFD functions (no still working).
+* Little fixes on FDM: done (and working).
+* Sounds on development.
+* Working (bitmap textures, slats, AP, modeling details, etc.)
+* Lights: Nav, landing and beacon/strobe flashes (with menu for select)
+* New MIDS screen.
+* Canopy animation
+* Reverser engine
+* Slats now working
+* New air intake (flaps key)
+* Added details: FLIR, APU-out, ...
+* (maybe dragchute)
+* (maybe fueldoor and refueling)
+* Autopilot working (no advanced modes yet)
+* Custom Autopilot Dialog (only for 2.0 and upper)
+* Cockpit Upper Left Panel has working animation and some working buttons
+* Gauges (pedals and stick done)
+* On ASI vertical speed indicator.
+* Status gear lights and others littles changes on cockpit
+	(please note that gear-lock, "l" key, is now active and disable gear
+	retract)
+
+***************************
+
+Release 1.3b - Fixed FDM
+
+* Reason of this released is only for Fixed FDM
+
+* On release 1.3b animations (slats, stick, pedals, hook) are only basics
+  on working development (fixing textures, sizes, etc)
+* No Flaps (at the moment -> only by AFCS control)
+* Slats seem do nothing -> on development
+* Autopilot only work Wing Leveler, pitch hold and Auto Throttle (without reheat)
+* No new Livery (under GPL-copyright request)
+
+*******************
+
+This model is released under the terms of the GPLv2
+
+Afterburners engage when throttle moves past 95%
+
+"N" expends Speedbrake
+
+"n" retracts Speedbrake
+
+"L" launchbar on carrier
+
+"C" catapult on carrier
+
+"O" Extend/retract hook
+
+"f" / "d" Extend/retract slats
+
+"Delete" Toggle thrust reversers
+	(max. 40% power)
+
+"Ctrl + d" Toggle canopy
+
+__________
+
+Max speed Mach 2.0+ reheat / 1.2 without
+Min speed: 130 KIAS (clean)
+Take off: 140-150 KIAS
+Stall betwen 80-90 KIAS (clean)
+
+

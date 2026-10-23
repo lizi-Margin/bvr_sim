@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<metrics>
+	<wingarea unit="M2">     3.10 </wingarea> 
+	<wingspan unit="M">     4.90 </wingspan> 
+	<wing_incidence unit="DEG"> 1.00 </wing_incidence> 
+	<chord unit="M">     0.48 </chord> 
+	<htailarea unit="M2">     0.59 </htailarea> 
+	<htailarm unit="M">     2.30 </htailarm> 
+	<vtailarea unit="M2">    0.40 </vtailarea> 
+	<vtailarm unit="M">     2.00 </vtailarm> 
+	
+	<location name="AERORP" unit="M">
+		<x>  0.23 </x>
+		<y>  0.0 </y> 
+		<z>  0.0 </z> 
+	</location>
+	<location name="EYEPOINT" unit="M">
+		<x>  0.55 </x>
+		<y>  0.0  </y>
+		<z>  0.55 </z>
+	</location>
+	<location name="VRP" unit="M"> 
+		<x>     0.0 </x>
+		<y>     0.0 </y>
+		<z>     0.0 </z>
+	</location>
+</metrics>

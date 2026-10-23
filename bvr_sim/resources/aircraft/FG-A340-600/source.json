@@ -1,0 +1,30 @@
+{
+  "set": "A340-600/A340-600-set.xml",
+  "name": "Airbus A340-600",
+  "fdm_type": "yasim",
+  "fdm": "A340-600/A340-600.xml",
+  "jets": 4,
+  "model": "A340-600/Models/A340-600-Models.xml",
+  "tags": [
+    "airbus",
+    "transport",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "four-engine",
+    "jet",
+    "glass-cockpit",
+    "etops",
+    "ifr",
+    "1990s",
+    "2000s",
+    "2010s"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "A340-600.zip",
+  "archive_sha256": "4ea4a04898147635b09f91eb400a2cd3e6deedaffba0c57fdc69cddf5f697453",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/A340-600.zip"
+}

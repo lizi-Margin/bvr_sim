@@ -1,0 +1,89 @@
+{
+  "files": [
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "F100-PW-220",
+      "source": "F-15/Engines/F100-PW-220.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "direct",
+      "source": "F-15/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "F100-PW-220",
+      "source": "F-15/Engines/F100-PW-220.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "direct",
+      "source": "F-15/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "f-15-hydraulic",
+      "source": "F-15/Systems/f-15-hydraulic.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "f-15-electrics",
+      "source": "F-15/Systems/f-15-electrics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "catapult",
+      "source": "F-15/Systems/catapult.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "autoflight",
+      "source": "F-15/Systems/autoflight.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "f-15-cadc",
+      "source": "F-15/Systems/f-15-cadc.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "f-15-cas",
+      "source": "F-15/Systems/f-15-cas.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "f-15-ecs",
+      "source": "F-15/Systems/f-15-ecs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "f-15-engines",
+      "source": "F-15/Systems/f-15-engines.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "hook",
+      "source": "F-15/Systems/hook.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-15/f15a.xml",
+      "reference": "flight-controls",
+      "source": "F-15/Systems/flight-controls.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

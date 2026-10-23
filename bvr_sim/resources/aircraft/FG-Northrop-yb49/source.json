@@ -1,0 +1,28 @@
+{
+  "set": "Northrop-yb49/yb49-set.xml",
+  "name": "Northrop YB 49 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Northrop-yb49/Systems/yb49-yasim.xml",
+  "jets": 8,
+  "model": "Northrop-yb49/Models/yb49.xml",
+  "tags": [
+    "northrop",
+    "bomber",
+    "1940s",
+    "ww2",
+    "flying-wing",
+    "jet",
+    "8-engine",
+    "tricycle",
+    "retractable-gear",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Northrop-yb49.zip",
+  "archive_sha256": "402fcdfdd9b6a420cf1780c861c5e78a41e0fb7a6758f86f297d98b909a5ec42",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Northrop-yb49.zip"
+}

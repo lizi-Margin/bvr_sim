@@ -1,0 +1,29 @@
+{
+  "set": "Yak-36/Yak-36-set.xml",
+  "name": "Yakovlev Yak-36 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Yak-36/Systems/Yak-36-yasim.xml",
+  "jets": 2,
+  "model": "Yak-36/Models/Yak-36.xml",
+  "tags": [
+    "yakovlev",
+    "fighter",
+    "1960s",
+    "vtol",
+    "mid-wing",
+    "tricycle",
+    "retractable-gear",
+    "twin-engine",
+    "jet",
+    "prototype",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Yak-36.zip",
+  "archive_sha256": "fc2580b1cb52dec5b67e44258f4c3ff84adb9691224c9d4e2bb05653958f86ea",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Yak-36.zip"
+}

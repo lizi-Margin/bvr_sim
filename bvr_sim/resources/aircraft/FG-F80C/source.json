@@ -1,0 +1,27 @@
+{
+  "set": "F80C/F80C-set.xml",
+  "name": "Lockheed F-80C Shooting Star",
+  "fdm_type": "jsb",
+  "fdm": "F80C/F80C.xml",
+  "jets": 0,
+  "model": "F80C/Models/f80.xml",
+  "tags": [
+    "fighter",
+    "lockheed",
+    "ww2",
+    "1940s",
+    "1950s",
+    "1960s",
+    "1970s",
+    "retractable-gear",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "F80C.zip",
+  "archive_sha256": "7e6d72122a18e502a0c432139cc306e717c41fabf73c52c23c115b985f5f8c22",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/F80C.zip"
+}

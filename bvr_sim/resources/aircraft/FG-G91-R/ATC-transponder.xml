@@ -1,0 +1,510 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="IFF transponder 62A">
+    
+    <property value="0.0">systems/gauges/radio/transponder/operative</property>
+    <property value="0.0">systems/gauges/radio/transponder/operative-heating</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-input</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-input-wa</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-input-wa-norm</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-off</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-stby</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-low</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-norm</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-power-emer</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-mode</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-mode-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-mode-off</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-mode-3A</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-mode-8</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-mode-0</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-test</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-test-togle</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-test-togle-norm</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-test-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-ident</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-ident-togle</property>
+    <property value="0.0">systems/gauges/radio/transponder/push-ident-pos</property>
+    <property value="9112.0">systems/gauges/radio/transponder/push-ident-id</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-ar</property>
+    <property value="0.0">systems/gauges/radio/transponder/sw-ar-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/channel</property>
+    <property value="1.0">systems/gauges/radio/transponder/chan-9000</property>
+    <property value="0.0">systems/gauges/radio/transponder/chan-9000-pos</property>
+    <property value="2.0">systems/gauges/radio/transponder/chan-0900</property>
+    <property value="0.0">systems/gauges/radio/transponder/chan-0900-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/chan-0090</property>
+    <property value="0.0">systems/gauges/radio/transponder/chan-0090-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/chan-0009</property>
+    <property value="0.0">systems/gauges/radio/transponder/chan-0009-pos</property>
+    <property value="0.0">systems/gauges/radio/transponder/transmit-on</property>
+    <property value="0.0">systems/gauges/radio/transponder/transmit-spy-pos</property>
+    
+    
+    <channel name="systems gauges radio transponder electric" execrate="32">
+        
+        <washout_filter name="systems/gauges/radio/transponder/sw-power-input-wa">
+            <input>systems/gauges/radio/transponder/sw-power-input</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/radio/transponder/sw-power-input-wa-norm">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/sw-power-input-wa GT 0.2
+                systems/gauges/radio/transponder/sw-power-input-wa LT -0.2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/sw-power">
+            <default value="systems/gauges/radio/transponder/sw-power" />
+            <test logic="AND" value="0">
+                /instrumentation/transponder/inputs/knob-mode == 0
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/gauges/radio/transponder/sw-power-input == 0
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="1">
+                /instrumentation/transponder/inputs/knob-mode == 1
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 0
+            </test>
+            <test logic="AND" value="1">
+                systems/gauges/radio/transponder/sw-power-input == 1
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="2">
+                /instrumentation/transponder/inputs/knob-mode == 3
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 0
+            </test>
+            <test logic="AND" value="2">
+                systems/gauges/radio/transponder/sw-power-input == 2
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="3">
+                /instrumentation/transponder/inputs/knob-mode GE 4
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 0
+            </test>
+            <test logic="AND" value="3">
+                systems/gauges/radio/transponder/sw-power-input == 3
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="4">
+                systems/gauges/radio/transponder/sw-power-input == 4
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/knob-mode" />
+            <test logic="AND" value="0">
+                systems/gauges/radio/transponder/sw-power == 0
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <output>/instrumentation/transponder/inputs/knob-mode</output>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/sw-power-off">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/sw-power GT 0.5
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/operative-start-stop">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/IFF/fuse == 1.0
+                systems/electric/bus[1]/V GE 24.0
+                systems/electric/inv-secondary/V GE 100.0
+                systems/gauges/radio/transponder/sw-power-off GT 0.5
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/transponder/I">
+            <default value="0.0" />
+            <test logic="AND" value="1.45">
+                systems/gauges/radio/transponder/operative-start-stop == 1.0
+            </test>
+        </switch>
+        
+        
+        <lag_filter name="systems/gauges/radio/transponder/operative-heating">
+            <input>systems/gauges/radio/transponder/operative-start-stop</input>
+            <c1>0.05</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/radio/transponder/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/radio/transponder/operative-heating GT 0.9
+                systems/gauges/radio/transponder/sw-power GE 2.0
+            </test>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/knob-mode" />
+            <test logic="AND" value="4">
+                systems/gauges/radio/transponder/push-test-togle-trigger == 1
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/gauges/radio/transponder/sw-power-input == 0
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/gauges/radio/transponder/sw-power-input == 1
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="3">
+                systems/gauges/radio/transponder/sw-power-input == 2
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <test logic="AND" value="4">
+                systems/gauges/radio/transponder/sw-power-input GE 3
+                systems/gauges/radio/transponder/sw-power-input-wa-norm == 1
+            </test>
+            <output>/instrumentation/transponder/inputs/knob-mode</output>
+        </switch>
+    
+    </channel>
+    
+    
+    <channel name="systems gauges radio transponder push button" execrate="8">
+        
+        
+        
+        <switch name="systems/gauges/radio/transponder/push-test-from-instrumentation">
+            <default value="systems/gauges/radio/transponder/push-test-from-instrumentation" />
+            <test logic="AND" value="1">
+                /instrumentation/transponder/inputs/knob-mode == 2.0
+            </test>
+            <test logic="AND" value="0">
+                /instrumentation/transponder/inputs/knob-mode NE 2.0
+                systems/gauges/radio/transponder/push-test-togle-norm == 0
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/gauges/radio/transponder/push-test-wa">
+            <input>systems/gauges/radio/transponder/push-test-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+
+        <washout_filter name="systems/gauges/radio/transponder/push-test-from-instrumentation-wa">
+            <input>systems/gauges/radio/transponder/push-test-from-instrumentation</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/radio/transponder/push-test-togle-norm">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/push-test-wa GT 0.2
+                systems/gauges/radio/transponder/push-test-wa LT -0.2
+            </test>
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/push-test-from-instrumentation-wa GT 0.2
+                systems/gauges/radio/transponder/push-test-from-instrumentation-wa LT -0.2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/push-test-togle-trigger">
+            <default value="systems/gauges/radio/transponder/push-test-togle-trigger" />
+            <test logic="AND" value="1">
+                systems/gauges/radio/transponder/push-test-togle-norm == 1
+                systems/gauges/radio/transponder/push-test-pos LE 0.05
+                systems/gauges/radio/transponder/push-test-togle-trigger == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/gauges/radio/transponder/push-test-pos GT 0.95
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/radio/transponder/push-test-pos">
+            <input>systems/gauges/radio/transponder/push-test-togle-trigger</input>
+            <c1>3.0</c1>
+        </lag_filter>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/knob-mode" />
+            <test logic="AND" value="1">
+                /instrumentation/transponder/inputs/knob-mode == 2.0
+                systems/gauges/radio/transponder/push-test-togle-norm == 0
+            </test>
+            <output>/instrumentation/transponder/inputs/knob-mode</output>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/gauges/radio/transponder/push-ident-wa">
+            <input>systems/gauges/radio/transponder/push-ident-togle</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/radio/transponder/push-ident-from-instrumentation-wa">
+            <input>/instrumentation/transponder/ident</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/radio/transponder/push-ident-togle-norm">
+            <default value="systems/gauges/radio/transponder/push-ident-togle-norm" />
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/push-ident-wa GE 0.5
+                systems/gauges/radio/transponder/push-ident-wa LE -0.5
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/radio/transponder/push-ident-wa GE 0.2
+                systems/gauges/radio/transponder/push-ident-wa LE -0.2
+            </test>
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/push-ident-from-instrumentation-wa GE 0.5
+                systems/gauges/radio/transponder/push-ident-from-instrumentation-wa LE -0.5
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/radio/transponder/push-ident-from-instrumentation-wa GE 0.2
+                systems/gauges/radio/transponder/push-ident-from-instrumentation-wa LE -0.2
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/radio/transponder/push-ident-pos">
+            <input>systems/gauges/radio/transponder/push-ident-togle-norm</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <switch>
+            <default value="/instrumentation/transponder/ident" />
+            <test logic="AND" value="1">
+                systems/gauges/radio/transponder/push-ident-togle-norm == 1
+                <test logic="AND">
+                    systems/gauges/radio/transponder/operative == 1
+                    systems/gauges/radio/transponder/push-ident-from-instrumentation-wa LE 0.1
+                    systems/gauges/radio/transponder/push-ident-from-instrumentation-wa GE -0.1
+                </test>
+            </test>
+            <test logic="AND" value="0">
+                /instrumentation/transponder/ident == 1
+                <test logic="OR">
+                    systems/gauges/radio/transponder/push-ident-from-instrumentation-wa GT 0.1
+                    systems/gauges/radio/transponder/push-ident-from-instrumentation-wa LT -0.1
+                </test>
+                <test logic="AND">
+                    systems/gauges/radio/transponder/push-ident-from-instrumentation-wa LE 0.5
+                    systems/gauges/radio/transponder/push-ident-from-instrumentation-wa GE -0.5
+                </test>
+            </test>
+            <output>/instrumentation/transponder/ident</output>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/transmitted-id" />
+            <test logic="AND" value="systems/gauges/radio/transponder/push-ident-id">
+                /instrumentation/transponder/ident == 1
+            </test>
+            <output>/instrumentation/transponder/transmitted-id</output>
+        </switch>
+        
+    </channel>
+    
+        
+    <channel name="systems gauges radio transponder switch AR" execrate="8">
+        
+        <lag_filter name="systems/gauges/radio/transponder/sw-ar-pos">
+            <input>systems/gauges/radio/transponder/sw-ar</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges radio transponder transmit on" execrate="8">
+        
+        <switch name="systems/gauges/radio/transponder/transmit-spy-pos-active">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/radio/transponder/operative == 1
+                <test logic="OR">
+                    systems/gauges/radio/transponder/push-test-pos GT 0.2
+                    /instrumentation/transponder/ident == 1
+                </test>
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/radio/transponder/transmit-spy-pos">
+            <input>systems/gauges/radio/transponder/transmit-spy-pos-active</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges radio transponder select channel" execrate="8">
+        
+        <fcs_function name="systems/gauges/radio/transponder/chan-9000-norm">
+            <function>
+                <integer><sum><p>systems/gauges/radio/transponder/chan-9000</p><v>0.5</v></sum></integer>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/gauges/radio/transponder/chan-0900-norm">
+            <function>
+                <integer><sum><p>systems/gauges/radio/transponder/chan-0900</p><v>0.5</v></sum></integer>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/gauges/radio/transponder/chan-0090-norm">
+            <function>
+                <integer><sum><p>systems/gauges/radio/transponder/chan-0090</p><v>0.5</v></sum></integer>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/gauges/radio/transponder/chan-0009-norm">
+            <function>
+                <integer><sum><p>systems/gauges/radio/transponder/chan-0009</p><v>0.5</v></sum></integer>
+            </function>
+        </fcs_function>
+        
+        <summer name="systems/gauges/radio/transponder/chan-gauge-variation">
+            <input>systems/gauges/radio/transponder/chan-9000-norm</input>
+            <input>systems/gauges/radio/transponder/chan-0900-norm</input>
+            <input>systems/gauges/radio/transponder/chan-0090-norm</input>
+            <input>systems/gauges/radio/transponder/chan-0009-norm</input>
+        </summer>
+        
+        <washout_filter name="systems/gauges/radio/transponder/chan-gauge-variation-wa">
+            <input>systems/gauges/radio/transponder/chan-gauge-variation</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <summer name="systems/gauges/radio/transponder/chan-system-variation">
+            <input>/instrumentation/transponder/inputs/digit[0]</input>
+            <input>/instrumentation/transponder/inputs/digit[1]</input>
+            <input>/instrumentation/transponder/inputs/digit[2]</input>
+            <input>/instrumentation/transponder/inputs/digit[3]</input>
+        </summer>
+        
+        <washout_filter name="systems/gauges/radio/transponder/chan-system-variation-wa">
+            <input>systems/gauges/radio/transponder/chan-system-variation</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/radio/transponder/chan-var-origin">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/radio/transponder/chan-gauge-variation-wa GT 0.2
+                systems/gauges/radio/transponder/chan-gauge-variation-wa LT -0.2
+            </test>
+            <test logic="OR" value="2">
+                systems/gauges/radio/transponder/chan-system-variation-wa GT 0.2
+                systems/gauges/radio/transponder/chan-system-variation-wa LT -0.2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/chan-9000-sw">
+            <default value="systems/gauges/radio/transponder/chan-9000-sw" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-9000-norm">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <test logic="OR" value="/instrumentation/transponder/inputs/digit[3]">
+                systems/gauges/radio/transponder/chan-var-origin == 2
+            </test>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/digit[3]" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-9000-sw">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <output>/instrumentation/transponder/inputs/digit[3]</output>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/chan-0900-sw">
+            <default value="systems/gauges/radio/transponder/chan-0900-sw" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-0900-norm">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <test logic="OR" value="/instrumentation/transponder/inputs/digit[2]">
+                systems/gauges/radio/transponder/chan-var-origin == 2
+            </test>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/digit[2]" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-0900-sw">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <output>/instrumentation/transponder/inputs/digit[2]</output>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/chan-0090-sw">
+            <default value="systems/gauges/radio/transponder/chan-0090-sw" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-0090-norm">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <test logic="OR" value="/instrumentation/transponder/inputs/digit[1]">
+                systems/gauges/radio/transponder/chan-var-origin == 2
+            </test>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/digit[1]" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-0090-sw">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <output>/instrumentation/transponder/inputs/digit[1]</output>
+        </switch>
+        
+        <switch name="systems/gauges/radio/transponder/chan-0009-sw">
+            <default value="systems/gauges/radio/transponder/chan-0009-sw" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-0009-norm">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <test logic="OR" value="/instrumentation/transponder/inputs/digit[0]">
+                systems/gauges/radio/transponder/chan-var-origin == 2
+            </test>
+        </switch>
+        
+        <switch>
+            <default value="/instrumentation/transponder/inputs/digit[0]" />
+            <test logic="AND" value="systems/gauges/radio/transponder/chan-0009-sw">
+                systems/gauges/radio/transponder/chan-var-origin == 1
+            </test>
+            <output>/instrumentation/transponder/inputs/digit[0]</output>
+        </switch>
+    
+        <linear_actuator name="systems/gauges/radio/transponder/chan-9000-pos">
+            <input>systems/gauges/radio/transponder/chan-9000-sw</input>
+            <module>8</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/radio/transponder/chan-0900-pos">
+            <input>systems/gauges/radio/transponder/chan-0900-sw</input>
+            <module>8</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/radio/transponder/chan-0090-pos">
+            <input>systems/gauges/radio/transponder/chan-0090-sw</input>
+            <module>8</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/radio/transponder/chan-0009-pos">
+            <input>systems/gauges/radio/transponder/chan-0009-sw</input>
+            <module>8</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+    </channel>
+    
+    
+</system>

@@ -27,6 +27,7 @@ __pycache__
 !/docs/release_checklist.md
 !/docs/developer/
 !/docs/developer/architecture.md
+!/docs/developer/aircraft_import.md
 !/docs/developer/game_prototype.md
 !/docs/rl/
 !/docs/rl/*.md
@@ -53,3 +54,6 @@ __pycache__
 /game/captures/
 /screenshots/
 /log.txt
+
+/game/maps/training_range_v3/
+/game/logs/

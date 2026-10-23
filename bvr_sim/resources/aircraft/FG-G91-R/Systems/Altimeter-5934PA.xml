@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="alt-5934PA">
+
+    <property value="29.92">systems/gauges/pneumatic/alt-5934PA/pin-MANUAL-inhg-set</property>
+    <property value="1.0">systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set</property>
+    <property value="0.0">systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-chg</property>
+    <property value="0.0">systems/gauges/pneumatic/alt-5934PA/pick-QFE-airport</property>
+
+
+    <channel name="AAU-37-A set MANUAL-QFE-QNH-2992" execrate="4">
+
+        <washout_filter name="systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-wa">
+            <input>systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <washout_filter name="systems/gauges/pneumatic/alt-5934PA/pin-MANUAL-inhg-set-wa">
+            <input>systems/gauges/pneumatic/alt-5934PA/pin-MANUAL-inhg-set</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <switch name="systems/gauges/pneumatic/alt-5934PA/pick-QFE-airport">
+            <default value="systems/gauges/pneumatic/alt-5934PA/pick-QFE-airport" />
+            <test logic="AND" value="/environment/pressure-inhg">
+                gear/wow GT 0.5
+            </test>
+            <test logic="AND" value="systems/autopilot/gui/airport_runway_QFE_inhg">
+                systems/autopilot/gui/airport_runway_QFE_inhg GT 0.1
+                gear/wow LE 0.5
+            </test>
+        </switch>
+
+        <switch name="systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-chg">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-wa GT 0.01
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-wa LT -0.01
+            </test>
+            <test logic="OR" value="1.0">
+                systems/gauges/pneumatic/alt-5934PA/pin-MANUAL-inhg-set-wa GT 0.01
+                systems/gauges/pneumatic/alt-5934PA/pin-MANUAL-inhg-set-wa LT -0.01
+            </test>
+        </switch>
+
+        <switch>
+            <default value="/instrumentation/altimeter/setting-inhg" />
+            <test logic="AND" value="systems/gauges/pneumatic/alt-5934PA/pin-MANUAL-inhg-set">
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set == 1.0
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <test logic="AND" value="systems/gauges/pneumatic/alt-5934PA/pick-QFE-airport">
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set == 2.0
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <test logic="AND" value="/environment/pressure-sea-level-inhg">
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set == 3.0
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <test logic="AND" value="29.92">
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set == 4.0
+                systems/gauges/pneumatic/alt-5934PA/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <output>/instrumentation/altimeter/setting-inhg</output>
+        </switch>
+
+
+    </channel>
+
+
+</system>

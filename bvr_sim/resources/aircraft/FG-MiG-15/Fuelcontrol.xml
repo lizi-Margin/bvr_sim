@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Fuel control </description>
+	</fileheader>
+
+
+	<channel name="Fuelcontrol">
+
+
+
+		<switch name="calculations/fuelcontrol/control-allowed">
+			<default value="systems/fuelcontrol/control-command" />
+			<test logic="AND" value="systems/fuelcontrol/control-input">
+				systems/leftpanel/serviceable eq 1
+			</test>
+			<output>systems/fuelcontrol/control-command</output>
+		</switch>
+
+		<kinematic name="calculations/fuelcontrol/control-pos">
+			<input>systems/fuelcontrol/control-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/fuelcontrol/control-pos</output>
+		</kinematic>
+
+		<switch name="calculations/fuelcontrol/control-not-allowed">
+			<default value="systems/fuelcontrol/control-input" />
+			<test logic="AND" value="systems/fuelcontrol/control-command">
+				systems/leftpanel/serviceable eq 0
+			</test>
+			<output>systems/fuelcontrol/control-input</output>
+		</switch>
+
+		<switch name="calculations/fuelcontrol/control-switch">
+			<default value="systems/fuelcontrol/control-switch" />
+			<test logic="AND" value="1">
+				systems/fuelcontrol/control-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/fuelcontrol/control-pos lt 0.5
+			</test>
+			<output>systems/fuelcontrol/control-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/fuelcontrol/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/fuelcontrol/control-pos ge 0.25
+				systems/fuelcontrol/control-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

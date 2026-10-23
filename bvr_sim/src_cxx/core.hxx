@@ -11,8 +11,11 @@
 #include <mutex>
 #include <condition_variable>
 #include <memory>
+#include <map>
+#include <set>
 
 namespace bvr_sim {
+struct Terrain;
 
 class SimCore {
 public:
@@ -33,9 +36,13 @@ public:
     void resume();
 
     void step(int steps = 1);
+    void set_environment(std::shared_ptr<const Terrain> environment) { environment_=std::move(environment); }
 
     json::JSON handle(const std::string& cmd);
     void set_acmi_file_path(const std::string& path);
+    void begin_recording(const std::string& log_path,const std::string& acmi_path,const std::string& reference_time);
+    void end_recording();
+    void flush_recording();
 
     bool is_running() const noexcept { return running_; }
     bool is_paused() const noexcept { return paused_; }
@@ -65,6 +72,7 @@ public:
     json::JSON get_game_mode_status() const;
 
 private:
+    std::shared_ptr<const Terrain> environment_;
     void run_loop();
     void update_physics();
     void log();
@@ -82,6 +90,11 @@ private:
     void truncate_acmi_file();
     std::string acmi_file_path_;
     std::ofstream acmi_file_;
+    bool state_recording_=false;
+    std::map<std::string,std::string> acmi_ids_;
+    std::set<std::string> acmi_alive_;
+    unsigned acmi_serial_=0,flush_ticks_=0;
+    void write_acmi_state();
     std::shared_ptr<TelemetryBridge> telemetry_bridge_;
     std::shared_ptr<EmbeddedWebServer> visualization_server_;
     std::shared_ptr<OpenGLViewer> opengl_viewer_;

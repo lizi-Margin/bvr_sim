@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='utf-8'?>
+<fdm_config name="MD-81" version="2.0" release="BETA">
+	
+	<aerodynamics file="FDE/Config/md-80-aerodynamics.xml" />
+	<external_reactions file="FDE/Config/md-80-external-reactions" />
+	<ground_reactions file="FDE/Config/md-80-ground-reactions" />
+	<mass_balance file="FDE/Config/md-80-mass-balance" />
+	<metrics file="FDE/Config/md-80-metrics" />
+	
+	<system file="md-80-libraries" />
+	<system file="md-80-electrical" />
+	<system file="md-80-fuel" />
+	<system file="md-80-hydraulics" />
+	<system file="md-80-irs-ahrs" />
+	<system file="md-80-pneumatics" />
+	<system file="md-80-dfgs" />
+	<system file="md-80-fcs" />
+	<system file="md-80-spoilers" />
+	<system file="md-80-ignition" />
+	<system file="md-80-209-engine-thrlim" />
+	<system file="md-80-apu" />
+	<system file="md-80-misc" />
+	<system file="md-80-performance" />
+	<system file="md-80-cockpit" />
+	<system file="md-80-instrumentation" />
+	
+	<propulsion>
+		<engine file="jt8d-209_1">
+			<feed>3</feed>
+			<thruster file="direct">
+				<location unit="M"> 
+					<x>33.7569</x>
+					<y>-1.4</y>
+					<z>-0.15426</z>
+				</location>
+				<orient unit="DEG">
+					<roll>0</roll>
+					<pitch>0</pitch>
+					<yaw>0</yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		<engine file="jt8d-209_2">
+			<feed>4</feed>
+			<thruster file="direct">
+				<location unit="M"> 
+					<x>33.7569</x>
+					<y>1.4</y>
+					<z>-0.15426</z>
+				</location>
+				<orient unit="DEG">
+					<roll>0</roll>
+					<pitch>0</pitch>
+					<yaw>0</yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		<engine file="gtcp85-98dhf">
+			<feed>5</feed>
+			<thruster file="direct">
+				<location unit="M">
+					<x>35.4694</x>
+					<y>1.2879</y>
+					<z>1.15571</z>
+				</location>
+				<orient unit="DEG">
+					<roll>0</roll>
+					<pitch>0</pitch>
+					<yaw>0</yaw>
+				</orient>
+			</thruster>
+		</engine>
+		
+		
+		<tank type="FUEL"> 
+			<location unit="M">
+				<x>23.91839</x>
+				<y>-5.03595</y>
+				<z>-0.2272</z>
+			</location>
+			<capacity unit="LBS">9819</capacity>
+			<contents unit="LBS">6000</contents>
+			<standpipe unit="LBS">31</standpipe>
+			<priority>1</priority>
+			<type>JET-A1</type>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL"> 
+			<location unit="M">
+				<x>23.23756</x>
+				<y>0</y>
+				<z>-0.30645</z>
+			</location>
+			<capacity unit="LBS">21801</capacity>
+			<contents unit="LBS">0</contents>
+			<standpipe unit="LBS">43</standpipe>
+			<priority>1</priority>
+			<type>JET-A1</type>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL"> 
+			<location unit="M">
+				<x>23.91839</x>
+				<y>5.03595</y>
+				<z>-0.2272</z>
+			</location>
+			<capacity unit="LBS">9819</capacity>
+			<contents unit="LBS">6000</contents>
+			<standpipe unit="LBS">31</standpipe>
+			<priority>1</priority>
+			<type>JET-A1</type>
+			<temperature>50</temperature>
+		</tank>
+		<tank type="FUEL"> 
+			<location unit="M">
+				<x>24.20826</x>
+				<y>0</y>
+				<z>-0.19827</z>
+			</location>
+			<capacity unit="LBS">10</capacity>
+			<contents unit="LBS">0</contents>
+			<priority>1</priority>
+			<type>JET-A1</type>
+		</tank>
+		<tank type="FUEL"> 
+			<location unit="M">
+				<x>24.20826</x>
+				<y>0</y>
+				<z>-0.19827</z>
+			</location>
+			<capacity unit="LBS">10</capacity>
+			<contents unit="LBS">0</contents>
+			<priority>1</priority>
+			<type>JET-A1</type>
+		</tank>
+		<tank type="FUEL"> 
+			<location unit="M">
+				<x>24.20826</x>
+				<y>0</y>
+				<z>-0.19827</z>
+			</location>
+			<capacity unit="LBS">5</capacity>
+			<contents unit="LBS">0</contents>
+			<priority>1</priority>
+			<type>JET-A1</type>
+		</tank>
+	</propulsion>
+
+</fdm_config>

@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="hydraulic">
+	
+	 <channel name="sysB" execrate="8"> 
+		
+		<scheduled_gain name="systems/hydraulics/edpb-pump-psi">
+			<input>propulsion/engine[0]/n1</input>
+			<table>
+				<independentVar lookup="row">propulsion/engine[0]/n2</independentVar>
+				<independentVar lookup="column">systems/hydraulics/edpb-pump/serviceable</independentVar>
+				<tableData>
+					        0      1
+					0       0      0
+					12      0    130
+				</tableData>
+			</table>
+			<clipto>
+				<min> 0 </min>
+				<max>
+					systems/hydraulics/normal-pressure
+				</max>
+			</clipto>
+		</scheduled_gain>
+		
+		<summer name="systems/hydraulics/sysb-psi">
+			<input>systems/hydraulics/edpb-pump-psi</input>
+			<clipto>
+				<min> 0 </min>
+				<max>
+					systems/hydraulics/normal-pressure
+				</max>
+			</clipto>
+		</summer>
+	</channel>
+	
+	<channel name="sysa" execrate="8">
+		
+
+		<scheduled_gain name="systems/hydraulics/edpa-pump-psi">
+			<input>propulsion/engine[0]/n1</input>
+			<table>
+				<independentVar lookup="row">propulsion/engine[0]/n2</independentVar>
+				<independentVar lookup="column">systems/hydraulics/edpa-pump/serviceable</independentVar>
+				<tableData>
+					        0      1
+					0       0      0
+					12      0    130
+				</tableData>
+			</table>
+			<clipto>
+				<min> 0 </min>
+				<max>
+					systems/hydraulics/normal-pressure
+				</max>
+			</clipto>
+		</scheduled_gain>
+
+		<pure_gain name="systems/hydraulics/emerg-pump-psi">
+			<input>elec/sources/epu-on</input>
+			<gain>2500</gain>
+		</pure_gain>
+
+		<summer name="systems/hydraulics/sysa-psi">
+			<input>systems/hydraulics/emerg-pump-psi</input>
+			<input>systems/hydraulics/edpa-pump-psi</input>
+			<clipto>
+				<min> 0 </min>
+				<max>
+					systems/hydraulics/normal-pressure
+				</max>
+			</clipto>
+		</summer>
+	</channel>
+	
+	<channel name="bleed" execrate="8">
+		
+		<summer name="systems/hydraulics/elevator-bleed">
+			<input>-fcs/elevator-cmd-norm</input>
+		</summer>
+
+		<summer name="systems/hydraulics/flight-system-bleed-basic">
+			<input>systems/hydraulics/elevator-bleed</input>
+		</summer>
+
+		
+		<scheduled_gain name="systems/hydraulics/flight-system-bleed">
+			<input>systems/hydraulics/flight-system-bleed-basic</input>
+			<table>
+				<independentVar lookup="row">systems/hydraulics/emerg-pump-psi</independentVar>
+				<tableData>
+					   0      30
+					2001     100
+				</tableData>
+			</table>
+			<clipto>
+				<min> 0 </min>
+				<max>300</max>
+			</clipto>
+		</scheduled_gain>
+
+	</channel>
+	
+	<channel name="Util" execrate="8">
+		
+		<switch name="systems/hydraulics/util-system-feedin">
+			<default value="0" />
+			<test value="systems/hydraulics/sysa-psi">
+				systems/hydraulics/sysa-psi gt 2000
+			</test>
+			<test value="systems/hydraulics/sysb-psi">
+				systems/hydraulics/sysb-psi gt 2000
+			</test>
+		</switch>
+		<summer name="systems/hydraulics/util-system-bleed">
+			
+			<input>systems/hydraulics/util-system-feedin</input>
+			<input>systems/hydraulics/util-system-preload-input</input>
+		</summer>
+		<summer name="systems/hydraulics/util-system-psi">
+			<input>systems/hydraulics/sysa-psi</input>
+			<input>systems/hydraulics/sysb-psi</input>
+			<clipto>
+				<min>0</min>
+				<max>3000</max>
+			</clipto>
+		</summer>
+		<actuator name="systems/hydraulics/util-system-accumulator">
+			<input>systems/hydraulics/util-system-psi</input>
+			<rate_limit>systems/hydraulics/util-system-bleed</rate_limit>
+			<output>systems/hydraulics/util-system-accumulator-psi</output>
+			<clipto>
+				<min>0</min>
+				<max>4000</max>
+			</clipto>
+		</actuator>
+	</channel>
+
+</system>

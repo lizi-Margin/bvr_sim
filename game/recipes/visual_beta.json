@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "name": "visual_agent_beta",
+  "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
+  "shader_source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\visual-beta\\shader-source",
+  "shader_cache": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\visual-beta\\shaders",
+  "physical_sky": true,
+  "aerial_perspective": true,
+  "high_quality_sky": false,
+  "volumetric_clouds": false,
+  "planet_albedo": [
+    0.12,
+    0.16,
+    0.1
+  ],
+  "legacy_distance_fog_density": 0.0,
+  "horizon_height_fog": {
+    "start_m": 100000,
+    "density_per_m": 5e-05,
+    "base_m": 0,
+    "top_m": 16000,
+    "approximation": "Distant aerosol haze shared by sky and geometry; no visibility culling change"
+  },
+  "sun_energy": 4.0,
+  "sun_rotation": [
+    -0.65,
+    -0.6,
+    0.0
+  ],
+  "ambient": [
+    0.075,
+    0.095,
+    0.13
+  ],
+  "sky_exposure": 1.0,
+  "exposure": 1.0,
+  "saturation": 1.0,
+  "paint_factor": 0.72,
+  "paint_roughness": 0.64,
+  "canopy_roughness": 0.09,
+  "canopy_alpha": 0.48,
+  "canopy_transmission": 0.12,
+  "terrain_detail": {
+    "base_color": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Ground072\\unpacked\\Ground072_1K-JPG_Color.jpg",
+    "normal": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Ground072\\unpacked\\Ground072_1K-JPG_NormalDX.jpg",
+    "roughness_map": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Ground072\\unpacked\\Ground072_1K-JPG_Roughness.jpg",
+    "tile_m": 3.0,
+    "mean_linear_luminance": 0.20355155337705852,
+    "strength": 0.7,
+    "base_color_sha256": "95ce6004caabb2777271e0b0b36cc81705fdec1edde4352151aaae836b192f43",
+    "normal_sha256": "ca264e1c0e0d22852dea77c64157fc85efb4c3380ff6ec2b6981cab12661d8ca",
+    "roughness_map_sha256": "49b159b2159524a64996f075631b2088dc8b8b8515721f84ae5d7cfd38100545"
+  },
+  "shader_patch": {
+    "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
+    "patched_objectHF_sha256": "e598631b961726d43ff9bc57a84112de36c76c4eaa32a37507cc8d3a81fc6a7c",
+    "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
+    "patched_skyHF_sha256": "941458bc320affe0885f742093f76dd73c5b491697e2e32eff63105911cd3166",
+    "flat_nwu_horizon_haze": "Downward sky-only rays use the same far aerial-perspective volume as opaque terrain; no geometry mask",
+    "planet_ground_radiance": true,
+    "material_flag": "0x42565244",
+    "pipeline": "Existing forward raster path; visibility compute shading remains off"
+  },
+  "provenance": {
+    "geometry": "Existing registered FlightGear geometry unchanged",
+    "material_parameters": "Engineering paint/glass/metal approximations based on source material names and roles, not measured BRDFs",
+    "detail_textures": "Existing registered ambientCG Ground072 CC0 source maps; images unchanged",
+    "detail_mean": "Computed from source color in linear sRGB to preserve macro mean brightness",
+    "shader_source": "Pinned Wicked Engine MIT source copied to cache; upstream checkout not edited"
+  }
+}

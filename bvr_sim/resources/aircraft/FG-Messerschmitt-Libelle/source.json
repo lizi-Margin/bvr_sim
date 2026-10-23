@@ -1,0 +1,29 @@
+{
+  "set": "Messerschmitt-Libelle/libelle-set.xml",
+  "name": "Messerschmitt Libelle (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Messerschmitt-Libelle/Systems/libelle-yasim.xml",
+  "jets": 1,
+  "model": "Messerschmitt-Libelle/Models/libelle.xml",
+  "tags": [
+    "messerschmitt",
+    "fighter",
+    "prototype",
+    "1940s",
+    "ww2",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "single-engine",
+    "jet",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Messerschmitt-Libelle.zip",
+  "archive_sha256": "3964214b445a78f6f39313bfc241746d1b2f435b7344ce9b421aeab3855ebc49",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Messerschmitt-Libelle.zip"
+}

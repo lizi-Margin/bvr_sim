@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="fuel">
+
+
+<property>propulsion/tank[7]/external-flow-rate/jettison</property>
+<property>propulsion/tank[8]/external-flow-rate/jettison</property>
+<property>/controls/fuel/x-feed</property>
+	<channel name="fuel">
+
+		<switch name="propulsion/tank[7]/external-flow-rate/x-feed">
+			<default value="0" />
+			<test logic="AND" value="10">
+				/controls/fuel/x-feed == 1
+				propulsion/tank[7]/contents-lbs gt propulsion/tank[8]/contents-lbs
+				propulsion/tank[7]/contents-lbs gt 0
+				propulsion/tank[8]/contents-lbs lt 100
+			</test>
+			
+		</switch>
+		<switch name="propulsion/tank[8]/external-flow-rate/x-feed">
+			<default value="0" />
+			<test logic="AND" value="10">
+				/controls/fuel/x-feed == 1
+				propulsion/tank[8]/contents-lbs gt propulsion/tank[7]/contents-lbs
+				propulsion/tank[8]/contents-lbs gt 0
+				propulsion/tank[7]/contents-lbs lt 100
+			</test>
+		</switch>
+
+
+		<switch name="propulsion/tank[1]/external-flow-rate/transfer-valve">
+			<default value="0" />
+			<test logic="AND" value="5">
+				propulsion/tank[1]/contents-lbs gt 0 
+				propulsion/tank[2]/contents-lbs lt 1650
+			</test>
+		</switch>
+
+		<switch name="propulsion/tank[5]/external-flow-rate/transfer-valve">
+			<default value="0" />
+			<test logic="AND" value="5">
+				propulsion/tank[5]/contents-lbs gt 0 
+				propulsion/tank[4]/contents-lbs lt 1650
+			</test>
+		</switch>
+
+
+		<switch name="propulsion/tank[2]/external-flow-rate/pump[0]">
+			<default value="0" />
+			<test logic="AND" value="5">
+				/controls/fuel/tank[2]/boost-pump[0] == 1
+				propulsion/tank[2]/contents-lbs gt 0 
+				propulsion/tank[7]/contents-lbs lt 90
+			</test>
+		</switch>
+
+		<switch name="propulsion/tank[2]/external-flow-rate/pump[1]">
+			<default value="0" />
+			<test logic="AND" value="5">
+				/controls/fuel/tank[2]/boost-pump[1] == 1
+				propulsion/tank[2]/contents-lbs gt 0 
+				propulsion/tank[7]/contents-lbs lt 90
+			</test>
+		</switch>
+
+		<switch name="propulsion/tank[4]/external-flow-rate/pump[0]">
+			<default value="0" />
+			<test logic="AND" value="5">
+				/controls/fuel/tank[4]/boost-pump[0] == 1
+				propulsion/tank[4]/contents-lbs gt 0 
+				propulsion/tank[8]/contents-lbs lt 90
+			</test>
+		</switch>
+
+		<switch name="propulsion/tank[4]/external-flow-rate/pump[1]">
+			<default value="0" />
+			<test logic="AND" value="5">
+				/controls/fuel/tank[4]/boost-pump[1] == 1
+				propulsion/tank[4]/contents-lbs gt 0 
+				propulsion/tank[8]/contents-lbs lt 90
+			</test>
+		</switch>
+
+
+
+		<switch name="propulsion/tank[3]/external-flow-rate/pump[0]">
+			<default value="0" />
+			<test logic="AND" value="5">
+				/controls/fuel/tank[3]/boost-pump[0] == 1
+				propulsion/tank[3]/contents-lbs gt 0 
+				propulsion/tank[7]/contents-lbs lt 95 
+			</test>
+		</switch>
+
+		<switch name="propulsion/tank[3]/external-flow-rate/pump[1]">
+			<default value="0" />
+			<test logic="AND" value="5">
+				/controls/fuel/tank[3]/boost-pump[1] == 1
+				propulsion/tank[3]/contents-lbs gt 0 
+				propulsion/tank[8]/contents-lbs lt 95
+			</test>
+		</switch>
+
+
+		<switch name="propulsion/tank[7]/external-flow-rate/recirculation">
+			<default value="0" />
+			<test logic="AND" value="5">
+				propulsion/tank[4]/contents-lbs gt propulsion/tank[2]/contents-lbs
+				propulsion/tank[7]/contents-lbs gt 50 
+				propulsion/tank[2]/contents-lbs lt 12186 
+			</test>
+		</switch>
+
+		<switch name="propulsion/tank[8]/external-flow-rate/recirculation">
+			<default value="0" />
+			<test logic="AND" value="5">
+				propulsion/tank[2]/contents-lbs gt propulsion/tank[4]/contents-lbs
+				propulsion/tank[8]/contents-lbs gt 50 
+				propulsion/tank[4]/contents-lbs lt 12186
+			</test>
+		</switch>
+
+
+
+
+		
+		<summer name="propulsion/tank[7]/external-flow-rate">
+			
+			<input>-propulsion/tank[7]/external-flow-rate/jettison</input>
+			<input>-propulsion/tank[7]/external-flow-rate/recirculation</input> 
+			<input>-propulsion/tank[7]/external-flow-rate/x-feed</input>
+
+			
+			<input>propulsion/tank[8]/external-flow-rate/x-feed</input>
+			<input>propulsion/tank[2]/external-flow-rate/pump[0]</input>
+			<input>propulsion/tank[2]/external-flow-rate/pump[1]</input>
+			<input>propulsion/tank[3]/external-flow-rate/pump[0]</input>
+
+			<output>propulsion/tank[7]/external-flow-rate-pps</output>
+		</summer>
+
+		
+		<summer name="propulsion/tank[8]/external-flow-rate">
+			
+			<input>-propulsion/tank[8]/external-flow-rate/jettison</input>
+			<input>-propulsion/tank[8]/external-flow-rate/recirculation</input>
+			<input>-propulsion/tank[8]/external-flow-rate/x-feed</input>
+
+			
+			<input>propulsion/tank[7]/external-flow-rate/x-feed</input>
+			<input>propulsion/tank[4]/external-flow-rate/pump[0]</input>
+			<input>propulsion/tank[4]/external-flow-rate/pump[1]</input>
+			<input>propulsion/tank[3]/external-flow-rate/pump[1]</input>
+
+			<output>propulsion/tank[8]/external-flow-rate-pps</output>
+		</summer>
+
+
+
+
+		
+		<summer name="propulsion/tank[2]/external-flow-rate">
+			
+			<input>-propulsion/tank[2]/external-flow-rate/pump[0]</input>
+			<input>-propulsion/tank[2]/external-flow-rate/pump[1]</input>
+			
+			<input>propulsion/tank[7]/external-flow-rate/recirculation</input>
+			<input>propulsion/tank[1]/external-flow-rate/transfer-valve</input>
+
+			<output>propulsion/tank[2]/external-flow-rate-pps</output>
+		</summer>
+
+		
+		<summer name="propulsion/tank[4]/external-flow-rate">
+			
+			<input>-propulsion/tank[4]/external-flow-rate/pump[0]</input>
+			<input>-propulsion/tank[4]/external-flow-rate/pump[1]</input>
+
+			
+			<input>propulsion/tank[8]/external-flow-rate/recirculation</input>
+			<input>propulsion/tank[5]/external-flow-rate/transfer-valve</input>
+
+			<output>propulsion/tank[4]/external-flow-rate-pps</output>
+		</summer>
+
+
+		
+		<summer name="propulsion/tank[1]/external-flow-rate">
+			
+			<input>-propulsion/tank[1]/external-flow-rate/transfer-valve</input>
+
+			<output>propulsion/tank[1]/external-flow-rate-pps</output>
+		</summer>
+
+		
+		<summer name="propulsion/tank[5]/external-flow-rate">
+			
+			<input>-propulsion/tank[5]/external-flow-rate/transfer-valve</input>
+
+			<output>propulsion/tank[5]/external-flow-rate-pps</output>
+		</summer>
+
+
+		
+		<summer name="propulsion/tank[3]/external-flow-rate">
+			
+			<input>-propulsion/tank[3]/external-flow-rate/pump[0]</input>
+			<input>-propulsion/tank[3]/external-flow-rate/pump[1]</input>
+			<output>propulsion/tank[3]/external-flow-rate-pps</output>
+		</summer>
+	   
+	</channel>
+	
+</system>

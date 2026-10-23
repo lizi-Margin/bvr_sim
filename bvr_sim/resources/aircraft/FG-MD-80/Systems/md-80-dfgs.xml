@@ -1,0 +1,1225 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-80: DFGS">
+	
+	<property value="0">/systems/dfgs/flaps-cmd-feedback</property>
+	<property value="340">/systems/dfgs/speeds/vmo</property>
+	<property value="0">/systems/abs/disarm</property>
+	
+	
+	<property value="0">/systems/dfgs/yaw/yd-p-gain-tune</property>
+	<property value="0">/systems/dfgs/yaw/tc-p-gain-tune</property>
+	<property value="0">/systems/dfgs/yaw/tc-d-gain-tune</property>
+	
+	<channel name="Libraries">
+		
+		<switch name="/systems/dfgs/dfgs-1-power">
+			<default value="0" />
+			<test value="1">
+				/systems/electrical/bus/dc-radio-l ge 24
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/dfgs-2-power">
+			<default value="0" />
+			<test value="1">
+				/systems/electrical/bus/dc-radio-r ge 24
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/power-avail">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/dfgs/dfgs-1-power eq 1
+				/systems/dfgs/dfgs-2-power eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/afs/enabled">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/it-autoflight/output/ap1 eq 1
+				/it-autoflight/output/ap2 eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="aero/alpha-deg-damped">
+			<input>aero/alpha-deg-fixed</input>
+			<c1>10</c1>
+		</lag_filter>
+		
+		<lag_filter name="aero/alpha-deg-damped-pli">
+			<input>aero/alpha-deg</input> 
+			<c1>10</c1>
+		</lag_filter>
+		
+		<switch name="/systems/dfgs/yaw/cmd-on">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/dfgs/afs/enabled eq 1
+				/controls/fcs/yaw-damper eq 0
+			</test>
+			<test value="1">
+				/controls/fcs/yaw-damper eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/yaw/active">
+			<default value="0" />
+			<test logic="AND" value="1">
+				position/wow eq 0
+				position/gear-agl-ft ge 50
+				/systems/dfgs/yaw/cmd-on eq 1
+				/systems/dfgs/power-avail eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/yaw/autoland-switch">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/dfgs/afs/enabled eq 1
+				/it-autoflight/output/lat eq 4
+			</test>
+		</switch>
+		
+		<summer name="/it-autoflight/input/alt-diff">
+			<input>/instrumentation/altimeter/indicated-altitude-ft</input>
+			<input>-/it-autoflight/input/alt</input>
+		</summer>
+		
+		<fcs_function name="/it-autoflight/input/alt-diff-abs">
+			<function>
+				<abs>
+					<property>/it-autoflight/input/alt-diff</property>
+				</abs>
+			</function>
+		</fcs_function>
+		
+		<summer name="/it-autoflight/internal/alt-diff">
+			<input>/instrumentation/altimeter/indicated-altitude-ft</input>
+			<input>-/it-autoflight/internal/alt</input>
+		</summer>
+		
+		<fcs_function name="/it-autoflight/internal/alt-diff-abs">
+			<function>
+				<abs>
+					<property>/it-autoflight/internal/alt-diff</property>
+				</abs>
+			</function>
+		</fcs_function>
+		
+		<summer name="/systems/dfgs/atr/epr-differential">
+			<input>/engines/engine[0]/epr-actual</input>
+			<input>-/engines/engine[1]/epr-actual</input>
+		</summer>
+		
+		<summer name="/systems/dfgs/atr/n1-differential">
+			<input>/engines/engine[0]/n1-actual</input>
+			<input>-/engines/engine[1]/n1-actual</input>
+		</summer>
+		
+		<switch name="/systems/dfgs/atr/descend-switch">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/it-autoflight/output/vert eq 7
+				position/gear-agl-ft ge 350
+				/instrumentation/vertical-speed-indicator/vert-speed-fpm le -0.5
+			</test>
+		</switch>
+		
+		<actuator name="/systems/dfgs/atr/descend-timer">
+			<input>/systems/dfgs/atr/descend-switch</input>
+			<rate_limit sense="incr">0.2</rate_limit> 
+			<rate_limit sense="decr">100000</rate_limit> 
+		</actuator>
+		
+		<fcs_function name="/systems/dfgs/atr/go-around-buffer">
+			<function>
+				<difference>
+					<property>/systems/engines/limit/go-around</property>
+					<value>0.01</value>
+				</difference>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/dfgs/atr/cmd">
+			<default value="0" />
+			<test logic="OR" value="0">
+				/it-autoflight/output/athr eq 0
+				position/gear-agl-ft lt 350
+				/engines/engine[0]/epr-actual ge /systems/dfgs/atr/go-around-buffer
+				/engines/engine[1]/epr-actual ge /systems/dfgs/atr/go-around-buffer
+			</test>
+			<test logic="AND" value="1">
+				/systems/dfgs/atr/epr-differential ge 0.25
+				/systems/dfgs/atr/n1-differential ge 7
+			</test>
+			<test logic="AND" value="1">
+				/systems/dfgs/atr/epr-differential le -0.25
+				/systems/dfgs/atr/n1-differential le -7
+			</test>
+			<test value="1">
+				/systems/dfgs/atr/descend-timer eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/dfgs/nlg-timer-20/wow-timer-cmd">
+			<function>
+				<sum> 
+					<product>
+						<property>gear/unit[0]/WOW</property>
+						<value>-1</value>
+					</product>
+					<value>1</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/systems/dfgs/nlg-timer-20/wow-timer-pos">
+			<input>/systems/dfgs/nlg-timer-20/wow-timer-cmd</input>
+			<rate_limit sense="incr">100000</rate_limit> 
+			<rate_limit sense="decr">0.05</rate_limit> 
+		</actuator>
+		
+		<fcs_function name="/systems/dfgs/nlg-timer-20/wow-timer">
+			<function>
+				<sum> 
+					<product>
+						<property>/systems/dfgs/nlg-timer-20/wow-timer-pos</property>
+						<value>-1</value>
+					</product>
+					<value>1</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/nlg-timer-120/wow-timer-cmd">
+			<function>
+				<sum> 
+					<product>
+						<property>gear/unit[0]/WOW</property>
+						<value>-1</value>
+					</product>
+					<value>1</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/systems/dfgs/nlg-timer-120/wow-timer-pos">
+			<input>/systems/dfgs/nlg-timer-120/wow-timer-cmd</input>
+			<rate_limit sense="incr">100000</rate_limit> 
+			<rate_limit sense="decr">0.008333</rate_limit> 
+		</actuator>
+		
+		<fcs_function name="/systems/dfgs/nlg-timer-120/wow-timer">
+			<function>
+				<sum> 
+					<product>
+						<property>/systems/dfgs/nlg-timer-120/wow-timer-pos</property>
+						<value>-1</value>
+					</product>
+					<value>1</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		
+		<actuator name="/systems/dfgs/bit-1/power-timer">
+			<input>/systems/dfgs/dfgs-1-power</input>
+			<rate_limit sense="incr">100000</rate_limit> 
+			<rate_limit sense="decr">0.5</rate_limit> 
+		</actuator>
+		
+		<switch name="/systems/dfgs/bit-1/cmd">
+			<default value="/systems/dfgs/bit-1/cmd" />
+			<test logic="OR" value="0">
+				/systems/dfgs/bit-1/power-timer eq 0
+				position/wow eq 0
+				/systems/dfgs/afs/enabled eq 1
+				/it-autoflight/output/athr eq 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/dfgs/nlg-timer-120/wow-timer eq 1
+				/engines/engine[0]/epr-actual lt 1.1
+				/engines/engine[1]/epr-actual lt 1.1
+				/instrumentation/airspeed-indicator/indicated-speed-kt lt 60
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/bit-1/incr">
+			<default value="0.125" /> 
+			<test value="0.5"> 
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/systems/dfgs/bit-1/timer">
+			<input>/systems/dfgs/bit-1/cmd</input>
+			<rate_limit sense="incr">/systems/dfgs/bit-1/incr</rate_limit>
+			<rate_limit sense="decr">100000</rate_limit> 
+		</actuator>
+		
+		<switch name="/systems/dfgs/bit-1/active">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/dfgs/bit-1/timer gt 0
+				/systems/dfgs/bit-1/timer lt 1
+			</test>
+		</switch>
+		
+		<actuator name="/systems/dfgs/bit-2/power-timer">
+			<input>/systems/dfgs/dfgs-2-power</input>
+			<rate_limit sense="incr">100000</rate_limit> 
+			<rate_limit sense="decr">0.5</rate_limit> 
+		</actuator>
+		
+		<switch name="/systems/dfgs/bit-2/cmd">
+			<default value="/systems/dfgs/bit-2/cmd" />
+			<test logic="OR" value="0">
+				/systems/dfgs/bit-2/power-timer eq 0
+				position/wow eq 0
+				/systems/dfgs/afs/enabled eq 1
+				/it-autoflight/output/athr eq 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/dfgs/nlg-timer-120/wow-timer eq 1
+				/engines/engine[0]/epr-actual lt 1.1
+				/engines/engine[1]/epr-actual lt 1.1
+				/instrumentation/airspeed-indicator/indicated-speed-kt lt 60
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/bit-2/incr">
+			<default value="0.125" /> 
+			<test value="0.5"> 
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/systems/dfgs/bit-2/timer">
+			<input>/systems/dfgs/bit-2/cmd</input>
+			<rate_limit sense="incr">/systems/dfgs/bit-2/incr</rate_limit>
+			<rate_limit sense="decr">100000</rate_limit> 
+		</actuator>
+		
+		<switch name="/systems/dfgs/bit-2/active">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/dfgs/bit-2/timer gt 0
+				/systems/dfgs/bit-2/timer lt 1
+			</test>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Envelope Protection Calculations" execrate="8"> 
+		
+		
+		<switch name="/systems/dfgs/speeds/flaps-wow-switch">
+			<default value="fcs/flap-pos-deg" />
+			<test value="/systems/dfgs/speeds/flaps-wow-switch">
+				position/wow eq 0
+			</test>
+		</switch>
+		
+		
+		<fcs_function name="/systems/dfgs/speeds/v2-table"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<independentVar lookup="column">/systems/dfgs/speeds/flaps-wow-switch</independentVar>
+					<tableData>
+						        4    11   15
+						 90000  130  120  119
+						 92000  132  121  120
+						 94000  133  123  121
+						 96000  135  124  123
+						 98000  136  126  124
+						100000  138  127  125
+						102000  139  128  126
+						104000  141  129  128
+						106000  142  131  129
+						108000  143  132  131
+						110000  144  133  132
+						112000  146  136  133
+						114000  147  135  134
+						116000  149  137  136
+						118000  150  138  137
+						120000  151  139  138
+						122000  153  140  139
+						124000  154  141  140
+						126000  155  142  141
+						128000  156  143  142
+						130000  158  144  143
+						132000  159  146  144
+						134000  160  147  145
+						136000  161  148  146
+						138000  163  149  147
+						140000  164  150  148
+						142000  165  151  150
+						144000  166  152  151
+						146000  168  153  152
+						148000  169  155  153
+						150000  170  156  154
+						160000  176  162  160
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/speeds/v2-minimum"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/position/altitude-ft</independentVar>
+					<independentVar lookup="column">propulsion/tat-c</independentVar>
+					<independentVar lookup="table">/systems/dfgs/speeds/flaps-wow-switch</independentVar>
+					<tableData breakPoint="4">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  132  132  132  132  131  131  129  129  127  127  125  125
+						 999  132  132  132  132  131  131  129  129  127  127  125  125
+						1000  130  130  130  130  130  130  127  127  124  124  122  122
+						1999  130  130  130  130  130  130  127  127  124  124  122  122
+						2000  128  128  128  128  128  128  125  125  122  122  120  120
+						2999  128  128  128  128  128  128  125  125  122  122  120  120
+						3000  127  127  127  127  125  125  122  122  120  120  117  117
+						3999  127  127  127  127  125  125  122  122  120  120  117  117
+						4000  125  125  124  124  123  123  120  120  117  117  115  115
+						4999  125  125  124  124  123  123  120  120  117  117  115  115
+						5000  124  124  123  123  120  120  117  117  115  115  114  114
+						5999  124  124  123  123  120  120  117  117  115  115  114  114
+						6000  123  123  121  121  118  118  115  115  114  114  112  112
+						6999  123  123  121  121  118  118  115  115  114  114  112  112
+						7000  119  119  118  118  116  116  114  114  112  112  110  110
+						7999  119  119  118  118  116  116  114  114  112  112  110  110
+					</tableData>
+					<tableData breakPoint="11">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  130  130  130  130  129  129  127  127  125  125  123  123
+						 999  130  130  130  130  129  129  127  127  125  125  123  123
+						1000  128  128  128  128  128  128  125  125  122  122  121  121
+						1999  128  128  128  128  128  128  125  125  122  122  121  121
+						2000  126  126  126  126  126  126  123  123  121  121  119  119
+						2999  126  126  126  126  126  126  123  123  121  121  119  119
+						3000  125  125  125  125  123  123  121  121  119  119  116  116
+						3999  125  125  125  125  123  123  121  121  119  119  116  116
+						4000  123  123  122  122  122  122  119  119  116  116  114  114
+						4999  123  123  122  122  122  122  119  119  116  116  114  114
+						5000  122  122  121  121  119  119  116  116  114  114  113  113
+						5999  122  122  121  121  119  119  116  116  114  114  113  113
+						6000  121  121  119  119  117  117  114  114  113  113  111  111
+						6999  121  121  119  119  117  117  114  114  113  113  111  111
+						7000  118  118  117  117  115  115  113  113  111  111  109  109
+						7999  118  118  117  117  115  115  113  113  111  111  109  109
+					</tableData>
+					<tableData breakPoint="15">
+						     -40   20   21   25   26   30   31   35   36   40   41   45
+						   0  127  127  127  127  127  127  124  124  122  122  120  120
+						 999  127  127  127  127  127  127  124  124  122  122  120  120
+						1000  125  125  125  125  125  125  122  122  120  120  118  118
+						1999  125  125  125  125  125  125  122  122  120  120  118  118
+						2000  124  124  124  124  123  123  120  120  118  118  116  116
+						2999  124  124  124  124  123  123  120  120  118  118  116  116
+						3000  122  122  122  122  121  121  118  118  116  116  114  114
+						3999  122  122  122  122  121  121  118  118  116  116  114  114
+						4000  121  121  120  120  119  119  116  116  114  114  111  111
+						4999  121  121  120  120  119  119  116  116  114  114  111  111
+						5000  120  120  118  118  116  116  114  114  111  111  110  110
+						5999  120  120  118  118  116  116  114  114  111  111  110  110
+						6000  118  118  116  116  114  114  112  112  109  109  107  107
+						6999  118  118  116  116  114  114  112  112  109  109  107  107
+						7000  115  115  114  114  112  112  110  110  108  108  105  105
+						7999  115  115  114  114  112  112  110  110  108  108  105  105
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/speeds/v2">
+			<function>
+				<max>
+					<property>/systems/dfgs/speeds/v2-table</property>
+					<property>/systems/dfgs/speeds/v2-minimum</property>
+				</max>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/speeds/v2-plus-10">
+			<function>
+				<sum>
+					<property>/systems/dfgs/speeds/v2</property>
+					<value>10</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/dfgs/speeds/v2-target-ias-input">
+			<default value="/instrumentation/airspeed-indicator/indicated-speed-kt" />
+			<test logic="AND" value="/systems/dfgs/speeds/v2-target-ias-input">
+				/systems/engines/engine-out eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/dfgs/speeds/v2-target"> 
+			<function>
+				<floor>
+					<sum>
+						<ifthen>
+							<eq>
+								<property>/systems/engines/engine-out</property>
+								<value>1</value>
+							</eq>
+							<min>
+								<max>
+									<property>/systems/dfgs/speeds/v2-target-ias-input</property>
+									<property>/systems/dfgs/speeds/v2</property>
+								</max>
+								<property>/systems/dfgs/speeds/v2-plus-10</property>
+							</min>
+							<property>/systems/dfgs/speeds/v2-plus-10</property>
+						</ifthen>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/dfgs/speeds/mmo-kts">
+			<function>
+				<product>
+					<quotient>
+						<property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+						<max> 
+							<property>/instrumentation/airspeed-indicator/indicated-mach</property>
+							<value>0.0001</value>
+						</max>
+					</quotient>
+					<value>0.84</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/dfgs/speeds/vmo-mmo">
+			<default value="/systems/dfgs/speeds/vmo" />
+			<test logic="AND" value="/systems/dfgs/speeds/mmo-kts">
+				/systems/dfgs/speeds/mmo-kts lt /systems/dfgs/speeds/vmo
+				position/wow eq 0
+				/sim/time/elapsed-sec gt 0
+			</test>
+		</switch>
+		
+		
+		<fcs_function name="/systems/dfgs/speeds/flap-slat-max-mach-kts">
+			<function>
+				<product>
+					<quotient>
+						<property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+						<max> 
+							<property>/instrumentation/airspeed-indicator/indicated-mach</property>
+							<value>0.0001</value>
+						</max>
+					</quotient>
+					<value>0.57</value>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/dfgs/speeds/flap-0-13-slat-mid-max-kts">
+			<default value="280" />
+			<test logic="AND" value="/systems/dfgs/speeds/flap-slat-max-mach-kts">
+				/systems/dfgs/speeds/flap-slat-max-mach-kts lt 280
+				position/wow eq 0
+				/sim/time/elapsed-sec gt 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/speeds/flap-15-20-slat-full-max-kts">
+			<default value="240" />
+			<test logic="AND" value="/systems/dfgs/speeds/flap-slat-max-mach-kts">
+				/systems/dfgs/speeds/flap-slat-max-mach-kts lt 240
+				position/wow eq 0
+				/sim/time/elapsed-sec gt 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/speeds/flap-21-25-max-kts">
+			<default value="220" />
+			<test logic="AND" value="/systems/dfgs/speeds/flap-slat-max-mach-kts">
+				/systems/dfgs/speeds/flap-slat-max-mach-kts lt 220
+				position/wow eq 0
+				/sim/time/elapsed-sec gt 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/speeds/flap-26-30-max-kts">
+			<default value="205" />
+			<test logic="AND" value="/systems/dfgs/speeds/flap-slat-max-mach-kts">
+				/systems/dfgs/speeds/flap-slat-max-mach-kts lt 205
+				position/wow eq 0
+				/sim/time/elapsed-sec gt 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/speeds/flap-31-40-max-kts">
+			<default value="200" />
+			<test logic="AND" value="/systems/dfgs/speeds/flap-slat-max-mach-kts">
+				/systems/dfgs/speeds/flap-slat-max-mach-kts lt 200
+				position/wow eq 0
+				/sim/time/elapsed-sec gt 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/speeds/vmax">
+			<default value="/systems/dfgs/speeds/vmo-mmo" />
+			<test value="/systems/dfgs/speeds/flap-31-40-max-kts">
+				fcs/flap-pos-deg ge 30.5
+			</test>
+			<test value="/systems/dfgs/speeds/flap-26-30-max-kts">
+				fcs/flap-pos-deg ge 25.5
+			</test>
+			<test value="/systems/dfgs/speeds/flap-21-25-max-kts">
+				fcs/flap-pos-deg ge 20.5
+			</test>
+			<test logic="OR" value="/systems/dfgs/speeds/flap-15-20-slat-full-max-kts">
+				fcs/flap-pos-deg ge 14
+				fcs/slat-pos-deg ge 11
+			</test>
+			<test logic="OR" value="/systems/dfgs/speeds/flap-0-13-slat-mid-max-kts">
+				fcs/flap-pos-deg ge 1
+				fcs/slat-pos-deg ge 1
+			</test>
+			<clipto>
+				<min>100</min>
+				<max>100000</max>
+			</clipto>
+		</switch>
+		
+		<switch name="/systems/dfgs/speeds/vmax-type"> 
+			<default value="0" /> 
+			<test logic="OR" value="3"> 
+				/systems/dfgs/speeds/vmax eq /systems/dfgs/speeds/flap-21-25-max-kts
+				/systems/dfgs/speeds/vmax eq /systems/dfgs/speeds/flap-26-30-max-kts
+				/systems/dfgs/speeds/vmax eq /systems/dfgs/speeds/flap-31-40-max-kts
+			</test>
+			<test logic="OR" value="2"> 
+				/systems/dfgs/speeds/vmax eq /systems/dfgs/speeds/flap-0-13-slat-mid-max-kts
+				/systems/dfgs/speeds/vmax eq /systems/dfgs/speeds/flap-15-20-slat-full-max-kts
+			</test>
+			<test logic="AND" value="1"> 
+				/systems/dfgs/speeds/vmax eq /systems/dfgs/speeds/vmo-mmo
+				/systems/dfgs/speeds/vmo-mmo ne /systems/dfgs/speeds/vmo
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/dfgs/speeds/vmax-mach">
+			<function>
+				<product>
+					<quotient>
+						<property>/instrumentation/airspeed-indicator/indicated-mach</property>
+						<max> 
+							<property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+							<value>0.0001</value>
+						</max>
+					</quotient>
+					<property>/systems/dfgs/speeds/vmax</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/dfgs/speeds/vss-kts"> 
+			<function>
+				<table>
+					<independentVar lookup="row">inertia/weight-lbs</independentVar>
+					<independentVar lookup="column">fcs/flap-pos-deg</independentVar>
+					<independentVar lookup="table">fcs/slat-pos-deg</independentVar>
+					<tableData breakPoint="0">
+						        0    11   15   28   40
+						 90000  132  122  119  112  106
+						 95000  136  125  123  116  109
+						100000  139  128  126  118  112
+						105000  143  132  129  122  114
+						110000  146  135  132  124  117
+						115000  149  138  135  127  120
+						120000  152  141  138  130  122
+						125000  156  143  141  133  125
+						130000  159  146  143  135  127
+						135000  162  149  146  138  130
+						140000  165  152  149  141  132
+						145000  168  155  152  143  135
+						160000  177  164  161  151  143
+					</tableData>
+					<tableData breakPoint="20">
+						        0    11   15   28   40
+						 90000  104   98   96   92   89
+						 95000  107  101   99   94   92
+						100000  110  104  102   97   94
+						105000  112  106  104   99   96
+						110000  115  109  107  101   99
+						115000  117  111  109  104  101
+						120000  120  114  111  106  103
+						125000  122  116  113  108  105
+						130000  125  118  116  110  107
+						135000  127  120  118  112  109
+						140000  129  122  120  114  111
+						145000  132  124  122  116  113
+						160000  140  130  128  122  119
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/speeds/vss-roll-factor"> 
+			<function>
+				<sqrt> 
+					<quotient> 
+						<value>1</value>
+						<cos>
+							<toradians>
+								<min>
+									<abs>
+										<property>/orientation/roll-deg</property>
+									</abs>
+									<value>89</value> 
+								</min>
+							</toradians>
+						</cos>
+					</quotient>
+				</sqrt>
+			</function>
+		</fcs_function>
+		
+		<pure_gain name="/systems/dfgs/speeds/vss">
+			<input>/systems/dfgs/speeds/vss-kts</input>
+			<gain>/systems/dfgs/speeds/vss-roll-factor</gain>
+			<clipto>
+				<min>0</min>
+				<max>/systems/dfgs/speeds/vmo-mmo</max>
+			</clipto>
+		</pure_gain>
+		
+		
+		<fcs_function name="/systems/dfgs/speeds/vmin">
+			<function>
+				<product>
+					<difference>
+						<property>/systems/dfgs/speeds/vss-kts</property>
+						<value>10</value>
+					</difference>
+					<sum>
+						<value>1.3</value> 
+						<table>
+							<independentVar lookup="row">atmosphere/density-altitude</independentVar>
+							<tableData>
+								    0  0.0000
+								45000  0.2302
+							</tableData>
+						</table>
+					</sum>
+				</product>
+			</function>
+			<clipto>
+				<min>/systems/dfgs/speeds/vss</min>
+				<max>/systems/dfgs/speeds/vmax</max>
+			</clipto>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/speeds/vmin-plus-5">
+			<function>
+				<sum>
+					<property>/systems/dfgs/speeds/vmin</property>
+					<value>5</value>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/speeds/ga-target"> 
+			<function>
+				<floor>
+					<sum>
+						<property>/systems/dfgs/speeds/vmin-plus-5</property>
+						<value>0.5</value>
+					</sum>
+				</floor>
+			</function>
+		</fcs_function>
+		
+		<pure_gain name="/systems/dfgs/speeds/vmin-90-percent">
+			<input>/systems/dfgs/speeds/vmin</input>
+			<gain>0.9</gain>
+		</pure_gain>
+		
+		<fcs_function name="/systems/dfgs/speeds/vmin-mach">
+			<function>
+				<product>
+					<quotient>
+						<property>/instrumentation/airspeed-indicator/indicated-mach</property>
+						<max> 
+							<property>/instrumentation/airspeed-indicator/indicated-speed-kt</property>
+							<value>0.0001</value>
+						</max>
+					</quotient>
+					<property>/systems/dfgs/speeds/vmin</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		
+		<fcs_function name="/systems/dfgs/stall-alpha-deg">
+			<function>
+				<table>
+					<independentVar lookup="row">velocities/mach</independentVar>
+					<independentVar lookup="column">fcs/slat-pos-deg</independentVar>
+					<tableData>
+						     0     20
+						0.2  12.7  14.8
+						0.9   8.5  10.7
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<pure_gain name="/systems/dfgs/stall-appr-alpha-deg">
+			<input>/systems/dfgs/stall-alpha-deg</input>
+			<gain>0.9</gain> 
+		</pure_gain>
+		
+		<switch name="/systems/dfgs/auto-slat-ext">
+			<default value="0" />
+			<test logic="AND" value="1">
+				aero/alpha-deg-damped ge /systems/dfgs/stall-appr-alpha-deg
+				position/wow eq 0
+				/instrumentation/airspeed-indicator/indicated-speed-kt le /systems/dfgs/speeds/flap-15-20-slat-full-max-kts
+				/systems/dfgs/flaps-cmd-feedback ge 1
+				/systems/dfgs/flaps-cmd-feedback lt 14
+			</test>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Gains">
+		
+		<fcs_function name="/systems/dfgs/yaw/yd-p-gain">
+			<function>
+				<product>
+					<table>
+						<independentVar lookup="row">velocities/vc-kts</independentVar>
+						<tableData>
+							130 -8.5
+							350 -1.0
+						</tableData>
+					</table>
+					 
+					<property>/systems/dfgs/yaw/active</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/yaw/tc-p-gain">
+			<function>
+				<product>
+					<table>
+						<independentVar lookup="row">velocities/vc-kts</independentVar>
+						<tableData>
+							130  2.0
+							350  0.5
+						</tableData>
+					</table>
+					 
+					<property>/systems/dfgs/yaw/active</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/dfgs/yaw/tc-d-gain">
+			<function>
+				<product>
+					<table>
+						<independentVar lookup="row">velocities/vc-kts</independentVar>
+						<tableData>
+							130  4
+							350  1
+						</tableData>
+					</table>
+					 
+					<property>/systems/dfgs/yaw/active</property>
+				</product>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="DFGS: Stick Pusher">
+		
+		<switch name="/systems/dfgs/stick-pusher/alpha-latch">
+			<default value="/systems/dfgs/stick-pusher/alpha-latch" />
+			<test logic="OR" value="0">
+				position/wow eq 1
+				/systems/dfgs/power-avail eq 0
+				/systems/fcs/flaps/input eq 0
+				aero/alpha-deg-damped le /systems/dfgs/stall-appr-alpha-deg
+				/accelerations/pilot-g le 0.6
+			</test>
+			<test logic="AND" value="1">
+				aero/alpha-deg-damped ge /systems/dfgs/stall-alpha-deg
+				position/wow ne 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/stick-pusher/active">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/dfgs/power-avail eq 1
+				/systems/dfgs/stick-pusher/alpha-latch eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/systems/dfgs/stick-pusher/output">
+			<input>/systems/dfgs/stick-pusher/active</input>
+			<rate_limit sense="incr">5.0</rate_limit>
+			<rate_limit sense="decr">1000</rate_limit>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="DFGS: Yaw Axis and Yaw Damper">
+		
+		<fcs_function name="/systems/dfgs/yaw/rudder-nul">
+			<function>
+				<table>
+					<independentVar lookup="row">/controls/flight/rudder</independentVar>
+					<independentVar lookup="column">/systems/dfgs/yaw/autoland-switch</independentVar>
+					<tableData>
+						       0  1
+						-1.00 -1  0
+						-0.02  0  0
+						 0.02  0  0
+						 1.00  1  0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<washout_filter name="/systems/dfgs/yaw/r-washout">
+			<input>velocities/r-rad_sec</input>
+			<c1>0.5</c1>
+		</washout_filter>
+		
+		<switch name="/systems/dfgs/yaw/r-switched">
+			<default value="/systems/dfgs/yaw/r-washout" />
+			<test value="0">
+				/systems/dfgs/yaw/active ne 1
+			</test>
+		</switch>
+		
+		<pure_gain name="/systems/dfgs/yaw/yd-f">
+			<input>/systems/dfgs/yaw/r-switched</input>
+			<gain>/systems/dfgs/yaw/yd-p-gain</gain>
+			<clipto>
+				<min>-0.5</min>
+				<max>0.5</max>
+			</clipto>
+		</pure_gain>
+		
+		<switch name="/systems/dfgs/yaw/slip-skid-switched">
+			<default value="aero/beta-rad" />
+			<test logic="OR" value="0">
+				position/wow eq 1
+			</test>
+		</switch>
+		
+		<lag_filter name="/systems/dfgs/yaw/slip-skid">
+			<input>/systems/dfgs/yaw/slip-skid-switched</input>
+			<c1>2.5</c1>
+		</lag_filter>
+		
+		<pid name="/systems/dfgs/yaw/tc-pd">
+			<input>/systems/dfgs/yaw/slip-skid</input>
+			<kp>/systems/dfgs/yaw/tc-p-gain</kp>
+			<ki>0.0</ki>
+			<kd>/systems/dfgs/yaw/tc-d-gain</kd>
+			<clipto>
+				<min>-0.2</min>
+				<max>0.2</max>
+			</clipto>
+		</pid>
+		
+		<switch name="/systems/dfgs/yaw/tc-pd-s">
+			<default value="/systems/dfgs/yaw/tc-pd" />
+			<test logic="OR" value="0">
+				/systems/dfgs/yaw/active ne 1
+				/systems/dfgs/yaw/autoland-switch eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/dfgs/yaw/afs-cmd">
+			<default value="0" />
+			<test value="/systems/dfgs/afs/yaw-cmd">
+				/systems/dfgs/yaw/autoland-switch eq 1
+			</test>
+		</switch>
+		
+		<summer name="/systems/dfgs/yaw/output-sum">
+			<input>/systems/dfgs/yaw/yd-f</input>
+			<input>/systems/dfgs/yaw/tc-pd-s</input>
+			<input>/systems/dfgs/yaw/afs-cmd</input>
+		</summer>
+		
+		<switch name="/systems/dfgs/yaw/output">
+			<default value="/systems/dfgs/yaw/afs-cmd" /> 
+			<test value="/systems/dfgs/yaw/output-sum">
+				/systems/dfgs/yaw/active eq 1
+			</test>
+		</switch>
+		
+		<summer name="/systems/dfgs/rudder-output">
+			<input>/systems/dfgs/yaw/rudder-nul</input>
+			<input>/systems/dfgs/yaw/output</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+	
+	</channel>
+	
+	<channel name="DFGS: Autobrake">
+		
+		
+		<switch name="/systems/abs/knob-input">
+			<default value="0" />
+			<test value="/controls/abs/knob">
+				/systems/electrical/outputs/idk ge 24
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/can-arm">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/abs/knob-input gt 0
+				fcs/flap-pos-deg gt 26
+				/systems/electrical/outputs/idk ge 24
+				/systems/abs/disarm ne 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/abs/knob-input lt 0
+				fcs/flap-pos-deg le 26
+				/systems/electrical/outputs/idk ge 24
+				/systems/abs/disarm ne 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/armed-input">
+			<default value="/controls/abs/armed" />
+			<test logic="AND" value="0">
+				/systems/abs/can-arm ne 1
+				/controls/abs/armed-momentary ne 1
+			</test>
+			<output>/controls/abs/armed</output>
+		</switch>
+		
+		<switch name="/systems/abs/mode">
+			<default value="0" />
+			<test value="/systems/abs/knob-input">
+				/systems/abs/armed-input eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/active">
+			<description>Flip flop for autobrake engage</description>
+			<default value="/systems/abs/active" />
+			<test logic="OR" value="0"> 
+				/systems/abs/armed-input ne 1
+			</test>
+			<test logic="AND" value="1"> 
+				/systems/abs/armed-input eq 1
+				/systems/abs/mode ne 0
+				/systems/abs/spoilers-cmd-deg gt 0
+				position/wow eq 1
+				/instrumentation/airspeed-indicator/indicated-speed-kt ge 50
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/rto-input-kts"> 
+			<default value="/instrumentation/airspeed-indicator/indicated-speed-kt" />
+			<test logic="AND" value="/systems/abs/rto-input-kts">
+				/systems/abs/active eq 1
+				/systems/abs/mode eq -1
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/throttle-can-disarm"> 
+			<default value="/systems/abs/throttle-can-disarm" />
+			<test value="0">
+				/systems/abs/active ne 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/engines/throttle-lever-feedback[0] lt 0.05
+				/systems/engines/throttle-lever-feedback[1] lt 0.05
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/throttle-disarm">
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/abs/throttle-can-disarm eq 1
+				/systems/engines/throttle-lever-feedback[0] ge 0.05
+			</test>
+			<test logic="AND" value="1">
+				/systems/abs/throttle-can-disarm eq 1
+				/systems/engines/throttle-lever-feedback[1] ge 0.05
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/to-flip-flop">
+			<default value="/systems/abs/to-flip-flop" />
+			<test value="0">
+				/systems/abs/mode ge 0
+			</test>
+			<test value="1">
+				position/wow ne 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/to-wow-disarm"> 
+			<default value="0" />
+			<test logic="AND" value="1">
+				/systems/abs/to-flip-flop eq 1
+				position/wow eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/disarm">
+			<default value="0" />
+			<test value="0">
+				/systems/abs/active ne 1
+			</test>
+			<test logic="OR" value="1">
+				/systems/abs/throttle-disarm eq 1
+				/controls/gear/brake-left gt 0.4
+				/controls/gear/brake-right gt 0.4
+				/systems/abs/to-wow-disarm eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/active-rate">
+			<default value="1000" /> 
+			<test logic="OR" value="0.33333333333"> 
+				/systems/abs/mode eq 1
+				/systems/abs/mode eq 2
+			</test>
+			<test value="1"> 
+				/systems/abs/mode eq 3
+			</test>
+		</switch>
+		
+		<actuator name="/systems/abs/active-slow">
+			<input>/systems/abs/active</input>
+			<rate_limit sense="incr">/systems/abs/active-rate</rate_limit>
+			<rate_limit sense="decr">1000</rate_limit> 
+			<output>/systems/abs/active-slow-out</output>
+		</actuator>
+		
+		<switch name="/systems/abs/active-final"> 
+			<default value="0" />
+			<test logic="OR" value="/systems/abs/active-slow">
+				/systems/abs/spoilers-cmd-deg gt 0
+			</test>
+		</switch>
+		
+		<switch name="/systems/abs/decel-rate-cmd">
+			<default value="0" />
+			<test value="-5"> 
+				/systems/abs/mode eq 1
+			</test>
+			<test value="-7.5"> 
+				/systems/abs/mode eq 2
+			</test>
+			<test value="-50"> 
+				/systems/abs/mode eq 3
+			</test>
+			<test logic="AND" value="-6.5"> 
+				/systems/abs/mode eq -1
+				/systems/abs/rto-input-kts le 70
+			</test>
+			<test logic="AND" value="-50"> 
+				/systems/abs/mode eq -1
+				/systems/abs/rto-input-kts gt 70
+			</test>
+		</switch>
+		
+		
+		<pid name="/systems/abs/decel-rate-kts">
+			<descripton>Use D only to calculate rate of decel</descripton>
+			<input>/velocities/groundspeed-kt</input>
+			<kp>0.0</kp>
+			<ki>0.0</ki>
+			<kd>1.0</kd>
+		</pid>
+		
+		<lag_filter name="/systems/abs/decel-rate-kts-lag">
+			<input>/systems/abs/decel-rate-kts</input>
+			<c1>1.0</c1>
+		</lag_filter>
+		
+		<pure_gain name="/systems/abs/decel-rate-fps2">
+			<input>/systems/abs/decel-rate-kts-lag</input>
+			<gain>1.687809857099737</gain> 
+		</pure_gain>
+		
+		<summer name="/systems/abs/decel-error">
+			<input>/systems/abs/decel-rate-fps2</input>
+			<input>-/systems/abs/decel-rate-cmd</input>
+		</summer>
+		
+		<switch name="/systems/abs/brake-cmd-trigger">
+			<default value="0" />
+			<test value="-1">
+				/systems/abs/active-final ne 1
+			</test>
+			<test logic="OR" value="1">
+				/systems/abs/brake-cmd le 0.001
+				/systems/abs/brake-cmd ge 0.999
+			</test>
+		</switch>
+		
+		<pid name="/systems/abs/brake-cmd">
+			<input>/systems/abs/decel-error</input>
+			<kp>0.45</kp>
+			<ki>0.25</ki>
+			<kd>0.0</kd>
+			<trigger>/systems/abs/brake-cmd-trigger</trigger>
+			<clipto>
+				<min>0.0</min>
+				<max>1.0</max>
+			</clipto>
+		</pid>
+		
+		<switch name="/systems/abs/brake-output">
+			<default value="0" />
+			<test value="/systems/abs/brake-cmd">
+				/systems/abs/active-final eq 1
+			</test>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Lights" execrate="8">
+			
+		<switch name="/systems/abs/lights/disarm">
+			<default value="0" />
+			<test value="0">
+				/systems/dfgs/power-avail ne 1
+			</test>
+			<test value="1">
+				/controls/abs/test-lamp eq 1
+			</test>
+			<test logic="AND" value="1">
+				/controls/gear/lever ge 2
+				/systems/abs/knob-input ne 0
+				/systems/abs/armed-input eq 0
+			</test>
+		</switch>
+	
+	</channel>
+
+</system>

@@ -1,0 +1,16 @@
+{
+  "set": "Leduc-022/leduc022-set.xml",
+  "name": "Leduc 022 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Leduc-022/leduc022-yasim.xml",
+  "jets": 2,
+  "model": "Leduc-022/Models/leduc022.xml",
+  "tags": [],
+  "model_rating": 4,
+  "fdm_rating": 1,
+  "variant_of": "",
+  "archive": "Leduc-022.zip",
+  "archive_sha256": "7101a8c3b81247c5b16e9c4e423dd20c587ed698a07d21552c8dc4f9f01c4713",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Leduc-022.zip"
+}

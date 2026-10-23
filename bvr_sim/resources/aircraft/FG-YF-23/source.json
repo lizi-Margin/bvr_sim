@@ -1,0 +1,16 @@
+{
+  "set": "YF-23/YF-23-set.xml",
+  "name": "Northrop/McDonnell Douglas YF-23 ATF prototype (YASim FDM)",
+  "fdm_type": "yasim",
+  "fdm": "YF-23/YF-23-yasim.xml",
+  "jets": 2,
+  "model": "YF-23/Models/YF-23-model.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "YF-23.zip",
+  "archive_sha256": "1ceb12972bf3ecdbf4416cbb0d38d561765238b82ada0ac53adda3caaf451af8",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/YF-23.zip"
+}

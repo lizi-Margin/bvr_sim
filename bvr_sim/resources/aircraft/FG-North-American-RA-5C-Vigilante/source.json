@@ -1,0 +1,32 @@
+{
+  "set": "North-American-RA-5C-Vigilante/vigilante-set.xml",
+  "name": "North American RA 5C \"Vigilante\" (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "North-American-RA-5C-Vigilante/Systems/vigilante-yasim.xml",
+  "jets": 2,
+  "model": "North-American-RA-5C-Vigilante/Models/vigilante.xml",
+  "tags": [
+    "north-american",
+    "nuclear-bomber",
+    "Reconnaissance",
+    "1950s",
+    "1960s",
+    "1970s",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "supersonic",
+    "jet",
+    "afterburner",
+    "twin-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "North-American-RA-5C-Vigilante.zip",
+  "archive_sha256": "23fc29b795d4fffb6bc2666d3daebee187de79ea77a9cf162b7835a710d2000b",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/North-American-RA-5C-Vigilante.zip"
+}

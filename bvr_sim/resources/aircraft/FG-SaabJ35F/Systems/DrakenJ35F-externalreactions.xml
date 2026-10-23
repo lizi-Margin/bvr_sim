@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<external_reactions>
+   
+   <force name="parachute" frame="WIND">
+      <function>
+        <product>
+          <property>aero/qbar-psf</property>
+          <property>fcs/drag-chute-deployed</property>
+          <property>fcs/drag-chute-serviceable</property>
+          <value> 44 </value>  
+        </product>
+      </function>
+      <location unit="IN">
+        <x>596</x>
+        <y>0</y>
+        <z>65</z>
+      </location>
+      <direction>
+        <x>-1</x>
+        <y>0</y>
+        <z>0</z>
+      </direction>
+    </force>
+ </external_reactions>

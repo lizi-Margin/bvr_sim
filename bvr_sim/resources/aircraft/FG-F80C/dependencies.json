@@ -1,0 +1,17 @@
+{
+  "files": [
+    {
+      "from": "F80C/F80C.xml",
+      "reference": "J33-A-35",
+      "source": "F80C/Engines/J33-A-35.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F80C/F80C.xml",
+      "reference": "direct",
+      "source": "F80C/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

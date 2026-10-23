@@ -1,0 +1,27 @@
+{
+  "set": "707/707-set.xml",
+  "name": "Boeing 707",
+  "fdm_type": "jsb",
+  "fdm": "707/707.xml",
+  "jets": 0,
+  "model": "707/Models/707.xml",
+  "tags": [
+    "boeing",
+    "low-wing",
+    "tricycle",
+    "retractable-gear",
+    "four-engine",
+    "jet",
+    "transport",
+    "1960s",
+    "1970s",
+    "ifr"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 4,
+  "variant_of": "",
+  "archive": "707.zip",
+  "archive_sha256": "6dd9726f45fd209a0bbfaf72fb867fcee25437efd2c2d2d7c3d54cf87bca1c33",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/707.zip"
+}

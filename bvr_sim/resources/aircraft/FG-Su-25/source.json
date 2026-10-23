@@ -1,0 +1,16 @@
+{
+  "set": "Su-25/Su-25-set.xml",
+  "name": "Sukhoi Su-25",
+  "fdm_type": "yasim",
+  "fdm": "Su-25/FDM.xml",
+  "jets": 2,
+  "model": "Su-25/Models/Su-25.xml",
+  "tags": [],
+  "model_rating": 5,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Su-25.zip",
+  "archive_sha256": "393d256a6054dbd0e75bed116c87bd6790da058dedc5dd467d2ad5ef65f35dcb",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Su-25.zip"
+}

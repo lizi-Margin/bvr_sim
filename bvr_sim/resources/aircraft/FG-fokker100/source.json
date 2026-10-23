@@ -1,0 +1,29 @@
+{
+  "set": "fokker100/fokker100-set.xml",
+  "name": "Fokker 100 (F-28-0100)",
+  "fdm_type": "jsb",
+  "fdm": "fokker100/fokker100.xml",
+  "jets": 0,
+  "model": "fokker100/Models/f100/fokker100.xml",
+  "tags": [
+    "1980s",
+    "1990s",
+    "2000s",
+    "transport",
+    "fokker",
+    "jet",
+    "t-tail",
+    "tricycle",
+    "twin-engine",
+    "retractable-gear",
+    "glass-cockpit",
+    "ifr"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "fokker100.zip",
+  "archive_sha256": "f9181a034c733567a0e8f20ee5cc45a6dfda4e5759eaff4979e14aeb91af3b95",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/fokker100.zip"
+}

@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Hydraulic">
+
+   <property type="double" value="0">systems/hydraulic/hydI-pump-q</property>
+   <property type="double" value="0">systems/hydraulic/hydII-pump-q</property>
+   <property type="double" value="10">systems/hydraulic/hydI-sys-p</property>
+   <property type="double" value="10">systems/hydraulic/hydII-sys-p</property>
+   <property type="double" value="10">systems/hydraulic/hydII-acc-p</property>
+   <property type="double" value="10">systems/hydraulic/hydII-acc-q</property>
+   <property type="double" value="0">systems/hydraulic/internal/old-left-elevon</property>
+   <property type="double" value="0">systems/hydraulic/internal/old-right-elevon</property>
+   <property type="double" value="0">systems/hydraulic/internal/old-rudder</property>
+
+ <channel name="FCS force">
+ 
+   <fcs_function name="systems/hydraulic/internal/dq">
+    <function>
+      <max>
+        <product>
+          <sum>
+            <abs>
+              <difference>
+                <property>fcs/right-aileron-pos-rad</property>
+                <property>systems/hydraulic/internal/old-right-elevon</property>
+              </difference>
+            </abs>
+            <abs>
+              <difference>
+                <property>fcs/left-aileron-pos-rad</property>
+                <property>systems/hydraulic/internal/old-left-elevon</property>
+              </difference>
+            </abs>
+            <abs>
+              <difference>
+                <property>fcs/rudder-pos-rad</property>
+                <property>systems/hydraulic/internal/old-rudder</property>
+              </difference>
+            </abs>
+          </sum>
+          <value>-100</value>
+        </product>
+        <value>-20</value>
+      </max>
+    </function>  
+  </fcs_function>
+
+  <summer name="Movement R elevon">
+     <input>fcs/right-aileron-pos-rad</input>
+     <output>systems/hydraulic/internal/old-right-elevon</output>
+  </summer>      
+
+  <summer name="Movement L elevon">
+     <input>fcs/left-aileron-pos-rad</input>
+     <output>systems/hydraulic/internal/old-left-elevon</output>
+  </summer>
+
+  <summer name="Movement rudder">
+     <input>fcs/rudder-pos-rad</input>
+     <output>systems/hydraulic/internal/old-rudder</output>
+  </summer>
+     
+   <summer name="systems/hydraulic/fsc-force">
+     <input>systems/hydraulic/hydII-sys-p</input>
+     <input>systems/hydraulic/hydI-sys-p</input>
+  </summer>
+
+  <aerosurface_scale name="systems/hydraulic/fsc-force-norm">
+    <input>systems/hydraulic/fsc-force</input>
+     <domain>
+       <min>0</min>
+       <max>6000</max>
+     </domain>
+     <range>
+       <min>0.0</min>
+       <max>1</max>
+     </range>
+  </aerosurface_scale>
+  
+  <aerosurface_scale name="systems/hydraulic/hydI-force-norm">
+    <input>systems/hydraulic/hydI-sys-p</input>
+     <domain>
+       <min>0</min>
+       <max>3000</max>
+     </domain>
+     <range>
+       <min>0.0</min>
+       <max>1</max>
+     </range>
+  </aerosurface_scale>
+  
+  </channel>
+     
+  <channel name="Hydraulic I">    
+
+    <fcs_function name="Pump HydI">
+      <function>
+        <product>
+          <quotient>
+            <integer> 
+              <property>propulsion/engine/n1</property>
+            </integer>
+            <property>systems/hydraulic/hydI-sys-p</property>
+          </quotient>
+          <value>50</value>
+        </product>
+      </function>
+      <clipto>
+        <min>0</min>
+        <max>5</max>
+      </clipto>
+      <output>systems/hydraulic/hydI-pump-q</output>    
+    </fcs_function>
+    
+    <summer name="Pressure HydI">
+      <input>systems/hydraulic/hydI-sys-p</input>
+      <input>systems/hydraulic/hydI-pump-q</input>
+      <input>systems/hydraulic/internal/dq</input>
+      <clipto>
+        <min>10</min>
+        <max>3000</max>
+      </clipto>      
+      <output>systems/hydraulic/hydI-sys-p</output>
+    </summer>
+    
+  </channel>    
+
+  <channel name="Hydraulic II">    
+
+    <fcs_function name="Pump HydII">
+      <function>
+        <product>
+          <quotient>
+            <integer> 
+              <property>propulsion/engine/n1</property>
+            </integer>
+            <property>systems/hydraulic/hydII-sys-p</property>
+          </quotient>
+          <value>85</value>
+        </product>
+      </function>
+      <clipto>
+        <min>0</min>
+        <max>4</max>
+      </clipto>
+      <output>systems/hydraulic/hydII-pump-q</output>    
+    </fcs_function>
+    
+    <fcs_function name="Accumulator HydI">
+      <function>
+        <difference>
+          <property>systems/hydraulic/hydII-sys-p</property>
+          <property>systems/hydraulic/hydII-acc-p</property>
+        </difference>
+      </function>
+      <clipto>
+        <min>-5</min>
+        <max>0.6</max>
+      </clipto>
+      <output>systems/hydraulic/hydII-acc-q</output>    
+    </fcs_function>
+    
+    <fcs_function name="Accumulator HydII">
+      <function>
+        <sum>
+            <property>systems/hydraulic/hydII-acc-p</property>
+          <product>
+            <property>systems/hydraulic/hydII-acc-q</property>
+            <value>0.35</value>
+          </product>
+        </sum>
+      </function>
+      <output>systems/hydraulic/hydII-acc-p</output>    
+    </fcs_function>
+        
+    
+    <summer name="Pressure HydII">
+      <input>systems/hydraulic/hydII-sys-p</input>
+      <input>systems/hydraulic/hydII-pump-q</input>
+      <input>systems/hydraulic/internal/dq</input>
+      <input>-systems/hydraulic/hydII-acc-q</input>
+      <clipto>
+        <min>10</min>
+        <max>3000</max>
+      </clipto>      
+      <output>systems/hydraulic/hydII-sys-p</output>
+    </summer> 
+    
+  </channel>  
+  
+</system>

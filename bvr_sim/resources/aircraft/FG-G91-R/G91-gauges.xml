@@ -1,0 +1,476 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Gauges">  
+    
+    <property value="0">systems/gauges/clock/push-status</property>
+    <property value="-1">systems/gauges/clock/seconds-trigger-id</property>
+    <property value="0">systems/gauges/clock/seconds-increment</property>
+    <property value="0">systems/gauges/clock/minutes-increment</property>
+    <property value="0">systems/gauges/clock/seconds</property>
+    <property value="0">systems/gauges/clock/seconds-lag</property>
+    <property value="0">systems/gauges/clock/minutes</property>
+    <property value="0">systems/gauges/clock/minutes-lag</property>
+    <property value="-1">systems/gauges/clock/minutes-id</property>
+    <property value="70">systems/gauges/cockpit-attitude-MM2-pitch-deg-off</property>
+    <property value="20">systems/gauges/cockpit-attitude-MM2-roll-deg-off</property>
+    <property value="50">systems/gauges/cockpit-attitude-J8-pitch-deg-off</property>
+    <property value="27">systems/gauges/cockpit-attitude-J8-roll-deg-off</property>
+    <property value="0">systems/gauges/cockpit-attitude-J8-horizon-offset</property>
+    <property value="0">systems/gauges/cockpit-attitude-J8-caged-push-trigger</property>
+    <property value="0">systems/gauges/cockpit-attitude-MM2-pitch-deg-display-offset</property>
+    <property value="0">systems/gauges/cockpit-attitude-MM2-pitch-deg-display</property>
+    <property value="0">systems/gauges/cockpit-attitude-MM2-roll-deg-display</property>
+    <property value="0">systems/gauges/cockpit-fire-sw-test-togle</property>
+    <property value="0">systems/gauges/cockpit-fire-light-intensity</property>
+    <property value="0">systems/gauges/cockpit-fire-light-transparent</property>
+
+    <channel name="Cockpit Clock" execrate="4">
+
+        <washout_filter name="systems/gauges/clock/seconds-counter-trigger-wa">
+            <input>/instrumentation/clock/indicated-sec</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <switch name="systems/gauges/clock/seconds-increment">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/clock/push-status == 1
+                systems/gauges/clock/seconds-counter-trigger-wa &gt;= 0.5
+                systems/gauges/clock/seconds-trigger-id NE /instrumentation/clock/indicated-sec
+            </test>
+        </switch>
+
+        <switch name="systems/gauges/clock/seconds-trigger-id">
+            <default value="systems/gauges/clock/seconds-trigger-id" />
+            <test logic="AND" value="/instrumentation/clock/indicated-sec">
+                systems/gauges/clock/seconds-increment == 1
+            </test>
+        </switch>
+
+        <summer name="systems/gauges/clock/seconds">
+            <input>systems/gauges/clock/seconds</input>
+            <input>systems/gauges/clock/seconds-increment</input>
+        </summer>
+
+        <fcs_function name="systems/gauges/clock/minutes-increment">
+            <function>
+                <ifthen>
+                    <and>
+                        <eq><mod><p>systems/gauges/clock/seconds</p><v>60</v></mod><v>0</v></eq>
+                        <gt><p>systems/gauges/clock/seconds</p><v>0</v></gt>
+                    </and>
+                    <p>systems/gauges/clock/seconds-increment</p>
+                    <v>0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+
+        <summer name="systems/gauges/clock/minutes">
+            <input>systems/gauges/clock/minutes</input>
+            <input>systems/gauges/clock/minutes-increment</input>
+        </summer>
+
+        <switch name="systems/gauges/clock/push-reset">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/clock/push-status == 0
+            </test>
+        </switch>
+
+        <linear_actuator name="systems/gauges/clock/seconds-lag">
+            <input>systems/gauges/clock/seconds-increment</input>
+            <versus>1</versus>
+            <reset>systems/gauges/clock/push-reset</reset>
+            <module>60</module>
+            <rate>0.1</rate>
+            <lag>0.0</lag>
+        </linear_actuator>
+
+        <linear_actuator name="systems/gauges/clock/minutes-lag">
+            <input>systems/gauges/clock/minutes-increment</input>
+            <versus>1</versus>
+            <reset>systems/gauges/clock/push-reset</reset>
+            <module>60</module>
+            <rate>0.1</rate>
+            <lag>0.0</lag>
+        </linear_actuator>
+
+        <switch name="systems/gauges/clock/seconds">
+            <default value="systems/gauges/clock/seconds" />
+            <test logic="OR" value="0">
+                systems/gauges/clock/push-status == 0
+            </test>
+        </switch>
+
+        <switch name="systems/gauges/clock/minutes">
+            <default value="systems/gauges/clock/minutes" />
+            <test logic="OR" value="0">
+                systems/gauges/clock/push-status == 0
+            </test>
+        </switch>
+
+    </channel>
+    
+
+    <channel name="Cockpit Fuel Pounds" execrate="8">
+        
+        <summer name="systems/gauges/cockpit-fuel-pounds/fuel_pounds_0-1-2">
+            <input>propulsion/tank[0]/contents-lbs</input>
+            <input>propulsion/tank[1]/contents-lbs</input>
+            <input>propulsion/tank[2]/contents-lbs</input>
+        </summer>
+        
+        <pure_gain name="propulsion/tank[5]/contents-lbs-27">
+            <input>propulsion/tank[5]/contents-lbs</input>
+            <gain>2.7</gain>
+        </pure_gain>
+        
+        <switch name="systems/electric/bus[1]/fuel-level-indicator/on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/bus[1]/fuel-level-indicator/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/fuel-level-indicator/I">
+            <default value="0" />
+            <test logic="AND" value="0.9">
+                systems/electric/bus[1]/fuel-level-indicator/on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/cockpit-fuel-pounds/libs">
+            <default value="0" />
+            <test logic="AND" value="systems/gauges/cockpit-fuel-pounds/fuel_pounds_0-1-2">
+                systems/electric/bus[1]/fuel-level-indicator/on == 1
+                systems/electric/bus[1]/fuel-level-indicator/sw == 0
+            </test>
+            <test logic="AND" value="propulsion/tank[5]/contents-lbs-27">
+                systems/electric/bus[1]/fuel-level-indicator/on == 1
+                systems/electric/bus[1]/fuel-level-indicator/sw == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/cockpit-fuel-pounds/display-libs">
+            <input>systems/gauges/cockpit-fuel-pounds/libs</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="Cockpit Gyroscopic Turn Indicator" execrate="8">
+        
+        
+        
+        <switch name="systems/gauges/cockpit-turn-indicator/operative">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/inv-primary/V GT 110.0
+                systems/electric/bus[1]/turn-indicator/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/cockpit-turn-indicator/gyro-start-stop">
+            <default value="0.01" />
+            <test logic="AND" value="0.1">
+                systems/gauges/cockpit-turn-indicator/operative == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/cockpit-turn-indicator/gyro-sensibility">
+            <input>systems/gauges/cockpit-turn-indicator/gyro-start-stop</input>
+            <c1>0.5</c1>
+        </lag_filter>
+        
+        <switch name="systems/electric/bus[1]/turn-indicator/I">
+            <default value="0" />
+            <test logic="AND" value="0.5">
+                systems/gauges/cockpit-turn-indicator/operative == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/cockpit-turn-indicator/r-aero-rad_sec-operative">
+            <default value="0.0" />
+            <test logic="AND" value="velocities/r-aero-rad_sec">
+                systems/gauges/cockpit-turn-indicator/operative == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/cockpit-turn-indicator/display-rad-sec">
+            <input>systems/gauges/cockpit-turn-indicator/r-aero-rad_sec-operative</input>
+            <c1>systems/gauges/cockpit-turn-indicator/gyro-sensibility</c1>
+            <clipto>
+                <min>-0.12</min>
+                <max>0.12</max>
+            </clipto>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="Cockpit Voltmeter" execrate="16">
+        
+        <lag_filter name="systems/gauges/cockpit-voltmeter/display-V">
+            <input>systems/electric/bus[1]/V</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="Cockpit Amperometer" execrate="16">
+        
+        <lag_filter name="systems/electric/bus[1]/internal-power-generator-I-display">
+            <input>systems/electric/bus[1]/internal-power-generator-I</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+    </channel>
+
+
+    <channel name="Cockpit Attitude Indicator MM2" execrate="8">
+
+        <switch name="systems/gauges/cockpit-attitude-MM2-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/inv-primary/V GT 110.0
+                systems/electric/bus[1]/turn-indicator/fuse == 1
+            </test>
+        </switch>
+
+        <switch name="systems/electric/bus[1]/attitude-indicator/I">
+            <default value="0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/cockpit-attitude-MM2-on == 1
+            </test>
+        </switch>
+
+        <lag_filter name="systems/gauges/cockpit-attitude-MM2-on-speed">
+            <input>systems/gauges/cockpit-attitude-MM2-on</input>
+            <c1>0.12</c1>
+        </lag_filter>
+
+        <scheduled_gain name="systems/gauges/cockpit-attitude-MM2-pitch-deg-off-display">
+            <input>systems/gauges/cockpit-attitude-MM2-pitch-deg-off</input>
+            <gain>1.0</gain>
+            <table>
+                <independentVar>systems/gauges/cockpit-attitude-MM2-on-speed</independentVar>
+                <tableData>
+                    0.0       1.0
+                    0.2       1.0
+                    0.7       0.0
+                    1.0       0.0
+                </tableData>
+            </table>
+        </scheduled_gain>
+
+        <scheduled_gain name="systems/gauges/cockpit-attitude-MM2-roll-deg-off-display">
+            <input>systems/gauges/cockpit-attitude-MM2-roll-deg-off</input>
+            <gain>1.0</gain>
+            <table>
+                <independentVar>systems/gauges/cockpit-attitude-MM2-on-speed</independentVar>
+                <tableData>
+                    0.0       1.0
+                    0.2       1.0
+                    0.7       0.0
+                    1.0       0.0
+                </tableData>
+            </table>
+        </scheduled_gain>
+
+        <switch name="systems/gauges/cockpit-attitude-MM2-no-flag-status">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/cockpit-attitude-MM2-on-speed GT 0.9
+            </test>
+        </switch>
+
+        <lag_filter name="systems/gauges/cockpit-attitude-MM2-no-flag">
+            <input>systems/gauges/cockpit-attitude-MM2-no-flag-status</input>
+            <c1>2.0</c1>
+        </lag_filter>
+
+        <lag_filter name="systems/gauges/cockpit-attitude-MM2-roll-deg">
+            <input>attitude/phi-deg</input>
+            <c1>systems/gauges/cockpit-attitude-MM2-on-speed</c1>
+        </lag_filter>
+
+        <summer name="systems/gauges/cockpit-attitude-MM2-roll-deg-display">
+            <input>systems/gauges/cockpit-attitude-MM2-roll-deg</input>
+            <input>systems/gauges/cockpit-attitude-MM2-roll-deg-off-display</input>
+        </summer>
+
+        <lag_filter name="systems/gauges/cockpit-attitude-MM2-pitch-deg">
+            <input>attitude/theta-deg</input>
+            <c1>systems/gauges/cockpit-attitude-MM2-on-speed</c1>
+        </lag_filter>
+
+        <summer name="systems/gauges/cockpit-attitude-MM2-pitch-deg-display">
+            <input>systems/gauges/cockpit-attitude-MM2-pitch-deg</input>
+            <input>systems/gauges/cockpit-attitude-MM2-pitch-deg-display-offset</input>
+            <input>systems/gauges/cockpit-attitude-MM2-pitch-deg-off-display</input>
+        </summer>
+
+    </channel>
+
+    
+    <channel name="Cockpit Attitude Indicator J8" execrate="8">
+        
+        <lead_lag_filter name="systems/gauges/cockpit-attitude-J8-caged-push-position">
+            <input>systems/gauges/cockpit-attitude-J8-caged-push-position-status</input>
+            <c1>1.0</c1>
+            <c2>10.0</c2>
+            <c3>1.0</c3>
+            <c4>1.0</c4>
+            <clipto>
+                <min>0.0</min>
+                <max>1.0</max>
+            </clipto>
+        </lead_lag_filter>
+        
+        <switch name="systems/gauges/cockpit-attitude-J8-caged-push-position-status">
+            <default value="systems/gauges/cockpit-attitude-J8-caged-push-position-status" />
+            <test logic="AND" value="0">
+                systems/gauges/cockpit-attitude-J8-caged-push-position GT 0.9
+            </test>
+            <test logic="AND" value="1">
+                systems/gauges/cockpit-attitude-J8-caged-push-trigger == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/cockpit-attitude-J8-on-speed">
+            <input>systems/gauges/cockpit-attitude-J8-on</input>
+            <c1>0.1</c1>
+        </lag_filter>
+
+        <scheduled_gain name="systems/gauges/cockpit-attitude-J8-pitch-deg-off-display">
+            <input>systems/gauges/cockpit-attitude-J8-pitch-deg-off</input>
+            <gain>1.0</gain>
+            <table>
+                <independentVar>systems/gauges/cockpit-attitude-J8-on-speed</independentVar>
+                <tableData>
+                    0.0       1.0
+                    0.2       1.0
+                    0.7       0.0
+                    1.0       0.0
+                </tableData>
+            </table>
+        </scheduled_gain>
+
+        <scheduled_gain name="systems/gauges/cockpit-attitude-J8-roll-deg-off-display">
+            <input>systems/gauges/cockpit-attitude-J8-roll-deg-off</input>
+            <gain>1.0</gain>
+            <table>
+                <independentVar>systems/gauges/cockpit-attitude-J8-on-speed</independentVar>
+                <tableData>
+                    0.0       1.0
+                    0.2       1.0
+                    0.7       0.0
+                    1.0       0.0
+                </tableData>
+            </table>
+        </scheduled_gain>
+        
+        <switch name="systems/gauges/cockpit-attitude-J8-no-flag-status">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/cockpit-attitude-J8-on-speed GT 0.5
+                systems/gauges/cockpit-attitude-J8-caged-push-position LE 0.05
+            </test>
+        </switch>
+
+        <lag_filter name="systems/gauges/cockpit-attitude-J8-no-flag">
+            <input>systems/gauges/cockpit-attitude-J8-no-flag-status</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/cockpit-attitude-J8-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/inv-primary/V GT 110.0
+                systems/electric/bus[1]/turn-indicator/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/attitude-indicator/I">
+            <default value="0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/cockpit-attitude-J8-on == 1
+            </test>
+        </switch>
+
+        <lag_filter name="systems/gauges/cockpit-attitude-roll-deg">
+            <input>attitude/phi-deg</input>
+            <c1>systems/gauges/cockpit-attitude-J8-on-speed</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/cockpit-attitude-roll-deg-caged">
+            <default value="systems/gauges/cockpit-attitude-roll-deg-caged" />
+            <test logic="AND" value="attitude/phi-deg">
+                systems/gauges/cockpit-attitude-J8-caged-push-position GT 0.95
+            </test>
+        </switch>
+        
+        <summer name="systems/gauges/cockpit-attitude-roll-deg-display">
+            <input>systems/gauges/cockpit-attitude-roll-deg</input>
+            <input>-systems/gauges/cockpit-attitude-roll-deg-caged</input>
+            <input>systems/gauges/cockpit-attitude-J8-roll-deg-off-display</input>
+        </summer>
+        
+        <lag_filter name="systems/gauges/cockpit-attitude-pitch-deg">
+            <input>attitude/theta-deg</input>
+            <c1>systems/gauges/cockpit-attitude-J8-on-speed</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/cockpit-attitude-pitch-deg-caged">
+            <default value="systems/gauges/cockpit-attitude-pitch-deg-caged" />
+            <test logic="AND" value="attitude/theta-deg">
+                systems/gauges/cockpit-attitude-J8-caged-push-position GT 0.95
+            </test>
+        </switch>
+        
+        <summer name="systems/gauges/cockpit-attitude-pitch-deg-display">
+            <input>systems/gauges/cockpit-attitude-pitch-deg</input>
+            <input>-systems/gauges/cockpit-attitude-pitch-deg-caged</input>
+            <input>systems/gauges/cockpit-attitude-J8-pitch-deg-off-display</input>
+        </summer>
+        
+    </channel>
+    
+    
+    <channel name="Fire advisor" execrate="16">
+        
+        <lag_filter name="systems/gauges/cockpit-fire-sw-test-pos">
+            <input>systems/gauges/cockpit-fire-sw-test-togle</input>
+            <c1>16.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/cockpit-fire-light-on">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/engine/jet-TC-temperature-hight-fire-on == 1
+                systems/gauges/cockpit-fire-sw-test-pos GT 0.8
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/cockpit-fire-light-intensity">
+            <default value="0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-battery-tension">
+                systems/gauges/cockpit-fire-light-on == 1
+                systems/electric/bus[1]/V GE 18.0
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/gauges/cockpit-fire-light-transparent">
+            <input>systems/gauges/cockpit-fire-light-intensity</input>
+            <gain>1.2</gain>
+            <clipto>
+                <min>0.05</min>
+                <max>1.0</max>
+            </clipto>
+        </pure_gain>
+        
+    </channel>
+    
+</system>

@@ -1,0 +1,1394 @@
+<?xml version='1.0' encoding='utf-8'?>
+<autopilot name="ABSU-154">
+
+
+
+
+
+<property value="0.001"> ap/alt-gain </property>
+
+
+<property value="0.0"> fcs/revers-by-key </property>
+<property value="0.0"> ap/turbulence </property>
+<property value="0.0"> ap/met-neutral </property>
+
+
+
+
+  <property>ap/roll-selector</property>
+  <property>ap/input-heading-pnp</property>
+  <property>ap/input-heading-zk</property>
+  <property>ap/input-at</property>
+  
+  <property>ap/suu-enable</property>
+  
+
+  
+  <property>ap/ils-epsilon</property> 
+  
+  <property>ap/at-pid-output</property> 
+  <property>ap/at-podg</property>
+  <property>ap/at-hold-0</property>
+  <property>ap/at-hold-1</property>
+  <property>ap/at-hold-2</property>
+  
+  <property>ap/input-heading-delta</property>
+  <property>ap/heading-cmd-norm</property>
+
+  
+  <property>ap/stab-input-roll-rad</property>
+  <property>ap/roll-hold</property>
+
+
+  <property>ap/pitch-selector</property>
+
+
+<property>ap/hdg-out</property>
+<property>ap/output-pitch-current</property>
+
+  <property>ap/input-glideslope-speed</property>
+  <property>ap/input-glideslope-delta</property>
+  
+  <property>ap/glideslope-cmd-norm</property>
+
+
+  <property>ap/input-mach</property>
+  <property>ap/mach-cmd-norm</property>
+
+
+  <property>ap/input-speed</property>
+  <property>ap/speed-cmd-norm</property>
+
+
+  <property>ap/input-altitude</property>
+  <property>ap/altitude-cmd-norm</property>
+  
+
+  <property>ap/stab-input-pitch-rad</property>
+  <property>ap/offset-pitch-rad</property>
+ 
+ 
+  <property>ap/pitch-hold</property>
+  <property>ap/pitch/latch-out-rad</property>
+  
+
+  <property>ap/windup-trigger</property>
+
+<property>ap/pitch/met-integr-out</property>
+ 
+  <property>ap/ena-needles</property>
+
+							
+							
+							
+<channel name="Glue">
+  
+<fcs_function name="ap/navigac">
+    <function>
+       <property>/tu154/switches/pn-5-navigac</property>
+    </function>
+  </fcs_function>
+
+<fcs_function name="ap/posadk">
+    <function>
+       <property>/tu154/switches/pn-5-posadk</property>
+    </function>
+</fcs_function>
+
+<fcs_function name="ap/pressure-altitude-ft">
+     <function>
+        <property>/instrumentation/altimeter[0]/pressure-alt-ft</property>
+     </function>
+</fcs_function>
+
+<fcs_function name="ap/heading-epsilon">
+     <function>
+        <property>/instrumentation/nav[0]/heading-needle-deflection-norm</property>
+     </function>
+</fcs_function>
+
+<fcs_function name="ap/gs-epsilon">
+     <function>
+        <property>/instrumentation/nav[0]/gs-needle-deflection-norm</property>
+     </function>
+</fcs_function>
+
+</channel>
+
+							
+
+
+
+
+
+
+
+<channel name="Pitch stab">
+  
+
+  <switch name="ap/pitch/gs-epsilon-gain">
+    <default value="-3.0" />
+    <test value="-2.0">
+      instrumentation/indicated-altitude-m lt 250.0
+    </test>
+  </switch>
+
+  <pure_gain name="ap/pitch/gs-epsilon">
+<input>ap/gs-epsilon</input>	 
+			    
+    <gain>ap/pitch/gs-epsilon-gain</gain>
+  </pure_gain>
+  
+  <pure_gain name="ap/pitch/gs-k7">
+    <input>ap/pitch/gs-epsilon</input>
+    <gain>0.5</gain>
+  </pure_gain>
+  
+  <pure_gain name="ap/pitch/gs-gain-k2">
+    <input>ap/pitch/gs-epsilon</input>
+    <gain>0.7</gain>
+  </pure_gain>
+
+  <washout_filter name="ap/pitch/gs-k2">
+  <input>ap/pitch/gs-gain-k2</input>
+  <c1>0.3</c1>
+  </washout_filter>
+  
+  <summer name="ap/pitch/gs-attitude">
+    <input>attitude/theta-rad</input>
+    <bias>-0.0087</bias>	
+  </summer>
+
+  <pure_gain name="ap/pitch/gs-gain-k11">
+    <input>ap/pitch/gs-attitude</input>
+    <gain>5.0</gain>
+  </pure_gain>
+
+  <washout_filter name="ap/pitch/gs-k11">
+    <input>ap/pitch/gs-gain-k11</input>
+    <c1>0.3</c1>
+  </washout_filter>
+  
+  <summer name="ap/pitch/gs-sum-internal">
+    <input>ap/pitch/gs-k7</input>
+    <input>ap/pitch/gs-k2</input>
+    <input>ap/pitch/gs-k11</input>
+  </summer>
+
+  <pure_gain name="ap/pitch/gs-k10">
+    <input>ap/pitch/gs-attitude</input>
+    <gain>0.3</gain>
+  </pure_gain>
+  
+  <lag_filter name="ap/pitch/gs-k4">
+    <input>ap/pitch/gs-sum-internal</input>
+    <c1>4.0</c1>
+  </lag_filter> 
+  
+  <lag_filter name="ap/pitch/gs-k8">
+    <input>ap/pitch/gs-k10</input>
+    <c1>4.0</c1>
+  </lag_filter> 
+  
+  <switch name="ap/pitch/gs-k8-switched">
+    <default value="0.0" />
+    <test value="ap/pitch/gs-k8">
+      ap/pitch-hold == 1
+    </test>
+  </switch>
+  
+  <summer name="ap/pitch/gs-sum-out">
+    <input>ap/pitch/gs-k4</input>
+    <input>ap/pitch/gs-k8-switched</input>
+  </summer>
+  
+  <switch name="ap/pitch/gs-sum-out-switched">
+    <default value="0.0" />
+    <test value="ap/pitch/gs-sum-out">
+      ap/posadk == 1
+    </test>
+  </switch>
+  
+  <pure_gain name="ap/pitch/gs-k5">
+    <input>ap/pitch/gs-sum-out-switched</input>
+    <gain>5.0</gain>
+    <clipto>
+      <min>-0.6</min>
+      <max>0.6</max>
+    </clipto>
+  </pure_gain>
+  
+  <pure_gain name="ap/pitch/gs-needle">
+    <input>ap/pitch/gs-sum-out-switched</input>
+    <gain>-0.5</gain>
+    <clipto>
+      <min>-1.0</min>
+      <max>1.0</max>
+    </clipto>
+  </pure_gain>
+  
+  
+
+  <summer name="ap/pitch/mach-error">
+    <input>ap/input-mach</input>
+    <input>-velocities/mach</input>
+    <clipto>
+      <min>-0.5</min>
+      <max>0.5</max>
+    </clipto>
+  </summer>
+  
+  <switch name="ap/pitch/mach-windup">
+    <default value="-1.0" />
+    <test value="0.0">
+      ap/pitch-selector == 4
+      ap/pitch-hold == 1
+    </test>
+  </switch>
+  
+  <pid name="ap/pitch/m-pid">
+    <input>ap/pitch/mach-error</input>	    
+    <kp> 5.0 </kp>
+    <ki> 0.5 </ki>
+    <kd> 5.0 </kd>
+    <trigger>ap/pitch/mach-windup</trigger>
+    <clipto>
+      <min>-0.25</min>
+      <max>0.25</max>
+    </clipto>
+  </pid>
+
+
+
+
+  <summer name="ap/pitch/speed-error">
+    <input>ap/input-speed</input>
+    <input>-velocities/vc-fps</input>
+    <clipto>
+      <min>-100</min>
+      <max>100</max>
+    </clipto>
+  </summer>
+  
+  <switch name="ap/pitch/speed-windup">
+    <default value="-1.0" />
+    <test value="0.0">
+      ap/pitch-selector == 3
+      ap/pitch-hold == 1
+    </test>
+  </switch>
+  
+  <pid name="ap/pitch/v-pid">
+    <input>ap/pitch/speed-error</input>	    
+    <kp> 0.01 </kp>
+    <ki> 0.001 </ki>
+    <kd> 0.01 </kd>
+    <trigger>ap/pitch/speed-windup</trigger>
+    <clipto>
+      <min>-0.3</min>
+      <max>0.3</max>
+    </clipto>
+  </pid>
+
+
+
+  <summer name="ap/pitch/altitude-error">
+    <input>ap/input-altitude</input>
+    <input>-ap/pressure-altitude-ft</input> 
+     
+    <clipto>
+      <min>-100</min>
+      <max>100</max>
+    </clipto>
+  </summer>
+
+  <switch name="ap/pitch/h-windup">
+    <default value="-1.0" />
+    <test value="0.0">
+      ap/pitch-selector == 2
+      ap/pitch-hold == 1
+    </test>
+  </switch>
+  
+  <pid name="ap/pitch/h-pid-pi">
+    <input>-ap/pitch/altitude-error</input>
+    <kp> 0.0005 </kp>
+    <ki> 0.00005 </ki>
+    <kd> 0.0 </kd>
+    <trigger>ap/pitch/h-windup</trigger>
+  </pid>
+  
+  <pid name="ap/pitch/h-pid-d">
+    <input>-ap/pitch/altitude-error</input>
+    <kp> 0.0 </kp>
+    <ki> 0.0 </ki>
+    <kd> 0.002 </kd>
+  </pid>
+  
+  <switch name="ap/pitch/h-pid-d-switched">
+    <default value="ap/pitch/h-pid-d" />
+    <test value="0.0">
+      ap/turbulence == 1
+    </test>
+  </switch>
+  
+  <summer name="ap/pitch/h-pid">
+    <input>ap/pitch/h-pid-pi</input>
+    <input>ap/pitch/h-pid-d</input>
+  </summer>
+
+
+
+
+  <fcs_function name="ap/pitch/go-around-speed">
+  <function>
+    <table>
+      <independentVar> fcs/flap-pos-deg </independentVar>
+      <tableData>
+	0         367
+	28        317
+	45        267
+      </tableData>
+    </table>
+  </function>
+  </fcs_function>
+
+  <fcs_function name="ap/pitch/go-around-pitch-rad">
+  <function>
+    <table>
+      <independentVar> fcs/flap-pos-deg </independentVar>
+      <tableData>
+	0         0.8
+	28        0.4
+	45        0.2
+      </tableData>
+    </table>
+  </function>
+  </fcs_function>
+  
+  <switch name="ap/pitch/go-around-pitch-rad-switched">
+    <default value="0.0" />
+    <test value="ap/pitch/go-around-pitch-rad">
+      ap/pitch-selector == 6
+    </test>
+  </switch>
+  
+  <washout_filter name="ap/pitch/go-around-pitch-rad-dot">
+    <input>ap/pitch/go-around-pitch-rad-switched</input>
+    <c1>0.1</c1>
+  </washout_filter>
+  
+  <summer name="ap/pitch/go-around-f5">
+    <input>ap/pitch/go-around-speed</input>
+    <input>-velocities/vc-fps</input>
+    <clipto>
+      <min>-82</min>
+      <max>82</max>	
+    </clipto>
+  </summer>
+
+  <pure_gain name="ap/pitch/go-around-kv">
+    <input>ap/pitch/go-around-f5</input>
+    <gain>0.005</gain>
+  </pure_gain>
+  
+  <pure_gain name="ap/pitch/go-around-kd">
+    <input>-velocities/vc-fps</input>
+    <gain>0.005</gain>
+  </pure_gain>
+
+  <washout_filter name="ap/pitch/go-around-d">
+    <input>ap/pitch/go-around-kd</input>
+    <c1>0.3</c1>
+  </washout_filter>
+  
+  <summer name="ap/pitch/go-around-sum-1">
+    <input>ap/pitch/go-around-kv</input>
+    <input>ap/pitch/go-around-d</input>
+  </summer>
+  
+  <lag_filter name="ap/pitch/go-around-sum-1-filtered">
+    <input>ap/pitch/go-around-sum-1</input>
+    <c1>2.0</c1>
+  </lag_filter> 
+  
+  <washout_filter name="ap/pitch/go-around-theta-rad-dot">
+    <input>attitude/theta-rad</input>
+    <c1>0.1</c1>
+  </washout_filter>
+
+  <summer name="ap/pitch/go-around-sum-2">
+    <input>ap/pitch/go-around-sum-1-filtered</input>
+    <input>-ap/pitch/go-around-pitch-rad-dot</input>
+    <input>ap/pitch/go-around-theta-rad-dot</input>
+  </summer>
+  
+  <pure_gain name="ap/pitch/go-around-f">
+    <input>ap/pitch/go-around-sum-2</input>
+    <gain>5.0</gain>
+  </pure_gain>
+  
+  
+
+
+
+
+
+  <switch name="ap/pitch/stab-selector">
+    <default value="0.0" />	 
+    <test value="ap/pitch/h-pid">
+      ap/pitch-selector == 2
+    </test>
+    <test value="ap/pitch/v-pid">
+      ap/pitch-selector == 3
+    </test>
+    <test value="ap/pitch/m-pid">
+      ap/pitch-selector == 4
+    </test>
+  </switch>
+    
+
+
+  <switch name="ap/pitch/theta-latched-rad">
+    <default value="ap/pitch/latch-out-rad" />
+    <test value="ap/pitch/theta-latched-rad">
+      ap/pitch-selector ne 0
+    </test>
+  </switch>
+  
+  <summer name="ap/pitch/theta-sum-rad">
+    <input>-ap/pitch/theta-latched-rad</input>
+    <input>attitude/theta-rad</input>
+  </summer>
+
+  <pure_gain name="ap/pitch/theta">
+    <input>ap/pitch/theta-sum-rad</input>
+    <gain>1.0</gain>
+  </pure_gain>
+
+
+ <fcs_function name="ap/pitch/bank-compensation">
+    <function>
+      <product>
+	<abs>
+	  <property>attitude/phi-rad</property>
+	</abs>  
+	<value>-0.015</value>
+      </product>
+    </function>
+ </fcs_function>
+
+
+  <pure_gain name="ap/pitch/manu">
+    <input>-ap/stab-input-pitch-rad</input>
+    <gain>1.0</gain>
+    <clipto>
+      <min>-0.3</min>	
+      <max>0.3</max>
+    </clipto>
+  </pure_gain>
+
+
+  <summer name="ap/pitch/main_stab_summer">
+    <input>ap/pitch/theta</input>
+    <input>ap/pitch/bank-compensation</input>
+    <input>ap/pitch/manu</input>
+    <input>ap/pitch/stab-selector</input>
+
+  </summer>
+
+
+  <summer name="ap/pitch/latch_stab_summer">
+    <input>attitude/theta-rad</input>
+    <input>ap/pitch/bank-compensation</input>
+    <input>ap/pitch/manu</input>
+    <input>ap/pitch/stab-selector</input>
+    <output>ap/pitch/latch-out-rad</output>
+  </summer>
+  
+  
+  <pure_gain name="ap/pitch/main_stab">
+    <input>ap/pitch/main_stab_summer</input>
+    <gain>5.0</gain>
+  </pure_gain>
+
+  
+  <switch name="ap/pitch/ap-sw">
+    <default value="0.0" />
+    <test value="ap/pitch/main_stab">
+      ap/pitch-selector == 1			
+    </test>
+    <test value="ap/pitch/main_stab">		
+      ap/pitch-selector == 2
+    </test>
+    <test value="ap/pitch/main_stab">		
+      ap/pitch-selector == 3
+    </test>
+    <test value="ap/pitch/main_stab">		
+      ap/pitch-selector == 4
+    </test>
+    <test value="ap/pitch/gs-k5">		
+      ap/pitch-selector == 5
+    </test>
+    <test value="ap/pitch/go-around-f">		
+      ap/pitch-selector == 6
+    </test>    
+  </switch>
+
+  <switch name="ap/pitch/ap-selector">
+    <default value="0.0" />
+    <test value="ap/pitch/ap-sw">
+      ap/pitch-hold == 1			
+    </test>
+  </switch>
+
+	    
+	    <switch name="ap/pitch/met-selector">
+	      <default value="ap/pitch/ap-selector" />
+	      <test logic="OR" value="fcs/met-cmd">
+		ap/pitch-selector == 0
+		ap/pitch-hold == 0	
+	      </test>
+	    </switch>
+	    
+	    <switch name="ap/pitch/met-trigger">
+	      <default value="0.0" />
+	      <test value="-1.0">
+		ap/met-neutral == 1	
+	      </test>
+	    </switch>
+	    
+	    
+	    <deadband name="ap/pitch/met-input-deadband">
+	      <input>ap/pitch/met-selector</input>
+	      <width>0.2</width>
+	    </deadband>
+	    
+	    
+	    <deadband name="ap/pitch/met-output-deadband">
+	      <input>ap/pitch/met-integr-out</input>
+	      <width>2.0</width> 
+	    </deadband>
+	    
+	    <switch name="ap/pitch/met-threshold">
+              <default value="0.0" />
+	      <test value="0.0625">	
+                ap/pitch/met-input-deadband ne 0
+		ap/pitch/met-selector ge 0
+              </test>
+              <test value="-0.0625">
+                ap/pitch/met-input-deadband ne 0
+		ap/pitch/met-selector lt 0
+              </test>	      
+            </switch>
+	    
+	    <switch name="ap/pitch/met-input">
+              <default value="ap/pitch/met-threshold" />
+              <test value="0.0">
+                ap/pitch/met-output-deadband ne 0
+		ap/pitch/met-integr-out le 0
+		ap/pitch/met-threshold le 0
+              </test>
+              <test value="0.0">
+                ap/pitch/met-output-deadband ne 0
+		ap/pitch/met-integr-out gt 0
+		ap/pitch/met-threshold gt 0
+              </test>	      
+            </switch>
+	    
+	    <pid name="ap/pitch/met-integrator">
+              <input>ap/pitch/met-input</input>
+	      <kp>0.0</kp>
+	      <ki>1.0</ki>
+	      <kd>0.0</kd>
+	      <trigger>ap/pitch/met-trigger</trigger>
+	      <output>ap/pitch/met-integr-out</output>
+            </pid>
+	    
+	    <pure_gain name="ap/pitch/met">
+	      <input>ap/pitch/met-integrator</input>
+	      <gain>0.7</gain>
+	    </pure_gain>
+  
+
+
+
+
+            <scheduled_gain name="ap/suu">
+              <input>fcs/elevator-cmd-norm</input>
+              <table>
+                
+		<independentVar> ap/pitch/met-integrator </independentVar>
+                <tableData>
+                  -1            -1.2
+                  0		-0.175
+		  0.5           0.325
+		  0.583         0.4
+		  0.667         0.4
+		  1             0.4
+                </tableData>
+              </table>
+            </scheduled_gain>
+            
+            <switch name="ap/suu-switched">
+              <default value="0.0" />
+              <test value="ap/suu">
+                ap/suu-enable == 1
+              </test>
+            </switch>
+	    
+	    <pure_gain name="ap/suu-gain">
+	      <input>ap/suu-switched</input>
+	      <gain>-0.5</gain>
+	    </pure_gain>
+
+
+
+
+
+  
+  <pure_gain name="ap/pitch/kwz-main">
+    <input>velocities/thetadot-rad_sec</input>
+    <gain>4.0</gain>
+  </pure_gain>
+
+  <pure_gain name="ap/pitch/kwz-gs">
+    <input>velocities/thetadot-rad_sec</input>
+    <gain>4.0</gain>
+  </pure_gain>
+  
+  <switch name="ap/pitch/kwz-gs-switched">
+    <default value="0.0" />
+    <test value="ap/pitch/kwz-gs">
+      ap/pitch-selector == 5		
+      ap/pitch-hold == 1
+    </test>
+    <test value="ap/pitch/kwz-gs">
+      ap/pitch-selector == 6		
+      ap/pitch-hold == 1
+    </test>
+  </switch>
+  
+
+  
+  <summer name="ap/pitch/ap-summer">
+    <input>ap/pitch/kwz-main</input>
+    <input>ap/pitch/kwz-gs-switched</input>
+    <input>ap/pitch/ap-selector</input>
+    <input>ap/suu-gain</input>
+    <clipto>
+      <min>-0.6</min>
+      <max>0.6</max>
+    </clipto>	      
+  </summer>
+
+  
+  <pure_gain name="ap/pitch/elevator-cmd">
+    <input>ap/pitch/ap-summer</input>
+    <gain>systems/electrical-ok</gain>    
+    <output>fcs/absu-pitch</output>
+  </pure_gain>
+
+</channel>
+
+
+
+
+      <channel name="Heading stab">
+        
+
+        <summer name="ap/heading-error-pnp">
+          <input> -instrumentation/pnp-heading </input>
+          <input> ap/input-heading-pnp </input>
+          <input> -instrumentation/nvu/drift-angle </input>
+        </summer>
+        
+        
+        <pure_gain name="ap/vor-beam-error">
+         <input> -ap/input-heading-delta </input>
+         <gain> 2.0 </gain>
+         <clipto>
+           <min> -5 </min>
+           <max>  5 </max>
+         </clipto>
+        </pure_gain>
+
+        <lag_filter name="ap/beam-error-filtered">
+          <input>ap/vor-beam-error</input>
+         <c1>5.0</c1>
+        </lag_filter> 
+        
+        <pure_gain name="ap/beam-error-adjusted">
+          <input> ap/beam-error-filtered </input>
+          <gain> 7.0 </gain>
+        </pure_gain>
+        
+        <switch name="ap/vor-eps">
+          <default value="0.0" />
+          <test value="ap/beam-error-adjusted">
+            ap/roll-selector eq 3
+	    ap/navigac == 1
+          </test>
+        </switch>
+
+        
+        <summer name="ap/heading-error-zk">
+			
+<input> -instrumentation/pnp-heading </input>    
+          <input> ap/input-heading-zk </input>
+        </summer>
+        
+        <pure_gain name="ap/nvu-delta-corr">
+          <input> instrumentation/nvu/Z-active </input>
+          <gain> 0.01 </gain>
+          <clipto>
+            <min> -60 </min>
+            <max>  60 </max>
+          </clipto>
+        </pure_gain>
+        
+        <summer name="ap/heading-error-nvu">
+          <input> -instrumentation/tks-heading </input>
+          <input> instrumentation/nvu/ZPU-active </input>
+          <input> -ap/nvu-delta-corr </input>
+          <input> -instrumentation/nvu/drift-angle </input>
+        </summer>
+
+
+        <summer name="ap/heading-error-ils">
+					
+<input> -instrumentation/pnp-heading </input>		
+          <input> ap/input-heading-pnp </input>
+        </summer>
+
+        <switch name="ap/ils-error-bias-switch">
+          <default value="0.0" />
+          <test value="360.0">
+            ap/heading-error-ils lt -180
+          </test>
+          <test value="-360.0">
+            ap/heading-error-ils gt 180
+          </test>
+        </switch>
+        
+        <switch name="ap/ils-beam-ki">
+          <default value="0.003" />
+          <test value="0.007">
+            instrumentation/indicated-altitude-m lt 250.0
+          </test>
+        </switch>
+
+        <pure_gain name="ap/ils-epsilon-input">
+				
+<input> ap/heading-epsilon </input>	
+          <gain> 3.0 </gain>
+        </pure_gain>
+        
+        
+        <pure_gain name="ap/ils-hdg-k10">
+	  <input> ap/ils-epsilon-input</input>
+          <gain> 1.0 </gain>
+        </pure_gain>
+	
+        <pure_gain name="ap/ils-gain-k17">
+	  <input> ap/ils-epsilon-input</input>
+          <gain> 10.0 </gain>
+        </pure_gain>
+        
+
+        
+
+ 
+
+        <summer name="ap/ils-hdg-deviation">
+          <input> ap/ils-error-bias-switch </input>
+          <input> ap/heading-error-ils </input>
+        </summer>
+	
+        <pure_gain name="ap/ils-hdg-gain-k2">
+	  <input> ap/ils-hdg-mainsummer </input>
+          <gain> 0.2 </gain>
+        </pure_gain>
+	
+        <switch name="ap/ils-hdg-gain-k2-switched">
+          <default value="0.0" />
+          <test value="ap/ils-hdg-gain-k2">
+            instrumentation/indicated-altitude-m lt 250.0
+          </test>
+        </switch>
+	
+        <pure_gain name="ap/ils-hdg-k3">
+	  <input> ap/ils-hdg-deviation </input>
+          <gain> -0.7 </gain>
+        </pure_gain>
+
+        <switch name="ap/ils-hdg-k3-switched">
+          <default value="0.0" />
+          <test value="ap/ils-hdg-k3">
+            instrumentation/indicated-altitude-m gt 250.0
+          </test>
+        </switch>
+                
+        <lag_filter name="ap/ils-hdg-k4">
+          <input>ap/ils-hdg-gain-k2-switched</input>
+          <c1>1.0</c1>
+        </lag_filter>
+        
+        <pure_gain name="ap/ils-hdg-gain-k5">
+	  <input> ap/ils-hdg-deviation </input>
+          <gain> 0.175 </gain>
+        </pure_gain>
+	
+        <pure_gain name="ap/ils-hdg-k6">
+	  <input> ap/ils-hdg-deviation </input>
+          <gain> 0.7 </gain>
+        </pure_gain>
+	
+        <switch name="ap/ils-hdg-k6-switched">
+          <default value="0.0" />
+          <test value="ap/ils-hdg-k6">
+            instrumentation/indicated-altitude-m gt 250.0
+          </test>
+        </switch>
+	
+        <washout_filter name="ap/ils-hdg-k5">
+	  <input> ap/ils-hdg-gain-k5</input>
+          <c1>0.3</c1>
+        </washout_filter>
+
+        <washout_filter name="ap/ils-hdg-k17">
+	  <input> ap/ils-gain-k17</input>
+          <c1>0.3</c1>
+        </washout_filter>
+
+        <summer name="ap/ils-hdg-f1">
+         <input> ap/ils-hdg-k3-switched </input>
+	 <input> ap/ils-hdg-k10 </input>
+	 <input> ap/ils-hdg-k4 </input>  
+         <clipto>
+           <min> -20.0 </min>
+           <max> 20.0 </max>
+         </clipto>
+        </summer>
+
+        
+        <summer name="ap/ils-hdg-mainsummer">
+         <input> ap/ils-hdg-k6-switched </input>
+	 <input> ap/ils-hdg-f1 </input>
+	 <input> ap/ils-hdg-k5 </input>
+	 <input> ap/ils-hdg-k17 </input>
+
+        </summer>
+	
+        <pure_gain name="ap/ils-out">
+	  <input> ap/ils-hdg-mainsummer </input>
+          <gain> 0.043 </gain>
+        </pure_gain>
+
+	
+        
+
+        <pure_gain name="ap/heading-needle-deflection-ils">
+          
+	  <input> ap/heading-epsilon </input>
+          <gain>1.0</gain>
+          <clipto>
+            <min> -1 </min>
+            <max>  1 </max>
+          </clipto>
+        </pure_gain>
+	
+        <pure_gain name="ap/heading-needle-deflection-vor">
+          <input> -ap/input-heading-delta </input>
+          <gain>0.02</gain>
+          <clipto>
+            <min> -1 </min>
+            <max>  1 </max>
+          </clipto>
+        </pure_gain>
+	
+        <pure_gain name="ap/heading-needle-deflection-nvu">
+          <input> -instrumentation/nvu/Z-active </input>
+          <gain>0.0002</gain>
+          <clipto>
+            <min> -1 </min>
+            <max>  1 </max>
+          </clipto>
+        </pure_gain>
+        
+        <switch name="ap/heading-needle-deflection">
+          <default value="0.0" />
+          <test value="ap/heading-needle-deflection-vor">
+            ap/roll-selector eq 3
+	    ap/posadk eq 0
+          </test>
+          <test value="ap/heading-needle-deflection-nvu">
+            ap/roll-selector eq 4
+	    ap/posadk eq 0
+          </test>
+          <test value="ap/heading-needle-deflection-ils">
+	    
+	    ap/posadk eq 1
+          </test>
+        </switch>
+
+        <pure_gain name="ap/gs-needle-deflection-ils">
+          <input> ap/gs-epsilon </input>
+          <gain>1.0</gain> 
+          <clipto>
+            <min> -1 </min>
+            <max>  1 </max>
+          </clipto>
+        </pure_gain>
+
+        <switch name="ap/gs-needle-deflection">
+          <default value="0.0" />
+          <test value="ap/gs-needle-deflection-ils">
+            
+	    ap/posadk eq 1
+          </test>
+	</switch>        
+
+        
+<switch name="ap/heading-error">
+          <default value="0.0" />
+          <test value="ap/heading-error-zk">
+            ap/roll-selector eq 2
+          </test>
+          <test value="ap/heading-error-pnp">
+            ap/roll-selector eq 3
+	    ap/navigac == 1
+          </test>
+          <test value="ap/heading-error-nvu">
+            ap/roll-selector eq 4
+	    ap/navigac == 1
+          </test>
+        </switch>
+        
+        <switch name="ap/heading-error-bias-switch">
+         <default value="0.0" />
+         <test value="360.0">
+            ap/heading-error lt -180
+         </test>
+         <test value="-360.0">
+            ap/heading-error gt 180
+         </test>
+        </switch>
+
+        <summer name="ap/heading-deviation">
+         <input> ap/heading-error-bias-switch </input>
+         <input> ap/heading-error </input>
+         <input> ap/vor-eps </input>
+       </summer>
+        
+       <pid name="ap/heading-pid">
+          <input>ap/heading-deviation</input>
+          <kp> 0.035 </kp>
+	  <ki> 0.0 </ki>
+          <kd> 0.025 </kd>
+          <output>ap/heading-cmd-norm</output>
+        </pid>
+    
+      </channel>      
+
+
+    <channel name="Roll">
+
+            <switch name="ap/roll-trigger">
+              <default value="-1.0" /> 
+              <test value="0.0">
+                ap/roll-hold ne 0
+              </test>
+            </switch>
+
+            <switch name="ap/input-roll-rad">
+              
+	      <default value="ap/heading-cmd-norm" /> 
+              <test value="0.0">
+                ap/roll-selector == 0 
+              </test>
+
+              <test value="ap/stab-input-roll-rad">
+                ap/roll-selector == 1 
+              </test>
+
+              <test value="ap/ils-out"> 
+                ap/roll-selector == 5 
+		ap/posadk == 1
+              </test>	     
+            </switch>
+            
+            <lag_filter name="ap/input-roll-rad-clipped">
+              <input>ap/input-roll-rad</input>
+              <c1>0.7</c1>
+              <clipto>
+                <min>-0.43</min>
+                <max>0.43</max>
+              </clipto>
+            </lag_filter> 
+
+            <summer name="ap/roll-error">
+              <input>ap/input-roll-rad-clipped</input>
+              <input>-attitude/roll-rad</input>
+            </summer>
+
+            <pid name="ap/roll-hold-pid">
+              <input>ap/roll-error</input>
+              <kp> 5.0 </kp>
+              <ki> 0.07 </ki>
+              <kd> 0.0 </kd>
+              <trigger>ap/roll-trigger</trigger>
+              <clipto>
+                <min>-1.0</min>
+                <max>1.0</max>
+              </clipto>
+            </pid>
+
+	    <switch name="ap/roll-pid-switched">
+              <default value="0.0" />
+              <test value="ap/roll-hold-pid">
+                ap/roll-hold ne 0
+              </test>
+            </switch>
+            
+            <pid name="ap/roll-damper">
+	      <input>-attitude/roll-rad</input>
+              <kp> 0.0 </kp>
+              <ki> 0.0 </ki>
+              <kd> 1.0 </kd>
+              <clipto>
+                <min>-1.0</min>
+                <max>1.0</max>
+              </clipto>
+            </pid>
+
+                        
+            <summer name="ap/roll-out">
+ 
+              <input>ap/roll-pid-switched</input>
+              <clipto>
+                <min>-1</min>
+                <max>1</max>
+              </clipto>
+            </summer>
+	    
+	    	    
+            <scheduled_gain name="ap/roll-turb">
+              <input>ap/roll-out</input>
+              <table>
+                <independentVar> ap/turbulence </independentVar>
+                <tableData>
+                  0             1.0
+		  1             0.5
+                </tableData>
+              </table>
+            </scheduled_gain>
+            
+            <pure_gain name="ap/aileron">
+              <input>ap/roll-turb</input>
+              <gain>1.0</gain>
+              <output>fcs/absu-roll</output>
+            </pure_gain>       
+      </channel>      
+      
+
+      <channel name="Yaw">
+    
+	        
+        <washout_filter name="ap/yaw-wf">
+          <input>velocities/r-aero-rad_sec</input>
+          <c1>0.4</c1>
+        </washout_filter>
+        
+        <pure_gain name="ap/yaw-damper">
+          <input>ap/yaw-wf</input>
+          <gain>8.0</gain>
+        </pure_gain>
+        
+        
+        <switch name="ap/beta-rad-switched">
+          <default value="0.0" />
+          <test value="aero/beta-rad">
+            ap/roll-hold ne 0
+          </test>
+        </switch>
+        
+        <pid name="ap/yaw-pid">
+          <input>ap/beta-rad-switched</input>
+          <kp> 1.0 </kp>
+          <ki> 1.0 </ki>
+          <kd> 0.0 </kd>
+          <clipto>
+            <min>-0.5</min>
+            <max>0.5</max>
+          </clipto>
+        </pid>
+                
+        <switch name="ap/yaw-pid-switched">
+          <default value="0.0" />
+          <test value="ap/yaw-pid">
+            ap/roll-hold ne 0
+          </test>
+        </switch>
+               
+                    
+        <summer name="ap/yaw-out">
+          <input>ap/yaw-damper</input>
+          
+          <input>-ap/yaw-pid-switched</input>
+          <clipto>
+            <min>-1</min>
+            <max>1</max>
+          </clipto>
+        </summer>
+     	    	    
+        <scheduled_gain name="ap/yaw-turb">
+           <input>ap/yaw-out</input>
+             <table>
+                <independentVar> ap/turbulence </independentVar>
+                <tableData>
+                  0             1.0
+		  1             0.5
+             </tableData>
+           </table>
+        </scheduled_gain>
+
+        <pure_gain name="ap/rudder">
+          <input>ap/yaw-turb</input>
+          <gain>1.0</gain>
+          <output>fcs/absu-yaw</output>
+        </pure_gain>
+	
+      </channel>
+
+<channel name="Reverser">
+  
+        <switch name="fcs/rev-1-left-cmd">
+          <default value="0.0" />
+          <test value="1.0">
+            fcs/revers-by-key gt 0.5
+          </test>          
+          <test value="fcs/revers-by-joy">
+            fcs/throttle-cmd-norm[0] lt fcs/revers-1-limit
+          </test>
+        </switch>
+        <switch name="fcs/rev-1-right-cmd">
+          <default value="0.0" />
+          <test value="1.0">
+            fcs/revers-by-key gt 0.5
+          </test>          
+          <test value="fcs/revers-by-joy">
+            fcs/throttle-cmd-norm[2] lt fcs/revers-1-limit
+          </test>
+        </switch>
+        <switch name="fcs/rev-2-left-cmd">
+          <default value="0.0" />
+          <test value="1.0">
+            fcs/revers-by-key gt 0.5
+          </test>          
+          <test value="fcs/revers-by-joy">
+            fcs/throttle-cmd-norm[0] lt fcs/revers-2-limit
+          </test>
+        </switch>
+        <switch name="fcs/rev-2-right-cmd">
+          <default value="0.0" />
+          <test value="1.0">
+            fcs/revers-by-key gt 0.5
+          </test>          
+          <test value="fcs/revers-by-joy">
+            fcs/throttle-cmd-norm[2] lt fcs/revers-2-limit
+          </test>
+        </switch>
+        
+        <kinematic name="fcs/reverser-lever-left">
+          <input>fcs/rev-1-left-cmd</input>
+          <traverse>
+            <setting>
+              <position>0</position>
+              <time>0</time>
+            </setting>
+            <setting>
+              <position>2.35</position>
+              <time>2</time>
+            </setting>
+          </traverse>
+          <output>propulsion/engine[0]/reverser-angle-rad</output>
+        </kinematic>
+        
+        <kinematic name="fcs/reverser-lever-right">
+          <input>fcs/rev-1-right-cmd</input>
+          <traverse>
+            <setting>
+              <position>0</position>
+              <time>0</time>
+            </setting>
+            <setting>
+              <position>2.35</position>
+              <time>2</time>
+            </setting>
+          </traverse>
+          <output>propulsion/engine[2]/reverser-angle-rad</output>
+        </kinematic>
+
+        <kinematic name="fcs/reverser-throttle-left">
+          <input>fcs/rev-2-left-cmd</input>
+          <traverse>
+            <setting>
+              <position>0</position>
+              <time>0</time>
+            </setting>
+            <setting>
+              <position>0.6</position>
+              <time>1</time>
+            </setting>
+          </traverse>
+        </kinematic>
+        
+        <kinematic name="fcs/reverser-throttle-right">
+          <input>fcs/rev-2-right-cmd</input>
+          <traverse>
+            <setting>
+              <position>0</position>
+              <time>0</time>
+            </setting>
+            <setting>
+              <position>0.6</position>
+              <time>1</time>
+            </setting>
+          </traverse>
+        </kinematic>
+	
+</channel>
+      
+      <channel name="At">
+        
+        <summer name="ap/at-error">
+          <input>-ap/input-at</input>
+          <input>velocities/vc-fps</input>
+          <clipto>
+            <min>-30</min>
+            <max>30</max>
+          </clipto>
+        </summer>
+
+
+        <summer name="ap/at-transient-error">
+          <input>fcs/throttle-cmd-norm[0]</input>
+          <input>-ap/at-pid-output</input>
+        </summer>
+                
+        <switch name="ap/at-tr-err-switched">
+          <default value="0.0" />
+          <test value="-ap/at-transient-error">
+            ap/at-podg == 1
+          </test>
+        </switch>
+        
+        <pure_gain name="ap/at-transient-compensator">
+          <input>ap/at-tr-err-switched</input>
+          <gain>20.0</gain>
+        </pure_gain>       
+
+                    
+
+        <switch name="ap/at-hold">
+          <default value="0.0" />
+          <test value="1">
+            ap/at-hold-0 == 1
+          </test>
+          <test value="1">
+            ap/at-hold-1 == 1
+          </test>
+          <test value="1">
+            ap/at-hold-2 == 1
+          </test>
+        </switch>
+        
+        <switch name="ap/at-trigger">
+          <default value="0.0" />
+          <test value="-1.0">
+            ap/at-podg == 0
+          </test>
+          <test value="-1.0">
+            ap/at-hold == 0
+          </test>
+          <test value="1.0">
+            ap/at-error &gt; 0.0
+	    
+	    
+            ap/at-pid-output lt 0.1	
+          </test>
+          <test value="1.0">
+            ap/at-error lt 0.0
+	    
+	    ap/at-pid-output &gt; 0.9
+          </test>
+          
+        </switch>
+
+        <switch name="ap/at-error-switched">
+          <default value="ap/at-transient-compensator" />
+          <test value="ap/at-error">
+            ap/at-hold == 1
+          </test>
+        </switch>
+        
+        <switch name="ap/at-pid-ki">
+          <default value="0.1" />
+          <test value="0.001">
+            ap/at-hold == 1
+          </test>
+        </switch>
+        <switch name="ap/at-pid-kd">
+          <default value="0.0" />
+          <test value="0.1">
+            ap/at-hold == 1
+          </test>
+        </switch>
+        
+        <pid name="ap/at-pid">
+          <input>-ap/at-error-switched</input>
+          <kp> 0.04 </kp>
+          <ki> ap/at-pid-ki </ki>
+          <kd> ap/at-pid-kd </kd>
+          <trigger>ap/at-trigger</trigger>
+          <clipto>
+            <min>0.0</min>
+            <max>1.0</max>
+          </clipto>
+          <output>ap/at-pid-output</output>
+        </pid>
+
+       <switch name="ap/at-thr-switched-0">
+         <default value="fcs/throttle-cmd-norm[0]" />
+         <test value="fcs/reverser-throttle-left">
+           fcs/reverser-throttle-left gt 0
+         </test>
+          <test value="ap/at-pid">
+            ap/at-hold-0 == 1
+          </test>
+          <output>fcs/at-throttle-cmd-norm[0]</output>
+        </switch>
+        
+        <switch name="ap/at-thr-switched-1">
+          <default value="fcs/throttle-cmd-norm[1]" />
+          <test value="ap/at-pid">
+            ap/at-hold-1 == 1
+          </test>
+          <output>fcs/at-throttle-cmd-norm[1]</output>
+        </switch>
+        
+        <switch name="ap/at-thr-switched-2">
+          <default value="fcs/throttle-cmd-norm[2]" />
+          <test value="fcs/reverser-throttle-right">
+            fcs/reverser-throttle-right gt 0
+          </test>
+          <test value="ap/at-pid">
+            ap/at-hold-2 == 1
+          </test>
+          <output>fcs/at-throttle-cmd-norm[2]</output>
+        </switch>
+      
+      </channel>
+      
+</autopilot>

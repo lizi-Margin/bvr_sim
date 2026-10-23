@@ -1,0 +1,274 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-04 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Gear valve </description>
+	</fileheader>
+
+
+
+	<channel name="Gearvalve">
+
+
+
+		<switch name="calculations/gearvalve/left-handle-allowed">
+			<default value="systems/gearvalve/left-handle-command" />
+			<test logic="AND" value="systems/gearvalve/left-handle-input">
+				systems/gearvalve/serviceable eq 1
+			</test>
+			<output>systems/gearvalve/left-handle-command</output>
+		</switch>
+
+		<kinematic name="calculations/gearvalve/left-handle-pos">
+			<input>systems/gearvalve/left-handle-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/gearvalve/left-handle-pos</output>
+		</kinematic>
+
+		<switch name="calculations/gearvalve/left-handle-not-allowed">
+			<default value="systems/gearvalve/left-handle-input" />
+			<test logic="AND" value="systems/gearvalve/left-handle-command">
+				systems/gearvalve/serviceable eq 0
+			</test>
+			<output>systems/gearvalve/left-handle-input</output>
+		</switch>
+
+		<switch name="calculations/gearvalve/left-handle-switch">
+			<default value="systems/gearvalve/left-handle-switch" />
+			<test logic="AND" value="1">
+				systems/gearvalve/left-handle-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/gearvalve/left-handle-pos lt 0.5
+			</test>
+			<output>systems/gearvalve/left-handle-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/gearvalve/right-handle-allowed">
+			<default value="systems/gearvalve/right-handle-command" />
+			<test logic="AND" value="systems/gearvalve/right-handle-input">
+				systems/gearvalve/serviceable eq 1
+			</test>
+			<output>systems/gearvalve/right-handle-command</output>
+		</switch>
+
+		<kinematic name="calculations/gearvalve/right-handle-pos">
+			<input>systems/gearvalve/right-handle-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/gearvalve/right-handle-pos</output>
+		</kinematic>
+
+		<switch name="calculations/gearvalve/right-handle-not-allowed">
+			<default value="systems/gearvalve/right-handle-input" />
+			<test logic="AND" value="systems/gearvalve/right-handle-command">
+				systems/gearvalve/serviceable eq 0
+			</test>
+			<output>systems/gearvalve/right-handle-input</output>
+		</switch>
+
+		<switch name="calculations/gearvalve/right-handle-switch">
+			<default value="systems/gearvalve/right-handle-switch" />
+			<test logic="AND" value="1">
+				systems/gearvalve/right-handle-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/gearvalve/right-handle-pos lt 0.5
+			</test>
+			<output>systems/gearvalve/right-handle-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/gearvalve/safer-allowed">
+			<default value="systems/gearvalve/safer-command" />
+			<test logic="AND" value="systems/gearvalve/safer-input">
+				systems/gearvalve/serviceable eq 1
+			</test>
+			<output>systems/gearvalve/safer-command</output>
+		</switch>
+
+		<kinematic name="calculations/gearvalve/safer-pos">
+			<input>systems/gearvalve/safer-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/gearvalve/safer-pos</output>
+		</kinematic>
+
+		<switch name="calculations/gearvalve/safer-not-allowed">
+			<default value="systems/gearvalve/safer-input" />
+			<test logic="AND" value="systems/gearvalve/safer-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/gearvalve/safer-input</output>
+		</switch>
+
+		<switch name="calculations/gearvalve/safer-switch">
+			<default value="systems/gearvalve/safer-switch" />
+			<test logic="AND" value="1">
+				systems/gearvalve/safer-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/gearvalve/safer-pos lt 0.5
+			</test>
+			<output>systems/gearvalve/safer-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/gearvalve/valve-allowed">
+			<default value="systems/gearvalve/valve-command" />
+			<test logic="AND" value="systems/gearvalve/valve-input">
+				systems/gearvalve/serviceable eq 1
+				systems/gearvalve/safer-switch eq 1
+			</test>
+			<output>systems/gearvalve/valve-command</output>
+		</switch>
+
+		<kinematic name="calculations/gearvalve/valve-pos">
+			<input>systems/gearvalve/valve-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.2</time>
+			</setting>
+			</traverse>
+			<output>systems/gearvalve/valve-pos</output>
+		</kinematic>
+
+		<switch name="calculations/gearvalve/valve-not-allowed">
+			<default value="systems/gearvalve/valve-input" />
+			<test logic="OR" value="systems/gearvalve/valve-command">
+				systems/gearvalve/serviceable eq 0
+				systems/gearvalve/safer-switch eq 0
+			</test>
+			<output>systems/gearvalve/valve-input</output>
+		</switch>
+
+		<switch name="calculations/gearvalve/valve-switch">
+			<default value="systems/gearvalve/valve-switch" />
+			<test logic="AND" value="1">
+				systems/gearvalve/valve-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/gearvalve/valve-pos lt 0.5
+			</test>
+			<output>systems/gearvalve/valve-switch</output>
+		</switch>
+
+		<switch name="calculations/gearvalve/valve-pressure-switch">
+			<default value="systems/gearvalve/valve-pressure-switch" />
+			<test logic="AND" value="1">
+				systems/gearvalve/valve-switch eq 0.0
+			</test>
+			<test logic="AND" value="0">
+				systems/gearvalve/valve-switch eq 1.0
+			</test>
+			<output>systems/gearvalve/valve-pressure-switch</output>
+		</switch>
+
+		<kinematic name="calculations/gearvalve/pressure-pos">
+			<input>systems/gearvalve/valve-pressure-switch</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>5.0</time>
+			</setting>
+			</traverse>
+			<output>systems/gearvalve/pressure-pos</output>
+		</kinematic>
+
+		<fcs_function name="calculations/gearvalve/pressure-indicated">
+		<function>
+			<sum>
+				<value>0.3</value>
+				<product>
+					<property>systems/gearvalve/pressure-pos</property>
+					<value>0.5</value>
+				</product>
+			</sum>
+		</function>
+			<output>systems/gearvalve/pressure-indicated</output>
+		</fcs_function>
+
+		<switch name="calculations/gearvalve/gear-down">
+			<default value="gear/gear-cmd-norm-real" />
+			<test logic="AND" value="1">
+				systems/gearcontrol/control-switch eq 1.0
+				systems/gearvalve/right-handle-switch eq 1.0
+				systems/gearvalve/left-handle-switch eq 1.0
+				systems/gearvalve/safer-switch eq 1.0
+				systems/gearvalve/valve-switch eq 1.0
+				systems/gearvalve/pressure-pos gt 0.75
+			</test>
+			<output>gear/gear-cmd-norm-real</output>
+		</switch>
+
+
+
+		<switch name="calculations/gearvalve/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/gearvalve/left-handle-pos ge 0.25
+				systems/gearvalve/left-handle-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/gearvalve/right-handle-pos ge 0.25
+				systems/gearvalve/right-handle-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/gearvalve/safer-pos ge 0.25
+				systems/gearvalve/safer-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/gearvalve/valve-pos ge 0.25
+				systems/gearvalve/valve-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

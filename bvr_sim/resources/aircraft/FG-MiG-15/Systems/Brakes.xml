@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="brakes">
+
+	<channel name="chocks" execrate="120">
+
+		<pure_gain name="gear/unit[1]/chocks/force-norm">
+			<input>gear/wheel-chocks</input>
+			<gain>1.16</gain>
+		</pure_gain>
+
+		<pure_gain name="gear/unit[2]/chocks/force-norm">
+			<input>gear/wheel-chocks</input>
+			<gain>1.16</gain>
+		</pure_gain>
+
+	</channel>
+
+	<channel name="differential brakes">
+
+		<fcs_function name="systems/brakes/brake-left">
+			<function>
+				<max>
+					<difference>
+						<property>/controls/gear/brake-left</property>
+						<product>
+							<property>/controls/gear/brake-left</property>
+							<abs>
+								<min>
+									<property>fcs/rudder-pos-norm</property>
+									<value>0</value>
+								</min>
+							</abs>
+						</product>
+					</difference>
+					<property>gear/unit[1]/chocks/force-norm</property>
+				</max>
+			</function>
+			<output>fcs/left-brake-cmd-norm</output>
+		</fcs_function>
+
+		<fcs_function name="systems/brakes/brake-right">
+			<function>
+				<max>
+					<difference>
+						<property>/controls/gear/brake-right</property>
+						<product>
+							<property>/controls/gear/brake-right</property>
+							<abs>
+								<max>
+									<property>fcs/rudder-pos-norm</property>
+									<value>0</value>
+								</max>
+							</abs>
+						</product>
+					</difference>
+					<property>gear/unit[2]/chocks/force-norm</property>
+				</max>
+			</function>
+			<output>fcs/right-brake-cmd-norm</output>
+		</fcs_function>
+
+	</channel>
+
+</system>

@@ -1,4 +1,8 @@
 #include "core.hxx"
+#include "simulator/environment.hxx"
+#include "simulator/aircraft/base.hxx"
+#include "simulator/missile/base.hxx"
+#include "simulator/ground/base.hxx"
 #include "cmd_handler.hxx"
 #include "support/check.hxx"
 #include "so_pool.hxx"
@@ -116,6 +120,7 @@ SimCore::SimCore(double dt, const std::string& log_file_path, const std::string&
 
 SimCore::~SimCore() {
     stop();
+    try { end_recording(); } catch(...) {}
 }
 
 void SimCore::start() {
@@ -178,6 +183,7 @@ void SimCore::step(int steps) {
         update_physics();
         cfg::sim_time += cfg::dt;
         log();
+        if(++flush_ticks_>=std::max(1,int(1/cfg::dt))){flush_recording();flush_ticks_=0;}
     }
     BaselinePool::instance().step();
     refresh_telemetry_snapshot();
@@ -247,13 +253,77 @@ void SimCore::log() {
         }
     }
 
-    if (acmi_file_.is_open()) {
+    if(state_recording_){
+        if(acmi_file_.is_open())write_acmi_state();
+    } else if (acmi_file_.is_open()) {
         acmi_file_ << log;
     } else {
         if (!acmi_file_path_.empty()) {
             SL::get().printf("[SimCore] Failed to log (append) acmi file: %s\n", acmi_file_path_.c_str());
         }
     }
+}
+void SimCore::flush_recording(){
+    if(acmi_file_.is_open()){
+        acmi_file_.flush();
+        if(!acmi_file_)throw std::runtime_error("ACMI write/flush failed: "+acmi_file_path_);
+    }
+    SL::optional().flush();
+}
+void SimCore::end_recording(){
+    std::exception_ptr error;
+    try{flush_recording();}catch(...){error=std::current_exception();}
+    if(acmi_file_.is_open())acmi_file_.close();
+    acmi_file_.clear();
+    acmi_file_path_.clear();acmi_ids_.clear();acmi_alive_.clear();acmi_serial_=0;
+    if(error)std::rethrow_exception(error);
+}
+void SimCore::begin_recording(const std::string& log_path,const std::string& acmi_path,const std::string& reference_time){
+    if(running_)throw std::logic_error("Configure recording before asynchronous core start");
+    end_recording();
+    SL::init_instance(log_path,false);
+    acmi_file_path_=acmi_path;state_recording_=true;flush_ticks_=0;
+    acmi_file_.clear();acmi_file_.open(std::filesystem::u8path(acmi_path),std::ios::out);
+    if(!acmi_file_)throw std::runtime_error("Cannot open ACMI output: "+acmi_path+": "+std::error_code(errno,std::generic_category()).message());
+    acmi_file_<<"FileType=text/acmi/tacview\nFileVersion=2.2\n0,ReferenceTime="<<reference_time<<"\n";
+    write_acmi_state();flush_recording();
+}
+void SimCore::write_acmi_state(){
+    // Stable hexadecimal IDs and actual core positions. No log() callbacks here:
+    // legacy log callbacks above are retained regardless of recording state so
+    // their historical UUID/visual bookkeeping cannot depend on file enablement.
+    acmi_file_<<'#'<<std::fixed<<std::setprecision(6)<<cfg::sim_time<<'\n';
+    std::set<std::string> alive;
+    for(const auto& obj:SOPool::instance().get_all_ever_existed()){
+        if(!obj || obj->Type==SOT::DataObj)continue;
+        auto found=acmi_ids_.find(obj->uid);
+        if(!obj->is_alive){
+            if(found!=acmi_ids_.end()&&acmi_alive_.count(obj->uid))
+                acmi_file_<<"0,Event=Destroyed|"<<found->second<<"\n-"<<found->second<<'\n';
+            continue;
+        }
+        if(found==acmi_ids_.end()){
+            std::ostringstream id;id<<std::hex<<++acmi_serial_;
+            found=acmi_ids_.emplace(obj->uid,id.str()).first;
+        }
+        alive.insert(obj->uid);
+        auto [lon,lat,alt]=NWU2LLA(obj->position[0],obj->position[1],obj->position[2]);
+        auto rpy=obj->get_rpy();std::string name="Object",type="Ground+Static";bool ground_attitude=false;
+        if(auto aircraft=std::dynamic_pointer_cast<Aircraft>(obj)){name=aircraft->aircraft_model;type="Air+FixedWing";}
+        else if(auto missile=std::dynamic_pointer_cast<Missile>(obj)){name=missile->missile_model;type="Weapon+Missile";}
+        else if(auto ground=std::dynamic_pointer_cast<GroundUnit>(obj)){name=ground->model_id();type="Ground+Vehicle";ground_attitude=true;}
+        else if(obj->Type==SOT::Bomb){name="Mk-82";type="Weapon+Bomb";}
+        auto escape=[](std::string s){for(auto& c:s)if(c==','||c=='\n'||c=='|'||c=='\r')c='_';return s;};
+        acmi_file_<<found->second<<",T="<<lon<<'|'<<lat<<'|'<<alt<<'|'<<c3utils::rad2deg(rpy[0])<<'|'<<c3utils::rad2deg(ground_attitude?rpy[1]:-rpy[1])<<'|'<<-c3utils::rad2deg(rpy[2])
+            <<",Name="<<escape(name)<<",Pilot="<<escape(obj->uid)<<",Type="<<type<<",Color="<<(obj->color==TeamColor::Red?"Red":"Blue")<<'\n';
+    }
+    for(const auto& uid:acmi_alive_)if(!alive.count(uid)){
+        // A removed object may no longer be in even the retired object set.
+        bool retired=false;
+        for(const auto& o:SOPool::instance().get_all_ever_existed())if(o->uid==uid){retired=true;break;}
+        if(!retired)acmi_file_<<'-'<<acmi_ids_.at(uid)<<'\n';
+    }
+    acmi_alive_=std::move(alive);
 }
 void SimCore::update_physics() {
     SL::get().print("===SimCore::update_physics===");
@@ -280,6 +350,10 @@ void SimCore::update_physics() {
             format_check(!obj->trashed(),"obj->uid: %s, obj->type: %s is trashed, which is just created", obj->uid.c_str(), SOT_to_string(obj->Type).c_str());
         }
     }
+    if(environment_)for(const auto& object:SOPool::instance().get_all())
+        if(auto aircraft=std::dynamic_pointer_cast<Aircraft>(object))
+            if(aircraft->is_alive && aircraft->position[2]<=environment_->collision_height(aircraft->position[0],aircraft->position[1]))
+                aircraft->hit();
     SL::get().print("---SimCore::update_physics---");
 }
 

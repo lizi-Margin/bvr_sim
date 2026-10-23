@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "CFM56-F108",
+      "source": "KC135/Engines/CFM56-F108.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "direct",
+      "source": "KC135/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "CFM56-F108",
+      "source": "KC135/Engines/CFM56-F108.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "direct",
+      "source": "KC135/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "CFM56-F108",
+      "source": "KC135/Engines/CFM56-F108.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "direct",
+      "source": "KC135/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "CFM56-F108",
+      "source": "KC135/Engines/CFM56-F108.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "KC135/KC135-E.xml",
+      "reference": "direct",
+      "source": "KC135/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

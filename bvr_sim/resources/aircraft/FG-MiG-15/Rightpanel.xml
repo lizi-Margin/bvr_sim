@@ -1,0 +1,710 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Right panel </description>
+	</fileheader>
+
+
+	<channel name="Rightpanel">
+
+
+
+		<switch name="calculations/rightpanel/battery-allowed">
+			<default value="systems/rightpanel/battery-command" />
+			<test logic="AND" value="systems/rightpanel/battery-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/battery-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/battery-pos">
+			<input>systems/rightpanel/battery-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/battery-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/battery-not-allowed">
+			<default value="systems/rightpanel/battery-input" />
+			<test logic="AND" value="systems/rightpanel/battery-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/battery-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/battery-switch">
+			<default value="systems/rightpanel/battery-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/battery-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/battery-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/battery-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/generator-allowed">
+			<default value="systems/rightpanel/generator-command" />
+			<test logic="AND" value="systems/rightpanel/generator-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/generator-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/generator-pos">
+			<input>systems/rightpanel/generator-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/generator-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/generator-not-allowed">
+			<default value="systems/rightpanel/generator-input" />
+			<test logic="AND" value="systems/rightpanel/generator-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/generator-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/generator-switch">
+			<default value="systems/rightpanel/generator-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/generator-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/generator-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/generator-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/headlight-allowed">
+			<default value="systems/rightpanel/headlight-command" />
+			<test logic="AND" value="systems/rightpanel/headlight-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/headlight-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/headlight-pos">
+			<input>systems/rightpanel/headlight-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/headlight-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/headlight-not-allowed">
+			<default value="systems/rightpanel/headlight-input" />
+			<test logic="AND" value="systems/rightpanel/headlight-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/headlight-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/headlight-switch">
+			<default value="systems/rightpanel/headlight-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/headlight-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/headlight-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/headlight-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/trimmer-allowed">
+			<default value="systems/rightpanel/trimmer-command" />
+			<test logic="AND" value="systems/rightpanel/trimmer-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/trimmer-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/trimmer-pos">
+			<input>systems/rightpanel/trimmer-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/trimmer-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/trimmer-not-allowed">
+			<default value="systems/rightpanel/trimmer-input" />
+			<test logic="AND" value="systems/rightpanel/trimmer-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/trimmer-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/trimmer-switch">
+			<default value="systems/rightpanel/trimmer-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/trimmer-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/trimmer-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/trimmer-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/horizon-allowed">
+			<default value="systems/rightpanel/horizon-command" />
+			<test logic="AND" value="systems/rightpanel/horizon-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/horizon-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/horizon-pos">
+			<input>systems/rightpanel/horizon-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/horizon-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/horizon-not-allowed">
+			<default value="systems/rightpanel/horizon-input" />
+			<test logic="AND" value="systems/rightpanel/horizon-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/horizon-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/horizon-switch">
+			<default value="systems/rightpanel/horizon-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/horizon-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/horizon-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/horizon-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/radio-allowed">
+			<default value="systems/rightpanel/radio-command" />
+			<test logic="AND" value="systems/rightpanel/radio-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/radio-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/radio-pos">
+			<input>systems/rightpanel/radio-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/radio-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/radio-not-allowed">
+			<default value="systems/rightpanel/radio-input" />
+			<test logic="AND" value="systems/rightpanel/radio-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/radio-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/radio-switch">
+			<default value="systems/rightpanel/radio-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/radio-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/radio-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/radio-switch</output>
+		</switch>
+
+
+
+
+		<switch name="calculations/rightpanel/radioaltimeter-allowed">
+			<default value="systems/rightpanel/radioaltimeter-command" />
+			<test logic="AND" value="systems/rightpanel/radioaltimeter-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/radioaltimeter-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/radioaltimeter-pos">
+			<input>systems/rightpanel/radioaltimeter-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/radioaltimeter-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/radioaltimeter-not-allowed">
+			<default value="systems/rightpanel/radioaltimeter-input" />
+			<test logic="AND" value="systems/rightpanel/radioaltimeter-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/radioaltimeter-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/radioaltimeter-switch">
+			<default value="systems/rightpanel/radioaltimeter-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/radioaltimeter-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/radioaltimeter-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/radioaltimeter-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/radiocompass-allowed">
+			<default value="systems/rightpanel/radiocompass-command" />
+			<test logic="AND" value="systems/rightpanel/radiocompass-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/radiocompass-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/radiocompass-pos">
+			<input>systems/rightpanel/radiocompass-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/radiocompass-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/radiocompass-not-allowed">
+			<default value="systems/rightpanel/radiocompass-input" />
+			<test logic="AND" value="systems/rightpanel/radiocompass-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/radiocompass-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/radiocompass-switch">
+			<default value="systems/rightpanel/radiocompass-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/radiocompass-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/radiocompass-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/radiocompass-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/drop-tank-allowed">
+			<default value="systems/rightpanel/drop-tank-command" />
+			<test logic="AND" value="systems/rightpanel/drop-tank-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/drop-tank-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/drop-tank-pos">
+			<input>systems/rightpanel/drop-tank-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/drop-tank-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/drop-tank-not-allowed">
+			<default value="systems/rightpanel/drop-tank-input" />
+			<test logic="AND" value="systems/rightpanel/drop-tank-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/drop-tank-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/drop-tank-switch">
+			<default value="systems/rightpanel/drop-tank-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/drop-tank-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/drop-tank-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/drop-tank-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/bomb-allowed">
+			<default value="systems/rightpanel/bomb-command" />
+			<test logic="AND" value="systems/rightpanel/bomb-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/bomb-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/bomb-pos">
+			<input>systems/rightpanel/bomb-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/bomb-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/bomb-not-allowed">
+			<default value="systems/rightpanel/bomb-input" />
+			<test logic="AND" value="systems/rightpanel/bomb-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/bomb-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/bomb-switch">
+			<default value="systems/rightpanel/bomb-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/bomb-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/bomb-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/bomb-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/photo-allowed">
+			<default value="systems/rightpanel/photo-command" />
+			<test logic="AND" value="systems/rightpanel/photo-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/photo-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/photo-pos">
+			<input>systems/rightpanel/photo-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/photo-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/photo-not-allowed">
+			<default value="systems/rightpanel/photo-input" />
+			<test logic="AND" value="systems/rightpanel/photo-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/photo-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/photo-switch">
+			<default value="systems/rightpanel/photo-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/photo-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/photo-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/photo-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/photo-machinegun-allowed">
+			<default value="systems/rightpanel/photo-machinegun-command" />
+			<test logic="AND" value="systems/rightpanel/photo-machinegun-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/photo-machinegun-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/photo-machinegun-pos">
+			<input>systems/rightpanel/photo-machinegun-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/photo-machinegun-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/photo-machinegun-not-allowed">
+			<default value="systems/rightpanel/photo-machinegun-input" />
+			<test logic="AND" value="systems/rightpanel/photo-machinegun-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/photo-machinegun-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/photo-machinegun-switch">
+			<default value="systems/rightpanel/photo-machinegun-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/photo-machinegun-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/photo-machinegun-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/photo-machinegun-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/headsight-allowed">
+			<default value="systems/rightpanel/headsight-command" />
+			<test logic="AND" value="systems/rightpanel/headsight-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/headsight-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/headsight-pos">
+			<input>systems/rightpanel/headsight-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/headsight-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/headsight-not-allowed">
+			<default value="systems/rightpanel/headsight-input" />
+			<test logic="AND" value="systems/rightpanel/headsight-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/headsight-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/headsight-switch">
+			<default value="systems/rightpanel/headsight-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/headsight-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/headsight-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/headsight-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/machinegun-allowed">
+			<default value="systems/rightpanel/machinegun-command" />
+			<test logic="AND" value="systems/rightpanel/machinegun-input">
+				systems/rightpanel/serviceable eq 1
+			</test>
+			<output>systems/rightpanel/machinegun-command</output>
+		</switch>
+
+		<kinematic name="calculations/rightpanel/machinegun-pos">
+			<input>systems/rightpanel/machinegun-command</input>
+			<traverse>
+			<setting>
+				<position>0</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.1</time>
+			</setting>
+			</traverse>
+			<output>systems/rightpanel/machinegun-pos</output>
+		</kinematic>
+
+		<switch name="calculations/rightpanel/machinegun-not-allowed">
+			<default value="systems/rightpanel/machinegun-input" />
+			<test logic="AND" value="systems/rightpanel/machinegun-command">
+				systems/rightpanel/serviceable eq 0
+			</test>
+			<output>systems/rightpanel/machinegun-input</output>
+		</switch>
+
+		<switch name="calculations/rightpanel/machinegun-switch">
+			<default value="systems/rightpanel/machinegun-switch" />
+			<test logic="AND" value="1">
+				systems/rightpanel/machinegun-pos ge 0.5
+			</test>
+			<test logic="AND" value="0">
+				systems/rightpanel/machinegun-pos lt 0.5
+			</test>
+			<output>systems/rightpanel/machinegun-switch</output>
+		</switch>
+
+
+
+		<switch name="calculations/rightpanel/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				systems/rightpanel/battery-pos ge 0.25
+				systems/rightpanel/battery-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/generator-pos ge 0.25
+				systems/rightpanel/generator-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/headlight-pos ge 0.25
+				systems/rightpanel/headlight-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/trimmer-pos ge 0.25
+				systems/rightpanel/trimmer-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/horizon-pos ge 0.25
+				systems/rightpanel/horizon-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/radio-pos ge 0.25
+				systems/rightpanel/radio-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/radioaltimeter-pos ge 0.25
+				systems/rightpanel/radioaltimeter-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/radiocompass-pos ge 0.25
+				systems/rightpanel/radiocompass-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/drop-tank-pos ge 0.25
+				systems/rightpanel/drop-tank-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/bomb-pos ge 0.25
+				systems/rightpanel/bomb-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/photo-pos ge 0.25
+				systems/rightpanel/photo-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/photo-machinegun-pos ge 0.25
+				systems/rightpanel/photo-machinegun-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/headsight-pos ge 0.25
+				systems/rightpanel/headsight-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<test logic="AND" value="1">
+				systems/rightpanel/machinegun-pos ge 0.25
+				systems/rightpanel/machinegun-pos le 0.75
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

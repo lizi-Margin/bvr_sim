@@ -26,6 +26,8 @@ protected:
     std::array<double, 3> true_velocity;
 
 public:
+    // Optional deterministic observation noise. Unseeded legacy clients keep random_device behavior.
+    static void set_noise_seed(std::optional<uint64_t> seed) noexcept;
     DataObj(
         const std::shared_ptr<SimulatedObject>& source_obj,
         double noise_std_position = 0.0,

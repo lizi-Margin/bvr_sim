@@ -1,0 +1,12 @@
+This directory contains a cockpit assembly model and XSLT
+stylesheet. An assembly is a lamp/switch combination. The lamp is
+implemented via two texture files representing the on/off states. The
+assembly can be latching (press to toggle, self-annunciating lamp) or
+momentary (press to activate, lamp driven by an external property). An
+optional guard is provided.
+
+The stylesheet can be used to generate the assemblies you need using
+an XSLT 1.1 processor. See Aircraft/Instruments-3d/mk-viii for an
+example.
+
+Author: Jean-Yves Lefort <jylefort@FreeBSD.org>

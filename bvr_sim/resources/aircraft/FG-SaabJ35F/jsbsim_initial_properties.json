@@ -1,0 +1,22 @@
+{
+  "fcs/pitch-damper-enable": 1.0,
+  "fcs/elevon-deflection-max": 0.0,
+  "fcs/yaw-damper-enable": 1.0,
+  "fcs/drag-chute-deployed": 0.0,
+  "fcs/drag-chute-serviceable": 1.0,
+  "systems/hydraulic/hydI-pump-q": 0.0,
+  "systems/hydraulic/hydII-pump-q": 0.0,
+  "systems/hydraulic/hydI-sys-p": 10.0,
+  "systems/hydraulic/hydII-sys-p": 10.0,
+  "systems/hydraulic/hydII-acc-p": 10.0,
+  "systems/hydraulic/hydII-acc-q": 10.0,
+  "systems/hydraulic/internal/old-left-elevon": 0.0,
+  "systems/hydraulic/internal/old-right-elevon": 0.0,
+  "systems/hydraulic/internal/old-rudder": 0.0,
+  "propulsion/tank[0]/collector-valve": 1.0,
+  "propulsion/tank[1]/collector-valve": 1.0,
+  "propulsion/tank[2]/collector-valve": 1.0,
+  "propulsion/tank[3]/collector-valve": 1.0,
+  "propulsion/afterburner-pump": 0.0,
+  "propulsion/afterburner-on": 1.0
+}

@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="AChH clock">
+ 
+
+ 
+
+
+ <property>systems/instr/AChH/button/stopwatch</property>
+ <property>systems/instr/AChH/button/flighttimer</property>
+
+
+ <channel name="AChH fast" execrate="4">
+
+  
+
+  <switch name="systems/instr/AChH/internal/stopwatch">
+   <default value="systems/instr/AChH/internal/stopwatch" />
+   <test value="systems/instr/AChH/internal/stopwatch">
+    systems/instr/AChH/button/stopwatch EQ 0
+   </test>
+   <test value="0">
+    systems/instr/AChH/internal/stopwatch-latch EQ 2
+   </test>
+   <test value="1">
+    systems/instr/AChH/internal/stopwatch-latch EQ 0
+   </test>
+   <test value="2">
+    systems/instr/AChH/internal/stopwatch-latch EQ 1
+   </test>
+  </switch>
+
+  <switch name="systems/instr/AChH/internal/stopwatch-latch">
+   <default value="systems/instr/AChH/internal/stopwatch" />
+   <test value="systems/instr/AChH/internal/stopwatch-latch">
+    systems/instr/AChH/button/stopwatch NE 0
+   </test>
+  </switch>
+
+  <switch name="systems/instr/AChH/flag/flighttimer">
+   <default value="systems/instr/AChH/flag/flighttimer" />
+   <test value="systems/instr/AChH/flag/flighttimer">
+    systems/instr/AChH/button/flighttimer EQ 0
+   </test>
+   <test value="0">
+    systems/instr/AChH/internal/flighttimer-latch EQ 2
+   </test>
+   <test value="1">
+    systems/instr/AChH/internal/flighttimer-latch EQ 0
+   </test>
+   <test value="2">
+    systems/instr/AChH/internal/flighttimer-latch EQ 1
+   </test>
+  </switch>
+
+  <switch name="systems/instr/AChH/internal/flighttimer-latch">
+   <default value="systems/instr/AChH/flag/flighttimer" />
+   <test value="systems/instr/AChH/internal/flighttimer-latch">
+    systems/instr/AChH/button/flighttimer NE 0
+   </test>
+  </switch>
+
+ </channel>
+
+
+ <channel name="AChH" execrate="24">
+  
+
+  <switch name="systems/instr/AChH/gauge/seconds-s">
+   <default value="simulation/sim-time-sec" />
+  </switch>
+
+  <switch name="systems/instr/AChH/internal/stopwatch-start-s">
+   <default value="simulation/sim-time-sec" />
+   <test value="systems/instr/AChH/internal/stopwatch-start-s">
+    systems/instr/AChH/internal/stopwatch NE 0
+   </test>
+  </switch>
+
+  <switch name="systems/instr/AChH/internal/stopwatch-stop-s">
+   <default value="simulation/sim-time-sec" />
+   <test value="systems/instr/AChH/internal/stopwatch-stop-s">
+    systems/instr/AChH/internal/stopwatch EQ 2
+   </test>
+  </switch>
+
+  <summer name="systems/instr/AChH/gauge/stopwatch-s">
+   <input>systems/instr/AChH/internal/stopwatch-stop-s</input>
+   <input>-systems/instr/AChH/internal/stopwatch-start-s</input>
+  </summer>
+
+  <switch name="systems/instr/AChH/internal/flighttimer-start-s">
+   <default value="simulation/sim-time-sec" />
+   <test value="systems/instr/AChH/internal/flighttimer-start-s">
+    systems/instr/AChH/flag/flighttimer NE 0
+   </test>
+  </switch>
+
+  <switch name="systems/instr/AChH/internal/flighttimer-stop-s">
+   <default value="simulation/sim-time-sec" />
+   <test value="systems/instr/AChH/internal/flighttimer-stop-s">
+    systems/instr/AChH/flag/flighttimer EQ 2
+   </test>
+  </switch>
+
+  <summer name="systems/instr/AChH/gauge/flighttimer-s">
+   <input>systems/instr/AChH/internal/flighttimer-stop-s</input>
+   <input>-systems/instr/AChH/internal/flighttimer-start-s</input>
+  </summer>
+
+ </channel>
+
+
+</system>

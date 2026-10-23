@@ -1,0 +1,95 @@
+{
+  "files": [
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "jsb-hook",
+      "source": "f16/Systems/jsb-hook.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "jsb-hydraulics",
+      "source": "f16/Systems/jsb-hydraulics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "jsb-electrical",
+      "source": "f16/Systems/jsb-electrical.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "jsb-misc",
+      "source": "f16/Systems/jsb-misc.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-ground-reactions",
+      "source": "f16/Systems/jsb-ground-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-external-reactions",
+      "source": "f16/Systems/jsb-external-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "jsb-pushback",
+      "source": "f16/Systems/jsb-pushback.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-metrics",
+      "source": "f16/Systems/jsb-metrics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-mass-52",
+      "source": "f16/Systems/jsb-mass-52.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-controls",
+      "source": "f16/Systems/jsb-controls.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "jsb-autoflight",
+      "source": "f16/Systems/jsb-autoflight.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-propulsion-block52",
+      "source": "f16/Systems/jsb-propulsion-block52.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/f16b52.xml",
+      "reference": "Systems/jsb-aerodynamics-block15-subtle.xml",
+      "source": "f16/Systems/jsb-aerodynamics-block15-subtle.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/Systems/jsb-propulsion-block52.xml",
+      "reference": "F100-PW-229",
+      "source": "f16/Engines/F100-PW-229.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "f16/Systems/jsb-propulsion-block52.xml",
+      "reference": "direct",
+      "source": "f16/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

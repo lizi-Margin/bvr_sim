@@ -1,0 +1,119 @@
+{
+  "files": [
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "Systems/jsb-propulsion-ja37",
+      "source": "JA37/Systems/jsb-propulsion-ja37.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-input",
+      "source": "JA37/Systems/jsb-input.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "autoflight",
+      "source": "JA37/Systems/autoflight.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-control-drivers",
+      "source": "JA37/Systems/jsb-control-drivers.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "Systems/jsb-controls",
+      "source": "JA37/Systems/jsb-controls.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "ja37-aerodynamics.xml",
+      "source": "JA37/ja37-aerodynamics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-hydraulic",
+      "source": "JA37/Systems/jsb-hydraulic.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-flight",
+      "source": "JA37/Systems/jsb-flight.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-electric",
+      "source": "JA37/Systems/jsb-electric.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-instruments",
+      "source": "JA37/Systems/jsb-instruments.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-warnings",
+      "source": "JA37/Systems/jsb-warnings.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-indicators",
+      "source": "JA37/Systems/jsb-indicators.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-lead-computer",
+      "source": "JA37/Systems/jsb-lead-computer.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-cannon_recoil",
+      "source": "JA37/Systems/jsb-cannon_recoil.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "jsb-fuel",
+      "source": "JA37/Systems/jsb-fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "Systems/jsb-external-reactions",
+      "source": "JA37/Systems/jsb-external-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/jsbsim-ja37.xml",
+      "reference": "Systems/jsb-ground-reactions",
+      "source": "JA37/Systems/jsb-ground-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/Systems/jsb-propulsion-ja37.xml",
+      "reference": "RM8B",
+      "source": "JA37/Engines/RM8B.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "JA37/Systems/jsb-propulsion-ja37.xml",
+      "reference": "direct",
+      "source": "JA37/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

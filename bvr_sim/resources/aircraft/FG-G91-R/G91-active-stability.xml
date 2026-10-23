@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Active stability"> 
+    
+    <property value="0.0">systems/active-stability/pitch-damper/operative</property>
+    <property value="10.0">systems/active-stability/pitch-damper/washout-c1</property>
+    <property value="0.0">systems/active-stability/pitch-damper/pid-gain</property>
+    <property value="0.1">systems/active-stability/pitch-damper/pid-gain-factor</property>
+    <property value="0.0">systems/active-stability/pitch-damper/correction-norm</property>
+    <property value="0.0">systems/active-stability/yaw-damper/operative</property>
+    <property value="10.0">systems/active-stability/yaw-damper/washout-c1</property>
+    <property value="0.0">systems/active-stability/yaw-damper/pid-gain</property>
+    <property value="0.5">systems/active-stability/yaw-damper/pid-gain-factor</property>
+    <property value="0.0">systems/active-stability/yaw-damper/correction-norm</property>
+    
+    
+    <channel name="Yaw Damper">
+        
+        <switch name="systems/active-stability/yaw-damper/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/manual-switches/lateral_panel_left/dampers/sw-yaw-damper-on == 1
+                systems/electric/bus[2]/V GE 24.0
+                systems/electric/bus[2]/yaw-damper/fuse == 1
+            </test>
+        </switch>
+
+        <washout_filter name="systems/active-stability/yaw-damper/pid">
+            <input>accelerations/Ny</input>
+            <c1>systems/active-stability/yaw-damper/washout-c1</c1>
+        </washout_filter>
+
+        <pure_gain name="systems/active-stability/yaw-damper/pid-gain">
+            <input>systems/active-stability/yaw-damper/pid</input>
+            <gain>systems/active-stability/yaw-damper/pid-gain-factor</gain>
+            <range>
+                <min> -0.1 </min>
+                <max>  0.1 </max>
+            </range>
+        </pure_gain>
+        
+        <switch name="systems/active-stability/yaw-damper/pid-on">
+            <default value="0.0" />
+            <test value="systems/active-stability/yaw-damper/pid-gain">
+                systems/active-stability/pitch-damper/operative == 1
+            </test>
+        </switch>
+        
+        <actuator name="systems/active-stability/yaw-damper/correction-norm">
+            <input>systems/active-stability/yaw-damper/pid-on</input>
+            <lag>50</lag>
+            <rate_limit>0.1</rate_limit>
+            <bias>0.0</bias>
+            <deadband_width>0.002</deadband_width>
+            <hysteresis_width> 0.001 </hysteresis_width>
+        </actuator>
+        
+        <scheduled_gain name="systems/electric/bus[2]/yaw-damper/I">
+            <input>systems/active-stability/yaw-damper/operative</input>
+            <table>
+                <independentVar>systems/active-stability/yaw-damper/correction-norm</independentVar>
+                <tableData>
+                    -1.0    11
+                    -0.01   11
+                    0.0     3
+                    0.01    11
+                    1.0     11
+                </tableData>
+            </table>
+        </scheduled_gain>
+        
+    </channel>
+    
+
+    <channel name="Pitch Damper">
+        
+        <switch name="systems/active-stability/pitch-damper/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/manual-switches/lateral_panel_left/dampers/sw-pitch-damper-on == 1
+                systems/electric/bus[2]/V GE 24.0
+                systems/electric/bus[2]/pitch-damper/fuse == 1
+            </test>
+        </switch>
+
+        <washout_filter name="systems/active-stability/pitch-damper/pid">
+            <input>accelerations/Nz</input>
+            <c1>systems/active-stability/pitch-damper/washout-c1</c1>
+        </washout_filter>
+
+        <pure_gain name="systems/active-stability/pitch-damper/pid-gain">
+            <input>systems/active-stability/pitch-damper/pid</input>
+            <gain>systems/active-stability/pitch-damper/pid-gain-factor</gain>
+            <range>
+                <min> -0.1 </min>
+                <max>  0.1 </max>
+            </range>
+        </pure_gain>
+        
+        <switch name="systems/active-stability/pitch-damper/pid-on">
+            <default value="0.0" />
+            <test value="systems/active-stability/pitch-damper/pid-gain">
+                systems/active-stability/pitch-damper/operative == 1
+            </test>
+        </switch>
+        
+        <actuator name="systems/active-stability/pitch-damper/correction-norm">
+            <input>systems/active-stability/pitch-damper/pid-on</input>
+            <lag>50</lag>
+            <rate_limit>0.1</rate_limit>
+            <bias>0.0</bias>
+            <deadband_width>0.002</deadband_width>
+            <hysteresis_width>0.001</hysteresis_width>
+        </actuator>
+        
+        <scheduled_gain name="systems/electric/bus[2]/pitch-damper/I">
+            <input>systems/active-stability/pitch-damper/operative</input>
+            <table>
+                <independentVar>systems/active-stability/pitch-damper/correction-norm</independentVar>
+                <tableData>
+                -1.0    24
+                -0.01   24
+                0.0     2
+                0.01    24
+                1.0     24
+                </tableData>
+            </table>
+        </scheduled_gain>
+        
+    </channel>
+
+    
+</system>

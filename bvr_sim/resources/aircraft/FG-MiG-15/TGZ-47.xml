@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="TGZ-47 exhaust gas temperature indicator">
+ 
+
+
+ <property>systems/elec/output/TGZ-47/DC27-V</property>
+
+
+ <channel name="EMI-3R" execrate="2">
+
+  <fcs_function name="systems/instr/TGZ-47/gauge/EGT-degC">
+   <function>
+    <product>
+     <p>systems/elec/output/TGZ-47/DC27-V</p>
+     
+     <p>/engines/engine/egt-degc</p>
+     
+     <v>0.037</v>
+    </product>
+   </function>
+  </fcs_function>
+
+ </channel>
+
+
+</system>

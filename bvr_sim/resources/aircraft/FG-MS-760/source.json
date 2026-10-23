@@ -1,0 +1,30 @@
+{
+  "set": "MS-760/ms760-set.xml",
+  "name": "Morane-Saulnier MS.760 Paris (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "MS-760/Systems/ms760-yasim.xml",
+  "jets": 2,
+  "model": "MS-760/Models/ms760.xml",
+  "tags": [
+    "morane-saulnier",
+    "trainer",
+    "1950s",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+    "tricycle",
+    "retractable-gear",
+    "twin-engine",
+    "jet",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "MS-760.zip",
+  "archive_sha256": "2c021c0959c4e8f45c5614ea320affbe9413d6e76f293ddf735922c2ca463be1",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MS-760.zip"
+}

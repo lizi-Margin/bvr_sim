@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="KES-917B fuel indicator">
+ 
+
+
+ <property>systems/elec/output/KES-917B/DC27-V</property>
+ <property>systems/elec/output/KES-917B/DC27-ok</property>
+
+
+ <channel name="KES-917B slow" execrate="8">
+
+  <pure_gain name="systems/elec/output/KES-917B/DC27-A">
+   <input>systems/elec/output/KES-917B/DC27-V</input>
+   
+   <gain>0.00686</gain>
+  </pure_gain>
+
+ </channel>
+
+
+ <channel name="KES-917B" execrate="2">
+
+  
+
+  
+
+  <fcs_function name="systems/instr/KES-917B/gauge/fuel-l">
+   <function>
+    <ifthen>
+     <p>systems/elec/output/KES-917B/DC27-ok</p>
+     <product>
+      <p>propulsion/tank[1]/contents-lbs</p>
+      
+      <v>0.546</v>
+     </product>
+     
+     <v>-47.619</v>
+    </ifthen>
+   </function>
+   <clipto>
+    
+    <min>-47.619</min>
+    <max>1400.0</max>
+   </clipto>
+  </fcs_function>
+
+  <switch name="systems/instr/KES-917B/light/fuel-low">
+   <default value="0" />
+   <test value="systems/elec/output/KES-917B/DC27-ok">
+    
+    propulsion/tank[1]/contents-lbs LT 163.752
+   </test>
+  </switch>
+
+ </channel>
+
+
+</system>

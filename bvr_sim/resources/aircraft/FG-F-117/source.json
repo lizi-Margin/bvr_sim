@@ -1,0 +1,29 @@
+{
+  "set": "F-117/F-117-set.xml",
+  "name": "Lockheed F-117 Nighthawk",
+  "fdm_type": "jsb",
+  "fdm": "F-117/F-117.xml",
+  "jets": 0,
+  "model": "F-117/Models/F-117.xml",
+  "tags": [
+    "fighter",
+    "bomber",
+    "lockheed",
+    "gulfwar1",
+    "1980s",
+    "1990s",
+    "2000s",
+    "ifr",
+    "retractable-gear",
+    "hud",
+    "jet",
+    "twin-engine"
+  ],
+  "model_rating": 2,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "F-117.zip",
+  "archive_sha256": "8d2474df8f869f5bf0695e02c6b93b112b0f58dd0214beeaa9de2f30178fcf7a",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/F-117.zip"
+}

@@ -6,7 +6,7 @@ Examples: python -m bvr_game.agent map validate --map ...
 from pathlib import Path
 import argparse,json,shutil,sys,subprocess,time,statistics
 from .content import ROOT,ASSETS,KENNEY,fetch_kenney,sha,write_json
-DEFAULT_MAP=ROOT/'game/maps/training_range_v2/generated-map.json'
+DEFAULT_MAP=ROOT/'game/maps/training_range_v3/generated-map.json'
 
 def inspect_asset(id):
     p=ASSETS/'registered'/id/'manifest.json'
@@ -22,19 +22,25 @@ def inspect_asset(id):
 
 def game_from_state(state,render=False,output=None):
     from .app import FlightGame
+    from .app import native
+    from .ground import apply_config,replay_ground_action
     if sha(state['map'])!=state['map_sha256']:raise ValueError('Saved sortie map changed')
     game=FlightGame(render=render,visible=False,map_path=state['map'],output=output or ROOT/'game/captures/agent')
-    for key,value in state['config'].items():setattr(game.config,key,value)
+    apply_config(native,game.config,state['config'])
     game.start()
     for action in state['actions']:
+        if replay_ground_action(native,game.sim,action):continue
         if 'paused' in action:game.sim.set_paused(action['paused']);continue
         if action.get('command'):game.command(**action['command'])
-        if action.get('exact'):game.sim.step_exact(action['ticks'])
+        if action.get('exact'):game.step_exact(action['ticks'])
         else:game.step(action['ticks'])
     if state.get('camera'):game.set_camera(**state['camera'])
     return game
 
 def run(a):
+    if a.domain=='aircraft':
+        from .aircraft import aircraft_catalog,aircraft
+        return aircraft_catalog(include_library=True) if a.action=='list' else aircraft(a.id)
     if a.domain=='asset':
         if a.action=='inspect':return inspect_asset(a.id)
         if a.action=='register':
@@ -68,7 +74,10 @@ def run(a):
             result['map_sha256']=sha(a.map)
             if a.render_height and not a.point:raise ValueError('--render-height requires --point north west')
             if a.point:
-                result['simulation_height']=scene.terrain(native).height(*a.point)
+                terrain=scene.terrain(native)
+                result['simulation_height']=terrain.height(*a.point)
+                result['simulation_contact_height']=terrain.contact(*a.point,0,a.reference_height).height
+                result['simulation_collision_height']=terrain.collision_height(*a.point)
                 if a.render_height:
                     from .app import FlightGame
                     game=FlightGame(render=True,visible=False,map_path=a.map)
@@ -76,6 +85,8 @@ def run(a):
                         game.start();game.draw()
                         result['render_vertex_height']=game.renderer.render_height(*a.point)
                         result['absolute_height_error_m']=abs(result['render_vertex_height']-result['simulation_height'])
+                        result['render_contact_height']=game.renderer.render_surface_height(*a.point,a.reference_height)
+                        result['absolute_contact_error_m']=abs(result['render_contact_height']-result['simulation_contact_height'])
                         result['shader_errors']=game.renderer.shader_errors()
                         result['height_method']='Independent interpolation over renderer CPU vertices uploaded to GPU versus typed GameTerrain'
                     finally:game.close()
@@ -93,18 +104,37 @@ def run(a):
             write_json(a.output/'benchmark.json',result);return result
         finally:game.close()
     from .app import FlightGame,serialize
+    if a.domain=='ground':
+        from .app import native
+        from .ground import spec_from_data,route_from_data
+        state=json.loads(a.state.read_text(encoding='utf8'));game=game_from_state(state)
+        try:
+            action=None
+            if a.action=='spawn':
+                data=json.loads(a.spec.read_text(encoding='utf8'));game.sim.spawn_ground(spec_from_data(native,data));action={'spawn_ground':data}
+            elif a.action=='route':
+                data=json.loads(a.route.read_text(encoding='utf8'));game.sim.set_ground_route(a.uid,route_from_data(native,data));action={'ground_route':data,'uid':a.uid}
+            elif a.action=='park':game.sim.park_ground(a.uid,a.parked);action={'ground_parked':a.parked,'uid':a.uid}
+            if action:state['actions'].append(action);write_json(a.state,state)
+            return {'ground_units':serialize(game.sim.frame().ground_units),'tick':game.sim.frame().tick}
+        finally:game.close()
     if a.action=='play':
         from .app import main
         sys.argv=['bvr_game','play','--map',str(a.map)];main();return {'closed':True}
     if a.action=='run':
-        game=FlightGame(map_path=a.map);game.config.mission=a.mission;game.config.seed=a.seed;game.config.player_model=a.aircraft;game.start()
+        game=FlightGame(map_path=a.map);row=game.select_aircraft(a.aircraft,a.loadout);mission=a.mission or row['missions'][0]
+        if mission not in row['missions']:game.close();raise ValueError('Mission is unsupported for '+a.aircraft)
+        game.config.mission=mission;game.config.seed=a.seed;game.start()
         state={'schema':1,'map':str(a.map.resolve()),'map_sha256':sha(a.map),'config':serialize(game.config),'actions':[]}
-        write_json(a.state,state);result={'state':str(a.state.resolve()),'frame':serialize(game.sim.frame())};game.close();return result
+        frame=serialize(game.sim.frame());game.close();state['sortie_logs']=game.log_paths();write_json(a.state,state)
+        return {'state':str(a.state.resolve()),'frame':frame,'logs':game.log_paths()}
+    if a.action=='logs':
+        return json.loads(a.state.read_text(encoding='utf8')).get('sortie_logs',{'reason':'No linked sortie logs in this older state file'})
     state=json.loads(a.state.read_text());game=game_from_state(state,render=a.action=='capture',output=a.output)
     try:
         if a.action=='step':
             command=json.loads(a.command);game.command(**command) if command else None
-            if a.exact:game.sim.step_exact(a.ticks)
+            if a.exact:game.step_exact(a.ticks)
             else:game.step(a.ticks)
             state['actions'].append({'command':command,'ticks':a.ticks,'exact':a.exact});write_json(a.state,state)
         if a.action=='pause':game.sim.set_paused(a.paused);state['actions'].append({'paused':a.paused});write_json(a.state,state)
@@ -115,11 +145,20 @@ def run(a):
             for _ in range(20):game.draw()
             return {'capture':game.capture(a.name),'frame':serialize(game.sim.frame())}
         if not game.camera_params:game.follow_camera(0)
-        return {'frame':serialize(game.sim.frame()),'camera':game.camera_params,'aim':game.aim,'mode':game.mode}
+        return {'frame':serialize(game.sim.frame()),'camera':game.camera_params,'aim':game.aim,'mode':game.mode,'logs':game.log_paths()}
     finally:game.close()
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);domains=p.add_subparsers(dest='domain',required=True)
+    aircraft=domains.add_parser('aircraft').add_subparsers(dest='action',required=True)
+    aircraft.add_parser('list');s=aircraft.add_parser('inspect');s.add_argument('id')
+    ground=domains.add_parser('ground').add_subparsers(dest='action',required=True)
+    for action in ['list','spawn','route','park']:
+        s=ground.add_parser(action);s.add_argument('--state',type=Path,required=True)
+        if action=='spawn':s.add_argument('--spec',type=Path,required=True)
+        if action in ['route','park']:s.add_argument('uid')
+        if action=='route':s.add_argument('--route',type=Path,required=True)
+        if action=='park':s.add_argument('--parked',action=argparse.BooleanOptionalAction,default=True)
     asset=domains.add_parser('asset').add_subparsers(dest='action',required=True)
     for action in ['search','fetch']:
         s=asset.add_parser(action);s.add_argument('source',choices=['kenney','ambientcg','polyhaven','aircraft']);s.add_argument('value')
@@ -131,17 +170,18 @@ def main():
     s=maps.add_parser('build');s.add_argument('--recipe',type=Path,default=ROOT/'game/recipes/training_range_v2.json');s.add_argument('--output',type=Path,required=True)
     for action in ['inspect','validate','benchmark','capture']:
         s=maps.add_parser(action);s.add_argument('--map',type=Path,default=DEFAULT_MAP)
-        if action=='inspect':s.add_argument('--point',nargs=2,type=float);s.add_argument('--render-height',action='store_true')
+        if action=='inspect':s.add_argument('--point',nargs=2,type=float);s.add_argument('--render-height',action='store_true');s.add_argument('--reference-height',type=float,default=float('inf'))
         if action=='validate':s.add_argument('--output',type=Path)
         if action in ['benchmark','capture']:
             s.add_argument('--output',type=Path,default=ROOT/'game/captures/agent');s.add_argument('--camera',type=Path);s.add_argument('--frames',type=int,default=600);s.add_argument('--name',default='map')
     games=domains.add_parser('game').add_subparsers(dest='action',required=True)
-    for action in ['run','play','step','query','capture','pause','camera']:
+    for action in ['run','play','step','query','capture','pause','camera','logs']:
         s=games.add_parser(action)
         if action in ['run','play']:s.add_argument('--map',type=Path,default=DEFAULT_MAP)
         if action!='play':s.add_argument('--state',type=Path,required=True)
         if action=='run':
-            s.add_argument('--mission',choices=['air','strike','combined'],default='air');s.add_argument('--aircraft',choices=['F22','F16'],default='F22');s.add_argument('--seed',type=int,default=7)
+            from .aircraft import aircraft_catalog
+            s.add_argument('--mission',choices=['intercept_patrol','air','strike','combined','convoy','training']);s.add_argument('--aircraft',choices=[r['id'] for r in aircraft_catalog(include_library=True)['aircraft']],default='F22');s.add_argument('--loadout');s.add_argument('--seed',type=int,default=7)
         if action=='step':s.add_argument('--ticks',type=int,default=1);s.add_argument('--command',default='{}');s.add_argument('--exact',action='store_true')
         if action=='pause':s.add_argument('--paused',action=argparse.BooleanOptionalAction,default=True)
         if action=='camera':s.add_argument('--eye',type=float,nargs=3,required=True);s.add_argument('--target',type=float,nargs=3,required=True);s.add_argument('--fov',type=float,default=1.05)

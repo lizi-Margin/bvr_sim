@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Brake-system">
+    
+
+  <channel name="Brake-channel">
+
+      
+
+      <switch name="systems/brakes/brake-eff">
+          <default value="1" />
+          <test value="0">
+              accelerations/n-pilot-x-norm lt -0.25
+          </test>
+     </switch>
+
+     <pure_gain name="systems/brakes/left-brake-value">
+         <input>/controls/gear/brake-left</input>
+         <gain>systems/brakes/brake-eff</gain>
+     </pure_gain>
+
+     <switch name="systems/brakes/left-brake-cmd-norm">
+         <default value="0" />
+         <test value="1">
+             /controls/gear/brake-parking  == 1
+         </test>
+         <test value="systems/brakes/left-brake-value">
+             /controls/gear/brake-parking  != 1
+         </test>
+         <output>fcs/left-brake-cmd-norm</output>
+     </switch>
+
+     <pure_gain name="systems/brakes/right-brake-value">
+         <input>/controls/gear/brake-right</input>
+         <gain>systems/brakes/brake-eff</gain>
+     </pure_gain>
+
+     <switch name="systems/brakes/right-brake-cmd-norm">
+         <default value="0" />
+         <test value="1">
+             /controls/gear/brake-parking  == 1
+         </test>
+         <test value="systems/brakes/right-brake-value">
+             /controls/gear/brake-parking  != 1
+         </test>
+         <output>fcs/right-brake-cmd-norm</output>
+     </switch>
+
+
+  </channel>
+
+</system>

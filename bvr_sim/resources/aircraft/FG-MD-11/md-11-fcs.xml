@@ -1,0 +1,1805 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MD-11: FCS">
+	
+	<channel name="Libraries">
+		
+		<switch name="/systems/fcs/aileron-out-enable">
+			<default value="0" />
+			<test logic="OR" value="1">
+				fcs/slat-pos-deg ge 2
+				position/wow eq 1
+			</test>
+			<output>/systems/fcc/aileron-out-enable</output>
+		</switch>
+		
+		
+		<switch name="/systems/fcs/deflected-aileron/flaps">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/fcs/flaps/input eq 2
+				/systems/fcs/flaps/input eq 3
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/deflected-aileron/cmd"> 
+			<default value="/systems/fcs/deflected-aileron/cmd" />
+			<test value="0">
+				/systems/fcs/deflected-aileron/flaps ne 1
+			</test>
+			<test logic="AND" value="1">
+				/systems/fcs/deflected-aileron/flaps eq 1
+				/gear/gear[0]/wow eq 1
+			</test>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/deflected-aileron/active">
+			<input>/systems/fcs/deflected-aileron/cmd</input>
+			<gain>/systems/acconfig/options/deflected-aileron</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/deflected-aileron/in-l-rate">
+			<default value="0.575" /> 
+			<test value="100">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="0.55"> 
+				/it-autoflight/internal/active-fms eq 1
+				<test logic="OR">
+					/systems/fcc/rcws/active-no-wow eq 1
+					/systems/fcc/afs/enabled eq 1
+				</test>
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/deflected-aileron/in-r-rate">
+			<default value="0.575" /> 
+			<test value="100">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="AND" value="0.55"> 
+				/it-autoflight/internal/active-fms eq 2
+				<test logic="OR">
+					/systems/fcc/rcws/active-no-wow eq 1
+					/systems/fcc/afs/enabled eq 1
+				</test>
+			</test>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/deflected-aileron/in-cmd"> 
+			<input>/systems/fcs/deflected-aileron/active</input>
+			<gain>0.575</gain> 
+		</pure_gain>
+		
+		<actuator name="/systems/fcs/deflected-aileron/in-l">
+			<input>/systems/fcs/deflected-aileron/in-cmd</input> 
+			<rate_limit>/systems/fcs/deflected-aileron/in-l-rate</rate_limit>
+		</actuator>
+		
+		<actuator name="/systems/fcs/deflected-aileron/in-r">
+			<input>/systems/fcs/deflected-aileron/in-cmd</input>
+			<rate_limit>/systems/fcs/deflected-aileron/in-r-rate</rate_limit>
+		</actuator>
+		
+		<switch name="/systems/fcs/deflected-aileron/out-rate">
+			<default value="0.55" /> 
+			<test value="100">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/deflected-aileron/out-cmd">
+			<default value="0" />
+			<test logic="AND" value="0.75"> 
+				/systems/acconfig/options/deflected-aileron eq 1
+				/systems/fcs/deflected-aileron/active eq 1
+			</test>
+			<test value="0.2"> 
+				/systems/acconfig/options/deflected-aileron eq 1
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/deflected-aileron/out">
+			<input>/systems/fcs/deflected-aileron/out-cmd</input>
+			<rate_limit>/systems/fcs/deflected-aileron/out-rate</rate_limit>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Aileron General">
+		
+		<pure_gain name="/systems/fcs/ailerons/trim-overall">
+			<input>/controls/flight/aileron-trim</input>
+			<gain>0.25</gain>
+		</pure_gain>
+		
+		<fcs_function name="/systems/fcs/aileron-rcws"> 
+			<function>
+				<sum>
+					<product>
+						<property>/controls/flight/aileron</property>
+						<table>
+							<independentVar lookup="row">/systems/fcc/rcws/in-detent</independentVar>
+							<tableData>
+								0  1.00
+								1  0.25
+							</tableData>
+						</table>
+					</product>
+					<product>
+						<difference>
+							<property>/systems/fcc/rcws/output</property>
+							<product>
+								<property>/controls/flight/aileron</property>
+								<table>
+									<independentVar lookup="row">/systems/fcc/rcws/in-detent</independentVar>
+									<tableData>
+										0  1
+										1  0
+									</tableData>
+								</table>
+							</product>
+						</difference>
+						<value>0.25</value>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/aileron-yoke-switch">
+			<default value="/controls/flight/aileron" />
+			<test value="/systems/fcs/aileron-rcws"> 
+				/systems/fcc/rcws/active eq 1
+			</test>
+			<test value="/systems/fcc/afs/roll-cmd">
+				/systems/fcc/afs/enabled eq 1
+			</test>
+		</switch>
+		
+		
+		
+		<switch name="/systems/fcs/ailerons/backdrive/direction-1">
+			<default value="-1" />
+			<test value="1">
+				/it-autoflight/internal/active-fms eq 2
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/ailerons/backdrive/direction-2">
+			<default value="-1" />
+			<test value="1">
+				/systems/fcs/deflected-aileron/active eq 1
+			</test>
+		</switch>
+		
+		<summer name="/systems/fcs/ailerons/backdrive/error">
+			<input>/systems/fcs/deflected-aileron/in-l</input>
+			<input>-/systems/fcs/deflected-aileron/in-r</input>
+		</summer>
+		
+		<switch name="/systems/fcs/ailerons/backdrive/active">
+			<default value="0" />
+			<test logic="OR" value="1">
+				/systems/fcs/ailerons/backdrive/error le -0.01
+				/systems/fcs/ailerons/backdrive/error ge 0.01
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/fcs/ailerons/backdrive/cmd">
+			<function>
+				<product>
+					<property>/systems/acconfig/options/deflected-aileron</property>
+					<property>/systems/acconfig/options/rcws</property>
+					<property>/systems/fcs/ailerons/backdrive/active</property>
+					<property>/systems/fcs/ailerons/backdrive/direction-1</property>
+					<property>/systems/fcs/ailerons/backdrive/direction-2</property>
+					<value>0.13</value> 
+				</product>
+			</function>
+		</fcs_function>
+		
+		<actuator name="/systems/fcs/ailerons/backdrive/output">
+			<input>/systems/fcs/ailerons/backdrive/cmd</input>
+			<rate_limit>0.75</rate_limit>
+		</actuator>
+		
+		
+		<summer name="/systems/fcs/aileron-yoke-sum">
+			<input>/systems/fcs/aileron-yoke-switch</input>
+			<input>/systems/fcs/ailerons/trim-overall</input>
+			<input>/systems/fcs/ailerons/backdrive/output</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<summer name="/systems/fcs/ailerons/output">
+			<input>/systems/fcc/roll-output</input>
+			<input>/systems/fcs/ailerons/trim-overall</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		
+		<summer name="/systems/fcs/ailerons/output-surfaces">
+			<input>/systems/fcs/ailerons/output</input>
+			<input>-/systems/fcs/ailerons/trim-overall</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<fcs_function name="/systems/fcs/ailerons/trim-left"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/controls/flight/aileron-trim</independentVar>
+					<tableData>
+						-1.0 -0.35
+						 0.0  0.00
+						 1.0  0.35
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/ailerons/trim-right"> 
+			<function>
+				<table>
+					<independentVar lookup="row">/controls/flight/aileron-trim</independentVar>
+					<tableData>
+						-1.0  0.35
+						 0.0  0.00
+						 1.0 -0.35
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/aileron-droop">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 7  1
+						31  0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/aileron-in-droop-rate">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 7  0.333333
+						31  2
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/aileron-out-droop-rate">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 7  0.066667
+						31  2
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Aileron L Outer">
+		
+		<fcs_function name="/systems/fcs/aileron-out-l/function">
+			<function>
+				<sum>
+					<product>
+						<sum>
+							<table>
+								<independentVar lookup="row">/systems/fcs/ailerons/output-surfaces</independentVar>
+								<tableData>
+									-0.95 -1.0
+									 0.00  0.0
+									 0.95  1.0
+								</tableData>
+							</table>
+							<property>/systems/fcs/ailerons/trim-left</property> 
+						</sum>
+						<property>/systems/fcs/aileron-out-enable</property>
+					</product>
+					<property>/systems/fcs/deflected-aileron/out</property>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/aileron-out-l/switch">
+			<default value="/systems/fcs/aileron-droop" />
+			<test logic="OR" value="/systems/fcs/aileron-out-l/function">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/aileron-out-l/cmd-deg">
+			<input>/systems/fcs/aileron-out-l/switch</input>
+			<gain>20</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/aileron-out-l/rate">
+			<default value="/systems/fcs/aileron-out-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/aileron-out-l/final-actuator">
+			<input>/systems/fcs/aileron-out-l/cmd-deg</input>
+			<rate_limit>/systems/fcs/aileron-out-l/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/aileron-out-l/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Aileron L Inner">
+		
+		<fcs_function name="/systems/fcs/aileron-in-l/function">
+			<function>
+				<sum>
+					<table>
+						<independentVar lookup="row">/systems/fcs/ailerons/output-surfaces</independentVar>
+						<tableData>
+							-0.95 -1.0
+							 0.00  0.0
+							 0.95  1.0
+						</tableData>
+					</table>
+					<property>/systems/fcs/ailerons/trim-left</property> 
+					<property>/systems/fcs/deflected-aileron/in-l</property>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/aileron-in-l/switch">
+			<default value="/systems/fcs/aileron-droop" />
+			<test logic="OR" value="/systems/fcs/aileron-in-l/function">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/aileron-in-l/cmd-deg">
+			<input>/systems/fcs/aileron-in-l/switch</input>
+			<gain>20</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/aileron-in-l/rate">
+			<default value="/systems/fcs/aileron-in-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/aileron-in-l/final-actuator">
+			<input>/systems/fcs/aileron-in-l/cmd-deg</input>
+			<rate_limit>/systems/fcs/aileron-in-l/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/aileron-in-l/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Aileron R Inner">
+		
+		<fcs_function name="/systems/fcs/aileron-in-r/function">
+			<function>
+				<sum>
+					<table>
+						<independentVar lookup="row">/systems/fcs/ailerons/output-surfaces</independentVar>
+						<tableData>
+							-0.95  1.0
+							 0.00  0.0
+							 0.95 -1.0
+						</tableData>
+					</table>
+					<property>/systems/fcs/ailerons/trim-right</property> 
+					<property>/systems/fcs/deflected-aileron/in-r</property>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/aileron-in-r/switch">
+			<default value="/systems/fcs/aileron-droop" />
+			<test logic="OR" value="/systems/fcs/aileron-in-r/function">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/aileron-in-r/cmd-deg">
+			<input>/systems/fcs/aileron-in-r/switch</input>
+			<gain>20</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/aileron-in-r/rate">
+			<default value="/systems/fcs/aileron-in-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/aileron-in-r/final-actuator">
+			<input>/systems/fcs/aileron-in-r/cmd-deg</input>
+			<rate_limit>/systems/fcs/aileron-in-r/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/aileron-in-r/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Aileron R Outer">
+		
+		<fcs_function name="/systems/fcs/aileron-out-r/function">
+			<function>
+				<sum>
+					<product>
+						<sum>
+							<table>
+								<independentVar lookup="row">/systems/fcs/ailerons/output-surfaces</independentVar>
+								<tableData>
+									-0.95  1.0
+									 0.00  0.0
+									 0.95 -1.0
+								</tableData>
+							</table>
+							<property>/systems/fcs/ailerons/trim-right</property> 
+						</sum>
+						<property>/systems/fcs/aileron-out-enable</property>
+					</product>
+					<property>/systems/fcs/deflected-aileron/out</property>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/aileron-out-r/switch">
+			<default value="/systems/fcs/aileron-droop" />
+			<test logic="OR" value="/systems/fcs/aileron-out-r/function">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/aileron-out-r/cmd-deg">
+			<input>/systems/fcs/aileron-out-r/switch</input>
+			<gain>20</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/aileron-out-r/rate">
+			<default value="/systems/fcs/aileron-out-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/aileron-out-r/final-actuator">
+			<input>/systems/fcs/aileron-out-r/cmd-deg</input>
+			<rate_limit>/systems/fcs/aileron-out-r/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/aileron-out-r/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Elevator General">
+		
+		<pure_gain name="/systems/fcs/elevator-small">
+			<input>/controls/flight/elevator</input>
+			<gain>0.25</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/elevator-yoke-switch">
+			<default value="/controls/flight/elevator" />
+			<test value="/systems/fcs/elevator-small"> 
+				/systems/fcc/lsas/pah/active eq 1
+			</test>
+			<test value="/systems/fcc/afs/pitch-cmd">
+				/systems/fcc/afs/enabled eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/fcs/elevator-droop">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 8  1
+						32  0
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/elevator-in-droop-rate">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 8  0.333333
+						32  2
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/elevator-out-droop-rate">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 8  0.066667
+						32  2
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Elevator L Outer">
+		
+		<switch name="/systems/fcs/elevator-out-l/switch">
+			<default value="/systems/fcs/elevator-droop" />
+			<test logic="OR" value="/systems/fcc/elevator-o-l-output">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-2-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/elevator-out-l/cmd-deg">
+			<input>/systems/fcs/elevator-out-l/switch</input>
+			<gain>22</gain>
+			<clipto>
+				<min>-22</min>
+				<max>20</max>
+			</clipto>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/elevator-out-l/rate">
+			<default value="/systems/fcs/elevator-out-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-2-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/elevator-out-l/final-actuator">
+			<input>/systems/fcs/elevator-out-l/cmd-deg</input>
+			<rate_limit>/systems/fcs/elevator-out-l/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/elevator-out-l/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Elevator L Inner">
+		
+		<switch name="/systems/fcs/elevator-in-l/switch">
+			<default value="/systems/fcs/elevator-droop" />
+			<test logic="OR" value="/systems/fcc/elevator-i-l-output">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-aft-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/elevator-in-l/cmd-deg">
+			<input>/systems/fcs/elevator-in-l/switch</input>
+			<gain>22</gain>
+			<clipto>
+				<min>-22</min>
+				<max>20</max>
+			</clipto>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/elevator-in-l/rate">
+			<default value="/systems/fcs/elevator-in-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/sys-3-aft-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/elevator-in-l/final-actuator">
+			<input>/systems/fcs/elevator-in-l/cmd-deg</input>
+			<rate_limit>/systems/fcs/elevator-in-l/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/elevator-in-l/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Elevator R Inner">
+		
+		<switch name="/systems/fcs/elevator-in-r/switch">
+			<default value="/systems/fcs/elevator-droop" />
+			<test logic="OR" value="/systems/fcc/elevator-i-r-output">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-aft-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/elevator-in-r/cmd-deg">
+			<input>/systems/fcs/elevator-in-r/switch</input>
+			<gain>22</gain>
+			<clipto>
+				<min>-22</min>
+				<max>20</max>
+			</clipto>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/elevator-in-r/rate">
+			<default value="/systems/fcs/elevator-in-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-aft-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/elevator-in-r/final-actuator">
+			<input>/systems/fcs/elevator-in-r/cmd-deg</input>
+			<rate_limit>/systems/fcs/elevator-in-r/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/elevator-in-r/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Elevator R Outer">
+		
+		<switch name="/systems/fcs/elevator-out-r/switch">
+			<default value="/systems/fcs/elevator-droop" />
+			<test logic="OR" value="/systems/fcc/elevator-o-r-output">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-2-psi ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/elevator-out-r/cmd-deg">
+			<input>/systems/fcs/elevator-out-r/switch</input>
+			<gain>22</gain>
+			<clipto>
+				<min>-22</min>
+				<max>20</max>
+			</clipto>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/elevator-out-r/rate">
+			<default value="/systems/fcs/elevator-out-droop-rate" />
+			<test logic="OR" value="80">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-2-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/elevator-out-r/final-actuator">
+			<input>/systems/fcs/elevator-out-r/cmd-deg</input>
+			<rate_limit>/systems/fcs/elevator-out-r/rate</rate_limit>
+			<lag>26.5</lag>
+			<output>/systems/fcs/elevator-out-r/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Stabilizer">
+		
+		<switch name="/systems/fcs/stabilizer/rate">
+			<default value="0" />
+			<test value="20">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="OR" value="/systems/fcc/pitch-trim-speed">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/stabilizer/cmd-deg">
+			<input>/controls/flight/elevator-trim</input>
+			<gain>15.5</gain>
+			<clipto>
+				<min>-15.5</min>
+				<max>1.0</max>
+			</clipto>
+		</pure_gain>
+		
+		<actuator name="/systems/fcs/stabilizer/final-actuator">
+			<input>/systems/fcs/stabilizer/cmd-deg</input>
+			<rate_limit>/systems/fcs/stabilizer/rate</rate_limit>
+			<lag>22.5</lag>
+			<output>/systems/fcs/stabilizer/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Rudder General">
+		
+		<pure_gain name="/systems/fcs/rudders/trim">
+			<input>/controls/flight/rudder-trim</input>
+			<gain>0.43333333333333333333333333333333</gain> 
+		</pure_gain>
+		
+		<summer name="/systems/fcs/rudders/upper-sum">
+			<input>/systems/fcc/rudder-upper-output</input>
+			<input>/systems/fcs/rudders/trim</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<summer name="/systems/fcs/rudders/lower-sum">
+			<input>/systems/fcc/rudder-lower-output</input>
+			<input>/systems/fcs/rudders/trim</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<switch name="/systems/fcs/rudders/pedal-switch">
+			<default value="/systems/fcc/yaw/rudder-nul" />
+			<test value="/systems/fcc/yaw/output-and-rudder"> 
+				/systems/fcc/yaw/parallel-rudder-active eq 1
+			</test>
+		</switch>
+		
+		<summer name="/systems/fcs/rudders/pedal-sum">
+			<input>/systems/fcs/rudders/pedal-switch</input>
+			<input>/systems/fcs/rudders/trim</input>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<fcs_function name="/systems/fcs/rudder-droop-rate">
+			<function>
+				<table>
+					<independentVar lookup="row">aero/qbar-psf</independentVar>
+					<tableData>
+						 7.5  0
+						31.5  2
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+	
+	</channel>
+	
+	<channel name="Rudder Upper">
+		
+		<switch name="/systems/fcs/rudder-upper/switch">
+			<default value="0" />
+			<test logic="OR" value="/systems/fcs/rudders/upper-sum">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/nrmp/sys-2-to-sys-1 ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/rudder-upper/cmd-deg">
+			<input>/systems/fcs/rudder-upper/switch</input>
+			<gain>30</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/rudder-upper/rate">
+			<default value="/systems/fcs/rudder-droop-rate" />
+			<test logic="OR" value="75">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/nrmp/sys-2-to-sys-1 ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/rudder-upper/final-actuator">
+			<input>/systems/fcs/rudder-upper/cmd-deg</input>
+			<rate_limit>/systems/fcs/rudder-upper/rate</rate_limit>
+			<lag>25.5</lag>
+			<output>/systems/fcs/rudder-upper/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Rudder Lower">
+		
+		<switch name="/systems/fcs/rudder-lower/switch">
+			<default value="0" />
+			<test logic="OR" value="/systems/fcs/rudders/lower-sum">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/nrmp/sys-3-to-sys-2 ge 2200
+			</test>
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/rudder-lower/cmd-deg">
+			<input>/systems/fcs/rudder-lower/switch</input>
+			<gain>30</gain>
+		</pure_gain>
+		
+		<switch name="/systems/fcs/rudder-lower/rate">
+			<default value="/systems/fcs/rudder-droop-rate" />
+			<test logic="OR" value="75">
+				/systems/hydraulics/sys-2-psi ge 2200
+				/systems/hydraulics/nrmp/sys-3-to-sys-2 ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/rudder-lower/final-actuator">
+			<input>/systems/fcs/rudder-lower/cmd-deg</input>
+			<rate_limit>/systems/fcs/rudder-lower/rate</rate_limit>
+			<lag>25.5</lag>
+			<output>/systems/fcs/rudder-lower/final-deg</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Flaps/Slats Control">
+		
+		<fcs_function name="/systems/fcs/flaps/fixed"> 
+			<function>
+				<quotient>
+					<floor>
+						<sum>
+							<product>
+								<property>/controls/flight/flaps</property>
+								<value>10000</value>
+							</product>
+							<value>0.5</value> 
+						</sum>
+					</floor>
+					<value>10000</value>
+				</quotient>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/flaps/input">
+			<default value="0" /> 
+			<test logic="AND" value="1"> 
+				/systems/fcs/flaps/fixed ge 0.20
+				/systems/fcs/flaps/fixed lt 0.36
+			</test>
+			<test logic="AND" value="2"> 
+				/systems/fcs/flaps/fixed ge 0.36
+				/systems/fcs/flaps/fixed lt 0.52
+			</test>
+			<test logic="AND" value="3"> 
+				/systems/fcs/flaps/fixed ge 0.52
+				/systems/fcs/flaps/fixed lt 0.68
+			</test>
+			<test logic="AND" value="4"> 
+				/systems/fcs/flaps/fixed ge 0.68
+				/systems/fcs/flaps/fixed lt 0.84
+			</test>
+			<test value="5"> 
+				/systems/fcs/flaps/fixed ge 0.84
+			</test>
+			<output>/systems/fms/speeds/flaps-input-feedback</output>
+		</switch>
+		
+		<fcs_function name="/systems/fcs/flaps/dial-a-flap-cmd">
+			<function>
+				<floor>
+					<sum>
+						<property>/controls/flight/dial-a-flap</property>
+						<value>0.5</value> 
+					</sum>
+				</floor>
+			</function>
+			<clipto>
+				<min>10</min>
+				<max>25</max>
+			</clipto>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/flaps/cmd">
+			<default value="0" />
+			<test value="/systems/fcs/flaps/dial-a-flap-cmd">
+				/systems/fcs/flaps/input eq 2
+			</test>
+			<test value="28">
+				/systems/fcs/flaps/input eq 3
+			</test>
+			<test value="35">
+				/systems/fcs/flaps/input eq 4
+			</test>
+			<test value="50">
+				/systems/fcs/flaps/input eq 5
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/slats/cmd">
+			<default value="0" />
+			<test logic="AND" value="31">
+				/systems/fcs/flaps/input ge 1
+				/controls/flight/slat-stow eq 0
+			</test>
+		</switch>
+		
+		<switch name="/controls/flight/auto-slat-cmd">
+			<default value="0" />
+			<test logic="AND" value="1">
+				aero/alpha-deg-damped ge /systems/fcc/stall-alpha-deg
+				position/wow eq 0
+				/systems/fcs/flaps/input eq 0
+			</test>
+		</switch>
+		
+		<actuator name="/controls/flight/auto-slat-timer">
+			<input>/controls/flight/auto-slat-cmd</input>
+			<rate_limit sense="incr">1000</rate_limit> 
+			<rate_limit sense="decr">0.2</rate_limit> 
+			<output>/controls/flight/auto-slat-timer-out</output>
+		</actuator>
+		
+		<switch name="/systems/fcs/slats/cmd-final">
+			<default value="/systems/fcs/slats/cmd" />
+			<test logic="AND" value="31"> 
+				/systems/electrical/bus/ac-3 ge 112
+				/instrumentation/airspeed-indicator/indicated-mach le 0.55
+				/controls/flight/auto-slat-timer gt 0
+				position/wow eq 0
+				/systems/fcs/flaps/input eq 0
+			</test>
+			<test logic="AND" value="0"> 
+				/systems/fcs/flaps/input eq 1
+				/instrumentation/airspeed-indicator/indicated-speed-kt ge 280
+			</test>
+			<test logic="AND" value="0"> 
+				/systems/fcs/flaps/input eq 1
+				/instrumentation/airspeed-indicator/indicated-mach ge 0.55
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/flaps/max-deg">
+			<default value="50" />
+			<test logic="AND" value="22">
+				/instrumentation/airspeed-indicator/indicated-speed-kt gt /systems/fms/speeds/flap-20-25-max-kts
+				/controls/fcc/flap-limit eq 0
+				/systems/failures/fcc/flap-limit ne 1
+			</test>
+			<test logic="AND" value="25">
+				/instrumentation/airspeed-indicator/indicated-speed-kt gt /systems/fms/speeds/flap-28-max-kts
+				/controls/fcc/flap-limit eq 0
+				/systems/failures/fcc/flap-limit ne 1
+			</test>
+			<test logic="AND" value="28">
+				/instrumentation/airspeed-indicator/indicated-speed-kt gt /systems/fms/speeds/flap-35-max-kts
+				/controls/fcc/flap-limit eq 0
+				/systems/failures/fcc/flap-limit ne 1
+			</test>
+			<test logic="AND" value="35">
+				/instrumentation/airspeed-indicator/indicated-speed-kt gt /systems/fms/speeds/flap-50-max-kts
+				/controls/fcc/flap-limit eq 0
+				/systems/failures/fcc/flap-limit ne 1
+			</test>
+		</switch>
+		
+		<pure_gain name="/systems/fcs/flaps/cmd-deg">
+			<input>/systems/fcs/flaps/cmd</input>
+			<gain>1.0</gain>
+			<clipto>
+				<min>0</min>
+				<max>/systems/fcs/flaps/max-deg</max>
+			</clipto>
+		</pure_gain>
+		
+		<pure_gain name="/systems/fcs/slats/cmd-deg">
+			<input>/systems/fcs/slats/cmd-final</input>
+			<gain>1.0</gain>
+		</pure_gain>
+	
+	</channel>
+	
+	<channel name="Flaps">
+		
+		<switch name="/systems/fcs/flaps/rate">
+			<default value="0" />
+			<test value="100">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="OR" value="1.6">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-2-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/flaps/final-actuator">
+			<input>/systems/fcs/flaps/cmd-deg</input>
+			<rate_limit>/systems/fcs/flaps/rate</rate_limit>
+			<output>fcs/flap-pos-deg</output>
+		</actuator>
+		
+		<aerosurface_scale name="/systems/fcs/flaps/final-norm">
+			<input>/systems/fcs/flaps/final-actuator</input>
+			<domain>
+				<min>0</min>
+				<max>50</max>
+			</domain>
+			<range>
+				<min>0</min>
+				<max>1</max>
+			</range>
+			<output>fcs/flap-pos-norm</output>
+		</aerosurface_scale>
+	
+	</channel>
+	
+	<channel name="Slats">
+		
+		<switch name="/systems/fcs/slats/rate">
+			<default value="0" />
+			<test value="100">
+				/systems/acconfig/autoconfig-running eq 1
+			</test>
+			<test logic="OR" value="3.1">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/slats/final-actuator">
+			<input>/systems/fcs/slats/cmd-deg</input>
+			<rate_limit>/systems/fcs/slats/rate</rate_limit>
+			<output>fcs/slat-pos-deg</output>
+		</actuator>
+		
+		<aerosurface_scale name="/systems/fcs/slats/final-norm">
+			<input>/systems/fcs/slats/final-actuator</input>
+			<domain>
+				<min>0</min>
+				<max>31</max>
+			</domain>
+			<range>
+				<min>0</min>
+				<max>1</max>
+			</range>
+			<output>fcs/slat-pos-norm</output>
+		</aerosurface_scale>
+	
+	</channel>
+	
+	<channel name="Gear Common">
+		
+		<switch name="/systems/gear/cmd">
+			<default value="1" />
+			<test value="0">
+				/controls/gear/lever le 1
+			</test>
+		</switch>
+		
+		<switch name="gear/center-gear-latch">
+			<default value="gear/center-gear-latch" />
+			<test logic="AND" value="0">
+				/controls/gear/center-gear-up eq 0
+			</test>
+			<test logic="AND" value="1">
+				/controls/gear/lever le 1
+				/controls/gear/center-gear-up eq 1
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/cmd-center">
+			<default value="1" />
+			<test logic="OR" value="0">
+				/controls/gear/lever le 1
+				gear/center-gear-latch eq 1
+			</test>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Nose Gear">
+		
+		<switch name="/systems/gear/unit[0]/rate-incr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/nose-actuator eq 1
+			</test>
+			<test value="0.0555556"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<test logic="AND" value="0.0166667"> 
+				/controls/hydraulics/gear-gravity-ext eq 1
+				/accelerations/pilot-g ge 0.5
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[0]/rate-decr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/nose-actuator eq 1
+			</test>
+			<test value="0.125"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/gear/unit[0]/pos-actuator">
+			<input>/systems/gear/cmd</input>
+			<rate_limit sense="incr">/systems/gear/unit[0]/rate-incr</rate_limit>
+			<rate_limit sense="decr">/systems/gear/unit[0]/rate-decr</rate_limit>
+			<output>gear/unit[0]/pos-norm</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Left Main Gear">
+		
+		<switch name="/systems/gear/unit[1]/rate-incr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/left-actuator eq 1
+			</test>
+			<test value="0.0487805"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<test logic="AND" value="0.0222222"> 
+				/controls/hydraulics/gear-gravity-ext eq 1
+				/accelerations/pilot-g ge 0.5
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[1]/rate-decr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/left-actuator eq 1
+			</test>
+			<test value="0.1176471"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/gear/unit[1]/pos-actuator">
+			<input>/systems/gear/cmd</input>
+			<rate_limit sense="incr">/systems/gear/unit[1]/rate-incr</rate_limit>
+			<rate_limit sense="decr">/systems/gear/unit[1]/rate-decr</rate_limit>
+			<output>gear/unit[1]/pos-norm</output>
+		</actuator>
+		
+		<switch name="/systems/gear/unit[1]/angle-deg-cmd">
+			<default value="0" />
+			<test logic="AND" value="/orientation/pitch-deg">
+				gear/unit[1]/WOW eq 1
+			</test>
+			<clipto>
+				<min>-20</min>
+				<max>20</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/systems/gear/unit[1]/angle-deg">
+			<input>/systems/gear/unit[1]/angle-deg-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Right Main Gear">
+		
+		<switch name="/systems/gear/unit[2]/rate-incr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/right-actuator eq 1
+			</test>
+			<test value="0.0487805"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<test logic="AND" value="0.0222222"> 
+				/controls/hydraulics/gear-gravity-ext eq 1
+				/accelerations/pilot-g ge 0.5
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[2]/rate-decr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/right-actuator eq 1
+			</test>
+			<test value="0.1176471"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/gear/unit[2]/pos-actuator">
+			<input>/systems/gear/cmd</input>
+			<rate_limit sense="incr">/systems/gear/unit[2]/rate-incr</rate_limit>
+			<rate_limit sense="decr">/systems/gear/unit[2]/rate-decr</rate_limit>
+			<output>gear/unit[2]/pos-norm</output>
+		</actuator>
+		
+		<switch name="/systems/gear/unit[2]/angle-deg-cmd">
+			<default value="0" />
+			<test logic="AND" value="/orientation/pitch-deg">
+				gear/unit[2]/WOW eq 1
+			</test>
+			<clipto>
+				<min>-20</min>
+				<max>20</max>
+			</clipto>
+		</switch>
+		
+		<lag_filter name="/systems/gear/unit[2]/angle-deg">
+			<input>/systems/gear/unit[2]/angle-deg-cmd</input>
+			<c1>20</c1>
+		</lag_filter>
+	
+	</channel>
+	
+	<channel name="Center Main Gear">
+		
+		<switch name="/systems/gear/unit[3]/rate-incr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/center-actuator eq 1
+			</test>
+			<test value="0.0625"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+			<test logic="AND" value="0.0181818"> 
+				/controls/hydraulics/gear-gravity-ext eq 1
+				/accelerations/pilot-g ge 0.5
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[3]/rate-decr">
+			<default value="0" />
+			<test logic="AND" value="1000">
+				/systems/acconfig/autoconfig-running eq 1
+				position/wow eq 1
+			</test>
+			<test value="0">
+				/systems/failures/gear/center-actuator eq 1
+			</test>
+			<test value="0.1428571"> 
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/gear/unit[3]/pos-actuator">
+			<input>/systems/gear/cmd-center</input>
+			<rate_limit sense="incr">/systems/gear/unit[3]/rate-incr</rate_limit>
+			<rate_limit sense="decr">/systems/gear/unit[3]/rate-decr</rate_limit>
+			<output>gear/unit[3]/pos-norm</output>
+		</actuator>
+	
+	</channel>
+	
+	<channel name="Gear Misc">
+		
+		<fcs_function name="/systems/gear/all-norm">
+			<function>
+				<product>
+					<property>/systems/gear/unit[0]/pos-actuator</property>
+					<property>/systems/gear/unit[1]/pos-actuator</property>
+					<property>/systems/gear/unit[2]/pos-actuator</property>
+					<property>/systems/gear/unit[3]/pos-actuator</property>
+				</product>
+			</function>
+		</fcs_function>
+		
+		
+		<switch name="/systems/gear/unit[0]/status">
+			<default value="1" /> 
+			<test logic="AND" value="0"> 
+				/controls/gear/lever eq 0
+				/systems/gear/unit[0]/pos-actuator lt 0.01
+			</test>
+			<test logic="AND" value="2"> 
+				/controls/gear/lever eq 3
+				/systems/gear/unit[0]/pos-actuator gt 0.99
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[1]/status">
+			<default value="1" /> 
+			<test logic="AND" value="0"> 
+				/controls/gear/lever eq 0
+				/systems/gear/unit[1]/pos-actuator lt 0.01
+			</test>
+			<test logic="AND" value="2"> 
+				/controls/gear/lever eq 3
+				/systems/gear/unit[1]/pos-actuator gt 0.99
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[2]/status">
+			<default value="1" /> 
+			<test logic="AND" value="0"> 
+				/controls/gear/lever eq 0
+				/systems/gear/unit[2]/pos-actuator lt 0.01
+			</test>
+			<test logic="AND" value="2"> 
+				/controls/gear/lever eq 3
+				/systems/gear/unit[2]/pos-actuator gt 0.99
+			</test>
+		</switch>
+		
+		<switch name="/systems/gear/unit[3]/status">
+			<default value="1" /> 
+			<test logic="AND" value="0"> 
+				/controls/gear/center-gear-up eq 1
+				/systems/gear/unit[3]/pos-actuator lt 0.01
+			</test>
+			<test logic="AND" value="0"> 
+				/controls/gear/lever eq 0
+				/systems/gear/unit[3]/pos-actuator lt 0.01
+			</test>
+			<test logic="AND" value="2"> 
+				/controls/gear/lever eq 3
+				/systems/gear/unit[3]/pos-actuator gt 0.99
+			</test>
+		</switch>
+		
+		
+		<fcs_function name="/systems/gear/tire-psi-delta">
+			<function>
+				<product>
+					<difference>
+						<property>/environment/temperature-degc</property>
+						<value>15</value> 
+					</difference>
+					<value>0.19</value> 
+				</product>
+			</function>
+		</fcs_function>
+		
+		<summer name="/systems/gear/unit[0]/tire-l-psi">
+			<input>/systems/gear/unit[0]/tire-l-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[0]/tire-r-psi">
+			<input>/systems/gear/unit[0]/tire-r-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[1]/tire-l-aft-psi">
+			<input>/systems/gear/unit[1]/tire-l-aft-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[1]/tire-l-fwd-psi">
+			<input>/systems/gear/unit[1]/tire-l-fwd-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[1]/tire-r-aft-psi">
+			<input>/systems/gear/unit[1]/tire-r-aft-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[1]/tire-r-fwd-psi">
+			<input>/systems/gear/unit[1]/tire-r-fwd-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[2]/tire-l-aft-psi">
+			<input>/systems/gear/unit[2]/tire-l-aft-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[2]/tire-l-fwd-psi">
+			<input>/systems/gear/unit[2]/tire-l-fwd-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[2]/tire-r-aft-psi">
+			<input>/systems/gear/unit[2]/tire-r-aft-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[2]/tire-r-fwd-psi">
+			<input>/systems/gear/unit[2]/tire-r-fwd-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[3]/tire-l-psi">
+			<input>/systems/gear/unit[3]/tire-l-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+		
+		<summer name="/systems/gear/unit[3]/tire-r-psi">
+			<input>/systems/gear/unit[3]/tire-r-psi-input</input>
+			<input>/systems/gear/tire-psi-delta</input>
+		</summer>
+	
+	</channel>
+	
+	<channel name="Tiller">
+		
+		<switch name="/systems/fcs/tiller/input-switched">
+			<default value="/controls/flight/rudder" />
+			<test value="0">
+				/gear/gear[0]/wow ne 1
+			</test>
+			<test value="/controls/gear/steering">
+				/systems/acconfig/options/separate-tiller-axis eq 1
+			</test>
+			<test value="/controls/flight/aileron">
+				/controls/flight/aileron-drives-tiller eq 1
+			</test>
+		</switch>
+		
+		<scheduled_gain name="/systems/fcs/tiller/handle-scheduled">
+			<input>/systems/fcs/tiller/input-switched</input>
+			<table>
+				<independentVar lookup="row">/velocities/groundspeed-kt</independentVar>
+				<independentVar lookup="column">/systems/acconfig/options/separate-tiller-axis</independentVar>
+				<tableData> 
+					      0         1
+					 0.5  0.000000  0.000000
+					 1.0  1.000000  1.000000
+					15.0  1.000000  1.000000
+					45.0  0.142857  1.000000
+				</tableData>
+			</table>
+		</scheduled_gain>
+		
+		<actuator name="/systems/fcs/tiller/handle">
+			<input>/systems/fcs/tiller/handle-scheduled</input>
+			<rate_limit>0.5</rate_limit> 
+		</actuator>
+		
+		<pure_gain name="/systems/fcs/tiller/autopush-cmd-deg">
+			<input>/systems/fcs/tiller/autopush-cmd</input>
+			<gain>70</gain>
+		</pure_gain>
+		
+		<summer name="/systems/fcs/tiller/afs-cmd-input">
+			<input>/systems/fcc/afs/yaw-cmd</input>
+			<input>/systems/fcs/rudders/trim</input> 
+			<clipto>
+				<min>-1.0</min>
+				<max>1.0</max>
+			</clipto>
+		</summer>
+		
+		<scheduled_gain name="/systems/fcs/tiller/afs-cmd-deg">
+			<input>/systems/fcs/tiller/afs-cmd-input</input>
+			<table>
+				<independentVar lookup="row">/velocities/groundspeed-kt</independentVar>
+				<tableData>
+					  0.5   0
+					  1.0  10
+				</tableData>
+			</table>
+		</scheduled_gain>
+		
+		<switch name="/systems/fcs/tiller/rudder-cmd-switch">
+			<default value="/controls/flight/rudder" />
+			<test value="/controls/flight/aileron">
+				/controls/flight/aileron-drives-tiller eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/fcs/tiller/rudder-cmd-deg"> 
+			<function>
+				<table>
+					<independentVar lookup="row">zero</independentVar> 
+					<independentVar lookup="column">/systems/fcs/tiller/rudder-cmd-switch</independentVar>
+					<independentVar lookup="table">/velocities/groundspeed-kt</independentVar>
+					<tableData breakPoint="0.5">
+						  -1.00 -0.01  0.01  1.00
+						0  0     0     0     0
+						1  0     0     0     0
+					</tableData>
+					<tableData breakPoint="1.0">
+						  -1.00 -0.01  0.01  1.00
+						0 -70    0     0     70
+						1 -70    0     0     70
+					</tableData>
+					<tableData breakPoint="15">
+						  -1.00 -0.01  0.01  1.00
+						0 -70    0     0     70
+						1 -70    0     0     70
+					</tableData>
+					<tableData breakPoint="45">
+						  -1   0  1
+						0 -10  0  10
+						1 -10  0  10
+					</tableData>
+				</table>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/tiller/tiller-cmd-deg">
+			<function>
+				<sum>
+					<table>
+						<independentVar lookup="row">/velocities/groundspeed-kt</independentVar>
+						<independentVar lookup="column">/controls/gear/steering</independentVar>
+						<tableData>
+							    -1.00 -0.01  0.01  1.00
+							0.5  0     0     0     0
+							1.0 -70    0     0     70
+						</tableData>
+					</table>
+					<product>
+						<property>/systems/fcs/tiller/rudder-cmd-switch</property>
+						<table>
+							<independentVar lookup="row">/velocities/groundspeed-kt</independentVar>
+							<tableData>
+								0.5   0
+								1.0  10
+							</tableData>
+						</table>
+					</product>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<switch name="/systems/fcs/tiller/min-deg">
+			<default value="-25" />
+			<test value="-70">
+				/sim/model/autopush/connected eq 1
+			</test>
+			<test value="-70">
+				/systems/hydraulics/sys-1-psi ge 2200
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/tiller/max-deg">
+			<default value="25" />
+			<test value="70">
+				/sim/model/autopush/connected eq 1
+			</test>
+			<test value="70">
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<switch name="/systems/fcs/tiller/cmd-deg">
+			<default value="/systems/fcs/tiller/rudder-cmd-deg" />
+			<test value="0">
+				/gear/gear[0]/wow ne 1
+			</test>
+			<test value="/systems/fcs/tiller/autopush-cmd-deg">
+				/sim/model/autopush/connected eq 1
+			</test>
+			<test value="/systems/fcs/tiller/afs-cmd-deg">
+				/systems/fcc/afs/enabled eq 1
+			</test>
+			<test value="/systems/fcs/tiller/tiller-cmd-deg">
+				/systems/acconfig/options/separate-tiller-axis eq 1
+			</test>
+			<clipto>
+				<min>/systems/fcs/tiller/min-deg</min>
+				<max>/systems/fcs/tiller/max-deg</max>
+			</clipto>
+		</switch>
+		
+		<switch name="/systems/fcs/tiller/rate">
+			<default value="0" />
+			<test value="70">
+				/sim/model/autopush/connected eq 1
+			</test>
+			<test logic="OR" value="35">
+				/systems/hydraulics/sys-1-psi ge 2200
+				/systems/hydraulics/sys-3-psi ge 2200
+			</test>
+		</switch>
+		
+		<actuator name="/systems/fcs/tiller/actuator">
+			<input>/systems/fcs/tiller/cmd-deg</input>
+			<rate_limit>/systems/fcs/tiller/rate</rate_limit>
+			<lag>24.5</lag>
+			<output>fcs/steer-pos-deg[0]</output>
+		</actuator>
+		
+		<switch name="/systems/fcs/tiller/pushback-steer-deg">
+			<default value="0" />
+			<test value="/systems/fcs/tiller/actuator">
+				/sim/model/autopush/connected eq 1
+			</test>
+		</switch>
+	
+	</channel>
+	
+	<channel name="Brakes">
+		
+		<fcs_function name="/systems/fcs/brakes/rate">
+			<function>
+				<sum>
+					<table>
+						<independentVar lookup="row">/systems/hydraulics/brakes/sys-1-psi</independentVar>
+						<tableData>
+							 50  0.0
+							750  0.5
+						</tableData>
+					</table>
+					<table>
+						<independentVar lookup="row">/systems/hydraulics/brakes/sys-2-psi</independentVar>
+						<tableData>
+							 50  0.0
+							750  0.5
+						</tableData>
+					</table>
+				</sum>
+			</function>
+		</fcs_function>
+		
+		<fcs_function name="/systems/fcs/brakes/left-input">
+			<function>
+				<max>
+					<property>/controls/gear/brake-left</property>
+					<property>/controls/gear/brake-parking</property>
+					<property>/systems/abs/brake-output</property>
+				</max>
+			</function>
+			<output>/systems/hydraulics/brakes/left-input-feedback</output>
+			<clipto>
+				<min>0.0</min>
+				<max>1.0</max>
+			</clipto>
+		</fcs_function>
+		
+		<actuator name="/systems/fcs/brakes/left-actuator">
+			<input>/systems/fcs/brakes/left-input</input>
+			<rate_limit>/systems/fcs/brakes/rate</rate_limit>
+			<output>/systems/hydraulics/brakes/left-actuator-feedback</output>
+		</actuator>
+		
+		<switch name="fcs/left-brake-cmd-norm">
+			<default value="/systems/fcs/brakes/left-actuator" />
+			<test logic="OR" value="1">
+				/systems/acconfig/autoconfig-running eq 1
+				/services/chocks/enable eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/fcs/brakes/right-input">
+			<function>
+				<max>
+					<property>/controls/gear/brake-right</property>
+					<property>/controls/gear/brake-parking</property>
+					<property>/systems/abs/brake-output</property>
+				</max>
+			</function>
+			<output>/systems/hydraulics/brakes/right-input-feedback</output>
+			<clipto>
+				<min>0.0</min>
+				<max>1.0</max>
+			</clipto>
+		</fcs_function>
+		
+		<actuator name="/systems/fcs/brakes/right-actuator">
+			<input>/systems/fcs/brakes/right-input</input>
+			<rate_limit>/systems/fcs/brakes/rate</rate_limit>
+			<output>/systems/hydraulics/brakes/right-actuator-feedback</output>
+		</actuator>
+		
+		<switch name="fcs/right-brake-cmd-norm">
+			<default value="/systems/fcs/brakes/right-actuator" />
+			<test logic="OR" value="1">
+				/systems/acconfig/autoconfig-running eq 1
+				/services/chocks/enable eq 1
+			</test>
+		</switch>
+		
+		<fcs_function name="/systems/fcs/brakes/center-input">
+			<function>
+				<max>
+					<sum>
+						<product>
+							<property>/controls/gear/brake-left</property>
+							<value>0.5</value>
+						</product>
+						<product>
+							<property>/controls/gear/brake-right</property>
+							<value>0.5</value>
+						</product>
+					</sum>
+					<property>/controls/gear/brake-parking</property>
+					<property>/systems/abs/brake-output</property>
+				</max>
+			</function>
+			<output>/systems/hydraulics/brakes/center-input-feedback</output>
+			<clipto>
+				<min>0.0</min>
+				<max>1.0</max>
+			</clipto>
+		</fcs_function>
+		
+		<actuator name="/systems/fcs/brakes/center-actuator">
+			<input>/systems/fcs/brakes/center-input</input>
+			<rate_limit>/systems/fcs/brakes/rate</rate_limit>
+			<output>/systems/hydraulics/brakes/center-actuator-feedback</output>
+		</actuator>
+		
+		<switch name="fcs/center-brake-cmd-norm">
+			<default value="/systems/fcs/brakes/center-actuator" />
+			<test logic="OR" value="1">
+				/systems/acconfig/autoconfig-running eq 1
+				/services/chocks/enable eq 1
+			</test>
+		</switch>
+	
+	</channel>
+
+</system>

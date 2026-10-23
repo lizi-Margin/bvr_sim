@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="hook">
+
+  <property>systems/hook/tailhook-cmd-norm</property>
+
+  <property value="4">systems/hook/tailhook-length-ft</property>
+  <property value="-5">systems/hook/tailhook-pos-min-deg</property>
+  <property value="50">systems/hook/tailhook-pos-max-deg</property>
+  <property value="210.17">systems/hook/tailhook-offset-x-in</property>
+  <property value="0">systems/hook/tailhook-offset-y-in</property>
+  <property value="-31.57">systems/hook/tailhook-offset-z-in</property>
+  <property value="0">/sim/carrier/runway-heading-degs</property>
+  
+
+  <channel name="Hook">
+
+      
+
+     <pure_gain name="Tailhook Cmd Norm">
+         <input>/controls/gear/tailhook</input>
+         <gain>1</gain>
+         <output>systems/hook/tailhook-cmd-norm</output>
+     </pure_gain>
+
+
+
+     <kinematic name="systems/hook/tailhook-control">
+       <input>systems/hook/tailhook-cmd-norm</input>
+       <traverse>
+        <setting>
+          <position> 0 </position>
+          <time>     0 </time>
+        </setting>
+        <setting>
+          <position> 1 </position>
+          <time>     1.5 </time>
+        </setting>
+       </traverse>
+       <output>systems/hook/tailhook-pos-norm</output>
+     </kinematic>
+
+
+
+     <switch name="systems/hook/wheel-speed">
+         <default value="0" />
+         <test logic="AND" value="gear/unit[1]/wheel-speed-fps">
+             gear/unit[1]/wheel-speed-fps gt 0
+             gear/unit[1]/wheel-speed-fps ge  gear/unit[2]/wheel-speed-fps
+         </test>
+         <test logic="AND" value="gear/unit[2]/wheel-speed-fps">
+             gear/unit[2]/wheel-speed-fps gt 0
+             gear/unit[2]/wheel-speed-fps ge  gear/unit[1]/wheel-speed-fps
+         </test>
+         
+     </switch>
+
+
+     <switch name="systems/hook/ready">
+          <default value="0" />
+          <test logic="AND" value="1">
+              systems/hook/tailhook-control gt 0.99
+          </test>
+     </switch>
+
+     <scheduled_gain name="systems/hook/hook-decel-multiplier">
+      <input>systems/hook/ready</input>
+      <table>
+          <independentVar lookup="row">systems/hook/wheel-speed</independentVar>
+         <tableData>
+            0     0.00
+            1     0.00
+            80    2.5
+         </tableData>
+      </table>
+     </scheduled_gain>
+
+     <pure_gain name="systems/hook/hook-decel-force">
+        <input>systems/hook/hook-decel-multiplier</input>
+        <gain>inertia/weight-lbs</gain>
+     </pure_gain>
+
+     <summer name="systems/hook/force">
+        <input>systems/hook/hook-decel-force</input>
+        <input>forces/fbx-prop-lbs</input>
+     </summer>
+     
+     </channel>
+     
+     
+     
+     <channel name="wire-animation">
+	 
+	 
+	<kinematic name="systems/hook/wire-on_timer">
+	<input>systems/hook/wire-on</input>
+	<traverse>
+	    <setting>
+		<position>0</position>
+		<time>0</time>
+	    </setting>
+	    <setting>
+		<position>1</position>
+		<time>10</time>
+	    </setting>
+	</traverse>
+    </kinematic>
+     
+	 
+     
+     <switch name="systems/hook/wire-on_sw">
+          <default value="systems/hook/wire-on" />
+          <test logic="AND" value="1">
+	      external_reactions/hook/magnitude  != 0
+          </test>
+	  <test logic="AND" value="0">
+              systems/hook/wire-on_timer == 1
+	      systems/hook/wire-on  == 1
+          </test>
+	  <output>systems/hook/wire-on</output>
+     </switch>
+     
+     
+     <switch name="systems/hook/wire-on_timer_sw">
+          <default value="systems/hook/wire-on_timer" />
+          <test logic="AND" value="1">
+	     systems/hook/wire-on  == 1
+          </test>
+	  <test logic="AND" value="0">
+              systems/hook/wire-on_timer == 1
+          </test>
+	  <output>systems/hook/wire-on_timer</output>
+     </switch>
+     
+
+    <fcs_function name="systems/hook/wire-heading">
+	    <function>
+			<difference>
+			    <product>
+				<property>attitude/heading-true-rad</property>
+				<value>57.29578</value>
+			    </product>
+			    <property>/sim/carrier/runway-heading-degs</property>
+			</difference>
+	    </function>
+    </fcs_function>
+
+  </channel>
+
+</system>

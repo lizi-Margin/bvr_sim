@@ -1,0 +1,16 @@
+{
+  "set": "Lockheed-Martin-FA-22A-Raptor/f22-yasim-set.xml",
+  "name": "f22-yasim",
+  "fdm_type": "yasim",
+  "fdm": "Lockheed-Martin-FA-22A-Raptor/f22-yasim.xml",
+  "jets": 2,
+  "model": "Lockheed-Martin-FA-22A-Raptor/Models/F-22-Yasim-Model-File.xml",
+  "tags": [],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "Lockheed-Martin-FA-22A-Raptor.zip",
+  "archive_sha256": "9af22d91f025782fe18753df5e83665195f7194473575ac1d5781ccb7449809c",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Lockheed-Martin-FA-22A-Raptor.zip"
+}

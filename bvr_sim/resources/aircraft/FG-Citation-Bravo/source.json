@@ -1,0 +1,24 @@
+{
+  "set": "Citation-Bravo/Bravo-set.xml",
+  "name": "Cessna 550B - Citation-Bravo",
+  "fdm_type": "yasim",
+  "fdm": "Citation-Bravo/fdm-y.xml",
+  "jets": 2,
+  "model": "Citation-Bravo/Models/Bravo.xml",
+  "tags": [
+    "bizjet",
+    "cessna",
+    "jet",
+    "retractable-gear",
+    "ifr",
+    "twin-engine",
+    "glass-cockpit"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "Citation-Bravo.zip",
+  "archive_sha256": "2f62338f967c4c132e6340cd92da1504bd308ca332d3bfdd64f373f758c20a24",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Citation-Bravo.zip"
+}

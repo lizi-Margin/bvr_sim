@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="SpeedBrake">
+
+    
+
+    <channel name="SpeedBrake">
+
+
+
+
+
+
+
+     <switch name="Speedbrake Control">
+          <default value="/controls/flight/speedbrake" />
+          <test logic="AND" value="0">
+                 /controls/gear/gear-down  gt 0
+                /position/altitude-agl-ft  lt 25
+          </test>
+          <output>/controls/flight/speedbrake</output>
+     </switch>
+
+
+
+        <kinematic name="Speedbrake Position">
+            <input>/controls/flight/speedbrake</input>
+            <traverse>
+                <setting>
+                    <position>0.0000</position>
+                    <time>0.0000</time>
+                </setting>
+                <setting>
+                    <position>15.000</position>
+                    <time>0.5</time>
+                </setting>
+                    <setting>
+                    <position>30.000</position>
+                    <time>1</time>
+                </setting>
+                <setting>
+                    <position>45.000</position>
+                    <time>1.5</time>
+                </setting>
+                <setting>
+                    <position>60.0000</position>
+                    <time>2</time>
+                </setting>
+            </traverse>
+            <output>fcs/speedbrake-pos-deg</output>
+        </kinematic>
+
+        <pure_gain name="Speedbrake surface">
+            <input>fcs/speedbrake-pos-deg</input>
+            <gain>1</gain>
+            <output>/surface-positions/speed_brake-pos-norm</output>
+        </pure_gain>
+
+
+
+
+
+    </channel>
+
+</system>

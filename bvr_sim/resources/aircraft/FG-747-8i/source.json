@@ -1,0 +1,24 @@
+{
+  "set": "747-8i/747-8F-set.xml",
+  "name": "Boeing 747-8 Freighter",
+  "fdm_type": "yasim",
+  "fdm": "747-8i/747-8f-yasim.xml",
+  "jets": 4,
+  "model": "747-8i/Models/747-8F.xml",
+  "tags": [
+    "cargo",
+    "boeing",
+    "jet",
+    "retractable-gear",
+    "glass-cockpit",
+    "ifr",
+    "2010s"
+  ],
+  "model_rating": 3,
+  "fdm_rating": 4,
+  "variant_of": "747-8i",
+  "archive": "747-8i.zip",
+  "archive_sha256": "bac8eccf3d025729fc2004b7fdc4491c9faae70e6c66901ffe047d209d4371fd",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/747-8i.zip"
+}

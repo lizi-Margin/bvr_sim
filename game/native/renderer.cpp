@@ -8,9 +8,12 @@
 #include <random>
 #include <stdexcept>
 #include <unordered_map>
+#include <chrono>
+#include <thread>
 #include "world_scene.hxx"
 #include "audio_presenter.hxx"
 #include "visual_effects.hxx"
+#include "aircraft_visuals.hxx"
 namespace py = pybind11;
 using namespace DirectX;
 using wi::ecs::Entity;
@@ -27,6 +30,7 @@ struct HudLine {
 };
 struct Input {
     float x = 0, y = 0;
+    int wheel = 0;
     bool active = false, quit = false;
     std::vector<int> held, pressed;
 };
@@ -59,6 +63,7 @@ class GamePath : public wi::RenderPath3D {
     }
 };
 class Renderer {
+    inline static int wheel_delta = 0;
     std::unique_ptr<wi::Application> app;
     std::unique_ptr<GamePath> path;
     HWND window = nullptr;
@@ -77,11 +82,15 @@ class Renderer {
     bool camera_set = false;
     int width, height;
     bool studio = false;
+    Entity preview_root = wi::ecs::INVALID_ENTITY;
     std::vector<Entity> studio_entities;
     std::map<Entity, std::vector<Entity>> engine_effects;
     AudioPresenter audio;
     std::unique_ptr<VisualEffects> effects;
+    std::unique_ptr<AircraftVisuals> aircraft_visuals;
     std::map<Entity, Entity> weapon_flames;
+    nlohmann::json visual_profile;
+    Entity weather_entity=wi::ecs::INVALID_ENTITY;
     static LRESULT CALLBACK wndproc(HWND h, UINT m, WPARAM w, LPARAM l) {
         if (m == WM_CLOSE) {
             PostMessage(h, WM_APP + 1, 0, 0);
@@ -89,6 +98,10 @@ class Renderer {
         }
         if (m == WM_INPUT) {
             wi::input::rawinput::ParseMessage((void *)l);
+            return 0;
+        }
+        if (m == WM_MOUSEWHEEL) {
+            wheel_delta += GET_WHEEL_DELTA_WPARAM(w) / WHEEL_DELTA;
             return 0;
         }
         return DefWindowProc(h, m, w, l);
@@ -117,9 +130,10 @@ class Renderer {
         auto &s = wi::scene::GetScene();
         const int count = model == "F22" ? 2 : 1;
         for (int i = 0; i < count; ++i) {
-            auto e = s.Entity_CreateSphere("engine_glow", 1, 10, 10);
+            auto e = visual_profile.is_null()?s.Entity_CreateSphere("engine_glow", 1, 10, 10):soft_sprite(s,"afterburner",{1,.4f,.09f,.45f},1.2f);
             auto t = s.transforms.GetComponent(e);
-            t->Scale(XMFLOAT3(.22f, .22f, .6f));
+            if(visual_profile.is_null())t->Scale(XMFLOAT3(.22f, .22f, .6f));
+            else {t->Scale(XMFLOAT3(.18f,.75f,1));t->RotateRollPitchYaw(XMFLOAT3(DirectX::XM_PIDIV2,0,0));}
             t->Translate(
                 XMFLOAT3(count == 2 ? (i == 0 ? -.7f : .7f) : 0, -.1f, model == "F22" ? -8.6f : -5.9f));
             t->UpdateTransform();
@@ -133,15 +147,20 @@ class Renderer {
 
   public:
     Renderer(int w, int h, bool visible, const std::string &engine, const std::string &shaders,
-             const std::map<std::string, std::string> &models)
+             const std::map<std::string, std::string> &models,const std::string& profile_file="")
         : model_files(models.begin(), models.end()), width(w), height(h) {
         if (w < 320 || h < 240)
             throw std::invalid_argument("Window too small");
         if (!LoadLibraryW(std::filesystem::path(engine + "/WickedEngine/dxcompiler.dll").c_str()))
             throw std::runtime_error("Cannot load Wicked Engine dxcompiler.dll");
         wi::arguments::Parse(L"alwaysactive dx12");
-        wi::renderer::SetShaderSourcePath(engine + "/WickedEngine/shaders/");
-        wi::renderer::SetShaderPath(shaders + "/");
+        if(!profile_file.empty()){
+            std::ifstream file(profile_file);
+            if(!file)throw std::runtime_error("Cannot read visual profile: "+profile_file);
+            file>>visual_profile;
+        }
+        wi::renderer::SetShaderSourcePath((visual_profile.is_null()?engine+"/WickedEngine/shaders":visual_profile.value("shader_source",engine+"/WickedEngine/shaders"))+"/");
+        wi::renderer::SetShaderPath((visual_profile.is_null()?shaders:visual_profile.value("shader_cache",shaders))+"/");
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         WNDCLASSW wc{};
         wc.lpfnWndProc = wndproc;
@@ -163,14 +182,23 @@ class Renderer {
         app->swapChain.desc.vsync = false;
         app->Initialize();
         wi::initializer::WaitForInitializationsToFinish();
+        // Shader errors can be zero while asynchronous object PSOs are still
+        // compiling. Do not start gameplay/capture against an empty opaque pass.
+        auto loading_deadline=std::chrono::steady_clock::now()+std::chrono::seconds(120);
+        while(wi::renderer::IsPipelineCreationActive()){
+            if(std::chrono::steady_clock::now()>loading_deadline)throw std::runtime_error("Timed out waiting for Wicked object shader pipelines");
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
         path = std::make_unique<GamePath>();
         app->ActivatePath(path.get());
-        path->camera->CreatePerspective(float(w), float(h), .2f, 600000.f, 1.05f);
+        path->camera->CreatePerspective(float(w), float(h), .2f,600000.f, 1.05f);
         set_quality("medium");
         auto &s = wi::scene::GetScene();
         baked_world = std::make_unique<WorldScene>(s, model_files);
-        effects = std::make_unique<VisualEffects>(s);
-        auto weather = wi::ecs::CreateEntity();
+        effects = std::make_unique<VisualEffects>(s,!visual_profile.is_null());
+        aircraft_visuals = std::make_unique<AircraftVisuals>(s);
+        aircraft_visuals->set_material_profile(visual_profile);
+        auto weather = weather_entity=wi::ecs::CreateEntity();
         auto &sky = s.weathers.Create(weather);
         sky.SetRealisticSky(false);
         sky.SetRealisticSkyAerialPerspective(false);
@@ -182,12 +210,32 @@ class Renderer {
         // Keep nearby BVR contacts clear while fading the finite regional terrain
         // into the same horizon color as the sky before its outer boundary appears.
         sky.fogDensity = .000020f;
-        auto sun = s.Entity_CreateLight("sun", {0, 100, 0}, {1, .94f, .84f}, 4, 100000,
+        auto sun = s.Entity_CreateLight("sun", {0, 100, 0}, {1, .94f, .84f}, visual_profile.is_null()?4.f:visual_profile.value("sun_energy",4.f), 100000,
                                         wi::scene::LightComponent::DIRECTIONAL);
         auto t = s.transforms.GetComponent(sun);
         t->RotateRollPitchYaw(XMFLOAT3(-.65f, -.6f, 0));
         t->UpdateTransform();
         s.lights.GetComponent(sun)->SetCastShadow(true);
+        if(!visual_profile.is_null()){
+            sky.SetRealisticSky(visual_profile.value("physical_sky",true));
+            sky.SetRealisticSkyAerialPerspective(visual_profile.value("aerial_perspective",true));
+            sky.SetRealisticSkyHighQuality(visual_profile.value("high_quality_sky",false));
+            sky.SetVolumetricClouds(visual_profile.value("volumetric_clouds",false));
+            auto a=visual_profile.at("ambient");sky.ambient={a[0].get<float>(),a[1].get<float>(),a[2].get<float>()};
+            sky.skyExposure=visual_profile.value("sky_exposure",1.f);
+            // Aerial perspective already integrates atmospheric extinction.
+            // A weak height-fog layer begins beyond 100 km and applies to both
+            // the sky planet and finite terrain to make their horizon continuous.
+            auto haze=visual_profile.value("horizon_height_fog",nlohmann::json::object());
+            sky.SetHeightFog(true);sky.fogStart=haze.value("start_m",100000.f);sky.fogDensity=haze.value("density_per_m",.00005f);
+            sky.fogHeightStart=haze.value("base_m",0.f);sky.fogHeightEnd=haze.value("top_m",16000.f);sky.stars=0;
+            auto albedo=visual_profile.value("planet_albedo",std::vector<float>{.12f,.16f,.1f});
+            sky.atmosphereParameters.groundAlbedo={albedo[0],albedo[1],albedo[2]};
+            auto r=visual_profile.at("sun_rotation");t->ClearTransform();t->RotateRollPitchYaw(XMFLOAT3(r[0].get<float>(),r[1].get<float>(),r[2].get<float>()));t->UpdateTransform();
+            path->setExposure(visual_profile.value("exposure",1.f));
+            path->setSaturation(visual_profile.value("saturation",1.f));
+            path->setTonemap(wi::renderer::Tonemap::ACES);
+        }
         s.layers.Create(sun).layerMask = 1;
         auto floor = cube("hangar_floor", {0, -.4f, 0}, {55, .3f, 45}, {.23f, .25f, .28f, 1});
         auto wall = cube("hangar_back", {0, 15, 34}, {55, 15, 1}, {.18f, .21f, .25f, 1});
@@ -336,7 +384,16 @@ class Renderer {
     }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
     double render_height(double n, double w) const { return baked_world->render_height(n, w); }
+    double render_surface_height(double n,double w,double reference=INFINITY) const {return baked_world->render_surface_height(n,w,reference);}
     void presentation(bool hangar) {
+        if(studio!=hangar&&!visual_profile.is_null()){
+            auto sky=wi::scene::GetScene().weathers.GetComponent(weather_entity);
+            sky->SetRealisticSky(!hangar&&visual_profile.value("physical_sky",true));
+            sky->SetRealisticSkyAerialPerspective(!hangar&&visual_profile.value("aerial_perspective",true));
+            sky->SetVolumetricClouds(!hangar&&visual_profile.value("volumetric_clouds",false));
+            auto a=visual_profile.at("ambient");sky->ambient=hangar?XMFLOAT3(.12f,.14f,.18f):XMFLOAT3(a[0].get<float>(),a[1].get<float>(),a[2].get<float>());
+            sky->horizon={.08f,.1f,.13f};sky->zenith={.025f,.035f,.055f};
+        }
         studio = hangar;
         path->setlayerMask(hangar ? 2 : 1);
     }
@@ -347,6 +404,8 @@ class Renderer {
     std::map<std::string, bool> audio_available() const { return audio.available; }
     Input poll() {
         Input in;
+        in.wheel = wheel_delta;
+        wheel_delta = 0;
         if (closed) {
             in.quit = true;
             return in;
@@ -398,13 +457,13 @@ class Renderer {
         return r;
     }
     void render(const bvr_sim::GameFrame &f, const std::vector<HudText> &texts,
-                const std::vector<HudLine> &lines) {
+                const std::vector<HudLine> &lines,float presentation_dt=1.f/60) {
         if (closed)
             throw std::runtime_error("Renderer closed");
         baked_world->update(camera_eye, f);
         audio.update(f, studio);
         if (!studio)
-            effects->update(f);
+            effects->update(f,camera_eye,presentation_dt);
         auto &s = wi::scene::GetScene();
         wi::unordered_set<std::string> live;
         if (depot != wi::ecs::INVALID_ENTITY) {
@@ -418,6 +477,7 @@ class Renderer {
             }
         }
         for (const auto &e : f.entities) {
+            if(preview_root!=wi::ecs::INVALID_ENTITY)break;
             if (studio && e.uid != "player")
                 continue;
             if (!e.alive)
@@ -427,8 +487,24 @@ class Renderer {
             auto it = roots.find(e.uid);
             if (it == roots.end()) {
                 if (e.kind == "aircraft") {
-                    root = import_model(e.uid, e.model);
-                    exhaust(root, e.model);
+                    auto file=model_files.find(e.model);
+                    if(file==model_files.end())throw std::runtime_error("Missing aircraft model: "+e.model);
+                    root=aircraft_visuals->instantiate(e.uid,file->second);
+                    roots[e.uid]=root;
+                    if(e.model=="F22"||e.model=="F16")exhaust(root,e.model);
+                } else if(e.kind=="vehicle") {
+                    root=import_model(e.uid,e.model);
+                } else if(e.kind=="sam") {
+                    // Authored schematic launcher proxy; it does not claim a surveyed SLAMRAAM mesh.
+                    root=s.Entity_CreateTransform(e.uid);s.layers.Create(root).layerMask=1;roots[e.uid]=root;
+                    auto add=[&](const std::string& name,XMFLOAT3 position,XMFLOAT3 scale) {
+                        auto part=cube(e.uid+name,position,scale,{.17f,.23f,.12f,1});s.Component_Attach(part,root,true);return part;
+                    };
+                    add("_platform",{0,.65f,0},{1.15f,.65f,2.5f});
+                    add("_pedestal",{0,1.6f,0},{.7f,.35f,.65f});
+                    for(int row=0;row<2;++row)for(int col=0;col<3;++col)
+                        add("_launch_tube",{(col-1)*.42f,2.f+row*.4f,0},{.18f,.18f,1.85f});
+                    add("_radar",{.8f,2.8f,-1.6f},{.3f,.45f,.15f});
                 } else if (e.kind == "missile" || e.kind == "bomb") {
                     root = s.Entity_CreateSphere(e.uid, 1, 10, 8);
                     auto body = s.transforms.GetComponent(root);
@@ -460,24 +536,28 @@ class Renderer {
             // Converted glTF: +Z forward, +Y up, +X starboard. NWU maps (west,up,north).
             if (!studio)
                 t->RotateRollPitchYaw(
-                    XMFLOAT3(float(-e.orientation[1]), float(-e.orientation[2]), float(-e.orientation[0])));
+                    // Aircraft NWU pitch is negative nose-up; Wicked +X rotation
+                    // pitches a +Z nose downward. Ground contacts use positive slope.
+                    XMFLOAT3(float(e.kind=="aircraft" ? e.orientation[1] : -e.orientation[1]), float(-e.orientation[2]), float(-e.orientation[0])));
             t->Translate(studio
                              ? XMFLOAT3(0, 2.1f, 0)
                              : XMFLOAT3(float(-e.position[1]), float(e.position[2]), float(e.position[0])));
             t->UpdateTransform();
+            if(e.kind=="aircraft")aircraft_visuals->update(root,e.animation_properties,e.throttle,studio);
             if (weapon_flames.count(root))
                 s.objects.GetComponent(weapon_flames[root])->SetRenderable(e.motor_burning);
             for (auto effect : engine_effects[root])
                 if (auto material = s.materials.GetComponent(effect)) {
-                    float intensity = studio ? 0 : float(std::clamp((e.throttle - .35) / .65, 0.0, 1.0));
+                    float intensity = studio ? 0 : float(visual_profile.is_null()?std::clamp((e.throttle-.35)/.65,0.,1.):std::clamp((e.throttle-.95)/.05,0.,1.));
                     s.objects.GetComponent(effect)->SetRenderable(intensity > .02f);
-                    material->SetEmissiveColor({1, .25f, .03f, intensity * 4});
-                    material->SetBaseColor({intensity, .15f * intensity, .01f, 1});
+                    material->SetEmissiveColor({1, .25f, .03f, intensity * (visual_profile.is_null()?4:1.2f)});
+                    material->SetBaseColor({1, .3f, .08f, visual_profile.is_null()?1.f:intensity*.45f});
                 }
         }
         for (auto it = roots.begin(); it != roots.end();) {
             if (!live.count(it->first)) {
                 s.Entity_Remove(it->second);
+                aircraft_visuals->remove(it->second);
                 engine_effects.erase(it->second);
                 weapon_flames.erase(it->second);
                 it = roots.erase(it);
@@ -485,7 +565,7 @@ class Renderer {
                 ++it;
         }
         for (const auto &event : f.events)
-            if ((event.kind == "missile_hit" || event.kind == "bomb_impact") && f.tick - event.tick <= 50) {
+            if (visual_profile.is_null()&&(event.kind == "missile_hit" || event.kind == "bomb_impact") && f.tick - event.tick <= 50) {
                 std::string id = event.kind + std::to_string(event.tick);
                 if (!flashes.count(id)) {
                     auto e = s.Entity_CreateSphere("impact_flash", 1, 12, 12);
@@ -540,11 +620,48 @@ class Renderer {
     int shader_errors() const {
         return wi::renderer::GetShaderErrorCount() + wi::renderer::GetShaderMissingCount();
     }
+    std::string visual_settings() const {return visual_profile.dump();}
+    size_t effect_count() const {return effects?effects->count():0;}
+    void set_clouds(bool enabled){
+        if(visual_profile.is_null())throw std::runtime_error("Cloud evaluation requires the visual profile");
+        visual_profile["volumetric_clouds"]=enabled;
+        wi::scene::GetScene().weathers.GetComponent(weather_entity)->SetVolumetricClouds(enabled&&!studio);
+    }
+    std::map<std::string,uint64_t> memory_usage() const {
+        auto v=wi::graphics::GetDevice()->GetMemoryUsage();return {{"usage_bytes",v.usage},{"budget_bytes",v.budget}};
+    }
+    std::array<float,3> entity_forward(const std::string& uid) const {
+        auto it=roots.find(uid);
+        if(it==roots.end())throw std::invalid_argument("Rendered entity not found: "+uid);
+        auto transform=wi::scene::GetScene().transforms.GetComponent(it->second);
+        auto forward=transform->GetForward();return {forward.x,forward.y,forward.z};
+    }
+    void preview_aircraft(const std::string& model,const std::map<std::string,double>& properties,double throttle){
+        reload();
+        auto file=model_files.find(model);
+        if(file==model_files.end())throw std::runtime_error("Missing review aircraft: "+model);
+        auto& s=wi::scene::GetScene();preview_root=aircraft_visuals->instantiate("asset_review",file->second);
+        s.layers.GetComponent(preview_root)->layerMask=2;
+        // Asset review can contain 80-m airliners: hide finite hangar walls.
+        for(auto e:studio_entities)if(auto o=s.objects.GetComponent(e))o->SetRenderable(false);
+        float lift=2.1f;
+        std::ifstream manifest(std::filesystem::path(file->second).parent_path()/"manifest.json");
+        if(manifest){nlohmann::json m;manifest>>m;lift+=std::max(0.f,-m.at("bounds_blender").at("min").at(2).get<float>());}
+        s.transforms.GetComponent(preview_root)->Translate(XMFLOAT3(0,lift,0));
+        aircraft_visuals->update(preview_root,properties,throttle,false);
+    }
+    std::map<std::string,uint64_t> aircraft_statistics() const { return aircraft_visuals->stats(); }
+    std::map<std::string,uint64_t> aircraft_import_counts() const { return aircraft_visuals->imports(); }
     void reload() {
         auto &s = wi::scene::GetScene();
+        if(preview_root!=wi::ecs::INVALID_ENTITY){
+            s.Entity_Remove(preview_root);preview_root=wi::ecs::INVALID_ENTITY;
+            for(auto e:studio_entities)if(auto o=s.objects.GetComponent(e))o->SetRenderable(true);
+        }
         for (auto [_, e] : roots)
             s.Entity_Remove(e);
         roots.clear();
+        if(aircraft_visuals)aircraft_visuals->clear();
         engine_effects.clear();
         weapon_flames.clear();
         if (effects)
@@ -555,6 +672,7 @@ class Renderer {
     }
 };
 PYBIND11_MODULE(bvr_game_render, m) {
+    m.attr("VISUAL_BETA")=true;
     py::class_<ScenePlacement>(m, "ScenePlacement")
         .def(py::init<>())
         .def_readwrite("id", &ScenePlacement::id)
@@ -572,6 +690,13 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readwrite("id", &SceneMaterial::id)
         .def_readwrite("base_color", &SceneMaterial::base_color)
         .def_readwrite("normal", &SceneMaterial::normal)
+        .def_readwrite("roughness_map", &SceneMaterial::roughness_map)
+        .def_readwrite("detail_color", &SceneMaterial::detail_color)
+        .def_readwrite("detail_normal", &SceneMaterial::detail_normal)
+        .def_readwrite("detail_roughness", &SceneMaterial::detail_roughness)
+        .def_readwrite("detail_tile_m", &SceneMaterial::detail_tile_m)
+        .def_readwrite("detail_mean_linear", &SceneMaterial::detail_mean_linear)
+        .def_readwrite("detail_strength", &SceneMaterial::detail_strength)
         .def_readwrite("color", &SceneMaterial::color)
         .def_readwrite("tile_m", &SceneMaterial::tile_m)
         .def_readwrite("roughness", &SceneMaterial::roughness)
@@ -581,7 +706,8 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readwrite("id", &SceneSurface::id)
         .def_readwrite("material", &SceneSurface::material)
         .def_readwrite("vertices", &SceneSurface::vertices)
-        .def_readwrite("indices", &SceneSurface::indices);
+        .def_readwrite("indices", &SceneSurface::indices)
+        .def_readwrite("drivable", &SceneSurface::drivable);
     py::class_<SceneStats>(m, "SceneStats")
         .def_readonly("unique_models", &SceneStats::unique_models)
         .def_readonly("imported_glbs", &SceneStats::imported_glbs)
@@ -614,14 +740,15 @@ PYBIND11_MODULE(bvr_game_render, m) {
     py::class_<Input>(m, "Input")
         .def_readonly("x", &Input::x)
         .def_readonly("y", &Input::y)
+        .def_readonly("wheel", &Input::wheel)
         .def_readonly("active", &Input::active)
         .def_readonly("quit", &Input::quit)
         .def_readonly("held", &Input::held)
         .def_readonly("pressed", &Input::pressed);
     py::class_<Renderer>(m, "Renderer")
         .def(py::init<int, int, bool, const std::string &, const std::string &,
-                      const std::map<std::string, std::string> &>())
-        .def("render", &Renderer::render)
+                      const std::map<std::string, std::string> &,const std::string&>(),py::arg("width"),py::arg("height"),py::arg("visible"),py::arg("engine"),py::arg("shaders"),py::arg("models"),py::arg("visual_profile")="")
+        .def("render", &Renderer::render,py::arg("frame"),py::arg("texts"),py::arg("lines"),py::arg("presentation_dt")=1.f/60)
         .def("poll", &Renderer::poll)
         .def("camera", &Renderer::camera)
         .def("camera_up", &Renderer::camera_up)
@@ -630,10 +757,19 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("reload", &Renderer::reload)
         .def("set_quality", &Renderer::set_quality)
         .def("shader_errors", &Renderer::shader_errors)
+        .def("visual_settings", &Renderer::visual_settings)
+        .def("effect_count", &Renderer::effect_count)
+        .def("set_clouds", &Renderer::set_clouds)
+        .def("memory_usage", &Renderer::memory_usage)
+        .def("entity_forward", &Renderer::entity_forward)
         .def("configure_world", &Renderer::configure_world)
         .def("configure_scene", &Renderer::configure_scene)
         .def("statistics", &Renderer::statistics)
+        .def("preview_aircraft", &Renderer::preview_aircraft)
+        .def("aircraft_statistics", &Renderer::aircraft_statistics)
+        .def("aircraft_import_counts", &Renderer::aircraft_import_counts)
         .def("render_height", &Renderer::render_height)
+        .def("render_surface_height",&Renderer::render_surface_height,py::arg("north"),py::arg("west"),py::arg("reference_height")=INFINITY)
         .def("presentation", &Renderer::presentation)
         .def("configure_audio", &Renderer::configure_audio)
         .def("audio_counts", &Renderer::audio_counts)

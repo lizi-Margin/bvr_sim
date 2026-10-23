@@ -14,6 +14,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "simulator/environment.hxx"
+#include "simulator/ground/ground_types.hxx"
+#include "simulator/aircraft/tactical_pilot.hxx"
 
 namespace bvr_sim {
 class SimCore;
@@ -24,6 +27,7 @@ struct GameConfig {
     std::string enemy_model = "F16";
     std::string mission = "air"; // air | strike | combined
     std::string fdm = "jsbsim";
+    bool library_aircraft = false; // explicit unarmed training access to separately imported aircraft
     std::uint32_t seed = 7;
     double dt = 0.02;
     double enemy_range = 12000.0;
@@ -35,6 +39,9 @@ struct GameConfig {
     bool enemy_evasion = false; // legacy callers keep their existing intercept behavior
     int missiles = 4;
     int bombs = 2;
+    std::vector<GroundUnitSpec> ground_units;
+    int intercept_waves=3;
+    double intercept_interval=120.,intercept_timeout=600.;
 };
 
 struct PilotCommand {
@@ -44,6 +51,9 @@ struct PilotCommand {
     double throttle = 0.8;
     double roll_input = 0.0;
     bool manual_roll = false;
+    std::optional<double> roll_rate; // YASim interactive assist, rad/s; manual_roll takes priority
+    double pitch_input = 0.0; // normalized stick: positive pull/up, negative push/down
+    bool manual_pitch = false; // override climb-angle assist with elevator input
     bool fire = false;
     bool drop_bomb = false;
     bool lock = false;
@@ -59,6 +69,14 @@ struct GameContact {
     bool locked = false;
 };
 
+struct GameWarning {
+    std::string uid;
+    double bearing = 0.0; // relative to ownship heading; RWS supplies direction only
+    double range = 0.0;
+    bool localized = false;
+    bool missile = false;
+};
+
 struct GameEntity {
     std::string uid, model, kind, team;
     bool alive = true;
@@ -68,6 +86,18 @@ struct GameEntity {
     double throttle = 0.0, weapon_age = 0.0;
     bool motor_burning = false;
     std::map<std::string, std::string> pylons;
+    std::map<std::string, double> animation_properties;
+};
+
+struct GroundState {
+    std::string uid, model, kind, motion, blocked_reason, contact_surface;
+    std::array<double, 3> position{}, velocity{}, orientation{};
+    VehicleRoute route;
+    double health = 0, speed = 0;
+    size_t waypoint = 0;
+    bool alive = true, parking = false;
+    int missiles_left = 0;
+    std::vector<std::string> sensor_contacts;
 };
 
 struct LaunchEnvelope {
@@ -95,6 +125,8 @@ struct GameFrame {
     std::string mission, result = "running", selected_target;
     std::vector<GameEntity> entities;  // render/debug world; never use as HUD contacts
     std::vector<GameContact> contacts; // player sensor observations only
+    std::vector<GameWarning> warnings; // RWS bearings and localized MWS warnings
+    std::vector<GroundState> ground_units;
     std::vector<CombatEvent> events;
     int missiles_left = 0, bombs_left = 0;
     int air_kills = 0, ground_kills = 0;
@@ -104,57 +136,12 @@ struct GameFrame {
     LaunchEnvelope envelope;
     std::vector<MissileFlight> missiles;
     std::optional<std::array<double, 3>> bomb_impact;
+    int mission_wave=0,mission_total=0,mission_kills_required=0;
+    double next_wave_time=-1;
 };
 
-// All height fields use indexed triangle planes, including fine/coarse tile seams.
-inline double sample_height_field(double origin_north, double origin_west, double spacing, int columns,
-                                  int rows, const std::vector<double> &heights, double north, double west) {
-    if (columns < 2 || rows < 2 || spacing <= 0 || heights.size() != size_t(columns * rows))
-        throw std::invalid_argument("Invalid terrain height field");
-    const double u = std::clamp((north - origin_north) / spacing, 0.0, double(columns - 1));
-    const double v = std::clamp((west - origin_west) / spacing, 0.0, double(rows - 1));
-    const int x = std::min(int(u), columns - 2), y = std::min(int(v), rows - 2);
-    const double tx = u - x, ty = v - y;
-    const double h00 = heights[y * columns + x], h10 = heights[y * columns + x + 1];
-    const double h01 = heights[(y + 1) * columns + x], h11 = heights[(y + 1) * columns + x + 1];
-    if (tx + ty <= 1)
-        return h00 + tx * (h10 - h00) + ty * (h01 - h00);
-    return h11 + (1 - tx) * (h01 - h11) + (1 - ty) * (h10 - h11);
-}
-struct TerrainTile {
-    double origin_north = 0, origin_west = 0, spacing = 50;
-    int columns = 2, rows = 2;
-    std::vector<double> heights{0, 0, 0, 0};
-    bool contains(double n, double w) const {
-        return n >= origin_north && w >= origin_west && n <= origin_north + spacing * (columns - 1) &&
-               w <= origin_west + spacing * (rows - 1);
-    }
-    double height(double n, double w) const {
-        return sample_height_field(origin_north, origin_west, spacing, columns, rows, heights, n, w);
-    }
-};
-// A multi-resolution height field usable without any renderer or GPU.
-struct GameTerrain {
-    double origin_north = -50000.0, origin_west = -50000.0;
-    double spacing = 1000.0;
-    int columns = 2, rows = 2;
-    std::vector<double> heights{0.0, 0.0, 0.0, 0.0};
-    std::vector<TerrainTile> detail_tiles;
-    // Set from the actual immutable data by GameSession; infinity disables the shortcut on mutable DTOs.
-    double maximum_height = std::numeric_limits<double>::infinity();
-    double height(double north, double west) const;
-    bool line_of_sight(const std::array<double, 3> &a, const std::array<double, 3> &b) const;
-};
-
-inline double GameTerrain::height(double north, double west) const {
-    const TerrainTile *selected = nullptr;
-    for (const auto &tile : detail_tiles)
-        if (tile.contains(north, west) && (!selected || tile.spacing < selected->spacing))
-            selected = &tile;
-    if (selected)
-        return selected->height(north, west);
-    return sample_height_field(origin_north, origin_west, spacing, columns, rows, heights, north, west);
-}
+// Backward-compatible API name; physical environment is owned by simulator/core.
+using GameTerrain = Terrain;
 
 class GameSession {
   public:
@@ -170,6 +157,12 @@ class GameSession {
     GameFrame frame() const;
     GameTerrain terrain() const;
     void set_terrain(const GameTerrain &terrain);
+    void spawn_ground(const GroundUnitSpec &spec);
+    void set_ground_route(const std::string &uid, const VehicleRoute &route);
+    void park_ground(const std::string &uid, bool parked);
+    void begin_recording(const std::string &log_path,const std::string &acmi_path,const std::string &reference_time);
+    void end_recording();
+    void flush_recording();
     void close();
 
   private:
@@ -178,11 +171,15 @@ class GameSession {
     void apply_command(const PilotCommand &command);
     void drive_player(const PilotCommand &command);
     void update_enemy();
+    void spawn_intercept_wave();
+    void update_intercept_enemies();
     void record(std::string kind, std::string actor, std::string target, std::string weapon,
                 std::string message, std::array<double, 3> position = {});
     std::shared_ptr<Fighter> fighter(const std::string &uid) const;
     mutable std::mutex mutex_;
     std::unique_ptr<SimCore> core_;
+    std::string session_log_path_;
+    bool recording_=false;
     std::shared_ptr<GameTerrain> terrain_;
     GameConfig config_;
     GameFrame frame_;
@@ -197,5 +194,10 @@ class GameSession {
     std::string enemy_behavior_ = "intercept";
     bool enemy_locked_ = false;
     std::map<std::string, double> weapon_launch_times_;
+    std::set<std::string> ground_objectives_;
+    int intercept_spawned_=0;
+    std::map<std::string,AirTacticalPilot> enemy_pilots_;
+    std::map<std::string,std::string> enemy_phases_;
+    std::set<std::string> intercept_weapon_kills_;
 };
 } // namespace bvr_sim

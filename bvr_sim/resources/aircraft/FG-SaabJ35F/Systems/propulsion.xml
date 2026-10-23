@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<propulsion>
+
+   <engine file="TLSvenskaFlygmotorRM6CTyp66">
+    <location unit="IN">
+      <x> 543.97 </x>
+      <y>   0.00 </y>
+      <z>   15.00 </z> 
+    </location>
+    <orient unit="DEG">
+      <pitch> 0.00 </pitch>
+      <roll>  0.00 </roll>
+      <yaw>   0.00 </yaw>
+    </orient>
+    <feed>4</feed>
+    <feed>5</feed>
+    <thruster file="direct">
+     <sense> 1 </sense>
+     <location unit="IN">
+       <x> 543.97 </x>
+       <y>   0.00 </y>
+       <z>   15.00 </z> 
+     </location>
+     <orient unit="DEG">
+       <pitch> 0.00 </pitch>
+       <roll>  0.00 </roll>
+       <yaw>   0.00 </yaw>
+     </orient>
+    </thruster>
+  </engine>
+
+  <property value="1">propulsion/afterburner-on</property>
+  
+  <tank type="FUEL" number="0">
+     <location unit="IN">
+       <x> 265.7 </x>
+       <y>   0.00 </y>
+       <z> 0 </z> 
+     </location>
+     <capacity unit="LBS"> 2420.00 </capacity>
+     <contents unit="LBS"> 2420.00 </contents>
+     <priority> 0 </priority>
+  </tank>
+
+  <tank type="FUEL" number="1">
+     <location unit="IN">
+       <x> 304.0 </x>
+       <y>   -24.00 </y>
+       <z> -22.4 </z>
+     </location>
+     <capacity unit="LBS"> 948.00 </capacity>
+     <contents unit="LBS"> 948.00 </contents>
+     <priority> 0 </priority>
+  </tank>
+  
+    <tank type="FUEL" number="2">
+     <location unit="IN">
+       <x> 304.0 </x>
+       <y>   24.00 </y>
+       <z> -22.4 </z>
+     </location>
+     <capacity unit="LBS"> 948.00 </capacity>
+     <contents unit="LBS"> 948.00 </contents>
+     <priority> 0 </priority>
+  </tank>
+
+  <tank type="FUEL" number="3">
+     <location unit="IN">
+       <x> 365.7 </x>
+       <y>   0.00 </y>
+       <z> 0 </z> 
+     </location>
+     <capacity unit="LBS"> 2420.00 </capacity>
+     <contents unit="LBS"> 2420.00 </contents>
+     <priority> 0 </priority>
+  </tank>
+
+  
+  
+  <tank type="FUEL" number="4">
+     <location unit="IN">
+       <x> 315.8 </x>
+       <y>  -0.5 </y>
+       <z> 0 </z> 
+     </location>
+     <capacity unit="LBS"> 130.00 </capacity>
+     <contents unit="LBS"> 130.00 </contents>
+     <priority> 0 </priority>
+  </tank>
+  
+  <tank type="FUEL" number="5">
+     <location unit="IN">
+       <x> 315.8 </x>
+       <y>   0.5 </y>
+       <z> 0 </z> 
+     </location>
+     <capacity unit="LBS"> 130.00 </capacity>
+     <contents unit="LBS"> 130.00 </contents>
+     <priority> 0 </priority>
+  </tank>
+   
+ </propulsion>

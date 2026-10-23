@@ -1,0 +1,16 @@
+{
+  "set": "L-1011-500/L-1011-500-set.xml",
+  "name": "Lockheed L-1011-500 TriStar",
+  "fdm_type": "jsb",
+  "fdm": "L-1011-500/L-1011-500.xml",
+  "jets": 3,
+  "model": "L-1011-500/Models/L-1011-500.xml",
+  "tags": [],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "L-1011-500.zip",
+  "archive_sha256": "076156d6b0d03b811d0c50b113b25770a72a58e81733000b90d2242d8c6dc7a9",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/L-1011-500.zip"
+}

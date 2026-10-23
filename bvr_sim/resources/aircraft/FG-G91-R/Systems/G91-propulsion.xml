@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='utf-8'?>
+<propulsion>
+    <engine file="ORPHEUS_MK_803">
+        
+        <feed>7</feed> 
+        <thruster file="direct">
+            <location unit="M">
+                <x>   9.50 </x>
+                <y>   0.00 </y>
+                <z>   0.00 </z>
+            </location>
+            <orient unit="DEG">
+                <pitch> 0.00 </pitch>
+                <roll>  0.00 </roll>
+                <yaw>   0.00 </yaw>
+            </orient>
+        </thruster>
+    </engine>
+    
+    
+    
+    <tank type="FUEL" number="0">
+        <location unit="IN">
+            <x> 212.50 </x>
+            <y> 0.00 </y>
+            <z> 16.14 </z>
+        </location>
+        <capacity unit="LBS"> 1367.00 </capacity>
+        <contents unit="LBS"> 1367.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="1">
+        <location unit="IN">
+            <x> 212.50 </x>
+            <y> 51.18 </y>
+            <z> 13.00 </z>
+        </location>
+        <capacity unit="LBS"> 562.00 </capacity>
+        <contents unit="LBS"> 562.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="2">
+        <location unit="IN">
+            <x> 212.50 </x>
+            <y> -51.18 </y>
+            <z> 13.00 </z>
+        </location>
+        <capacity unit="LBS"> 562.00 </capacity>
+        <contents unit="LBS"> 562.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="3">
+        <location unit="IN">
+            <x> 210.00 </x>
+            <y> 79.92 </y>
+            <z> -36.61 </z>
+        </location>
+        <capacity unit="LBS"> 900.00 </capacity>
+        <contents unit="LBS"> 0.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="4">
+        <location unit="IN">
+            <x> 210.00 </x>
+            <y> -79.92 </y>
+            <z> -36.61 </z>
+        </location>
+        <capacity unit="LBS"> 900.00 </capacity>
+        <contents unit="LBS"> 0.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="5">
+        <location unit="IN">
+            <x> 240.15 </x>
+            <y> 0.00 </y>
+            <z> -17.71 </z>
+        </location>
+        <capacity unit="LBS"> 277.00 </capacity>
+        <contents unit="LBS"> 277.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="6">
+        <location unit="IN">
+            <x> 181.89 </x>
+            <y> 0.00 </y>
+            <z> 0.00 </z>
+        </location>
+        <capacity unit="LBS"> 10.00 </capacity>
+        <contents unit="LBS"> 0.00 </contents>
+    </tank>
+    
+    
+    <tank type="FUEL" number="7">
+        <location unit="IN">
+            <x> 181.89 </x>
+            <y> 0.00 </y>
+            <z> 0.00 </z>
+        </location>
+        <capacity unit="LBS"> 4.00 </capacity>
+        <contents unit="LBS"> 4.00 </contents>
+    </tank>
+    
+    
+    
+    <engine file="JATO-M8-Engine">
+        
+        <feed>8</feed>
+        <thruster file="direct">
+            <location unit="M">
+                <x>   6.48 </x>
+                <y>   -0.34 </y>
+                <z>   -0.83 </z>
+            </location>
+            <orient unit="DEG">
+                <pitch> 15.0 </pitch>
+                <roll>  0.00 </roll>
+                <yaw>  -15.0 </yaw>
+            </orient>
+        </thruster>
+    </engine>
+    
+    <tank type="FUEL" number="8">
+        <location unit="M">
+            <x>   6.10 </x>
+            <y>   -0.34 </y>
+            <z>   -0.83 </z>
+        </location>
+        <capacity unit="LBS">70</capacity>
+        <contents unit="LBS">0.0</contents>
+    </tank>
+    
+    
+    
+    <engine file="JATO-M8-Engine">
+        
+        <feed>9</feed>
+        <thruster file="direct">
+            <location unit="M">
+                <x>   6.48 </x>
+                <y>   -0.11 </y>
+                <z>   -0.83 </z>
+            </location>
+            <orient unit="DEG">
+                <pitch> 25.0 </pitch>
+                <roll>  0.0 </roll>
+                <yaw>   0.0 </yaw>
+            </orient>
+        </thruster>
+    </engine>
+    
+    <tank type="FUEL" number="9">
+        <location unit="M">
+            <x>   6.10 </x>
+            <y>   -0.11 </y>
+            <z>   -0.83 </z>
+        </location>
+        <capacity unit="LBS">70</capacity>
+        <contents unit="LBS">0.0</contents>
+    </tank>
+    
+    
+    
+    <engine file="JATO-M8-Engine">
+        
+        <feed>10</feed>
+        <thruster file="direct">
+            <location unit="M">
+                <x>   6.48 </x>
+                <y>   0.11 </y>
+                <z>   -0.83 </z>
+            </location>
+            <orient unit="DEG">
+                <pitch> 25.0 </pitch>
+                <roll>  0.0 </roll>
+                <yaw>   0.0 </yaw>
+            </orient>
+        </thruster>
+    </engine>
+    
+    <tank type="FUEL" number="10">
+        <location unit="M">
+            <x>   6.10 </x>
+            <y>   0.11 </y>
+            <z>   -0.83 </z>
+        </location>
+        <capacity unit="LBS">70</capacity>
+        <contents unit="LBS">0.0</contents>
+    </tank>
+    
+    
+    
+    <engine file="JATO-M8-Engine">
+        
+        <feed>11</feed>
+        <thruster file="direct">
+            <location unit="M">
+                <x>   6.48 </x>
+                <y>   0.34 </y>
+                <z>   -0.83 </z>
+            </location>
+            <orient unit="DEG">
+                <pitch> 15.0 </pitch>
+                <roll>  0.00 </roll>
+                <yaw>   15.0 </yaw>
+            </orient>
+        </thruster>
+    </engine>
+    
+    <tank type="FUEL" number="11">
+        <location unit="M">
+            <x>   6.10 </x>
+            <y>   0.34 </y>
+            <z>   -0.83 </z>
+        </location>
+        <capacity unit="LBS">70</capacity>
+        <contents unit="LBS">0.0</contents>
+    </tank>
+</propulsion>

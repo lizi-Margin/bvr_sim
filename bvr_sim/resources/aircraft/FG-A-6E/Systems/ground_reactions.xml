@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ground_reactions>
+
+    
+    <contact type="BOGEY" name="NOSE">
+	<location unit="M">
+	    <x>  -2.7 </x>
+	    <y>   0.00 </y>
+	    <z>  -2.9 </z>
+	</location>
+	<static_friction>  0.80 </static_friction>
+	<dynamic_friction> 0.50 </dynamic_friction>
+	<rolling_friction> 0.02 </rolling_friction>
+	<spring_coeff unit="N/M">875000</spring_coeff>
+	<damping_coeff unit="N/M/SEC">47000</damping_coeff>
+	<max_steer unit="DEG">360</max_steer>
+	
+	<brake_group>NONE</brake_group>
+	<retractable>1</retractable>
+	<castered>0</castered>
+    </contact>
+
+    <contact type="BOGEY" name="LEFT_MAIN">
+	<location unit="M">
+	    <x>  2.26  </x>
+	    <y> -1.82 </y>
+	    <z> -2.74  </z>
+	</location>
+	<static_friction>  0.80 </static_friction>
+	<dynamic_friction> 0.50 </dynamic_friction>
+	<rolling_friction> 0.02 </rolling_friction>
+	<spring_coeff unit="N/M">784000</spring_coeff>
+	<damping_coeff unit="N/M/SEC">50800</damping_coeff>
+	<max_steer unit="DEG">0</max_steer>
+	<brake_group>LEFT</brake_group>
+	<retractable>1</retractable>
+    </contact>
+
+    <contact type="BOGEY" name="RIGHT_MAIN">
+	<location unit="M">
+	    <x>  2.26  </x>
+	    <y>  1.82 </y>
+	    <z> -2.74 </z>
+	</location>
+	<static_friction>  0.80 </static_friction>
+	<dynamic_friction> 0.50 </dynamic_friction>
+	<rolling_friction> 0.02 </rolling_friction>
+	<spring_coeff unit="N/M">784000</spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC">50800</damping_coeff>
+	<max_steer unit="DEG">0</max_steer>
+	<brake_group>RIGHT</brake_group>
+	<retractable>1</retractable>
+    </contact>
+
+    
+    
+    <contact type="STRUCTURE" name="LEFT_WINGTIP">
+	<location unit="M">
+	    <x> 3.70 </x>
+	    <y> -8.00 </y>
+	    <z> -0.10 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+    
+    <contact type="STRUCTURE" name="RIGHT_WINGTIP">
+	<location unit="M">
+	    <x>  3.70 </x>
+	    <y>  8.00 </y>
+	    <z> -0.10 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="TAIL">
+	<location unit="M">
+	    <x> 11.70 </x>
+	    <y>  0.00 </y>
+	    <z>  0.37 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="NOSE">
+	<location unit="M">
+	    <x> -5.00 </x>
+	    <y>  0.00 </y>
+	    <z> -0.60 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="FUSELAGE_FWD">
+	<location unit="M">
+	    <x> -2.80 </x>
+	    <y>  0.00 </y>
+	    <z> -1.35 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="FUSELAGE_MID">
+	<location unit="M">
+	    <x> -3.90 </x>
+	    <y>  0.00 </y>
+	    <z> -0.90 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="FUSELAGE_AFT">
+	<location unit="M">
+	    <x> -8.98 </x>
+	    <y>  0.00 </y>
+	    <z> -0.20 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="RUDDER">
+	<location unit="M">
+	    <x>-10.50 </x>
+	    <y>  0.00 </y>
+	    <z>  3.16 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="CANOPY">
+	<location unit="M">
+	    <x>  1.30 </x>
+	    <y>  0.00 </y>
+	    <z>  1.43 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+    <contact type="STRUCTURE" name="NOSE">
+	<location unit="M">
+	    <x> -4.55 </x>
+	    <y>  0.00 </y>
+	    <z>  1.25 </z>
+	</location>
+	<static_friction>0.8</static_friction>
+	<dynamic_friction>0.5</dynamic_friction>
+	<spring_coeff unit="LBS/FT">      30000.00 </spring_coeff>
+	<damping_coeff unit="LBS/FT/SEC"> 30000.00 </damping_coeff>
+	<damping_coeff_rebound unit="LBS/FT/SEC"> 60000 </damping_coeff_rebound>
+    </contact>
+
+</ground_reactions>

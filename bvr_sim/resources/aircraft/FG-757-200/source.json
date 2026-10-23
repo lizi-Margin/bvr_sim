@@ -1,0 +1,25 @@
+{
+  "set": "757-200/757-200-RB211-set.xml",
+  "name": "Boeing 757-200 (Rolls Royce)",
+  "fdm_type": "yasim",
+  "fdm": "757-200/757-200-RB211.xml",
+  "jets": 2,
+  "model": "757-200/Models/757-200.xml",
+  "tags": [
+    "twin-engine",
+    "boeing",
+    "jet",
+    "twin-engine",
+    "retractable-gear",
+    "etops",
+    "glass-cockpit",
+    "ifr"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "757-200.zip",
+  "archive_sha256": "713b91f88b65360c6cc750847ce93772ada8144d67a7ff51f214e7719e313c69",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/757-200.zip"
+}

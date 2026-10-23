@@ -1,0 +1,23 @@
+{
+  "defaults": {
+    "sim/view/internal": 1,
+    "sim/view/config/x-offset-m": 0.0,
+    "sim/view/config/y-offset-m": 1.35,
+    "sim/view/config/z-offset-m": -2.82,
+    "sim/chase-distance-m": -18.0,
+    "sim/ai-traffic/enabled": 1,
+    "consumables/fuel/tank/level-gal_us": 290.0,
+    "consumables/fuel/tank[1]/level-gal_us": 290.0,
+    "engines/engine/running": 1,
+    "weight/tank": 1.0,
+    "weight/weight-lb": 0.0,
+    "weight/opt/lbs": 350.0,
+    "weight/opt/gals": 320.0,
+    "weight[1]/tank": 1.0,
+    "weight[1]/weight-lb": 0.0,
+    "weight[1]/opt/lbs": 350.0,
+    "weight[1]/opt/gals": 320.0
+  },
+  "external_inputs": [],
+  "policy": "source defaults; otherwise zero external inputs; no Nasal execution"
+}

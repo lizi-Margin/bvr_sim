@@ -1,0 +1,12 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+
+Files: *
+Copyright: 2007-2010, Markus Zojer,
+           2007-2010, Paul Jay Schrenker
+           2015, Ludovic Brenta <ludovic@ludovic-brenta.org>
+License: GPL-2+
+
+Files: Models/Liveries/live-free-or-die*
+Copyright: 2015, Andreas Spiekermann
+License: GPL-2+
+

@@ -1,0 +1,26 @@
+{
+  "set": "Gloster-Meteor/gloster-meteor-set.xml",
+  "name": "Gloster Meteor (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Gloster-Meteor/Systems/gloster-meteor-yasim.xml",
+  "jets": 2,
+  "model": "Gloster-Meteor/Models/gloster-meteor.xml",
+  "tags": [
+    "fighter",
+    "ww2",
+    "1940s",
+    "1950s",
+    "retractable-gear",
+    "jet",
+    "twin-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Gloster-Meteor.zip",
+  "archive_sha256": "5d4ba588d6bf9832f0d735d066e47490fa654c1427112a2baba8280a39b4f1f0",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Gloster-Meteor.zip"
+}

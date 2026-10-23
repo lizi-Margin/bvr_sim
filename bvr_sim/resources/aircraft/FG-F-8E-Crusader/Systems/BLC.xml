@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="BLC">
+
+  <property>systems/BLC/active</property>
+
+  <channel name="Boundary Layer Control">
+
+       <switch name="systems/BLC/switch">
+          <default value="0" />
+          <test logic="AND" value="1">
+              fcs/wing-incidence-up == 1
+               propulsion/engine[0]/n2 gt 70.0
+          </test>
+          <output>systems/BLC/active</output>
+       </switch>
+
+  </channel>
+
+</system>

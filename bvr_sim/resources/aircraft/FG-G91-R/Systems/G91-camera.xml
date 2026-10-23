@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Camera"> 
+    
+    <property value="0">systems/camera/compartment/sw-open-compartmemt-togle</property>
+    <property value="0">systems/camera/compartment/sw-open-compartmemt-pos</property>
+    <property value="0">systems/camera/compartment/sw-open-compartmemt-open</property>
+    
+    
+    <channel name="camera compartment" execrate="8">
+        
+        <lag_filter name="systems/camera/compartment/sw-open-compartmemt-lag">
+            <input>systems/camera/compartment/sw-open-compartmemt-togle</input>
+            <c1>1.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/camera/compartment/sw-open-compartmemt-pos">
+            <default value="0" />
+            <test logic="AND" value="systems/camera/compartment/sw-open-compartmemt-lag">
+                context/gears/on-ground GT 0
+                systems/camera/compartment/sw-open-compartmemt-lag GE 0.03
+                systems/camera/compartment/sw-open-compartmemt-lag LE 0.98
+            </test>
+            <test logic="AND" value="0.0">
+                context/gears/on-ground == 0
+                systems/camera/compartment/sw-open-compartmemt-lag LT 0.03
+            </test>
+            <test logic="AND" value="1.0">
+                systems/camera/compartment/sw-open-compartmemt-lag GT 0.98
+            </test>
+        </switch>
+        
+        <switch name="systems/camera/compartment/sw-open-compartmemt-open">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/camera/compartment/sw-open-compartmemt-pos GT 0.1
+            </test>
+        </switch>
+        
+    </channel>
+        
+    
+</system>

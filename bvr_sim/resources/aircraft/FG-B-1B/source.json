@@ -1,0 +1,32 @@
+{
+  "set": "B-1B/B-1B-set.xml",
+  "name": "Rockwell B-1B Lancer",
+  "fdm_type": "yasim",
+  "fdm": "B-1B/B-1B-yasim.xml",
+  "jets": 4,
+  "model": "B-1B/Models/B-1B.xml",
+  "tags": [
+    "bomber",
+    "boeing",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s",
+    "gulfwar1",
+    "gulfwar2",
+    "retractable-gear",
+    "variable-geometry",
+    "ifr",
+    "hud",
+    "supersonic",
+    "afterburner",
+    "jet"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "B-1B.zip",
+  "archive_sha256": "d3a3953ee84617010eda4d2d6643d2ffb7267ca113e1ab637f5910f44827d7a4",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/B-1B.zip"
+}

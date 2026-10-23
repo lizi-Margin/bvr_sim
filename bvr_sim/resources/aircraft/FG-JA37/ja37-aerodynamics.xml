@@ -1,0 +1,2478 @@
+<?xml version='1.0' encoding='utf-8'?>
+<aerodynamics>
+
+    
+
+    <hysteresis_limits unit="DEG">
+        <description>Stall regime</description>
+        <min> 35 </min>
+        <max> 41 </max>
+    </hysteresis_limits>
+
+    <aero_ref_pt_shift_x>
+        <function name="metrics/aero-rp-shift-mac">
+            <description>
+                Mach-tuck: Transonic Shift of Aerodynamic Center
+
+                NASA-TN-D-7505 page 134 - Configuration: Wing II and Canard II
+
+                ===============
+
+                I now have a better source than the above, from official aerodynamic compendium:
+                
+            </description>
+            <quotient>
+                <product>
+                    <table name="aero/table/aero-shift-mac">
+                        <independentVar>velocities/mach</independentVar>
+                        <tableData>
+                            0.38208 0.29141
+                            0.44235 0.34356
+                            0.49446 0.38497
+                            0.55147 0.42485
+                            0.60195 0.45706
+                            0.64919 0.48313
+                            0.69316 0.50613
+                            0.73876 0.52761
+                            0.77948 0.54448
+                            0.82834 0.56442
+                            0.87394 0.57975
+                            0.90489 0.58282
+                            0.92443 0.59049
+                            0.93746 0.60429
+                            0.94397 0.62423
+                            0.95537 0.69172
+                            0.96026 0.71779
+                            0.97492 0.79448
+                            0.98632 0.85583
+                            0.99772 0.90951
+                            1.01075 0.92638
+                            1.02866 0.93405
+                            1.04821 0.93098
+                            1.06775 0.92025
+                            1.08567 0.90951
+                            1.10684 0.90337
+                            1.13941 0.90031
+                            1.17850 0.89571
+                            1.21596 0.89417
+                            1.25505 0.88957
+                            1.29577 0.88344
+                            1.32997 0.88037
+                            1.36254 0.87423
+                            1.39186 0.86963
+                            1.7     1.0
+                        </tableData>
+                    </table>
+                    <v>3.280840</v>
+                </product>
+                <property>metrics/cbarw-ft</property>
+            </quotient>
+        </function>
+    </aero_ref_pt_shift_x>
+
+
+    
+
+     <function name="aero/function/CNmachFactor">
+        <description>
+            Change_in_normal_due_to_mach
+
+            http://www.dtic.mil/dtic/tr/fulltext/u2/b184826.pdf
+        </description>
+              <table name="aero/table/CN_mach-factor">
+                  <independentVar lookup="row">velocities/mach</independentVar>
+                  <tableData>
+                      0.0 1.00
+                      0.2 1.00
+                      0.4 1.05
+                      0.6 1.15
+                      1.0 1.25
+                  </tableData>
+              </table>
+    </function>
+
+        
+    <function name="aero/function/Cdgear">
+        <description>Drag_due_to_gear</description>
+        <product>
+            <property>aero/qbar-psf</property>
+            <property>metrics/Sw-sqft</property>
+            <property>gear/gear-pos-norm</property>
+            <property>aero/drag/gear</property>
+        </product>
+    </function>
+
+    <axis name="NORMAL">
+
+
+        <function name="aero/coefficient/CN" apply_at_cg="false">
+            <description>
+               Normal force due to alpha, ground-effect and elevator
+
+               Increase in CN decreases Period and damping, Dutch Roll damping
+               CN is low for landing
+            </description>
+            <product>
+                
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>structural/wings/normal-factor</property>
+                
+                <table name="aero/table/CN">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/alpha-deg</independentVar>
+                    <independentVar lookup="table">fcs/elevon/average-aero-deg</independentVar>
+                    
+                    <tableData breakPoint="-20.0">
+                                      0         1
+                       -10.07383  -0.78915  -0.78915
+                         1.60059  -0.24972  -0.24972
+                         8.40885   0.09493   0.09493
+                        14.97192   0.46057   0.46057
+                        22.02022   0.86834   0.86834
+                        25.42043   1.10492   1.10492
+                        30.52352   1.41423   1.41423
+                        33.31697   1.60163   1.60163
+                        35.38471   1.69078   1.69078
+                        39.03779   1.78021   1.78021
+                        43.18024   1.84402   1.84402
+                        46.83660   1.87970   1.87970
+                        49.03170   1.88009   1.88009
+                        49.76483   1.85685   1.85685
+                        51.11568   1.70288   1.70288
+                        52.70502   1.63774   1.63774
+                        55.63438   1.59620   1.59620
+                        58.56146   1.59204   1.59204
+                        62.21882   1.61137   1.61137
+                        66.60731   1.64018   1.64018
+                        69.77701   1.65709   1.65709
+                        72.94642   1.67867   1.67867
+                    </tableData>
+                    <tableData breakPoint="0.0">
+                                      0         1
+                       -11.21614  -0.40038  -0.40038
+                         0.00000   0.00000   0.00000
+                         4.76007   0.24179   0.24179
+                         7.09306   0.38400   0.38400
+                        10.44027   0.58716   0.58716
+                        12.87714   0.75170   0.75170
+                        15.92315   0.95688   0.95688
+                        18.36093   1.12752   1.12752
+                        21.00156   1.31036   1.31036
+                        23.03305   1.45256   1.45256
+                        25.67306   1.63133   1.63133
+                        27.90617   1.77759   1.77759
+                        31.14247   1.91171   1.91171
+                        34.37112   1.99507   1.99507
+                        37.39478   2.05203   2.05203
+                        38.60265   2.06425   2.06425
+                        40.21101   2.06634   2.06634
+                        41.61652   2.05623   2.05623
+                        43.01989   2.03191   2.03191
+                        44.42142   1.99541   1.99541
+                        45.62041   1.94875   1.94875
+                        47.61486   1.84527   1.84527
+                        49.50881   1.74178   1.74178
+                        50.91004   1.70325   1.70325
+                        52.41636   1.69517   1.69517
+                        54.62865   1.70337   1.70337
+                        58.85345   1.72788   1.72788
+                        63.88319   1.75851   1.75851
+                        69.71665   1.78713   1.78713
+                        72.93489   1.80145   1.80145
+                        75.34819   1.80966   1.80966
+                        76.95532   1.80362   1.80362
+                    </tableData>
+                    <tableData breakPoint="20.0">
+                                      0         1
+                       -11.32382  -0.28937  -0.28937
+                        -0.01809   0.29673   0.29673
+                         4.96647   0.54994   0.54994
+                        10.07013   0.84990   0.84990
+                        14.44408   1.11702   1.11702
+                        19.06080   1.40287   1.40287
+                        22.82757   1.62783   1.62783
+                        26.83938   1.83414   1.83414
+                        30.00153   1.97488   1.97488
+                        33.65063   2.12973   2.12973
+                        36.57201   2.21903   2.21903
+                        39.74043   2.25696   2.25696
+                        42.42418   2.24342   2.24342
+                        45.35483   2.18084   2.18084
+                        49.02002   2.07167   2.07167
+                        51.95608   1.92032   1.92032
+                        53.18099   1.83175   1.83175
+                        54.64624   1.80163   1.80163
+                        56.35383   1.79726   1.79726
+                        60.74374   1.80270   1.80270
+                        66.10925   1.80831   1.80831
+                        72.93844   1.80951   1.80951
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/CNwave">
+            <description>
+               Wave normal Coefficient
+            </description>
+            <product>
+                
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/function/mach-effect-drag</property>
+                <sin>
+                    <property>aero/alpha-rad</property>
+                </sin>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CNGnd">
+            <description>
+                        Change in normal force due to ground effect factor
+            </description>
+            <product>
+                
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <table name="aero/table/dCN_gnd-effect">
+                    <independentVar lookup="row">aero/h_b-mac-ft</independentVar>
+                    <independentVar lookup="column">aero/alpha-deg</independentVar>
+                    <tableData>
+                               0.0     5.0    15.0     90.0
+                        0.0  0.0000  0.2000  0.6500  -0.2500
+                        2.2  0.0000  0.0000  0.0000   0.0000
+                    </tableData>
+                </table>
+                <cos>
+                  
+                  <product>
+                      <p>/orientation/roll-deg</p>
+                      <v>0.017453</v>
+                  </product>
+              </cos>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CNBrake">
+            <description>
+               Speedbrake normal Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/speedbrake-pos-norm</property>
+                <property>aero/drag/speedbrake</property>
+                <sin>
+                    <property>aero/alpha-rad</property>
+                </sin>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CNTurbine">
+            <description>
+               Ram air turbine normal Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>systems/electrical/generator-reserve-pos-norm</property>
+                <property>aero/drag/ram-air-turbine</property>
+                <sin>
+                    <property>aero/alpha-rad</property>
+                </sin>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CNCanopy">
+            <description>
+               Canopy normal Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                
+                <property>fcs/canopy/pos-norm</property>
+                <property>fcs/canopy/hinges/serviceable</property>
+                <property>aero/drag/canopy</property>
+                <sin>
+                    <property>aero/alpha-rad</property>
+                </sin>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CNGndElevator">
+            <description>
+                        Normal force due to elevator due to groundeffect
+            </description>
+            <product>
+                
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <table name="aero/table/dCN_gnd-elevator">
+                    <independentVar lookup="row">aero/h_b-mac-ft</independentVar>
+                    <independentVar lookup="column">fcs/elevon/average-aero-deg</independentVar>
+                    <tableData>
+                              -25.0   -20.0   -15.0   -10.0     -5.0     0.0
+                      0.0    -0.310  -0.210  -0.130  -0.070   -0.030   0.000
+                      0.209   0.000   0.000   0.000   0.000    0.000   0.000
+                </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CNflaps">
+            <description>
+                        Normal force due to flaps
+            </description>
+            <product>
+                
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/flap-pos-norm</property>
+                <table name="aero/table/CN_flaps">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                      -0.00083    0.07540
+                       5.62181    0.07738
+                      25.84119    0.15476
+                      28.49379    0.08531
+                      31.15469    0.00000
+                      35.07043   -0.08134
+                      37.97731   -0.11110
+                      40.69473   -0.10912
+                      42.79054   -0.11309
+                      45.42153   -0.11904
+                      48.28687   -0.09722
+                      50.21232   -0.07341
+                      53.62779    0.00000
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/CNgear">
+            <description>
+                Normal force due to gear
+            </description>
+                    <product>
+                        <property>aero/function/Cdgear</property>
+                        <sin>
+                            <property>aero/alpha-rad</property>
+                        </sin>
+                    </product>
+        </function>
+
+    </axis>
+
+
+
+
+    
+
+
+    
+    <function name="aero/function/ground-effect-factor-axial">
+        <description>Change in axial due to ground effect</description>
+            <table name="aero/table/CA_gnd-factor">
+                <independentVar lookup="row">aero/h_b-mac-ft</independentVar>
+                <tableData>
+                    0.0  0.480
+                    0.1  0.515
+                    0.15 0.629
+                    0.2  0.709
+                    0.3  0.815
+                    0.4  0.882
+                    0.5  0.928
+                    0.6  0.962
+                    0.7  0.988
+                    0.8  1.000
+                    0.9  1.000
+                    1.0  1.000
+                    1.1  1.000
+                </tableData>
+            </table>
+    </function>
+
+    <function name="aero/function/stores-wave-drag-factor">
+        <description>Change in stores drag due to mach</description>
+            <table name="aero/table/CD_stores-factor">
+                <independentVar lookup="row">velocities/mach</independentVar>
+                <tableData>
+                    0    1.000
+                    0.7  1.045
+                    0.8  1.200
+                    0.9  1.392
+                    1.0  1.622
+                    1.1  1.888
+                    1.2  2.193
+                    1.4  2.007
+                    1.6  1.863
+                    1.8  1.754
+                    2.0  1.668
+                    2.2  1.598
+                </tableData>
+            </table>
+    </function>    
+
+
+    
+    <function name="aero/function/mach-effect-drag">
+        <description>
+            Change in force due to mach effect
+        </description>
+        
+            <product>
+                <table name="aero/table/dCD_mach-effect">
+                    <independentVar lookup="row">velocities/mach</independentVar>
+                    
+                    <tableData>
+                        0.80 0.00000 
+                        0.91 0.00990 
+                        1.00 0.01600 
+                        1.21 0.01560 
+                    
+                        2.03 0.01375   
+                    </tableData>
+                </table>
+                <property>aero/factor-axial-mach</property>
+                
+            </product>
+            
+    </function>
+
+    
+    <function name="aero/function/CAflaps">
+        <description>Axial due to flaps</description>
+        <product>
+            <property>aero/qbar-psf</property>
+            <property>metrics/Sw-sqft</property>
+            <difference>
+                <product>
+                    <table name="aero/table/CD_flaps">
+                        <independentVar lookup="row"> aero/alpha-deg </independentVar>
+                        <independentVar lookup="column"> fcs/flap-pos-deg </independentVar>
+                        <tableData>
+                                       -7.0000   -4.0000     .0000   15.0000   30.0000
+                             -2.0000     .0001     .0001     .0000     .0012     .0017
+                               .0000    -.0003    -.0002     .0000     .0019     .0027
+                              2.0000    -.0006    -.0004     .0000     .0027     .0036
+                              4.0000    -.0010    -.0006     .0000     .0035     .0046
+                              8.0000    -.0018    -.0010     .0000     .0050     .0065
+                             12.0000    -.0026    -.0015     .0000     .0066     .0084
+                             16.0000    -.0034    -.0019     .0000     .0081     .0103
+                             20.0000    -.0042    -.0023     .0000     .0097     .0122
+                             24.0000    -.0049    -.0028     .0000     .0112     .0141
+                             28.0000    -.0057    -.0032     .0000     .0128     .0159
+                             32.0000    -.0065    -.0037     .0000     .0143     .0178
+                             36.0000    -.0073    -.0041     .0000     .0159     .0197
+                             40.0000    -.0081    -.0045     .0000     .0174     .0216
+                             45.0000    -.0090    -.0051     .0000     .0194     .0240
+                             50.0000    -.0100    -.0056     .0000     .0213     .0264
+                             60.0000    -.0120    -.0067     .0000     .0252     .0311
+                             70.0000    -.0139    -.0078     .0000     .0291     .0359
+                             89.0000    -.0176    -.0099     .0000     .0365     .0449
+                            120.0000    -.0237    -.0133     .0000     .0485     .0596
+                            175.0000    -.0344    -.0193     .0000     .0698     .0857
+                        </tableData>
+                    </table>
+                    <cos>
+                        <property>aero/alpha-rad</property>
+                    </cos>
+                </product>
+                <product>
+                    <table name="aero/table/CL_flaps">
+                        <independentVar lookup="row"> fcs/flap-pos-deg </independentVar>
+                        <tableData>
+                             -7.0000    -.0101
+                             -4.0000    -.0058
+                               .0000     .0000
+                             15.0000     .0207
+                             30.0000     .0254
+                        </tableData>
+                    </table>
+                    <value>3.0</value>
+                    <sin>
+                        <property>aero/alpha-rad</property>
+                    </sin>
+                </product>
+            </difference>
+        </product>
+    </function>
+
+    <function name="aero/function/Afactors">
+        <description>Change in axial due to mach and ground effect</description>
+        <property>aero/function/ground-effect-factor-axial</property>
+        
+    </function>
+
+    <function name="aero/function/left-elevon-pos-rad-squared">
+        <description>Elevon left squared</description>
+        <product>
+            <property>fcs/elevon/left-avg-aero-rad</property>
+            <property>fcs/elevon/left-avg-aero-rad</property>
+        </product>
+    </function>
+
+    <function name="aero/function/right-elevon-pos-rad-squared">
+        <description>Elevon right squared</description>
+        <product>
+            <property>fcs/elevon/right-avg-aero-rad</property>
+            <property>fcs/elevon/right-avg-aero-rad</property>
+        </product>
+    </function>
+
+    <axis name="AXIAL">
+
+        
+        
+        <function name="aero/coefficient/CAtakeoff">
+            <description>
+                Axial force due to flaps and gear
+            </description>
+            <product>
+                <property>aero/function/Afactors</property>
+                <sum>
+                    <product>
+                        <property>aero/function/Cdgear</property>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+                    <property>aero/function/CAflaps</property>
+                </sum>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CABrake">
+            <description>
+               Speedbrake axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/speedbrake-pos-norm</property>
+                <property>aero/drag/speedbrake</property>
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CATurbine">
+            <description>
+               Ram air turbine axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>systems/electrical/generator-reserve-pos-norm</property>
+                <property>aero/drag/ram-air-turbine</property>
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CACanopy">
+            <description>
+               Canopy axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                
+                <property>fcs/canopy/pos-norm</property>
+                <property>fcs/canopy/hinges/serviceable</property>
+                <property>aero/drag/canopy</property>
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CACanopyOff">
+            <description>
+                Canopy axial Coefficient for broken off
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                
+                <property>aero/drag/canopy-off</property>
+                <table name="aero/table/CA_canopy-off">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/canopy/hinges/serviceable</independentVar>
+                    <tableData>
+                               0      1
+                       -180  -1.00   0.0
+                       -165  -0.97   0.0
+                       -150  -0.87   0.0
+                       -120  -0.50   0.0
+                        -90   0.00   0.0
+                        -60   0.50   0.0
+                        -30   0.87   0.0
+                        -15   0.97   0.0
+                          0   1.00   0.0
+                         15   0.97   0.0
+                         30   0.87   0.0
+                         60   0.50   0.0
+                         90   0.00   0.0
+                        120  -0.50   0.0
+                        150  -0.87   0.0
+                        165  -0.97   0.0
+                        180  -1.00   0.0
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAElevonLeft">
+            <description>
+                Left elevon axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                
+                <value>0.125</value>
+                <difference>
+                    <product>
+                        <table name="aero/table/CD_elevon-left">
+                            <independentVar lookup="row"> aero/alpha-deg </independentVar>
+                            <independentVar lookup="column"> fcs/elevon/left-avg-aero-deg </independentVar>
+                            <tableData>
+                      -40.0000  -30.0000  -20.0000  -10.0000     .0000   10.0000   20.0000   30.0000   35.0000
+             -2.0000     .0156     .0110     .0079     .0024     .0000     .0031     .0092     .0126     .0148
+               .0000     .0075     .0042     .0021    -.0009     .0000     .0064     .0150     .0194     .0222
+              2.0000    -.0005    -.0026    -.0037    -.0042     .0000     .0096     .0208     .0262     .0296
+              4.0000    -.0085    -.0094    -.0095    -.0075     .0000     .0129     .0266     .0330     .0370
+              8.0000    -.0246    -.0230    -.0211    -.0140     .0000     .0195     .0382     .0466     .0518
+             12.0000    -.0407    -.0366    -.0326    -.0205     .0000     .0260     .0497     .0602     .0666
+             16.0000    -.0567    -.0502    -.0442    -.0271     .0000     .0325     .0613     .0738     .0814
+             20.0000    -.0728    -.0638    -.0558    -.0336     .0000     .0391     .0729     .0874     .0962
+             24.0000    -.0889    -.0774    -.0674    -.0402     .0000     .0456     .0845     .1010     .1110
+             28.0000    -.1049    -.0910    -.0790    -.0467     .0000     .0522     .0961     .1146     .1258
+             32.0000    -.1210    -.1046    -.0905    -.0532     .0001     .0587     .1077     .1282     .1406
+             36.0000    -.1370    -.1182    -.1021    -.0598     .0001     .0652     .1192     .1418     .1554
+             40.0000    -.1531    -.1318    -.1137    -.0663     .0001     .0718     .1308     .1554     .1702
+             45.0000    -.1732    -.1488    -.1282    -.0745     .0001     .0800     .1453     .1725     .1887
+             50.0000    -.1933    -.1658    -.1427    -.0827     .0001     .0881     .1598     .1895     .2072
+             60.0000    -.2334    -.1999    -.1716    -.0990     .0001     .1045     .1887     .2235     .2442
+             70.0000    -.2736    -.2339    -.2006    -.1154     .0001     .1208     .2177     .2575     .2812
+             89.0000    -.3499    -.2985    -.2556    -.1464     .0001     .1519     .2727     .3221     .3515
+            120.0000    -.4743    -.4039    -.3453    -.1971     .0002     .2026     .3624     .4276     .4661
+            175.0000    -.6952    -.5910    -.5046    -.2871     .0003     .2925     .5217     .6147     .6696
+                            </tableData>
+                        </table>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+                    <product>
+                        <table name="aero/table/CL_elevon-left">
+                            <independentVar lookup="row"> fcs/elevon/left-avg-aero-deg </independentVar>
+                            <tableData>
+                                -40.0000    -.3086
+                                -30.0000    -.2613
+                                -20.0000    -.2219
+                                -10.0000    -.1249
+                                   .0000     .0001
+                                 10.0000     .1249
+                                 20.0000     .2219
+                                 30.0000     .2613
+                                 35.0000     .2841
+                            </tableData>
+                        </table>
+                        <sin>
+                            <property>aero/alpha-rad</property>
+                        </sin>
+                    </product>
+                </difference>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAElevonRight">
+            <description>
+                Right elevon axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                
+                <value>0.125</value>
+                <difference>
+                    <product>
+                        <table name="aero/table/CD_elevon-right">
+                            <independentVar lookup="row"> aero/alpha-deg </independentVar>
+                            <independentVar lookup="column"> fcs/elevon/right-avg-aero-deg </independentVar>
+                            <tableData>
+                  -40.0000  -30.0000  -20.0000  -10.0000     .0000   10.0000   20.0000   30.0000   35.0000
+         -2.0000     .0156     .0110     .0079     .0024     .0000     .0031     .0092     .0126     .0148
+           .0000     .0075     .0042     .0021    -.0009     .0000     .0064     .0150     .0194     .0222
+          2.0000    -.0005    -.0026    -.0037    -.0042     .0000     .0096     .0208     .0262     .0296
+          4.0000    -.0085    -.0094    -.0095    -.0075     .0000     .0129     .0266     .0330     .0370
+          8.0000    -.0246    -.0230    -.0211    -.0140     .0000     .0195     .0382     .0466     .0518
+         12.0000    -.0407    -.0366    -.0326    -.0205     .0000     .0260     .0497     .0602     .0666
+         16.0000    -.0567    -.0502    -.0442    -.0271     .0000     .0325     .0613     .0738     .0814
+         20.0000    -.0728    -.0638    -.0558    -.0336     .0000     .0391     .0729     .0874     .0962
+         24.0000    -.0889    -.0774    -.0674    -.0402     .0000     .0456     .0845     .1010     .1110
+         28.0000    -.1049    -.0910    -.0790    -.0467     .0000     .0522     .0961     .1146     .1258
+         32.0000    -.1210    -.1046    -.0905    -.0532     .0001     .0587     .1077     .1282     .1406
+         36.0000    -.1370    -.1182    -.1021    -.0598     .0001     .0652     .1192     .1418     .1554
+         40.0000    -.1531    -.1318    -.1137    -.0663     .0001     .0718     .1308     .1554     .1702
+         45.0000    -.1732    -.1488    -.1282    -.0745     .0001     .0800     .1453     .1725     .1887
+         50.0000    -.1933    -.1658    -.1427    -.0827     .0001     .0881     .1598     .1895     .2072
+         60.0000    -.2334    -.1999    -.1716    -.0990     .0001     .1045     .1887     .2235     .2442
+         70.0000    -.2736    -.2339    -.2006    -.1154     .0001     .1208     .2177     .2575     .2812
+         89.0000    -.3499    -.2985    -.2556    -.1464     .0001     .1519     .2727     .3221     .3515
+        120.0000    -.4743    -.4039    -.3453    -.1971     .0002     .2026     .3624     .4276     .4661
+        175.0000    -.6952    -.5910    -.5046    -.2871     .0003     .2925     .5217     .6147     .6696
+                            </tableData>
+                        </table>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+                    <product>
+                        <table name="aero/table/CL_elevon-right">
+                            <independentVar lookup="row"> fcs/elevon/right-avg-aero-deg </independentVar>
+                            <tableData>
+                                -40.0000    -.3086
+                                -30.0000    -.2613
+                                -20.0000    -.2219
+                                -10.0000    -.1249
+                                   .0000     .0001
+                                 10.0000     .1249
+                                 20.0000     .2219
+                                 30.0000     .2613
+                                 35.0000     .2841
+                            </tableData>
+                        </table>
+                        <sin>
+                            <property>aero/alpha-rad</property>
+                        </sin>
+                    </product>
+                </difference>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CARudder">
+            <description>
+               Rudder axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                
+                <property>aero/drag/rudder</property>
+                <table name="aero/table/CA_rudder">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/rudder/final-norm</independentVar>
+                    <tableData>
+                               -1     0      1  
+                       -180  -1.00   0.0   -1.00
+                       -165  -0.97   0.0   -0.97
+                       -150  -0.87   0.0   -0.87
+                       -120  -0.50   0.0   -0.50
+                        -90   0.00   0.0    0.00
+                        -60   0.50   0.0    0.50
+                        -30   0.87   0.0    0.87
+                        -15   0.97   0.0    0.97
+                          0   1.00   0.0    1.00
+                         15   0.97   0.0    0.97 
+                         30   0.87   0.0    0.87
+                         60   0.50   0.0    0.50
+                         90   0.00   0.0    0.00
+                        120  -0.50   0.0   -0.50
+                        150  -0.87   0.0   -0.87
+                        165  -0.97   0.0   -0.97
+                        180  -1.00   0.0   -1.00
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAMissile1">
+            <description>
+                Left wing pylon axial Coefficient
+            </description>
+            <product>
+                <property>inertia/pointmass-dragarea-sqft[1]</property>
+                <property>aero/qbar-psf</property>
+                
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+                <property>aero/function/stores-wave-drag-factor</property>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAMissile2">
+            <description>
+               Left fuselage pylon axial Coefficient
+            </description>
+            <product>
+                <property>inertia/pointmass-dragarea-sqft[2]</property>
+                <property>aero/qbar-psf</property>
+                
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+                <property>aero/function/stores-wave-drag-factor</property>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAMissile3">
+            <description>
+               Right wing pylon axial Coefficient
+            </description>
+            <product>
+                <property>inertia/pointmass-dragarea-sqft[3]</property>
+                <property>aero/qbar-psf</property>
+                
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+                <property>aero/function/stores-wave-drag-factor</property>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAMissile4">
+            <description>
+               Right fuselage pylon axial Coefficient
+            </description>
+            <product>
+                <property>inertia/pointmass-dragarea-sqft[4]</property>
+                <property>aero/qbar-psf</property>
+                
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+                <property>aero/function/stores-wave-drag-factor</property>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAMissile5">
+            <description>
+               Left outer wing pylon axial Coefficient
+            </description>
+            <product>
+                <property>inertia/pointmass-dragarea-sqft[5]</property>
+                <property>aero/qbar-psf</property>
+                
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+                <property>aero/function/stores-wave-drag-factor</property>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CAMissile6">
+            <description>
+               Right outer wing pylon axial Coefficient
+            </description>
+            <product>
+                <property>inertia/pointmass-dragarea-sqft[6]</property>
+                <property>aero/qbar-psf</property>
+                
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+                <property>aero/function/stores-wave-drag-factor</property>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CATank">
+            <description>
+               Drop tank axial Coefficient
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <difference>
+                    <product>
+                        <property>aero/function/stores-wave-drag-factor</property>
+                        <table name="aero/table/CD_xtank">
+                            <independentVar lookup="row"> aero/alpha-deg </independentVar>
+                            <tableData>
+                                 -2.0000         .0011
+                                   .0000         .0011
+                                  2.0000         .0011
+                                  4.0000         .0011
+                                  8.0000         .0013
+                                 12.0000         .0018
+                                 16.0000         .0025
+                                 20.0000         .0036
+                                 24.0000         .0051
+                                 28.0000         .0070
+                                 32.0000         .0093
+                                 36.0000         .0120
+                                 40.0000         .0153
+                                 45.0000         .0199
+                                 50.0000         .0249
+                                 60.0000         .0355
+                                 70.0000         .0455
+                                 89.0000         .0539
+                                120.0000         .0304
+                                175.0000        -.0010 
+                            </tableData>
+                        </table>
+                        <property>aero/drag/drop-tank</property>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+                    <product>
+                        <table name="aero/table/CL_xtank">
+                            <independentVar lookup="row"> aero/alpha-deg </independentVar>
+                            <tableData>
+                                 -2.0000        -.0003
+                                   .0000         .0000
+                                  2.0000         .0003
+                                  4.0000         .0008
+                                  8.0000         .0020
+                                 12.0000         .0035
+                                 16.0000         .0053
+                                 20.0000         .0072
+                                 24.0000         .0093
+                                 28.0000         .0114
+                                 32.0000         .0135
+                                 36.0000         .0154
+                                 40.0000         .0172
+                                 45.0000         .0191
+                                 50.0000         .0203
+                                 60.0000         .0202
+                                 70.0000         .0164
+                                 89.0000         .0009
+                                120.0000        -.0179
+                                175.0000        -.0004
+                            </tableData>
+                        </table>
+                        <sin>
+                            <property>aero/alpha-rad</property>
+                        </sin>
+                    </product>
+                </difference>
+                <not><property>/consumables/fuel/tank[8]/jettisoned</property></not>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CA">
+            <description>
+               Basic Tangential/axial Coefficient
+            </description>
+            <product>
+                <property>aero/function/Afactors</property>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/factor-axial</property>
+                <table name="aero/table/CA">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                         -2.0      .013  
+                           .0      .014  
+                          2.0      .013  
+                          4.0      .010  
+                          8.0     -.001  
+                         12.0     -.019  
+                         16.0     -.046  
+                         20.0     -.078  
+                         24.0     -.117  
+                         28.0     -.160  
+                         32.0     -.208  
+                         36.0     -.258  
+                         40.0     -.309  
+                         45.0     -.371  
+                         50.0     -.429  
+                         60.0     -.516  
+                         70.0     -.549  
+                         89.0     -.447  
+                        120.0     -.152  
+                        175.0      .014  
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/CAwave">
+            <description>
+               Wave Tangential/axial Coefficient
+            </description>
+            <product>
+                
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/function/mach-effect-drag</property>
+                <cos>
+                    <property>aero/alpha-rad</property>
+                </cos>
+            </product>
+        </function>
+
+    </axis>
+
+
+
+
+    
+
+
+
+    <axis name="SIDE">
+
+        
+        <function name="aero/coefficient/Cyb">
+            <description>
+               Side Force coefficient due to Sideslip
+
+               Contributes to damping of Dutch Roll mode
+            </description>
+            <product>
+                <property>aero/function/ground-effect-factor-axial</property>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/beta-rad</property>
+                <value>-1.0</value>
+                
+                <table name="aero/table/CY_beta">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">gear/gear-pos-norm</independentVar>
+                    <tableData>
+                                       0.0           1.0
+                         -79.9634     0.644810      0.644810        
+                         -77.0113     0.643349      0.643349          
+                         -74.3731     0.652732      0.652732          
+                         -72.2024     0.666751      0.666751          
+                         -70.3434     0.683862      0.683862          
+                         -68.7975     0.708715      0.708715          
+                         -51.0473     1.08755       1.08755          
+                         -49.5008     1.11086       1.11086          
+                         -47.9516     1.12486       1.12486          
+                         -45.7790     1.13268       1.13268          
+                         -39.8766     1.13596       1.13596          
+                         -37.8561     1.13292       1.13292          
+                         -35.0583     1.12835       1.12835          
+                         -33.1913     1.11910       1.11910          
+                         -31.7889     1.10519       1.10519          
+                         -30.8520     1.08972       1.090        
+                         -23.8069     0.911634      1.063         
+                         -23.1817     0.899249      1.061         
+                         -21.9361     0.889985      1.056         
+                         -20.5351     0.880725      1.055         
+                         -18.6699     0.877681      1.045         
+                           1.3709     0.876738      0.992        
+                           9.2938     0.876978      0.951        
+                          12.0916     0.872412      0.931        
+                          14.4247     0.863180      0.913        
+                          16.7592     0.849297      0.891        
+                          18.3174     0.833841      0.875        
+                          19.5659     0.815274      0.857        
+                          24.8955     0.658844      0.732        
+                          25.9887     0.640272      0.691        
+                          27.0785     0.632553      0.647        
+                          28.4767     0.632595      0.632595          
+                          29.8725     0.640390      0.640390          
+                          31.4198     0.660592      0.660592          
+                          40.7031     0.784906      0.784906          
+                          41.7887     0.791141      0.791141          
+                          43.9636     0.791207      0.791207          
+                          45.2079     0.786593      0.786593          
+                          46.4549     0.772678      0.772678          
+                          51.1410     0.689098      0.689098          
+                          53.0170     0.650394      0.650394          
+                          54.4204     0.633382      0.633382          
+                          56.1325     0.622581      0.622581          
+                          58.3089     0.617996      0.617996          
+                          60.7950     0.616521      0.616521          
+                          64.0597     0.608868      0.608868          
+                          66.8589     0.599650      0.599650          
+                          69.6599     0.584231      0.584231          
+                          72.3061     0.567257      0.567257          
+                          74.3313     0.548714      0.548714          
+                          76.2012     0.530165      0.530165          
+                          77.9157     0.511612      0.511612          
+                          79.4763     0.488403      0.488403          
+                          80.7248     0.469836      0.469836          
+                          82.7543     0.437339      0.437339          
+                          84.9405     0.400196      0.400196          
+                          86.9729     0.358396      0.358396          
+                          88.6935     0.319688      0.319688          
+                          90.1026     0.284071      0.284071          
+                          91.2004     0.249996      0.249996          
+                          92.6108     0.209728      0.209728          
+                          93.7049     0.188055      0.188055          
+                          94.9539     0.167938      0.167938          
+                          96.3568     0.152476      0.152476          
+                          97.7587     0.140115      0.140115          
+                          99.4718     0.126214      0.126214          
+                          101.339     0.115417      0.115417          
+                          104.139     0.103099      0.103099          
+                          106.939     0.0938815     0.0938815          
+                          109.892     0.0893199     0.0893199          
+                          112.690     0.0816527     0.0816527          
+                          115.954     0.0786509     0.0786509          
+                          119.529     0.0710073     0.0710073          
+                          122.949     0.0633590     0.0633590          
+                          125.748     0.0541414     0.0541414          
+                          128.082     0.0449097     0.0449097          
+                          130.259     0.0356733     0.0356733          
+                          132.282     0.0248818     0.0248818          
+                          133.683     0.0156218     0.0156218          
+                          135.707     0.00172947    0.00172947                           
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cybtank">
+            <description>
+                      Side Force coefficient due to Sideslip due to drop tank
+            </description>
+            <product>
+                <property>aero/function/ground-effect-factor-axial</property>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/beta-rad</property>
+                <value>-1.0</value>
+                
+                <table name="aero/table/CY_xtank">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                       -30.8520      0.000      
+                       -23.8069      0.153         
+                       -23.1817      0.161         
+                       -21.9361      0.166         
+                       -20.5351      0.175         
+                       -18.6699      0.168         
+                         1.3709      0.115
+                         9.2938      0.074       
+                        12.0916      0.069       
+                        14.4247      0.050        
+                        16.7592      0.042
+                        18.3174      0.041
+                        19.5659      0.032
+                        24.8955      0.023
+                        25.9887      0.011        
+                        27.0785      0.000                        
+                    </tableData>
+                </table>
+                <not><property>/consumables/fuel/tank[8]/jettisoned</property></not>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/CYb_M">
+            <description>Change_in_Side_force_due_to_beta_due_to_mach</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/beta-rad</property>
+                <table name="aero/table/dCY_beta_mach">
+                    <independentVar>velocities/mach</independentVar>
+                    <tableData>
+                      0.4000  0.0000
+                      1.2000  0.0400
+                      1.6000 -0.1400
+                  </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cyzero">
+            <description>
+                Side Force coefficient due to asymmetric detachment of fuselage vortices
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>aero/function/vortex</property>
+                <value>-1.0</value>
+                
+                <table name="aero/table/CY_0">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                41.0979     0.0000000
+                42.3374     0.0097501
+                44.1988     0.0191090
+                46.5258     0.0300325
+                48.8537     0.0378551
+                50.7165     0.0425629
+                52.8900     0.0472801
+                55.3742     0.0520066
+                58.4803     0.0552017
+                61.8980     0.0553054
+                64.5399     0.0522847
+                67.9586     0.0492876
+                70.9122     0.0431755
+                74.4886     0.0324311
+                78.0631     0.0278883
+                80.8617     0.0202211
+                83.6600     0.0141044
+                85.9926     0.0064231
+                87.8587     0.0000000
+            </tableData>
+                </table>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/CYdr">
+            <description>Side_force_due_to_rudder</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/rudder/final-rad</property>
+                <value>0.0860</value>
+            </product>
+        </function>
+
+        <function name="aero/coefficient/CYDa">
+            <description>Side_force_due_to_aileron</description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>fcs/elevon/diff-half-aero-rad</property>
+                <value>-0.0226</value>
+            </product>
+        </function>
+
+    </axis>
+
+
+    
+
+
+    
+
+    <axis name="ROLL">
+
+        
+        <function name="aero/coefficient/Clb">
+            <description>
+                            Roll damp due to sideslip
+
+                            Decrease of Clb to small negative value improves Dutch Roll Damping
+                            High Positive value leads to excessive spiral instability
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/beta-rad</property>
+                <table name="aero/table/Cl_beta">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">gear/gear-pos-norm</independentVar>
+                    <tableData>
+                                       0.0           1.0  
+                       -20.7021       0.1445       0.1445     
+                       -14.6436       0.1205       0.1205     
+                       -12.1996       0.1077       0.1077     
+                        -9.6481       0.0905       0.0905     
+                        -7.4625       0.0726       0.0726     
+                        -5.7881       0.0562       0.0562     
+                        -3.9699       0.0345       0.0293     
+                        -1.4976       0.0039      -0.0066     
+                         2.7902      -0.0544      -0.0686     
+                         5.9904      -0.0925      -0.1111     
+                         8.2086      -0.1190      -0.1417     
+                        12.5745      -0.1665      -0.2048     
+                        16.5401      -0.2098      -0.2653     
+                        18.0313      -0.2270      -0.2889     
+                        19.8518      -0.2438      -0.3105     
+                        21.3831      -0.2531      -0.3277     
+                        22.5877      -0.2576      -0.3337     
+                        24.3059      -0.2581      -0.3337     
+                        25.9899      -0.2536      -0.3207     
+                        27.1626      -0.2477      -0.2991     
+                        28.2634      -0.2391      -0.2779     
+                        29.0346      -0.2317      -0.2619     
+                        30.4687      -0.2138      -0.2329     
+                        31.6107      -0.1952      -0.2068     
+                        33.3441      -0.1625      -0.1625     
+                        35.0827      -0.1185      -0.1185     
+                        37.1131      -0.0761      -0.0761     
+                        39.0303      -0.0411      -0.0411     
+                        39.8774      -0.0277      -0.0277     
+                        40.3543      -0.0243      -0.0243     
+                        40.8663      -0.0240      -0.0240     
+                        41.4865      -0.0270      -0.0270     
+                        42.5072      -0.0337      -0.0337     
+                        43.5270      -0.0423      -0.0423     
+                        44.9086      -0.0595      -0.0595     
+                        46.9096      -0.0811      -0.0811     
+                        49.7127      -0.1080      -0.1080     
+                        50.8424      -0.1163      -0.1163     
+                        52.3746      -0.1238      -0.1238     
+                        54.5648      -0.1316      -0.1316     
+                        56.6103      -0.1362      -0.1362     
+                        58.8760      -0.1388      -0.1388     
+                        60.3380      -0.1400      -0.1400     
+                        62.1294      -0.1404      -0.1404     
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cltank">
+            <description>
+                                  Roll damp due to drop tank
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/beta-rad</property>
+                <table name="aero/table/Cl_xtank">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                           0.0030       -0.0103
+                           2.0373       -0.0103
+                           3.9281       -0.0091
+                           5.5895       -0.0072
+                           6.7351       -0.0054
+                           7.9947       -0.0014
+                           9.9417        0.0034
+                          11.1444        0.0062
+                          12.5189        0.0089
+                          13.7218        0.0111
+                          14.8674        0.0129
+                          16.4138        0.0157
+                          18.1324        0.0178
+                          19.5647        0.0193
+                          21.3981        0.0206
+                          22.7732        0.0215
+                          24.8935        0.0218
+                          27.4148        0.0225
+                          30.1651        0.0237
+                          31.5975        0.0246
+                          33.3161        0.0268
+                          34.5764        0.0283
+                          35.5501        0.0301
+                    </tableData>
+                </table>
+                <not><property>/consumables/fuel/tank[8]/jettisoned</property></not>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Clp">
+            <description>
+                        Roll damp due to roll rate
+
+                        Clp alone determines damping-in-roll characteristics
+        </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/p-aero-rad_sec</property>
+                <property>structural/wings/normal-factor</property>
+                <table name="aero/table/Cl_p">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+                                  -10        0         10
+                -46.3572       -0.154623  -0.154975  -0.154623
+                -44.4592       -0.159781  -0.159673  -0.159781
+                -37.6517       -0.164750  -0.177522  -0.164750
+                -30.0431       -0.177574  -0.200929  -0.177574
+                -23.5490       -0.201362  -0.224275  -0.201362
+                -18.9627       -0.224585  -0.242004  -0.224585
+                -14.5642       -0.250555  -0.261552  -0.250555
+                -12.7661       -0.259842  -0.265330  -0.259842
+                -11.1329       -0.261310  -0.266340  -0.261310
+                 -9.7694       -0.261386  -0.264581  -0.261386
+                 -8.9533       -0.262349  -0.262783  -0.262349
+                 -4.4666       -0.247436  -0.247404  -0.247436
+                 -0.9097       -0.242119  -0.242078  -0.242119
+                  1.9862       -0.248251  -0.248674  -0.248251
+                  4.3297       -0.257569  -0.257998  -0.257569
+                  6.6732       -0.266886  -0.267323  -0.266886
+                  9.2105       -0.270701  -0.271141  -0.270701
+                 11.7616       -0.268086  -0.268523  -0.268086
+                 13.4057       -0.264501  -0.264936  -0.264501
+                 18.4371       -0.207811  -0.228430  -0.207811
+                 23.2561       -0.165352  -0.197442  -0.165352
+                 29.5115       -0.131241  -0.164674  -0.131241
+                 36.8310       -0.109592  -0.133816  -0.109592
+                 42.6673       -0.101185  -0.114829  -0.101185
+                 46.6688       -0.100487  -0.104936  -0.100487
+                 49.0272       -0.102914  -0.103228  -0.102914
+                 51.3806       -0.107638  -0.107955  -0.107638
+                 52.9960       -0.117375  -0.117240  -0.117375
+                 53.5986       -0.133028  -0.133829  -0.133028
+                 54.4728       -0.149156  -0.150428  -0.149156
+                 57.2312       -0.176872  -0.177241  -0.176872
+                 59.1952       -0.193519  -0.193901  -0.193519
+                 61.5348       -0.204674  -0.205064  -0.204674
+                 64.9651       -0.215889  -0.216288  -0.215889
+            </tableData>
+                </table>
+                <table name="aero/table/Cl_p-mach-factor">
+                    <independentVar lookup="row">velocities/mach</independentVar>
+                    <tableData>
+                 0.8  1.0
+                 2.0  1.65
+            </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Clr">
+            <description>
+                        Roll due to yaw rate
+
+                        Considerable effect on Spiral mode. Large 
+                        positive values leads to strong spiral instability.
+       </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/r-aero-rad_sec</property>
+                <table name="aero/table/Cl_r">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+               -52.8308     -0.4005
+               -51.5790     -0.4348
+               -50.4357     -0.4569
+               -48.8207     -0.4631
+               -47.3143     -0.4570
+               -36.2581     -0.3297
+               -25.7898     -0.2196
+                -4.7404     -0.0042
+                -2.4134      0.0215
+                 3.1647      0.0717
+                 8.8634      0.1304
+                13.1684      0.1781
+                18.2905      0.2393
+                22.7211      0.3042
+                27.1566      0.3777
+                30.3190      0.4487
+                33.3645      0.5173
+                36.7581      0.5883
+                39.5681      0.6496
+                42.9632      0.7231
+                44.2469      0.7439
+                46.3335      0.7536
+                48.4122      0.7499
+                50.1378      0.7352
+                51.0492      0.7119
+                52.0514      0.6457
+                53.2791      0.5697
+                54.8445      0.4777
+                56.1892      0.4041
+                57.5368      0.3355
+                58.7674      0.2643
+                60.5746      0.1908
+                63.0853      0.1343
+                66.2975      0.0914
+                69.8614      0.0570
+                74.0069      0.0287
+                78.2744      0.0115
+            </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Clbdot">
+            <description>
+                            Roll due to sideslip rate
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>aero/betadot-rad_sec</property>
+                <sum>
+                    <table name="aero/table/Cl_betadot-offset-">
+                        <independentVar lookup="row">aero/alpha-deg</independentVar>
+                        <tableData>
+                              0.00000        0.008805
+                              6.14085       -0.004145
+                              9.45788       -0.005356
+                              12.4749       -0.019666
+                              15.3425       -0.038780
+                              17.9105       -0.064304
+                              19.8780       -0.097845
+                              21.9957       -0.129782
+                              24.4151       -0.163310
+                              27.5896       -0.203216
+                              29.7039       -0.222353
+                              32.4217       -0.244672
+                              35.2893       -0.263786
+                              38.6098       -0.286087
+                              40.1180       -0.292442
+                              41.1727       -0.292410
+                              42.9801       -0.290756
+                              44.3335       -0.281115
+                              45.2340       -0.268288
+                              45.8328       -0.253870
+                              50.6071       -0.077723
+                              52.5512       -0.023264
+                              53.4504       -0.005636
+                              56.4593        0.008805               
+                        </tableData>
+                    </table>
+                    <value>-0.00880462</value>
+                    
+                </sum>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Clpylon">
+            <description>
+                      Roll due to missile asymmetric loaded under wings
+      </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <table name="aero/table/Cl_asym">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">inertia/asymmetric-wing-load</independentVar>
+                    <tableData>
+                         -1.0       0.0       1.0
+                  0.0   0.0000    0.0000    0.0000
+                 20.0  -0.0033    0.0000    0.0033
+            </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        
+        <function name="aero/coefficient/Claileron">
+            <description>
+                            Roll due to aileron and elevator
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>fcs/elevon/diff-half-aero-rad</property>
+                <table name="aero/table/Cl_elevon">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/elevon/average-aero-deg</independentVar>
+                    <independentVar lookup="table">aero/beta-deg</independentVar>
+                    <tableData breakPoint="-70.0">
+                                  0.0     1.0
+                          0.0     0.0     0.0
+                         10.0     0.0     0.0
+                    </tableData>
+                    <tableData breakPoint="0.0">
+                                  -25.0   0.0      20.00
+                        -60.0      0.0    0.0      0.0
+                        -50.0      0.01   0.100    0.100
+                        -40.0      0.03   0.120    0.110
+                        -30.0      0.07   0.170    0.130
+                        -20.0      0.07   0.200    0.135
+                        -10.0      0.07   0.220    0.140
+                          0.0      0.07   0.215    0.130
+                         10.0      0.07   0.210    0.110
+                         20.0      0.10   0.200    0.100
+                         30.0      0.12   0.180    0.070
+                         40.0      0.12   0.130    0.055
+                         50.0      0.12   0.065    0.035
+                         60.0      0.12   0.050    0.025
+                         70.0      0.12   0.045    0.020
+                         90.0      0.12   0.030    0.020
+                        100.0      0.0    0.0      0.0
+                    </tableData>
+                    <tableData breakPoint="70.0">
+                                  0.0     1.0
+                          0.0     0.0     0.0
+                         10.0     0.0     0.0
+                    </tableData>
+                </table>
+            </product>
+        </function>
+    </axis>
+
+
+
+
+    
+
+
+    
+    
+
+    <function name="aero/function/CA-intake-flow-number">
+        <description>
+                     mil*factor
+            CA = ____________________________
+                 rho*intakeArea*freeflowspeed
+
+            intakeArea = 0.6 m^2 / 6.46 ft^2
+            freeflowspeed = velocities/uBody-fps
+            rho = atmosphere/rho-slugs_ft3
+            mil = propulsion/engine/MilThrust
+            factor = 0.0001395
+
+            The limitation of this is that it wont work so well near idle thrust,
+            as it depend on mil thrust. So the factor will be bit too large
+            when running with idle thrust.
+        </description>
+        <quotient>
+            <product>
+                <property>propulsion/engine/mil-rate</property>
+                <value>0.0001395</value>
+            </product>
+            <product>
+                <value>6.46</value>
+                <property>atmosphere/rho-slugs_ft3</property>
+                <property>/velocities/uBody-fps</property>
+            </product>
+        </quotient>
+    </function>
+
+
+    <axis name="PITCH">
+
+        
+        <function name="aero/coefficient/CmCA">
+            <description>
+                              Pitch due to Air intake flow number
+
+                              Using 3D table due to alpha data points not being the same,
+                              the extra column is required, and is therefore a copy
+
+                              [measured using graph analyser]
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <table name="aero/table/Cm_CA">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/alpha-deg</independentVar>
+                    <independentVar lookup="table">aero/function/CA-intake-flow-number</independentVar>
+                    <tableData breakPoint="1.0">
+                                      0         1
+                         0.00000   0.00000   0.00000
+                         1.00000   0.00000   0.00000
+                    </tableData>
+                    <tableData breakPoint="2.0">
+                                      0         1
+                         0.00000   0.00000   0.00000
+                         1.30314   0.00177   0.00177
+                         2.28679   0.00246   0.00246
+                         3.41509   0.00325   0.00325
+                         4.86088   0.00373   0.00373
+                         6.59561   0.00416   0.00416
+                         8.41704   0.00459   0.00459
+                         9.83371   0.00493   0.00493
+                        11.74178   0.00531   0.00531
+                        13.53446   0.00584   0.00584
+                        15.15336   0.00613   0.00613
+                        16.85941   0.00671   0.00671
+                        18.99897   0.00729   0.00729
+                        22.06424   0.00845   0.00845
+                        24.84013   0.00937   0.00937
+                        27.96321   0.01054   0.01054
+                        29.64056   0.01127   0.01127 
+                    </tableData>
+                    <tableData breakPoint="3.0">
+                                      0          1
+                         0.00000   0.00000   0.00000
+                         1.41975   0.00247   0.00247
+                         3.33033   0.00459   0.00459
+                         5.06656   0.00606   0.00606
+                         6.54211   0.00714   0.00714
+                         8.19092   0.00812   0.00812
+                         9.57955   0.00905   0.00905
+                        11.22800   0.00978   0.00978
+                        12.73174   0.01036   0.01036
+                        14.09103   0.01100   0.01100
+                        15.91247   0.01143   0.01143
+                        17.56064   0.01196   0.01196
+                        19.38271   0.01284   0.01284
+                        21.14699   0.01372   0.01372
+                        22.59306   0.01440   0.01440
+                        24.18393   0.01528   0.01528
+                        26.23743   0.01630   0.01630
+                        28.32020   0.01758   0.01758
+                        29.62205   0.01846   0.01846
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CmZero">
+            <description>
+                                Pitch due to Zero moment
+
+                                Zero moment: Cm part that is independent of alpha.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <sum>
+                    <table name="aero/table/Cm_zero-flaps">
+                      <independentVar lookup="row">fcs/flap-pos-deg</independentVar>
+                        
+                        <tableData>
+                          -7.0 -0.006
+                          -4.0  0.000
+                          15.0  0.036
+                          30.0  0.042
+                        </tableData>
+                    </table>
+                    <table name="aero/table/Cm_zero-mach">
+                        <independentVar lookup="row">velocities/mach</independentVar>
+                        <tableData>
+                            
+                           0.0  -0.006
+                           0.8   0.004
+                           0.92 -0.005
+                           0.97  0.000
+                           1.05  0.001
+                           1.1  -0.001
+                           1.8  -0.009
+                        </tableData>
+                    </table>
+                    <table name="aero/table/Cm_zero-fudge">
+                        <independentVar lookup="row">velocities/mach</independentVar>
+                        <independentVar lookup="column">gear/gear-pos-norm</independentVar>
+                        <tableData>
+                                    0 1
+                           0.0  0.035 0
+                           0.4  0.015 0
+                           0.8  0.009 0
+                        </tableData>
+                    </table>
+                </sum>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CmGnd">
+            <description>
+                                Pitch due to ground effect
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <table name="aero/table/Cm_gnd">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/h_b-mac-ft</independentVar>
+                    <tableData>
+                               0.0   2.2
+                      -10.0    0.030  0.000
+                       -2.0    0.005  0.000
+                        0.0    0.000  0.000
+                        5.0   -0.040  0.000
+                       10.0   -0.070  0.000
+                       15.0   -0.100  0.000
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cm">
+            <description>
+                                  Pitch moment due to alpha
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <table name="aero/table/Cm">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">gear/gear-pos-norm</independentVar>
+                    <tableData>
+                                    0.0        1.0
+                          
+                        -10.0       0.034000    0.029000
+                          
+                         0.0        0.000000    0.000000
+                         1.6       -0.007400   -0.002700 
+                         3.0       -0.011200   -0.003500
+                         3.3       -0.011800   -0.004400
+                         8.0       -0.022300   -0.015800
+                         9.5       -0.026300   -0.020400
+                        11.5       -0.030900   -0.023300
+                        12.7       -0.033100   -0.024800
+                        15.3       -0.039000   -0.030600
+                        17.0       -0.042100   -0.035700          
+                          
+                        25.236381  -0.075591   -0.075591
+                        26.224033  -0.075598   -0.075598
+                        27.129723  -0.074771   -0.074771
+                        28.118232  -0.072695   -0.072695
+                        29.024779  -0.069784   -0.069784
+                        29.849537  -0.065623   -0.065623
+                        31.664861  -0.054386   -0.054386
+                        32.572609  -0.048559   -0.048559
+                        33.645137  -0.042316   -0.042316
+                        34.304771  -0.039404   -0.039404
+                        34.881416  -0.038158   -0.038158
+                        35.869581  -0.036915   -0.036915
+                        36.857233  -0.036922   -0.036922
+                        39.735519  -0.042687   -0.042687
+                        40.474547  -0.046850   -0.046850
+                        41.294167  -0.055171   -0.055171
+                        42.686667  -0.071397   -0.071397
+                        43.915585  -0.085127   -0.085127
+                        45.634222  -0.108840   -0.108840
+                        46.371367  -0.117577   -0.117577
+                        46.781862  -0.120074   -0.120074
+                        47.192870  -0.121324   -0.121324
+                        48.345130  -0.121332   -0.121332
+                        49.003907  -0.120505   -0.120505
+                        49.580037  -0.120509   -0.120509
+                        50.977841  -0.123846   -0.123846
+                        52.949721  -0.132175   -0.132175
+                        54.922116  -0.139257   -0.139257
+                        56.483330  -0.145505   -0.145505
+                        57.962070  -0.152168   -0.152168
+                        58.536831  -0.155499   -0.155499
+                        60.098046  -0.161747   -0.161747
+                        61.988136  -0.168828   -0.168828
+                        64.700242  -0.178410   -0.178410
+                        65.850962  -0.182161   -0.182161
+                        67.576957  -0.187994   -0.187994
+                        69.220647  -0.193826   -0.193826
+                        72.261970  -0.203411   -0.203411
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cmelevator">
+            <description>
+                            Pitch moment due to elevator
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                
+                <table name="aero/table/Cm_elevator">
+                    
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/elevon/average-aero-deg</independentVar>
+                    <independentVar lookup="table">aero/beta-deg</independentVar>
+                    <tableData breakPoint="-50.0">
+                                  0.0     1.0
+                          0.0     0.0     0.0
+                         10.0     0.0     0.0
+                    </tableData>
+                    <tableData breakPoint="0.0">
+                                  -25.0    -20.0    -10.0    0.0     10.0      20.0
+                        -15.0     0        0        0        0.0    0.0       0.0
+                        -10.0     0.1675   0.1475   0.0975   0.0   -0.0875   -0.1575
+                          0.0     0.2000   0.1750   0.1000   0.0   -0.0875   -0.1700
+                         10.0     0.1900   0.1700   0.0900   0.0   -0.0950   -0.1700
+                         20.0     0.2000   0.1800   0.0975   0.0   -0.0850   -0.1450
+                         30.0     0.1950   0.1650   0.0850   0.0   -0.0500   -0.0950
+                         50.0     0        0        0        0.0    0.0       0.0
+                    </tableData>
+                    <tableData breakPoint="50.0">
+                                  0.0     1.0
+                          0.0     0.0     0.0
+                         10.0     0.0     0.0
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cmq">
+            <description>
+                    Pitch damping due to pitch rate
+
+                    Pitch Damping Derivative
+                    Very important to Short Period damping of oscillations
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <property>aero/ci2vel</property>
+                <property>velocities/q-aero-rad_sec</property>
+                <table name="aero/table/Cm_q">
+                    <independentVar>aero/alpha-deg</independentVar>
+                    <tableData>
+                        -61.9610       -0.936245
+                        -57.7010       -0.838961
+                        -55.7957       -0.787515
+                        -54.1160       -0.719059
+                        -51.7634       -0.639130
+                        -49.7472       -0.564938
+                        -47.8408       -0.530537
+                        -46.0452       -0.518882
+                        -44.1367       -0.518572
+                        -42.1148       -0.535289
+                        -40.4286       -0.569107
+                        -37.7295       -0.642534
+                        -35.9299       -0.693379
+                        -32.8926       -0.789478
+                        -29.4050       -0.902550
+                        -26.4792       -1.01003
+                        -24.3414       -1.08355
+                        -21.6430       -1.14561
+                        -19.2825       -1.19068
+                        -16.3610       -1.22998
+                        -12.9919       -1.24648
+                        -10.9711       -1.24615
+                         -8.83762      -1.25149
+                         -6.47927      -1.26247
+                         -4.23390      -1.26211
+                         -1.87843      -1.22763
+                          0.366579     -1.22159
+                          5.53092      -1.22075
+                          7.88675      -1.19196
+                          9.34372      -1.15195
+                         10.6877       -1.10059
+                         12.2577       -1.07193
+                         13.9406       -1.05461
+                         15.6257       -1.07138
+                         17.0874       -1.10523
+                         18.3255       -1.15617
+                         19.4515       -1.20712
+                         20.6907       -1.27511
+                         22.1528       -1.31464
+                         23.8386       -1.34278
+                         25.5230       -1.34819
+                         27.4308       -1.33651
+                         29.4487       -1.29073
+                         30.9050       -1.23936
+                         34.3752       -1.07970
+                         35.9416       -0.994216
+                         37.6195       -0.897352
+                         45.2181       -0.333609
+                         46.5631       -0.299299
+                         47.9104       -0.299080
+                         49.3724       -0.338616
+                         50.9481       -0.400861
+                         55.6785       -0.638734
+                         59.5053       -0.791524
+                         62.0925       -0.870651
+                         64.5639       -0.892977
+                         67.9334       -0.915158
+                         71.5267       -0.925938
+                         75.6806       -0.925264
+                         79.3855       -0.924663
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cmadot">
+            <description>
+                    Pitch damping due to alpha rate
+
+                    Negative Cmad increase Short Period damping
+
+                    This is also what drives pitch turbulence.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/cbarw-ft</property>
+                <property>aero/ci2vel</property>
+                <property>aero/alphadot-rad_sec</property>
+                <table name="aero/table/Cm_alphadot">
+                    <independentVar>aero/alpha-deg</independentVar>
+                    <tableData>
+                          -40.3523       -0.001000
+                          -34.8411       -0.159103
+                          -30.2302       -0.283356
+                          -25.8452       -0.384919
+                          -22.4729       -0.452554
+                          -20.5632       -0.469290
+                           18.7314       -0.474274
+                           20.8634       -0.456883
+                           23.6669       -0.405290
+                           25.7967       -0.353807
+                           29.9449       -0.262223
+                           33.1956       -0.182149
+                           37.4550       -0.073501
+                           40.4812       -0.001000
+                    </tableData>
+                </table>
+            </product>
+        </function>
+    </axis>
+
+    
+
+    
+
+    <axis name="YAW">
+
+        
+        <function name="aero/coefficient/Cnb">
+            <description>
+                       Yaw due to sideslip
+
+                       Determines Dutch Roll and Spiral characteristics
+                       Prevents side-slip and yawing moments
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/beta-rad</property>
+                <table name="aero/table/Cn_beta">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/flap-pos-deg</independentVar>
+                    <tableData>
+                                    -4.0         30.0
+                        -98.1030     0.137652    0.137652  
+                        -90.4097     0.137589    0.137589  
+                        -85.4435     0.136279    0.136279  
+                        -78.5389     0.134011    0.134011  
+                        -70.5191     0.130733    0.130733  
+                        -65.5356     0.128345    0.128345  
+                        -56.8976     0.120791    0.116
+                        -48.7737     0.111047    0.053
+                        -42.5537     0.100107    0.018
+                        -37.3795     0.085865    0.010
+                        -33.9213     0.075832    0.010
+                        -30.5759     0.072803    0.013
+                        -26.2020     0.074153    0.019
+                        -20.7823     0.078804    0.029
+                        -15.0449     0.080778    0.044
+                         -8.1836     0.081203    0.066
+                         -2.1283     0.080500    0.073
+                          3.9356     0.079258    0.070
+                          8.6793     0.074698    0.062
+                         12.1115     0.066282    0.055
+                         15.0381     0.055137    0.047
+                         18.2478     0.043470    0.037
+                         21.7667     0.029666    0.024
+                         24.4969     0.013654    0.009
+                         28.7380    -0.010892   -0.015
+                         32.2166    -0.039261   -0.063
+                         34.8804    -0.068221   -0.142
+                         36.2730    -0.086472   -0.167
+                         37.2815    -0.114996   -0.177
+                         37.8421    -0.132759   -0.179
+                         40.2371    -0.145016   -0.183
+                         43.0943    -0.151850   -0.181
+                         45.6945    -0.159779   -0.175
+                         48.2686    -0.166092   -0.173
+                         52.2409    -0.173935   -0.173
+                         56.1613    -0.178546   -0.178546  
+                         59.7032    -0.176709   -0.176709    
+                         62.0692    -0.170090   -0.170090  
+                         71.5155    -0.091298   -0.0912984  
+                         73.0928    -0.086885   -0.0868857  
+                         74.7482    -0.087322   -0.0873224  
+                         77.0045    -0.090957   -0.0909579  
+                         79.4833    -0.091343   -0.0913435  
+                        112.917     -0.052054   -0.0520548  
+                    </tableData>
+                </table>
+                
+                <table name="aero/table/Cn_beta_nonlin-factor">
+                    <independentVar lookup="row">aero/beta-deg</independentVar>
+                    <independentVar lookup="column">aero/alpha-deg</independentVar>
+                    <tableData>
+                                  0     15     20     25     30
+                        -60.0    0.02  0.00   0.00   0.00   0.00
+                        -55.0    0.05  0.00   0.04   0.00   0.00
+                        -52.5    0.09  0.10   0.04   0.00   0.00
+                        -40.0    0.66  0.44   0.38   0.19  -1.04
+                        -37.5    0.78  0.50   0.40   0.15  -1.27
+                        -35.0    0.91  0.55   0.29   0.16  -1.80
+                        -33.0    0.98  0.52   0.22  -0.05  -2.12
+                        -30.0    1.00  0.48   0.16  -0.30  -2.51
+                        -26.0    1.00  0.52   0.26  -0.46  -3.03
+                        -24.0    1.00  0.57   0.38  -0.41  -3.28
+                        -21.0    1.00  0.68   0.50  -0.14  -3.92
+                        -19.0    1.00  0.76   0.59   0.22  -4.51
+                        -16.0    1.00  0.85   0.71   0.50  -4.63
+                        -14.0    1.00  0.80   0.75   0.64  -2.08
+                        -12.5    1.00  0.82   0.83   0.75  -0.69
+                        -11.0    1.00  0.87   0.88   0.88   0.33
+                         -8.0    1.00  1.00   1.00   1.00   1.00
+                          8.0    1.00  1.00   1.00   1.00   1.00
+                         11.0    1.00  0.87   0.88   0.88   0.33
+                         12.5    1.00  0.82   0.83   0.75  -0.69
+                         14.0    1.00  0.80   0.75   0.64  -2.08
+                         16.0    1.00  0.85   0.71   0.50  -4.63
+                         19.0    1.00  0.76   0.59   0.22  -4.51
+                         21.0    1.00  0.68   0.50  -0.14  -3.92
+                         24.0    1.00  0.57   0.38  -0.41  -3.28
+                         26.0    1.00  0.52   0.26  -0.46  -3.03
+                         30.0    1.00  0.48   0.16  -0.30  -2.51
+                         33.0    0.98  0.52   0.22  -0.05  -2.12
+                         35.0    0.91  0.55   0.29   0.16  -1.80
+                         37.5    0.78  0.50   0.40   0.15  -1.27
+                         40.0    0.66  0.44   0.38   0.19  -1.04
+                         52.5    0.09  0.10   0.04   0.00   0.00
+                         55.0    0.05  0.00   0.04   0.00   0.00
+                         60.0    0.02  0.00   0.00   0.00   0.00
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cnzero">
+            <description>
+                       Yaw due to asymmetric detachment of vortexes
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/function/vortex</property>
+                <table name="aero/table/Cn_zero">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                        39.2856     0.0000000
+                        44.7312     0.0025050
+                        49.3275     0.0071048
+                        52.8347     0.0110978
+                        55.2007     0.0177167
+                        57.8412     0.0243527
+                        62.5992     0.0359741
+                        65.5488     0.0404718
+                        68.5504     0.0417367
+                        73.2335     0.0409485
+                        76.5442     0.0400751
+                        78.2690     0.0353280
+                        79.2137     0.0278357
+                        80.7247     0.0192998
+                        83.0417     0.0118927
+                        85.0409     0.0071626
+                        87.8634     0.0024835
+                        90.1024     0.0000000
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cnp">
+            <description>
+                        Yawing due to roll rate
+
+                        Reduces Dutch Roll damping
+                        positive value desireable
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/p-aero-rad_sec</property>
+                <table name="aero/table/Cn_p">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+                                        -10          0              10
+                        -50.459         0.003      0.003          0.003            
+                        -49.162         0.006      0.006          0.006            
+                        -46.376         0.024      0.023          0.024            
+                        -45.705         0.032      0.033          0.032            
+                        -40.926         0.152      0.183          0.152            
+                        -39.923         0.175      0.196          0.175            
+                        -37.801         0.182      0.206          0.182            
+                        -35.054         0.185      0.210          0.185            
+                        -33.608         0.183      0.210          0.183            
+                        -29.299         0.168      0.197          0.168            
+                        -24.528         0.149      0.178          0.149            
+                        -19.940         0.125      0.151          0.125            
+                         -4.796         0.038      0.047          0.038            
+                          0.000         0.000      0.000          0.000            
+                          5.293        -0.015     -0.026         -0.015            
+                         10.016        -0.037     -0.061         -0.037            
+                         18.232        -0.068     -0.113         -0.068            
+                         24.409        -0.087     -0.147         -0.087            
+                         30.118        -0.103     -0.176         -0.103            
+                         32.823        -0.110     -0.187         -0.110            
+                         34.741        -0.115     -0.191         -0.115            
+                         37.157        -0.115     -0.190         -0.115            
+                         38.946        -0.111     -0.183         -0.111            
+                         39.934        -0.107     -0.176         -0.107            
+                         42.199        -0.092     -0.116         -0.092            
+                         44.850        -0.034     -0.034         -0.034
+                         46.184        -0.018     -0.018         -0.018                  
+                         47.826        -0.006     -0.006         -0.006                  
+                         49.616        -0.001     -0.001         -0.001            
+                         51.554        -0.001     -0.001         -0.001            
+                         53.308        -0.002     -0.002         -0.002            
+                         54.897        -0.009     -0.009         -0.009            
+                         59.794        -0.041     -0.041         -0.041            
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cnr">
+            <description>
+                      Yaw damping due to yaw rate
+
+                      Main contributor to damping of Dutch Roll
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>velocities/r-aero-rad_sec</property>
+                <table name="aero/table/Cn_r">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                         -62.0848      -0.1188
+                         -53.3430      -0.1543
+                         -45.5824      -0.1911
+                         -40.6475      -0.2179
+                         -37.5474      -0.2364
+                         -34.3623      -0.2557
+                         -30.0802      -0.2839
+                         -25.7103      -0.3138
+                         -23.6096      -0.3281
+                         -21.6022      -0.3390
+                         -19.7703      -0.3465
+                         -17.7784      -0.3527
+                         -15.6251      -0.3581
+                         -13.1461      -0.3625
+                         -10.1800      -0.3652
+                          -6.3983      -0.3661
+                          -2.4537      -0.3666
+                           0.5039      -0.3667
+                           4.9398      -0.3667
+                           9.4549      -0.3658
+                          13.8880      -0.3649
+                          15.7683      -0.3621
+                          17.4745      -0.3564
+                          22.0809      -0.3333
+                          26.4438      -0.3110
+                          28.6357      -0.3031
+                          30.3448      -0.2982
+                          32.3030      -0.2942
+                          34.0956      -0.2897
+                          35.5569      -0.2845
+                          37.1796      -0.2783
+                          38.7967      -0.2704
+                          40.0060      -0.2635
+                          43.6993      -0.2375
+                          46.9054      -0.2132
+                          50.4345      -0.1872
+                          54.2126      -0.1620
+                          56.9542      -0.1464
+                          60.1063      -0.1307
+                          64.3996      -0.1123
+                          69.5935      -0.0929
+                          74.3129      -0.0792
+                          79.0421      -0.0685
+                          83.9412      -0.0594
+                          89.5877      -0.0528
+                          94.0944      -0.0494
+                          98.0305      -0.0473
+                         104.6822      -0.0466
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cnbdot">
+            <description>
+                      Yaw due to sideslip rate
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>aero/bi2vel</property>
+                <property>aero/betadot-rad_sec</property>
+                <table name="aero/table/Cn_betadot">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <tableData>
+                        -50.9854      0.0000
+                        -46.4008      0.0080
+                        -42.1446      0.0127
+                        -39.0325      0.0156
+                        -34.7848      0.0229
+                        -33.1480      0.0247
+                        -28.7164      0.0261
+                        -22.7814      0.0198
+                        -19.8167      0.0176
+                        -12.4274      0.0187
+                         -5.7034      0.0224
+                          0.5278      0.0261
+                          6.5920      0.0305
+                         12.4126      0.0341
+                         15.4454      0.0361
+                         21.5236      0.0363
+                         25.8008      0.0346
+                         31.2319      0.0318
+                         39.9618      0.0250
+                         48.2046      0.0164
+                         60.0761      0.0000
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cntank">
+            <description>
+                      Yaw due drop tank
+
+                      Data is from alpha=16 and gears and flaps deployed.
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <table name="aero/table/Cn_xtank">
+                    <independentVar lookup="row">aero/beta-deg</independentVar>
+                    <tableData>
+                       -20.0             0.01
+                         0.0             0.00
+                        20.0            -0.01
+                    </tableData>
+                </table>
+                <not><property>/consumables/fuel/tank[8]/jettisoned</property></not>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/CnStores">
+            <description>
+                      Yaw due asymmetric stores on wing pylons
+            </description>
+            <product>
+                <sum>
+                    <product>
+                        <property>aero/coefficient/CAMissile1</property>
+                        <value>-2.70311</value>
+                    </product>
+                    <product>
+                        <property>aero/coefficient/CAMissile2</property>
+                        <value>-0.98148</value>
+                    </product>
+                    <product>
+                        <property>aero/coefficient/CAMissile3</property>
+                        <value>2.70311</value>
+                    </product>
+                    <product>
+                        <property>aero/coefficient/CAMissile4</property>
+                        <value>0.98148</value>
+                    </product>
+                    <product>
+                        <property>aero/coefficient/CAMissile5</property>
+                        <value>-3.94417</value>
+                    </product>
+                    <product>
+                        <property>aero/coefficient/CAMissile6</property>
+                        <value>3.94417</value>
+                    </product>
+                </sum>
+                <value>3.28084</value>
+            </product>
+        </function>
+
+        
+                
+                
+        
+
+        
+        <function name="aero/coefficient/Cnaileron">
+            <description>
+                       yaw due to aileron and elevator
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>fcs/elevon/diff-half-aero-rad</property>
+                <table name="aero/table/Cn_aileron">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">fcs/elevon/average-aero-deg</independentVar>
+                    <tableData>
+                                   -25.0     0.0       20.0
+                        -50.0      0.045    0.055     0.010
+                        -20.0      0.040    0.055     0.008
+                          0.0      0.050    0.055     0.005
+                         10.0      0.055    0.056     0.000
+                         20.0      0.070    0.045    -0.010
+                         30.0      0.080    0.030    -0.030
+                         40.0      0.050    0.010    -0.025
+                         70.0      0.045   -0.025    -0.020
+                         80.0      0.030   -0.030    -0.020
+                    </tableData>
+                </table>
+            </product>
+        </function>
+
+        
+        <function name="aero/coefficient/Cnrudder">
+            <description>
+                       Yaw moment due to rudder
+            </description>
+            <product>
+                <property>aero/qbar-psf</property>
+                <property>metrics/Sw-sqft</property>
+                <property>metrics/bw-ft</property>
+                <property>fcs/rudder/final-rad</property>
+                <table name="aero/table/Cn_rudder">
+                    <independentVar lookup="row">aero/alpha-deg</independentVar>
+                    <independentVar lookup="column">aero/beta-deg</independentVar>
+                    <tableData>
+                                 -50.0      -30.0     -20.0     0.0     20.0       30.0    50.0
+                        -80.0      0.000    -0.005    -0.010   -0.025   -0.010    -0.005    0.000
+                        -70.0      0.000    -0.005    -0.015   -0.030   -0.015    -0.005    0.000
+                        -60.0     -0.002    -0.010    -0.020   -0.035   -0.020    -0.010   -0.002
+                        -50.0     -0.004    -0.0125   -0.0233  -0.040   -0.0233   -0.0125  -0.004
+                        -40.0     -0.006    -0.015    -0.025   -0.055   -0.025    -0.015   -0.006
+                        -20.0     -0.010    -0.025    -0.040   -0.075   -0.040    -0.025   -0.010
+                          0.0     -0.013    -0.033    -0.055   -0.090   -0.055    -0.033   -0.013
+                         10.0     -0.012    -0.035    -0.055   -0.090   -0.055    -0.035   -0.012
+                         20.0     -0.010    -0.030    -0.050   -0.085   -0.050    -0.030   -0.010
+                         30.0     -0.008    -0.020    -0.035   -0.075   -0.035    -0.020   -0.008
+                         40.0     -0.005    -0.010    -0.020   -0.045   -0.020    -0.010   -0.005
+                         50.0      0.000    -0.005    -0.005   -0.015   -0.005    -0.005    0.000
+                         60.0      0.000     0.000     0.000    0.000    0.000     0.000    0.000
+                    </tableData>
+                </table>
+            </product>
+        </function>
+    </axis>
+</aerodynamics>

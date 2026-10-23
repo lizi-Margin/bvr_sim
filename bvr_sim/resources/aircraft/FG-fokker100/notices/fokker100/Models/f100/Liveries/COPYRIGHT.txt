@@ -1,0 +1,1 @@
+IMPORTANT NOTE : The Mexicana Livery is NOT released under a GNU GPLv2 Licence. it is released under a Freeware Licence. This is due to the fact that the photo from which the tail texture was created was released under a freeware licence.

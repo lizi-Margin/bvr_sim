@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="AGI-1 artificial horizon">
+ 
+
+
+ <property>systems/instr/AGI-1/pot/pitch-deg</property>
+ <property>systems/instr/AGI-1/button/cage</property>
+
+ <property>systems/elec/output/AGI-1/DC27-V</property>
+ <property>systems/elec/output/AGI-1/DC27-ok</property>
+
+
+ <channel name="AGI-1 slow" execrate="8">
+
+  <fcs_function name="systems/elec/output/AGI-1/DC27-A">
+   <function>
+    <product>
+     <p>systems/elec/output/AGI-1/DC27-V</p>
+     
+     <v>0.111</v>
+    </product>
+   </function>
+  </fcs_function>
+
+  <switch name="systems/instr/AGI-1/func/pitch-err-deg">
+   <default value="systems/instr/AGI-1/func/pitch-err-deg" />
+   <test logic="OR" value="accelerations/pendulum-pitch-error-deg">
+    systems/elec/output/AGI-1/DC27-ok EQ 0
+    systems/instr/AGI-1/button/cage NE 0
+   </test>
+  </switch>
+
+  <switch name="systems/instr/AGI-1/func/roll-err-deg">
+   <default value="systems/instr/AGI-1/func/roll-err-deg" />
+   <test logic="OR" value="accelerations/pendulum-roll-error-deg">
+    systems/elec/output/AGI-1/DC27-ok EQ 0
+    systems/instr/AGI-1/button/cage NE 0
+   </test>
+  </switch>
+
+ </channel>
+
+
+ <channel name="AGI-1" execrate="2">
+
+  
+
+  <fcs_function name="systems/instr/AGI-1/gauge/pitch-deg">
+   <function>
+    <ifthen>
+     <p>systems/elec/output/AGI-1/DC27-ok</p>
+     
+     <product>
+      <asin>
+       <sin>
+        <product>
+         <sum>
+          <p>attitude/theta-deg</p>
+          <p>systems/instr/AGI-1/func/pitch-err-deg</p>
+         </sum>
+         
+         <v>0.0175</v>
+        </product>
+       </sin>
+      </asin>
+      
+      <v>57.2975</v>
+     </product>
+     <p>systems/instr/AGI-1/gauge/pitch-deg</p>
+    </ifthen>
+   </function>
+  </fcs_function>
+
+  <fcs_function name="systems/instr/AGI-1/gauge/roll-deg">
+   <function>
+    <ifthen>
+     <p>systems/elec/output/AGI-1/DC27-ok</p>
+     <sum>
+      <p>attitude/phi-deg</p>
+      <p>systems/instr/AGI-1/func/roll-err-deg</p>
+     </sum>
+     <p>systems/instr/AGI-1/gauge/roll-deg</p>
+    </ifthen>
+   </function>
+   <clipto type="cyclic">
+    <min>-180.0</min>
+    <max>180.0</max>
+   </clipto>
+  </fcs_function>
+
+  <lag_filter name="systems/instr/AGI-1/gauge/ball-deg">
+   <input>-accelerations/pendulum-roll-deg</input>
+   <c1>20.0</c1>
+   <clipto>
+    <min>-8.0</min>
+    <max>8.0</max>
+   </clipto>
+  </lag_filter>
+
+ </channel>
+
+
+</system>

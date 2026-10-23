@@ -1,0 +1,1457 @@
+{
+  "source_archives": 664,
+  "aircraft": 147,
+  "backends": {
+    "jsbsim": 37,
+    "yasim": 110
+  },
+  "family_duplicates": 23,
+  "unresolved": 0,
+  "direct_fdm_10_seconds": 147,
+  "game_session_2_seconds": 147,
+  "yasim_regression_tests": 6,
+  "rendered_aircraft": 147,
+  "reviewed_contact_sheets": 17,
+  "gpu_renderer": "Wicked Engine / DX12",
+  "runtime_validation": {
+    "flights": [
+      {
+        "id": "FG-A-10",
+        "backend": "yasim",
+        "exact_parity": true,
+        "statistics": {
+          "animations": 178,
+          "cached_models": 1,
+          "exhausts": 2,
+          "instances": 1,
+          "material_resources": 249,
+          "mesh_resources": 630,
+          "property_updates": 13500
+        }
+      },
+      {
+        "id": "FG-SU-37",
+        "backend": "yasim",
+        "exact_parity": true,
+        "statistics": {
+          "animations": 238,
+          "cached_models": 1,
+          "exhausts": 2,
+          "instances": 1,
+          "material_resources": 22,
+          "mesh_resources": 151,
+          "property_updates": 23600
+        }
+      },
+      {
+        "id": "FG-737-800",
+        "backend": "jsbsim",
+        "exact_parity": true,
+        "statistics": {
+          "animations": 115,
+          "cached_models": 1,
+          "exhausts": 2,
+          "instances": 1,
+          "material_resources": 49,
+          "mesh_resources": 113,
+          "property_updates": 5200
+        }
+      }
+    ],
+    "cache_samples": [
+      {
+        "animations": 178,
+        "cached_models": 1,
+        "exhausts": 2,
+        "instances": 1,
+        "material_resources": 249,
+        "mesh_resources": 630,
+        "property_updates": 135
+      },
+      {
+        "animations": 178,
+        "cached_models": 1,
+        "exhausts": 2,
+        "instances": 1,
+        "material_resources": 249,
+        "mesh_resources": 630,
+        "property_updates": 135
+      },
+      {
+        "animations": 178,
+        "cached_models": 1,
+        "exhausts": 2,
+        "instances": 1,
+        "material_resources": 249,
+        "mesh_resources": 630,
+        "property_updates": 135
+      },
+      {
+        "animations": 178,
+        "cached_models": 1,
+        "exhausts": 2,
+        "instances": 1,
+        "material_resources": 249,
+        "mesh_resources": 630,
+        "property_updates": 135
+      },
+      {
+        "animations": 178,
+        "cached_models": 1,
+        "exhausts": 2,
+        "instances": 1,
+        "material_resources": 249,
+        "mesh_resources": 630,
+        "property_updates": 135
+      }
+    ],
+    "import_counts": {
+      "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A-10\\FG-A-10.glb": 1
+    },
+    "shader_errors": 0,
+    "control_pose_pixels_changed": true,
+    "engine_glow_pixels_changed": true
+  },
+  "evidence": {
+    "fdm": "runs/aircraft-import/fdm-current.json",
+    "game_session": "runs/aircraft-import/library-headless-all.json",
+    "gallery": "game/captures/aircraft-library/accepted-gallery",
+    "regression": "runs/aircraft-import/yasim-tests-final.log",
+    "runtime": "runs/aircraft-import/runtime-validation-final-seeded.log"
+  },
+  "limitations": [
+    "Validation covers the recorded conditions and durations, not a full flight envelope.",
+    "FlightGear Nasal, electrical/hydraulic/FCS and shader programs are not executed; generic host controls and supported snapshot properties are used.",
+    "Rotation/translation animation is supported; other animation XML is retained. Near LOD is selected at conversion.",
+    "Source-specific materials/liveries can use approximations. Unnamed nozzles use explicitly marked geometry-projected attachment estimates."
+  ],
+  "aircraft_evidence": [
+    {
+      "id": "FG-707",
+      "fdm": "jsbsim",
+      "glb_sha256": "0e1908588c0c67a9ddb79cb771e715e761e08a8b860a8bf20afa4c749c058e7f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-707.png",
+      "image_sha256": "55ef7409220f312969a7d6554fc907935cc118f507040a5e99ccf44fafe9bc74",
+      "animations": 93,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-717",
+      "fdm": "yasim",
+      "glb_sha256": "720d41699f3ca2813ca199467e8cb097d5360ab9f3e6d8f821ccbac84dbef681",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-717.png",
+      "image_sha256": "1dae3978ea578aa0f5e5958de6d1cbe92906bf7fcce73953f5540718bce81d32",
+      "animations": 66,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-727-230",
+      "fdm": "yasim",
+      "glb_sha256": "a8da45c3c96b57c244767c05d573f32f73ba4064edda7c9a3d62eb613e78ea42",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-727-230.png",
+      "image_sha256": "9c3e0e9829d7eeb37c4a672b5f4bc662d1f3d38046ad62fd67bfc805c53a1495",
+      "animations": 118,
+      "exhausts": 3
+    },
+    {
+      "id": "FG-737-800",
+      "fdm": "jsbsim",
+      "glb_sha256": "d3d519da6e23055bf08857fac24024301b62b290dd7a6d1dab7d1b3c0c31a12a",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-737-800.png",
+      "image_sha256": "216189b3c88748d4bef811e232cab4168a78e6aa1f04f627b59e2073b4c44924",
+      "animations": 115,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-747-8i",
+      "fdm": "yasim",
+      "glb_sha256": "252c4b56c6ae83ba30efca569963d1b3c56c0ceca89c15f3b1469d28b468bf8b",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-747-8i.png",
+      "image_sha256": "f32830e7fa2ec4397d0638006b27f3884205dc6475c83d09aade40872ece5bd6",
+      "animations": 137,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-757-200",
+      "fdm": "yasim",
+      "glb_sha256": "acd44e327ea722b803c0e50b4499c7b7f5c9e18df94132fe0de40a1ae6a83549",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-757-200.png",
+      "image_sha256": "e82ab5123b65eb38531817171d8b4605232cf838513b3e16c9b9da325be9486f",
+      "animations": 223,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-767-300",
+      "fdm": "yasim",
+      "glb_sha256": "a0e9f6608933e69327c73681d6179f6d77eaa8c7f2ff872f2698f27e47f8078a",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-767-300.png",
+      "image_sha256": "0b539c77e07b82e086addae33e04d63807b986fea2276e86063562ee96463934",
+      "animations": 76,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-777",
+      "fdm": "yasim",
+      "glb_sha256": "8065cddfcb7609af207995d0da9a32b84bf9191aeb4bfe9683a78fbbc91f7721",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-777.png",
+      "image_sha256": "3b245da6a72a8cc2b42efed079e9f4ce059d9abd6ef41d12c39a96d1adf136ba",
+      "animations": 150,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-787-8",
+      "fdm": "jsbsim",
+      "glb_sha256": "f1fee06f8a8b4c4c6e1c4d39110474d12131a7e74fe14579ac5488a32118dabb",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-787-8.png",
+      "image_sha256": "9c517eaf4d09da4302be66355e31ea24585515b667a52fa8545a44561a7f70a8",
+      "animations": 197,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-A-10",
+      "fdm": "yasim",
+      "glb_sha256": "581b4cd5514a5efe056bb298812841bd0d21b770ad71c1b20cabf4a5bf03cabe",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-A-10.png",
+      "image_sha256": "719309e8e66dc7e9e889513850752815f531ecf1ef99e3ae40dbc7ee86b3a9f7",
+      "animations": 178,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-A-6E",
+      "fdm": "jsbsim",
+      "glb_sha256": "995d52ca0c1aa977b25e0f0ffbc23c789f5c962eee430196eecc51ca005d12a3",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-A-6E.png",
+      "image_sha256": "c3fb8ef7e1be0e068b21e12d73b6c97a8678de30ed89f9f49d4ee4c69bf29797",
+      "animations": 142,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-A300-600",
+      "fdm": "jsbsim",
+      "glb_sha256": "e3e75ea2ba68ea7f27746e9831ae2ddbd0c6cad770f450ac8e97fbd70d3525ce",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-A300-600.png",
+      "image_sha256": "9dd0b948d86e29041c8ba7f458f43cc33bab3dfc3231e4f3e37ff7a602e0ccc5",
+      "animations": 91,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-A320-family",
+      "fdm": "jsbsim",
+      "glb_sha256": "5db8b5998689f18f3a2569d1ade77a6bb8681071eddd3a700d31c0e040c3f8ed",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-A320-family.png",
+      "image_sha256": "2948e68588a1dced4ca5aa47fcf037494d204e5316a459326afcfaf05f1e3929",
+      "animations": 190,
+      "exhausts": 3
+    },
+    {
+      "id": "FG-A340-600",
+      "fdm": "yasim",
+      "glb_sha256": "1f0469aa07b1ca26971120cb654a79ff0c35a9b5c18ade7f80358936a5995d6f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-A340-600.png",
+      "image_sha256": "4b0d6da7d07ac899f9c15e2da4e71d0d67204b505904cf9c9aa3c88c86418fdf",
+      "animations": 4,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-A380",
+      "fdm": "jsbsim",
+      "glb_sha256": "151bafb7dc224d5c31454b53a6032744f5a655820ac9d014698aaf73012203e9",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-A380.png",
+      "image_sha256": "b884dceec33d3f53527e3514a14cf92f667bae4decad104c95e0476654f34f98",
+      "animations": 321,
+      "exhausts": 5
+    },
+    {
+      "id": "FG-a4",
+      "fdm": "yasim",
+      "glb_sha256": "34f1223cd681837d19378a338691393d45f5438099ccb56c667c55b683b8ae01",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-a4.png",
+      "image_sha256": "f291799cb112396700c40e8510e8f17a2c2bc9894137f9b453a3bd1e0697ed11",
+      "animations": 46,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Aermacchi-MB-339",
+      "fdm": "yasim",
+      "glb_sha256": "6d5fce8bb4eba2bf2a91d342131762c3edfd871baa527f746832d0b213cd6698",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Aermacchi-MB-339.png",
+      "image_sha256": "6506eca31c2de2ca572a40e95265212f74ae3faa40e62434d411c7775c57eaa8",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Aero-L-29",
+      "fdm": "yasim",
+      "glb_sha256": "bc32440350b446b4c9f3a714a1f049ee310ff9fe36adf1f404f433e989a5f8dd",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Aero-L-29.png",
+      "image_sha256": "202177f8d2fb28353310dbb16a225bcf290d1ddb2b2ce3805dd64882a495525d",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Alphajet",
+      "fdm": "yasim",
+      "glb_sha256": "eb5c0f89174a1e0fc11a1da8358ee024fa698c9ce4f705a8b944d2b6d37ded10",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Alphajet.png",
+      "image_sha256": "ab3c16d220342714674919182076c10a5769577e6d42fe17ef147a1f6beb8e66",
+      "animations": 27,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-AN-225",
+      "fdm": "yasim",
+      "glb_sha256": "2850b0cabac8714c894305676330d131b470b6ed9a4aa1a1d445c6a5cfe76793",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-AN-225.png",
+      "image_sha256": "734471bf23f5cc775a778acda39150521726f029d919c9883e425cec87afa9f7",
+      "animations": 78,
+      "exhausts": 6
+    },
+    {
+      "id": "FG-AR-234",
+      "fdm": "yasim",
+      "glb_sha256": "e5e2ec8a35f5827d9efc505b8fa3ae6a56dc5c738f228efcd60dfd5913d773a2",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-AR-234.png",
+      "image_sha256": "3e769cde0534ce5a32e34b344199b2e8b253e5183479d7397a2b91da84e27746",
+      "animations": 27,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Avro-Arrow",
+      "fdm": "yasim",
+      "glb_sha256": "5a1af8b76fbf6b16ec87181446b054cb1c4cd371d9b2cd47bff6e6dc08dd9b62",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Avro-Arrow.png",
+      "image_sha256": "998f3c105052ebe27ed65e06a399eca72f6650cea40195e637af5d21f1208ac2",
+      "animations": 17,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-B-1B",
+      "fdm": "yasim",
+      "glb_sha256": "9d0cbd942916e250ef0496771992364d89935f268f6a171dfde9ad5bb0367440",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-B-1B.png",
+      "image_sha256": "b539e4045d52958c4a7f8b5c4153035881b6ad9980b84c875a451cd2fca7ad8d",
+      "animations": 203,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-B-2",
+      "fdm": "yasim",
+      "glb_sha256": "40be686b48db58cb7c594ee9dda97d3cab995383fd7668a746b5dc98203d3c63",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-B-2.png",
+      "image_sha256": "3a737d9b68351e53343b75bccefaad9b62f1242d51d9717e58a991c0959490ed",
+      "animations": 49,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-B-36D-Peacemaker",
+      "fdm": "yasim",
+      "glb_sha256": "a1b34e78d39bfd48356ff31c9b979dcb2e815c582532048d27001301f34abfb5",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-B-36D-Peacemaker.png",
+      "image_sha256": "202b924a4015f055172ea1d151473a1ce28593c2bda7a9614105523e77021c02",
+      "animations": 18,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-B-52F",
+      "fdm": "yasim",
+      "glb_sha256": "26828fe605378edf465316cc1230b5aaa81a7c9c0909bcc84c55945b028740a7",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-B-52F.png",
+      "image_sha256": "047eb92b83e8688a4c3631cfe135a2ee7fde6178daad216fda39b01771bd7c4b",
+      "animations": 97,
+      "exhausts": 8
+    },
+    {
+      "id": "FG-BAC-TSR2",
+      "fdm": "yasim",
+      "glb_sha256": "747668df2296dc2cf5cc5c0997989e223ef1c11a8ec6ab3dc0db73c3070106be",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-BAC-TSR2.png",
+      "image_sha256": "8e002e6cf9e89bc1d90e3c11bed4a97de10c4cc3589927f54f8aa1f39403b6a3",
+      "animations": 58,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-BAe-125",
+      "fdm": "yasim",
+      "glb_sha256": "aba9b4b106ff47d47d60fc5fc072fa74a10a9094df43b651038161b8dd20a633",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-BAe-125.png",
+      "image_sha256": "7c489c9b4679a570193341f948a57c1d9d78756827d84faafe18880af75a530d",
+      "animations": 16,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-BAe-146",
+      "fdm": "yasim",
+      "glb_sha256": "8a6fbb03f20208f91a14849d8a0ea2336a14d4fdef3701f264da1d9d5992c42f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-BAe-146.png",
+      "image_sha256": "459315266ee02025a31a1f7c83d1135cddb7fe8619507b298da9fe8893bc1d68",
+      "animations": 103,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-Bell-P-59",
+      "fdm": "yasim",
+      "glb_sha256": "c04bfe50b225ff9bbc5fe394b4879ffc5398e55aa5d45ee3b2f7ba749b1f011a",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Bell-P-59.png",
+      "image_sha256": "633b55bfe58f7e379b4af7271adde41b2efa81ea7e1def7f9942a157b53375f1",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Buccaneer",
+      "fdm": "yasim",
+      "glb_sha256": "99e02f5facd4bfd4195acd5418333458e00dc473192fa67849ef283bf64e986f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Buccaneer.png",
+      "image_sha256": "17e0b6e97e2ce0a83964e12ac97d167d258ed58c87c909b90a2c1c58463f35ca",
+      "animations": 79,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Campini-Caproni-N1",
+      "fdm": "yasim",
+      "glb_sha256": "e5c08b2ac4c8c4a110a5da82bb0868085341ea717d1f423e98628e308b146710",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Campini-Caproni-N1.png",
+      "image_sha256": "99d5310c6aee8070a9eddc32033ab0075ebb0e8b0d115b7e8b2d728b504ed5e7",
+      "animations": 14,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-CanberraBI8",
+      "fdm": "yasim",
+      "glb_sha256": "67af6477789ad2165d008fdca8fec287d403a74d74406c04dfa8daaf9fe25b15",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-CanberraBI8.png",
+      "image_sha256": "fb7ea5bdbe771e901cf5d86003d8185789a832f613ad688cdac3f2d3347e21f0",
+      "animations": 41,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Caproni-C22J",
+      "fdm": "yasim",
+      "glb_sha256": "f706053fec958ab6c2916ca161e82710f31dfaabbff764bf4b4cc1e2a561197c",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Caproni-C22J.png",
+      "image_sha256": "cee18e01d47d23473f22983c489ef867098625b3f587137c26a18fcae5ab20d1",
+      "animations": 15,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Caravelle",
+      "fdm": "yasim",
+      "glb_sha256": "5a1ce8ed7f569e1279d5c6b6f410c3410e8dd7c251739af65771029c10b53a92",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Caravelle.png",
+      "image_sha256": "b8c3368009dad6ede7096da266f83e9e8ef9dd4f8de93d9f88d8a7d28366ee3c",
+      "animations": 28,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Carreidas",
+      "fdm": "yasim",
+      "glb_sha256": "ce43f706927750f32bd9c1578f2d25631abc4d0c144a594018d77f1fd09de036",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Carreidas.png",
+      "image_sha256": "ce6d667729df5935bfe8c1a947e7eaae3afe61661402d4e700a9a8670378e072",
+      "animations": 31,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-Citation-Bravo",
+      "fdm": "yasim",
+      "glb_sha256": "1d65aabc726546d55d3e5cb60a3433d860cd9298475a6f4cd11282c5af2561a8",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Citation-Bravo.png",
+      "image_sha256": "4e51003e552cb6ecc61f26feed4c6788c2672b2121114b5fa57d291d6faf5f24",
+      "animations": 39,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-CitationX",
+      "fdm": "yasim",
+      "glb_sha256": "e5c3f25b346307217c360ba3df05b9ee4ec1e08efa1068a3cbf365bb79398235",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-CitationX.png",
+      "image_sha256": "60f3d770b6a1d9ad541a982b37231efa8f915e97f16469ae7ac74811124b30c7",
+      "animations": 61,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Coanda-1910",
+      "fdm": "yasim",
+      "glb_sha256": "8990a5facf4d62cbc57cdd6868020eb2dde043198273921fc821976ab82b6a56",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Coanda-1910.png",
+      "image_sha256": "d8b60f87337413609d7ae259e73931a67da968228f2a9bdc8389a2b8b9b86ba6",
+      "animations": 2,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Concorde",
+      "fdm": "jsbsim",
+      "glb_sha256": "392cf9896c2463c0a3c1727e74a6d9052cc8b7c6ad4c27c9d9b4e769da1a61fe",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Concorde.png",
+      "image_sha256": "75a917f55722ef287f8400f86ecfdfca217d98f72835f588e6a25a7cb8dfbb69",
+      "animations": 48,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-CRJ-200",
+      "fdm": "yasim",
+      "glb_sha256": "02e5cd2ca01d817d5a4b723d617f011b08319f689d8c03fcbfac59cd24c813e1",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-CRJ-200.png",
+      "image_sha256": "d5af838308224543466306762f2b08c675d67121c50f161e1c72617f87ccdaf4",
+      "animations": 38,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-CRJ700-family",
+      "fdm": "yasim",
+      "glb_sha256": "db207c15f487c82f8c048478b49de9d21e3ca6d004d3e61ee733293e17a4a038",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-CRJ700-family.png",
+      "image_sha256": "56a455236243724dbfd751d1f3b297e459157db67cc8380220d18cb0bf15b769",
+      "animations": 86,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Dassault-Mystere-IV",
+      "fdm": "yasim",
+      "glb_sha256": "2a2519c868f7078ddd5e2e196ed83854eb299ef47404849ddde78e597e8eeaa3",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Dassault-Mystere-IV.png",
+      "image_sha256": "ab16a5eddb727038a34b4dd9348068f003a2f2a1f5af53880c194feb21050fe9",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-DC-10-30",
+      "fdm": "yasim",
+      "glb_sha256": "543ec728cbe097f6e7ef3d42c2a135a9e9b40a0d6c9a451641cbc1b963711920",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-DC-10-30.png",
+      "image_sha256": "1879bc36d40494712245519f4066c88cfa71ea8b8d39dd3f71f5873c9b0273d5",
+      "animations": 124,
+      "exhausts": 3
+    },
+    {
+      "id": "FG-dc8-73",
+      "fdm": "jsbsim",
+      "glb_sha256": "b9c22505d7e66ca2c80a084f62a379ca4d227ba5503cbe4663a14da6bfc74ff6",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-dc8-73.png",
+      "image_sha256": "81e9a346b27f6ee05f1f0be266d4a434c3170332e81587ce83833c132176872a",
+      "animations": 46,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-DH-106",
+      "fdm": "yasim",
+      "glb_sha256": "020d02caded43e88d27df952f68b284578bdc29e5bde048ded6cfb5937aef0fb",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-DH-106.png",
+      "image_sha256": "a5011d7c075440a9a719d537158a24b8effd030cdf207db3f55a3372bacc0957",
+      "animations": 15,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-E3B",
+      "fdm": "jsbsim",
+      "glb_sha256": "ea6e57079266a27efbe47cc378e482a68c66da7b6a0c69370579967b206e7e0b",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-E3B.png",
+      "image_sha256": "a02bb05e48e5dab265c276286737442fe06eafea91fc583aed13dff24bf858a1",
+      "animations": 63,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-Embraer-ERJ-145",
+      "fdm": "yasim",
+      "glb_sha256": "dd959ac8ebac7fb12aa34cbe4a31267440bf59c6d2de94919c2b7bdb7c5e1085",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Embraer-ERJ-145.png",
+      "image_sha256": "c3371705b61c6956c50fb6520ac5abf20111ffc018b2799125a01dcd25a65d8c",
+      "animations": 28,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-eurofighter",
+      "fdm": "yasim",
+      "glb_sha256": "0490f90e39e7e19f58ca5075f9c9db495f3e3ec92e2d45e2cf751ee2bccfdec3",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-eurofighter.png",
+      "image_sha256": "207bb9d2709ce8d03a4d21d843b76e5c6e0ac6e24e5e4638a308682fc1cbc388",
+      "animations": 28,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-F-106-dart",
+      "fdm": "yasim",
+      "glb_sha256": "d1ab77f3ac6da10d4848d19e700ff112e4cc8023afcfed78104ecb1a2f841496",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F-106-dart.png",
+      "image_sha256": "480d2a0b380ed525f3443ae8619ceebb77f4c9c9fec438f734ce734e86e865f3",
+      "animations": 29,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F-117",
+      "fdm": "jsbsim",
+      "glb_sha256": "30f148178f826b8b8004801f8e182ea661b829b1e8b96e43a9cbc16a2cc82971",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F-117.png",
+      "image_sha256": "9eb2f2c480150c61c9cf886c726d0ed0cdf82189ec929a6445a76e4ce946a236",
+      "animations": 24,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-f-14b",
+      "fdm": "jsbsim",
+      "glb_sha256": "4d3fff0165871f45e6041bbbe2710e2f5ef2b86e2a7946e07807914fb79db99b",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-f-14b.png",
+      "image_sha256": "8326a43b285dbc8a5af4db3796bd494d992a595563936e01651bcbcd7a8a0f87",
+      "animations": 401,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-F15C",
+      "fdm": "jsbsim",
+      "glb_sha256": "af4861922174ce2b9ecd3c32100d2d88681a198bb4be4b1de791981168804dbd",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F15C.png",
+      "image_sha256": "13ead03b816cf175b93c559f0ec31b20a1977179da668ad6af056ca311fbca12",
+      "animations": 560,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-F-35B",
+      "fdm": "yasim",
+      "glb_sha256": "113ead73062e920f2cc15caed9242efa561b3f19f4b1be7cd5e3199bc59f1d03",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F-35B.png",
+      "image_sha256": "8eee67ae900e7e8545d98b44d33873431ac7714196872c6cc07ecfc2f44ed38d",
+      "animations": 64,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F-86",
+      "fdm": "yasim",
+      "glb_sha256": "0bd54408589b2c2e5ce1e5fef7b75fdfe618db3db0cb625875c87d1d8404eaf8",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F-86.png",
+      "image_sha256": "e9ed5428bb7a5679d74ebc04d8766a250ca2b3896923689beec613a7035ea119",
+      "animations": 121,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F-8E-Crusader",
+      "fdm": "jsbsim",
+      "glb_sha256": "ebbc5b359df7dd7735eb840cceaf899f99db9259ff14a40be9416434991a932a",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F-8E-Crusader.png",
+      "image_sha256": "894bbcf242fe28f0e0ed938669aa115fc22ef3cf2c011d5e9831cd52a06f6a51",
+      "animations": 193,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F11-Tiger",
+      "fdm": "yasim",
+      "glb_sha256": "91fb293470c86d1157a462ef60099e7efedd17decd07b09287318d9406c3d4dc",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F11-Tiger.png",
+      "image_sha256": "956ff2bda222941cf7f6882b39ca30098e292f830d4f69280786efaa12fe9c34",
+      "animations": 32,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F16",
+      "fdm": "jsbsim",
+      "glb_sha256": "4f25a3400ddd71d0a9784be836add59b5c9802e24798cf09ab59138ab970e4cb",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F16.png",
+      "image_sha256": "4cf414bd4023d42c697bb0ffa31f6bb951e429e762789ce7725f29129829c3e9",
+      "animations": 178,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F18-CAF",
+      "fdm": "jsbsim",
+      "glb_sha256": "e0f10fdc1fe5fb72af879e6242c3032f0ba831f92aed7cfbb828f60b6e375b87",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F18-CAF.png",
+      "image_sha256": "db29bc610918d22cdf4a8220795b7328b85252a1e3d75560fa5d5308bcb41749",
+      "animations": 9,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F80C",
+      "fdm": "jsbsim",
+      "glb_sha256": "a97683175a3844b6aa8552f2837bc5b84af66f59ad35aeee7c3f3e24ba2a92a4",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F80C.png",
+      "image_sha256": "2f6849614c43781be68b61a5e409b8518c3a9b8c7980410197b6e6162d98a419",
+      "animations": 11,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F9F-Panther",
+      "fdm": "yasim",
+      "glb_sha256": "45fdab6b0ceeab7b5bf6c2f58ee3ef2629108e7b86631f8cf25433d72f071389",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F9F-Panther.png",
+      "image_sha256": "83b83bc3b0d1baf99f31327dd03aac487822680e1a9dd2c72f06d0b78b347ebc",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Falcon-50",
+      "fdm": "yasim",
+      "glb_sha256": "bb9415ca38d9d8d9932b6595685452e41282df867cae1f46debe12bcb7dbf74c",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Falcon-50.png",
+      "image_sha256": "040a00a861523126374c636147af2d10ac8a49473579a4806940b4a542215143",
+      "animations": 37,
+      "exhausts": 3
+    },
+    {
+      "id": "FG-FMA-IA36-Condor",
+      "fdm": "yasim",
+      "glb_sha256": "aac0f0e2929a29518dd170f41d83eafe2b255fde375156b847ff36552ed3f13d",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-FMA-IA36-Condor.png",
+      "image_sha256": "b189172879ae9a9aea6d05969a0b324815f045935ec8acd6058b66765999b6cb",
+      "animations": 38,
+      "exhausts": 5
+    },
+    {
+      "id": "FG-fokker100",
+      "fdm": "jsbsim",
+      "glb_sha256": "57683cf31168e1cb431995499aa5aecf28113810beaebd21b670c2d084b8475f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-fokker100.png",
+      "image_sha256": "45f6e4c5f111a8f44588c3b11479fb8f6ba9a4393a0cbcf34a19a9a7240df85e",
+      "animations": 66,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Fouga-Magister",
+      "fdm": "yasim",
+      "glb_sha256": "22a7e5ff04914560467a96cf4b49bab7c930d6819c2cc616a4faf9c218892584",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Fouga-Magister.png",
+      "image_sha256": "d9c03c33ba4b3e1683d48238f0b3f1006ce3df079ccb530fbbcbb3d0b6e5562f",
+      "animations": 34,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-G91-R",
+      "fdm": "jsbsim",
+      "glb_sha256": "973eebee7bc802b3f963c316e94fbca60d7cbfcad9ff9dcae2777eb3aad829f9",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-G91-R.png",
+      "image_sha256": "59345f3b5e61ca25aa6c19fd60eadce6e83e9dc1c8c66b6fd59ef9ae972a2378",
+      "animations": 132,
+      "exhausts": 5
+    },
+    {
+      "id": "FG-Gloster-Meteor",
+      "fdm": "yasim",
+      "glb_sha256": "07bc61e0da4c37760ef617a07e1c03167d382debc018325e8fd5d5bd9e610382",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Gloster-Meteor.png",
+      "image_sha256": "8fab02c91ef0228f9674dd3713a75c07a991b0bf22b603df531d3ac4d433ecd7",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Gloster-Whittle",
+      "fdm": "yasim",
+      "glb_sha256": "7dae91a6d5a33eeb25f101e1bed53b68e677c2141ede71f27f30c7ea6b25c500",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Gloster-Whittle.png",
+      "image_sha256": "e74d2621ebaf7c06d35a6df01db04d4f95e31dcd0405fc7eb2428bbfba892f8d",
+      "animations": 20,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Grumman-EA-6B-Prowler",
+      "fdm": "yasim",
+      "glb_sha256": "00d1b32d3c4282e6f7793e2babf8cf10c03db077c59f7d21c0269c684d9b3128",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Grumman-EA-6B-Prowler.png",
+      "image_sha256": "6703c7b4caa8bf7f4465a96daaaa17e2238c886025e83b2d71180001627d573d",
+      "animations": 46,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Hansajet",
+      "fdm": "jsbsim",
+      "glb_sha256": "79b14ef1338563cf484140df511e5c655c29923be68ef7de079fc58f67378486",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Hansajet.png",
+      "image_sha256": "c768bc4043569c980204e619d3237bb67add43c4d0bee924dc573b0e09c7c236",
+      "animations": 48,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-harrier",
+      "fdm": "yasim",
+      "glb_sha256": "86134aa66cb8ce40728b9137e9e0accb3702bc7fb15ec56ce2877b2428b42bbf",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-harrier.png",
+      "image_sha256": "e9a5eeb7f468e556251deed65f7674a279432a2d009e85b1c537ee71f0b342cc",
+      "animations": 49,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Hawker-Siddeley-Nimrod",
+      "fdm": "yasim",
+      "glb_sha256": "90399aff579ad45fcf5a2102ead8061fa82fafec87ed26f65eafe173cc45309d",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Hawker-Siddeley-Nimrod.png",
+      "image_sha256": "b4d023b5336cb10e635819a43a99ca499b72fa4713865b382bb894c09acaf4ef",
+      "animations": 15,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-He162",
+      "fdm": "yasim",
+      "glb_sha256": "1f308b8a5da560031e2f88792de944d474001bf4586377610d93fca0efb0e062",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-He162.png",
+      "image_sha256": "70e467c24f3976e71380518ef863852f01b8926dbd461b5ec714377ef3dd8d32",
+      "animations": 35,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Heinkel-He-178",
+      "fdm": "yasim",
+      "glb_sha256": "0891d20a1d4744dbad0c3e9272a0e72f76d14203b2e31e228e67c5e4358e5bdd",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Heinkel-He-178.png",
+      "image_sha256": "a3efb74eebdeff52ba963b9aacfb38f13b5f0f9506123a6d0a32bce85776be95",
+      "animations": 30,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Heinkel-He-280",
+      "fdm": "yasim",
+      "glb_sha256": "617942e86f8fc126116ae16eb60faa715582ea59068b3623f038c2304d2b4e34",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Heinkel-He-280.png",
+      "image_sha256": "2ef5293aa6e223cc285abf77f4de37de8e5e23393ec9e7b440182f32cbbed0bc",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Horten-Ho-IX",
+      "fdm": "yasim",
+      "glb_sha256": "341b3ac19b478d2f5d4641d937436d0aba90f3f6712c87ad408436f15b677918",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Horten-Ho-IX.png",
+      "image_sha256": "ac82e015f824c813c5587d437f1c335d49ea2a4603e4a4ac1864a002a476f733",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Hunter",
+      "fdm": "yasim",
+      "glb_sha256": "7cf88c0be604cf3c303a19f9d9f268ffc414868420b02980b78f4f53e2cadc5b",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Hunter.png",
+      "image_sha256": "b705a17343160c531dd7640694e378d3dcd1d2369b2a2da67372980e153cba71",
+      "animations": 122,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-IL-76",
+      "fdm": "yasim",
+      "glb_sha256": "85753350a0eead715a990c91d29a71f1644ed0fd6858cb9c5a8c497c09eb962d",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-IL-76.png",
+      "image_sha256": "ecf2f200f42da66b64078b729028bcf5ffc7e6cfcb0ecc2b15f8a3dc970721e8",
+      "animations": 86,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-j22",
+      "fdm": "yasim",
+      "glb_sha256": "cd15899a09fdc04fb2c17f454e0689b6a77c82f68477a52f53757db5c77c3ae7",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-j22.png",
+      "image_sha256": "5489e4936dc90770f0f46db0a0abcd20c13be6d5f653267b62710c214710f92b",
+      "animations": 29,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-j7w",
+      "fdm": "yasim",
+      "glb_sha256": "8980dc784086d50239b56555824dec90ef7b639c368d2aab32a8041cb0f96722",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-j7w.png",
+      "image_sha256": "d45be8e7d34748d9bf7cf8a07aa04d77786c2da1082aae866580b0e1adf220fe",
+      "animations": 50,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-JA37",
+      "fdm": "jsbsim",
+      "glb_sha256": "03fc2fa6f5dfa5d0a7ccd661117e47b422e66db2364806f5f9e4f2fbb5130268",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-JA37.png",
+      "image_sha256": "fd9031af097da389941d3d1c8f63698dc66cec8c45f451cfdde3312fe4026654",
+      "animations": 109,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Jaguar",
+      "fdm": "yasim",
+      "glb_sha256": "e3dd6a329ba3c90aa42bffe19200ca1d153b87c3d2a53df45a4a91855986a20c",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Jaguar.png",
+      "image_sha256": "43e24bb0a0ba9d703fb7376ed1de2e5b69361b68222424a519e01f38413c087f",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-JAS39-Gripen",
+      "fdm": "yasim",
+      "glb_sha256": "66b00166ab67eaa2fdde17eb2b737d4bc93c9c58fec2233b56c658c4b37f8992",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-JAS39-Gripen.png",
+      "image_sha256": "9c76ca6117140c8330c94d90c0ce0c1f52fa7efeb3454f76d11c16a10d428a69",
+      "animations": 56,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-KC135",
+      "fdm": "jsbsim",
+      "glb_sha256": "2e38f3dd010e9e6f3455faaeef0fc159949481ba8a2c225c64a269f3c34a8d05",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-KC135.png",
+      "image_sha256": "e929e6b97ed6d60e99c9ce4d72bc01dc4e1201fe057f6e1a37aaf1774b0ab104",
+      "animations": 66,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-KM",
+      "fdm": "yasim",
+      "glb_sha256": "2f36a6fad72470ff5ed4deb4e47bb80e0c314ca7fce8f814271a9eb6cd99f95a",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-KM.png",
+      "image_sha256": "0e140352e7a428163063e5e7fc5918d2a8a0ed55e4b28795dd45d05f1ce74659",
+      "animations": 81,
+      "exhausts": 10
+    },
+    {
+      "id": "FG-L-1011-500",
+      "fdm": "jsbsim",
+      "glb_sha256": "37c57caa3923af72ad37d1dc444a88b25db3c6149419a8acddfe41d65a181583",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-L-1011-500.png",
+      "image_sha256": "bc54d8b7f6e63abf1cc1714a50f1c208f57fabe13570fb7cd57bad74c0601822",
+      "animations": 45,
+      "exhausts": 3
+    },
+    {
+      "id": "FG-l39",
+      "fdm": "yasim",
+      "glb_sha256": "14c5bd6237bf46c28a0a0fb3bd1166a9c185adc29529178e555826973e2aba60",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-l39.png",
+      "image_sha256": "25f5d1523dd5a8c14b24804e9e29908a3bd911170e4598e830b6e56db6dadd3b",
+      "animations": 11,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Leduc-022",
+      "fdm": "yasim",
+      "glb_sha256": "65553acb6e77b7b870a24b18469af71e90fe051d8015833ac2a946e14b1d0d97",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Leduc-022.png",
+      "image_sha256": "642fb65e7abb1629feedbfd98ef6188506eaa9d429caf02df673c6fa09d0b53e",
+      "animations": 8,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Lightning",
+      "fdm": "jsbsim",
+      "glb_sha256": "052b5be5aead6bc9357cd18ab60b2b8b7c84a3c86c8145c2aae7e3b0ef651d24",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Lightning.png",
+      "image_sha256": "c728f145be969da35c191031779f5c232d5415ed14389effa2767231d5a5d025",
+      "animations": 142,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-F22",
+      "fdm": "yasim",
+      "glb_sha256": "26fb0f65306b87a6c948b8b50b73adee455b2b0a194b50cacd75b613ded8de0c",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F22.png",
+      "image_sha256": "62a9802528a5f76debb0fea5c17034182d49aa0af9fd03bcf43662fce8fc70f0",
+      "animations": 54,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Lockheed-NF104A",
+      "fdm": "yasim",
+      "glb_sha256": "c731a113e444f9984820a2227c28d6104838cb13ceba62a1071dec2c668581cc",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Lockheed-NF104A.png",
+      "image_sha256": "710237b51d41c2f0d25bf158351edf28bb2deb2431bc96bb6b624bb478eb9fc6",
+      "animations": 53,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Lockheed-P-2-Neptune",
+      "fdm": "yasim",
+      "glb_sha256": "2636dca2d73803e491dbb3706de93a8c9e2101c5186396df4e478abffb3f465e",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Lockheed-P-2-Neptune.png",
+      "image_sha256": "a223dc24149f4534d541526feaef6097a44de11829b04ca9b4301c5b46321551",
+      "animations": 34,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Lockheed-S3-Viking",
+      "fdm": "yasim",
+      "glb_sha256": "bdc59eaa548f27022f043d2580555d18e90f90a236631070ee14a5a9245533a1",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Lockheed-S3-Viking.png",
+      "image_sha256": "6ffabf8960d6ab2e71a293c249f4c7f37194474f41f39d53b457d8f0986dba27",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Lockheed-SR71",
+      "fdm": "yasim",
+      "glb_sha256": "cee6f8851a354782189e1e704d871162f00ad8fb64d51172bf76645bb298d0d7",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Lockheed-SR71.png",
+      "image_sha256": "0ffa134681da4d1807796b2b2bad844b8e7429ef7ad83673c2555bd720aeb816",
+      "animations": 89,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Lockheed-U-2S",
+      "fdm": "yasim",
+      "glb_sha256": "c94e05677dea485af32d177492042167ed0bcd05c10b62aa5efb9d1bbc81b574",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Lockheed-U-2S.png",
+      "image_sha256": "9d33ddc78bd3cd7368bdad6a90ff50a22a6602022fa625dd7b111a5aca31a542",
+      "animations": 26,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-M-4-Bison-A",
+      "fdm": "yasim",
+      "glb_sha256": "84ff7e816d332a079e39d090bb7811da28b27164ea226a8f09866f6511046172",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-M-4-Bison-A.png",
+      "image_sha256": "d690f456ac02a353f739c9900787b0a4fa4819788948152d6e3435f59ccdf515",
+      "animations": 19,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-MB326",
+      "fdm": "yasim",
+      "glb_sha256": "27df8a9398efb911c832190c222849abc65ebfae125757bbe737b1e7e6e8d978",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MB326.png",
+      "image_sha256": "1eaab53edcfc8092e6a8f2f2f59bb29796c3c566219ad189ebd6f5c2a31c7821",
+      "animations": 24,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-MC-15",
+      "fdm": "jsbsim",
+      "glb_sha256": "a18e87c41769cbda0d3ac72b2f5759ec512555a08f0add961ccae727f1b3f4e7",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MC-15.png",
+      "image_sha256": "4d53200f1f1650e6bf60f8f8499f9359e6cf1bc45cab2b5806e78191c352256e",
+      "animations": 46,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-McDonnell-Douglas-T-45-Goshawk",
+      "fdm": "yasim",
+      "glb_sha256": "6a3f7a1c0ba031826a34421c7f1fa9150cc97600b7320164d5ed1f2deec7d029",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-McDonnell-Douglas-T-45-Goshawk.png",
+      "image_sha256": "7f7fa88da8d653fad37cb93aa8fa2b77d800add3edb9aa952376b94c0d5f1774",
+      "animations": 42,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-F4",
+      "fdm": "yasim",
+      "glb_sha256": "44da24a3d94e73fc23d36125b2c8d8f71c9d70e9036d36661cdc7504ccd01789",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-F4.png",
+      "image_sha256": "29b1540d2c1330dd682ab83f0df6c3ab0155caaeb47770c5f7bb9e58815a61d7",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-MD-11",
+      "fdm": "jsbsim",
+      "glb_sha256": "6bb963b452f741e54947f50f085d55cdcb696fa636d064247db03505e619d12f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MD-11.png",
+      "image_sha256": "7ad6d0935f7e60afc4b977ace49ad8606ce2334de59fb5a6fff051faf155284c",
+      "animations": 221,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-MD-80",
+      "fdm": "jsbsim",
+      "glb_sha256": "e8fdaac375ec0a161bdd8d94e161f06429deb1f1b8519d0007ee741d2019c453",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MD-80.png",
+      "image_sha256": "ad4e36a5d6f3f379158f5b3fdac6673266e623ba812b0f88548c811633d57784",
+      "animations": 244,
+      "exhausts": 3
+    },
+    {
+      "id": "FG-ME-262",
+      "fdm": "yasim",
+      "glb_sha256": "2ce4300654260eaaaf01aeedf92a5d22ffb59250ffff5c12a636b4b615552518",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-ME-262.png",
+      "image_sha256": "b6075c588650f43c3975410a70277c3348edd39698257f417ef9fe367f572cc4",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Messerschmitt-Libelle",
+      "fdm": "yasim",
+      "glb_sha256": "acf5407ffd4c1cf62277af45f9bc8e189b9db439fbc2f5ba1d8e818659fbaf74",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Messerschmitt-Libelle.png",
+      "image_sha256": "76ebf0051eb88cac5774be911f92bfd2a8fb6717eeaa6e49d0702189ea40ef68",
+      "animations": 16,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Messerschmitt-P1101",
+      "fdm": "yasim",
+      "glb_sha256": "174b8cc5b16426b5cd98fefedac487472fd9ed52d52a16c902883acf01059602",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Messerschmitt-P1101.png",
+      "image_sha256": "056e9c9bb03a57b24c8a79de4242386493a7f343b09bf0cc7240ee51690d9d71",
+      "animations": 13,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-MiG-15",
+      "fdm": "jsbsim",
+      "glb_sha256": "c1d89553bd3b1f1e2f7416c9569cce65ab84c1cdb16023c634a6c6cca9a47031",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MiG-15.png",
+      "image_sha256": "602434cf2362176aa16c781465adc2a469044c36242101863da1090643ce652d",
+      "animations": 43,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-MiG-21bis",
+      "fdm": "jsbsim",
+      "glb_sha256": "a5021963f7e8196d363f2835716e0660de7f5e77b4ebb6c738ed4dd9ab18d83e",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MiG-21bis.png",
+      "image_sha256": "d28356cc47bc2e1472c757423209712ced49085dceefbfe857ae68a582a53487",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Mig-29",
+      "fdm": "yasim",
+      "glb_sha256": "fe5e47001a9de64a4a6379f5aa44301e4bee46ad4929f6c07c092337584fe53f",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Mig-29.png",
+      "image_sha256": "5475ef814ed3054afdad5fd8f0e6d1fccb2740489674f7f800b65594a936789d",
+      "animations": 102,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-mirage2000",
+      "fdm": "jsbsim",
+      "glb_sha256": "433770b17cf528290200be29a2dea04b0e10f19533c43227a94058a75e9e2c70",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-mirage2000.png",
+      "image_sha256": "7b9c20b2e8e59d735845399ebb2f7d4aa56887be0e81f006d60c5f6d5ae142c6",
+      "animations": 10,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Mirage_F1",
+      "fdm": "yasim",
+      "glb_sha256": "08c6cbb3b688be98662b283cce9d786d6db80a022df4b6e5c75eeed9e857fa48",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Mirage_F1.png",
+      "image_sha256": "f55d5e49684652de1e8fa27c01d981150420f63aa13f988b6d3598f45a12c8af",
+      "animations": 66,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-MirageG8",
+      "fdm": "yasim",
+      "glb_sha256": "74782c162015b7ec3d9043f56fce7aeb909ee066e9d246cad9c78cbe394fbe73",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MirageG8.png",
+      "image_sha256": "59dc66a194fcd7e291cd297ff944ba58eb48469083e2a20e36198548dbd6f534",
+      "animations": 101,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-MirageIII",
+      "fdm": "yasim",
+      "glb_sha256": "115fcd8dc11ed2ec47ffae2902309ba2b5f236d209252ab7ba7affe44596177d",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MirageIII.png",
+      "image_sha256": "6c3850e9ff3535e28022127734e917ab92f870eda307eac4598d8ffb8f749a19",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-MirageIV",
+      "fdm": "yasim",
+      "glb_sha256": "fe74942995d2c92b6b4211bfd66064becf084381ed1b3889888c78976ffb7b8e",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MirageIV.png",
+      "image_sha256": "f7798c4d91e5480d1d0a51f3272da0aaa01c1e525c5fdb5e04a22ef05229e067",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-MRJ",
+      "fdm": "jsbsim",
+      "glb_sha256": "497d42a6c0f629ca8e14ccd16b08a5fdc792f72773e7c3493ab8be6ace41dab6",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MRJ.png",
+      "image_sha256": "7d4d32255840298765f778fef5a4a6a328040999dc9564f14a6586d97dac7b4a",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-MS-760",
+      "fdm": "yasim",
+      "glb_sha256": "fa53911ca044d45c929b3334e3a6f13c21fcdeb447463052c722b690a83c8372",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-MS-760.png",
+      "image_sha256": "50564f373d9bb15b4044faed3d83d950a172728b8d95062841d69c59e9729245",
+      "animations": 24,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Nord-1405-Gerfaut-II",
+      "fdm": "yasim",
+      "glb_sha256": "686e414b090d8a999438fc83e9bdfaa27d874f190a422bf1a950b96e66499b43",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Nord-1405-Gerfaut-II.png",
+      "image_sha256": "ccbdd2439d18141ae663026debdfc34f55837e0a4b2f3482ab5c0bb5ce475145",
+      "animations": 22,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Nord-2502",
+      "fdm": "yasim",
+      "glb_sha256": "b110fc4c1965c508bbd3e2c54d6e137f1395ecc7995b58232fa890647a5e6f59",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Nord-2502.png",
+      "image_sha256": "febdfdee643b3cb8666266e462fbb19d1cfb5666eb83a2716f1292b7b00e1385",
+      "animations": 56,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-North-American-RA-5C-Vigilante",
+      "fdm": "yasim",
+      "glb_sha256": "c7d6c5aadeb4ebe030ecf11bcf129e757b16fc38409a03024fc3a044d276b0ba",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-North-American-RA-5C-Vigilante.png",
+      "image_sha256": "8544c046bac1cb7b8df5b8aa3adec4f0f537f82bdf081425c53f9814407b4f56",
+      "animations": 139,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Northrop-T38-Talon",
+      "fdm": "yasim",
+      "glb_sha256": "5a440e8483c06ac6f9a07fd2f857c02b15a53c440fe98adb1baa436f3ded0596",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Northrop-T38-Talon.png",
+      "image_sha256": "9b31546dbb43543227253e7a7bf859f008b09a5856e85880c007d9865510e4d6",
+      "animations": 22,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Northrop-yb49",
+      "fdm": "yasim",
+      "glb_sha256": "34e7bbfa6299bbe1085c526bab0de23232b0ec3f4574193e728a21f8d7747bd1",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Northrop-yb49.png",
+      "image_sha256": "f5e8206cb859ebfc4e2646bdf6947481ef0d7b0134800586cc2b2830a4bfc923",
+      "animations": 0,
+      "exhausts": 8
+    },
+    {
+      "id": "FG-Pilatus-PC-24",
+      "fdm": "yasim",
+      "glb_sha256": "e0b7490ffe5f6f5df53f92fbd96def16d59231c96231881fcc4b74fae35c5eb8",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Pilatus-PC-24.png",
+      "image_sha256": "19f5e95188b1bfd619a19a3ea3a7dbe71950fea24657f40981a197654b7186ab",
+      "animations": 37,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-PZL-230F",
+      "fdm": "yasim",
+      "glb_sha256": "ee8f31d161621883b250b8038c779cd27e53767cf4e6442f229b123c5a5c6a14",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-PZL-230F.png",
+      "image_sha256": "3329d9b69bcc8063b231e45ccf7350c60506bd47e2f491b240abca659dab8cf0",
+      "animations": 13,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-RainbowRacer71",
+      "fdm": "yasim",
+      "glb_sha256": "ee1f641397c50ca806f916733690ecaaee20d818a7d4625be2adb9c21b18b085",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-RainbowRacer71.png",
+      "image_sha256": "91e47703fa174581155f58088ef16d53abb1cb67ef143f208e4fc4ad3bd7b8c5",
+      "animations": 17,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-SaabJ35F",
+      "fdm": "jsbsim",
+      "glb_sha256": "9dcf18b553faf26ad4fd112a9ca57cd3eaac801c41438c4594146792e5e70c9b",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-SaabJ35F.png",
+      "image_sha256": "eb2e296b19bfdab06d5e7f18965a4d6403a480098685dc56785126247a050a88",
+      "animations": 68,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-seahawk",
+      "fdm": "yasim",
+      "glb_sha256": "07fadd3e239a3b84de95c40d906622246399f3d47453aab53b97ec561054caa8",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-seahawk.png",
+      "image_sha256": "44a76e7ac97a93fb1902bf27f4cb5b4ab777be425615ad202e24b8f99071b73c",
+      "animations": 97,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-SeaVixen",
+      "fdm": "yasim",
+      "glb_sha256": "08f080a5b81bde41dd895d43bab048eae9c5ed60fddd1ecd3aa90bd40559d3fa",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-SeaVixen.png",
+      "image_sha256": "aa2156bdfcebc1a62624867a95ebc0b477e142b19d6959ae2cd5acd0b4ff2085",
+      "animations": 65,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Stiletto",
+      "fdm": "yasim",
+      "glb_sha256": "612843507b91a1d1bcc78432547d028ee6276538045af2b2fca8df01873d7e28",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Stiletto.png",
+      "image_sha256": "592a125f34af8219f6f12f7426f6a5b8ecc1be07119ae53fb184ce3360c7473e",
+      "animations": 22,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Su-25",
+      "fdm": "yasim",
+      "glb_sha256": "6213862c4b8cd1b40635aaa3d75bc4c1cd73de3da15929b39e221ad454baa2fa",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Su-25.png",
+      "image_sha256": "6ebeef911afb314c2b2342f5fd2725da1f6c87c265556e744d4a18183133d587",
+      "animations": 46,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-SU-37",
+      "fdm": "yasim",
+      "glb_sha256": "74d2c23efce7a2e8c30ac34870282aae02d7afd951733a15e3814ddbae59bccd",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-SU-37.png",
+      "image_sha256": "5702c374d3532a50bdc9bdbbe7f84dab22bbcaf99096b55c3a7d6238c134cfe0",
+      "animations": 238,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Sukhoi-Su-33",
+      "fdm": "yasim",
+      "glb_sha256": "45aa8091a5600f72cae69cd2f366ca94dc28a7221c6279fa92702a339c480336",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Sukhoi-Su-33.png",
+      "image_sha256": "4c72921fc8ea0ec1b5d9e523b960de9605cd63b7fa20d0519223958163ae03e8",
+      "animations": 0,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Super-Etendard",
+      "fdm": "yasim",
+      "glb_sha256": "fc48f6694816405dc960bae8969af655057d2b973426663b48b51db6fef02119",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Super-Etendard.png",
+      "image_sha256": "a42fb9b86578e66d7db5c1d7f11061d384d98f078a14993eeada4e3311d377ed",
+      "animations": 21,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Supermarine-Swift",
+      "fdm": "jsbsim",
+      "glb_sha256": "ccf9df0a3c38015fd053520857cb3639aca1c448fb9d7851370f3343c6a3cfd9",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Supermarine-Swift.png",
+      "image_sha256": "26b90d71d1814a318a3d7a2cd3c042d22ba9a0b4389c925f51c514b19b040c77",
+      "animations": 51,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-T-4",
+      "fdm": "yasim",
+      "glb_sha256": "1cd27e408549d4053f29f833e136463db026edeadff610efe18d3aabfd6c9655",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-T-4.png",
+      "image_sha256": "6c40887af1b58c093ccdb92b01717e5e979a7c8032ad274164944e1b6cefdf05",
+      "animations": 110,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-T-50",
+      "fdm": "yasim",
+      "glb_sha256": "8663d695d97000b9e15c2cc99a4b48f3614ab0265a98dbae1f624fab7d3969a5",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-T-50.png",
+      "image_sha256": "517718b7d5071ed7366e1d9e7b7a6ed37d64d1c18d772e86233551effb06626e",
+      "animations": 188,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-T37",
+      "fdm": "jsbsim",
+      "glb_sha256": "72509245073c54b56d0972caabc1b8dd8a181860ed5e8e46dc2fa3a57ee44f16",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-T37.png",
+      "image_sha256": "8c8deb89755b2668088e5a2efd9122b603de8e1f9576cb0729982c4423c966bb",
+      "animations": 32,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-T7-RedHawk",
+      "fdm": "yasim",
+      "glb_sha256": "77231b8c2b88b4a87c72d2a96f9c2e53bf651b889ad8925f5762f37a4deb1b0e",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-T7-RedHawk.png",
+      "image_sha256": "9a92b08c6c763d3554015d1a34c2b4343c83c5e2746a88503960005522be2df8",
+      "animations": 60,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Tu-134",
+      "fdm": "yasim",
+      "glb_sha256": "cf4ca975cfa219944fc6018c775387f260bbc3149cea5ca7f2aa03091c150aa6",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Tu-134.png",
+      "image_sha256": "c98ed0865f77042af5c12930b59a6f3164fc381dab1283d98f7a7ee8e4fb5d8f",
+      "animations": 38,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Tu-22-Blinder",
+      "fdm": "yasim",
+      "glb_sha256": "0f378b835287d6065bbd19fdcd12e5a3c1d3a342357ead824b717066b0674518",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Tu-22-Blinder.png",
+      "image_sha256": "2b6853f0d5abf968d2287c38b11793486996a89076180ab7ff730f3661a47734",
+      "animations": 94,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-tu154b",
+      "fdm": "jsbsim",
+      "glb_sha256": "82e118b66a4af6c800b94dd583b2d0c40e35478d832f1e2b148ec143544d6cf6",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-tu154b.png",
+      "image_sha256": "d0a203278c1f02c5c271af3a5962bed7057988ddf289abd864a86523e2d9f465",
+      "animations": 208,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-victor",
+      "fdm": "jsbsim",
+      "glb_sha256": "b83a9bbc9e4b72d353506bfbf4cfc1d821a7bf98bae799c5d4084c5a8e213793",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-victor.png",
+      "image_sha256": "5eb5ac63c1a00bf4e1ad68f8e6fa7248f31f52b72cf25f87d5e157fcc6b84d3b",
+      "animations": 22,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-vulcanb2",
+      "fdm": "jsbsim",
+      "glb_sha256": "4989c52597b62e27d5675f92dead960f40ad6aa6472edf1b9b265617a8e679d8",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-vulcanb2.png",
+      "image_sha256": "02b797f0e80419e2e53daa852f37be3fd91eebc7b0d6be3e69558fcfaa4bd3b7",
+      "animations": 28,
+      "exhausts": 4
+    },
+    {
+      "id": "FG-Westwind-II",
+      "fdm": "yasim",
+      "glb_sha256": "85a559fa4d6a57a2f39be7d9fc9ba815b197b0d8a81f0ed14052167f3caa0827",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Westwind-II.png",
+      "image_sha256": "da53311032c763265649a6605555fc4d946eae6c22d9077da1e631e4ccef25a5",
+      "animations": 23,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-XB-70",
+      "fdm": "yasim",
+      "glb_sha256": "32848e82bef260a68eab8de153b7488127e67d74270e2f46cf8e7bdd70b12102",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-XB-70.png",
+      "image_sha256": "b773b502fe84570a00fe36632ddc60b61d3b71ab808cadda4d9c7117bd453425",
+      "animations": 57,
+      "exhausts": 6
+    },
+    {
+      "id": "FG-Yak-130",
+      "fdm": "yasim",
+      "glb_sha256": "b138722dc49c8649bdc95d96dab4ff04b1ae0bfc7628419545f776cde28f6675",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Yak-130.png",
+      "image_sha256": "5fa09204b79f93d756d203f44e6b870709052a4b69c99c0ca8b7bc692358d903",
+      "animations": 28,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-Yak-23",
+      "fdm": "yasim",
+      "glb_sha256": "2a7da89535d34d7b6ad4fa059cbc8b452a1e2d8afa527d28b05837e28abd9443",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Yak-23.png",
+      "image_sha256": "90dfc98b338e58193ff4f20e0347427fd19df0b439eb85ee5a3206796a32da8e",
+      "animations": 0,
+      "exhausts": 1
+    },
+    {
+      "id": "FG-Yak-36",
+      "fdm": "yasim",
+      "glb_sha256": "252399526cdb0bf5072f8737ec32914784360ddfd8d60b3c35bd995d5a1080ea",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-Yak-36.png",
+      "image_sha256": "54c0f63faa2941961fc364691c6b12372ec0435d60d90d060bf3cb28731a7060",
+      "animations": 36,
+      "exhausts": 2
+    },
+    {
+      "id": "FG-YF-23",
+      "fdm": "yasim",
+      "glb_sha256": "aaaa54f88918ecaddd07c8ddfc12c11003f9100f2d6bae32e6b4ebddba7fcba0",
+      "image": "game\\captures\\aircraft-library\\accepted-gallery\\FG-YF-23.png",
+      "image_sha256": "2f8df10c4d9de1f996af0c1adf10334f231f03641e1b5a95ec5c57a799ba62b9",
+      "animations": 26,
+      "exhausts": 2
+    }
+  ],
+  "runtime_validation_binary": {
+    "core_sha256": "1204b321b1357f561745742261f3547738a497bd254427d983af4669ff112d47",
+    "renderer_sha256": "5d006c70b668c19d0d58de52d1e8f400d19d83fd899f17bd6ecd1837850be3b4"
+  }
+}

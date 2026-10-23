@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="stations- set hardpoint and hook"> 
+    
+    <property value="0">systems/stations/stationSxExternal/typeHardpoint</property>
+    <property value="0">systems/stations/stationSxInternal/typeHardpoint</property>
+    <property value="0">systems/stations/stationDxExternal/typeHardpoint</property>
+    <property value="0">systems/stations/stationDxInternal/typeHardpoint</property>
+    
+    <property value="0">systems/stations/stationSxExternal/typeHook</property>
+    <property value="0">systems/stations/stationSxInternal/typeHook</property>
+    <property value="0">systems/stations/stationDxExternal/typeHook</property>
+    <property value="0">systems/stations/stationDxInternal/typeHook</property>
+    
+    <property value="0.0">systems/stations/show-hardpoint-hook</property>
+    
+    
+    <channel name="set hardpoint" execrate="32">
+        
+        <switch name="systems/stations/stationSxExternal/typeHardpoint">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/store/stations/sx/external/type == 20
+            </test>
+        </switch>
+    
+        <switch name="systems/stations/stationSxInternal/typeHardpoint">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+                systems/store/stations/sx/internal/type NE 11
+            </test>
+            <test logic="AND" value="1">
+                systems/fuel/external-tank-active == 1
+                <test logic="OR">
+                    systems/store/stations/sx/internal/type == 10
+                    systems/store/stations/sx/internal/type == 12
+                </test>
+            </test>
+            <test logic="OR" value="1">
+                systems/store/stations/sx/internal/type == 20
+                systems/store/stations/sx/internal/type == 21
+            </test>
+            <test logic="AND" value="2">
+                systems/store/stations/sx/internal/type == 11
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/typeHardpoint">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+                systems/store/stations/dx/internal/type NE 11
+            </test>
+            <test logic="AND" value="1">
+                systems/fuel/external-tank-active == 1
+                <test logic="OR">
+                    systems/store/stations/dx/internal/type == 10
+                    systems/store/stations/dx/internal/type == 12
+                </test>
+            </test>
+            <test logic="OR" value="1">
+                systems/store/stations/dx/internal/type == 20
+                systems/store/stations/dx/internal/type == 21
+            </test>
+            <test logic="AND" value="2">
+                systems/store/stations/dx/internal/type == 11
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/typeHardpoint">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/store/stations/dx/external/type == 20
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="set hook" execrate="32">
+        
+        <switch name="systems/stations/stationSxExternal/typeHook">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/store/stations/sx/external/type == 20
+            </test>
+        </switch>
+    
+        <switch name="systems/stations/stationSxInternal/typeHook">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+                systems/store/stations/sx/internal/type NE 11
+            </test>
+            <test logic="AND" value="1">
+                systems/fuel/external-tank-active == 1
+                <test logic="OR">
+                    systems/store/stations/sx/internal/type == 10
+                    systems/store/stations/sx/internal/type == 12
+                </test>
+            </test>
+            <test logic="OR" value="1">
+                systems/store/stations/sx/internal/type == 20
+                systems/store/stations/sx/internal/type == 21
+            </test>
+            <test logic="AND" value="2">
+                systems/store/stations/sx/internal/type == 11
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxInternal/typeHook">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+                systems/store/stations/dx/internal/type NE 11
+            </test>
+            <test logic="AND" value="1">
+                systems/fuel/external-tank-active == 1
+                <test logic="OR">
+                    systems/store/stations/dx/internal/type == 10
+                    systems/store/stations/dx/internal/type == 12
+                </test>
+            </test>
+            <test logic="OR" value="1">
+                systems/store/stations/dx/internal/type == 20
+                systems/store/stations/dx/internal/type == 21
+            </test>
+            <test logic="AND" value="2">
+                systems/store/stations/dx/internal/type == 11
+            </test>
+        </switch>
+        
+        <switch name="systems/stations/stationDxExternal/typeHook">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/stations/show-hardpoint-hook == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/store/stations/dx/external/type == 20
+            </test>
+        </switch>
+    
+    </channel>
+    
+</system>

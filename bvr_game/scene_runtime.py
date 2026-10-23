@@ -20,9 +20,21 @@ class BakedScene:
         tiles=[]
         for config in meta['details']:
             tile=native.TerrainTile()
-            for k,v in config.items():setattr(tile,k,v)
-            tile.heights=self.arrays['focus'].astype(float).ravel().tolist();tiles.append(tile)
-        terrain.detail_tiles=tiles;return terrain
+            for k in ['origin_north','origin_west','spacing','columns','rows']:setattr(tile,k,config[k])
+            tile.heights=self.arrays[config.get('array_key','focus')].astype(float).ravel().tolist();tiles.append(tile)
+        terrain.detail_tiles=tiles
+        environment=self.document.get('environment',{})
+        for name,type_name,fields in [('contact_surfaces','ContactSurface',['id','material','vertices','indices','drivable']),
+                                      ('obstacles','CollisionBox',['id','center','half_size','yaw']),
+                                      ('water_regions','WaterRegion',['id','polygon'])]:
+            result=[]
+            for value in environment.get(name,[]):
+                item=getattr(native,type_name)()
+                for key in fields:
+                    if key in value:setattr(item,key,value[key])
+                result.append(item)
+            setattr(terrain,name,result)
+        terrain.prepare_surfaces();return terrain
     def compatibility_view(self):
         result=dict(self.document);result['id']=result['name'];result['version']=2
         result['player_start']=result['mission']['player_start'];result['ground_target']={'id':'depot','position':self.target}
@@ -30,7 +42,7 @@ class BakedScene:
         airport=result['airfields'][0];height=float(sample_grid(self.arrays['focus'],result['terrain']['details'][0],*airport['center']))
         result['runway']={'position':[*airport['center'],height],'length_m':airport['runway_length_m'],'width_m':airport['runway_width_m']}
         return result
-    def configure(self,renderer,bindings,terrain):
+    def configure(self,renderer,bindings,terrain,visual_profile=None):
         from .content import ASSETS
         for id,version in self.document['resource_versions'].items():
             directory=ASSETS/'registered'/id
@@ -38,9 +50,15 @@ class BakedScene:
                 if sha(directory/lod['file'])!=lod['sha256']:raise ValueError('Baked map resource version mismatch: '+id)
         materials=[];surfaces=[];placements=[]
         for id,data in self.document['materials'].items():
-            m=bindings.SceneMaterial();m.id=id;m.color=data['color'];m.roughness=data['roughness'];m.tile_m=data['tile_m'];m.base_color=data.get('base_color','');m.normal=data.get('normal','');m.water=id=='water';materials.append(m)
+            m=bindings.SceneMaterial();m.id=id;m.color=data['color'];m.roughness=data['roughness'];m.tile_m=data['tile_m'];m.base_color=data.get('base_color','');m.normal=data.get('normal','');m.roughness_map=data.get('roughness_map','');m.water=id=='water';materials.append(m)
+            if id=='detail_1' and visual_profile and visual_profile.get('terrain_detail'):
+                d=visual_profile['terrain_detail']
+                for slot in ['base_color','normal','roughness_map']:
+                    if sha(d[slot])!=d[slot+'_sha256']:raise ValueError('Detail texture hash mismatch: '+d[slot])
+                m.detail_color=d['base_color'];m.detail_normal=d['normal'];m.detail_roughness=d['roughness_map']
+                m.detail_tile_m=d['tile_m'];m.detail_mean_linear=d['mean_linear_luminance'];m.detail_strength=d['strength']
         for data in self.document['surfaces']:
-            s=bindings.SceneSurface();s.id=data['id'];s.material=data['material'];s.vertices=data['vertices'];s.indices=data['indices'];surfaces.append(s)
+            s=bindings.SceneSurface();s.id=data['id'];s.material=data['material'];s.vertices=data['vertices'];s.indices=data['indices'];s.drivable=data.get('drivable',True);surfaces.append(s)
         for data in self.document['instances']:
             p=bindings.ScenePlacement()
             for k in ['id','model','chunk','category','position','yaw','scale','lod_distance','cull_distance']:setattr(p,k,data[k])

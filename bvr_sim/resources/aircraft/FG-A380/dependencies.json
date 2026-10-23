@@ -1,0 +1,71 @@
+{
+  "files": [
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "TRENT-900",
+      "source": "A380/Engines/TRENT-900.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "direct",
+      "source": "A380/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "TRENT-900",
+      "source": "A380/Engines/TRENT-900.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "direct",
+      "source": "A380/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "TRENT-900",
+      "source": "A380/Engines/TRENT-900.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "direct",
+      "source": "A380/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "TRENT-900",
+      "source": "A380/Engines/TRENT-900.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "direct",
+      "source": "A380/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "APU",
+      "source": "A380/Engines/APU.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "direct",
+      "source": "A380/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "A380/A380_RJ.xml",
+      "reference": "pushback",
+      "source": "A380/Systems/pushback.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

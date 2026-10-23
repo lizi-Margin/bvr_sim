@@ -14,6 +14,93 @@ class GameSessionTests(unittest.TestCase):
     def tearDown(self):
         self.sim.close()
 
+    def test_manual_pitch_validation_and_optional_compatibility(self):
+        self.sim.reset(self.config)
+        command=native.PilotCommand()
+        self.assertFalse(command.manual_pitch)
+        command.manual_pitch=True;command.pitch_input=float('nan')
+        with self.assertRaises(ValueError):self.sim.submit(command)
+        command.pitch_input=5
+        self.sim.submit(command);self.sim.step()
+        player=next(e for e in self.sim.frame().entities if e.uid=='player')
+        self.assertEqual(player.animation_properties['controls/flight/elevator'],-1)
+
+    def test_optional_roll_rate_validation_and_raw_aileron_priority(self):
+        command=native.PilotCommand();self.assertIsNone(command.roll_rate)
+        self.sim.reset(self.config);command.roll_rate=0.
+        with self.assertRaises(ValueError):self.sim.submit(command)
+        self.config.player_model='FG-A-10';self.config.library_aircraft=True
+        self.config.fdm='auto';self.config.mission='training'
+        self.config.missiles=self.config.bombs=0
+        self.sim.reset(self.config);command.roll_rate=float('nan')
+        with self.assertRaises(ValueError):self.sim.submit(command)
+        command.roll_rate=-1.;command.manual_roll=True;command.roll_input=.2
+        self.sim.submit(command);self.sim.step(50)
+        p=next(e for e in self.sim.frame().entities if e.uid=='player')
+        self.assertTrue(p.alive)
+        self.assertAlmostEqual(p.animation_properties['controls/flight/aileron'],.2,places=6)
+        self.assertGreater(p.orientation[0],.05)
+
+    def test_imported_jsbsim_external_flight_controls_reach_the_fdm(self):
+        self.config.player_model='FG-737-800';self.config.library_aircraft=True
+        self.config.fdm='auto';self.config.mission='training'
+        self.config.missiles=self.config.bombs=0;self.config.altitude=5000;self.config.speed=200
+        pitches=[]
+        for stick in [1,-1]:
+            self.sim.reset(self.config)
+            command=native.PilotCommand();command.manual_pitch=True;command.pitch_input=stick
+            command.manual_roll=True;command.roll_input=0;self.sim.submit(command);self.sim.step(100)
+            player=next(e for e in self.sim.frame().entities if e.uid=='player')
+            self.assertTrue(player.alive);pitches.append(-player.orientation[1])
+        self.assertGreater(pitches[0]-pitches[1],math.radians(5))
+
+    def test_ordinary_f15_uses_imported_f15c_dynamics(self):
+        self.config.fdm='auto';self.config.mission='training'
+        self.config.missiles=self.config.bombs=0
+        self.config.altitude=5000;self.config.speed=200
+        trajectories=[]
+        for model,library in [('F15',False),('FG-F15C',True)]:
+            self.config.player_model=model;self.config.library_aircraft=library
+            self.sim.reset(self.config);trajectory=[]
+            for tick in range(300):
+                command=native.PilotCommand();command.throttle=.7
+                command.heading=.3 if tick<150 else -.2
+                command.pitch=.1 if tick<100 else 0.
+                self.sim.submit(command);self.sim.step()
+                player=next(e for e in self.sim.frame().entities if e.uid=='player')
+                self.assertTrue(player.alive)
+                self.assertEqual(player.model,model)
+                trajectory.append((player.position,player.velocity,player.orientation))
+            trajectories.append(trajectory)
+        self.assertEqual(trajectories[0],trajectories[1])
+        # The ordinary selection still supports its armed air-to-air loadout.
+        self.config.player_model='F15';self.config.library_aircraft=False
+        self.config.missiles=6;self.sim.reset(self.config)
+        self.assertEqual(self.sim.frame().missiles_left,6)
+
+    def test_yasim_manual_bank_survives_centered_input_and_keeps_turning(self):
+        self.config.library_aircraft=True;self.config.fdm='auto'
+        self.config.mission='training';self.config.missiles=self.config.bombs=0
+        self.config.altitude=5000;self.config.speed=200
+        for model in ['FG-A-10','FG-SU-37']:
+            for direction in [-1,1]:
+                with self.subTest(model=model,direction=direction):
+                    self.config.player_model=model;self.sim.reset(self.config)
+                    # Same release path as the interactive clients: heading is
+                    # refreshed from the current aircraft attitude each tick.
+                    for tick in range(200):
+                        p=next(e for e in self.sim.frame().entities if e.uid=='player')
+                        c=native.PilotCommand();c.heading=p.orientation[2];c.throttle=.7
+                        c.manual_roll=tick<25;c.roll_input=.2*direction
+                        self.sim.submit(c);self.sim.step()
+                        if tick==49:
+                            banked=next(e for e in self.sim.frame().entities if e.uid=='player')
+                    p=next(e for e in self.sim.frame().entities if e.uid=='player')
+                    self.assertTrue(p.alive)
+                    self.assertGreater(p.orientation[0]*direction,.15)
+                    self.assertGreater(p.orientation[0]/banked.orientation[0],.7)
+                    self.assertLess((p.orientation[2]-banked.orientation[2])*direction,-.01)
+
     def test_tick_boundary_pause_and_immutable_frame(self):
         self.sim.reset(self.config)
         initial = self.sim.frame()

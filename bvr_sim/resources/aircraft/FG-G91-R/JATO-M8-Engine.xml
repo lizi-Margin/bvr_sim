@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rocket_engine name="JATO_M8_Engine">    
+    <isp>180</isp>
+    <builduptime> 0.2 </builduptime>
+    <variation>
+        <thrust>0.02</thrust>
+        <total_isp>0.00</total_isp>
+    </variation>
+    <thrust_table name="propulsion/thrust_prop_remain" type="internal"> 
+        <tableData>
+            0.0 200
+            6.0 800
+            8.0 1000
+            50.0 1000
+            60.0 900
+            65.0 500
+            70.0 0.0
+        </tableData>
+    </thrust_table>
+</rocket_engine>

@@ -34,7 +34,7 @@ public:
         const std::array<double, 3>& velocity_,
         double dt_ = 0.1,
         const std::string& fdm_type = "simple"
-    ) noexcept;
+    );
 
     ~Fighter() noexcept override = default;
 
@@ -49,7 +49,10 @@ public:
     void step() override;
     // Persistent human/in-process input; training behavior stays unchanged otherwise.
     void set_pilot_input(double heading, double climb, double throttle,
-                         std::optional<double> aileron = std::nullopt);
+                         std::optional<double> aileron = std::nullopt,
+                         std::optional<double> elevator = std::nullopt,
+                         std::optional<double> roll_rate = std::nullopt);
+    std::map<std::string,double> visual_properties() const { return fdm->visual_properties(); }
 
     double get_speed() const noexcept override;
     double get_heading() const noexcept override;
@@ -61,7 +64,7 @@ public:
     virtual std::string log() noexcept override { return Aircraft::log() + fdm->log();}
 
 private:
-    void initialize_fdm(const std::string& fdm_type) noexcept;
+    void initialize_fdm(const std::string& fdm_type);
 };
 
 }

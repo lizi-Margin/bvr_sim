@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="Climate">
+    <property value="0.0">systems/climate/sw-set-off</property>
+    <property value="0.0">systems/climate/sw-set-off-trigger</property>
+    <property value="0.0">systems/climate/sw-set-automatic</property>
+    <property value="0.0">systems/climate/sw-set-automatic-trigger</property>
+    <property value="0.0">systems/climate/sw-set-manual-dec</property>
+    <property value="0.0">systems/climate/sw-set-manual-dec-trigger</property>
+    <property value="0.0">systems/climate/sw-set-manual-dec-delay</property>
+    <property value="0.0">systems/climate/sw-set-manual-inc</property>
+    <property value="0.0">systems/climate/sw-set-manual-inc-trigger</property>
+    <property value="0.0">systems/climate/sw-set-manual-inc-delay</property>
+    <property value="0.0">systems/climate/sw-set-pos_y</property>
+    <property value="0.0">systems/climate/sw-set-pos_z</property>
+    <property value="0.0">systems/climate/reg-canopy-defrost</property>
+    <property value="0.0">systems/climate/reg-canopy-defrost-pos</property>
+    <property value="0.0">systems/climate/reg-canopy-defrost-active</property>
+    <property value="0.0">systems/climate/reg-canopy-defrost-operative</property>
+    <property value="0.0">systems/climate/reg-emerg-ventilation</property>
+    <property value="0.0">systems/climate/reg-emerg-ventilation-pos</property>
+    <property value="0.0">systems/climate/reg-emerg-ventilation-active</property>
+    <property value="0.0">systems/climate/reg-emerg-ventilation-operative</property>
+    <property value="0.0">systems/climate/reg-air-temperature</property>
+    <property value="0.0">systems/climate/reg-air-temperature-pos</property>
+    <property value="0.0">systems/climate/reg-air-temperature-active</property>
+    <property value="0.0">systems/climate/sw-pressuriz</property>
+    <property value="0.0">systems/climate/sw-pressuriz-pos</property>
+    <property value="0.0">systems/climate/sw-pressuriz-active</property>
+    <property value="0.0">systems/climate/sw-pressuriz-operative</property>
+    <property value="0.0">systems/climate/sw-pressuriz-internal-pressure</property>
+    <property value="0.0">systems/climate/sw-pilot-heat</property>
+    <property value="0.0">systems/climate/sw-pilot-heat-pos</property>
+    <property value="0.0">systems/climate/sw-pilot-heat-active</property>
+
+    
+    <channel name="systems climate reg air temperature" execrate="16">
+        
+        <lag_filter name="systems/climate/reg-air-temperature-pos">
+            <input>systems/climate/reg-air-temperature</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/reg-air-temperature-active">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/climate/sw-set-off == 0
+                systems/electric/bus[1]/air-conditioning-temperature/fuse == 1
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/inv-primary/cockpit-air-temp/fuse == 1
+                systems/electric/inv-primary/V GT 100.0
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/air-conditioning-temperature/I">
+            <default value="0" />
+            <test logic="AND" value="1.0">
+                systems/climate/reg-air-temperature-active == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/inv-primary/cockpit-air-temp/I">
+            <default value="0" />
+            <test logic="AND" value="0.1">
+                systems/climate/reg-air-temperature-active == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems climate reg canopy defrost" execrate="16">
+        
+        <lag_filter name="systems/climate/reg-canopy-defrost-pos">
+            <input>systems/climate/reg-canopy-defrost</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/reg-canopy-defrost-active">
+            <default value="0" />
+            <test logic="AND" value="systems/climate/reg-canopy-defrost-pos">
+                systems/climate/reg-canopy-defrost-pos GT 0.05
+            </test>
+        </switch>
+        
+        <switch name="systems/climate/reg-canopy-defrost-operative">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/climate/reg-canopy-defrost-active == 1
+                systems/engine/air-compression-service-on == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems climate reg emerg ventilation" execrate="16">
+        
+        <lag_filter name="systems/climate/reg-emerg-ventilation-pos">
+            <input>systems/climate/reg-emerg-ventilation</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/reg-emerg-ventilation-active">
+            <default value="0" />
+            <test logic="AND" value="systems/climate/reg-emerg-ventilation-pos">
+                systems/climate/reg-emerg-ventilation-pos GT 0.05
+            </test>
+        </switch>
+        
+        <switch name="systems/climate/reg-emerg-ventilation-operative">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/climate/reg-emerg-ventilation-pos GT 0.95
+                aero/qbar-psf GT 0.1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems climate sw set" execrate="16">
+        
+        <switch name="systems/climate/sw-set-off">
+            <default value="systems/climate/sw-set-off" />
+            <test logic="AND" value="1">
+                systems/climate/sw-set-off-trigger == 1
+            </test>
+            <test logic="AND" value="1">
+                systems/climate/sw-set-manual-dec == 0
+                systems/climate/sw-set-manual-inc == 0
+                systems/climate/sw-set-automatic == 0
+            </test>
+            <test logic="OR" value="0">
+                systems/climate/sw-set-manual-dec == 1
+                systems/climate/sw-set-manual-inc == 1
+                systems/climate/sw-set-automatic == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/climate/sw-set-automatic">
+            <default value="systems/climate/sw-set-automatic" />
+            <test logic="AND" value="1">
+                systems/climate/sw-set-automatic-trigger == 1
+            </test>
+            <test logic="OR" value="0">
+                systems/climate/sw-set-manual-dec == 1
+                systems/climate/sw-set-manual-inc == 1
+                systems/climate/sw-set-off-trigger == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/climate/sw-set-manual-dec">
+            <default value="systems/climate/sw-set-manual-dec" />
+            <test logic="AND" value="1">
+                systems/climate/sw-set-manual-dec-trigger == 1
+            </test>
+            <test logic="OR" value="0">
+                systems/climate/sw-set-automatic == 1
+                systems/climate/sw-set-manual-inc == 1
+                systems/climate/sw-set-manual-dec-delay GT 0.9
+                systems/climate/sw-set-off-trigger == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/climate/sw-set-manual-dec-delay">
+            <input>systems/climate/sw-set-manual-dec</input>
+            <c1>0.5</c1>
+        </lag_filter>
+
+        <switch name="systems/climate/sw-set-manual-inc">
+            <default value="systems/climate/sw-set-manual-inc" />
+            <test logic="AND" value="1">
+                systems/climate/sw-set-manual-inc-trigger == 1
+            </test>
+            <test logic="OR" value="0">
+                systems/climate/sw-set-automatic == 1
+                systems/climate/sw-set-manual-dec == 1
+                systems/climate/sw-set-manual-inc-delay GT 0.9
+                systems/climate/sw-set-off-trigger == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/climate/sw-set-manual-inc-delay">
+            <input>systems/climate/sw-set-manual-inc</input>
+            <c1>0.5</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/sw-set-y">
+            <default value="0" />
+            <test logic="AND" value="1.0">
+                systems/climate/sw-set-automatic == 1
+            </test>
+            <test logic="AND" value="-0.5">
+                systems/climate/sw-set-manual-dec == 1
+            </test>
+            <test logic="AND" value="-0.5">
+                systems/climate/sw-set-manual-inc == 1
+            </test>
+        </switch>
+                
+        <lag_filter name="systems/climate/sw-set-pos_y">
+            <input>systems/climate/sw-set-y</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/sw-set-z">
+            <default value="0" />
+            <test logic="AND" value="0">
+                systems/climate/sw-set-automatic == 1
+            </test>
+            <test logic="AND" value="-0.86">
+                systems/climate/sw-set-manual-dec == 1
+            </test>
+            <test logic="AND" value="0.86">
+                systems/climate/sw-set-manual-inc == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/climate/sw-set-pos_z">
+            <input>systems/climate/sw-set-z</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="systems climate sw pressuriz" execrate="16">
+        
+        <lag_filter name="systems/climate/sw-pressuriz-pos">
+            <input>systems/climate/sw-pressuriz</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/sw-pressuriz-active">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/climate/sw-pressuriz-pos GT 0.90
+                systems/engine/air-compression-service-on == 1
+                systems/electric/bus[1]/V GE 18.0
+                systems/electric/bus[1]/air-conditioning-pressurization/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/air-conditioning-pressurization/I">
+            <default value="0" />
+            <test logic="AND" value="0.5">
+                systems/climate/sw-pressuriz-active == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems climate sw pilot heat" execrate="16">
+        
+        <lag_filter name="systems/climate/sw-pilot-heat-pos">
+            <input>systems/climate/sw-pilot-heat</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/climate/sw-pilot-heat-active">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/climate/sw-pilot-heat-pos GT 0.90
+                systems/electric/bus[1]/pitot-heating/fuse == 1
+                systems/electric/bus[1]/V GT 18
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[1]/pitot-heating/I">
+            <default value="0" />
+            <test logic="AND" value="5.6">
+                systems/climate/sw-pilot-heat-active == 1
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+</system>

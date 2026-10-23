@@ -89,6 +89,7 @@ private:
 
     std::unique_ptr<JSBSim::FGFDMExec> jsbsim_exec;
     bool initialized;
+    std::vector<std::pair<std::string,int>> host_control_inputs;
 
     double jsbsim_dt_max;
     double jsbsim_inner_dt;
@@ -106,7 +107,7 @@ private:
     std::string _nav_point_uuid;
 
 public:
-    explicit JSBSimFDM(double dt = 0.1, const std::map<std::string, std::string>& kwargs = {}) noexcept;
+    explicit JSBSimFDM(double dt = 0.1, const std::map<std::string, std::string>& kwargs = {});
 
     ~JSBSimFDM() noexcept override = default;
 
@@ -115,6 +116,7 @@ public:
     void step(const ActionSpace& action) override;
 
     double get_mach() const noexcept;
+    std::map<std::string,double> visual_properties() const override;
 
     void set_property_value(const Property& prop, double value) noexcept;
 
@@ -125,18 +127,18 @@ public:
     virtual std::string log() const noexcept override;
 
 private:
-    void initialize_jsbsim() noexcept;
+    void initialize_jsbsim();
 
     // void clear_default_condition() noexcept;
 
-    void run_jsbsim_step(const ActionSpace& action) noexcept;
+    void run_jsbsim_step(const ActionSpace& action);
 
     void set_jsbsim_controls(const std::array<double, 4>& controls) noexcept;
 
     void set_jsbsim_initial_conditions(double lon, double lat, double alt,
-                                      double speed, double roll, double pitch, double yaw) noexcept;
+                                      double speed, double roll, double pitch, double yaw);
 
-    void update_properties() noexcept;
+    void update_properties();
 };
 
 }

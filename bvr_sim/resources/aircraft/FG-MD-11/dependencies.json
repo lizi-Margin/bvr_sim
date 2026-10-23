@@ -1,0 +1,179 @@
+{
+  "files": [
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "FDE/Config/md-11-aerodynamics.xml",
+      "source": "MD-11/FDE/Config/md-11-aerodynamics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "FDE/Config/md-11-external-reactions",
+      "source": "MD-11/FDE/Config/md-11-external-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "FDE/Config/md-11-ground-reactions",
+      "source": "MD-11/FDE/Config/md-11-ground-reactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "FDE/Config/md-11-mass-balance",
+      "source": "MD-11/FDE/Config/md-11-mass-balance.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "FDE/Config/md-11-metrics",
+      "source": "MD-11/FDE/Config/md-11-metrics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-libraries",
+      "source": "MD-11/Systems/md-11-libraries.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-electrical",
+      "source": "MD-11/Systems/md-11-electrical.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-fuel",
+      "source": "MD-11/Systems/md-11-fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-hydraulics",
+      "source": "MD-11/Systems/md-11-hydraulics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-irs",
+      "source": "MD-11/Systems/md-11-irs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-pneumatics",
+      "source": "MD-11/Systems/md-11-pneumatics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-fms",
+      "source": "MD-11/Systems/md-11-fms.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-fcc",
+      "source": "MD-11/Systems/md-11-fcc.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-fcs",
+      "source": "MD-11/Systems/md-11-fcs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-spoilers",
+      "source": "MD-11/Systems/md-11-spoilers.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-ignition",
+      "source": "MD-11/Systems/md-11-ignition.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-ge-engine-fadec",
+      "source": "MD-11/Systems/md-11-ge-engine-fadec.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-apu",
+      "source": "MD-11/Systems/md-11-apu.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-misc",
+      "source": "MD-11/Systems/md-11-misc.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-cockpit",
+      "source": "MD-11/Systems/md-11-cockpit.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "md-11-instrumentation",
+      "source": "MD-11/Systems/md-11-instrumentation.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "cf6-80c2d1f_1",
+      "source": "MD-11/Engines/cf6-80c2d1f_1.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "direct",
+      "source": "MD-11/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "cf6-80c2d1f_2",
+      "source": "MD-11/Engines/cf6-80c2d1f_2.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "direct",
+      "source": "MD-11/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "cf6-80c2d1f_3",
+      "source": "MD-11/Engines/cf6-80c2d1f_3.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "direct",
+      "source": "MD-11/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "tscp700-4e",
+      "source": "MD-11/Engines/tscp700-4e.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "MD-11/FDE/MD-11-GE.xml",
+      "reference": "direct",
+      "source": "MD-11/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

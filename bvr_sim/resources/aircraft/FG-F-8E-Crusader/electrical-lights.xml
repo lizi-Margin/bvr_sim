@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="instruments-lights">
+    <property>systems/effets/lights/blinker-kinemat-out</property>
+    <property value="0.75">systems/lights/frequency</property>
+
+    <channel name="lights">
+        <switch name="electrical/instruments-factor">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /controls/electric/master-switch == 1
+                /systems/electrical/outputs/instrument-lights gt 27
+            </test>
+        </switch>
+
+        <scheduled_gain name="animation/instrument-dimmer">
+            <input>/sim/model/f8e/instrument-lights</input>
+            <table>
+                <independentVar lookup="row">/sim/time/sun-angle-rad</independentVar>
+                <tableData>
+                    0.5  0.2
+                    1.5  0.5
+                    1.8  1
+                </tableData>
+            </table>
+        </scheduled_gain>
+
+
+        <pure_gain name="electrical/instrument-lights">
+            <input>electrical/instruments-factor</input>
+            <gain>animation/instrument-dimmer</gain>
+            <output>/controls/lighting/instruments-norm</output>
+        </pure_gain>
+
+    </channel>
+
+    <channel name="light-outdoor">
+
+        <switch name="Landing Light">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /surface-positions/gear-pos-norm  == 1
+                /controls/lighting/landing-lights == 1
+                
+                /systems/electrical/outputs/landing-light  gt 24
+            </test>
+        </switch>
+
+
+        <switch name="blinker-sw">
+            <default value="systems/effets/lights/blinker-kinemat-in" />
+            <test logic="AND" value="1">
+                systems/effets/lights/blinker-kinemat-in == 0
+                systems/effets/lights/blinker-kinemat-out == 0
+            </test>
+            <test logic="AND" value="0">
+                systems/effets/lights/blinker-kinemat-in == 1
+                systems/effets/lights/blinker-kinemat-out == 1
+            </test>
+            <output>systems/effets/lights/blinker-kinemat-in</output>
+            <output>/instrumentation/lights/blinker-kinemat-in</output>
+        </switch>
+
+        <kinematic name="light-blinker-norm">
+            <input>systems/effets/lights/blinker-kinemat-in</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0</time>
+                </setting>
+                <setting>
+                    <position>1</position>
+                    <time>1</time>
+                </setting>
+            </traverse>
+            <output>systems/effets/lights/blinker-kinemat-out</output>
+            <output>/instrumentation/lights/blinker-kinemat-out</output>
+        </kinematic>
+
+        <switch name="beacon1-sw">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/effets/lights/blinker-kinemat-out gt 0.90
+                systems/effets/lights/blinker-kinemat-out lt 0.97
+            </test>
+            <output>systems/effets/lights/beacon1-on</output>
+        </switch>
+
+        <switch name="beacon2-sw">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/effets/lights/blinker-kinemat-out gt 0.03
+                systems/effets/lights/blinker-kinemat-out lt 0.10
+            </test>
+            <output>systems/effets/lights/beacon2-on</output>
+        </switch>
+
+        <switch name="beacon-sw">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /instrumentation/lights/blinker-kinemat-out &gt; 0.90
+                /instrumentation/lights/blinker-kinemat-out lt 0.97
+            </test>
+            <output>/instrumentation/lights/beacon-on</output>
+        </switch>
+
+
+        <fcs_function name="systems/lights/blinker1_factor">
+            <function>
+                <sin>
+                    <product>
+                            <property>sim-time-sec</property>
+                        <value>6.283185307</value>
+                        <property>systems/lights/frequency</property>
+                    </product>
+                </sin>
+            </function>
+   </fcs_function>
+
+    <switch name="systems/lights/blinker1_on">
+       <default value="0" />
+       <test logic="AND" value="1">
+           systems/lights/blinker1_factor GE 0.96
+       </test>
+    </switch>
+
+    <fcs_function name="systems/lights/blinker2_factor">
+        <function>
+            <sin>
+                <product>
+                <sum>
+                    <property>sim-time-sec</property>
+                    <value>0.3</value>
+                </sum>
+                    <value>6.283185307</value>
+                    <property>systems/lights/frequency</property>
+                </product>
+            </sin>
+        </function>
+    </fcs_function>
+
+    <switch name="systems/lights/blinker2_on">
+        <default value="0" />
+        <test logic="AND" value="1">
+            systems/lights/blinker2_factor GE 0.96
+        </test>
+    </switch>
+
+    <fcs_function name="systems/lights/blinker3_factor">
+        <function>
+            <sin>
+                <product>
+                    <sum>
+                        <property>sim-time-sec</property>
+                        <value>0.5</value>
+                    </sum>
+                    <value>6.283185307</value>
+                    <property>systems/lights/frequency</property>
+                </product>
+            </sin>
+        </function>
+    </fcs_function>
+
+    <switch name="systems/lights/blinker3_on">
+        <default value="0" />
+        <test logic="AND" value="1">
+            systems/lights/blinker3_factor GE 0.95
+        </test>
+    </switch>
+
+
+    </channel>
+
+
+</system>

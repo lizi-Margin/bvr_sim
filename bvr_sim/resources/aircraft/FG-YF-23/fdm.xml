@@ -1,0 +1,238 @@
+<?xml version='1.0' encoding='utf-8'?>
+<airplane mass="40000">
+
+
+
+  <approach speed="165" aoa="9" fuel="1.0">
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[0]/throttle-norm" value="0.7" />
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[1]/throttle-norm" value="0.7" />
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[0]/reheat-norm" value="0.0" />
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[1]/reheat-norm" value="0.0" />
+    <control-setting axis="/autopilot/FCS/controls/flight/flap-norm" value="1" />
+    <control-setting axis="/autopilot/FCS/controls/flight/slat-norm" value="1" />
+    <control-setting axis="/controls/gear/gear-down" value="1" />
+  </approach>
+
+
+
+  <cruise speed="680" alt="0">
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[0]/throttle-norm" value="1.0" />
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[1]/throttle-norm" value="1.0" />
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[0]/reheat-norm" value="0.0" />
+    <control-setting axis="/autopilot/FCS/controls/engines/engine[1]/reheat-norm" value="0.0" />
+    <control-setting axis="/autopilot/FCS/controls/flight/flap-norm" value="0" />
+    <control-setting axis="/autopilot/FCS/controls/flight/slat-norm" value="0" />
+    <control-setting axis="/controls/gear/gear-down" value="0" />
+  </cruise>
+
+  <cockpit x="5.70" y="0.00" z="1.26" />
+
+
+
+  <fuselage ax="10.00" ay="0.00" az="0.00" bx="-2.00" by="0.00" bz="0.00" width="1.6" taper="0.5" midpoint="0.5" />
+
+
+  <fuselage ax="-2.00" ay="1.80" az="0.00" bx="-8.00" by="1.20" bz="0.60" width="1.2" taper="0" midpoint="0.3" />
+
+
+  <fuselage ax="-2.00" ay="-1.80" az="0.00" bx="-8.00" by="-1.20" bz="0.60" width="1.2" taper="0" midpoint="0.3" />
+
+
+
+
+  <wing x="-2.00" y="0.00" z="0.25" length="6.66" chord="12.00" taper="0.08" sweep="0" dihedral="0" incidence="0.0" camber="0.0" idrag="1.6">
+
+    <stall aoa="30" width="3" peak="1.3" />
+
+    <flap0 start="0.36" end="0.63" lift="1.4" drag="1.4" />
+
+    <flap1 start="0.63" end="0.89" lift="1.3" drag="1.3" />
+
+    <slat start="0.36" end="0.89" aoa="6" drag="1.2" />
+
+
+    <control-input axis="/autopilot/FCS/controls/flight/flap-norm" control="FLAP0" src0="-1" src1="1" dst0="-1.0" dst1="1.0" />
+
+
+    <control-input axis="/autopilot/FCS/controls/flight/flap-norm" control="FLAP1" src0="-1" src1="1" dst0="-0.5" dst1="0.5" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/aileron-norm" control="FLAP1" split="true" src0="-1" src1="1" dst0="-1.0" dst1="1.0" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/slat-norm" control="SLAT" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/speedbrake-flap-norm" control="FLAP0" src0="-1" src1="1" dst0="-1.0" dst1="1.0" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/speedbrake-aileron-norm" control="FLAP1" invert="true" src0="-1" src1="1" dst0="-1.0" dst1="1.0" />
+
+
+    <control-output prop="/surface-positions/flap-pos-norm" control="FLAP0" />
+
+    <control-output prop="/surface-positions/left-flap-pos-norm" control="FLAP0" />
+
+    <control-output prop="/surface-positions/right-flap-pos-norm" control="FLAP0" />
+
+    <control-output prop="/surface-positions/aileron-pos-norm" control="FLAP1" />
+
+    <control-output prop="/surface-positions/left-aileron-pos-norm" control="FLAP1" side="left" />
+
+    <control-output prop="/surface-positions/right-aileron-pos-norm" control="FLAP1" side="right" />
+
+    <control-output prop="/surface-positions/slat-pos-norm" control="SLAT" />
+
+    <control-output prop="/surface-positions/left-slat-pos-norm" control="SLAT" side="left" />
+
+    <control-output prop="/surface-positions/right-slat-pos-norm" control="SLAT" side="right" />
+
+
+    <control-speed control="FLAP0" transition-time="0.1" />
+
+    <control-speed control="FLAP1" transition-time="0.1" />
+
+    <control-speed control="SLAT" transition-time="0.1" />
+
+  </wing>
+
+
+  <hstab x="-8.70" y="2.40" z="0.36" length="3.30" chord="5.10" taper="0.11" sweep="0" dihedral="40" camber="0.0" idrag="0.1" effectiveness="1">
+
+    <stall aoa="32" width="2" peak="1.3" />
+
+    <flap0 start="0" end="1" lift="1.45" drag="1.5" />
+
+
+    <control-input axis="/autopilot/FCS/controls/flight/ruddervator-pitch-norm" control="FLAP0" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/ruddervator-pitch-trim-norm" control="FLAP0" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/ruddervator-yaw-norm" control="FLAP0" split="true" invert="true" />
+
+    <control-input axis="/autopilot/FCS/controls/flight/ruddervator-yaw-trim-norm" control="FLAP0" split="true" invert="true" />
+
+
+    <control-input axis="/controls/flight/elevator-trim" control="FLAP0" />
+
+
+    <control-output prop="/surface-positions/ruddervator-pos-norm" control="FLAP0" min="-1" max="1" />
+
+    <control-output prop="/surface-positions/ruddervator-left-pos-norm" control="FLAP0" side="left" min="-1" max="1" />
+
+    <control-output prop="/surface-positions/ruddervator-right-pos-norm" control="FLAP0" side="right" min="-1" max="1" />
+
+
+    <control-speed control="FLAP0" transition-time="0.05" />
+
+  </hstab>
+
+
+  <jet x="-5.5" y="1.25" z="0.20" thrust="24500" afterburner="35000" mass="3500">
+
+    <actionpt x="-7.5" y="1.2" z="0.3" />
+
+
+    <control-input axis="/autopilot/FCS/controls/engines/engine[0]/throttle-norm" control="THROTTLE" />
+
+    <control-input axis="/autopilot/FCS/controls/engines/engine[0]/reheat-norm" control="REHEAT" />
+
+
+    <control-output prop="/engines/engine[0]/throttle-norm" control="THROTTLE" />
+
+    <control-output prop="/engines/engine[0]/reheat-norm" control="REHEAT" />
+
+    <control-speed control="THROTTLE" transition-time="1" />
+
+    <control-speed control="REHEAT" transition-time="1" />
+
+  </jet>
+
+  <jet x="-5.5" y="-1.25" z="0.20" thrust="24500" afterburner="35000" mass="3500">
+
+    <actionpt x="-7.5" y="-1.2" z="0.3" />
+
+
+    <control-input axis="/autopilot/FCS/controls/engines/engine[1]/throttle-norm" control="THROTTLE" />
+
+    <control-input axis="/autopilot/FCS/controls/engines/engine[1]/reheat-norm" control="REHEAT" />
+
+
+    <control-output prop="/engines/engine[1]/throttle-norm" control="THROTTLE" />
+
+    <control-output prop="/engines/engine[1]/reheat-norm" control="REHEAT" />
+
+    <control-speed control="THROTTLE" transition-time="1" />
+
+    <control-speed control="REHEAT" transition-time="1" />
+
+  </jet>
+
+
+
+  <gear x="5.25" y="0.00" z="-2.3" compression="0.5" spring="2.5">
+
+    <control-input axis="/controls/gear/steering-norm" control="STEER" square="true" />
+
+    <control-input axis="/controls/gear/gear-down" control="EXTEND" />
+
+    <control-output prop="/gear/gear[0]/position-norm" control="EXTEND" />
+
+    <control-output prop="/gear/gear[0]/steering-norm" control="STEER" />
+
+    <control-speed control="EXTEND" transition-time="1" />
+
+  </gear>
+
+
+  <gear x="-2.03" y="1.92" z="-2.36" compression="0.8" spring="1.2">
+
+    <control-input axis="/controls/gear/gear-down" control="EXTEND" />
+
+    <control-input axis="/controls/gear/brake-left" control="BRAKE" />
+
+    <control-input axis="/controls/gear/brake-parking" control="BRAKE" />
+
+    <control-output prop="/gear/gear[1]/position-norm" control="EXTEND" />
+
+    <control-speed control="EXTEND" transition-time="1" />
+
+  </gear>
+
+
+  <gear x="-2.03" y="-1.92" z="-2.36" compression="0.8" spring="1.2">
+
+    <control-input axis="/controls/gear/gear-down" control="EXTEND" />
+
+    <control-input axis="/controls/gear/brake-right" control="BRAKE" />
+
+    <control-input axis="/controls/gear/brake-parking" control="BRAKE" />
+
+    <control-output prop="/gear/gear[2]/position-norm" control="EXTEND" />
+
+    <control-speed control="EXTEND" transition-time="1" />
+
+  </gear>
+
+
+
+  <tank x="1.5" y="0" z="0.68" capacity="16000" jet="true" />
+
+
+  <tank x="-1.40" y="2" z="0.0" capacity="4000" jet="true" />
+
+
+  <tank x="-1.40" y="-2" z="0.0" capacity="4000" jet="true" />
+
+
+
+
+  <ballast x="4" y="0" z="0.6" mass="3000" />
+
+
+  <ballast x="7" y="0" z="0.2" mass="1500" />
+
+
+  <ballast x="5.8" y="0" z="0.6" mass="200" />
+
+
+  <ballast x="5" y="0" z="0.0" mass="500" />
+
+
+</airplane>

@@ -1,0 +1,185 @@
+{
+  "files": [
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "PW-J57P-new",
+      "source": "F-8E-Crusader/Engines/PW-J57P-new.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "direct-new",
+      "source": "F-8E-Crusader/Engines/direct-new.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "fcs",
+      "source": "F-8E-Crusader/Systems/fcs.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "steady-behaviour",
+      "source": "F-8E-Crusader/Systems/steady-behaviour.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "electrical-fdm-custom",
+      "source": "F-8E-Crusader/Systems/electrical-fdm-custom.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "electrical-fdm",
+      "source": "F-8E-Crusader/Systems/electrical-fdm.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "electrical-lights",
+      "source": "F-8E-Crusader/Systems/electrical-lights.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "catapult_free",
+      "source": "F-8E-Crusader/Systems/catapult_free.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "holdback_free",
+      "source": "F-8E-Crusader/Systems/holdback_free.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "init-carrier",
+      "source": "F-8E-Crusader/Systems/init-carrier.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "cat-hold",
+      "source": "F-8E-Crusader/Systems/cat-hold.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "hook",
+      "source": "F-8E-Crusader/Systems/hook.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "speedbrake",
+      "source": "F-8E-Crusader/Systems/speedbrake.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "wings",
+      "source": "F-8E-Crusader/Systems/wings.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "BLC",
+      "source": "F-8E-Crusader/Systems/BLC.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "propulsion",
+      "source": "F-8E-Crusader/Systems/propulsion.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "crash-detect",
+      "source": "F-8E-Crusader/Systems/crash-detect.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "crash-sink-anim",
+      "source": "F-8E-Crusader/Systems/crash-sink-anim.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "fuel",
+      "source": "F-8E-Crusader/Systems/fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "probe-refuel",
+      "source": "F-8E-Crusader/Systems/probe-refuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "refuel",
+      "source": "F-8E-Crusader/Systems/refuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "brake",
+      "source": "F-8E-Crusader/Systems/brake.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "landing-gear",
+      "source": "F-8E-Crusader/Systems/landing-gear.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "instruments",
+      "source": "F-8E-Crusader/Systems/instruments.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "annunciator",
+      "source": "F-8E-Crusader/Systems/annunciator.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "aoa-new",
+      "source": "F-8E-Crusader/Systems/aoa-new.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "canopy",
+      "source": "F-8E-Crusader/Systems/canopy.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "mule-crus",
+      "source": "F-8E-Crusader/Systems/mule-crus.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "blackout",
+      "source": "F-8E-Crusader/Systems/blackout.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-8E-Crusader/f8e_v4-jsbsim.xml",
+      "reference": "cpdrag",
+      "source": "F-8E-Crusader/Systems/cpdrag.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

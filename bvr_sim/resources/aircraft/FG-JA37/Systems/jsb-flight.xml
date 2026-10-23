@@ -1,0 +1,729 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="flight">
+
+    <channel execrate="4" name="Aerodynamic info">
+
+        <fcs_function name="systems/flight/axial-force-lb">
+            <function>
+                <sum>
+                    <property>aero/coefficient/CAtakeoff</property>
+                    <property>aero/coefficient/CACanopy</property>
+                    <property>aero/coefficient/CABrake</property>
+                    <property>aero/coefficient/CATurbine</property>                    
+                    <property>aero/coefficient/CACanopyOff</property>
+                    <property>aero/coefficient/CAElevonLeft</property>
+                    <property>aero/coefficient/CAElevonRight</property>
+                    <property>aero/coefficient/CARudder</property>
+                    <property>aero/coefficient/CAMissile1</property>
+                    <property>aero/coefficient/CAMissile2</property>
+                    <property>aero/coefficient/CAMissile3</property>
+                    <property>aero/coefficient/CAMissile4</property>
+                    <property>aero/coefficient/CAMissile5</property>
+                    <property>aero/coefficient/CAMissile6</property>
+                    <property>aero/coefficient/CATank</property>
+                    <property>aero/coefficient/CA</property>
+                    <property>aero/coefficient/CAwave</property>
+                    <property>aero/coefficient/CABrake</property>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/normal-force-lb">
+            <function>
+                <sum>
+                    <property>aero/coefficient/CN</property>
+                    <property>aero/coefficient/CNGnd</property>
+                    <property>aero/coefficient/CNGndElevator</property>
+                    <property>aero/coefficient/CNflaps</property>
+                    <property>aero/coefficient/CNgear</property>
+                    <property>aero/coefficient/CNwave</property>
+                    <property>aero/coefficient/CNBrake</property>
+                    <property>aero/coefficient/CNTurbine</property>
+                    <property>aero/coefficient/CNCanopy</property>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/lift-force-lb">
+            <function>
+                <difference>
+                    <product>
+                        <property>systems/flight/normal-force-lb</property>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+                    <product>
+                        <property>systems/flight/axial-force-lb</property>
+                        <sin>
+                            <property>aero/alpha-rad</property>
+                        </sin>
+                    </product>
+                </difference>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/drag-force-lb">
+            <function>
+                <sum>
+                    <product>
+                        <property>systems/flight/normal-force-lb</property>
+                        <sin>
+                            <property>aero/alpha-rad</property>
+                        </sin>
+                    </product>
+                    <product>
+                        <property>systems/flight/axial-force-lb</property>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/drag-force-tank-lb">
+            <function>
+                    <product>
+                        <property>aero/coefficient/CATank</property>
+                        <cos>
+                            <property>aero/alpha-rad</property>
+                        </cos>
+                    </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/drag-force-N">
+            <function>
+                <product>
+                    <property>systems/flight/drag-force-lb</property>
+                    <value>4.44822</value>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/drag-force-clean-N">
+            <function>
+                <product>
+                    <difference>
+                        <property>systems/flight/drag-force-lb</property>
+                        <property>systems/flight/drag-force-tank-lb</property>
+                    </difference>
+                    <value>4.44822</value>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/Cd-total">
+            <function>
+                <quotient>
+                    <quotient>
+                        <property>systems/flight/drag-force-lb</property>
+                        <property>aero/qbar-psf</property>
+                    </quotient>
+                    <property>metrics/Sw-sqft</property>
+                </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/excess-thrust-lb">
+            <function>
+                <difference>
+                    <property>propulsion/engine/thrust-lbs</property>
+                    <property>systems/flight/drag-force-lb</property>
+                </difference>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/lift-drag-ratio">
+            <function>
+                <quotient>
+                    <property>systems/flight/lift-force-lb</property>
+                    <property>systems/flight/drag-force-lb</property>
+                </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/thrust-weight-ratio">
+            <function>
+                <quotient>
+                    <property>propulsion/engine/thrust-lbs</property>
+                    <property>inertia/weight-lbs</property>
+                </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/lift-weight-ratio">
+            <function>
+                <quotient>
+                    <property>systems/flight/lift-force-lb</property>
+                    <property>inertia/weight-lbs</property>
+                </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/thrust-drag-ratio">
+            <function>
+                <quotient>
+                    <property>propulsion/engine/thrust-lbs</property>
+                    <property>systems/flight/drag-force-lb</property>
+                </quotient>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/turning-radius-nm">
+            <function>
+                <ifthen>
+                    <eq>
+                        <property>velocities/psidot-rad_sec</property>
+                        <v>0</v>
+                    </eq>
+                    <v>0</v>
+                    <abs>
+                        <quotient>
+                            <product>
+                                <product>
+                                    <property>velocities/vg-fps</property>
+                                    <value>0.000164578834</value>
+                                    
+                                </product>
+                                <quotient>
+                                    <product>
+                                        <pi />
+                                        <value>2.0</value>
+                                    </product>
+                                    <property>velocities/psidot-rad_sec</property>
+                                </quotient>
+                            </product>
+                            <product>
+                                <pi />
+                                <value>2</value>
+                            </product>
+                        </quotient>
+                    </abs>
+                </ifthen>
+            </function>
+        </fcs_function>
+
+        <switch name="aero/spin-norm">
+            <default value="0" />
+            <test logic="OR" value="1">
+                velocities/r-aero-rad_sec gt  0.724
+                velocities/r-aero-rad_sec lt -0.724
+            </test>
+        </switch>
+        
+    </channel>
+
+    <channel execrate="4" name="various controls">
+
+        <fcs_function name="fcs/elevator/cmg-limit-pos-weight">
+            <description>Just some random guesses..almost</description>
+            <function>
+                <table>
+                    <independentVar lookup="row">inertia/weight-lbs</independentVar>
+                    <tableData>
+                        00000.00  8 
+                        30864.72  8
+                        40340.00  5
+                    </tableData>
+                </table>
+            </function>
+        </fcs_function>
+
+        <switch name="fcs/elevator/cmg-limit-pos">
+            <description>As per my guessing with gears out no more than 3G allowed.</description>
+            <default value="fcs/elevator/cmg-limit-pos-weight" />
+            <test logic="AND" value="3">
+                gear/gear-pos-norm ne 0
+            </test>
+            <output>/limits/max-positive-g</output>
+        </switch>
+
+        <switch name="fcs/elevator/cmg-limit-neg">
+            <description>As per manual with gears out no less than 0G allowed.</description>
+            <default value="-3" />
+            <test logic="AND" value="0">
+                gear/gear-pos-norm ne 0
+            </test>
+            <output>/limits/max-negative-g</output>
+        </switch>
+
+        <kinematic name="autoflight/athr-pos">
+            <input>autoflight/athr-cmd</input>
+            <traverse>
+                <setting>
+                    <position>0.0</position>
+                    <time>0.0</time>
+                </setting>
+                <setting>
+                    <position>1.0</position>
+                    <time>0.35</time>
+                </setting>
+            </traverse>
+        </kinematic>
+
+    </channel>
+
+    <channel execrate="4" name="effects">
+
+        <fcs_function name="effects/wingtip-vapour">
+            <function>
+                <and>
+                   <gt>
+                     <property>/velocities/airspeed-kt</property>
+                     <value>120</value>
+                   </gt>
+                   <gt>
+                     <property>/environment/relative-humidity</property>
+                     <value>50</value>
+                   </gt>
+                   <or>
+                     <lt>
+                       <property>/position/altitude-ft</property>
+                       <value>800</value>
+                     </lt>
+                      <gt>
+                        <property>aero/alpha-deg</property>
+                        <value>11.0</value>
+                      </gt>
+                   </or>
+                   <lt>
+                     <property>/environment/temperature-degc</property>
+                     <value>20</value>
+                   </lt>
+                   <property>structural/wings/serviceable</property>
+                 </and>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/buffeting/output">
+            <function>
+                <product>
+                    <sum>
+                        <sin>
+                          <product>
+                            <property>sim-time-sec</property>
+                            <property>systems/flight/buffeting/var1</property>
+                          </product>
+                        </sin>
+                        <sin>
+                          <product>
+                            <property>sim-time-sec</property>
+                            <property>systems/flight/buffeting/var2</property>
+                          </product>
+                        </sin>
+                        <sin>
+                          <product>
+                            <property>sim-time-sec</property>
+                            <property>systems/flight/buffeting/var3</property>
+                          </product>
+                        </sin>
+                    </sum>
+                    
+                    <property>systems/flight/buffeting/magnitude</property>
+                </product>
+            </function>
+        </fcs_function>        
+
+    </channel>
+
+    <channel execrate="4" name="payloads">
+
+        <pure_gain name="names/payload/pilot-lbm">
+            <input>/payload/weight[7]/weight-lb</input>
+            <gain>1</gain>
+            <output>inertia/pointmass-weight-lbs[0]</output>
+        </pure_gain>
+
+    </channel>
+
+    <channel execrate="4" name="investigate-intake-flow">
+
+        
+
+    </channel>
+
+
+
+    <channel execrate="1" name="Engine">
+
+        
+        <switch name="systems/flight/tertiary/state-cmd">
+            <default value="systems/flight/tertiary/state-cmd" />
+            <test logic="AND" value="0">
+                
+              systems/flight/tertiary/state-cmd == 1
+              velocities/mach gt 0.67
+              gear/gear-cmd-norm == 0
+              propulsion/engine/zone gt 1
+              /controls/engines/engine/cutoff-augmentation == 0
+            </test>
+            <test logic="AND" value="1">
+                
+              systems/flight/tertiary/state-cmd == 0
+              velocities/mach lt 0.64              
+            </test>
+            <test logic="AND" value="1">
+                
+              systems/flight/tertiary/state-cmd == 0
+              gear/gear-cmd-norm ne 0              
+            </test>
+            <test logic="AND" value="1">
+                
+              systems/flight/tertiary/state-cmd == 0
+              propulsion/engine/zone le 1             
+            </test>
+            <test logic="AND" value="1">
+                
+              systems/flight/tertiary/state-cmd == 0
+              /controls/engines/engine/cutoff-augmentation == 1             
+            </test>
+        </switch>
+
+        <switch name="systems/flight/tertiary/state-current">
+            <default value="systems/flight/tertiary/state" />
+            <test logic="AND" value="systems/flight/tertiary/state-cmd">
+                /ja37/elec/dc-bus-main-bool == 1
+            </test>
+        </switch>
+
+        <kinematic name="systems/flight/tertiary/state">
+            <input>systems/flight/tertiary/state-current</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0.0</time>
+                </setting>
+                <setting>
+                    <position>1</position>
+                    <time>5.0</time>
+                </setting>
+            </traverse>
+            <clipto>
+                <min>0</min>
+                <max>1</max>
+            </clipto>
+            <output> /ja37/systems/tertiary-opening </output>
+        </kinematic>
+
+        
+
+        <switch name="systems/flight/reverse/R1-time">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="OR" value="systems/flight/reverse/R1-time">
+                gear/unit[2]/WOW == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/flight/reverse/R1-time-release">
+            <function>
+                <sum>
+                    <p>systems/flight/reverse/R1-time</p>
+                    <v>1</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/flight/reverse/R1">
+            <default value="1" />
+            <test logic="OR" value="0">
+                sim-time-sec gt systems/flight/reverse/R1-time-release
+            </test>
+        </switch>
+
+        <switch name="systems/flight/reverse/R2-time">
+            <default value="sim-time-sec" />
+            <test value="0">
+                sim-time-sec lt 1
+            </test>
+            <test logic="OR" value="systems/flight/reverse/R2-time">
+                gear/unit[0]/WOW == 0
+            </test>
+        </switch>
+
+        <fcs_function name="systems/flight/reverse/R2-time-release">
+            <function>
+                <sum>
+                    <p>systems/flight/reverse/R2-time</p>
+                    <v>30</v>
+                </sum>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/flight/reverse/R2">
+            <default value="0" />
+            <test logic="AND" value="1">
+                sim-time-sec lt systems/flight/reverse/R2-time-release
+                systems/flight/reverse/R2-time lt sim-time-sec
+            </test>
+        </switch>
+
+        <switch name="systems/flight/reverse/state-cmd">
+            <default value="0" />
+            <test logic="AND" value="1">
+              /ja37/systems/tertiary-opening == 1
+              gear/gear-cmd-norm == 1
+              gear/unit[0]/WOW == 1
+              /controls/engines/engine[0]/reverser-cmd == 1
+            </test>
+            <test logic="AND" value="1">
+              /controls/engines/engine[0]/reverser-cmd == 1
+              /ja37/systems/tertiary-opening == 1
+              gear/unit[2]/WOW == 1
+              gear/gear-cmd-norm == 1
+              systems/flight/reverse/R1 == 1
+            </test>
+            <test logic="AND" value="1">
+              /controls/engines/engine[0]/reverser-cmd == 1
+              /ja37/systems/tertiary-opening == 1
+              gear/unit[2]/WOW == 1
+              gear/gear-cmd-norm == 1
+              systems/flight/reverse/R2 == 1
+            </test>
+        </switch>
+
+        <switch name="systems/flight/reverse/state-current">
+            <default value="systems/flight/reverse/state" />
+            <test logic="AND" value="systems/flight/reverse/state-cmd">
+                /ja37/elec/dc-bus-main-bool == 1
+                systems/hydraulics/system1/pressure == 1
+                /controls/engines/engine[0]/reverse-system/serviceable == 1
+            </test>
+        </switch>
+
+        <kinematic name="systems/flight/reverse/state">
+            <input>systems/flight/reverse/state-current</input>
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0.0</time>
+                </setting>
+                <setting>
+                    <position>1</position>
+                    <time>1.5</time>
+                </setting>
+            </traverse>
+            <clipto>
+                <min>0</min>
+                <max>1</max>
+            </clipto>
+            <output> /engines/engine[0]/reverser-pos-norm </output>
+        </kinematic>
+    
+        <aerosurface_scale name="systems/flight/reverse/state-angle">
+            <input>systems/flight/reverse/state</input>
+            <zero_centered> true </zero_centered>
+            <domain>
+                <min> 0 </min>
+                <max> 1 </max>
+            </domain>
+            <range>
+                <min>0</min>                
+                <max>2.0669551</max>
+            </range>
+            <output> propulsion/engine[0]/reverser-angle-rad </output>
+        </aerosurface_scale>
+        
+        <switch name="systems/flight/reverse/is-reversed">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/flight/reverse/state == 1
+            </test>
+            <output> /engines/engine[0]/is-reversed </output>
+        </switch>
+
+        <fcs_function name="names/flight/reverser-position">
+            <function>
+                <difference>
+                    <value>1</value>
+                    <property>/engines/engine/reverser-pos-norm</property>
+                </difference>
+            </function>
+            <output>/engines/engine/reverser-position</output>
+        </fcs_function>
+
+        
+        <fcs_function name="systems/flight/engine/thrust_abs">
+            <function>
+                <abs>
+                    <property>/engines/engine/thrust_lb</property>
+                </abs>
+            </function>
+            <output>/engines/engine/thrust_lb-absolute</output>
+        </fcs_function>
+
+        
+
+
+        
+
+        <fcs_function name="systems/flight/oil/inverted-flight">
+            <description>G of -1 will become +0.75, -0.25 will become +0</description>
+            <function>
+                <max>
+                    <sum>
+                        <product>
+                            <property>accelerations/Nz</property>
+                            <v>-1</v>
+                        </product>
+                        <v>-0.25</v>
+                    </sum>
+                    <v>0</v>
+                </max>
+            </function>
+            <clipto>
+                <min>0</min>
+                <max>0.75</max>
+            </clipto>
+        </fcs_function>
+
+        <kinematic name="systems/flight/oil/pressure-drop-norm">
+            <input>systems/flight/oil/inverted-flight</input>
+            <noscale />
+            <traverse>
+                <setting>
+                    <position>0</position>
+                    <time>0.0</time>
+                </setting>
+                <setting>
+                    <position>0.75</position>
+                    <time>15</time>
+                </setting>
+            </traverse>
+        </kinematic>
+
+        <fcs_function name="systems/flight/oil/pressure-drop-psi">
+            <function>
+                <product>
+                    <property>/engines/engine/oil-pressure-psi</property>
+                    <property>systems/flight/oil/pressure-drop-norm</property>
+                </product>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="propulsion/engine/oil-pressure-psi">
+            <function>
+                <max>
+                    <value>0</value>
+                    <difference>
+                        <property>/engines/engine/oil-pressure-psi</property>
+                        <property>systems/flight/oil/pressure-drop-psi</property>
+                    </difference>
+                </max>
+            </function>
+        </fcs_function>
+
+        <switch name="propulsion/engine/cutoff-low-pressure">
+            <default value="1" />
+            <test logic="AND" value="0">
+                propulsion/engine/cutoff-commanded == 0
+                systems/flight/oil/pressure-drop-norm lt 0.5625
+            </test>
+        </switch>
+
+        <switch name="propulsion/engine/cutoff-high-pressure">
+            <default value="1" />
+            <test logic="AND" value="0">
+                fcs/throttle-pos-deg ge 8
+                systems/flight/oil/pressure-drop-norm lt 0.5625
+                propulsion/engine/n2 gt 16 
+            </test>
+        </switch>
+
+        <switch name="propulsion/engine/cutoff-jsbsim">
+            <default value="1" />
+            <test logic="AND" value="0">
+                propulsion/engine/cutoff-low-pressure == 0
+                propulsion/engine/cutoff-high-pressure == 0
+            </test>
+            <output>propulsion/cutoff_cmd</output>
+        </switch>
+    </channel>
+
+    <channel execrate="2" name="blinkers">
+
+        <fcs_function name="systems/flight/blink/two">
+            <function>
+                <integer>
+                  <mod>
+                    <product>
+                        <property>sim-time-sec</property>
+                        <value>4</value>
+                    </product>
+                    <value>2</value>
+                  </mod>
+                </integer>
+            </function>
+            <output>/ja37/blink/two-Hz/state</output>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/blink/four">
+            <function>
+                <integer>
+                  <mod>
+                    <product>
+                        <property>sim-time-sec</property>
+                        <value>8</value>
+                    </product>
+                    <value>2</value>
+                  </mod>
+                </integer>
+            </function>
+            <output>/ja37/blink/four-Hz/state</output>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/blink/five">
+            <function>
+                <integer>
+                  <mod>
+                    <product>
+                        <property>sim-time-sec</property>
+                        <value>10</value>
+                    </product>
+                    <value>2</value>
+                  </mod>
+                </integer>
+            </function>
+            <output>/ja37/blink/five-Hz/state</output>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/blink/ten">
+            <function>
+                <integer>
+                  <mod>
+                    <product>
+                        <property>sim-time-sec</property>
+                        <value>20</value>
+                    </product>
+                    <value>2</value>
+                  </mod>
+                </integer>
+            </function>
+            <output>/ja37/blink/ten-Hz/state</output>
+        </fcs_function>
+
+        <fcs_function name="systems/flight/blink/third">
+            <function>
+                <integer>
+                    <min>
+                        <mod>
+                            <product>
+                                <property>sim-time-sec</property>
+                                <value>1</value>
+                            </product>
+                            <value>3</value>
+                        </mod>
+                        <value>1.99999999</value>
+                    </min>
+                </integer>
+            </function>
+            <output>/ja37/blink/third-Hz/state</output>
+        </fcs_function>
+    
+    </channel>
+
+</system>

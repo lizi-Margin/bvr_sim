@@ -1,0 +1,20 @@
+This directory contains a set of standard GPWS assemblies (lamp format
+2), connected to /instrumentation/mk-viii. Use them by referencing the
+XML files from your aircraft model file (see
+Aircraft/b1900d/Models/b1900d-anim.xml for an example), and by setting
+/sim/mk-viii/assemblies/emission/* to off-state emission values, for
+instance:
+
+	<sim>
+	  <mk-viii>
+	    <assemblies>
+	      <emission>
+		<red>0.5</red>
+		<green>0.5</green>
+		<blue>0.5</blue>
+		<factor alias="/controls/lighting/instruments-norm"/>
+	     </emission>
+	  </mk-viii>
+	</sim>
+
+Author: Jean-Yves Lefort <jylefort@FreeBSD.org>

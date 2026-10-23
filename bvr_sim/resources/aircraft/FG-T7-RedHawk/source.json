@@ -1,0 +1,32 @@
+{
+  "set": "T7-RedHawk/t7-set.xml",
+  "name": "Boeing-SAAB T7 Red Hawk (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "T7-RedHawk/Systems/t7-yasim.xml",
+  "jets": 1,
+  "model": "T7-RedHawk/Models/t7.xml",
+  "tags": [
+    "boeing-saab",
+    "fighter",
+    "2010s",
+    "2020s",
+    "delta",
+    "retractable-gear",
+    "glass-cockpit",
+    "hud",
+    "ifr",
+    "supersonic",
+    "afterburner",
+    "jet",
+    "single-engine",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 3,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "T7-RedHawk.zip",
+  "archive_sha256": "edf329b95273217c1bb43208c50244667d86fe50964f4022996961ff2adb66fa",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/T7-RedHawk.zip"
+}

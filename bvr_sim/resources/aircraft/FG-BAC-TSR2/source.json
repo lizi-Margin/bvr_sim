@@ -1,0 +1,25 @@
+{
+  "set": "BAC-TSR2/BAC-TSR2-set.xml",
+  "name": "BAC TSR2 Prototype (YASim FDM)",
+  "fdm_type": "yasim",
+  "fdm": "BAC-TSR2/BAC-TSR2-yasim.xml",
+  "jets": 2,
+  "model": "BAC-TSR2/Models/BAC-TSR2-model.xml",
+  "tags": [
+    "bomber",
+    "1960s",
+    "coldwar",
+    "prototype",
+    "supersonic",
+    "jet",
+    "afterburner",
+    "twin-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "BAC-TSR2.zip",
+  "archive_sha256": "0002b5cf2d9042f34e328520da0d4b4e5fea29c1e1e6713a9b56076053b52315",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/BAC-TSR2.zip"
+}

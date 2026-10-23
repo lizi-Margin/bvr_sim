@@ -18,6 +18,7 @@
 #include "baseline_opponents/standoff.hxx"
 #include "baseline_opponents/tactical.hxx"
 #include "baseline_opponents/straight_line.hxx"
+#include "resource_paths.hxx"
 #include <iostream>
 
 namespace bvr_sim {
@@ -46,6 +47,12 @@ UnitFactory::UnitType UnitFactory::parse_unit_type(const std::string& unit_spec)
 
     auto it = UNIT_MAP.find(unit_spec);
     if (it == UNIT_MAP.end()) {
+        if(unit_spec.find("..") == std::string::npos && unit_spec.find_first_of("/\\:") == std::string::npos) {
+            try {
+                if(std::filesystem::is_regular_file(resource_paths::get_resource_path("aircraft/"+unit_spec+"/fdm.xml")))
+                    return UnitType::Fighter;
+            } catch(...) {}
+        }
         return UnitType::Unknown;
     }
     return it->second;
@@ -129,6 +136,7 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
 
                 std::string radar_type = "radar";
                 get_string_from_json("radar_type", spec_json, radar_type);
+                if(radar_type!="none") {
                 
                 if (radar_type == "radar") {
                     fighter->add_sensor("radar", std::make_shared<Radar>(fighter));
@@ -147,6 +155,7 @@ std::shared_ptr<SimulatedObject> UnitFactory::create_unit(
                 fighter->add_sensor("mws", std::make_shared<MissileWarningSystem>(fighter));
                 SL::get().print("[UnitFactory] add sensor sa_datalink to fighter with uid: " + uid);
                 fighter->add_sensor("sa_datalink", std::make_shared<SADatalink>(fighter));
+                }
 
                 SL::get().print("[UnitFactory] start add pyload to fighter pylon manager with uid: " + uid);
                 std::map<std::string, std::string> pylon_mounts;

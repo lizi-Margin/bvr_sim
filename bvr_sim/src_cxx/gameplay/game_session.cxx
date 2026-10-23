@@ -1,4 +1,9 @@
 #include "game_session.hxx"
+#include "simulator/bomb/mk82.hxx"
+#include "simulator/aircraft/catalog.hxx"
+#include "simulator/ground/vehicle.hxx"
+#include "simulator/ground/ground_factory.hxx"
+#include "simulator/ground/slamraam.hxx"
 #include "bsl_pool.hxx"
 #include "core.hxx"
 #include "global_config.hxx"
@@ -80,68 +85,16 @@ LaunchEnvelope launch_envelope(const Fighter &own, const std::array<double, 3> &
     zone.in_range = zone.range <= zone.rmax && std::abs(zone.bearing) < pi / 3;
     return zone;
 }
-void ballistic_step(std::array<double, 3> &position, std::array<double, 3> &velocity, double dt) {
-    const double speed = std::hypot(std::hypot(velocity[0], velocity[1]), velocity[2]);
-    for (int i = 0; i < 3; ++i)
-        velocity[i] -= 0.00003 * speed * velocity[i] * dt;
-    velocity[2] -= 9.80665 * dt;
-    for (int i = 0; i < 3; ++i)
-        position[i] += velocity[i] * dt;
-}
-
-// Ballistics and ground damage live here, never in the render/input layer.
-class GameBomb final : public SimulatedObject {
-  public:
-    std::shared_ptr<const GameTerrain> terrain;
-    std::string owner;
-    bool impacted = false;
-    GameBomb(std::string id, const Fighter &parent, std::shared_ptr<const GameTerrain> surface,
-             double timestep)
-        : SimulatedObject(id, parent.color, parent.position, parent.velocity, timestep, SOT::Bomb),
-          terrain(std::move(surface)), owner(parent.uid) {
-        position[2] -= 2.0;
-    }
-    void step() override {
-        if (!is_alive)
-            return;
-        const auto previous = position;
-        ballistic_step(position, velocity, dt);
-        if (position[2] <= terrain->height(position[0], position[1])) {
-            double low = 0, high = 1;
-            for (int n = 0; n < 24; ++n) {
-                const double t = (low + high) / 2;
-                const double x = previous[0] + (position[0] - previous[0]) * t;
-                const double y = previous[1] + (position[1] - previous[1]) * t;
-                const double z = previous[2] + (position[2] - previous[2]) * t;
-                if (z > terrain->height(x, y))
-                    low = t;
-                else
-                    high = t;
-            }
-            for (int i = 0; i < 3; ++i)
-                position[i] = previous[i] + (position[i] - previous[i]) * high;
-            for (const auto &obj : SOPool::instance().get_all()) {
-                if (obj->color == color || !obj->is_alive)
-                    continue;
-                if (auto ground = std::dynamic_pointer_cast<GroundUnit>(obj))
-                    if (distance(position, ground->position) <= 45.0)
-                        ground->hit();
-            }
-            impacted = true;
-            is_alive = false;
-        }
-    }
-    std::string log() noexcept override { return {}; }
-};
-
 std::shared_ptr<Fighter> create_fighter(const std::string &uid, const std::string &model,
                                         const std::string &team, const std::array<double, 3> &position,
                                         const std::array<double, 3> &velocity, const GameConfig &config,
                                         bool player) {
     json::JSON spec = json::Object();
     spec["unit_spec"] = json::String(model);
+    spec["radar_type"] = json::String(config.library_aircraft?"none":"radar");
     spec["color"] = json::String(team);
-    spec["fdm_type"] = json::String(config.fdm);
+    spec["fdm_type"] = json::String(
+        config.fdm == "auto" ? aircraft_definition(model, config.library_aircraft).fdm_type : config.fdm);
     spec["position"] = json::Array(position[0], position[1], position[2]);
     spec["velocity"] = json::Array(velocity[0], velocity[1], velocity[2]);
     spec["pylon_mounts"] = json::Object();
@@ -158,36 +111,47 @@ std::shared_ptr<Fighter> create_fighter(const std::string &uid, const std::strin
 }
 } // namespace
 
-bool GameTerrain::line_of_sight(const std::array<double, 3> &a, const std::array<double, 3> &b) const {
-    if (std::min(a[2], b[2]) > maximum_height + 1)
-        return true;
-    double sample_spacing = spacing;
-    for (const auto &tile : detail_tiles)
-        sample_spacing = std::min(sample_spacing, tile.spacing);
-    const int n = std::max(2, int(std::ceil(distance(a, b) / std::max(5.0, sample_spacing / 4))));
-    for (int i = 1; i < n; ++i) {
-        const double t = double(i) / n;
-        if (a[2] + (b[2] - a[2]) * t < height(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
-            return false;
-    }
-    return true;
-}
-GameSession::GameSession(const std::string &log_path) : terrain_(std::make_shared<GameTerrain>()) {
+GameSession::GameSession(const std::string &log_path) : session_log_path_(log_path),terrain_(std::make_shared<GameTerrain>()) {
     bool expected = false;
     if (!session_owned.compare_exchange_strong(expected, true))
         throw std::runtime_error("bvr_sim currently permits one game session per process");
     try {
         core_ = std::make_unique<SimCore>(config_.dt, log_path, "", false);
+        core_->set_environment(terrain_);
     } catch (...) {
         session_owned = false;
         throw;
     }
 }
-GameSession::~GameSession() { close(); }
+GameSession::~GameSession() { try{close();}catch(...){} }
+void GameSession::begin_recording(const std::string& log,const std::string& acmi,const std::string& reference){
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(closed_)throw std::runtime_error("Session is closed");
+    try{core_->begin_recording(log,acmi,reference);recording_=true;}
+    catch(...){
+        try{core_->end_recording();SL::init_instance(session_log_path_,true);}catch(...){}
+        recording_=false;throw;
+    }
+}
+void GameSession::end_recording(){
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(!recording_||closed_)return;
+    std::exception_ptr error;
+    try{core_->end_recording();}catch(...){error=std::current_exception();}
+    recording_=false;SL::init_instance(session_log_path_,true);
+    if(error)std::rethrow_exception(error);
+}
+void GameSession::flush_recording(){
+    std::lock_guard<std::mutex> lock(mutex_);
+    if(closed_)throw std::runtime_error("Session is closed");
+    core_->flush_recording();
+}
 void GameSession::close() {
     std::lock_guard<std::mutex> lock(mutex_);
     if (closed_)
         return;
+    std::exception_ptr error;
+    if(recording_){try{core_->end_recording();}catch(...){error=std::current_exception();}recording_=false;}
     if (core_)
         core_->stop();
     BaselinePool::instance().clear();
@@ -195,24 +159,38 @@ void GameSession::close() {
     core_.reset();
     SL::shutdown();
     SimulatedObject::set_uuid_seed(std::nullopt);
+    DataObj::set_noise_seed(std::nullopt);
     closed_ = true;
     session_owned = false;
+    if(error)std::rethrow_exception(error);
 }
 void GameSession::reset(const GameConfig &config) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (closed_)
         throw std::runtime_error("Session is closed");
+    if(recording_){core_->end_recording();recording_=false;SL::init_instance(session_log_path_,true);}
     if (config.dt <= 0 || config.dt > 0.1 || !std::isfinite(config.dt))
         throw std::invalid_argument("Game dt must be in (0,0.1]");
-    if (config.player_model != "F22" && config.player_model != "F16")
-        throw std::invalid_argument("Unsupported player aircraft");
-    if (config.enemy_model != "F22" && config.enemy_model != "F16")
-        throw std::invalid_argument("Unsupported opponent aircraft");
-    if (config.mission != "air" && config.mission != "strike" && config.mission != "combined")
+    const auto definition = aircraft_definition(config.player_model, config.library_aircraft);
+    if (!config.library_aircraft)
+        aircraft_definition(config.enemy_model);
+    if (config.library_aircraft &&
+        (config.mission != "training" || config.missiles || config.bombs || config.enemy_attacks))
+        throw std::invalid_argument(
+            "Imported library access is unarmed training-only; disable enemy weapons");
+    if (config.mission != "air" && config.mission != "strike" && config.mission != "combined" &&
+        config.mission != "convoy" && config.mission != "training" && config.mission != "intercept_patrol")
         throw std::invalid_argument("Unknown mission");
-    if (config.fdm != "jsbsim" && config.fdm != "simple")
+    if(config.mission=="intercept_patrol" && (config.intercept_waves<1||config.intercept_waves>5||
+       !std::isfinite(config.intercept_interval)||config.intercept_interval<30||
+       !std::isfinite(config.intercept_timeout)||config.intercept_timeout<120||config.intercept_timeout>900))
+        throw std::invalid_argument("Invalid intercept scenario");
+    if (config.fdm != "jsbsim" && config.fdm != "simple" && config.fdm != "yasim" && config.fdm != "auto")
         throw std::invalid_argument("Unknown FDM");
-    if (config.missiles < 0 || config.missiles > 8 || config.bombs < 0 || config.bombs > 4)
+    if (config.library_aircraft && config.fdm != "auto" && config.fdm != definition.fdm_type)
+        throw std::invalid_argument("Requested backend differs from the imported source");
+    if (config.missiles < 0 || config.missiles > definition.max_missiles || config.bombs < 0 ||
+        config.bombs > definition.max_bombs)
         throw std::invalid_argument("Invalid loadout");
     if (!std::isfinite(config.player_north) || !std::isfinite(config.player_west) ||
         !std::isfinite(config.ground_north) || !std::isfinite(config.ground_west) ||
@@ -237,24 +215,35 @@ void GameSession::reset(const GameConfig &config) {
     enemy_behavior_ = "intercept";
     enemy_locked_ = false;
     weapon_launch_times_.clear();
+    ground_objectives_.clear();
     pilot_controls_.reset();
+    intercept_spawned_=0;enemy_pilots_.clear();enemy_phases_.clear();intercept_weapon_kills_.clear();
     SimulatedObject::set_uuid_seed(config.seed);
+    DataObj::set_noise_seed(config.seed);
     create_fighter("player", config.player_model, "Blue",
                    {config.player_north, config.player_west, config.altitude}, {config.speed, 0, 0}, config,
                    true);
-    if (config.mission != "strike") {
+    if (config.mission == "air" || config.mission == "combined") {
         std::mt19937 random(config.seed);
         const double west = std::uniform_real_distribution<double>(-100.0, 100.0)(random);
         create_fighter("bandit", config.enemy_model, "Red",
                        {config.player_north + config.enemy_range, config.player_west + west, config.altitude},
                        {-config.speed, 0, 0}, config, false);
     }
+    if(config.mission=="intercept_patrol")spawn_intercept_wave();
     auto ground = std::make_shared<GroundStaticTarget>(
         "depot", TeamColor::Red,
         std::array<double, 3>{config.ground_north, config.ground_west,
                               terrain_->height(config.ground_north, config.ground_west)},
         config.dt);
     SOPool::instance().add(ground);
+    for (const auto &spec : config.ground_units) {
+        create_ground_unit(spec, terrain_, config.dt);
+        if (spec.mission_target && spec.team == "red")
+            ground_objectives_.insert(spec.uid);
+    }
+    if (config.mission == "convoy" && ground_objectives_.empty())
+        throw std::invalid_argument("Convoy mission requires declared ground objectives");
     record("sortie_started", "player", "", "", "Sortie started");
     publish_frame();
 }
@@ -263,10 +252,14 @@ void GameSession::submit(const PilotCommand &command) {
     if (closed_)
         throw std::runtime_error("Session is closed");
     if (!std::isfinite(command.heading) || !std::isfinite(command.pitch) ||
-        !std::isfinite(command.throttle) || !std::isfinite(command.roll_input))
+        !std::isfinite(command.throttle) || !std::isfinite(command.roll_input) ||
+        !std::isfinite(command.pitch_input) || (command.roll_rate && !std::isfinite(*command.roll_rate)))
         throw std::invalid_argument("Pilot controls must be finite");
     if (command.uid != "player")
         throw std::invalid_argument("Pilot command must address the player");
+    if (command.roll_rate && (config_.fdm == "auto" ?
+        aircraft_definition(config_.player_model, config_.library_aircraft).fdm_type : config_.fdm) != "yasim")
+        throw std::invalid_argument("Roll-rate assist requires the YASim backend");
     if (pending_.size() >= 256)
         throw std::runtime_error("Pilot command queue is full");
     pending_.push_back(command);
@@ -288,7 +281,9 @@ void GameSession::drive_player(const PilotCommand &c) {
     player->set_pilot_input(
         std::clamp(norm_angle(c.heading - player->get_yaw()) / (85 * pi / 180), -1.0, 1.0),
         std::clamp(c.pitch / (pi / 4), -1.0, 1.0), std::clamp(c.throttle, 0.0, 1.0),
-        c.manual_roll ? std::optional<double>(std::clamp(c.roll_input, -1.0, 1.0)) : std::nullopt);
+        c.manual_roll ? std::optional<double>(std::clamp(c.roll_input, -1.0, 1.0)) : std::nullopt,
+        c.manual_pitch ? std::optional<double>(-std::clamp(c.pitch_input, -1.0, 1.0)) : std::nullopt,
+        c.roll_rate);
 }
 void GameSession::apply_command(const PilotCommand &c) {
     auto player = fighter(c.uid);
@@ -330,13 +325,55 @@ void GameSession::apply_command(const PilotCommand &c) {
         if (mount.empty())
             record("release_rejected", c.uid, "", "Mk-82", "No bombs remaining");
         else {
-            SOPool::instance().add(std::make_shared<GameBomb>("bomb_" + std::to_string(++bomb_serial_),
+            SOPool::instance().add(std::make_shared<Mk82Bomb>("bomb_" + std::to_string(++bomb_serial_),
                                                               *player, terrain_, config_.dt));
             record("bomb_released", c.uid, "", "Mk-82", "Bomb away", player->position);
         }
     }
 }
+void GameSession::spawn_intercept_wave(){
+    const int wave=intercept_spawned_++;
+    const std::string uid="raider_"+std::to_string(wave+1);
+    std::mt19937 random(config_.seed+unsigned(wave)*7919);
+    double west=std::uniform_real_distribution<double>(-6000,6000)(random);
+    create_fighter(uid,config_.enemy_model,"Red",
+        {config_.player_north+config_.enemy_range+wave*20000,config_.player_west+west,config_.altitude},
+        {-config_.speed,0,0},config_,false);
+    enemy_pilots_.emplace(uid,AirTacticalPilot(config_.seed+wave));
+    record("hostile_wave","mission",uid,"","Inbound group "+std::to_string(wave+1)+" / "+std::to_string(config_.intercept_waves)+"; search northern corridor");
+}
+void GameSession::update_intercept_enemies(){
+    if(intercept_spawned_<config_.intercept_waves && cfg::sim_time>=intercept_spawned_*config_.intercept_interval)
+        spawn_intercept_wave();
+    for(auto& [uid,pilot]:enemy_pilots_){
+        auto own=fighter(uid);if(!own||!own->is_alive)continue;
+        TacticalObservation o;o.position=own->position;o.velocity=own->velocity;o.yaw=own->get_yaw();
+        o.altitude_agl=own->position[2]-terrain_->height(own->position[0],own->position[1]);
+        o.missiles=own->pylon_manager.num_left_weapons("AIM-120");
+        auto radar=std::dynamic_pointer_cast<Radar>(own->radar);
+        if(radar)for(const auto& [id,t]:radar->get_data())
+            if(t->is_alive && t->color!=own->color && terrain_->line_of_sight(own->position,t->position))
+                o.tracks.push_back({id,t->position,t->velocity});
+        o.radar_warning=own->rws&&!own->rws->get_data().empty();
+        o.missile_warning=own->mws&&!own->mws->get_data().empty();
+        if(o.missile_warning){auto t=own->mws->get_data().begin()->second;
+            o.threat_bearing=norm_angle(std::atan2(t->position[1]-o.position[1],t->position[0]-o.position[0])-o.yaw);}
+        o.weapon_supporting=std::any_of(own->launched_missiles.begin(),own->launched_missiles.end(),[](const auto& m){return m&&m->is_alive;});
+        auto intent=pilot.decide(o,cfg::sim_time,pi,config_.altitude);
+        own->set_pilot_input(std::clamp(norm_angle(intent.heading-o.yaw)/(85*pi/180),-.8,.8),intent.pitch/(pi/4),intent.throttle);
+        if(radar)radar->radar_mode=intent.lock?"stt":"scan";
+        if(intent.phase!=enemy_phases_[uid]){
+            enemy_phases_[uid]=intent.phase;enemy_behavior_=intent.phase;
+            record("enemy_maneuver",uid,"player","","Observed-state AI: "+intent.phase,own->position);
+        }
+        if(config_.enemy_attacks&&intent.fire&&own->shoot("AIM-120C7",intent.target_uid)){
+            own->last_shoot_time=cfg::sim_time;pilot.launched(cfg::sim_time);
+            record("missile_launched",uid,intent.target_uid,"AIM-120C7","Hostile missile launched",own->position);
+        }
+    }
+}
 void GameSession::update_enemy() {
+    if(config_.mission=="intercept_patrol"){update_intercept_enemies();return;}
     auto enemy = fighter("bandit"), player = fighter("player");
     if (!enemy || !player || !enemy->is_alive || !player->is_alive)
         return;
@@ -411,29 +448,39 @@ void GameSession::advance(int n, bool force) {
         update_enemy();
         core_->step(1);
         for (const auto &obj : SOPool::instance().get_all_ever_existed()) {
-            if (auto bomb = std::dynamic_pointer_cast<GameBomb>(obj)) {
+            if (auto bomb = std::dynamic_pointer_cast<Mk82Bomb>(obj)) {
                 if (bomb->impacted && seen_missiles_.insert(bomb->uid).second)
                     record("bomb_impact", bomb->owner, "", "Mk-82", "Bomb impacted terrain", bomb->position);
             } else if (auto missile = std::dynamic_pointer_cast<Missile>(obj)) {
-                weapon_launch_times_.try_emplace(missile->uid, cfg::sim_time - config_.dt);
+                auto [launch, inserted] =
+                    weapon_launch_times_.try_emplace(missile->uid, cfg::sim_time - config_.dt);
+                if (inserted && missile->parent && missile->parent->Type == SOT::AA)
+                    record("missile_launched", missile->parent->uid,
+                           missile->target ? missile->target->uid : "", missile->missile_model,
+                           "Ground launcher fired after sensor detection", missile->position);
                 if (missile->is_done && seen_missiles_.insert(missile->uid).second)
+                {
+                    if(config_.mission=="intercept_patrol"&&missile->is_success&&missile->parent&&
+                       missile->parent->uid=="player"&&missile->target&&enemy_pilots_.count(missile->target->uid))
+                        intercept_weapon_kills_.insert(missile->target->uid);
                     record(missile->is_success ? "missile_hit" : "missile_missed",
                            missile->parent ? missile->parent->uid : "",
                            missile->target ? missile->target->uid : "", missile->missile_model,
                            missile->get_log_done_reason(), missile->position);
+                }
             }
-            if (!obj->is_alive && (obj->Type == SOT::Aircraft || obj->Type == SOT::GroundUnit) &&
+            if (!obj->is_alive &&
+                (obj->Type == SOT::Aircraft || obj->Type == SOT::GroundUnit || obj->Type == SOT::AA) &&
                 seen_deaths_.insert(obj->uid).second)
-                record(obj->Type == SOT::Aircraft ? "aircraft_destroyed" : "ground_destroyed", "", obj->uid,
-                       "", "Target destroyed", obj->position);
+                record(
+                    obj->Type == SOT::Aircraft ? "aircraft_destroyed" : "ground_destroyed", "", obj->uid, "",
+                    obj->uid == "player" &&
+                            obj->position[2] <= terrain_->collision_height(obj->position[0], obj->position[1])
+                        ? "Terrain collision"
+                        : "Target destroyed",
+                    obj->position);
         }
         auto player = fighter("player");
-        if (player && player->is_alive &&
-            player->position[2] <= terrain_->height(player->position[0], player->position[1])) {
-            player->hit();
-            seen_deaths_.insert("player");
-            record("aircraft_destroyed", "", "player", "", "Terrain collision", player->position);
-        }
         if (seen_deaths_.count(selected_target_)) {
             selected_target_.clear();
             if (auto radar = std::dynamic_pointer_cast<Radar>(player->radar))
@@ -441,12 +488,16 @@ void GameSession::advance(int n, bool force) {
         }
         if (!player || !player->is_alive)
             result_ = "failed";
-        else if ((config_.mission == "air" && seen_deaths_.count("bandit")) ||
+        else if ((config_.mission=="intercept_patrol" && int(intercept_weapon_kills_.size())==config_.intercept_waves) ||
+                 (config_.mission == "air" && seen_deaths_.count("bandit")) ||
                  (config_.mission == "strike" && seen_deaths_.count("depot")) ||
                  (config_.mission == "combined" && seen_deaths_.count("bandit") &&
-                  seen_deaths_.count("depot")))
+                  seen_deaths_.count("depot")) ||
+                 (config_.mission == "convoy" && !ground_objectives_.empty() &&
+                  std::all_of(ground_objectives_.begin(), ground_objectives_.end(),
+                              [&](const auto &uid) { return seen_deaths_.count(uid) > 0; })))
             result_ = "succeeded";
-        else if (cfg::sim_time >= 900)
+        else if (cfg::sim_time >= (config_.mission=="intercept_patrol"?config_.intercept_timeout:900))
             result_ = "failed";
         if (result_ != "running")
             record("mission_" + result_, "player", "", "",
@@ -467,7 +518,44 @@ void GameSession::publish_frame() {
     f.enemy_behavior = enemy_behavior_;
     f.events = events_;
     f.air_kills = int(seen_deaths_.count("bandit"));
-    f.ground_kills = int(seen_deaths_.count("depot"));
+    if(config_.mission=="intercept_patrol"){
+        f.air_kills=int(intercept_weapon_kills_.size());
+        f.mission_wave=intercept_spawned_;f.mission_total=f.mission_kills_required=config_.intercept_waves;
+        f.next_wave_time=intercept_spawned_<config_.intercept_waves?intercept_spawned_*config_.intercept_interval:-1;
+    }
+    for (const auto &object : SOPool::instance().get_all_ever_existed()) {
+        if (object->color == TeamColor::Red && !object->is_alive &&
+            (object->Type == SOT::GroundUnit || object->Type == SOT::AA))
+            ++f.ground_kills;
+        if (auto ground = std::dynamic_pointer_cast<GroundUnit>(object)) {
+            GroundState state;
+            state.uid = ground->uid;
+            state.model = ground->model_id();
+            state.alive = ground->is_alive;
+            state.position = ground->position;
+            state.velocity = ground->velocity;
+            state.orientation = ground->get_rpy();
+            state.health = ground->health();
+            state.speed = ground->get_speed();
+            state.kind = "static";
+            state.motion = "static";
+            if (auto vehicle = std::dynamic_pointer_cast<GroundVehicle>(ground)) {
+                state.kind = "vehicle";
+                state.motion = state.alive ? vehicle->motion : "destroyed";
+                state.blocked_reason = vehicle->blocked_reason;
+                state.contact_surface = vehicle->contact_surface;
+                state.route = vehicle->route;
+                state.waypoint = vehicle->waypoint;
+                state.parking = vehicle->parking;
+            } else if (auto sam = std::dynamic_pointer_cast<SLAMRAAM>(ground)) {
+                state.kind = "sam";
+                state.missiles_left = sam->get_num_left_missiles();
+                for (const auto &[uid, _] : sam->search_radar.contacts)
+                    state.sensor_contacts.push_back(uid);
+            }
+            f.ground_units.push_back(std::move(state));
+        }
+    }
     for (const auto &obj : SOPool::instance().get_all()) {
         if (obj->Type == SOT::DataObj)
             continue;
@@ -485,6 +573,8 @@ void GameSession::publish_frame() {
             e.health = ac->bloods;
             e.pylons = ac->pylon_manager.get_all_mounts();
             e.throttle = ac->uid == "player" && pilot_controls_ ? pilot_controls_->throttle : .85;
+            if (auto controlled = std::dynamic_pointer_cast<Fighter>(ac))
+                e.animation_properties = controlled->visual_properties();
         } else if (auto missile = std::dynamic_pointer_cast<Missile>(obj)) {
             e.kind = "missile";
             e.model = missile->missile_model;
@@ -512,6 +602,14 @@ void GameSession::publish_frame() {
         } else if (obj->Type == SOT::Bomb) {
             e.kind = "bomb";
             e.model = "Mk-82";
+        } else if (auto vehicle = std::dynamic_pointer_cast<GroundVehicle>(obj)) {
+            e.kind = "vehicle";
+            e.model = vehicle->model_id();
+            e.health = vehicle->health();
+        } else if (auto sam = std::dynamic_pointer_cast<SLAMRAAM>(obj)) {
+            e.kind = "sam";
+            e.model = "SLAMRAAM";
+            e.health = sam->health();
         } else {
             e.kind = "ground";
             e.model = "depot";
@@ -521,19 +619,12 @@ void GameSession::publish_frame() {
     if (auto player = fighter("player")) {
         if (auto radar = std::dynamic_pointer_cast<Radar>(player->radar))
             f.radar_range = radar->radar_range;
+        else { f.radar_mode="OFF";f.radar_range=0; }
         f.missiles_left = player->pylon_manager.num_left_weapons("AIM-120");
         f.bombs_left = player->pylon_manager.num_left_weapons("Mk-82");
         if (f.bombs_left > 0 && player->is_alive) {
-            auto p = player->position, v = player->velocity;
-            p[2] -= 2;
-            for (int i = 0; i < 6000; ++i) {
-                ballistic_step(p, v, config_.dt);
-                if (p[2] <= terrain_->height(p[0], p[1])) {
-                    p[2] = terrain_->height(p[0], p[1]);
-                    f.bomb_impact = p;
-                    break;
-                }
-            }
+            f.bomb_impact =
+                predict_ballistic_impact(player->position, player->velocity, *terrain_, config_.dt);
         }
         if (player->radar)
             for (const auto &[uid, observation] : player->radar->get_data()) {
@@ -546,8 +637,24 @@ void GameSession::publish_frame() {
                             launch_envelope(*player, observation->position, observation->velocity, uid);
                 }
             }
+        const auto append_warning = [&](const auto &sensor, bool missile, bool localized) {
+            if (!sensor)
+                return;
+            for (const auto &[uid, observation] : sensor->get_data()) {
+                if (!observation || !observation->is_alive)
+                    continue;
+                const double dn = observation->position[0] - player->position[0];
+                const double dw = observation->position[1] - player->position[1];
+                const double bearing =
+                    std::remainder(std::atan2(dw, dn) - player->get_yaw(), 2.0 * std::acos(-1.0));
+                f.warnings.push_back({uid, bearing, std::hypot(dn, dw), localized, missile});
+            }
+        };
+        append_warning(player->rws, false, false);
+        append_warning(player->mws, true, true);
         f.radar_warning = player->rws && !player->rws->get_data().empty();
         f.missile_warning = player->mws && !player->mws->get_data().empty();
+        f.rwr_mode = f.missile_warning ? "missile" : (f.radar_warning ? "search" : "quiet");
         if (auto enemy = fighter("bandit")) {
             bool illuminated = enemy->is_alive && enemy->radar && enemy->radar->get_data().count("player") &&
                                terrain_->line_of_sight(player->position, enemy->position);
@@ -595,5 +702,38 @@ void GameSession::set_terrain(const GameTerrain &terrain) {
         throw std::logic_error("Change terrain before sortie reset");
     *terrain_ = terrain;
     terrain_->maximum_height = highest;
+    terrain_->prepare_surfaces();
+}
+void GameSession::spawn_ground(const GroundUnitSpec &spec) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (closed_)
+        throw std::runtime_error("Session is closed");
+    create_ground_unit(spec, terrain_, config_.dt);
+    if (spec.mission_target && spec.team == "red")
+        ground_objectives_.insert(spec.uid);
+    record("ground_spawned", "", spec.uid, "", "Core ground object created", spec.position);
+    publish_frame();
+}
+void GameSession::set_ground_route(const std::string &uid, const VehicleRoute &route) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (closed_)
+        throw std::runtime_error("Session is closed");
+    auto vehicle = std::dynamic_pointer_cast<GroundVehicle>(SOPool::instance().get(uid));
+    if (!vehicle || !vehicle->is_alive)
+        throw std::invalid_argument("Unknown live ground vehicle: " + uid);
+    vehicle->set_route(route);
+    record("ground_route_set", "", uid, "", "Route submitted to core");
+    publish_frame();
+}
+void GameSession::park_ground(const std::string &uid, bool parked) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (closed_)
+        throw std::runtime_error("Session is closed");
+    auto vehicle = std::dynamic_pointer_cast<GroundVehicle>(SOPool::instance().get(uid));
+    if (!vehicle || !vehicle->is_alive)
+        throw std::invalid_argument("Unknown live ground vehicle: " + uid);
+    vehicle->set_parking(parked);
+    record(parked ? "ground_stop_requested" : "ground_resume_requested", "", uid, "", "Core parking command");
+    publish_frame();
 }
 } // namespace bvr_sim

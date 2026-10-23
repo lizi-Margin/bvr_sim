@@ -1,0 +1,349 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="gears">
+    
+    <property value="-60">systems/gears/gear[0]/z</property>
+    <property value="-55">systems/gears/gear[1]/z</property>
+    <property value="-55">systems/gears/gear[2]/z</property>
+    
+    <property value="0.0">systems/gears/gear[0]/is-stationary</property>
+    <property value="1.5">systems/gears/gear[0]/slip-angle-deg-lag-c1</property>
+    
+    
+    <property value="0.0">systems/gears/induced-turbulence</property>
+    <property value="0.2">systems/gears/induced-turbulence-intensity</property>
+    <property value="8.0">systems/gears/induced-turbulence-lag-C1</property>
+    <property value="0.0">systems/gears/induced-turbulence-lag</property>
+    
+    <property value="0.0">systems/gears/preset-onground</property>
+    
+    
+    <channel name="Landing Gear_0 steer" execrate="4">
+        
+        <fcs_function name="systems/gears/gear[0]/is-stationary">
+            <function>
+                <ifthen>
+                    <and>
+                        <gt>
+                            <p>gear/unit[0]/compression-ft</p>
+                            <v>0.01</v>
+                        </gt>
+                        <lt>
+                            <p>gear/unit[0]/wheel-speed-fps</p>
+                            <v>0.1</v>
+                        </lt>
+                    </and>
+                    <v>1.0</v>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+
+        <lag_filter name="gear/unit[0]/WOW-lag">
+            <input>gear/unit[0]/WOW</input>
+            <c1>0.5</c1>
+        </lag_filter>
+
+        <switch name="systems/gears/gear[0]/is-on-ground">
+            <default value="0" />
+            <test value="1" logic="AND">
+                gear/unit[0]/WOW-lag GT 0.5
+            </test>
+        </switch>
+
+        <switch name="systems/gears/gear[0]/is-not-on-ground">
+            <default value="0" />
+            <test value="-1" logic="AND">
+                gear/unit[0]/WOW-lag LT 0.5
+            </test>
+        </switch>
+
+        <switch name="gear/unit[0]/steering-angle-deg">
+            <default value="gear/unit[0]/steering-angle-deg" />
+            <test value="0" logic="AND">
+                systems/gears/gear[0]/is-on-ground GT 0.0
+            </test>
+        </switch>
+
+        <lag_filter name="gear/unit[0]/steering-angle-deg-lag">
+            <input>gear/unit[0]/steering-angle-deg</input>
+            <c1>1.0</c1>
+        </lag_filter>
+
+        <fcs_function name="systems/gears/gear[0]/slip-angle-deg-c1">
+            <function>
+                <product>
+                    <difference>
+                        <p>gear/unit[0]/steering-angle-deg</p>
+                        <p>systems/gears/gear[0]/slip-angle-deg</p>
+                    </difference>
+                    <v>3.0</v>
+                </product>
+            </function>
+        </fcs_function>
+
+        <integrator name="systems/gears/gear[0]/slip-angle-deg">
+            <input>gear/unit[0]/wheel-speed-fps</input>
+            <c1>systems/gears/gear[0]/slip-angle-deg-c1</c1>
+            <trigger>systems/gears/gear[0]/is-not-on-ground</trigger>
+            <clipto>
+                <min>-40.0</min>
+                <max>40.0</max>
+            </clipto>
+        </integrator>
+        
+        <lag_filter name="systems/gears/gear[0]/slip-angle-deg-lag">
+            <input>systems/gears/gear[0]/slip-angle-deg</input>
+            <c1>systems/gears/gear[0]/slip-angle-deg-lag-c1</c1>
+        </lag_filter>
+
+    </channel>
+    
+    
+    <channel name="Landing Gear control" execrate="4">
+        
+        <kinematic name="gear/gear-pos-norm">
+            <input>gear/gear-cmd-norm</input>
+            <traverse>
+                <setting>
+                    <position> 0 </position>
+                    <time>     0 </time>
+                </setting>
+                <setting>
+                    <position> 1 </position>
+                    <time>     12 </time>
+                </setting>
+            </traverse>
+        </kinematic>
+        
+        <switch name="systems/gears/gear-direction-sound">
+            <default value="0" />
+            <test logic="AND" value="1">
+                gear/gear-cmd-norm EQ 0
+                gear/gear-pos-norm GT 0
+                gear/gear-pos-norm LT 1
+            </test>
+            <test logic="AND" value="-1">
+                gear/gear-cmd-norm EQ 1
+                gear/gear-pos-norm GT 0
+                gear/gear-pos-norm LT 1
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gears/gear-pos-norm-sound-roumble">
+            <function>
+                <sum>
+                    <product>
+                        <v>0.3</v>
+                        <p>gear/gear-pos-norm</p>
+                    </product>
+                    <abs>
+                        <product>
+                            <p>systems/gears/induced-turbulence-lag</p>
+                            <v>50.0</v>
+                        </product>
+                    </abs>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <kinematic name="gear/gear-pos-norm-sound">
+            <input>gear/gear-pos-norm</input>
+            <traverse>
+                <setting>
+                    <position> 0 </position>
+                    <time>     0 </time>
+                </setting>
+                <setting>
+                    <position> 1 </position>
+                    <time>     17.5 </time>
+                </setting>
+            </traverse>
+        </kinematic>
+        
+        <switch name="gear/gear-direction-sound">
+            <default value="0" />
+            <test logic="AND" value="1">
+                gear/gear-cmd-norm EQ 0
+                gear/gear-pos-norm-sound GT 0
+                gear/gear-pos-norm-sound LT 1
+            </test>
+            <test logic="AND" value="-1">
+                gear/gear-cmd-norm EQ 1
+                gear/gear-pos-norm-sound GT 0
+                gear/gear-pos-norm-sound LT 1
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gears/induced-turbulence">
+            <function>
+                <product>
+                    <product>
+                        <p>gear/gear-pos-norm</p>
+                        <p>aero/qbar-psf</p>
+                        <random />
+                        <p>systems/gears/induced-turbulence-intensity</p>
+                    </product>
+                    <table>
+                        <independentVar>aero/qbar-psf</independentVar>
+                        <tableData>
+                            0.0 0
+                            6.53 0.008
+                            26.1 0.006
+                            104.0 0.002
+                            418.0 0.001
+                            1671.0 0.0005
+                        </tableData>
+                    </table>
+                </product>
+            </function>
+        </fcs_function>
+        
+        <lag_filter name="systems/gears/induced-turbulence-lag">
+            <input>systems/gears/induced-turbulence</input>
+            <c1>systems/gears/induced-turbulence-lag-C1</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gears/lever-rotation-lag">
+            <input>gear/gear-cmd-norm</input>
+            <c1>3.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="Landing gear hydraulics extension" execrate="8">
+        
+        <summer>
+            <input>systems/gears/gear[0]/z</input>
+            <input>systems/gears/unit[0]/hydraulics-extension</input>
+            <output>gear/unit[0]/z-position</output>
+        </summer>
+        
+        <summer>
+            <input>systems/gears/gear[1]/z</input>
+            <input>systems/gears/unit[1]/hydraulics-extension</input>
+            <output>gear/unit[1]/z-position</output>
+        </summer>
+        
+        <summer>
+            <input>systems/gears/gear[2]/z</input>
+            <input>systems/gears/unit[2]/hydraulics-extension</input>
+            <output>gear/unit[2]/z-position</output>
+        </summer>
+        
+    </channel>
+    
+    
+    <channel name="drag gear" execrate="8">
+        
+        <pure_gain>
+            <input>systems/gears/gear[0]/drag-norm</input>
+            <gain>2.0</gain>
+            <output>external_reactions/LandingGearFrontAerodinamicDrag/magnitude</output>
+        </pure_gain>
+        
+        <pure_gain>
+            <input>systems/gears/gear[1]/drag-norm</input>
+            <gain>4.0</gain>
+            <output>external_reactions/LandingGearRightAerodinamicDrag/magnitude</output>
+        </pure_gain>
+        
+        <pure_gain>
+            <input>systems/gears/gear[2]/drag-norm</input>
+            <gain>4.0</gain>
+            <output>external_reactions/LandingGearLeftAerodinamicDrag/magnitude</output>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <function name="systems/gears/unit[0]/hydraulics-extension">
+        <description>Extension main gear hydraulic cylinder</description>
+        <table>
+            <independentVar>systems/hydraulics/flight-system-psi</independentVar>
+            <tableData>
+                0.0 0.0
+                1000.0 0.0
+                3000.0 0.0
+                4000.0 0.0
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/gears/unit[1]/hydraulics-extension">
+        <description>Extension main gear hydraulic cylinder</description>
+        <table>
+            <independentVar>systems/hydraulics/flight-system-psi</independentVar>
+            <tableData>
+                0.0  0.0
+                3000.0 -5
+                4000.0 -5
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/gears/unit[2]/hydraulics-extension">
+        <description>Extension main gear hydraulic cylinder</description>
+        <table>
+            <independentVar>systems/hydraulics/flight-system-psi</independentVar>
+            <tableData>
+                0.0  0.0
+                3000.0 -5
+                4000.0 -5
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/gears/gear[0]/drag-norm">
+        <product>
+            <p>aero/qbar-psf</p>
+            <table>
+                <independentVar>gear/gear-pos-norm</independentVar>
+                <tableData>
+                    0.0  0.0
+                    0.2  0.292
+                    0.4  0.559
+                    0.6  0.777
+                    0.8  0.927
+                    1.0  0.996
+                </tableData>
+            </table>
+        </product>
+    </function>
+    
+    <function name="systems/gears/gear[1]/drag-norm">
+        <product>
+            <p>aero/qbar-psf</p>
+            <table>
+                <independentVar>gear/gear-pos-norm</independentVar>
+                <tableData>
+                    0.0  0.0
+                    0.2  0.309
+                    0.4  0.588
+                    0.6  0.809
+                    0.8  0.951
+                    1.0  1.000
+                </tableData>
+            </table>
+        </product>
+    </function>
+    
+    <function name="systems/gears/gear[2]/drag-norm">
+        <product>
+            <p>aero/qbar-psf</p>
+            <table>
+                <independentVar>gear/gear-pos-norm</independentVar>
+                <tableData>
+                    0.0  0.0
+                    0.2  0.309
+                    0.4  0.588
+                    0.6  0.809
+                    0.8  0.951
+                    1.0  1.000
+                </tableData>
+            </table>
+        </product>
+    </function>
+    
+    
+</system>

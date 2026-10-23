@@ -1,0 +1,201 @@
+
+SAAB J35F IN FLIGHTGEAR
+
+Liveries
+F-16 Green - default military green markings for F-16 (Uppsala) air force base.
+F-16 Camoflage - 1970-ties camoflage pattern, F-16 air force base
+Petter red - "Petter röd" special painting 1983 to mark the last fligth from F-18 (Tullinge)
+F-10 ghost - "Johan 66" air show painting F-10 (Ängelholm)
+
+Special aircraft keys
+Ctrl-J Jettison droptanks in air.
+Ctrl-D Unlocks and opens/closes and locks canopy. Closed and locked canopy - first press unlocks second opens canopy. Closed and unlocked canopy at simulation start - first press locks. Open canopy - first press closes canopy second locks 
+Shift-P use drag chute handle
+e Fire ADEN 30mm cannon (100 rounds available, 1700 rounds per minute)
+z Sight: Decreased distance
+Z Sight: Increased distance
+
+Aircraft menus
+Operations:
+Autostart- autoconfigures and starts the engine
+Cabin light- turn on the cabin light (without trying to find the switch in the dark...)
+Fuel Cutoff- Cuts of the fuel to the engine
+Select STRIL target- Selects the target for combat control setting on the navigation unit. In single play only Route is selectable, in multiplay different callsigns can be selected. See navigation unit STRIL below.
+Toggle droptanks- Droptanks attached or not.
+Reload parachute- reloads the prachute after use.
+J35 Draken:
+Radio frequencies- Shows the frequencies loaded in the fr-21 radio. See below
+Navigation beacons- Shows the stored navigation aids for the PN-59 navigation unit. See below
+Heading dialog- A convinience dialog showing the heading indicator.
+Toggle tooltips- turns tooltips on and off.
+
+Special views
+100-Instrument view focused on the instrument panel.
+99- Navigation view focused on the navigation unit.
+98- Radio view focused on the radio and start panel.
+
+
+
+Indicators
+GLÖM EJ LAND-STÄLL: ("Do not forget landing gear") flashes if altitude < 1450 m, airspeed < 450 km/h and throttle < 85% if landing gears are retracted.
+HUVUDVARN.: Main caution light. Indicates important system warnings. See below. Acknowledge by pressing the light to silence the alarm. No warning signal while taxing.
+HÖJDV: Flashes when autopilot HÖJD (altitude hold) is set and aircraft not at target altitude or vertical speed above 200 m/min. Lit when stable at target altitude. It is recomended to be at target altitude before setting autopilot to HÖJD.
+Landing gear down and locked: (LANDSTÄLL LÅST UTE) Green lights front lower left
+
+Gauges and instruments
+Fuel gauge: Shows percent of fuel in droptanks until they are empty if attached. Otherwise percent of internal fuel remaining. One needle for left/forward and one for right/aft tank.
+
+G-gauge: Max G-force is displayed by a striped needle. Reset by clicking the small reset pin on the right side of the instrument.
+
+Altitude gauge: Pressure setting is done with knob (lower left of he instrument).
+
+AHK
+The real AHK (swe.Avstånd Höjd Kommando, eng. distance altitude command), on the right side of the radar, was an instrument connected to the Swedish air combat control centers (The system is part of "STRIL60"). It gave tactical information to the pilot by 20 different commands, displayed as words at the top of the instrument, and also the distance scale and the arrow needle on the height scale. Some of the commands are reused  as instrument modes.
+In all modes the "HÖJD" (altitude) scale shows pressure-altitude. Dot-needle from 0-2000 m and tape-needle from 0-20000 m.
+The displayed data depends on mode selected on the Navigation unit (see below):
+0: Only altitude shown
+HÖJDÄNDRING: Arrow shows height reached in one minute at current vertical speed. Scale 0-20000 m. "AVST" tape shows distance over ground to change altitude 1000 m at current vertical speed. Speed over ground calculated from IAS using standard atmosphere.
+LANDA: Arrow shows height reached in one minute at current vertical speed, scale 0-2000 m. AVST tape shows distance to beacon 0-40 km.
+AVST. 400: Arrow shows height reached in one minute at current vertical speed. AVST tape shows distance to beacon 0-400 km.
+AVSTÅND 40: Arrow shows height reached in one minute at current vertical speed. AVST tape shows distance to beacon 0-40 km.
+BARBRO: Arrow shows height reached in one minute at current vertical speed. Scale 0-2000 m.
+"AVST" tape shows distance over ground until touchdown at sealevel and current vertical speed. Speed over ground calculated from IAS using standard atmosphere.
+NYTT MÅL: Arrow shows target altitud or cruise altitude 0-20000 m. AVST shows distance 0-400 km/0-40 km to target or waypoint.
+
+Altitude selector
+Right side below secondary AI. Sets target altitude for autopilot. Click for PLANÉ mode. 
+
+Course selector
+Below Heading indicator. Sets course needle on the heading indicator (compass).
+
+Caution panel
+Lower right. Shows system cautions and warnings.
+Those with * in front triggers main caution light:
+*BRAND MOTOR: (fire engine) not implemented
+*BRAND EBK P: (fire afterburner pump) not implemented
+*STYR AUT: (autopilot) autopilot off
+MOTOR IS: (engine ice) engine deicing on not implemented yet
+*TANK LUFT: (tank air) airpressure fault in fuel system. Not implemented
+*OLJE TRYCK: (oil pressure) low oil pressure.
+EBK: (afterburner) Indicates that the exhaust nozzle is working as AB is turned off or on
+or open when idle on the ground to keep engine from overheating. (Not lit constantly when using AB.)
+*SYR GAS: (oxygen pressure) not implemented
+*EL FEL: (electric fault) fault in AC circuit or generator off.
+*HYDR I, HYDR II: (hydraulic I and II) Low pressure in hydraulic circuit
+*KABIN TRYCK: (cabin pressure) Cabin pressure too low. Not implemented.
+*HUV LÅS: (canopy lock) canopy not locked.
+TANK LUFT, OLJE TRYCK, EL FEL, HYDR I and HYDR II will be lit when engine not running. But should go off when engine starts.
+
+Radio
+The radio equipment consists of two transceiver and one control unit of model Fr-21. They are on the left horizontal panel. In the simulation both transceivers are used for communication. In the real aircraft one was the receiver for combat control data feeding the AHK and other avionics. The letters A-K stores pre set frequencies for transceiver A (closest to the control unit) and the numbers 1-5 stores pre set frequencies for transceiver B. A stores the COM1 frequency at FG start up. Number 1 stores the COM2 frequency at FG start up. The frequency for the other letters and numbers are in the text file $FG_HOME/Export/SaabJ35F-Fr21.txt and can be changed by the user.
+Pressing the buttons marked with dash (-) makes it possible to manually set the frequency using the knobs on the two manual units. Changing mode from Normal to Reserv changes sending unit from A to B.
+The radio is off at simulation start. Transceiver B uses battery power and transceiver A uses main AC.
+
+Radar
+Only a limited simulation of the radar is implemented;
+*Showing a sweep and antenna azimut. (mode TYST and SÄND)
+*In multiplayer the radar shows aircrafts in radar range: dist < 40 km, +-60 deg in yaw, +-30 deg in pitch and > 100 m above ground. (mode SÄND)
+Radar Modes (Set by radar panel on the right side of cockpit):
+FRÅN: Power off
+BER: Readies radar for transmission. Takes 20 sec (In reality 3 min)
+TILL: Like BER but sights and weapon connections also ready. (Same as BER in the simulation.)
+TYST: Everything running but no emissions from antenna.
+SÄND: Everything running and antenna emitting.
+Yellow lines are nav indicators used by the navigation system. See below.
+Knobs on radar panel set intensity of scope (LJSSTYRKA FSKOP) and navigation lines (KORSVISARE). 
+
+Autopilot
+The autopilot is on the right side of the seat and has the following functions and controls:
+HÖJD: Altitude hold. If plané on alltitude selector the autopilot will folow a glide slope of approx 3 degrees.
+ATTITYD: Attitude hold- pitch and roll
+DÄMPN: Pitch and yaw-damper on. This is on in all normal flightconditions
+SVÄNG: Banks the aircraft in attitude mode
+NOS: Pitch setting in attitude mode
+FRÅN TILL: Main autopilot switch. Normally left on.
+ROLL: Roll trim elevon setting
+GIR: Rudder trim setting
+Shift click zeros the slider/knob.
+IMPORTANT: The autopilot switces automatically to only damping if airspeed is Mach 0.95-1.05 or G-force is above 4 G or below -0.5 G. No warning is given.
+At present the autopilot is not as stable as it should be, especially altitude hold.
+
+Navigation unit and mode selector
+The unit is on the right side horizontal panel below cautions. This is the main mode selector for navigation, AHK and radar.
+Draken does not have ordinary navigation instruments. It has a special system that was integrated in the combat command and navigation system of the Swedish airforce. A letter code was used to select navigation beacons and airbase landing system. There was three parts of the system: Anita - general navigation and landing, and Barbro - reserve landing guidance and combat control.
+To simulate the navigation modes and still be compatible with FG there is a file $FG_HOME/Export/SaabJ35F-Beacons.txt. In that file you write a line for each beacon you want to use. The format is a comma separated list:
+letter code,type,frequenzy,note
+letter code: Three letters A-P that identifies the beacon. VOR, NDB does only use the first two (you can set the last to any character you want). ILS uses all three.
+type: VOR, NDB or ILS.
+frequency: The beacons frequency VOR/ILS in MHz, NDB in kHz.
+note: Descriptive note. Must have at least one character.
+
+The modes sets input to course needle (cn), radar and AHK
+Modes:
+FRÅN: (Off)  No nav radio, AHK 0, cn manual, Radar lines parked.
+FÖRV: (Preselected) No nav radio, AHK HÖJDÄNDRING, cn manual, Radar lines parked.
+STRIL: (Combat control) Guides you towards the in the "Select STRIL target" dialog selected target (default Route). If "Route" is selected it activates Route Manager with AHK NYTT MÅL, cn direction to next waypoint, Radar direction line course deviation. If a callsign is selected with AHK NYTT MÅL, cn target course, Radar direction line target angle.
+STRID: (Combat) No nav info, AHK HÖJDÄNDRING, cn manual, Radar lines parked.
+NAVRIKTN: (Navigation direction) Uses NDB/VOR set by the two letters NAV. Radar shows direction line, AHK HÖJDÄNDRING, cn ADF.
+NAV 400: (Navigation 400 km) Uses VOR/NDB set by the two letters NAV. Radar shows direction line, AHK AVST. 400 (shows 0 if NDB), cn direction to VOR. In plané mode a glideslope will also be shown on radar.
+NAV 40: (Navigation 40 km) Uses VOR/NDB set by the two letters NAV. Radar shows direction line, AHK AVSTÅND 40 (shows 0 if NDB), cn direction to beacon. In plané mode a glideslope will also be shown on radar.
+LANDN 40: (Landing 40 km) Uses ILS set by the three letters. Radar shows direction line and glide path, AHK LANDA, cn direction to ILS beacon.
+BARBRO: (Barbro) Uses ILS set by the three letters. Radar shows direction line, AHK BARBRO, cn direction to ILS beacon. 
+
+Important controls and switches
+Drag chute handle: (BROMSFALLSKÄRM) Lower left. First use deploys drag chute. Second drops it. It takes approx. 3 seconds to deploy and should be done under 320 km/h and above 200 km/h. The handle can not be used if throttle above 85%.
+Throttle: (GASKRAN) lower left.
+Landing gear: (LAND-STÄLL) lower left.
+Droptank fuel valve: (MÄTSYSTEM FÄLLTANKAR) Right front canopy rim. Set to on (forward) when using droptanks.
+Parking brake: Center console below instrument panel to the right.
+Jettison droptanks: Left side with red protection ring.
+Canopy handle: Left side
+Landing light switches: (LAND TAXI) Left front canopy rim. Left and right landing light. If switches are in on position the lights will be automatically turned on/off as landing gear are lowered/rised. 
+Navigation lights: (LANTERNOR) Right aft panel. Four settings off, bright, blinking and dim.
+Indicator lights: (IND. LAMPOR) Sets full or half intensity of indicator lights and caution panel,
+Instrument lighting: (INST-LYSE) Left side above throttle. Sets the brightness of the red instrument lighting.
+Consol light: (KONS_LYSE) Left side above throttle. Sets the brightness of the consol lights illuminating the left and right consols.
+Cabin light: (KABIN LYSE) Left side above throttle. Turns cabin light on or off.
+Canopy deice: Right side panel. Regulates the canopy deicing (off, half, full).
+Start panel: Lower left instrument panel. Se below.
+
+IFF:
+Right side of the seat futhers back. Transmit resons to IFF request. The unt takes 20 sec to warm up from FRÅN. Cryptation selector 1-11.
+IFF in JA-37 style: Fiendly on the same code setting (1-11).
+
+The clock:
+Clock ring: Knob furtherst right from clock turns the ring. Set pointing to the minute hand before lift off to keep track of flying time.
+Clock mode button: Lowest knob. Switches between clock and stopwatch. In reality also setting of the clock but not implemented.
+Stopwatch button: Starts, stops and resets the stopwatch.
+
+Weapons and sight
+ADEN 30 mm cannon implemented. Choose AKAN with weapon chooser knob. (Right side radar panel).
+If AKAN is selected a gyroscopic gun sight is projected. Use knob on the sights right side to set target wing span and keyboard controls (z/Z) to adjust ring diameter for shooting distance 180-800 m (default is 400 m). 
+Nose wheel needs to be up for weapons to function.
+
+Starting the aircraft
+Either press Shift-S and let the automatic start make the work or follow the checklist below.
+* Battery switch on. The smaller covered switch on the start panel. Click cover to open and then switch.
+* Lock canopy. Click handle. The HUV LÅS caution should now go out.
+* Turn on main fuel pump. Under the large cover on he start panel.
+* Turn on afterburner fuel pump. Leftmost switch on the start panel. The red light on the start panel is now off.
+* Turn on drop tanks fuel valve. The yellow light on the start panel is now unlit.
+* Press START button on the start panel and wait until the engine is ignited.
+* Switch on the generator. The switch next to the start button.
+All caution lights should now be unlit in a few seconds.
+
+Flying
+* To avoid accidents on landing is it not possible to retract landing gears if throttle < 90 %
+* Maxspeed approx: Mach 1 at low altitude Mach 1.8 at 12 000 m
+* Too long with negative G causes fuel starvation.
+* Watch alpha and speed. Drag increases fast with increasing alpha and uncontrollable pitch up can occur at alpha > 20 deg
+* Draken has elevons, combined ailerons and elevators. Large elevon deflections decreases the availiable aileron difference.
+* The aircraft has non-linear control responce in elevation to lessen effect of small stick movements.
+* Fuel will be drawn from droptanks until they are nearly emtpy then from internal tank.
+
+Lift off: Rotate at 270 km/h to 10-12 degrees pitch. Lift off at approx 300 km/h. Turn of afterburner at 500 km/h if not needed for climbing. Normal climb speed Mach 0.9.
+
+Landing: Lower speed to 500 km/h. Lower gears and turn on landing lights. Turn to final lowering the speed to 325 km/h. Keep a speed of 300 km/h and a plané of 3 degrees (100 m at 2 km distance), RPM 80-85%. After tuchdown raise the nose up to increase drag until speed is 240 km/h. Apply brakes. Lower nose at 160 km/h.
+
+
+2024-01-19 Anders M https://forum.flightgear.org/memberlist.php?mode=viewprofile&u=14101
+
+ 

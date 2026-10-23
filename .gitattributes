@@ -1,0 +1,10 @@
+# Resource manifests identify these imports by their exact source-file bytes.
+# Preserve them across Windows/Linux checkouts, independent of core.autocrlf.
+/bvr_sim/resources/aircraft/** -text whitespace=cr-at-eol
+/bvr_sim/resources/aircraft_catalog.json -text whitespace=cr-at-eol
+/bvr_sim/resources/imported_aircraft_catalog.json -text whitespace=cr-at-eol
+
+# Keep pinned third-party source and license files in their imported form.
+/bvr_sim/src_cxx/extern/yasim/** -text whitespace=cr-at-eol
+/bvr_sim/src_cxx/simulator/aircraft/fdm/yasim_support/simgear/** -text whitespace=cr-at-eol
+/bvr_sim/src_cxx/simulator/aircraft/fdm/yasim_support/COPYING.SimGear -text whitespace=cr-at-eol

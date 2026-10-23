@@ -1,0 +1,2217 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="PHI">
+    
+    <property value="0.0">systems/gauges/PHI/doppler/switch-turn</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-up</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-turned</property>
+    <property value="0.0">systems/gauges/PHI/doppler/is-on</property>
+    <property value="0.0">systems/gauges/PHI/doppler/is-operative</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch</property>
+    <property value="0.0">systems/gauges/PHI/doppler/allarm</property>
+    <property value="0.0">systems/gauges/PHI/doppler/sea-land</property>
+    <property value="0.0">systems/gauges/PHI/doppler/increase</property>
+    <property value="0.0">systems/gauges/PHI/doppler/decrease</property>
+    <property value="0.0">systems/gauges/PHI/doppler/left</property>
+    <property value="0.0">systems/gauges/PHI/doppler/right</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-terrain-sea</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-terrain-sea-pos</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-increase</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-decrease</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-left</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-right</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-increase-decrease-pos</property>
+    <property value="0.0">systems/gauges/PHI/doppler/switch-left-right-pos</property>
+    <property value="0.0">systems/gauges/PHI/doppler/sw-test-togle</property>
+    <property value="0.0">systems/gauges/PHI/doppler/sw-test-pos</property>
+    <property value="0.0">systems/gauges/PHI/doppler/sw-test-top-togle</property>
+    <property value="0.0">systems/gauges/PHI/doppler/sw-test-top-pos</property>
+    
+    <property value="0.0">systems/gauges/PHI/control/sequence</property>
+    <property value="0.0">systems/gauges/PHI/program/release-togle</property>
+    
+    <property value="0.0">systems/gauges/PHI/indicator/is-phi-on</property>
+    <property value="0.0">systems/gauges/PHI/indicator/switch-turn-command</property>
+    <property value="0.0">systems/gauges/PHI/indicator/switch-turn</property>
+    <property value="0.0">systems/gauges/PHI/indicator/switch-up</property>
+    <property value="0.0">systems/gauges/PHI/indicator/switch-turned</property>
+    <property value="0.0">systems/gauges/PHI/indicator/switch</property>
+    <property value="0.0">systems/gauges/PHI/indicator/brg</property>
+    <property value="0.0">systems/gauges/PHI/indicator/brg-lag</property>
+    <property value="0.0">systems/gauges/PHI/indicator/brg-lag-difference</property>
+    <property value="0.0">systems/gauges/PHI/indicator/brg-correct</property>
+    <property value="0.0">systems/gauges/PHI/indicator/brg-imposed</property>
+    <property value="0.0">systems/gauges/PHI/indicator/is-hold</property>
+    <property value="0.0">systems/gauges/PHI/indicator/var-deg</property>
+    <property value="0.0">systems/gauges/PHI/indicator/dist</property>
+    <property value="0.0">systems/gauges/PHI/indicator/dist-set</property>
+    <property value="0.0">systems/gauges/PHI/indicator/dist-set-lag</property>
+    <property value="0.0">systems/gauges/PHI/indicator/is-hold-on</property>
+    <property value="0.0">systems/gauges/PHI/indicator/phi-set-lag</property>
+    <property value="0.0">systems/gauges/PHI/indicator/mil-direction</property>
+    <property value="1.0">systems/gauges/PHI/indicator/digit-inc-stop</property>
+    
+    <property value="0.0">systems/gauges/PHI/wind/wd</property>
+    <property value="0.0">systems/gauges/PHI/wind/ws</property>
+    <property value="0.0">systems/gauges/PHI/wind/advise-light-set-prepare-on</property>
+    <property value="0.0">systems/gauges/PHI/wind/advise-light-delay</property>
+    <property value="0.0">systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel-integral</property>
+    <property value="0.0">systems/gauges/PHI/wind/advise-light-on</property>
+    <property value="0.0">systems/gauges/PHI/wind/advise-light-transparent</property>
+    <property value="0.0">systems/gauges/PHI/wind/correction-WCA</property>
+    <property value="0.0">systems/gauges/PHI/wind/isActive</property>
+    <property value="0.0">systems/gauges/PHI/wind/automatic-wind-sw</property>
+    
+    <property value="80.0">systems/gauges/PHI/dir-div-1AW</property>
+    <property value="10.0">systems/gauges/PHI/dir-div-2AW</property>
+    <property value="0.0">systems/gauges/PHI/distance-reset</property>
+    <property value="0.0">systems/gauges/PHI/convergency/lat-mid-deg</property>
+    <property value="0.0">systems/gauges/PHI/convergency/conversion-angle</property>
+    
+    <property value="0.0">systems/gauges/PHI/program/route-from</property>
+    <property value="1.0">systems/gauges/PHI/program/route-is-pusching</property>
+    <property value="1.0">systems/gauges/PHI/program/route-pushed</property>
+    <property value="1.0">systems/gauges/PHI/program/route-select-dist</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/dist</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/phi</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/altitude-hold-ft</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/push-pos</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/push-togle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/isPush</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/lat</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/lon</property>
+    <property value="0.0">systems/gauges/PHI/program/route[1]/conversion-angle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/dist</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/phi</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/altitude-hold-ft</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/push-pos</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/push-togle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/isPush</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/isPush</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/lat</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/lon</property>
+    <property value="0.0">systems/gauges/PHI/program/route[2]/conversion-angle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/dist</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/phi</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/altitude-hold-ft</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/push-pos</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/push-togle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/isPush</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/lat</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/lon</property>
+    <property value="0.0">systems/gauges/PHI/program/route[3]/conversion-angle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/dist</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/phi</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/altitude-hold-ft</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/push-pos</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/push-togle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/isPush</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/lat</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/lon</property>
+    <property value="0.0">systems/gauges/PHI/program/route[4]/conversion-angle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/dist</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/phi</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/altitude-hold-ft</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/push-pos</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/push-togle</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/isPush</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/lat</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/lon</property>
+    <property value="0.0">systems/gauges/PHI/program/route[5]/conversion-angle</property>
+    <property value="0.0">systems/gauges/PHI/program/route-phi</property>
+    <property value="0.0">systems/gauges/PHI/program/route-altitude-hold-ft</property>
+    <property value="0.0">systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy</property>
+    <property value="0.0">systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy</property>
+    <property value="0.0">systems/gauges/PHI/program/release-togle-pos-lag</property>
+    <property value="0.0">systems/gauges/PHI/program/route-select-route-id</property>
+    <property value="0.0">systems/gauges/PHI/program/route-manager/autopush-prepare-active</property>
+    <property value="0.0">systems/gauges/PHI/program/route-manager/autopush-active</property>
+    <property value="0.0">systems/gauges/PHI/program/route-manager/autopush-next</property>
+    <property value="0.0">systems/gauges/PHI/program/route-manager/autopush-next-wa</property>
+    <property value="0.0">systems/gauges/PHI/program/route-manager/autopush-last</property>
+    <property value="0.0">systems/gauges/PHI/program/route-manager/autopush-finished</property>
+    <property value="0.0">systems/gauges/PHI/program/reset</property>
+    <property value="0.0">systems/gauges/PHI/program/reset-pos-lag</property>
+    <property value="0.0">systems/gauges/PHI/program/reset-after</property>
+    <property value="0.0">systems/gauges/PHI/program/reset-type</property>
+    <property value="0.0">systems/gauges/PHI/program/status</property>
+    <property value="0.0">systems/gauges/PHI/program/route-modify</property>
+    
+    <property value="0.0">systems/gauges/PHI/operative</property>
+    <property value="0.0">systems/gauges/PHI/operative-wa</property>
+    
+    <property value="0.0">systems/gauges/PHI/angle-zero</property>
+    
+    <property value="0.0">systems/autopilot/gui/phi-heading</property>
+    <property value="0.0">systems/autopilot/gui/phi-heading-button-on-off</property>
+    
+    
+    <channel name="systems gauges PHI electric" execrate="32">
+        
+        <switch name="systems/gauges/PHI/operative-start-stop">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[2]/PHI/fuse == 1
+                systems/electric/bus[2]/V GE 24.0
+            </test>
+        </switch>
+        
+        <switch name="systems/electric/bus[2]/PHI/I">
+            <default value="0.0" />
+            <test logic="AND" value="0.9">
+                systems/gauges/PHI/operative-start-stop == 1
+            </test>
+        </switch>
+        
+        
+        <lag_filter name="systems/gauges/PHI/operative-heating">
+            <input>systems/gauges/PHI/operative-start-stop</input>
+            <c1>0.3</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/operative-heating GT 0.9
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/gauges/PHI/operative-wa">
+            <input>systems/gauges/PHI/operative</input>
+            <c1>0.5</c1>
+        </washout_filter>
+        
+    </channel>
+    
+    
+    
+    <channel name="systems gauges PHI calculate TAS" execrate="16">
+        
+        <sensor name="systems/gauges/PHI/T-R-sensor">
+            <input>atmosphere/T-R</input>
+            <lag>0.2</lag>
+            <noise variation="PERCENT" distribution="GAUSSIAN"> 0.5 </noise>
+            <quantization name="systems/gauges/PHI/quantizated/T-R-sensor">
+                <bits>10</bits>
+                <min>0</min>
+                <max>1000</max>
+            </quantization>
+            <drift_rate>0.0</drift_rate>
+            <gain>1.0</gain>
+            <bias>0.0</bias>
+            <delay type="time">0.5</delay>
+        </sensor>
+        
+        <sensor name="systems/gauges/PHI/qbar-psf-sensor">
+            <input>aero/qbar-psf</input>
+            <lag>2.0</lag>
+            <noise variation="PERCENT" distribution="GAUSSIAN"> 0.2 </noise>
+            <quantization name="systems/gauges/PHI/quantizated/qbar-psf-sensor">
+                <bits>10</bits>
+                <min>0</min>
+                <max>1000</max>
+            </quantization>
+            <drift_rate>0.0</drift_rate>
+            <gain>1.0</gain>
+            <bias>0.0</bias>
+            <delay type="time">0.1</delay>
+        </sensor>
+        
+        <sensor name="systems/gauges/PHI/P-psf-sensor">
+            <input>atmosphere/P-psf</input>
+            <lag>2.0</lag>
+            <noise variation="PERCENT" distribution="GAUSSIAN"> 0.2 </noise>
+            <quantization name="systems/gauges/PHI/quantizated/PHI/P-psf-sensor">
+                <bits>10</bits>
+                <min>0</min>
+                <max>1000</max>
+            </quantization>
+            <drift_rate>0.0</drift_rate>
+            <gain>1.0</gain>
+            <bias>0.0</bias>
+            <delay type="time">0.1</delay>
+        </sensor>
+        
+        <fcs_function name="systems/gauges/PHI/TAS-mil-s">
+            <function>
+                <product>
+                    <v>0.183741</v>
+                    <pow>
+                        <product>
+                            <quotient>
+                                <product>
+                                    <v>2.77778</v>
+                                    <p>systems/gauges/PHI/T-R-sensor</p>
+                                </product>
+                                <v>288.15</v>
+                            </quotient>
+                            <sum>
+                                <pow>
+                                    <sum>
+                                        <quotient>
+                                            <p>systems/gauges/PHI/qbar-psf-sensor</p>
+                                            <p>systems/gauges/PHI/P-psf-sensor</p>
+                                        </quotient>
+                                        <v>1.0</v>
+                                    </sum>
+                                    <v>0.285714</v>
+                                </pow>
+                                <v>-1</v>
+                            </sum>
+                        </product>
+                        <v>0.5</v>
+                    </pow>
+                </product>
+            </function>
+        </fcs_function>
+        
+        <lag_filter name="systems/gauges/PHI/TAS-mil-s-lag">
+            <input>systems/gauges/PHI/TAS-mil-s</input>
+            <c1>1.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/TAS-mil-s-calculate">
+            <default value="0" />
+            <test logic="AND" value="systems/gauges/PHI/TAS-mil-s-lag">
+                systems/gauges/PHI/operative == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/gauges/PHI/TAS-mil-h-calculate">
+            <input>systems/gauges/PHI/TAS-mil-s-calculate</input>
+            <gain>3600.0</gain>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI calculate doppler speed" execrate="16">
+        
+        <switch name="systems/gauges/PHI/doppler/is-correct-asset">
+            <default value="0" />
+            <test logic="AND" value="1">
+                attitude/pitch-rad GE -0.69
+                attitude/pitch-rad LE 0.69
+                attitude/roll-rad GE -0.69
+                attitude/roll-rad LE 0.69
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/is-correct-min-cas">
+            <default value="0" />
+            <test logic="AND" value="1">
+                /position/altitude-agl-ft GE 500.0
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gauges/PHI/speed-XY-fps">
+            <function>
+                <sqrt>
+                    <sum>
+                        <pow>
+                            <p>velocities/v-north-fps</p>
+                            <v>2.0</v>
+                        </pow>
+                        <pow>
+                            <p>velocities/v-east-fps</p>
+                            <v>2.0</v>
+                        </pow>
+                    </sum>
+                </sqrt>
+            </function>
+        </fcs_function>
+        
+        
+        <switch name="systems/gauges/PHI/speed-doppler-fps">
+            <default value="0" />
+            <test logic="AND" value="systems/gauges/PHI/speed-XY-fps">
+                systems/gauges/PHI/doppler/is-operative == 1
+                systems/gauges/PHI/doppler/rec-only == 0
+                systems/gauges/PHI/doppler/is-correct-asset == 1
+                systems/gauges/PHI/doppler/is-correct-min-cas == 1
+            </test>
+        </switch>
+        
+        <sensor name="systems/gauges/PHI/speed-doppler-fps-sensor">
+            <input>systems/gauges/PHI/speed-doppler-fps</input>
+            <lag>1.0</lag>
+            <noise variation="PERCENT" distribution="GAUSSIAN"> 0.01 </noise>
+            <quantization name="systems/gauges/PHI/quantizated/speed-doppler-fps-sensor">
+                <bits>12</bits>
+                <min>0</min>
+                <max>10000</max>
+            </quantization>
+            <drift_rate>0.0</drift_rate>
+            <gain>1.0</gain>
+            <bias>0.0</bias>
+            <delay type="time">0.1</delay>
+        </sensor>
+        
+        <pure_gain name="systems/gauges/PHI/speed-doppler-mil-sensor">
+            <input>systems/gauges/PHI/speed-doppler-fps-sensor</input>
+            <gain>0.00016449</gain>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI calculate the gyrocompass magnetic flux gate" execrate="8">
+    
+        <switch name="systems/gauges/PHI/gyrocompass/magnetic-deg-on">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                systems/gauges/PHI/indicator/is-phi-on == 1
+                systems/gauges/PHI/indicator/is-ps-on == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/gyrocompass/magnetic-deg-var-linear">
+            <input>systems/gauges/gyrocompass/magnetic-deg-var</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI calculate speed and space" execrate="4">
+        
+        <switch name="systems/gauges/PHI/speed-mil-sensor">
+            <default value="systems/gauges/PHI/TAS-mil-s-calculate" />
+            <test logic="AND" value="systems/gauges/PHI/speed-doppler-mil-sensor">
+                systems/gauges/PHI/doppler/is-operative == 1
+                systems/gauges/PHI/doppler/allarm == 0
+                systems/gauges/PHI/doppler/switch == 2
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gauges/PHI/speed-mil-sensor-EW">
+            <function>
+                <product>
+                    <p>systems/gauges/PHI/speed-mil-sensor</p>
+                    <v>-1.0</v>
+                    <sin>
+                        <toradians>
+                            <p>systems/gauges/PHI/gyrocompass/magnetic-deg-var-linear</p>
+                        </toradians>
+                    </sin>
+                </product>
+            </function>
+        </fcs_function>
+        
+        <integrator name="systems/gauges/PHI/mil-sum-EW">
+            <input>systems/gauges/PHI/speed-mil-sensor-EW</input>
+            <c1 type="ab2">1.0</c1>
+            <trigger>systems/gauges/PHI/distance-reset</trigger>
+        </integrator>
+        
+        <fcs_function name="systems/gauges/PHI/speed-mil-sensor-NS">
+            <function>
+                <product>
+                    <p>systems/gauges/PHI/speed-mil-sensor</p>
+                    <v>-1.0</v>
+                    <cos>
+                        <toradians>
+                            <p>systems/gauges/PHI/gyrocompass/magnetic-deg-var-linear</p>
+                        </toradians>
+                    </cos>
+                </product>
+            </function>
+        </fcs_function>
+        
+        <integrator name="systems/gauges/PHI/mil-sum-NS">
+            <input>systems/gauges/PHI/speed-mil-sensor-NS</input>
+            <c1 type="ab2">1.0</c1>
+            <trigger>systems/gauges/PHI/distance-reset</trigger>
+        </integrator>
+        
+        <integrator name="systems/gauges/PHI/mil-sum">
+            <input>systems/gauges/PHI/speed-mil-sensor</input>
+            <c1 type="ab2">1.0</c1>
+            <trigger>systems/gauges/PHI/distance-reset</trigger>
+        </integrator>
+        
+        <fcs_function name="systems/gauges/PHI/mil-sum-mod-less">
+            <function>
+                <integer>
+                    <sum>
+                        <p>systems/gauges/PHI/mil-sum</p>
+                        <v>1.0</v>
+                    </sum>
+                </integer>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/gauges/PHI/mil-sum-display">
+            <function>
+                <ifthen>
+                    <gt>
+                        <p>systems/gauges/PHI/mil-sum</p>
+                        <v>1000</v>
+                    </gt>
+                    <difference>
+                        <p>systems/gauges/PHI/mil-sum</p>
+                        <v>1000</v>
+                    </difference>
+                    <p>systems/gauges/PHI/mil-sum</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <summer name="systems/gauges/PHI/speed-TAS-doppler">
+            <input>systems/gauges/PHI/TAS-mil-s-calculate</input>
+            <input>-systems/gauges/PHI/speed-doppler-mil-sensor</input>
+        </summer>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI indicator digit" execrate="4">
+        
+        <switch name="systems/gauges/PHI/distance-reset">
+            <default value="systems/gauges/PHI/distance-reset" />
+            <test logic="AND" value="-1.0">
+                systems/gauges/PHI/program/route-is-pusching == 1.0
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/route-is-pusching == 0.0
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gauges/PHI/indicator/mil-digit">
+            <function>
+                <sum>
+                    <product>
+                        <p>systems/gauges/PHI/indicator/digit1A</p>
+                        <v>100</v>
+                    </product>
+                    <product>
+                        <p>systems/gauges/PHI/indicator/digit2A</p>
+                        <v>10</v>
+                    </product>
+                    <p>systems/gauges/PHI/indicator/digit3A</p>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <linear_actuator name="systems/gauges/PHI/doppler/switch-increase-summer">
+            <input>systems/gauges/PHI/doppler/switch-increase</input>
+            <module>1</module>
+            <rate>1</rate>
+            <versus>1</versus>
+            <gain>0.5</gain>
+            <lag>0.0</lag>
+            <reset>systems/gauges/PHI/doppler/test_reset_off</reset>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/PHI/doppler/switch-decrease-summer">
+            <input>systems/gauges/PHI/doppler/switch-decrease</input>
+            <module>1</module>
+            <rate>1</rate>
+            <versus>1</versus>
+            <gain>0.5</gain>
+            <lag>0.0</lag>
+            <reset>systems/gauges/PHI/doppler/test_reset_off</reset>
+        </linear_actuator>
+        
+        <fcs_function name="systems/gauges/PHI/indicator/mil-direction">
+            <function>
+                <sum>
+                    <abs>
+                        <difference>
+                            <p>systems/gauges/PHI/indicator/dist</p>
+                            <p>systems/gauges/PHI/mil-sum-display</p>
+                        </difference>
+                    </abs>
+                    <p>systems/gauges/PHI/doppler/switch-increase-summer</p>
+                    <difference>
+                        <v>0</v>
+                        <p>systems/gauges/PHI/doppler/switch-decrease-summer</p>
+                    </difference>
+                </sum>
+            </function>
+        </fcs_function>
+        
+        <lag_filter name="systems/gauges/PHI/indicator/digit-inc-stop-lag">
+            <input>systems/gauges/PHI/indicator/digit-inc-stop</input>
+            <c1>0.3</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/indicator/digit-inc-stop">
+            <default value="systems/gauges/PHI/indicator/digit-inc-stop" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/indicator/digit-inc-stop-lag GT 0.9
+            </test>
+        </switch> 
+        
+        <washout_filter name="systems/gauges/PHI/indicator/digit-inc">
+            <input>systems/gauges/PHI/indicator/mil-direction</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        
+        
+        <switch name="systems/gauges/PHI/program/route-from">
+            <default value="systems/gauges/PHI/program/route-from" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/indicator/digit-inc-stop-lag LT 0.1
+                systems/gauges/PHI/operative-wa GT 0.1
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/indicator/digit-inc-stop-lag LT 0.1
+                systems/gauges/PHI/operative == 0.0
+            </test>
+            <test logic="AND" value="0.0">
+                context/gears/on-ground GE 1.0
+                systems/autopilot/speed-true-on-air LT 50.0
+                systems/gauges/PHI/operative-wa GT 0.1
+            </test>
+            <test logic="OR" value="0.0">
+                systems/gauges/PHI/indicator/digit-inc-stop-lag GE 0.1
+                systems/gauges/PHI/indicator/digit-inc LE -0.01
+                systems/gauges/PHI/program/route-is-pusching == 1.0
+                systems/gauges/PHI/program/route-manager/autopush-next-wa LE -0.001
+                systems/gauges/PHI/program/route-manager/autopush-next-wa GE 0.001
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/indicator/digit-inc-stop-lag LT 0.1
+                systems/gauges/PHI/indicator/digit-inc GT 0.01
+            </test>
+        </switch>
+        
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <p>systems/gauges/PHI/indicator/mil-direction</p>
+                        <v>100</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/PHI/indicator/digit1A</output>
+        </fcs_function>
+        
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <difference>
+                            <p>systems/gauges/PHI/indicator/mil-direction</p>
+                            <product>
+                                <p>systems/gauges/PHI/indicator/digit1A</p>
+                                <v>100</v>
+                            </product>
+                        </difference>
+                        <v>10</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/PHI/indicator/digit2A</output>
+        </fcs_function>
+        
+        <fcs_function>
+            <function>
+                <integer>
+                    <difference>
+                        <p>systems/gauges/PHI/indicator/mil-direction</p>
+                        <sum>
+                            <product>
+                                <p>systems/gauges/PHI/indicator/digit1A</p>
+                                <v>100</v>
+                            </product>
+                            <product>
+                                <p>systems/gauges/PHI/indicator/digit2A</p>
+                                <v>10</v>
+                            </product>
+                        </sum>
+                    </difference>
+                </integer>
+            </function>
+            <output>systems/gauges/PHI/indicator/digit3A</output>
+        </fcs_function>
+        
+        <linear_actuator name="systems/gauges/PHI/indicator/digit1AW">
+            <input>systems/gauges/PHI/indicator/digit1A</input>
+            <module>10</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/PHI/indicator/digit2AW">
+            <input>systems/gauges/PHI/indicator/digit2A</input>
+            <module>10</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/PHI/indicator/digit3AW">
+            <input>systems/gauges/PHI/indicator/digit3A</input>
+            <module>10</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI wind digit" execrate="4">
+        
+        <fcs_function name="systems/gauges/PHI/wind/digit-ws-dif">
+            <function>
+                <difference>
+                    <integer>
+                        <p>systems/gauges/PHI/wind/ws</p>
+                    </integer>
+                    <sum>
+                        <product>
+                            <p>systems/gauges/PHI/wind/digit1A</p>
+                            <v>100</v>
+                        </product>
+                        <product>
+                            <p>systems/gauges/PHI/wind/digit2A</p>
+                            <v>10</v>
+                        </product>
+                        <p>systems/gauges/PHI/wind/digit3A</p>
+                    </sum>
+                </difference>
+            </function>
+        </fcs_function>
+        
+        <switch name="systems/gauges/PHI/wind/digit-inc">
+            <default value="systems/gauges/PHI/wind/digit-inc" />
+            <test logic="AND" value="0.1">
+                systems/gauges/PHI/wind/digit-ws-dif GT 0.0
+            </test>
+            <test logic="AND" value="-0.1">
+                systems/gauges/PHI/wind/digit-ws-dif LT 0.0
+            </test>
+        </switch>
+        
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <p>systems/gauges/PHI/wind/ws</p>
+                        <v>100</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/PHI/wind/digit1A</output>
+        </fcs_function>
+        
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <difference>
+                            <p>systems/gauges/PHI/wind/ws</p>
+                            <product>
+                                <p>systems/gauges/PHI/wind/digit1A</p>
+                                <v>100</v>
+                            </product>
+                        </difference>
+                        <v>10</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/PHI/wind/digit2A</output>
+        </fcs_function>
+        
+        <fcs_function>
+            <function>
+                <integer>
+                    <difference>
+                        <p>systems/gauges/PHI/wind/ws</p>
+                        <sum>
+                            <product>
+                                <p>systems/gauges/PHI/wind/digit1A</p>
+                                <v>100</v>
+                            </product>
+                            <product>
+                                <p>systems/gauges/PHI/wind/digit2A</p>
+                                <v>10</v>
+                            </product>
+                        </sum>
+                    </difference>
+                </integer>
+            </function>
+            <output>systems/gauges/PHI/wind/digit3A</output>
+        </fcs_function>
+        
+        <linear_actuator name="systems/gauges/PHI/wind/digit1AW">
+            <input>systems/gauges/PHI/wind/digit1A</input>
+            <module>10</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/PHI/wind/digit2AW">
+            <input>systems/gauges/PHI/wind/digit2A</input>
+            <module>10</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+        <linear_actuator name="systems/gauges/PHI/wind/digit3AW">
+            <input>systems/gauges/PHI/wind/digit3A</input>
+            <module>10</module>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+            <versus>0</versus>
+        </linear_actuator>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI wind" execrate="16">
+        
+        <washout_filter name="systems/gauges/PHI/wind/wd-wa">
+            <input>systems/gauges/PHI/wind/wd</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/PHI/wind/ws-wa">
+            <input>systems/gauges/PHI/wind/ws</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/PHI/indicator/is-phi-operative-wa">
+            <input>systems/gauges/PHI/indicator/is-phi-operative</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/PHI/program/release-on-wa">
+            <input>systems/gauges/PHI/program/release-on</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/PHI/program/route-is-pusching-wa">
+            <input>systems/gauges/PHI/program/route-is-pusching</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <fcs_function name="systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel">
+            <function>
+                <product>
+                    <sum>
+                        <ifthen>
+                            <gt>
+                                <p>systems/gauges/PHI/indicator/is-phi-operative-wa</p>
+                                <v>0.1</v>
+                            </gt>
+                            <v>2.0</v>
+                            <v>0.0</v>
+                        </ifthen>
+                        <ifthen>
+                            <lt>
+                                <p>systems/gauges/PHI/program/release-on-wa</p>
+                                <v>-0.1</v>
+                            </lt>
+                            <v>2.0</v>
+                            <v>0.0</v>
+                        </ifthen>
+                        <ifthen>
+                            <gt>
+                                <abs><p>systems/gauges/PHI/wind/ws-wa</p></abs>
+                                <v>0.1</v>
+                            </gt>
+                            <v>1.0</v>
+                            <v>0.0</v>
+                        </ifthen>
+                        <ifthen>
+                            <gt>
+                                <abs><p>systems/gauges/PHI/wind/wd-wa</p></abs>
+                                <v>0.1</v>
+                            </gt>
+                            <v>1.0</v>
+                            <v>0.0</v>
+                        </ifthen>
+                        <ifthen>
+                            <gt>
+                                <p>systems/gauges/PHI/program/route-is-pusching-wa</p>
+                                <v>0.1</v>
+                            </gt>
+                            <v>10.0</v>
+                            <v>0.0</v>
+                        </ifthen>
+                    </sum>
+                    <p>systems/gauges/PHI/indicator/is-phi-operative</p>
+                </product>      
+            </function>
+        </fcs_function>
+        
+        <integrator name="systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel-integral">
+            <input>systems/gauges/PHI/wind/advise-light-delay</input>
+            <c1>1.0</c1>
+        </integrator>
+        
+        <fcs_function name="systems/gauges/PHI/wind/advise-light-delay">
+            <function>
+                <ifthen>
+                    <and>
+                        <gt>
+                            <p>systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel-integral</p>
+                            <v>0.1</v>
+                        </gt>
+                        <lt>
+                            <p>systems/gauges/PHI/wind/advise-light-set-prepare-on</p>
+                            <v>0.2</v>
+                        </lt>
+                    </and>
+                    <difference>
+                        <p>systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel</p>
+                        <v>0.5</v>
+                    </difference>
+                    <p>systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <switch name="systems/gauges/PHI/wind/advise-light-on-time">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel GE 1.0
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/wind/advise-light-set-prepare-on">
+            <input>systems/gauges/PHI/wind/advise-light-on-time</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/wind/advise-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus2-tension">
+                systems/gauges/PHI/wind/advise-light-ws-wd-phi-rel-integral GT 0.5
+                systems/gauges/PHI/wind/advise-light-set-prepare-on LT 0.2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/wind/advise-light-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus2-tension">
+                systems/gauges/PHI/wind/advise-light-on GT 0.01
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI wind correction" execrate="16">
+        
+        <switch name="systems/gauges/PHI/wind/isActive">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/operative == 1
+                systems/gauges/PHI/indicator/is-phi-on == 1
+                systems/gauges/PHI/TAS-mil-h-calculate GE 80.0
+                systems/gauges/PHI/wind/advise-light-on GT 0.1
+            </test>
+        </switch>
+        
+        
+        <fcs_function name="systems/gauges/PHI/wind/correction-WCA">
+            <function>
+                <ifthen>
+                    <p>systems/gauges/PHI/wind/isActive</p>
+                    <todegrees>
+                        <asin>
+                            <product>
+                                <quotient>
+                                    <p>systems/gauges/PHI/wind/ws</p>
+                                    <p>systems/gauges/PHI/TAS-mil-h-calculate</p>
+                                </quotient>
+                                <sin>
+                                    <toradians>
+                                        <difference>
+                                            <sum>
+                                                <p>systems/gauges/PHI/program/route-phi</p>
+                                                <v>180.0</v>
+                                            </sum>
+                                            <p>systems/gauges/PHI/wind/wd</p>
+                                        </difference>
+                                    </toradians>
+                                </sin>
+                            </product>
+                        </asin>
+                    </todegrees>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+    </channel>
+    
+    
+    
+    
+    
+    <channel name="systems gauges PHI indicator set dist and phi" execrate="8">
+        
+        <washout_filter name="systems/gauges/PHI/indicator/dist-set-lag">
+            <input>systems/gauges/PHI/indicator/dist-set</input>
+            <c1>1.0</c1>            
+        </washout_filter>
+        
+        <washout_filter name="systems/gauges/PHI/indicator/phi-set-lag">
+            <input>systems/gauges/PHI/indicator/brg-imposed</input>
+            <c1>1.0</c1>            
+        </washout_filter>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI select route" execrate="16">
+        
+        
+        
+        <switch name="systems/gauges/PHI/indicator/dist-set-lag-on">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/PHI/indicator/dist-set-lag GT 0.7
+                systems/gauges/PHI/indicator/dist-set-lag LT -0.7
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/digit-inc-stop">
+            <default value="systems/gauges/PHI/indicator/digit-inc-stop" />
+            <test logic="OR" value="1">
+                systems/gauges/PHI/indicator/dist-set-lag-on == 1.0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[1]/dist">
+            <default value="systems/gauges/PHI/program/route[1]/dist" />
+            <test logic="AND" value="systems/gauges/PHI/indicator/dist-set">
+                systems/gauges/PHI/indicator/dist-set-lag-on == 1.0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/dist-set">
+            <default value="systems/gauges/PHI/indicator/dist-set" />
+            <test logic="AND" value="systems/gauges/PHI/program/route[1]/dist">
+                systems/gauges/PHI/indicator/dist-set NE systems/gauges/PHI/program/route[1]/dist
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/phi-set-lag-on">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/PHI/indicator/phi-set-lag GT 0.7
+                systems/gauges/PHI/indicator/phi-set-lag LT -0.7
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[1]/phi">
+            <default value="systems/gauges/PHI/program/route[1]/phi" />
+            <test logic="AND" value="systems/gauges/PHI/indicator/brg-imposed">
+                systems/gauges/PHI/indicator/phi-set-lag-on EQ 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/brg-imposed">
+            <default value="systems/gauges/PHI/indicator/brg-imposed" />
+            <test logic="AND" value="systems/gauges/PHI/program/route[1]/phi">
+                systems/gauges/PHI/indicator/brg-imposed NE systems/gauges/PHI/program/route[1]/phi
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/dist-phi-set-lag-on">
+            <default value="0" />
+            <test logic="OR" value="1">
+                systems/gauges/PHI/indicator/phi-set-lag-on == 1
+                systems/gauges/PHI/indicator/dist-set-lag-on == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-modify">
+            <default value="systems/gauges/PHI/program/route-modify" />
+            <test logic="AND" value="1">
+                systems/gauges/PHI/indicator/dist-phi-set-lag-on == 1
+                systems/gauges/PHI/indicator/is-hold-on == 1
+            </test>
+            <test logic="AND" value="0">
+                systems/gauges/PHI/indicator/is-hold-on == 0
+            </test>
+        </switch>
+        
+        
+        
+        
+        
+        <washout_filter name="systems/gauges/PHI/program/route[1]/push-togle-washed">
+            <input>systems/gauges/PHI/program/route[1]/push-togle</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[1]/push-togle-norm">
+            <default value="systems/gauges/PHI/program/route[1]/push-togle-norm" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[1]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[1]/push-togle-washed LT -0.1
+                    systems/gauges/PHI/program/route-manager/autopush-next == 1
+                </test>
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/PHI/program/route-is-pusching == 1
+                systems/gauges/PHI/program/reset-after GE 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/route[1]/push-pos-lag">
+            <input>systems/gauges/PHI/program/route[1]/push-togle-norm</input>
+            <c1>32</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[1]/push-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[1]/isPush">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-pushed == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[1]/push-light-on-transparent">
+            <default value="0.5" />
+            <test logic="AND" value="systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 1
+                systems/gauges/PHI/program/release-on == 0
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/gauges/PHI/program/route[2]/push-togle-washed">
+            <input>systems/gauges/PHI/program/route[2]/push-togle</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[2]/push-togle-norm">
+            <default value="systems/gauges/PHI/program/route[2]/push-togle-norm" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[2]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[2]/push-togle-washed LT -0.1
+                    systems/gauges/PHI/program/route-manager/autopush-next == 2
+                </test>
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/PHI/program/route-is-pusching == 1
+                systems/gauges/PHI/program/reset-after GE 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/route[2]/push-pos-lag">
+            <input>systems/gauges/PHI/program/route[2]/push-togle-norm</input>
+            <c1>32</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[2]/push-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[2]/isPush">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-pushed == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[2]/push-light-on-transparent">
+            <default value="0.5" />
+            <test logic="AND" value="systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 2
+                systems/gauges/PHI/program/release-on == 0
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/gauges/PHI/program/route[3]/push-togle-washed">
+            <input>systems/gauges/PHI/program/route[3]/push-togle</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[3]/push-togle-norm">
+            <default value="systems/gauges/PHI/program/route[3]/push-togle-norm" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[3]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[3]/push-togle-washed LT -0.1
+                    systems/gauges/PHI/program/route-manager/autopush-next == 3
+                </test>
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/PHI/program/route-is-pusching == 1
+                systems/gauges/PHI/program/reset-after GE 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/route[3]/push-pos-lag">
+            <input>systems/gauges/PHI/program/route[3]/push-togle-norm</input>
+            <c1>32</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[3]/push-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 3
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[3]/isPush">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-pushed == 3
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[3]/push-light-on-transparent">
+            <default value="0.5" />
+            <test logic="AND" value="systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 3
+                systems/gauges/PHI/program/release-on == 0
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/gauges/PHI/program/route[4]/push-togle-washed">
+            <input>systems/gauges/PHI/program/route[4]/push-togle</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[4]/push-togle-norm">
+            <default value="systems/gauges/PHI/program/route[4]/push-togle-norm" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[4]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[4]/push-togle-washed LT -0.1
+                    systems/gauges/PHI/program/route-manager/autopush-next == 4
+                </test>
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/PHI/program/route-is-pusching == 1
+                systems/gauges/PHI/program/reset-after GE 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/route[4]/push-pos-lag">
+            <input>systems/gauges/PHI/program/route[4]/push-togle-norm</input>
+            <c1>32</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[4]/push-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 4
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[4]/isPush">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-pushed == 4
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[4]/push-light-on-transparent">
+            <default value="0.5" />
+            <test logic="AND" value="systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 4
+                systems/gauges/PHI/program/release-on == 0
+            </test>
+        </switch>
+        
+        
+        
+        <washout_filter name="systems/gauges/PHI/program/route[5]/push-togle-washed">
+            <input>systems/gauges/PHI/program/route[5]/push-togle</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[5]/push-togle-norm">
+            <default value="systems/gauges/PHI/program/route[5]/push-togle-norm" />
+            <test logic="AND" value="1">
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[5]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[5]/push-togle-washed LT -0.1
+                    systems/gauges/PHI/program/route-manager/autopush-next == 5
+                </test>
+            </test>
+            <test logic="OR" value="0">
+                systems/gauges/PHI/program/route-is-pusching == 1
+                systems/gauges/PHI/program/reset-after GE 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/route[5]/push-pos-lag">
+            <input>systems/gauges/PHI/program/route[5]/push-togle-norm</input>
+            <c1>32</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/route[5]/push-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 5
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[5]/isPush">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-pushed == 5
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route[5]/push-light-on-transparent">
+            <default value="0.5" />
+            <test logic="AND" value="systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy">
+                systems/gauges/PHI/program/route-pushed == 5
+                systems/gauges/PHI/program/release-on == 0
+            </test>
+        </switch>
+
+        <switch name="systems/gauges/PHI/program/route-is-pusching">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[1]/push-pos-lag GE 0.1
+                    systems/gauges/PHI/program/route[1]/push-pos-lag LT 0.8
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[2]/push-pos-lag GE 0.1
+                    systems/gauges/PHI/program/route[2]/push-pos-lag LT 0.8
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[3]/push-pos-lag GE 0.1
+                    systems/gauges/PHI/program/route[3]/push-pos-lag LT 0.8
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[4]/push-pos-lag GE 0.1
+                    systems/gauges/PHI/program/route[4]/push-pos-lag LT 0.8
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[5]/push-pos-lag GE 0.1
+                    systems/gauges/PHI/program/route[5]/push-pos-lag LT 0.8
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-pushed">
+            <default value="0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route[1]/push-pos-lag GE 0.9
+            </test>
+            <test logic="AND" value="2.0">
+                systems/gauges/PHI/program/route[2]/push-pos-lag GE 0.9
+            </test>
+            <test logic="AND" value="3.0">
+                systems/gauges/PHI/program/route[3]/push-pos-lag GE 0.9
+            </test>
+            <test logic="AND" value="4.0">
+                systems/gauges/PHI/program/route[4]/push-pos-lag GE 0.9
+            </test>
+            <test logic="AND" value="5.0">
+                systems/gauges/PHI/program/route[5]/push-pos-lag GE 0.9
+            </test>
+        </switch>
+        
+    </channel>    
+    
+    
+    
+    <channel name="systems gauges PHI select next route" execrate="32">
+        
+        <washout_filter name="systems/gauges/PHI/program/reset-wa">
+            <input>systems/gauges/PHI/program/reset</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/reset-type">
+            <default value="systems/gauges/PHI/program/reset-type" />
+            <test logic="AND" value="systems/gauges/PHI/program/reset">
+                systems/gauges/PHI/program/reset-type == 0.0
+                systems/gauges/PHI/program/reset-wa GE 0.5
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/reset-type GE 1.0
+                systems/gauges/PHI/program/reset == 0.0
+                systems/gauges/PHI/program/reset-after == 0.0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/reset">
+            <default value="systems/gauges/PHI/program/reset" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/reset-wa LT 0.5
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/reset-pos-lag">
+            <input>systems/gauges/PHI/program/reset</input>
+            <c1>2</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/reset-after">
+            <default value="systems/gauges/PHI/program/reset-after" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/reset-wa LT 0.05
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/reset == 0.0
+                systems/gauges/PHI/program/reset-wa GE 0.05
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-select-route-id">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/PHI/program/route[1]/isPush == 1
+            </test>
+            <test logic="AND" value="2">
+                systems/gauges/PHI/program/route[2]/isPush == 1
+            </test>
+            <test logic="AND" value="3">
+                systems/gauges/PHI/program/route[3]/isPush == 1
+            </test>
+            <test logic="AND" value="4">
+                systems/gauges/PHI/program/route[4]/isPush == 1
+            </test>
+            <test logic="AND" value="5">
+                systems/gauges/PHI/program/route[5]/isPush == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-manager/autopush-last">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[1]/dist == 0.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[1]/isPush == 1
+                    systems/gauges/PHI/program/route[2]/dist == 0.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[2]/isPush == 1
+                    systems/gauges/PHI/program/route[3]/dist == 0.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[3]/isPush == 1
+                    systems/gauges/PHI/program/route[4]/dist == 0.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[4]/isPush == 1
+                    systems/gauges/PHI/program/route[5]/dist == 0.0
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route[5]/isPush == 1
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-select-dist">
+            <default value="0" />
+            <test logic="AND" value="systems/gauges/PHI/program/route[1]/dist">
+                systems/gauges/PHI/program/route[1]/isPush == 1
+            </test>
+            <test logic="AND" value="systems/gauges/PHI/program/route[2]/dist">
+                systems/gauges/PHI/program/route[2]/isPush == 1
+            </test>
+            <test logic="AND" value="systems/gauges/PHI/program/route[3]/dist">
+                systems/gauges/PHI/program/route[3]/isPush == 1
+            </test>
+            <test logic="AND" value="systems/gauges/PHI/program/route[4]/dist">
+                systems/gauges/PHI/program/route[4]/isPush == 1
+            </test>
+            <test logic="AND" value="systems/gauges/PHI/program/route[5]/dist">
+                systems/gauges/PHI/program/route[5]/isPush == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-manager/autopush-term-trunc">
+            <default value="0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route[1]/isPush == 1
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[1]/dist == 0.0
+                    systems/gauges/PHI/mil-sum-mod-less GE systems/gauges/PHI/program/route[1]/dist
+                </test>
+            </test>
+            <test logic="AND" value="2.0">
+                systems/gauges/PHI/program/route[2]/isPush == 1
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[2]/dist == 0.0
+                    systems/gauges/PHI/mil-sum-mod-less GE systems/gauges/PHI/program/route[2]/dist
+                </test>
+            </test>
+            <test logic="AND" value="3.0">
+                systems/gauges/PHI/program/route[3]/isPush == 1
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[3]/dist == 0.0
+                    systems/gauges/PHI/mil-sum-mod-less GE systems/gauges/PHI/program/route[3]/dist
+                </test>
+            </test>
+            <test logic="AND" value="4.0">
+                systems/gauges/PHI/program/route[4]/isPush == 1
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[4]/dist == 0.0
+                    systems/gauges/PHI/mil-sum-mod-less GE systems/gauges/PHI/program/route[4]/dist
+                </test>
+            </test>
+            <test logic="AND" value="5.0">
+                systems/gauges/PHI/program/route[5]/isPush == 1
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[5]/dist == 0.0
+                    systems/gauges/PHI/mil-sum-mod-less GE systems/gauges/PHI/program/route[5]/dist
+                </test>
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/gauges/PHI/program/route-manager/autopush-active-wa">
+            <input>systems/gauges/PHI/program/route-manager/autopush-active</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route-manager/autopush-next">
+            <default value="systems/gauges/PHI/program/route-manager/autopush-next" />
+            <test logic="AND" value="1">
+                systems/gauges/PHI/program/route-select-route-id NE 1.0 
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[1]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[1]/push-togle-washed LT -0.1
+                </test>
+                systems/gauges/PHI/program/route-manager/autopush-next NE 1.0
+                systems/gauges/PHI/program/route[1]/dist GT 0.0
+            </test>
+            <test logic="AND" value="2">
+                systems/gauges/PHI/program/route-select-route-id NE 2.0 
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[2]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[2]/push-togle-washed LT -0.1
+                </test>
+                systems/gauges/PHI/program/route-manager/autopush-next NE 2.0
+                systems/gauges/PHI/program/route[2]/dist GT 0.0
+            </test>
+            <test logic="AND" value="3">
+                systems/gauges/PHI/program/route-select-route-id NE 3.0 
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[3]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[3]/push-togle-washed LT -0.1
+                </test>
+                systems/gauges/PHI/program/route-manager/autopush-next NE 3.0
+                systems/gauges/PHI/program/route[3]/dist GT 0.0
+            </test>
+            <test logic="AND" value="4">
+                systems/gauges/PHI/program/route-select-route-id NE 4.0 
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[4]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[4]/push-togle-washed LT -0.1
+                </test>
+                systems/gauges/PHI/program/route-manager/autopush-next NE 4.0
+                systems/gauges/PHI/program/route[4]/dist GT 0.0
+            </test>
+            <test logic="AND" value="5">
+                systems/gauges/PHI/program/route-select-route-id NE 5.0 
+                <test logic="OR">
+                    systems/gauges/PHI/program/route[5]/push-togle-washed GT 0.1
+                    systems/gauges/PHI/program/route[5]/push-togle-washed LT -0.1
+                </test>
+                systems/gauges/PHI/program/route-manager/autopush-next NE 5.0
+                systems/gauges/PHI/program/route[5]/dist GT 0.0
+            </test>
+            
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/route-manager/autopush-active == 0.0
+            </test>
+            <test logic="AND" value="systems/gauges/PHI/program/route-select-route-id">
+                systems/gauges/PHI/program/route-select-route-id GT 0.0
+                systems/gauges/PHI/program/route-manager/autopush-active-wa GE 0.9
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-select-route-id == 0.0
+                systems/gauges/PHI/program/route-manager/autopush-active-wa GE 0.9
+            </test>
+            <test logic="OR" value="-2.0">
+                <test logic="AND">
+                    systems/gauges/PHI/program/route-manager/autopush-last == 1
+                    systems/gauges/PHI/program/route-manager/autopush-term-trunc == 1
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route-manager/autopush-last == 1
+                    systems/gauges/PHI/program/route-manager/autopush-term-trunc == 2
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route-manager/autopush-last == 1
+                    systems/gauges/PHI/program/route-manager/autopush-term-trunc == 3
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route-manager/autopush-last == 1
+                    systems/gauges/PHI/program/route-manager/autopush-term-trunc == 4
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/program/route-manager/autopush-term-trunc == 5
+                </test>
+            </test>
+            <test logic="OR" value="1.0">
+                <test logic="AND">
+                    systems/gauges/PHI/program/route-manager/autopush-active == 1
+                    systems/gauges/PHI/program/route-select-route-id == 0.0
+                </test>
+                systems/gauges/PHI/program/route-manager/autopush-active-wa GE 0.9
+            </test>
+            <test logic="AND" value="2.0">
+                systems/gauges/PHI/program/route-manager/autopush-term-trunc == 1
+            </test>
+            <test logic="AND" value="3.0">
+                systems/gauges/PHI/program/route-manager/autopush-term-trunc == 2
+            </test>
+            <test logic="AND" value="4.0">
+                systems/gauges/PHI/program/route-manager/autopush-term-trunc == 3
+            </test>
+            <test logic="AND" value="5.0">
+                systems/gauges/PHI/program/route-manager/autopush-term-trunc == 4
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/gauges/PHI/program/route-manager/autopush-next-wa">
+            <input>systems/gauges/PHI/program/route-manager/autopush-next</input>
+            <c1>1.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route-manager/autopush-active">
+            <default value="systems/gauges/PHI/program/route-manager/autopush-active" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                systems/gauges/PHI/program/route-manager/autopush-next == -2.0
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/route-manager/autopush-active == 1
+                systems/gauges/PHI/program/reset GE 1.0
+                systems/gauges/PHI/program/reset-after == 0.0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/route-manager/autopush-end">
+            <default value="systems/gauges/PHI/program/route-manager/autopush-end" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-manager/autopush-active == 0.0
+                systems/gauges/PHI/program/route-manager/autopush-next == -2.0
+            </test>
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/program/route-manager/autopush-active GT 0.0
+            </test>
+        </switch>
+        
+        <washout_filter name="systems/gauges/PHI/program/route-manager/autopush-end-wa">
+            <input>systems/gauges/PHI/program/route-manager/autopush-end</input>
+            <c1>0.1</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/route-manager/autopush-finished">
+            <default value="systems/gauges/PHI/program/route-manager/autopush-finished" />
+            <test logic="OR" value="0.0">
+                systems/gauges/PHI/program/route-manager/autopush-active GT 0.0
+                systems/gauges/PHI/program/route-manager/autopush-end-wa LE 0.1
+            </test>
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/program/route-manager/autopush-end-wa GT 0.1
+            </test>
+        </switch>
+        
+    </channel> 
+    
+    
+    <channel name="systems gauges PHI indicator brg" execrate="4">
+        
+        <fcs_function name="systems/gauges/PHI/program/route-phi">
+            <function>
+                <ifthen>
+                    <and>
+                        <gt><p>systems/gauges/PHI/operative</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/indicator/is-phi-on</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/program/route-pushed</p><v>0.0</v></gt>
+                    </and>
+                    <switch>
+                        <p>systems/gauges/PHI/program/route-pushed</p>
+                        <p>systems/gauges/PHI/program/route[1]/phi</p>
+                        <p>systems/gauges/PHI/program/route[1]/phi</p>
+                        <p>systems/gauges/PHI/program/route[2]/phi</p>
+                        <p>systems/gauges/PHI/program/route[3]/phi</p>
+                        <p>systems/gauges/PHI/program/route[4]/phi</p>
+                        <p>systems/gauges/PHI/program/route[5]/phi</p>
+                    </switch>
+                    <p>systems/gauges/PHI/program/route-phi</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        <fcs_function name="systems/gauges/PHI/program/route-altitude-hold-ft">
+            <function>
+                <ifthen>
+                    <and>
+                        <gt><p>systems/gauges/PHI/operative</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/indicator/is-phi-on</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/program/route-pushed</p><v>0.0</v></gt>
+                    </and>
+                    <switch>
+                        <p>systems/gauges/PHI/program/route-pushed</p>
+                        <p>systems/gauges/PHI/program/route[1]/altitude-hold-ft</p>
+                        <p>systems/gauges/PHI/program/route[1]/altitude-hold-ft</p>
+                        <p>systems/gauges/PHI/program/route[2]/altitude-hold-ft</p>
+                        <p>systems/gauges/PHI/program/route[3]/altitude-hold-ft</p>
+                        <p>systems/gauges/PHI/program/route[4]/altitude-hold-ft</p>
+                        <p>systems/gauges/PHI/program/route[5]/altitude-hold-ft</p>
+                    </switch>
+                    <p>systems/gauges/PHI/program/route-altitude-hold-ft</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        
+        
+        <fcs_function name="systems/gauges/PHI/indicator/differential">
+            <function>
+                <ifthen>
+                    <and>
+                        <gt><p>systems/gauges/PHI/operative</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/indicator/is-phi-on</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/program/route-pushed</p><v>0.0</v></gt>
+                    </and>
+                    <difference>
+                        <p>systems/gauges/PHI/gyrocompass/magnetic-deg-var-linear</p>
+                        <switch>
+                            <p>systems/gauges/PHI/program/route-pushed</p>
+                            <p>systems/gauges/PHI/program/route[1]/phi</p>
+                            <p>systems/gauges/PHI/program/route[1]/phi</p>
+                            <p>systems/gauges/PHI/program/route[2]/phi</p>
+                            <p>systems/gauges/PHI/program/route[3]/phi</p>
+                            <p>systems/gauges/PHI/program/route[4]/phi</p>
+                            <p>systems/gauges/PHI/program/route[5]/phi</p>
+                        </switch>
+                        <v>0.0</v>
+                    </difference>
+                    <ifthen>
+                        <and>
+                            <gt><p>systems/gauges/PHI/operative</p><v>0.0</v></gt>
+                            <gt><p>systems/gauges/PHI/indicator/is-phi-on</p><v>0.0</v></gt>
+                            <eq><p>systems/gauges/PHI/program/route-pushed</p><v>0.0</v></eq>
+                        </and>
+                        <difference>
+                            <p>systems/gauges/PHI/gyrocompass/magnetic-deg-var-linear</p>
+                            <p>systems/gauges/PHI/program/route[1]/phi</p>
+                            <v>0.0</v>
+                        </difference>
+                        <v>0.0</v>
+                    </ifthen>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+        
+        
+        <fcs_function name="systems/gauges/PHI/indicator/brg">
+            <function>
+                <difference>
+                    <p>systems/gauges/PHI/indicator/differential</p>
+                    <product>
+                        <integer>
+                            <quotient>
+                                <p>systems/gauges/PHI/indicator/differential</p>
+                                <v>360.0</v>
+                            </quotient>
+                        </integer>
+                        <v>360.0</v>
+                    </product>
+                </difference>
+            </function>
+        </fcs_function>
+
+        
+        
+        <fcs_function name="systems/gauges/PHI/indicator/brg-correct">
+            <function>
+                <ifthen>
+                    <and>
+                        <p>systems/gauges/PHI/operative</p>
+                        <p>systems/gauges/PHI/indicator/is-phi-on</p>
+                    </and>
+                    <difference>
+                        <ifthen>
+                            <p>systems/gauges/PHI/program/route-from</p>
+                            <sum>
+                                <p>systems/gauges/PHI/indicator/brg</p>
+                                <v>180</v>
+                            </sum>
+                            <p>systems/gauges/PHI/indicator/brg</p>
+                        </ifthen>
+                        <p>systems/gauges/PHI/wind/correction-WCA</p>
+                    </difference>
+                    <p>systems/gauges/PHI/indicator/brg</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+
+        
+        
+        
+        
+        <fcs_function name="systems/gauges/PHI/indicator/brg-correct-mod">
+            <function>
+                <ifthen>
+                    <and>
+                        <p>systems/gauges/PHI/operative</p>
+                        <p>systems/gauges/PHI/indicator/is-phi-on</p>
+                    </and>
+                    <difference>
+                        <ifthen>
+                            <p>systems/gauges/PHI/program/route-from</p>
+                            <sum>
+                                <p>systems/gauges/PHI/program/route-phi</p>
+                                <v>180</v>
+                            </sum>
+                            <p>systems/gauges/PHI/program/route-phi</p>
+                        </ifthen>
+                        <p>systems/gauges/PHI/wind/correction-WCA</p>
+                    </difference>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+        </fcs_function>
+
+        <angle name="systems/gauges/PHI/indicator/brg-lag-difference" unit="DEG">
+            <source_angle unit="DEG">systems/gauges/PHI/indicator/brg-correct-mod</source_angle>
+            <target_angle unit="DEG">systems/gauges/PHI/indicator/brg-lag</target_angle>
+        </angle>
+
+        <scheduled_gain name="systems/gauges/PHI/indicator/brg-lag-factor">
+            <input>systems/gauges/PHI/operative</input>
+            <table>
+                <independentVar>systems/gauges/PHI/indicator/brg-lag-difference</independentVar>
+                <tableData>
+                    -5.0    100.0
+                    -0.5      0.0
+                     0.5      0.0
+                     5.0   -100.0
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+
+        <integrator name="systems/gauges/PHI/indicator/brg-lag">
+            <input>systems/gauges/PHI/indicator/brg-lag-factor</input>
+            <c1>1.0</c1>
+        </integrator>
+
+    </channel>
+    
+    
+    <channel name="systems gauges PHI indicator dist" execrate="4">
+        
+        <fcs_function name="systems/gauges/PHI/indicator/dist">
+            <function>
+                <ifthen>
+                    <and>
+                        <gt><p>systems/gauges/PHI/operative</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/indicator/is-phi-on</p><v>0.0</v></gt>
+                        <gt><p>systems/gauges/PHI/program/route-pushed</p><v>0.0</v></gt>
+                    </and>
+                    <switch>
+                        <p>systems/gauges/PHI/program/route-pushed</p>
+                        <v>0.0</v>
+                        <p>systems/gauges/PHI/program/route[1]/dist</p>
+                        <p>systems/gauges/PHI/program/route[2]/dist</p>
+                        <p>systems/gauges/PHI/program/route[3]/dist</p>
+                        <p>systems/gauges/PHI/program/route[4]/dist</p>
+                        <p>systems/gauges/PHI/program/route[5]/dist</p>
+                    </switch>
+                    <p>systems/gauges/PHI/indicator/dist</p>
+                </ifthen>
+            </function>
+        </fcs_function>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI indicator switch" execrate="16">
+        
+        <washout_filter name="systems/gauges/PHI/indicator/switch-turn-wa">
+            <input>systems/gauges/PHI/indicator/switch-turn</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/indicator/switch-up">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/gauges/PHI/indicator/switch-turn-wa GT -0.1
+                systems/gauges/PHI/indicator/switch-turn-wa LT 0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/switch-turn-command">
+            <default value="systems/gauges/PHI/indicator/switch-turn-command" />
+            <test logic="AND" value="0">
+                systems/gauges/PHI/indicator/switch-turn-command == 1
+                systems/gauges/PHI/indicator/switch-turn-wa GT -0.03
+                systems/gauges/PHI/indicator/switch-turn-wa LT 0.03
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/switch">
+            <default value="systems/gauges/PHI/indicator/switch" />
+            <test logic="AND" value="0">
+                systems/gauges/PHI/indicator/switch-turn LT 0.75
+                systems/gauges/PHI/indicator/switch-up == 0
+            </test>
+            <test logic="AND" value="1">
+                systems/gauges/PHI/indicator/switch-turn GE 0.75
+                systems/gauges/PHI/indicator/switch-turn LT 1.5
+                systems/gauges/PHI/indicator/switch-up == 0
+            </test>
+            <test logic="AND" value="2">
+                systems/gauges/PHI/indicator/switch-turn GE 1.5
+                systems/gauges/PHI/indicator/switch-up == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/switch-turned">
+            <default value="systems/gauges/PHI/indicator/switch" />
+            <test logic="AND" value="systems/gauges/PHI/indicator/switch-turn">
+                systems/gauges/PHI/indicator/switch-up == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/is-hold-on">
+            <default value="1.0" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/indicator/switch GT 0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/is-phi-on">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/indicator/switch == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/is-phi-operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/indicator/is-phi-on == 1
+                systems/gauges/PHI/operative == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/indicator/is-ps-on">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/indicator/switch == 2
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    <channel name="systems gauges PHI release caddy" execrate="16">
+        
+        <washout_filter name="systems/gauges/PHI/program/release-togle-washed">
+            <input>systems/gauges/PHI/program/release-togle</input>
+            <c1>4.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/program/release-togle-washed-norm">
+            <default value="0.0" />
+            <test logic="OR" value="1">
+                systems/gauges/PHI/program/release-togle-washed GT 0.1
+                systems/gauges/PHI/program/release-togle-washed LT -0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/program/release-on-start">
+            <default value="systems/gauges/PHI/program/release-on-start" />
+            <test logic="AND" value="1">
+                systems/gauges/PHI/program/release-togle-washed-norm == 1
+                systems/gauges/PHI/program/release-togle-pos-lag LT 0.01
+            </test>
+            <test logic="AND" value="0">
+                systems/gauges/PHI/program/release-togle-washed-norm == 1
+                systems/gauges/PHI/program/release-togle-pos-lag GT 0.3
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/program/release-togle-pos-lag">
+            <input>systems/gauges/PHI/program/release-on-start</input>
+            <c1>1</c1>
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/program/release-on">
+            <default value="0.0" />
+            <test logic="AND" value="0">
+                systems/gauges/PHI/program/release-togle-pos-lag LE 0.05
+            </test>
+            <test logic="AND" value="1">
+                systems/gauges/PHI/program/release-togle-pos-lag GT 0.05
+            </test>
+        </switch>
+        
+        <fcs_function name="systems/gauges/PHI/program/light-intensity-by-bus2-tension-on-caddy">
+            <function>
+                <ifthen>
+                    <eq>
+                        <p>systems/gauges/PHI/program/release-on</p>
+                        <v>0.0</v>
+                    </eq>
+                    <product>
+                        <p>systems/warning-lights/light-intensity-by-bus2-tension</p>
+                        <p>systems/lightning/ambient-light-emission-display-correction</p>
+                        <v>2.0</v>
+                    </product>
+                    <v>0.0</v>
+                </ifthen>
+            </function>
+            <clipto>
+                <min>0.0</min>
+                <max>1.0</max>
+                </clipto>]
+        </fcs_function>
+        
+        <switch name="systems/gauges/PHI/program/transparent-by-bus2-tension-on-caddy">
+            <default value="0.0" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus2-tension">
+                systems/gauges/PHI/program/release-on == 0
+            </test>
+        </switch>
+        
+    </channel>
+    
+    
+    
+    
+    
+    <channel name="systems gauges PHI doppler pannel switch" execrate="16">
+        
+        <washout_filter name="systems/gauges/PHI/doppler/switch-turn-wa">
+            <input>systems/gauges/PHI/doppler/switch-turn</input>
+            <c1>3.0</c1>
+        </washout_filter>
+        
+        <switch name="systems/gauges/PHI/doppler/switch-up">
+            <default value="1" />
+            <test logic="AND" value="0">
+                systems/gauges/PHI/doppler/switch-turn-wa GT -0.1
+                systems/gauges/PHI/doppler/switch-turn-wa LT 0.1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/switch">
+            <default value="systems/gauges/PHI/doppler/switch" />
+            <test logic="AND" value="0">
+                systems/gauges/PHI/doppler/switch-turn LT 0.75
+                systems/gauges/PHI/doppler/switch-up == 0
+            </test>
+            <test logic="AND" value="1">
+                systems/gauges/PHI/doppler/switch-turn GE 0.75
+                systems/gauges/PHI/doppler/switch-turn LT 1.5
+                systems/gauges/PHI/doppler/switch-up == 0
+            </test>
+            <test logic="AND" value="2">
+                systems/gauges/PHI/doppler/switch-turn GE 1.5
+                systems/gauges/PHI/doppler/switch-turn LT 2.5
+                systems/gauges/PHI/doppler/switch-up == 0
+            </test>
+            <test logic="AND" value="3">
+                systems/gauges/PHI/doppler/switch-turn GE 2.5
+                systems/gauges/PHI/doppler/switch-up == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/switch-turned">
+            <default value="systems/gauges/PHI/doppler/switch" />
+            <test logic="AND" value="systems/gauges/PHI/doppler/switch-turn">
+                systems/gauges/PHI/doppler/switch-up == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/off">
+            <default value="1.0" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/doppler/switch GT 0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/rec-only">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/doppler/switch == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/on">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/doppler/switch == 2
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/test">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/doppler/switch == 3
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/test_reset_off">
+            <default value="1.0" />
+            <test logic="AND" value="0.0">
+                systems/gauges/PHI/doppler/test == 1
+                systems/gauges/PHI/doppler/is-operative == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/is-powered">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/electric/bus[2]/doppler/fuse == 1
+                systems/electric/bus[2]/V GE 24.0
+                systems/gauges/PHI/doppler/off == 0
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/I">
+            <default value="0.0" />
+            <test logic="AND" value="2.0">
+                systems/gauges/PHI/doppler/is-powered == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/is-on">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                systems/gauges/PHI/doppler/on == 1
+                systems/gauges/PHI/doppler/rec-only == 1
+                systems/gauges/PHI/doppler/test == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/heating-prepare">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/doppler/is-on == 1
+                <test logic="AND" value="1.0">
+                    systems/gauges/PHI/doppler/is-powered == 1
+                </test>
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/heating">
+            <input>systems/gauges/PHI/doppler/heating-prepare</input>
+            <c1>0.05</c1> 
+        </lag_filter>
+        
+        <switch name="systems/gauges/PHI/doppler/is-operative">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/doppler/heating GT 0.9
+                systems/gauges/PHI/doppler/is-powered == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/allarm">
+            <default value="0.0" />
+            <test logic="AND" value="1.0">
+                systems/gauges/PHI/doppler/is-on == 1
+                <test logic="OR">
+                    <test logic="AND">
+                        systems/gauges/PHI/doppler/is-operative == 1
+                        <test logic="OR">
+                            systems/gauges/PHI/doppler/is-correct-asset == 0
+                            systems/gauges/PHI/doppler/is-correct-min-cas == 0
+                        </test>
+                    </test>
+                    <test logic="AND">
+                        systems/gauges/PHI/doppler/heating GT 0.05
+                        systems/gauges/PHI/doppler/is-operative == 0
+                    </test>
+                </test>
+                <test logic="AND">
+                    systems/gauges/PHI/doppler/is-powered == 1
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/advise-light-transparent">
+            <default value="0.85" />
+            <test logic="AND" value="systems/warning-lights/transparent-by-bus2-tension">
+                systems/gauges/PHI/doppler/allarm == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/gauges/PHI/doppler/advise-light-on">
+            <default value="0.0" />
+            <test logic="AND" value="systems/warning-lights/light-intensity-by-bus2-tension">
+                systems/gauges/PHI/doppler/allarm == 1
+            </test>
+        </switch>
+        
+        
+        
+        <lag_filter name="systems/gauges/PHI/doppler/switch-terrain-sea-pos">
+            <input>systems/gauges/PHI/doppler/switch-terrain-sea</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/switch-terrain-sea-pos">
+            <input>systems/gauges/PHI/doppler/switch-terrain-sea</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/switch-increase-pos">
+            <input>systems/gauges/PHI/doppler/switch-increase</input>
+            <c1>16.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/switch-decrease-pos">
+            <input>systems/gauges/PHI/doppler/switch-decrease</input>
+            <c1>16.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/switch-left-pos">
+            <input>systems/gauges/PHI/doppler/switch-left</input>
+            <c1>16.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/switch-right-pos">
+            <input>systems/gauges/PHI/doppler/switch-right</input>
+            <c1>16.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/sw-test-pos">
+            <input>systems/gauges/PHI/doppler/sw-test-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/gauges/PHI/doppler/sw-test-top-pos">
+            <input>systems/gauges/PHI/doppler/sw-test-top-togle</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+    </channel>
+    
+</system>

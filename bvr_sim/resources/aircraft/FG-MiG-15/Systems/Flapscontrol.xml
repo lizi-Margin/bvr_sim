@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system>
+
+	<fileheader>
+		<author> Slavutinsky Victor </author>
+		<filecreationdate> 2010-10-03 </filecreationdate>
+		<version>$Revision: 1.00 $</version>
+		<description> Flapscontrol </description>
+	</fileheader>
+
+
+
+	<channel name="Flapscontrol">
+
+		
+
+		<fcs_function name="calculations/flapscontrol/lever-command">
+			<function>
+				<table>
+					<independentVar lookup="column">fcs/flap-cmd-norm</independentVar>
+					<independentVar lookup="row">fcs/flap-pos-norm</independentVar>
+				<tableData>
+						0.0	0.36	1.0
+					0.0	0.0	0.36	1.0
+					0.01	-1.0	0.36	1.0
+					0.35	-1.0	0.36	1.0
+					0.36	-1.0	0.0	1.0
+					0.37	-1.0	-1.0	1.0
+					0.99	-1.0	-1.0	1.0
+					1.0	-1.0	-1.0	0.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/flapscontrol/lever-command</output>
+		</fcs_function>
+
+		<switch name="calculations/flapscontrol/lever-command-serviceabled">
+			<default value="systems/flapscontrol/lever-pos" />
+			<test logic="AND" value="systems/flapscontrol/lever-command">
+				systems/flapscontrol/serviceable eq 1.0
+			</test>
+			<output>systems/flapscontrol/lever-command-serviceabled</output>
+		</switch>
+
+		<kinematic name="calculations/flapscontrol/lever-pos">
+			<input>systems/flapscontrol/lever-command-serviceabled</input>
+			<traverse>
+			<setting>
+				<position>-1</position>
+				<time>0</time>
+			</setting>
+			<setting>
+				<position>0</position>
+				<time>0.1</time>
+			</setting>
+			<setting>
+				<position>0.36</position>
+				<time>0.2</time>
+			</setting>
+			<setting>
+				<position>1</position>
+				<time>0.3</time>
+			</setting>
+			</traverse>
+			<output>systems/flapscontrol/lever-pos</output>
+		</kinematic>
+
+		<fcs_function name="calculations/flapscontrol/lever-command-pos-diff">
+			<function>
+				<abs>
+					<difference>
+						<property>systems/flapscontrol/lever-pos</property>
+						<property>systems/flapscontrol/lever-command</property>
+					</difference>
+				</abs>
+			</function>
+			<output>systems/flapscontrol/lever-command-pos-diff</output>
+		</fcs_function>
+
+		<fcs_function name="calculations/flapscontrol/flaps-command-pos-diff">
+			<function>
+				<abs>
+					<difference>
+						<property>fcs/flap-cmd-norm</property>
+						<property>fcs/flap-pos-norm</property>
+					</difference>
+				</abs>
+			</function>
+			<output>systems/flapscontrol/flaps-command-pos-diff</output>
+		</fcs_function>
+
+		<switch name="calculations/flapscontrol/flaps-go">
+			<default value="0" />
+			<test logic="AND" value="1">
+				systems/flapscontrol/lever-command-pos-diff lt 0.01
+				systems/flapscontrol/flaps-command-pos-diff gt 0.01
+			</test>
+			<output>systems/flapscontrol/flaps-go</output>
+		</switch>
+
+		
+
+		<fcs_function name="calculations/flapscontrol/fix-pos">
+			<function>
+				<table>
+					<independentVar lookup="row">systems/flapscontrol/lever-pos</independentVar>
+				<tableData>
+					-1.0	1.0
+					-0.98	0.0
+					-0.02	0.0
+					0.0	1.0
+					0.02	0.0
+					0.358	0.0
+					0.36	1.0
+					0.362	0.0
+					0.98	0.0
+					1.0	1.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/flapscontrol/fix-pos</output>
+		</fcs_function>
+
+		
+
+		<fcs_function name="calculations/flapscontrol/click-command">
+			<function>
+				<table>
+					<independentVar lookup="column">systems/flapscontrol/lever-command</independentVar>
+					<independentVar lookup="row">systems/flapscontrol/lever-pos</independentVar>
+				<tableData>
+						-1.0	0.0	0.36	1.0
+					-1.0	0.0	0.0	0.0	0.0
+					-0.9	1.0	0.0	0.0	0.0
+					-0.1	0.0	1.0	1.0	1.0
+					0.0	0.0	0.0	0.0	0.0
+					0.1	1.0	1.0	0.0	0.0
+					0.3	0.0	0.0	1.0	1.0
+					0.36	0.0	0.0	0.0	0.0
+					0.4	1.0	1.0	1.0	0.0
+					0.9	0.0	0.0	0.0	1.0
+					1.0	0.0	0.0	0.0	0.0
+				</tableData>
+				</table>
+			</function>
+			<output>systems/flapscontrol/click-command</output>
+		</fcs_function>&gt;
+
+		<switch name="calculations/flapscontrol/click">
+			<default value="systems/sounds/click/on" />
+			<test logic="AND" value="1">
+				calculations/flapscontrol/click-command gt 0.9
+				systems/sounds/click/on == 0
+			</test>
+			<output>systems/sounds/click/on</output>
+		</switch>
+
+	</channel>
+
+</system>

@@ -1,0 +1,28 @@
+{
+  "set": "Yak-23/yak23-set.xml",
+  "name": "Yakovlev Yak-23 (YASim)",
+  "fdm_type": "yasim",
+  "fdm": "Yak-23/Systems/yak23-yasim.xml",
+  "jets": 1,
+  "model": "Yak-23/Models/yak23.xml",
+  "tags": [
+    "yakovlev",
+    "fighter",
+    "mid-wing",
+    "tricycle",
+    "retractable-gear",
+    "single-engine",
+    "jet",
+    "ifr",
+    "1950s",
+    "1960s",
+    "compositor"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "Yak-23.zip",
+  "archive_sha256": "afcec5be8b98b946d8303aa232107b4c098b641a6490ac1a3adacbdbd159556b",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/Yak-23.zip"
+}

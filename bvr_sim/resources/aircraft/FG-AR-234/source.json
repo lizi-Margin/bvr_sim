@@ -1,0 +1,28 @@
+{
+  "set": "AR-234/ar234-v9-set.xml",
+  "name": "Arado Ar 234 (with Wheels - YASim)",
+  "fdm_type": "yasim",
+  "fdm": "AR-234/Systems/FDM/ar234-v9-yasim.xml",
+  "jets": 2,
+  "model": "AR-234/Models/ar234.xml",
+  "tags": [
+    "arado",
+    "bomber",
+    "reconnaissance",
+    "high-wing",
+    "tricycle",
+    "retractable-gear",
+    "two-engine",
+    "jet",
+    "1940s",
+    "compositor",
+    "HDR"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "AR-234.zip",
+  "archive_sha256": "5e5521dca889100b3751b33b3376b9e58117529fd9ea597062d1d4c334aef858",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/AR-234.zip"
+}

@@ -1,0 +1,396 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="AAU-37A">
+
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/on</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-set</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-position</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-flag-position</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/sw-pneu-elect</property>
+    <property value="29.92">systems/gauges/pneumatic/AAU-37A/pin-MANUAL-inhg-set</property>
+    <property value="1.0">systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-chg</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/pick-QFE-airport</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/QFE-1111-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/QFE-1000-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/QFE-0100-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/QFE-0010-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/QFE-0001-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/altitude-to-display</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/altitude-1111-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/altitude-1000-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/altitude-0100-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/altitude-0010-digit</property>
+    <property value="0.0">systems/gauges/pneumatic/AAU-37A/altitude-0001-digit</property>
+
+
+    <channel name="AAU-37-A electric" execrate="16">
+
+        <switch name="systems/gauges/pneumatic/AAU-37A/on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/inv-primary/V GT 110.0
+                systems/electric/bus[1]/turn-indicator/fuse == 1
+            </test>
+        </switch>
+
+        
+
+    </channel>
+
+
+    <channel name="AAU-37-A mode" execrate="4">
+
+        <lag_filter name="systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-position">
+            <input>systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-set</input>
+            <c1>3.0</c1>
+        </lag_filter>
+
+        <switch name="systems/gauges/pneumatic/AAU-37A/sw-pneu-elect">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-position GT 0.9
+                systems/gauges/pneumatic/AAU-37A/on == 1
+            </test>
+        </switch>
+
+        <lag_filter name="systems/gauges/pneumatic/AAU-37A/sw-pneu-elect-flag-position">
+            <input>systems/gauges/pneumatic/AAU-37A/sw-pneu-elect</input>
+            <c1>2.0</c1>
+        </lag_filter>
+
+    </channel>
+
+
+    <channel name="AAU-37-A set MANUAL-QFE-QNH-2992" execrate="4">
+
+        <washout_filter name="systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-wa">
+            <input>systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <washout_filter name="systems/gauges/pneumatic/AAU-37A/pin-MANUAL-inhg-set-wa">
+            <input>systems/gauges/pneumatic/AAU-37A/pin-MANUAL-inhg-set</input>
+            <c1>4.0</c1>
+        </washout_filter>
+
+        <switch name="systems/gauges/pneumatic/AAU-37A/pick-QFE-airport">
+            <default value="systems/gauges/pneumatic/AAU-37A/pick-QFE-airport" />
+            <test logic="AND" value="/environment/pressure-inhg">
+                gear/wow GT 0.5
+            </test>
+            <test logic="AND" value="systems/autopilot/gui/airport_runway_QFE_inhg">
+                systems/autopilot/gui/airport_runway_QFE_inhg GT 0.1
+                gear/wow LE 0.5
+            </test>
+        </switch>
+
+        <switch name="systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-chg">
+            <default value="0.0" />
+            <test logic="OR" value="1.0">
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-wa GT 0.01
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-wa LT -0.01
+            </test>
+            <test logic="OR" value="1.0">
+                systems/gauges/pneumatic/AAU-37A/pin-MANUAL-inhg-set-wa GT 0.01
+                systems/gauges/pneumatic/AAU-37A/pin-MANUAL-inhg-set-wa LT -0.01
+            </test>
+        </switch>
+
+        <switch>
+            <default value="/instrumentation/altimeter/setting-inhg" />
+            <test logic="AND" value="systems/gauges/pneumatic/AAU-37A/pin-MANUAL-inhg-set">
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set == 1.0
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <test logic="AND" value="systems/gauges/pneumatic/AAU-37A/pick-QFE-airport">
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set == 2.0
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <test logic="AND" value="/environment/pressure-sea-level-inhg">
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set == 3.0
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <test logic="AND" value="29.92">
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set == 4.0
+                systems/gauges/pneumatic/AAU-37A/pick-MANUAL-QFE-QNH-2992-set-chg == 1.0
+            </test>
+            <output>/instrumentation/altimeter/setting-inhg</output>
+        </switch>
+
+        <fcs_function>
+            <function>
+                <integer>
+                    <product>
+                        <p>/instrumentation/altimeter/setting-inhg</p>
+                        <v>100</v>
+                    </product>
+                </integer>
+            </function>
+            <output>systems/gauges/pneumatic/AAU-37A/QFE-1111-digit</output>
+        </fcs_function>
+
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <p>systems/gauges/pneumatic/AAU-37A/QFE-1111-digit</p>
+                        <v>1000</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/pneumatic/AAU-37A/QFE-1000-digit-A</output>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/QFE-1000-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/QFE-1000-digit-A</input>
+            <module>10</module>
+            <rate>0.5</rate>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <difference>
+                            <p>systems/gauges/pneumatic/AAU-37A/QFE-1111-digit</p>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/QFE-1000-digit-A</p>
+                                <v>1000</v>
+                            </product>
+                        </difference>
+                        <v>100</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/pneumatic/AAU-37A/QFE-0100-digit-A</output>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/QFE-0100-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/QFE-0100-digit-A</input>
+            <module>10</module>
+            <rate>0.5</rate>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+
+        <fcs_function>
+            <function>
+                <integer>
+                    <quotient>
+                        <difference>
+                            <p>systems/gauges/pneumatic/AAU-37A/QFE-1111-digit</p>
+                            <sum>
+                                <product>
+                                    <p>systems/gauges/pneumatic/AAU-37A/QFE-1000-digit-A</p>
+                                    <v>1000</v>
+                                </product>
+                                <product>
+                                    <p>systems/gauges/pneumatic/AAU-37A/QFE-0100-digit-A</p>
+                                    <v>100</v>
+                                </product>
+                            </sum>
+                        </difference>
+                        <v>10</v>
+                    </quotient>
+                </integer>
+            </function>
+            <output>systems/gauges/pneumatic/AAU-37A/QFE-0010-digit-A</output>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/QFE-0010-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/QFE-0010-digit-A</input>
+            <module>10</module>
+            <rate>0.5</rate>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+
+        <fcs_function>
+            <function>
+                <integer>
+                    <difference>
+                        <p>systems/gauges/pneumatic/AAU-37A/QFE-1111-digit</p>
+                        <sum>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/QFE-1000-digit-A</p>
+                                <v>1000</v>
+                            </product>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/QFE-0100-digit-A</p>
+                                <v>100</v>
+                            </product>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/QFE-0010-digit-A</p>
+                                <v>10</v>
+                            </product>
+                        </sum>
+                    </difference>
+                </integer>
+            </function>
+            <output>systems/gauges/pneumatic/AAU-37A/QFE-0001-digit-A</output>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/QFE-0001-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/QFE-0001-digit-A</input>
+            <module>10</module>
+            <rate>0.5</rate>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+
+    </channel>
+
+
+    <channel name="AAU-37-A altitude" execrate="4">
+
+        <switch name="systems/gauges/pneumatic/AAU-37A/altitude-to-display">
+            <default value="/instrumentation/altimeter/indicated-altitude-ft" />
+            <test logic="AND" value="/instrumentation/altimeter/mode-c-alt-ft">
+                systems/gauges/pneumatic/AAU-37A/sw-pneu-elect == 1
+            </test>
+        </switch>
+
+        <fcs_function name="systems/gauges/pneumatic/AAU-37A/altitude-to-display-abs">
+            <function>
+                <abs>
+                    <p>systems/gauges/pneumatic/AAU-37A/altitude-to-display</p>
+                </abs>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/gauges/pneumatic/AAU-37A/altitude-1111-digit">
+            <function>
+                <integer>
+                    <p>systems/gauges/pneumatic/AAU-37A/altitude-to-display-abs</p>
+                </integer>
+            </function>
+        </fcs_function>
+
+        <fcs_function name="systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-A">
+            <function>
+                <integer>
+                    <quotient>
+                        <p>systems/gauges/pneumatic/AAU-37A/altitude-1111-digit</p>
+                        <v>10000</v>
+                    </quotient>
+                </integer>
+            </function>
+        </fcs_function>
+
+        <switch name="systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-AC">
+            <default value="systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-A" />
+            <test logic="AND" value="9">
+                systems/gauges/pneumatic/AAU-37A/altitude-to-display LT 0.0
+            </test>
+        </switch>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/altitude-1000-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-AC</input>
+            <module>10</module>
+            <rate>0.5</rate>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+
+        <fcs_function name="systems/gauges/pneumatic/AAU-37A/altitude-0100-digit-A">
+            <function>
+                <integer>
+                    <quotient>
+                        <difference>
+                            <p>systems/gauges/pneumatic/AAU-37A/altitude-1111-digit</p>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-A</p>
+                                <v>10000</v>
+                            </product>
+                        </difference>
+                        <v>1000</v>
+                    </quotient>
+                </integer>
+            </function>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/altitude-0100-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/altitude-0100-digit-A</input>
+            <module>10</module>
+            <rate>0.5</rate>
+            <lag>8.0</lag>
+            <gain>1.0</gain>
+        </linear_actuator>
+
+        <fcs_function name="systems/gauges/pneumatic/AAU-37A/altitude-0010-digit-A">
+            <function>
+                <integer>
+                <quotient>
+                    <difference>
+                        <p>systems/gauges/pneumatic/AAU-37A/altitude-to-display-abs</p>
+                        <sum>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-A</p>
+                                <v>10000</v>
+                            </product>
+                            <product>
+                                <p>systems/gauges/pneumatic/AAU-37A/altitude-0100-digit-A</p>
+                                <v>1000</v>
+                            </product>
+                        </sum>
+                    </difference>
+                    <v>1.0</v>
+                </quotient>
+                </integer>
+            </function>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/altitude-0010-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/altitude-0010-digit-A</input>
+            <module>1000</module>
+            <rate>100</rate>
+            <lag>8.0</lag>
+            <gain>0.01</gain>
+        </linear_actuator>
+
+        <fcs_function name="systems/gauges/pneumatic/AAU-37A/altitude-0001-digit-A">
+            <function>
+                <integer>
+                    <quotient>
+                        <difference>
+                            <p>systems/gauges/pneumatic/AAU-37A/altitude-to-display-abs</p>
+                            <sum>
+                                <product>
+                                    <p>systems/gauges/pneumatic/AAU-37A/altitude-1000-digit-A</p>
+                                    <v>10000</v>
+                                </product>
+                                <product>
+                                    <p>systems/gauges/pneumatic/AAU-37A/altitude-0100-digit-A</p>
+                                    <v>1000</v>
+                                </product>
+                                <product>
+                                    <integer>
+                                        <quotient>
+                                            <p>systems/gauges/pneumatic/AAU-37A/altitude-0010-digit-A</p>
+                                            <v>100</v>
+                                        </quotient>
+                                    </integer>
+                                    <v>100</v>
+                                </product>
+                            </sum>
+                        </difference>
+                        <v>0.1</v>
+                    </quotient>
+                </integer>
+            </function>
+        </fcs_function>
+
+        <linear_actuator name="systems/gauges/pneumatic/AAU-37A/altitude-0001-digit">
+            <input>systems/gauges/pneumatic/AAU-37A/altitude-0001-digit-A</input>
+            <module>1000</module>
+            <rate>100</rate>
+            <lag>8.0</lag>
+            <gain>0.01</gain>
+        </linear_actuator>
+
+    </channel>
+
+
+</system>

@@ -1,0 +1,691 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="lightning">
+
+    <property value="1.0">systems/lightning/unit</property>
+    <property value="0">systems/lightning/ambient-light</property>
+    <property value="0">systems/lightning/ambient-light-inernal-canopy</property>
+    <property value="0">systems/lightning/light-uv-instrument</property>
+    <property value="0">systems/lightning/light-uv-instrument-bright</property>
+    <property value="0">systems/lightning/light-uv-instrument-bright-pos</property>
+    <property value="0">systems/lightning/light-red-emer-instrument</property>
+    <property value="0">systems/lightning/light-red-emer-instrument-bright</property>
+    <property value="0">systems/lightning/light-red-emer-instrument-bright-pos</property>
+    <property value="0">systems/lightning/light-red-console</property>
+    <property value="0">systems/lightning/light-red-console-bright</property>
+    <property value="0">systems/lightning/light-red-console-bright-pos</property>
+    <property value="0">systems/lightning/light-panel</property>
+    <property value="0">systems/lightning/intensity-bus1-norm</property>
+    <property value="0">systems/lightning/intensity-bus2-norm</property>
+    <property value="0">systems/lightning/ambient-light-emission-display-correction</property>
+    <property value="0">systems/lightning/landing-light/intensity-norm</property>
+    <property value="0">systems/lightning/landing-light/on</property>
+    <property value="0">systems/lightning/landing-light-set-on</property>
+    <property value="0">systems/lightning/taxiing-light/intensity-norm</property>
+    <property value="0">systems/lightning/taxiing-light/on</property>
+    <property value="0">systems/lightning/main-gear-light/on</property>
+    <property value="1.5">systems/lightning/main-gear-light/I</property>
+    <property value="0">systems/lightning/beacon/on</property>
+    <property value="0">systems/lightning/beacon/motor</property>
+    <property value="0">systems/lightning/beacon/deg</property>
+    <property value="0">systems/lightning/beacon/deg-trigger</property>
+    <property value="0">systems/lightning/beacon/intensity</property>
+    <property value="0">systems/lightning/beacon/emission_cover</property>
+    <property value="0">systems/lightning/beacon/intensity_effect</property>
+    <property value="0">systems/lightning/beacon/intensity_mirror</property>
+    <property value="0">systems/lightning/beacon/intensity_bulb</property>
+    <property value="0">systems/lightning/beacon/transparent_cover</property>
+    <property value="0">systems/lightning/beacon/transparent_glass</property>
+    <property value="0">systems/lightning/anticollision/on</property>
+    <property value="0">systems/lightning/ambient-light-anticollision-procedural</property>
+    <property value="0">systems/lightning/ambient-light-anticollision-intensity</property>
+    <property value="0">systems/lightning/ambient-light-anticollision-glass</property>
+    <property value="0">systems/lightning/ambient-light-anticollision-glass-lamp</property>
+    <property value="0">systems/lightning/ambient-position-lights-procedural</property>
+    <property value="0">systems/lightning/ambient-position-lights-intensity</property>
+    <property value="0">systems/lightning/ambient-position-lights-glass</property>
+    <property value="0">systems/lightning/ambient-position-lights-glass-lamp</property>
+    <property value="0">systems/lightning/accessories/illuminators/sx/intensity</property>
+    <property value="0">systems/lightning/accessories/illuminators/sx/intensity-spot</property>
+    <property value="0">systems/lightning/accessories/illuminators/dx/intensity</property>
+    <property value="0">systems/lightning/accessories/illuminators/dx/intensity-spot</property>
+    
+
+    <channel name="Ambient lighting" execrate="64">
+
+        <summer name="systems/lightning/ambient-light-sum">
+            <input>/rendering/scene/ambient/red</input>
+            <input>/rendering/scene/ambient/green</input>
+            <input>/rendering/scene/ambient/blue</input>
+        </summer>
+
+        <pure_gain name="systems/lightning/ambient-light">
+            <input>systems/lightning/ambient-light-sum</input>
+            <gain>0.3333</gain>
+        </pure_gain>
+
+        <summer name="systems/lightning/ambient-light-inernal-canopy">
+            <input>systems/lightning/ambient-light-sum</input>
+            <bias>0.1</bias>
+        </summer>
+
+        <summer name="systems/lightning/ambient-light-inernal-canopy-low">
+            <input>systems/lightning/ambient-light-sum</input>
+            <bias>0.05</bias>
+        </summer>
+
+    </channel>
+
+
+    <channel name="external standIlluminators" execrate="16">
+
+        <lag_filter name="systems/lightning/accessories/standIlluminators/light/intensity-set-lag">
+            <input>/sim/G91/accessories/standIlluminators/intensity</input>
+            <c1>2.0</c1>
+        </lag_filter>
+
+        <switch name="systems/lightning/accessories/standIlluminators/light/intensity-gain">
+            <default value="1.0" />
+            <test logic="AND" value="0.3">
+                /sim/current-view/internal GT 0.5
+            </test>
+        </switch>
+
+        <scheduled_gain name="systems/lightning/accessories/standIlluminators/light/intensity">
+            <input>systems/lightning/accessories/standIlluminators/light/intensity-set-lag</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/red</independentVar>
+                <tableData>
+                    0.0 1.00
+                    0.1 0.50
+                    0.2 0.20
+                    0.3 0.10
+                    0.4 0.07
+                    0.6 0.05
+                    0.8 0.01
+                    1.0 0.00
+                </tableData>
+            </table>
+            <gain>systems/lightning/accessories/standIlluminators/light/intensity-gain</gain>
+        </scheduled_gain>
+
+        <scheduled_gain name="systems/lightning/accessories/standIlluminators/light/intensity-spot">
+            <input>systems/lightning/accessories/standIlluminators/light/intensity-set-lag</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/red</independentVar>
+                <tableData>
+                    0.0 1.00
+                    1.0 0.60
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+    </channel>
+
+    
+
+    <channel name="light uv instrument" execrate="32">
+        
+        <lag_filter name="systems/lightning/light-uv-instrument-bright-pos">
+            <input>systems/lightning/light-uv-instrument-bright</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/lightning/light-uv-instrument-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/instrument-flood-lights/fuse == 1
+                systems/lightning/light-uv-instrument-bright-pos GT 0.1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/lightning/light-uv-instrument-on-volt-norm">
+            <gain>systems/lightning/light-uv-instrument-on</gain>
+            <input>systems/lightning/intensity-bus1-norm</input>
+        </pure_gain>
+
+        <pure_gain name="systems/lightning/light-uv-instrument-bright-set">
+            <gain>systems/lightning/light-uv-instrument-bright-pos</gain>
+            <input>systems/lightning/light-uv-instrument-on-volt-norm</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/lightning/light-uv-instrument">
+            <gain>systems/lightning/ambient-light-reflection-display-correction</gain>
+            <input>systems/lightning/light-uv-instrument-bright-set</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/electric/bus[1]/instrument-flood-lights/I">
+            <gain>3.0</gain>
+            <input>systems/lightning/light-uv-instrument-on-volt-norm</input>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <channel name="instrument panel emerg lights" execrate="32">
+        
+        <lag_filter name="systems/lightning/light-red-emer-instrument-bright-pos">
+            <input>systems/lightning/light-red-emer-instrument-bright</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/lightning/light-red-emer-instrument-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/instrument-panel-emerg-lights/fuse == 1
+                systems/lightning/light-red-emer-instrument-bright-pos GT 0.1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/lightning/light-red-emer-instrument-on-volt-norm">
+            <gain>systems/lightning/light-red-emer-instrument-on</gain>
+            <input>systems/lightning/intensity-bus1-norm</input>
+        </pure_gain>
+
+        <pure_gain name="systems/lightning/light-red-emer-bright-set">
+            <gain>systems/lightning/light-red-emer-instrument-bright-pos</gain>
+            <input>systems/lightning/light-red-emer-instrument-on-volt-norm</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/lightning/light-red-emer-instrument">
+            <gain>systems/lightning/ambient-light-reflection-display-correction</gain>
+            <input>systems/lightning/light-red-emer-bright-set</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/electric/bus[1]/instrument-panel-emerg-lights/I">
+            <gain>1.0</gain>
+            <input>systems/lightning/light-red-emer-instrument-on-volt-norm</input>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <channel name="light red console and panel" execrate="32">
+        
+        <lag_filter name="systems/lightning/light-red-console-bright-pos">
+            <input>systems/lightning/light-red-console-bright</input>
+            <c1>4.0</c1>
+        </lag_filter>
+        
+        <switch name="systems/lightning/light-red-console-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[1]/console-lights/fuse == 1
+                systems/lightning/light-red-console-bright-pos GT 0.1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/lightning/light-red-console-on-volt-norm">
+            <gain>systems/lightning/light-red-console-on</gain>
+            <input>systems/lightning/intensity-bus1-norm</input>
+        </pure_gain>
+
+        <pure_gain name="systems/lightning/light-red-console-bright-set">
+            <gain>systems/lightning/light-red-console-bright-pos</gain>
+            <input>systems/lightning/light-red-console-on-volt-norm</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/lightning/light-red-console">
+            <gain>systems/lightning/ambient-light-reflection-display-correction</gain>
+            <input>systems/lightning/light-red-console-bright-set</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/electric/bus[1]/console-lights/I">
+            <gain>1.5</gain>
+            <input>systems/lightning/light-red-console-on-volt-norm</input>
+        </pure_gain>
+        
+        <switch name="systems/lightning/light-panel-on">
+            <default value="0" />
+            <test logic="AND" value="1">
+                systems/electric/bus[2]/panel-lights/fuse == 1
+                systems/lightning/light-red-console-bright-pos GT 0.1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/lightning/light-panel-on-volt-norm">
+            <gain>systems/lightning/light-panel-on</gain>
+            <input>systems/lightning/intensity-bus2-norm</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/lightning/light-panel">
+            <gain>systems/lightning/light-red-console-bright-pos</gain>
+            <input>systems/lightning/light-panel-on-volt-norm</input>
+        </pure_gain>
+        
+        <pure_gain name="systems/electric/bus[2]/panel-lights/I">
+            <gain>1.5</gain>
+            <input>systems/lightning/light-panel-on-volt-norm</input>
+        </pure_gain>
+        
+    </channel>
+    
+    
+    <channel name="landing light" execrate="32">
+        
+        <lag_filter name="systems/lightning/landing-light/intensity-norm">
+            <input>systems/lightning/landing-light/on</input>
+            <c1>8.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/lightning/taxiing-light/intensity-norm">
+            <input>systems/lightning/taxiing-light/on</input>
+            <c1>16.0</c1>
+        </lag_filter>
+        
+        <lag_filter name="systems/lightning/main-gear-light/intensity-norm">
+            <input>systems/lightning/main-gear-light/on</input>
+            <c1>32.0</c1>
+        </lag_filter>
+    
+        <switch name="systems/lightning/landing-light/on">
+            <default value="0" />
+            <test logic="OR" value="systems/lightning/intensity-bus1-norm">
+                <test logic="AND">
+                    systems/manual-switches/cockpit/sw-landing-light GT 0.95
+                    systems/electric/bus[1]/landing-light/fuse == 1
+                    gear/unit/compression-ft LE 0.0001
+                    gear/gear-pos-norm GT 0
+                </test>
+                <test logic="AND">
+                    systems/manual-switches/cockpit/sw-landing-light-test == 1
+                    systems/electric/bus[1]/landing-light/fuse == 1
+                </test>
+                <test logic="AND">
+                    systems/lightning/landing-light-set-on GT 0.5
+                </test>
+            </test>
+        </switch>
+        
+        <switch name="systems/lightning/taxiing-light/on">
+            <default value="0" />
+            <test logic="AND" value="systems/lightning/intensity-bus1-norm">
+                systems/manual-switches/cockpit/sw-landing-light GT 0.95
+                systems/electric/bus[1]/landing-light/fuse == 1
+                gear/unit/compression-ft GT 0.0001
+                gear/gear-pos-norm GT 0
+            </test>
+        </switch>
+        
+        <switch name="systems/lightning/main-gear-light/on">
+            <default value="0" />
+            <test logic="AND" value="systems/lightning/intensity-bus1-norm">
+                systems/manual-switches/cockpit/sw-landing-light GT 0.95
+                systems/electric/bus[1]/landing-light/fuse == 1
+                gear/gear-pos-norm GT 0.05
+            </test>
+        </switch>
+        
+        <summer name="systems/electric/bus[1]/landing-light/I">
+            <input>systems/lightning/landing-light/I</input>
+            <input>systems/lightning/taxiing-light/I</input>
+            <input>systems/lightning/main-gear-light/I</input>
+        </summer>
+
+        <pure_gain name="systems/lightning/landing-light/I">
+            <input>systems/lightning/landing-light/on</input>
+            <gain>16.0</gain>
+        </pure_gain>
+        
+        <pure_gain name="systems/lightning/taxiing-light/I">
+            <input>systems/lightning/taxiing-light/on</input>
+            <gain>2.15</gain>
+        </pure_gain>
+        
+        <pure_gain name="systems/lightning/main-gear-light/I">
+            <input>systems/lightning/main-gear-light/on</input>
+            <gain>1.5</gain>
+        </pure_gain>
+        
+    </channel>
+
+
+    <channel name="beacon light" execrate="4">
+
+        <switch name="systems/lightning/beacon/on">
+            <default value="0" />
+            <test logic="AND" value="systems/lightning/intensity-bus1-norm">
+                systems/manual-switches/lateral_panel_right/lightning/sw-flasher-on == 1
+                systems/electric/bus[1]/beacon-light/fuse == 1
+            </test>
+        </switch>
+        
+        <lag_filter name="systems/lightning/beacon/motor">
+            <input>systems/lightning/beacon/on</input>
+            <c1>2.0</c1>
+        </lag_filter>
+        
+        <integrator name="systems/lightning/beacon/deg-int">
+            <input>systems/lightning/beacon/motor</input>
+            <c1>270.0</c1>
+            <trigger>systems/lightning/beacon/deg-trigger</trigger>
+        </integrator>
+
+        <summer name="systems/lightning/beacon/deg">
+            <input>systems/lightning/beacon/deg-int</input>
+        </summer>
+
+        <switch name="systems/lightning/beacon/deg-trigger">
+            <default value="0.0" />
+            <test logic="AND" value="-1.0">
+                systems/lightning/beacon/deg GE 360.0
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/electric/bus[1]/beacon/I">
+            <input>systems/lightning/beacon/on</input>
+            <gain>3.0</gain>
+        </pure_gain>
+
+        <scheduled_gain name="systems/lightning/beacon/pl-emission">
+            <input>systems/lightning/beacon/on</input>
+            <table>
+                <independentVar>systems/lightning/ambient-light</independentVar>
+                <tableData>
+                    0.0 1.00
+                    0.2 0.90
+                    0.3 0.70
+                    0.4 0.40
+                    0.6 0.20
+                    0.8 0.10
+                    1.0 0.05
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+
+        <pure_gain name="systems/lightning/beacon/pl-emission-a">
+            <input>systems/lightning/beacon/pl-emission</input>
+            <gain>3.0</gain>
+        </pure_gain>
+
+        <pure_gain name="systems/lightning/beacon/pl-emission-b">
+            <input>systems/lightning/beacon/pl-emission</input>
+            <gain>-1.0</gain>
+        </pure_gain>
+
+        <pure_gain name="systems/lightning/beacon/pl-emission-c">
+            <input>systems/lightning/beacon/pl-emission</input>
+            <gain>-0.25</gain>
+        </pure_gain>
+
+        <scheduled_gain name="systems/lightning/beacon/pl-emission-effect">
+            <input>systems/lightning/beacon/on</input>
+            <table>
+                <independentVar>systems/lightning/ambient-light</independentVar>
+                <tableData>
+                    0.0 1.00
+                    0.2 0.90
+                    0.3 0.30
+                    0.4 0.15
+                    0.6 0.05
+                    1.0 0.00
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+
+        <pure_gain name="systems/lightning/beacon/intensity_effect">
+            <input>systems/lightning/beacon/pl-emission-effect</input>
+            <gain>1.2</gain>
+        </pure_gain>
+
+        <summer name="systems/lightning/beacon/intensity_mirror">
+            <input>systems/lightning/beacon/pl-emission</input>
+            <bias>0.3 </bias>
+        </summer>
+
+        <summer name="systems/lightning/beacon/intensity_bulb">
+            <input>systems/lightning/beacon/pl-emission-a</input>
+            <bias>0.3 </bias>
+        </summer>
+
+        <summer name="systems/lightning/beacon/transparent_glass">
+            <input>systems/lightning/beacon/pl-emission-b</input>
+            <bias>1.0</bias>
+        </summer>
+
+        <summer name="systems/lightning/beacon/transparent_cover">
+            <input>systems/lightning/beacon/pl-emission-c</input>
+            <bias>1.0</bias>
+        </summer>
+
+    </channel>
+    
+    
+    <channel name="anticollision lights" execrate="32">
+
+        <switch name="systems/lightning/anticollision/on">
+            <default value="0" />
+            <test logic="AND" value="systems/lightning/intensity-bus1-norm">
+                systems/manual-switches/lateral_panel_right/lightning/sw-anticollision-on == 1
+                systems/electric/bus[1]/anti-collision-light/fuse == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/electric/bus[1]/anticollision/I">
+            <input>systems/lightning/anticollision/on</input>
+            <gain>2.0</gain>
+        </pure_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-light-anticollision-intensity">
+            <input>systems/lightning/anticollision/on</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/red</independentVar>
+                <tableData>
+                    0.2 1.00
+                    0.3 0.90
+                    0.4 0.80
+                    0.6 0.70
+                    0.8 0.65
+                    1.0 0.60
+                </tableData>
+            </table>
+            <gain>1.5</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-light-anticollision-glass">
+            <input>systems/lightning/anticollision/on</input>
+            <table>
+                <independentVar>systems/lightning/ambient-light-anticollision-intensity</independentVar>
+                <tableData>
+                    0.2 0.00
+                    0.3 0.10
+                    0.4 0.20
+                    0.6 0.30
+                    0.8 0.20
+                    1.0 0.10
+                </tableData>
+            </table>
+            <gain>1.5</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-light-anticollision-glass-lamp">
+            <input>systems/lightning/anticollision/on</input>
+            <table>
+                <independentVar>systems/lightning/ambient-light-anticollision-intensity</independentVar>
+                <tableData>
+                    0.2 0.30
+                    0.3 0.50
+                    0.4 0.70
+                    0.6 0.80
+                    0.8 0.90
+                    1.0 1.00
+                </tableData>
+            </table>
+            <gain>1.5</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-light-anticollision-procedural">
+            <input>systems/lightning/anticollision/on</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/red</independentVar>
+                <tableData>
+                    0.05 1.00
+                    0.20 0.50
+                    0.40 0.05
+                    0.60 0.00
+                    0.80 0.00
+                    1.00 0.00
+                </tableData>
+            </table>
+            <gain>0.7</gain>
+        </scheduled_gain>
+
+    </channel>
+    
+    
+    <channel name="position lights" execrate="32">
+
+        <switch name="systems/lightning/position-lights/on">
+            <default value="0" />
+            <test logic="AND" value="systems/lightning/intensity-bus2-norm">
+                systems/electric/bus[2]/position-lights/fuse == 1
+            </test>
+        </switch>
+        
+        <switch name="systems/manual-switches/lateral_panel_right/lightning/position-intensity">
+            <default value="0.7" />
+            <test logic="AND" value="1.0">
+                systems/manual-switches/lateral_panel_right/lightning/sw-position-intensity-on == 1
+            </test>
+        </switch>
+        
+        <pure_gain name="systems/lightning/position-lights/on-intensity">
+            <input>systems/manual-switches/lateral_panel_right/lightning/position-intensity</input>
+            <gain>systems/lightning/position-lights/on</gain>
+        </pure_gain>
+        
+        <pure_gain name="systems/electric/bus[2]/position-lights/I">
+            <input>systems/lightning/position-lights/on-intensity</input>
+            <gain>4.0</gain>
+        </pure_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-position-lights-intensity">
+            <input>systems/lightning/position-lights/on-intensity</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/red</independentVar>
+                <tableData>
+                    0.0 1.00
+                    0.2 0.90
+                    0.4 0.80
+                    0.6 0.70
+                    0.8 0.65
+                    1.0 0.60
+                </tableData>
+            </table>
+            <gain>1.2</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-position-lights-glass">
+            <input>systems/lightning/unit</input>
+            <table>
+                <independentVar>systems/lightning/position-lights/on-intensity</independentVar>
+                <tableData>
+                    0.0 0.90
+                    0.2 0.85
+                    0.4 0.80
+                    0.6 0.75
+                    0.8 0.70
+                    1.0 0.70
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-position-lights-glass-lamp">
+            <input>systems/lightning/unit</input>
+            <table>
+                <independentVar>systems/lightning/position-lights/on-intensity</independentVar>
+                <tableData>
+                    0.0 0.30
+                    0.2 0.50
+                    0.4 0.70
+                    0.6 0.80
+                    0.8 0.90
+                    1.0 1.00
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+        
+        <scheduled_gain name="systems/lightning/ambient-position-lights-procedural">
+            <input>systems/lightning/ambient-position-lights-intensity</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/red</independentVar>
+                <tableData>
+                    0.00 1.00
+                    0.15 0.50
+                    0.40 0.05
+                    0.60 0.00
+                    0.80 0.00
+                    1.00 0.00
+                </tableData>
+            </table>
+            <gain>0.55</gain>
+        </scheduled_gain>
+
+    </channel>
+    
+    
+    <channel name="ambient lighting corection" execrate="64">
+        
+        <scheduled_gain name="systems/lightning/ambient-light-emission-display-correction">
+            <input>systems/lightning/unit</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/blue</independentVar>
+                <tableData>
+                    0.0 0.30
+                    0.2 0.35
+                    0.4 0.40
+                    0.6 0.60
+                    0.8 0.90
+                    1.0 1.00
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+
+        <scheduled_gain name="systems/lightning/ambient-light-reflection-display-correction">
+            <input>systems/lightning/unit</input>
+            <table>
+                <independentVar>/rendering/scene/ambient/blue</independentVar>
+                <tableData>
+                    0.0 1.00
+                    0.2 0.60
+                    0.4 0.20
+                    0.6 0.10
+                    0.8 0.08
+                    1.0 0.04
+                </tableData>
+            </table>
+            <gain>1.0</gain>
+        </scheduled_gain>
+    
+    </channel>
+
+    
+    <function name="systems/lightning/intensity-bus1-norm">
+        <table>
+            <independentVar>systems/electric/bus[1]/V</independentVar>
+            <tableData>
+                0.0   0.0
+                10.0  0.3
+                20.0  0.5
+                30.0  1.0
+            </tableData>
+        </table>
+    </function>
+    
+    <function name="systems/lightning/intensity-bus2-norm">
+        <table>
+            <independentVar>systems/electric/bus[2]/V</independentVar>
+            <tableData>
+                0.0   0.0
+                10.0  0.3
+                20.0  0.5
+                30.0  1.0
+            </tableData>
+        </table>
+    </function>
+    
+</system>

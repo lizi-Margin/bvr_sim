@@ -1,0 +1,27 @@
+{
+  "set": "CRJ-200/CRJ-200-set.xml",
+  "name": "Bombardier CRJ-200",
+  "fdm_type": "yasim",
+  "fdm": "CRJ-200/CRJ-200.xml",
+  "jets": 2,
+  "model": "CRJ-200/Models/CRJ-200.xml",
+  "tags": [
+    "transport",
+    "1990s",
+    "2000s",
+    "2010s",
+    "bombardier",
+    "glass-cockpit",
+    "retractable-gear",
+    "ifr",
+    "jet",
+    "twin-engine"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "CRJ-200.zip",
+  "archive_sha256": "c60d033565c21e520162e77bd5510dc013e2c7b3c6bac364e3c4c6f7dc9aacb5",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/CRJ-200.zip"
+}

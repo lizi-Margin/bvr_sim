@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<system name="MRP-48P marker receiver">
+ 
+
+
+ <property>systems/elec/output/MRP-48P/DC27-V</property>
+ <property>systems/elec/output/MRP-48P/DC27-ok</property>
+
+
+ <channel name="MRP-48P slow" execrate="8">
+
+  
+
+  <fcs_function name="systems/elec/output/MRP-48P/DC27-A">
+   <function>
+    <product>
+     <p>systems/elec/output/MRP-48P/DC27-V</p>
+     
+     <v>0.0363</v>
+    </product>
+   </function>
+  </fcs_function>
+
+ </channel>
+
+
+ <channel name="MRP-48P" execrate="2">
+
+  <fcs_function name="systems/instr/MRP-48P/marker">
+   <output>systems/instr/MRP-48P/light/marker</output>
+   <output>systems/instr/MRP-48P/sound/bell</output>
+   <function>
+    <product>
+     <or>
+      <p>systems/instr/MRP-48P/backend/inner</p>
+      <p>systems/instr/MRP-48P/backend/middle</p>
+      <p>systems/instr/MRP-48P/backend/outer</p>
+     </or>
+     <p>systems/elec/output/MRP-48P/DC27-ok</p>
+     <p>systems/instr/ARK-5/on</p>
+    </product>
+   </function>
+   <clipto>
+    <min>0</min>
+    <max>1</max>
+   </clipto>
+  </fcs_function>
+
+ </channel>
+
+
+</system>

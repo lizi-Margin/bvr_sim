@@ -1,0 +1,41 @@
+{
+  "files": [
+    {
+      "from": "F-117/F-117.xml",
+      "reference": "GE_F404-F1D2",
+      "source": "F-117/Engines/GE_F404-F1D2.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-117/F-117.xml",
+      "reference": "direct",
+      "source": "F-117/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-117/F-117.xml",
+      "reference": "GE_F404-F1D2",
+      "source": "F-117/Engines/GE_F404-F1D2.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-117/F-117.xml",
+      "reference": "direct",
+      "source": "F-117/Engines/direct.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-117/F-117.xml",
+      "reference": "armament",
+      "source": "F-117/Systems/armament.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "F-117/F-117.xml",
+      "reference": "brake-chute",
+      "source": "F-117/Systems/brake-chute.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

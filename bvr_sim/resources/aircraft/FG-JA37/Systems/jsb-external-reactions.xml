@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='utf-8'?>
+<external_reactions>
+    <force name="recoil" frame="BODY">
+      <location unit="M">
+        <x>  -1.05893</x>
+        <y>  -0.20322</y>
+        <z> -0.91246</z>
+      </location>
+      <direction>
+        <x>  -1.0 </x>
+        <y>   0.0 </y>
+        <z>   0.0 </z>
+      </direction>
+    </force>
+
+    <force name="recoil2" frame="BODY">
+      <location unit="M">
+        <x>  1.31450 </x>
+        <y> -2.69858 </y>
+        <z> -0.86707 </z>
+      </location>
+      <direction>
+        <x>  -1.0 </x>
+        <y>   0.0 </y>
+        <z>   0.0 </z>
+      </direction>
+    </force>
+
+    <force name="recoil3" frame="BODY">
+      <location unit="M">
+        <x>  1.31450 </x>
+        <y>  2.69858 </y>
+        <z> -0.86707 </z>
+      </location>
+      <direction>
+        <x>  -1.0 </x>
+        <y>   0.0 </y>
+        <z>   0.0 </z>
+      </direction>
+    </force>
+
+    <force name="recoil4" frame="BODY">
+      <location unit="M">
+        <x>  -1.85</x>
+        <y>  0</y>
+        <z> -1.235</z>
+      </location>
+      <direction>
+        <x>  -1.0 </x>
+        <y>   0.0 </y>
+        <z>   0.0 </z>
+      </direction>
+    </force>
+
+    
+    <force name="ai-wake" frame="BODY">
+        <location unit="M">
+            
+            <x> 0.30698 </x>
+            <y> 0.0 </y>
+            <z> -0.27425 </z>
+        </location>
+        <direction>
+            <x>   0.0 </x>
+            <y>   0.0 </y>
+            <z>   0.0 </z>
+        </direction>
+    </force>
+    <moment name="ai-wake" frame="BODY">
+        <direction>
+            <x>   0.0 </x>
+            <y>   0.0 </y>
+            <z>   0.0 </z>
+        </direction>
+    </moment>
+  </external_reactions>

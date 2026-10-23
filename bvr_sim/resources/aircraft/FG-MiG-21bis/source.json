@@ -1,0 +1,32 @@
+{
+  "set": "MiG-21bis/MiG-21bis-set.xml",
+  "name": "Mikoyan-Gurevich MiG-21bis JSBSim",
+  "fdm_type": "jsb",
+  "fdm": "MiG-21bis/MiG-21bis.xml",
+  "jets": 0,
+  "model": "MiG-21bis/Models/MiG-21bis.xml",
+  "tags": [
+    "fighter",
+    "mikoyan-gurevich",
+    "1960s",
+    "1970s",
+    "1980s",
+    "1990s",
+    "2000s",
+    "coldwar",
+    "vietnam",
+    "delta",
+    "retractable-gear",
+    "supersonic",
+    "afterburner",
+    "jet",
+    "single-engine"
+  ],
+  "model_rating": 5,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "MiG-21bis.zip",
+  "archive_sha256": "922c996ce880fcdc75ce8236e4c87dfedb8629b8e67611ece6cf3844f12e7a7c",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/MiG-21bis.zip"
+}

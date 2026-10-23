@@ -1,0 +1,33 @@
+(GNU General Public License GPL)
+
+This 767-300 model complies with and is released under the license: GNU GPL. This license applies to all textures, Models, sounds, xml docs, etc which have been included in this entire file. It may be freely distributed throughout the Flightgear community, and modified under its own discrepancy. It is not commercially distributed, but under terms of the GNU GPL it may be commercially distributed given the source code is freely available.
+
+The license applies to the 3D model(s), interior models, the Flight Dynamics Model (FDM), Sounds, and the textures. Alot of objects/ideas are shared directly already under the Flightgear project GNU GPL, which have similarities (such as parts from other planes). They also come under this protection, and we thank other authors for also releasing under GNU GPL for ease of work and collaborative development.
+
+Alot of the systems were used from the Flightgear Boeing 777-200ER model, by Syd Adams and Justin Smithies, which is also under the same GNU GPL.
+--------------------------------------------------------------------
+Flightgear Only!####################################################
+I do not recommend the use of this aircraft with the "FlightProSim" simulator, as it is not its intended purpose. Proudly, this model is part of FlightGear simulator, and was designed to be enjoyed by those who wish to use it. This aircraft is not intended to be used with (disputedly) illegal copy's of FlightGear, in which FlightProSim we do not trust. For more information regarding this issue, See http://wiki.flightgear.org/index.php/FlightProSim
+--------------------------------------------------------------------
+Feel free to work on this aircraft, it would be cool if you could contact the author and tell him of the changes, so if its good we can add it to the package, which is what makes Flightgear projects' GNU GPL good!
+
+Author(s):
+   Liam Gathercole
+   Isaías V. Prestes
+
+Additional Authors:
+   Juuso Tappaninen - Cockpit
+   John Williams - Systems, FDMs, Additional Models, Cockpit porting from 757
+
+www.flightgearliveries.ning.com
+www.flightgear.org
+
+FLIGHTGEAR PROJECT
+-------------------------------------------------------------------
+GNU General Public License is intended to guarantee your freedom to share and change all versions of a program--to make sure it remains free software for all its users. I hope that in the structure of this license, we can see much improvement from this Aircraft and its development in the Flightgear community.
+
+Conveying Verbatim Copies:
+You may convey verbatim copies of the Program's source code as you receive it, in any medium, provided that you conspicuously and appropriately publish on each copy an appropriate copyright notice; keep intact all notices stating that this License and any non-permissive terms added in accord with section 7 apply to the code; keep intact all notices of the absence of any warranty; and give all recipients a copy of this License along with the Program.
+You may charge any price or no price for each copy that you convey, and you may offer support or warranty protection for a fee.
+-------------------------------------------------------------------
+This text file must remain intact and be included with all distributions of this model and its contents. It must not be changed except by the creator/distributor of the original works, whose name is above.

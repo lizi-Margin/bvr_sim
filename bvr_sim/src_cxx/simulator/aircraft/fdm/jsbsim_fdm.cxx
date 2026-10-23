@@ -17,10 +17,21 @@
 #include <filesystem>
 #include <algorithm>
 #include <optional>
+#include <fstream>
 #include "FGFCS.h"
+#include "input_output/FGLog.h"
 #include "resource_paths.hxx"
+#include "simulator/aircraft/catalog.hxx"
 
 namespace bvr_sim {
+
+namespace {
+std::string fdm_source_model(const std::string& model) {
+    const auto& definitions=aircraft_definitions();
+    auto entry=definitions.find(model);
+    return entry==definitions.end() ? model : entry->second.fdm_model;
+}
+}
 
 const static int jsb_debug_level = 0;
 
@@ -79,7 +90,7 @@ namespace Catalog {
     }
 }
 
-JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs) noexcept
+JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs)
     : AircraftFDM(dt),
       aircraft_model("F16"),
       jsbsim_exec(nullptr),
@@ -100,7 +111,9 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
     auto it = kwargs.find("aircraft_model");
     if (it != kwargs.end()) {
         aircraft_model = it->second;
-        fc = StdFlightController(jsbsim_inner_dt, aircraft_model);
+        const bool imported=std::filesystem::is_regular_file(resource_paths::get_resource_path("aircraft/"+fdm_source_model(aircraft_model)+"/fdm.xml"));
+        fc = StdFlightController(jsbsim_inner_dt, imported ? "F16" : aircraft_model);
+        if(imported)SL::optional().print("Imported JSBSim aircraft uses approximate F16 host flight controller: "+aircraft_model);
     }
 
     if (this->dt > jsbsim_dt_max) {
@@ -110,7 +123,7 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
 }
 
-void JSBSimFDM::initialize_jsbsim() noexcept {
+void JSBSimFDM::initialize_jsbsim() {
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));
 
     if (jsbsim_exec != nullptr) {
@@ -127,7 +140,7 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         try {
             JSBSim_dir = resource_paths::get_jsbsim_dir();
         } catch (const std::exception& e) {
-            SL::get().print(std::string("Error: ") + e.what());
+            SL::optional().print(std::string("Error: ") + e.what());
             return;
         }
 
@@ -151,7 +164,61 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         };
         jsbsim_exec->SetRootDir(SGPath(JSBSim_dir));
         jsbsim_exec->SetDebugLevel(jsb_debug_level);
-        jsbsim_exec->LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), jsbsim_model_mapping.at(aircraft_model), true);
+        const auto source_model=fdm_source_model(aircraft_model);
+        auto source_defaults=resource_paths::get_resource_path("aircraft/"+source_model+"/jsbsim_initial_properties.json");
+        if(std::filesystem::is_regular_file(source_defaults)){
+            std::ifstream file(source_defaults);std::stringstream text;text<<file.rdbuf();auto defaults=json::JSON::Load(text.str());
+            for(const auto& [key,value]:defaults.ObjectRange())if(!jsbsim_exec->GetPropertyManager()->HasNode(key))
+                jsbsim_exec->SetPropertyValue(key,value.JSONType()==json::JSON::Class::Integral?double(value.ToInt()):value.ToFloat());
+        }
+        auto host_properties=resource_paths::get_resource_path("aircraft/"+source_model+"/host_properties.json");
+        host_control_inputs.clear();
+        if(std::filesystem::is_regular_file(host_properties)){
+            std::ifstream file(host_properties);std::stringstream text;text<<file.rdbuf();
+            auto data=json::JSON::Load(text.str());
+            if(data.hasKey("external_inputs"))for(const auto& value:data["external_inputs"].ArrayRange()){
+                auto key=value.ToString();
+                if(!jsbsim_exec->GetPropertyManager()->HasNode(key))jsbsim_exec->SetPropertyValue(key,0);
+                // These are declared external normalized stick inputs, normally
+                // supplied by FlightGear/Nasal. Never overwrite trims, faults,
+                // internal FCS outputs or arbitrary properties by substring.
+                auto canonical=key;
+                if(!canonical.empty()&&canonical.front()=='/')canonical.erase(0,1);
+                for(const auto& axis:std::array<std::pair<std::string,int>,3>{{{"aileron",0},{"elevator",1},{"rudder",2}}}){
+                    auto base="controls/flight/"+axis.first;
+                    if(canonical==base||canonical==base+"-sum"||canonical==base+"[0]"||canonical==base+"[1]")
+                        host_control_inputs.emplace_back(key,axis.second);
+                }
+                for(int i=0;i<8;++i){
+                    auto engine="controls/engines/engine"+(i?"["+std::to_string(i)+"]":std::string(""))+"/throttle";
+                    if(canonical==engine||canonical=="controls/engines/engine[0]/throttle"){
+                        host_control_inputs.emplace_back(key,3);break;
+                    }
+                }
+            }
+            if(data.hasKey("defaults"))for(const auto& [key,value]:data["defaults"].ObjectRange()){
+                auto absolute="/"+key;
+                if(!jsbsim_exec->GetPropertyManager()->HasNode(absolute))
+                    jsbsim_exec->SetPropertyValue(absolute,value.JSONType()==json::JSON::Class::Integral?double(value.ToInt()):value.ToFloat());
+            }
+        }
+        auto imported=resource_paths::get_resource_path("aircraft/"+source_model);
+        bool loaded=false;
+        try {
+        if(std::filesystem::is_regular_file(imported/"fdm.xml")) {
+            loaded=jsbsim_exec->LoadModel(SGPath(imported),SGPath(imported/"Engines"),SGPath(imported/"Systems"),"fdm",false);
+        } else {
+            if(source_model.rfind("FG-",0)==0)
+                throw std::runtime_error("Missing catalog JSBSim source: "+source_model);
+            auto mapping=jsbsim_model_mapping.find(aircraft_model);
+            if(mapping==jsbsim_model_mapping.end())throw std::invalid_argument("Unknown JSBSim aircraft: "+aircraft_model);
+            loaded=jsbsim_exec->LoadModel(SGPath(AircraftPath),SGPath(EnginePath),SGPath(SystemsPath),mapping->second,true);
+        }
+        } catch(const JSBSim::LogException& error) {
+            throw std::runtime_error(error.what());
+        } catch(const std::string& error) { throw std::runtime_error(error); }
+        catch(const char* error) { throw std::runtime_error(error); }
+        if(!loaded){jsbsim_exec.reset();throw std::runtime_error("JSBSim failed to load aircraft: "+aircraft_model);}
 
         std::string props = jsbsim_exec->QueryPropertyCatalog("");
         std::vector<std::string> prop_list;
@@ -163,7 +230,7 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
         Catalog::add_jsbsim_props(prop_list);
 
         // std::cout << "\033[31m" << "JSBSim dt: " << jsbsim_inner_dt << "\033[0m" << std::endl;
-        SL::get().print("JSBSim dt: " + std::to_string(jsbsim_inner_dt));
+        SL::optional().print("JSBSim dt: " + std::to_string(jsbsim_inner_dt));
         jsbsim_exec->Setdt(jsbsim_inner_dt);
     }
     
@@ -186,14 +253,15 @@ void JSBSimFDM::initialize_jsbsim() noexcept {
 //     // set_property_value(Catalog::ic_terrain_elevation_ft, 12000);
 // }
 
-void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
+void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) try {
+    terminate=false;
     auto pos_any = initial_state.at("position");
     std::array<double, 3> pos_arr;
     if (pos_any.type() == typeid(std::array<double, 3>)) {
         pos_arr = std::any_cast<std::array<double, 3>>(pos_any);
     } else {
         std::cout << "[JSBSimFDM] Error: Cannot reset position with type " << pos_any.type().name() << std::endl;
-        SL::get().print("[JSBSimFDM] Error: Cannot reset position with type " + std::string(pos_any.type().name()));
+        SL::optional().print("[JSBSimFDM] Error: Cannot reset position with type " + std::string(pos_any.type().name()));
         pos_arr = {0.0, 0.0, 0.0};
     }
 
@@ -203,7 +271,7 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
         vel_arr = std::any_cast<std::array<double, 3>>(vel_any);
     } else {
         std::cout << "[JSBSimFDM] Error: Cannot reset velocity with type " << vel_any.type().name() << std::endl;
-        SL::get().print("[JSBSimFDM] Error: Cannot reset velocity with type " + std::string(vel_any.type().name()));
+        SL::optional().print("[JSBSimFDM] Error: Cannot reset velocity with type " + std::string(vel_any.type().name()));
         vel_arr = {100.0, 0.0, 0.0};
     }
 
@@ -218,7 +286,7 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
             yaw_val = std::any_cast<double>(yaw_it->second);
         } else {
             std::cout << "[JSBSimFDM] Error: Cannot reset yaw with type " << yaw_it->second.type().name() << std::endl;
-            SL::get().print("[JSBSimFDM] Error: Cannot reset yaw with type " + std::string(yaw_it->second.type().name()));
+            SL::optional().print("[JSBSimFDM] Error: Cannot reset yaw with type " + std::string(yaw_it->second.type().name()));
             yaw_val = 0.0;
         }
     }
@@ -286,15 +354,43 @@ void JSBSimFDM::reset(const std::map<std::string, std::any>& initial_state) {
               << meters_to_feet(alt2) << "ft, " << rad2deg(yaw) << " deg)"
               << std::endl;
               
-    SL::get().print(ss.str());
+    SL::optional().print(ss.str());
     // colorful::printLAN(ss.str());
-}
+} catch(const std::string& error) { throw std::runtime_error(error); }
+catch(const char* error) { throw std::runtime_error(error); }
 
 double JSBSimFDM::get_mach() const noexcept {
     return mach;
 }
 
-void JSBSimFDM::run_jsbsim_step(const ActionSpace& action) noexcept {
+std::map<std::string,double> JSBSimFDM::visual_properties() const {
+    std::map<std::string,double> result;
+    if(!jsbsim_exec)return result;
+    const std::map<std::string,std::string> aliases={
+        {"controls/flight/aileron","fcs/aileron-cmd-norm"},
+        {"controls/flight/elevator","fcs/elevator-cmd-norm"},
+        {"controls/flight/rudder","fcs/rudder-cmd-norm"},
+        {"surface-positions/left-aileron-pos-norm","fcs/left-aileron-pos-norm"},
+        {"surface-positions/right-aileron-pos-norm","fcs/right-aileron-pos-norm"},
+        {"surface-positions/elevator-pos-norm","fcs/elevator-pos-norm"},
+        {"surface-positions/rudder-pos-norm","fcs/rudder-pos-norm"},
+        {"surface-positions/flap-pos-norm","fcs/flap-pos-norm"},
+        {"gear/gear[0]/position-norm","gear/gear-pos-norm"},
+        {"gear/gear[1]/position-norm","gear/gear-pos-norm"},
+        {"gear/gear[2]/position-norm","gear/gear-pos-norm"},
+        {"controls/gear/gear-down","gear/gear-cmd-norm"}
+    };
+    for(const auto& [dest,source]:aliases)
+        if(jsbsim_exec->GetPropertyManager()->HasNode(source))result[dest]=jsbsim_exec->GetPropertyValue(source);
+    for(int i=0;i<jsbsim_exec->GetPropulsion()->GetNumEngines();++i){
+        auto key="controls/engines/engine"+(i==0?std::string(""):"["+std::to_string(i)+"]")+"/throttle";
+        auto source="fcs/throttle-cmd-norm["+std::to_string(i)+"]";
+        if(jsbsim_exec->GetPropertyManager()->HasNode(source))result[key]=jsbsim_exec->GetPropertyValue(source);
+    }
+    return result;
+}
+
+void JSBSimFDM::run_jsbsim_step(const ActionSpace& action) {
     auto aileron_override = action.aileron_cmd();
     auto elevator_override = action.elevator_cmd();
     auto rudder_override = action.rudder_cmd();
@@ -377,13 +473,14 @@ void JSBSimFDM::run_jsbsim_step(const ActionSpace& action) noexcept {
     }
 }
 
-void JSBSimFDM::step(const ActionSpace& action) {
+void JSBSimFDM::step(const ActionSpace& action) try {
     if (!initialized) {
         throw std::runtime_error("JSBSimFDM must be reset before stepping");
     }
 
     run_jsbsim_step(action);
-}
+} catch(const std::string& error) { throw std::runtime_error(error); }
+catch(const char* error) { throw std::runtime_error(error); }
 
 void JSBSimFDM::set_property_value(const Property& prop, double value) noexcept {
     if (value < prop.min) {
@@ -420,6 +517,8 @@ std::vector<double> JSBSimFDM::get_property_values(const std::vector<Property*>&
 }
 
 void JSBSimFDM::set_jsbsim_controls(const std::array<double, 4>& controls) noexcept {
+    for(const auto& [property,axis]:host_control_inputs)
+        jsbsim_exec->SetPropertyValue(property,controls[axis]);
     set_property_value(Catalog::fcs_aileron_cmd_norm, controls[0]);
     set_property_value(Catalog::fcs_elevator_cmd_norm, controls[1]);
     set_property_value(Catalog::fcs_rudder_cmd_norm, controls[2]);
@@ -433,7 +532,7 @@ void JSBSimFDM::set_jsbsim_controls(const std::array<double, 4>& controls) noexc
 }
 
 void JSBSimFDM::set_jsbsim_initial_conditions(double lon, double lat, double alt,
-                                             double speed, double roll_val, double pitch_val, double yaw_val) noexcept {
+                                             double speed, double roll_val, double pitch_val, double yaw_val) {
     double alt_ft = meters_to_feet(alt);
 
     // double v_nwu_n = velocity[0];
@@ -476,7 +575,7 @@ void JSBSimFDM::set_jsbsim_initial_conditions(double lon, double lat, double alt
     }
 }
 
-void JSBSimFDM::update_properties() noexcept {
+void JSBSimFDM::update_properties() {
     std::vector<Property*> geodetic_props = {
         &Catalog::position_long_gc_deg,
         &Catalog::position_lat_geod_deg,
@@ -524,13 +623,13 @@ void JSBSimFDM::update_properties() noexcept {
     // vel_est[2] = (position[2] - old_position[2]) / jsbsim_inner_dt;
 
     // //print the est and true vel
-    // SL::get().printf("[JSBSimFDM] vel_est: %f, %f, %f\n", vel_est[0], vel_est[1], vel_est[2]);
-    // SL::get().printf("[JSBSimFDM] vel_true: %f, %f, %f\n", velocity[0], velocity[1], velocity[2]);
+    // SL::optional().printf("[JSBSimFDM] vel_est: %f, %f, %f\n", vel_est[0], vel_est[1], vel_est[2]);
+    // SL::optional().printf("[JSBSimFDM] vel_true: %f, %f, %f\n", velocity[0], velocity[1], velocity[2]);
 
     mach = get_property_value(Catalog::velocities_mach);
 
     if (alt_m < 25) {
-        SL::get().printf("[JSBSimFDM] Altitude below 25m, terminating simulation\n");
+        SL::optional().printf("[JSBSimFDM] Altitude below 25m, terminating simulation\n");
         terminate = true;
         return;
     }
@@ -541,14 +640,14 @@ void JSBSimFDM::update_properties() noexcept {
             double v = std::any_cast<double>(value);
             if (std::isnan(v)) {
                 terminate = true;
-                SL::get().printf("[JSBSimFDM] NaN (%s) value found for %s, terminating simulation\n", std::to_string(v).c_str(), key.c_str());
+                SL::optional().printf("[JSBSimFDM] NaN (%s) value found for %s, terminating simulation\n", std::to_string(v).c_str(), key.c_str());
                 break;
             }
         } else if (value.type() == typeid(std::array<double, 3>)) {
             auto arr = std::any_cast<std::array<double, 3>>(value);
             for (double v : arr) {
                 if (std::isnan(v)) {
-                    SL::get().printf("[JSBSimFDM] NaN (%s) value found for %s (std::array<double, 3>), terminating simulation\n", std::to_string(v).c_str(), key.c_str());
+                    SL::optional().printf("[JSBSimFDM] NaN (%s) value found for %s (std::array<double, 3>), terminating simulation\n", std::to_string(v).c_str(), key.c_str());
                     terminate = true;
                     break;
                 }

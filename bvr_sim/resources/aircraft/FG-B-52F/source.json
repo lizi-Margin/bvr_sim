@@ -1,0 +1,22 @@
+{
+  "set": "B-52F/B-52F-set.xml",
+  "name": "Boeing B-52 F in Arclight colour scheme",
+  "fdm_type": "yasim",
+  "fdm": "B-52F/B-52F-yasim.xml",
+  "jets": 8,
+  "model": "B-52F/Models/B-52F-model.xml",
+  "tags": [
+    "bomber",
+    "boeing",
+    "jet",
+    "retractable-gear",
+    "coldwar"
+  ],
+  "model_rating": 3,
+  "fdm_rating": 3,
+  "variant_of": "",
+  "archive": "B-52F.zip",
+  "archive_sha256": "fd5b0afe2cee06f3c2c9977605e14f277d36808efc1e02acefb4c7bf6eb7ecca",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/B-52F.zip"
+}

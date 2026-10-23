@@ -1,0 +1,59 @@
+{
+  "files": [
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "DrakenJ35F-groundreactions.xml",
+      "source": "SaabJ35F/DrakenJ35F-groundreactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "Systems/propulsion",
+      "source": "SaabJ35F/Systems/propulsion.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "fuel",
+      "source": "SaabJ35F/Systems/fuel.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "hydraulic",
+      "source": "SaabJ35F/Systems/hydraulic.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "Systems/flightcontrol",
+      "source": "SaabJ35F/Systems/flightcontrol.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "DrakenJ35F-aerodynamics.xml",
+      "source": "SaabJ35F/DrakenJ35F-aerodynamics.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/DrakenJ35F.xml",
+      "reference": "DrakenJ35F-externalreactions",
+      "source": "SaabJ35F/DrakenJ35F-externalreactions.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/Systems/propulsion.xml",
+      "reference": "TLSvenskaFlygmotorRM6CTyp66",
+      "source": "SaabJ35F/Engines/TLSvenskaFlygmotorRM6CTyp66.xml",
+      "label_repairs": []
+    },
+    {
+      "from": "SaabJ35F/Systems/propulsion.xml",
+      "reference": "direct",
+      "source": "SaabJ35F/Engines/direct.xml",
+      "label_repairs": []
+    }
+  ],
+  "missing": []
+}

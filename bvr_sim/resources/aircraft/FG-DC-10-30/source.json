@@ -1,0 +1,25 @@
+{
+  "set": "DC-10-30/DC-10-30-set.xml",
+  "name": "McDonnell Douglas DC-10-30",
+  "fdm_type": "yasim",
+  "fdm": "DC-10-30/DC-10-30.xml",
+  "jets": 3,
+  "model": "DC-10-30/Models/DC-10-30.xml",
+  "tags": [
+    "transport",
+    "mc-donnell-douglas",
+    "1970s",
+    "1980s",
+    "1990s",
+    "jet",
+    "ifr",
+    "retractable-gear"
+  ],
+  "model_rating": 4,
+  "fdm_rating": 2,
+  "variant_of": "",
+  "archive": "DC-10-30.zip",
+  "archive_sha256": "041554106183d7411ffabc9a32e43cb958be6388d86c6f1ca0eff8cac86b8d44",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/DC-10-30.zip"
+}

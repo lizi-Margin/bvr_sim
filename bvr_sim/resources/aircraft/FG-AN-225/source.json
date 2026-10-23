@@ -1,0 +1,30 @@
+{
+  "set": "AN-225/AN-225-set.xml",
+  "name": "Antonov AN-225 heavy/outsize cargo aircraft (YASim fdm)",
+  "fdm_type": "yasim",
+  "fdm": "AN-225/AN-225-yasim.xml",
+  "jets": 6,
+  "model": "AN-225/Models/AN-225-model.xml",
+  "tags": [
+    "antonov",
+    "high-wing",
+    "tricycle",
+    "retractable-gear",
+    "multi-engine",
+    "jet",
+    "ifr",
+    "cargo",
+    "etops",
+    "1980s",
+    "1990s",
+    "2000s",
+    "2010s"
+  ],
+  "model_rating": 0,
+  "fdm_rating": 0,
+  "variant_of": "",
+  "archive": "AN-225.zip",
+  "archive_sha256": "92c083d1a84ee7cd3c4bef8e2589d28e24902d7e22ffdd503436ded0cbe17642",
+  "license": "FlightGear catalog GPL; see original per-file/package notices",
+  "source_url": "https://us1mirror.flightgear.org/fgaddon/Aircraft-2024/AN-225.zip"
+}

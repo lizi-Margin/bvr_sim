@@ -4,6 +4,8 @@
 #include "support/SL.hxx"
 // #include "simulator/pylon_manager.hxx"
 #include "rl/action_space.hxx"
+#include "fdm/yasim_fdm.hxx"
+#include "resource_paths.hxx"
 #include <iostream>
 #include <cmath>
 
@@ -24,7 +26,7 @@ Fighter::Fighter(
     const std::array<double, 3>& velocity_,
     double dt_,
     const std::string& fdm_type
-) noexcept
+)
     : Aircraft(uid_, model_, color_, position_, velocity_, dt_),
       _t(0.0),
       min_shoot_interval(5.0),
@@ -43,9 +45,11 @@ Fighter::Fighter(
     write_register();
 }
 
-void Fighter::initialize_fdm(const std::string& fdm_type) noexcept {
+void Fighter::initialize_fdm(const std::string& fdm_type) {
     if (fdm_type == "simple") {
         fdm = std::make_unique<SimpleFDM>(dt);
+    } else if (fdm_type == "yasim") {
+        fdm = std::make_unique<YASimFDM>(dt, resource_paths::get_resource_path("aircraft/"+aircraft_model+"/fdm.xml").string());
     } else if (fdm_type == "jsbsim") {
         std::map<std::string, std::string> kwargs;
         kwargs["aircraft_model"] = aircraft_model;
@@ -122,13 +126,16 @@ double Fighter::get_speed() const noexcept {
 }
 
 void Fighter::set_pilot_input(double heading, double climb, double throttle,
-                             std::optional<double> aileron) {
+                             std::optional<double> aileron, std::optional<double> elevator,
+                             std::optional<double> roll_rate) {
     json::JSON action=json::Object();
     action["delta_heading"]=json::Float(heading);
     action["delta_altitude"]=json::Float(climb);
     action["delta_speed"]=json::Float(0.0);
     action["throttle_cmd"]=json::Float(throttle);
     if(aileron)action["aileron_cmd"]=json::Float(*aileron);
+    if(elevator)action["elevator_cmd"]=json::Float(*elevator);
+    if(roll_rate)action["roll_rate_cmd"]=json::Float(*roll_rate);
     pilot_input_=ActionSpace(std::move(action));
 }
 
