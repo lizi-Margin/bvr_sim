@@ -2,7 +2,7 @@
 
 Source-derived albedo impostors, not AI imagery or replacement plant geometry.
 """
-import bpy,math,struct,json,random
+import bpy,math,struct,json,random,shutil
 from mathutils import Vector,Matrix
 
 def make_cluster(objects,spec,source_base_override=None,source_bounds_override=None):
@@ -32,25 +32,54 @@ def make_cluster(objects,spec,source_base_override=None,source_bounds_override=N
     for i,(x,y) in enumerate(positions):
         angle=rng.uniform(-math.pi,math.pi);scale=rng.uniform(*spec.get('scale_range',[.85,1.15]))
         base_anchor=Vector((x,y,0))+Matrix.Rotation(angle,3,'Z')@source_base*scale
-        poses.append({'position':[x,y,0],'yaw':angle,'scale':scale,'base_anchor':list(base_anchor)})
-        transform=Matrix.Translation(Vector((x,y,0)))@Matrix.Rotation(angle,4,'Z')@Matrix.Scale(scale,4)
+        z=-base_anchor.z if spec.get('ground_conform') else 0.
+        base_anchor.z+=z
+        poses.append({'position':[x,y,z],'yaw':angle,'scale':scale,'base_anchor':list(base_anchor)})
+        transform=Matrix.Translation(Vector((x,y,z)))@Matrix.Rotation(angle,4,'Z')@Matrix.Scale(scale,4)
         bounded_points.extend(transform@p for p in source_corners)
         for original in objects:
             o=original.copy();o.data=original.data.copy();o.name=f'{original.name}_source_copy_{i}'
-            bpy.context.scene.collection.objects.link(o);o.matrix_world=transform@original.matrix_world;result.append(o)
+            bpy.context.scene.collection.objects.link(o);o.matrix_world=transform@original.matrix_world
+            if spec.get('ground_conform'):
+                o['bvr_base_anchor']=list(base_anchor);o['bvr_tree_index']=i
+            result.append(o)
     for o in objects:bpy.data.objects.remove(o,do_unlink=True)
     bpy.context.view_layer.update();points=bounded_points or [o.matrix_world@Vector(c) for o in result for c in o.bound_box]
     lo=[min(p[i] for p in points) for i in range(3)];hi=[max(p[i] for p in points) for i in range(3)]
     center=Vector(((lo[0]+hi[0])/2,(lo[1]+hi[1])/2,lo[2]))
+    if spec.get('ground_conform'):center.z=0
     for o in result:o.location-=center
+    encoding=None
+    if spec.get('ground_conform'):
+        anchors=[Vector(p['base_anchor'])-center for p in poses]
+        minimum=[min(p[i] for p in anchors) for i in range(2)];span=[max(p[i] for p in anchors)-minimum[i] for i in range(2)]
+        bpy.ops.object.select_all(action='DESELECT')
+        for o in result:o.hide_set(False);o.select_set(True)
+        bpy.context.view_layer.objects.active=result[0]
+        bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
+        tree_bounds=[{'min':[math.inf]*3,'max':[-math.inf]*3} for _ in poses]
+        for o in result:
+            if len(o.data.uv_layers)!=1:raise ValueError('Ground-anchor metadata requires an unused UV1')
+            uv=o.data.uv_layers.new(name='BVR_BASE_ANCHOR');a=Vector(o['bvr_base_anchor'])-center
+            pair=((a.x-minimum[0])/span[0],1-(a.y-minimum[1])/span[1])
+            for loop in uv.data:loop.uv=pair
+            bounds=tree_bounds[o['bvr_tree_index']]
+            for vertex in o.data.vertices:
+                p=vertex.co-a
+                for axis in range(3):
+                    bounds['min'][axis]=min(bounds['min'][axis],p[axis]);bounds['max'][axis]=max(bounds['max'][axis],p[axis])
+        encoding={'method':'UV1 normalized actual tree base anchors; glTF V flip accounted for; identity mesh nodes',
+                  'min_local_xz':minimum,'span_local_xz':span,'anchor_local_y':0.,'all_passes_required':True,
+                  'tree_bounds_relative_blender':tree_bounds}
     bounds={'min':[lo[i]-center[i] for i in range(3)],'max':[hi[i]-center[i] for i in range(3)]}
     return result,bounds,{'source_copies':count,'seed':spec['seed'],'poses_before_recentering':poses,'recentering':list(center),
         'source_base_anchor_blender':list(source_base),'base_anchor_method':'Mean of source vertices within0.03m of its lowest geometry, transformed per source copy',
+        'ground_conform':encoding,
         'method':'Copies of the exact selected source tree; rigid transforms, uniform scale and offline mesh LOD simplification only'}
 
 def triangles(objects):return sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in objects if o.type=='MESH')
 
-def source_foliage_cards(objects,out,height,width,policy,render_engine):
+def source_foliage_cards(objects,out,height,width,policy,render_engine,reuse_bake=None):
     """Keep source wood in 3D; replace fragile needle geometry with source views."""
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:
@@ -68,7 +97,7 @@ def source_foliage_cards(objects,out,height,width,policy,render_engine):
     for o in foliage:o.hide_render=False
     out.mkdir(parents=True,exist_ok=True)
     cards,report=impostors(foliage,out,height,width,policy.get('resolution',1024),render_engine,
-        normal_maps=policy.get('normal_maps',False))
+        normal_maps=policy.get('normal_maps',False),reuse_bake=reuse_bake)
     for o in foliage:bpy.data.objects.remove(o,do_unlink=True)
     before=triangles(wood);reduce_meshes(wood,int(policy.get('wood_triangles_per_tree',2000)))
     return wood+cards,{'source_materials':sorted(names),'source_wood_triangles':before,'retained_wood_triangles':triangles(wood),
@@ -89,7 +118,7 @@ def alpha_mask_glb(path):
     encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*((-len(encoded))%4)
     rest=data[20+length:];path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(rest))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+rest)
 
-def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False):
+def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False,reuse_bake=None):
     if render_engine not in ['BLENDER_EEVEE','CYCLES']:raise ValueError('Unsupported source-albedo bake engine')
     out.mkdir(parents=True,exist_ok=True)
     scene=bpy.context.scene;scene.render.engine=render_engine;scene.render.film_transparent=True
@@ -123,7 +152,9 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
         distance=max(20,side*2)
         camera.location=Vector((0,0,height+distance)) if angle is None else Vector((math.sin(angle)*distance,-math.cos(angle)*distance,height/2))
         camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
-        file=out/f'source_albedo_view_{i}.png';scene.render.filepath=str(file);bpy.ops.render.render(write_still=True)
+        file=out/f'source_albedo_view_{i}.png';scene.render.filepath=str(file)
+        if reuse_bake:shutil.copy2(reuse_bake['views'][i],file)
+        else:bpy.ops.render.render(write_still=True)
         views.append((angle,file))
     if normal_maps:
         # Bake actual source surface normals into each card's tangent frame.
@@ -150,7 +181,10 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
             camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
             for axes in normal_nodes:
                 for node,axis in zip(axes,basis):node.inputs[1].default_value=axis
-            file=out/f'source_normal_view_{i}.png';scene.render.filepath=str(file);bpy.ops.render.render(write_still=True);normal_views.append(file)
+            file=out/f'source_normal_view_{i}.png';scene.render.filepath=str(file)
+            if reuse_bake:shutil.copy2(reuse_bake['normal_views'][i],file)
+            else:bpy.ops.render.render(write_still=True)
+            normal_views.append(file)
         scene.view_settings.view_transform='Standard'
     for o,materials in restored.items():
         for i,m in enumerate(materials):o.data.materials[i]=m
@@ -183,5 +217,5 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
     return planes,{'views':[str(file) for _,file in views],'resolution':resolution,'triangles':8,
         'normal_views':[str(file) for file in normal_views],
         'normal_basis':'Actual source geometry normals projected onto per-card tangent/bitangent/front-normal, Raw linear RGB; no baked directional lighting' if normal_maps else None,
-        'render_engine':render_engine,
+        'render_engine':render_engine,'reused_registered_bake':reuse_bake,
         'method':'Three source-albedo vertical views and one top view, alpha-tested crossed planes. Approximate silhouette; not full source geometry or a measured BRDF.'}

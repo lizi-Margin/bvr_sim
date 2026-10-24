@@ -10,11 +10,12 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--action',choices=['map','input','projection'],default='map')
     p.add_argument('--map',type=Path,default=ROOT/'game/maps/river_valley_airfield/generated-map.json')
     p.add_argument('--profile-file',type=Path,help='Frozen candidate player profile, without editing the game defaults')
+    p.add_argument('--visual-profile',type=Path,default=ROOT/'game/recipes/player_daylight.json',help='Explicit presentation candidate without changing game defaults')
     p.add_argument('--views',nargs='+',help='Named map cameras to capture; default captures every map camera')
     a=p.parse_args()
     os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
     g=FlightGame(render=True,visible=False,map_path=a.map,
-        visual_profile=ROOT/'game/recipes/player_daylight.json',output=a.output/'client')
+        visual_profile=a.visual_profile,output=a.output/'client')
     if a.profile_file:
         from bvr_game.player_profiles import PlayerProfileStore
         g.profile_store=PlayerProfileStore(a.profile_file)
@@ -131,6 +132,7 @@ def main():
                         'capture':g.capture(model+'_'+key),'shader_errors':g.renderer.shader_errors(),
                         'input_path':'Real FlightGame.input handler with explicit deterministic events; not a claim of physical keyboard hardware injection'})
         write_json(a.output/'report.json',{'captures':rows,'visual_settings':json.loads(g.renderer.visual_settings()),'statistics':serialize(g.renderer.statistics()),
+            'source_card_materials':serialize(g.renderer.source_card_materials()) if hasattr(g.renderer,'source_card_materials') else None,
             'map_sha256':g.scene_hash,'shader_errors':g.renderer.shader_errors(),'profile_file_sha256':g.profile_store.file_sha256,
             'native_core':str(__import__('bvr_game.app',fromlist=['native']).native.__file__)})
         print('GPU_CANDIDATE_CAPTURED',a.action,len(rows),'shader',g.renderer.shader_errors(),flush=True)

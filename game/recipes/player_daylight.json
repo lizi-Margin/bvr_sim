@@ -54,7 +54,7 @@
   },
   "shader_patch": {
     "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
-    "patched_objectHF_sha256": "061616ccb75ebd3b72ad6e9042f97a1a24c2388292596a71abea7fa5a85e49c8",
+    "patched_objectHF_sha256": "08513b20084fcd165c82a5a9ecfe41645c4317647202ece766e787b58a731e7b",
     "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
     "patched_skyHF_sha256": "a74dec34f77c16adc67783bc3d4d0be5e24e88c52be7c24db60a7e625d762e05",
     "flat_nwu_horizon_haze": "Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.",
@@ -63,6 +63,8 @@
     "pipeline": "Existing forward raster path; visibility compute shading remains off",
     "paint_material_flag": "0x42565250",
     "source_card_material_flag": "0x42565256",
+    "source_card_backface_normals": "For registered source-volume cards only, mirror normal depth while retaining texture tangent/bitangent components on backfaces. Source images, alpha/depth and standard materials unchanged. Opposite-side volume lighting remains an impostor approximation.",
+    "source_card_normal_encoding": "Exact retained source PNG loaded once per view as linear RGBA8; decode all three averaged normal channels for explicitly marked source-volume cards. No inferred hemisphere, altered source vectors or global normal-map change.",
     "water_refraction_depth": "Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias."
   },
   "provenance": {
@@ -80,6 +82,7 @@
   "temporal_aa": true,
   "fxaa": false,
   "source_surface_corrections": true,
+  "source_card_full_rgb_normals": true,
   "canopy_color": [
     0.06,
     0.045,

@@ -134,3 +134,18 @@ python game/tools/build_river_valley_recipe.py --bake --outer-cover --river-chan
 林簇继续使用原源树、数量预算、尺度、LOD 和视距，中心改为按林区面积均匀采样；实际接地拒绝仍可能使最终簇数略有差别。林下宏观颜色使用真实源材质的线性均值，独立的 3m 运行时地面细节保留，避免把米级源林下斑块放大到 160m。布局与农作物覆盖均为工程创作，不是 GIS、实测农业或树种密度资料。
 
 当前候选有 5,123 块田、10,078 个源林簇，比旧候选多 9 簇。所有高度数组、道路/接触面和障碍物均与旧图相同；土地覆盖、颜色与装饰实例数据变化，因此高度 NPZ 整体哈希不同，必须固定新的不可变版本进行重放。均匀分布减少了大空洞，但源簇的重复圆团轮廓仍明显，森林尚未通过自然画面验收；默认地图与主启动入口暂不切换。
+
+## 源树卡片的双面法线
+
+`prepare_player_visuals.py` 在项目自己的 shader 缓存中修正已注册 `source_impostor_*` 树卡片的背面切线基，不修改 Wicked 上游。源法线描述的是投影到卡片上的树体；从卡片背后观察时，镜像其深度分量，保留纹理横向和纵向分量，避免把向上的枝叶法线翻成向下。普通材质继续使用引擎原双面处理，源图片、源几何、透明度、深度与物理数据保持。它仍是镜像已烘焙视图的近似，不能恢复真实树的背面几何。
+
+日间配方的 `source_card_full_rgb_normals` 为明确声明源法线烘焙视图的卡片保留原 PNG 的三个线性通道。渲染器用独立共享的 RGBA8 资源加载这些图片，避免 BC5 丢弃蓝通道；shader 读取完整 RGB 向量，其他材质保留原 RG 路径。源图中一个像素可能平均了多个表面法线，向量长度不是 1，因此不能仅从 RG 推算 `sqrt(1-x*x-y*y)`。旧资源未声明源法线视图时保留原路径，声明了却缺失图片时明确报错。`renderer.source_card_materials()` 返回实际资源格式、尺寸、mipmap 数量和 `rgb_preserved`，可直接核对 GPU 资源。当前源林簇 8 张共享 RGBA 法线图的 texel/mipmap 大小约 42.7MiB，另有 GPU 分配和缓存开销；不能用这个大小冒充显存总量或性能验收。
+
+```powershell
+python game/tools/prepare_player_visuals.py
+python game/tools/validate_vegetation_lighting.py --map PATH_TO_IMMUTABLE_MAP.json --visual-profile game/recipes/player_daylight.json --output NEW_INSPECTION_DIRECTORY
+```
+
+检查工具把一簇未修改的真实源树放在空中，暂停物理时间，以相同光照、相机和强制近/远 LOD 检查树卡片，隔离地形接触和地面阴影的影响；这不是地图或性能验收。`--classify-normals` 只用于显式输出红/绿法线诊断色的独立 shader，`--expect-up` 只用于已知向上向量的专用探针。真实源法线包含向下的枝叶，不能要求它们全部向上。正常光照下的改变主要是局部受光方向，平均明暗变化很小；森林过暗、重复圆团与最终自然画面仍需要独立处理。
+
+`--normal-error-probe --split-rgb-probe --expect-rgb-match` 仅用于专用 GPU 对照：左半实际执行旧 RG 解码，右半执行 RGB 解码，两者共用同一原始 RGBA 纹理、真实模型和相机，再与完整源向量比较，绿色为误差不超过 1°。这些诊断 shader 保存在验证目录，不写入正常配方。`capture_player_visuals.py --visual-profile PATH_TO_CANDIDATE.json` 也可直接检查独立视觉候选。曾隔离关闭树卡片接收阴影，亮度仅增加约 8%，不能解释或解决全部远景过暗；正常配置继续保留阴影。

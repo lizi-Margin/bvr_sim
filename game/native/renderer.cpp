@@ -406,6 +406,7 @@ class Renderer {
                                outer_colors, terrain_materials);
     }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
+    std::vector<SourceCardMaterialState> source_card_materials() const { return baked_world->source_card_materials(); }
     std::optional<std::array<float,4>> reflection_plane() const {
         const auto& visibility=path->visibility_main;
         if(!visibility.planar_reflection_visible)return std::nullopt;
@@ -835,6 +836,11 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readonly("chunk_instances", &SceneStats::chunk_instances)
         .def_readonly("visible_lods", &SceneStats::visible_lods)
         .def_readonly("visible_chunks", &SceneStats::visible_chunks);
+    py::class_<SourceCardMaterialState>(m,"SourceCardMaterialState")
+        .def_readonly("name",&SourceCardMaterialState::name).def_readonly("normal_resource",&SourceCardMaterialState::normal_resource)
+        .def_readonly("normal_format",&SourceCardMaterialState::normal_format).def_readonly("width",&SourceCardMaterialState::width)
+        .def_readonly("height",&SourceCardMaterialState::height).def_readonly("mip_levels",&SourceCardMaterialState::mip_levels)
+        .def_readonly("rgb_preserved",&SourceCardMaterialState::rgb_preserved);
     py::class_<HudText>(m, "HudText")
         .def(py::init<>())
         .def_readwrite("x", &HudText::x)
@@ -894,6 +900,7 @@ PYBIND11_MODULE(bvr_game_render, m) {
              py::arg("outer_cover"), py::arg("outer_colors"),
              py::arg("terrain_materials")=std::vector<std::string>{})
         .def("statistics", &Renderer::statistics)
+        .def("source_card_materials", &Renderer::source_card_materials)
         .def("reflection_plane", &Renderer::reflection_plane)
         .def("preview_aircraft", &Renderer::preview_aircraft)
         .def("aircraft_statistics", &Renderer::aircraft_statistics)

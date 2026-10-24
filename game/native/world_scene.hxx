@@ -35,6 +35,11 @@ struct SceneStats {
     std::map<std::string, uint64_t> visible_chunks;
     std::array<uint64_t, 2> visible_lods{0, 0};
 };
+struct SourceCardMaterialState {
+    std::string name, normal_resource;
+    uint32_t normal_format=0, width=0, height=0, mip_levels=0;
+    bool rgb_preserved=false;
+};
 class WorldScene {
     struct Part {
         wi::ecs::Entity mesh;
@@ -89,10 +94,29 @@ class WorldScene {
             std::ifstream manifest_stream(manifest_path);nlohmann::json manifest;manifest_stream>>manifest;
             const auto& impostor=manifest.value("impostor",nlohmann::json::object());
             if(impostor.is_object()&&impostor.value("view_facing_alpha",false)){
+                const auto& source_bake=impostor.value("source_tree_bake",impostor);
+                const bool declared_source_normals=source_bake.is_object()&&source_bake.contains("normal_views")&&
+                    source_bake.at("normal_views").is_array()&&!source_bake.at("normal_views").empty();
                 for(size_t i=0;i<loaded.materials.GetCount();++i){
                     auto n=loaded.names.GetComponent(loaded.materials.GetEntity(i));
                     if(n&&n->name.starts_with("source_impostor_")){
                         auto& m=loaded.materials[i];m.userdata.x=0x42565256u;m.SetDirty();
+                        if(declared_source_normals&&material_profile.is_object()&&material_profile.value("source_card_full_rgb_normals",false)){
+                            // These are projected, averaged source-volume normals,
+                            // not small tangent-space bumps. BC5 discards their
+                            // independent blue component and cannot reconstruct it
+                            // after spatial averaging. Retain the exact source PNG
+                            // in a separate linear RGBA resource; all instances share it.
+                            auto& slot=m.textures[wi::scene::MaterialComponent::NORMALMAP];
+                            if(!slot.resource.IsValid())throw std::runtime_error("Source card has no registered normal image");
+                            const auto& bytes=slot.resource.GetFileData();
+                            if(bytes.empty())throw std::runtime_error("Source card normal image bytes were not retained");
+                            const auto key=slot.name+".bvr-source-rgb.png";
+                            auto rgb=wi::resourcemanager::Load(key,wi::resourcemanager::Flags::IMPORT_RETAIN_FILEDATA|wi::resourcemanager::Flags::IMPORT_NORMALMAP,bytes.data(),bytes.size());
+                            if(!rgb.IsValid()||rgb.GetTexture().GetDesc().format!=wi::graphics::Format::R8G8B8A8_UNORM)
+                                throw std::runtime_error("Source card RGB normals require a linear RGBA8 texture");
+                            slot.name=key;slot.resource=rgb;m.userdata.y=0x5247424eu;m.SetDirty();
+                        }
                     }
                 }
             }
@@ -528,6 +552,24 @@ class WorldScene {
             result.visible_chunks[instances[index].spec.chunk]++;
         }
         result.visible_mesh_subset_groups = groups.size();
+        return result;
+    }
+    std::vector<SourceCardMaterialState> source_card_materials() const {
+        std::vector<SourceCardMaterialState> result;
+        for(size_t i=0;i<scene.materials.GetCount();++i){
+            const auto& material=scene.materials[i];
+            if(material.userdata.x!=0x42565256u)continue;
+            const auto& slot=material.textures[wi::scene::MaterialComponent::NORMALMAP];
+            SourceCardMaterialState item;
+            auto name=scene.names.GetComponent(scene.materials.GetEntity(i));item.name=name?name->name:"";
+            item.normal_resource=slot.name;
+            if(slot.resource.IsValid()){
+                const auto& desc=slot.resource.GetTexture().GetDesc();
+                item.normal_format=uint32_t(desc.format);item.width=desc.width;item.height=desc.height;item.mip_levels=desc.mip_levels;
+                item.rgb_preserved=material.userdata.y==0x5247424eu&&desc.format==wi::graphics::Format::R8G8B8A8_UNORM;
+            }
+            result.push_back(std::move(item));
+        }
         return result;
     }
     double render_surface_height(double north, double west, double reference = INFINITY) const {

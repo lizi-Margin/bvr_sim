@@ -73,6 +73,9 @@ def main():
 '''
     assert object_source.count(object_anchor)==1
     object_source=object_source.replace(object_anchor,object_anchor+object_hook)
+    from bvr_game.vegetation_shaders import patch_source_card_basis,patch_source_card_rgb_normals
+    object_source=patch_source_card_basis(object_source)
+    object_source=patch_source_card_rgb_normals(object_source)
     water_depth_anchor='water_depth = max(water_depth, -dot(float4(refraction_position, 1), water_plane));'
     assert object_source.count(water_depth_anchor)==1
     object_source=object_source.replace(water_depth_anchor,'''// The coarse depth search only chooses/rejects a refracted UV. Its
@@ -93,7 +96,7 @@ def main():
     profile={**before,'name':'player_daylight','shader_source':str(source),'shader_cache':str(binary),
         'sun_rotation':[-.4,-.65,0],'ambient':[.13,.14,.15],
         'exposure':2.,'sky_exposure':1.,'sun_energy':4.,'temporal_aa':True,'fxaa':False,
-        'source_surface_corrections':True,
+        'source_surface_corrections':True,'source_card_full_rgb_normals':True,
         'canopy_color':[.06,.045,.02],'canopy_alpha':.15,'canopy_transmission':0.,
         'f22_paint_knee':.18,'f22_paint_shoulder':.09,'f22_paint_floor':.02,
         'scenery_materials':{'leaf_albedo':[.025,.075,.018],'bark_albedo':[.09,.06,.035],
@@ -105,6 +108,8 @@ def main():
     for key in ['base_color','normal','roughness_map']:profile['terrain_detail'][key+'_sha256']=sha(grass[key])
     profile['shader_patch']={**before['shader_patch'],'patched_skyHF_sha256':sha(sky),
         'patched_objectHF_sha256':sha(object_file),'paint_material_flag':'0x42565250','source_card_material_flag':'0x42565256',
+        'source_card_backface_normals':'For registered source-volume cards only, mirror normal depth while retaining texture tangent/bitangent components on backfaces. Source images, alpha/depth and standard materials unchanged. Opposite-side volume lighting remains an impostor approximation.',
+        'source_card_normal_encoding':'Exact retained source PNG loaded once per view as linear RGBA8; decode all three averaged normal channels for explicitly marked source-volume cards. No inferred hemisphere, altered source vectors or global normal-map change.',
         'water_refraction_depth':'Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias.',
         'flat_nwu_horizon_haze':'Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.'}
     profile['provenance']={**before['provenance'],'detail_textures':'Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes',
@@ -115,7 +120,9 @@ def main():
     profile['provenance']['geometry']='Original registered FlightGear exterior geometry retained; F16 adds original source pilot_externalview.ac and Cockpit/Main/cockpit.ac, without new invented geometry or physical changes.'
     from bvr_game.exhaust_profiles import build_document
     exhaust_file=ROOT/'game/config/aircraft_exhaust_profiles.json'
-    write_changed(exhaust_file,json.dumps(build_document(),ensure_ascii=False,indent=2)+'\n')
+    # Match content.write_json's canonical bytes, including no final newline,
+    # so preparing shaders does not change an otherwise identical policy hash.
+    write_changed(exhaust_file,json.dumps(build_document(),ensure_ascii=False,indent=2))
     profile['aircraft_exhaust_profiles_file']='../config/aircraft_exhaust_profiles.json'
     profile['aircraft_exhaust_profiles_sha256']=sha(exhaust_file)
     profile['provenance']['imported_exhausts']='Source FDM capability and existing normalized REHEAT snapshot output required. Source dry engines and unavailable state do not get throttle-created glow. Attachments and emission remain engineering approximations; ordinary F22/F16 retain their separate legacy effect.'
