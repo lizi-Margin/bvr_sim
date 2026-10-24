@@ -9,6 +9,13 @@ KENNEY={
  'city-kit-industrial':{'name':'City Kit Industrial','tags':['warehouse','tank','industrial']},
  'city-kit-suburban':{'name':'City Kit Suburban','tags':['house','village','building']}}
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+def registered_version(asset_id,manifest):
+    result={'sha256':manifest['glb_sha256'],'lods':manifest['lods']}
+    # External mip resources can change without changing a GLB. Freeze their
+    # manifest too, which in turn declares every sidecar hash and sampling rule.
+    if manifest.get('source_card_mips'):result['manifest_sha256']=sha(ASSETS/'registered'/asset_id/'manifest.json')
+    return result
 def get(url):
     request=urllib.request.Request(url,headers={'User-Agent':'BVRSimSceneBuilder/2.0 (content research)'})
     with urllib.request.urlopen(request,timeout=60) as response:return response.read()

@@ -128,7 +128,7 @@ def rebuild_forests(recipe,source_scene,document):
     from .worldgen import Baker
     from .heightfield import sample_grid
     from .grove_grounding import conform_grove
-    from .content import sha
+    from .content import sha,registered_version
     class HeightView:
         def height_many(self,n,w):
             n,w=np.broadcast_arrays(n,w);meta=document['terrain'];arrays=source_scene.arrays
@@ -156,7 +156,7 @@ def rebuild_forests(recipe,source_scene,document):
     for category,key in [('vegetation','vegetation_instances'),('building','building_instances'),('prop','prop_instances')]:
         if document['counts'][category]>recipe['budgets'][key]:raise ValueError('Source forest rebuild exceeds '+key)
     for id in set(i['model'] for i in source_items):
-        m=baker.metadata[id];document['resource_versions'][id]={'sha256':m['glb_sha256'],'lods':m['lods']}
+        m=baker.metadata[id];document['resource_versions'][id]=registered_version(id,m)
     if document.get('environment') is not None:document['environment']['decorative_instance_ids']=[i['id'] for i in baker.instances if i['category']!='building']
     document['forest_representation']={'independently_grounded_groves':len(source_items),'independently_grounded_source_trees':sum(len(i['ground_stems']) for i in source_items),
         'unused_shared_mesh_slots':sum(i['independent_source_layout']['source_slots']-len(i['ground_stems']) for i in source_items),'maximum_batch_axis_extent_m':max(float(np.ptp(i['ground_stems'],axis=0).max()) for i in source_items),

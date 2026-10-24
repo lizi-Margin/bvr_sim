@@ -203,3 +203,28 @@ python game/tools/build_river_valley_recipe.py --replace-forest-map SOURCE_IMMUT
 `--maximum-alpha-control` 只用于负对照：与面积版本每级RGB、法线DDS、mip0、纹理格式和级数相同，仅albedo低级alpha不同。另有保留alpha/法线、仅改为编码RGB过滤的私有诊断，不能当作正常资源。完整地图实际对照保留652,800株树、相同视距及输入三角形量；面积版本减弱了远处实心色块。原引擎基线还与DDS对照存在压缩、级数和法线过滤差别，不能把全部改善只归因于一个alpha开关。
 
 该候选采用未压缩RGBA8 DDS，按唯一纹理估算比原压缩albedo增加约32MiB GPU纹理数据，实际预算与性能仍需最终地图测量。硬alpha-test、关闭TAA、跨视角卡片及完整动态自然度尚未验收；面积平均也不等于多张交叉卡片光学厚度的准确积分。默认地图和启动入口未切换。
+
+卡片与真实源树的视角误差可用现有注册资源直接审计：
+
+```powershell
+& 'C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe' --background --python-exit-code 1 --python game/tools/audit_vegetation_views.py -- --asset fir_grove_stream_a --output NEW_AUDIT_DIRECTORY
+```
+
+工具先验证源文件依赖及注册GLB内嵌图像，再复用同一组源烘焙图，不重画树形。固定正交相机分别渲染真实源几何、交叉卡片及采用当前朝向alpha权重的卡片，共6组仰角/方位、18张无光照RGBA图。输出包含相机、来源、工具哈希和渐进报告；不会修改注册库、地图或默认入口。它使用Cycles的独立透明路径，不是Wicked/TAA、远距mip、阴影、运行性能或最终森林画面的验收。
+
+v54实际对照确认现有资产已有顶视图。30°–70°斜俯视同时存在漏失和多出轮廓，70°朝向加权卡片的alpha积分约为真实源树的80%，垂直顶视则接近100%。因此面积mip与逐树噪声相位只能处理采样问题，不能恢复缺失的斜向形状；后续视角表示应对照真实源几何改进，不能用增加树量或统一增大alpha代替。逐树相位仍为隔离的诊断候选，未写入默认shader。
+
+## 透明边框裁切与资源版本
+
+```powershell
+python game/tools/assets.py mip-variant fir_grove_stream_crop_area_a --source fir_grove_stream_a --crop-transparent
+python game/tools/build_river_valley_recipe.py --replace-forest-map ORIGINAL_RESOURCE_IMMUTABLE_MAP.json --forest-asset fir_grove_stream_crop_area_a --output NEW_CANDIDATE_DIRECTORY --recipe-output NEW_CANDIDATE_RECIPE.json
+```
+
+该派生用颜色/法线alpha并集和8px边框，选择包含全部非零alpha的最小二次幂矩形。保留原始RGBA子矩形，不重采样、不提高alpha、不重画树形；调整卡片顶点，使对应源像素仍处于原有空间位置。当前侧视图为512×1024、顶视图512×512，完整矩形mip链由现有DDS工具生成。材质法线、UV0、UV1树索引、索引、木质几何、树位/姿态及原保守边界保留。只改变透明支撑面的范围和纹理采样网格，原斜向形状限制仍在。
+
+替换工具会从原始注册GLB独立重算裁切，不能只靠新manifest中的SHA通过验证。现有杉树DDS文件数据从89,480,832降到39,149,216字节，源卡片支撑面总面积为原来的43.75%；这些是文件/几何数据，不能直接称为实测显存或FPS收益。5cm顶点修改即使同步更新manifest里的GLB哈希，仍会被独立派生校验拒绝。
+
+新烘焙、森林重建及替换配方会把外置mip资源的manifest SHA写进resource_versions，运行时同时校验manifest及其DDS哈希。此前不可变替换候选已有source_card_resource_swap.registered_manifest_sha256，加载器继续使用其冻结值；移除mip声明也不能绕过它。没有冻结manifest版本的早期外置mip诊断地图需生成新版本，普通GLB地图的读取保持原有行为。
+
+离线源树转换现在允许配方声明impostor_aerial_views（方位/仰角，度）。它生成真实源几何的额外无光照颜色和RGB法线，原四张验证过的图可以逐字节复用；尚无方向采样器时，额外视图只能离线审计，不能把所有平面直接叠入游戏。v55的45°/70°两圈、每圈8个方位仅存于独立work原型，未注册为运行资源。实际六组对照显示：简单最近视图在70°明显改善，但部分低角度更差；沿源twig面积重心调整深度也不足以解决，尚未通过连续视角验收。

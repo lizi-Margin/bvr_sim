@@ -53,12 +53,22 @@ class BakedScene:
             meta=self.document['terrain']['ground_atlas']
             if not hasattr(renderer,'configure_ground_atlas'):raise RuntimeError('Map requires the native source-tree ground atlas interface; rebuild the renderer')
             renderer.configure_ground_atlas(self.ground_atlas,meta['origin_north'],meta['origin_west'],meta['spacing'],meta['sha256'])
+        frozen_canopy_assets={p['model'] for p in self.document.get('instances',[]) if 'ground_stems' in p}
+        swap=self.document.get('source_card_resource_swap',{})
         for id,version in self.document['resource_versions'].items():
             directory=ASSETS/'registered'/id
             for lod in version['lods']:
                 if sha(directory/lod['file'])!=lod['sha256']:raise ValueError('Baked map resource version mismatch: '+id)
-            manifest=json.loads((directory/'manifest.json').read_text(encoding='utf8'))
+            manifest_file=directory/'manifest.json';manifest=json.loads(manifest_file.read_text(encoding='utf8'))
+            if (manifest.get('impostor') or {}).get('requires_directional_view_selection'):raise RuntimeError('Offline aerial source views require a directional source view sampler; overlapping all source planes is unsupported')
+            expected_manifest=version.get('manifest_sha256')
+            if not expected_manifest and (manifest.get('source_card_mips') or id in frozen_canopy_assets or id==swap.get('asset_id')):
+                # v53/v55 immutable replacement maps already froze this hash
+                # in their swap provenance. Retain that exact recorded version.
+                expected_manifest=swap.get('registered_manifest_sha256')
+            if expected_manifest and sha(manifest_file)!=expected_manifest:raise ValueError('Baked map resource manifest version mismatch: '+id)
             if manifest.get('source_card_mips'):
+                if not expected_manifest:raise ValueError('Explicit source-card mips require a versioned manifest: '+id)
                 if not getattr(bindings,'SOURCE_CARD_AREA_MIPS',False):raise RuntimeError('Map requires native explicit source-card mip loading; rebuild the renderer')
                 checked={}
                 for materials in manifest['source_card_mips']['materials_by_lod_file'].values():

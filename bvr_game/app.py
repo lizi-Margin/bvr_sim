@@ -392,7 +392,7 @@ class FlightGame:
         # Three different symbols: amber aim ring, white nose cross, cyan path
         # ring/wings. All positions are projected from real world directions.
         self.flight_marks={};self.flight_mark_labels={};self.flight_mark_projection={};mark_label_boxes=[]
-        if p:
+        if p and self.mode!='result':
             distance=self.player_profile['input']['aim_distance_m']
             for name,direction,color in [('AIM',self.player_input.direction,0xff77dfff),('NOSE',body_forward(p.orientation),WHITE),('PATH',unit(p.velocity),0xfff5e575)]:
                 mark=self.renderer.project([p.position[i]+direction[i]*distance for i in range(3)])
@@ -416,7 +416,7 @@ class FlightGame:
                 mark_label_boxes.append(label);text(label[0],label[1],caption,12,color)
                 labels.rectangles.extend([(label[0],label[1],label[0]+label[2],label[1]+label[3]),(x-16,y-16,x+16,y+16)])
                 self.flight_mark_labels[name]=list(label);self.flight_marks[name]=[x*sx,y*sy]
-        for c in frame.contacts:
+        for c in (frame.contacts if self.mode!='result' else []):
             v=self.renderer.project(c.position)
             if 0<v[2]<1:
                 x,y=min(max(v[0]/sx,450),1490),min(max(v[1]/sy,200),760);color=GREEN if c.locked else RED
@@ -492,7 +492,7 @@ class FlightGame:
             eta=f'{m.eta:.1f}s' if m.eta>=0 else 'opening'
             text(40,440+i*62,f'AIM-120 IN FLIGHT / {m.age:.1f}s',18,GREEN)
             text(40,465+i*62,f'{m.range/1000:.1f} km / ETA ~{eta} / '+('ACTIVE' if m.seeker_active else 'MIDCOURSE'),17)
-        if frame.mission in ('strike','combined'):
+        if frame.mission in ('strike','combined') and self.mode!='result':
             target=self.map['ground_target']['position'];q=self.renderer.project(target)
             if 0<q[2]<1:
                 x,y=min(max(q[0]/sx,450),1490),min(max(q[1]/sy,200),760);box(x-16,y-16,32,32,RED)

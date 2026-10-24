@@ -9,6 +9,7 @@ def reusable_bakes(spec,source_sha,policy):
     if old['source_sha256']!=source_sha:raise ValueError('Reuse source tree differs')
     for key in ['select_object','height_m','foliage_cards','impostor_resolution','impostor_normal_maps']:
         if original.get(key)!=policy.get(key):raise ValueError('Reuse bake settings differ: '+key)
+    if original.get('impostor_aerial_views') and original['impostor_aerial_views']!=policy.get('impostor_aerial_views'):raise ValueError('Reuse aerial view directions differ')
     def validate(lod,bake):
         file=path.parent/old['lods'][lod]['file'];data=file.read_bytes()
         if hashlib.sha256(data).hexdigest()!=old['lods'][lod]['sha256']:raise ValueError('Reuse GLB changed')
@@ -22,7 +23,7 @@ def reusable_bakes(spec,source_sha,policy):
                 images.setdefault((kind,int(match[1])),set()).add(sha)
         hashes={}
         for kind in ['views','normal_views']:
-            if len(bake[kind])!=4:raise ValueError('Four source bake views required')
+            if len(bake[kind])!=4+len(original.get('impostor_aerial_views',[])):raise ValueError('Source bake view count differs from registered directions')
             for i,name in enumerate(bake[kind]):
                 sha=hashlib.sha256(Path(name).read_bytes()).hexdigest()
                 if sha not in images[(kind,i)]:raise ValueError('Reuse PNG differs from registered embedded source image')

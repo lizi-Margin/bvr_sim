@@ -54,7 +54,7 @@ if per_tree_far:
     # in the far mesh. Never expand the multi-million-triangle tree64times
     # merely to produce a single flat whole-grove billboard.
     tree_far,tree_report=impostors(meshes,out/'single_tree',hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),
-        policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'),normal_maps=policy.get('impostor_normal_maps',False),reuse_bake=reuse['far'] if reuse else None)
+        policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'),normal_maps=policy.get('impostor_normal_maps',False),reuse_bake=reuse['far'] if reuse else None,additional_views=policy.get('impostor_aerial_views',()))
     far,bounds,cluster_report=make_cluster(tree_far,policy['cluster'],source_base,source_bounds)
     lo,hi=bounds['min'],bounds['max']
     bpy.ops.object.select_all(action='DESELECT')
@@ -72,7 +72,7 @@ if per_tree_far:
         for o in preview:bpy.data.objects.remove(o,do_unlink=True)
     slo,shi=source_bounds
     hybrid,foliage_report=source_foliage_cards(meshes,out/'near_foliage',shi[2],max(shi[0]-slo[0],shi[1]-slo[1]),
-        policy['foliage_cards'],policy.get('impostor_engine','BLENDER_EEVEE'),reuse_bake=reuse['near'] if reuse else None)
+        policy['foliage_cards'],policy.get('impostor_engine','BLENDER_EEVEE'),reuse_bake=reuse['near'] if reuse else None,additional_views=policy.get('impostor_aerial_views',()))
     meshes,_,near_report=make_cluster(hybrid,policy['cluster'],source_base,source_bounds)
     assert near_report['poses_before_recentering']==cluster_report['poses_before_recentering']
     if cluster_report.get('ground_conform'):
@@ -84,7 +84,8 @@ if per_tree_far:
     impostor_report={**aggregate_report,'triangles':triangles(far),'source_tree_bake':tree_report,
         'method':'Individual positioned source-tree crossed cards in one shared mesh. Grove preview images are for the existing ground-canopy proxy only; no whole-grove far billboard.',
         'source_trees':cluster_report['source_copies'],'aggregate_preview_bake':aggregate_report,
-        'view_facing_alpha':policy.get('impostor_view_facing_alpha',False)}
+        'view_facing_alpha':policy.get('impostor_view_facing_alpha',False),
+        'requires_directional_view_selection':bool(policy.get('impostor_aerial_views'))}
 elif policy.get('foliage_cards'):
     if not policy.get('cluster') or not policy.get('impostor'):raise ValueError('Foliage cards require the source grove/far-bake policy')
     for o in meshes:

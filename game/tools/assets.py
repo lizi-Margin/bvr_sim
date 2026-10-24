@@ -17,6 +17,7 @@ def inspect(asset_id):
                 path=(root/item['file']).resolve()
                 if not path.is_relative_to(root.resolve()) or hashlib.sha256(path.read_bytes()).hexdigest()!=item['sha256']:raise ValueError('Source card mip sidecar mismatch: '+asset_id)
     if m['faces']>100000:raise ValueError('Asset exceeds prototype face budget')
+    if (m.get('impostor') or {}).get('requires_directional_view_selection'):raise ValueError('Offline aerial source views require a directional source view sampler before registration or placement')
     return m
 def main():
     p=argparse.ArgumentParser(description=__doc__);s=p.add_subparsers(dest='action',required=True)
@@ -24,11 +25,12 @@ def main():
     r.add_argument('--recipe',type=Path,help='Optional source-object selection, explicit height and LOD/impostor conversion policy')
     i=s.add_parser('inspect');i.add_argument('id')
     d=s.add_parser('mip-variant');d.add_argument('id');d.add_argument('--source',required=True);d.add_argument('--maximum-alpha-control',action='store_true')
+    d.add_argument('--crop-transparent',action='store_true',help='Crop only zero-opacity margins and reparameterize source quads before generating rectangular mips')
     a=s.add_parser('place');a.add_argument('id');a.add_argument('--map',type=Path,default=GAME/'maps/training.json');a.add_argument('--name',required=True);a.add_argument('--position',nargs=3,type=float,required=True);a.add_argument('--scale',type=float,default=1)
     args=p.parse_args()
     if args.action=='mip-variant':
         sys.path.insert(0,str(GAME.parent));from bvr_game.card_mips import derive
-        derive(args.source,args.id,maximum_alpha=args.maximum_alpha_control)
+        derive(args.source,args.id,maximum_alpha=args.maximum_alpha_control,crop_transparent=args.crop_transparent)
     if args.action=='register':
         if not args.id.replace('_','').replace('-','').isalnum():raise ValueError('Invalid asset id')
         command=[args.blender,'--background','--python-exit-code','1','--python',str(HERE/'convert_environment.py'),'--',str(args.entry),str(args.manifest),args.id,str(GAME/'assets/registered'/args.id)]
@@ -41,6 +43,7 @@ def main():
             for lod in m['lods']:r['models'][args.id+('' if lod['level']==0 else '::lod1')]=str((GAME/'assets/registered'/args.id/lod['file']).resolve())
             runtime.write_text(json.dumps(r,indent=2),encoding='utf8')
             inventory=[json.loads(p.read_text(encoding='utf8')) for p in (GAME/'assets/registered').glob('*/manifest.json') if p.parent.name!='audio']
+            inventory=[m for m in inventory if not (m.get('impostor') or {}).get('requires_directional_view_selection')]
             (GAME/'assets/catalog.json').write_text(json.dumps({'schema_version':2,'assets':inventory},indent=2),encoding='utf8')
     if args.action=='place':
         if args.scale<=0:raise ValueError('Asset scale must be positive')

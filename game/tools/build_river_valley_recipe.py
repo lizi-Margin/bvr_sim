@@ -86,7 +86,7 @@ def main():
     p.add_argument('--rural-layout',action='store_true',help='Full bake: road-oriented recursive fields and area-uniform forest placement; requires --forest-floor-only')
     p.add_argument('--retexture-map',type=Path,help='Rebake materials of a verified immutable map, preserving all terrain and scene geometry')
     p.add_argument('--rebuild-forest-map',type=Path,help='Resample source trees through the existing Baker, preserving source terrain/material/contact/mission and ordinary placements')
-    p.add_argument('--replace-forest-map',type=Path,help='Replace canopy references with a registered texture variant having exactly the same GLBs and source anchors; preserve every placement')
+    p.add_argument('--replace-forest-map',type=Path,help='Replace canopy references with an exact-GLB texture variant or independently verified transparent-card crop; preserve every placement')
     p.add_argument('--forest-edge-width-m',type=float,help='Independent source trees: gradual boundary density width; preserves total tree count')
     p.add_argument('--forest-floor-transition',action='store_true',help='Material-only rebake: mix source grass/forest ground with existing declared canopy edge density')
     a=p.parse_args()
@@ -115,7 +115,11 @@ def main():
             if a.replace_forest_map:
                 for old in source_canopy:
                     original_manifest=json.loads((ROOT/'game/assets/registered'/old/'manifest.json').read_text(encoding='utf8'))
-                    if any(original_manifest[k]!=forest[k] for k in ['lods','cluster','bounds_blender']):p.error('Resource replacement requires exact source GLBs, anchors and bounds')
+                    if any(original_manifest[k]!=forest[k] for k in ['cluster','bounds_blender']):p.error('Resource replacement requires exact source anchors and conservative bounds')
+                    if original_manifest['lods']!=forest['lods']:
+                        if not forest.get('source_card_crop'):p.error('Resource replacement requires exact source GLBs or a verifiable zero-opacity crop')
+                        from bvr_game.card_crop import verify_variant
+                        verify_variant(old,a.forest_asset)
             r['asset_roles']['canopy']=[a.forest_asset]
             for rule in r['scatter_rules']:
                 if rule['roles']=='canopy':rule['spatial_batch_extent_m']=250
@@ -168,9 +172,10 @@ def main():
             for item in doc['instances']:
                 if item['model'] in source_canopy:item['model']=a.forest_asset;changed+=1
             for old in source_canopy:doc['resource_versions'].pop(old)
-            doc['resource_versions'][a.forest_asset]={'sha256':forest['glb_sha256'],'lods':forest['lods']}
+            from bvr_game.content import registered_version
+            doc['resource_versions'][a.forest_asset]=registered_version(a.forest_asset,forest)
             doc['recipe_sha256']=hashlib.sha256(canonical(r)).hexdigest()
-            doc['source_card_resource_swap']={'source_map':str(a.replace_forest_map),'source_map_sha256':sha(a.replace_forest_map),'changed_model_references':changed,'registered_manifest_sha256':sha(ROOT/'game/assets/registered'/a.forest_asset/'manifest.json'),'operation':'Exact GLB/source-anchor texture variant; all placements and physical environment frozen'}
+            doc['source_card_resource_swap']={'source_map':str(a.replace_forest_map),'source_map_sha256':sha(a.replace_forest_map),'changed_model_references':changed,'registered_manifest_sha256':sha(ROOT/'game/assets/registered'/a.forest_asset/'manifest.json'),'operation':('Verified zero-opacity source-card crop' if forest.get('source_card_crop') else 'Exact GLB/source-anchor texture variant')+'; all placements and physical environment frozen'}
             for key in ['surfaces','environment','mission','fields','roads','rivers','airfields','settlements','chunks','counts','forest_representation']:assert doc[key]==original.document[key],key
             assert sha(stage/'terrain.npz')==original.document['terrain']['sha256']
             write_json(stage/'scene-recipe.json',r);write_json(stage/'generated-map.json',doc)

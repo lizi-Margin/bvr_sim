@@ -83,7 +83,7 @@ def make_cluster(objects,spec,source_base_override=None,source_bounds_override=N
 
 def triangles(objects):return sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in objects if o.type=='MESH')
 
-def source_foliage_cards(objects,out,height,width,policy,render_engine,reuse_bake=None):
+def source_foliage_cards(objects,out,height,width,policy,render_engine,reuse_bake=None,additional_views=()):
     """Keep source wood in 3D; replace fragile needle geometry with source views."""
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:
@@ -101,7 +101,7 @@ def source_foliage_cards(objects,out,height,width,policy,render_engine,reuse_bak
     for o in foliage:o.hide_render=False
     out.mkdir(parents=True,exist_ok=True)
     cards,report=impostors(foliage,out,height,width,policy.get('resolution',1024),render_engine,
-        normal_maps=policy.get('normal_maps',False),reuse_bake=reuse_bake)
+        normal_maps=policy.get('normal_maps',False),reuse_bake=reuse_bake,additional_views=additional_views)
     for o in foliage:bpy.data.objects.remove(o,do_unlink=True)
     before=triangles(wood);reduce_meshes(wood,int(policy.get('wood_triangles_per_tree',2000)))
     return wood+cards,{'source_materials':sorted(names),'source_wood_triangles':before,'retained_wood_triangles':triangles(wood),
@@ -122,7 +122,7 @@ def alpha_mask_glb(path):
     encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*((-len(encoded))%4)
     rest=data[20+length:];path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(rest))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+rest)
 
-def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False,reuse_bake=None):
+def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False,reuse_bake=None,additional_views=()):
     if render_engine not in ['BLENDER_EEVEE','CYCLES']:raise ValueError('Unsupported source-albedo bake engine')
     out.mkdir(parents=True,exist_ok=True)
     scene=bpy.context.scene;scene.render.engine=render_engine;scene.render.film_transparent=True
@@ -152,12 +152,21 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
     camera_data=bpy.data.cameras.new('source_albedo_bake');camera=bpy.data.objects.new('source_albedo_bake',camera_data)
     scene.collection.objects.link(camera);scene.camera=camera;camera_data.type='ORTHO'
     side=max(height,width)*1.06;camera_data.ortho_scale=side;target=Vector((0,0,height/2));views=[];normal_views=[]
-    for i,angle in enumerate([0,math.pi/3,2*math.pi/3,None]):
+    if len(additional_views)>32 or len({tuple(p) for p in additional_views})!=len(additional_views):raise ValueError('At most32distinct additional source view directions')
+    for azimuth,elevation in additional_views:
+        if not math.isfinite(azimuth) or not math.isfinite(elevation) or not 0<=azimuth<360 or not 0<elevation<90:raise ValueError('Additional source view needs azimuth0..360 and elevation0..90 degrees')
+    directions=[0,math.pi/3,2*math.pi/3,None]+[tuple(math.radians(x) for x in p) for p in additional_views]
+    def view_basis(angle):
+        if angle is None:return [Vector((1,0,0)),Vector((0,1,0)),Vector((0,0,1))]
+        azimuth,elevation=angle if isinstance(angle,tuple) else (angle,0)
+        right=Vector((math.cos(azimuth),math.sin(azimuth),0));front=Vector((math.sin(azimuth)*math.cos(elevation),-math.cos(azimuth)*math.cos(elevation),math.sin(elevation)))
+        return [right,front.cross(right),front]
+    for i,angle in enumerate(directions):
         distance=max(20,side*2)
-        camera.location=Vector((0,0,height+distance)) if angle is None else Vector((math.sin(angle)*distance,-math.cos(angle)*distance,height/2))
+        camera.location=target+view_basis(angle)[2]*distance if isinstance(angle,tuple) else (Vector((0,0,height+distance)) if angle is None else Vector((math.sin(angle)*distance,-math.cos(angle)*distance,height/2)))
         camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
         file=out/f'source_albedo_view_{i}.png';scene.render.filepath=str(file)
-        if reuse_bake:shutil.copy2(reuse_bake['views'][i],file)
+        if reuse_bake and i<len(reuse_bake['views']):shutil.copy2(reuse_bake['views'][i],file)
         else:bpy.ops.render.render(write_still=True)
         views.append((angle,file))
     if normal_maps:
@@ -177,16 +186,13 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
             links.new(combine.outputs[0],emission.inputs['Color']);normal_nodes.append(axes)
         scene.view_settings.view_transform='Raw'
         for i,(angle,_) in enumerate(views):
-            if angle is None:
-                basis=[(1,0,0),(0,1,0),(0,0,1)];camera.location=(0,0,height+distance)
-            else:
-                basis=[(math.cos(angle),math.sin(angle),0),(0,0,1),(math.sin(angle),-math.cos(angle),0)]
-                camera.location=(math.sin(angle)*distance,-math.cos(angle)*distance,height/2)
+            basis=view_basis(angle)
+            camera.location=target+basis[2]*distance if isinstance(angle,tuple) else ((0,0,height+distance) if angle is None else (math.sin(angle)*distance,-math.cos(angle)*distance,height/2))
             camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
             for axes in normal_nodes:
                 for node,axis in zip(axes,basis):node.inputs[1].default_value=axis
             file=out/f'source_normal_view_{i}.png';scene.render.filepath=str(file)
-            if reuse_bake:shutil.copy2(reuse_bake['normal_views'][i],file)
+            if reuse_bake and i<len(reuse_bake['normal_views']):shutil.copy2(reuse_bake['normal_views'][i],file)
             else:bpy.ops.render.render(write_still=True)
             normal_views.append(file)
         scene.view_settings.view_transform='Standard'
@@ -195,7 +201,9 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
         o.hide_render=True;o.select_set(False)
     bpy.data.objects.remove(camera,do_unlink=True);planes=[]
     for i,(angle,file) in enumerate(views):
-        if angle is None:
+        if isinstance(angle,tuple):
+            right,up,front=view_basis(angle);vertices=[tuple(target+right*x*side/2+up*y*side/2) for x,y in [(-1,-1),(1,-1),(1,1),(-1,1)]]
+        elif angle is None:
             vertices=[(-side/2,-side/2,height*.6),(side/2,-side/2,height*.6),(side/2,side/2,height*.6),(-side/2,side/2,height*.6)]
         else:
             ux,uy=math.cos(angle),math.sin(angle);low=(height-side)/2;high=low+side
@@ -218,8 +226,10 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
     bpy.ops.object.select_all(action='DESELECT')
     for o in planes:o.select_set(True)
     bpy.context.view_layer.objects.active=planes[0];bpy.ops.object.join();planes=[bpy.context.view_layer.objects.active]
-    return planes,{'views':[str(file) for _,file in views],'resolution':resolution,'triangles':8,
+    return planes,{'views':[str(file) for _,file in views],'resolution':resolution,'triangles':2*len(views),
+        'view_directions_blender':[list(view_basis(angle)[2]) for angle,_ in views],
+        'additional_aerial_views_degrees':list(additional_views),
         'normal_views':[str(file) for file in normal_views],
         'normal_basis':'Actual source geometry normals projected onto per-card tangent/bitangent/front-normal, Raw linear RGB; no baked directional lighting' if normal_maps else None,
         'render_engine':render_engine,'reused_registered_bake':reuse_bake,
-        'method':'Three source-albedo vertical views and one top view, alpha-tested crossed planes. Approximate silhouette; not full source geometry or a measured BRDF.'}
+        'method':'Three source-albedo vertical views and one top view'+(', plus declared oblique source views. Requires view selection before use in the game; overlapping all views is not a valid runtime representation' if additional_views else '')+'. Approximate silhouette; not full source geometry or a measured BRDF.'}
