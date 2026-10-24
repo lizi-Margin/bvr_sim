@@ -6,10 +6,12 @@
 #include <bit>
 #include <fstream>
 #include "json.hpp"
+#include "ground_atlas.hxx"
 struct ScenePlacement {
     std::string id, model, chunk, category, target_uid;
     std::array<double, 3> position{};
     std::array<float, 3> up_normal{0,1,0};
+    std::vector<std::array<double,2>> ground_stems;
     float yaw = 0, scale = 1, lod_distance = 1700, cull_distance = 35000;
 };
 struct SceneMaterial {
@@ -40,6 +42,14 @@ struct SourceCardMaterialState {
     uint32_t normal_format=0, width=0, height=0, mip_levels=0;
     bool rgb_preserved=false;
 };
+struct GroundVertexState {
+    uint32_t subset=0, vertex_index=0;
+    bool source_tree_active=true;
+    std::array<float,2> uv_anchor{};
+    std::array<float,3> world_position{}, world_base{}, bounds_min{}, bounds_max{};
+    std::array<float,3> surface_position{}, previous_position{};
+    std::array<float,4> gpu_instance_sphere{};
+};
 class WorldScene {
     struct Part {
         wi::ecs::Entity mesh;
@@ -48,6 +58,9 @@ class WorldScene {
     };
     struct Prototype {
         std::vector<Part> parts;
+        nlohmann::json ground_spec;
+        nlohmann::json ground_cluster;
+        wi::graphics::GPUBuffer ground_parameters;
     };
     struct Instance {
         ScenePlacement spec;
@@ -56,6 +69,8 @@ class WorldScene {
         int lod = -1;
         bool shown = true;
         bool has_lod = false;
+        std::optional<wi::primitive::AABB> ground_bounds;
+        uint32_t ground_tree_offset_plus1=0;
     };
     struct TerrainMesh {
         wi::ecs::Entity entity;
@@ -67,6 +82,8 @@ class WorldScene {
         std::array<double, 4> bounds;
     };
     wi::scene::Scene &scene;
+    GroundAtlas ground_atlas_;
+    GroundBoundsUpdater ground_bounds_updater;
     float detail_tile_m_=3;
     const std::unordered_map<std::string, std::string> &model_files;
     std::map<std::string, Prototype> prototypes;
@@ -89,9 +106,35 @@ class WorldScene {
         wi::scene::Scene loaded;
         ImportModel_GLTF(file->second, loaded);
         auto base_model=model.substr(0,model.find("::"));
+        nlohmann::json ground_spec;
+        nlohmann::json ground_cluster;
+        wi::graphics::GPUBuffer ground_parameters;
         const auto manifest_path=std::filesystem::path(file->second).parent_path()/"manifest.json";
         if(std::filesystem::exists(manifest_path)){
             std::ifstream manifest_stream(manifest_path);nlohmann::json manifest;manifest_stream>>manifest;
+            if(manifest.contains("cluster") && manifest["cluster"].is_object()){
+                ground_spec=manifest["cluster"].value("ground_conform",nlohmann::json());
+                if(!ground_spec.is_null())ground_cluster=manifest["cluster"];
+            }
+            if(!ground_spec.is_null()){
+                if(!material_profile.value("source_tree_grounding",false))throw std::runtime_error("Source grove requires the shared ground deformation shader");
+                // Mesh-shader cluster bounds and ray tracing geometry are not
+                // deformed by the current raster implementation. Fail closed.
+                if(wi::renderer::IsMeshShaderAllowed())throw std::runtime_error("Ground-conforming source groves require the indexed raster path");
+                const auto minimum=ground_spec.at("min_local_xz").get<std::array<float,2>>();
+                const auto span=ground_spec.at("span_local_xz").get<std::array<float,2>>();
+                std::vector<std::array<float,2>> anchors;
+                if(ground_spec.value("anchor_encoding","")=="source_tree_index_uv1"){
+                    const auto center=ground_cluster.at("recentering").get<std::array<float,3>>();
+                    for(const auto& pose:ground_cluster.at("poses_before_recentering")){
+                        const auto a=pose.at("base_anchor").get<std::array<float,3>>();anchors.push_back({a[0]-center[0],a[1]-center[1]});
+                    }
+                    if(anchors.size()!=ground_spec.at("source_tree_count").get<size_t>())throw std::runtime_error("Source-tree index table count mismatch");
+                }
+                ground_parameters=ground_atlas_.parameters({minimum[0],minimum[1],span[0],span[1]},anchors);
+                const auto srv=wi::graphics::GetDevice()->GetDescriptorIndex(&ground_parameters,wi::graphics::SubresourceType::SRV);
+                for(size_t i=0;i<loaded.materials.GetCount();++i){auto& m=loaded.materials[i];m.userdata.z=uint32_t(srv)+1;m.userdata.w=0x47524e44u;m.SetDirty();}
+            }
             const auto& impostor=manifest.value("impostor",nlohmann::json::object());
             if(impostor.is_object()&&impostor.value("view_facing_alpha",false)){
                 const auto& source_bake=impostor.value("source_tree_bake",impostor);
@@ -136,12 +179,26 @@ class WorldScene {
             throw std::runtime_error("Empty GLB: " + file->second);
         loaded.Update(0);
         Prototype data;
+        data.ground_spec=std::move(ground_spec);data.ground_cluster=std::move(ground_cluster);data.ground_parameters=std::move(ground_parameters);
         for (size_t i = 0; i < loaded.objects.GetCount(); ++i) {
             auto entity = loaded.objects.GetEntity(i);
             auto &object = loaded.objects[i];
             auto transform = loaded.transforms.GetComponent(entity);
             if (!transform)
                 throw std::runtime_error("Mesh missing transform");
+            if(!data.ground_spec.is_null()){
+                DirectX::XMFLOAT4X4 identity;DirectX::XMStoreFloat4x4(&identity,DirectX::XMMatrixIdentity());
+                for(int r=0;r<4;++r)for(int c=0;c<4;++c)if(std::abs(transform->world.m[r][c]-identity.m[r][c])>1e-5f)
+                    throw std::runtime_error("Ground-conforming source mesh nodes must have identity transforms");
+                const auto mesh=loaded.meshes.GetComponent(object.meshID);
+                if(!mesh || mesh->vertex_uvset_1.size()!=mesh->vertex_positions.size())throw std::runtime_error("Ground-conforming source mesh is missing UV1 anchors");
+                if(!mesh->vertex_boneindices.empty())throw std::runtime_error("Ground-conforming source groves must be static meshes");
+                for(size_t k=0;k+2<mesh->indices.size();k+=3){
+                    const auto a=mesh->vertex_uvset_1[mesh->indices[k]],b=mesh->vertex_uvset_1[mesh->indices[k+1]],c=mesh->vertex_uvset_1[mesh->indices[k+2]];
+                    if(a.x!=b.x||a.y!=b.y||a.x!=c.x||a.y!=c.y)throw std::runtime_error("Ground-conforming triangles must belong to exactly one source tree");
+                }
+                for(const auto& subset:mesh->subsets){auto m=loaded.materials.GetComponent(subset.materialID);if(m&&m->IsUsingWind())throw std::runtime_error("Ground-conforming static groves do not support wind deformation");}
+            }
             data.parts.push_back({object.meshID, transform->world, object.color});
             object.SetRenderable(false);
         }
@@ -332,6 +389,7 @@ class WorldScene {
         : scene(s), model_files(files),material_profile(profile) {}
     wi::ecs::Entity instantiate(const std::string &uid, const std::string &model) {
         auto &data = prototype(model);
+        if(!data.ground_spec.is_null())throw std::runtime_error("Ground-conforming resources must be configured as static scenery");
         auto root = scene.Entity_CreateTransform(uid);
         scene.layers.Create(root).layerMask = 1;
         for (size_t i = 0; i < data.parts.size(); ++i)
@@ -361,6 +419,13 @@ class WorldScene {
                    const std::vector<std::string> &terrain_materials) {
         using namespace DirectX;
         clear();
+        std::vector<std::array<float,2>> streamed_points;
+        for(const auto& spec:placements)for(const auto& point:spec.ground_stems){
+            if(!std::isfinite(point[0])||!std::isfinite(point[1]))throw std::invalid_argument("Nonfinite independent source tree position");
+            streamed_points.push_back({float(point[0]),float(point[1])});
+        }
+        ground_atlas_.set_tree_positions(streamed_points);
+        uint32_t stream_offset=0;
         for (const auto &m : mats)
             material(m);
         bvr_sim::TerrainTile base;
@@ -457,6 +522,38 @@ class WorldScene {
             t->Translate(
                 XMFLOAT3(float(-spec.position[1]), float(spec.position[2]), float(spec.position[0])));
             t->UpdateTransform();
+            if(!data.ground_spec.is_null()){
+                if(spec.up_normal!=std::array<float,3>{0,1,0}||spec.scale<=0)throw std::invalid_argument("Per-tree grounding requires upright static groves with positive scale");
+                const auto& cluster=data.ground_cluster;
+                const auto center=cluster.at("recentering").get<std::array<float,3>>();
+                const auto& poses=cluster.at("poses_before_recentering");
+                const auto& bounds=data.ground_spec.at("tree_bounds_relative_blender");
+                if(poses.size()!=bounds.size())throw std::runtime_error("Source grove anchor/bounds count mismatch");
+                const bool independent=data.ground_spec.value("anchor_encoding","")=="source_tree_index_uv1";
+                if(independent){
+                    if(spec.ground_stems.empty()||spec.ground_stems.size()>poses.size())throw std::runtime_error("Independent source batch must specify1..source_count tree positions");
+                    instance.ground_tree_offset_plus1=stream_offset+1;
+                }else if(!spec.ground_stems.empty())throw std::runtime_error("Source resource does not declare independent tree indices");
+                wi::primitive::AABB box;
+                for(size_t j=0;j<(independent?spec.ground_stems.size():poses.size());++j){
+                    const auto anchor=poses[j].at("base_anchor").get<std::array<float,3>>();
+                    const auto base=XMVector3TransformCoord(XMVectorSet(anchor[0]-center[0],0,anchor[1]-center[1],1),t->GetWorldMatrix());
+                    const double n=independent?spec.ground_stems[j][0]:XMVectorGetZ(base),w=independent?spec.ground_stems[j][1]:-XMVectorGetX(base);
+                    if(!ground_atlas_.covers(n,w))throw std::runtime_error("Source grove base lies outside the shared ground atlas");
+                    const float height=float(terrain.height(n,w));
+                    const auto lo=bounds[j].at("min").get<std::array<float,3>>(), hi=bounds[j].at("max").get<std::array<float,3>>();
+                    for(int corner=0;corner<8;++corner){
+                        const auto offset=XMVector3TransformNormal(XMVectorSet(corner&1?hi[0]:lo[0],corner&4?hi[2]:lo[2],corner&2?hi[1]:lo[1],0),t->GetWorldMatrix());
+                        box.AddPoint(XMVectorSet(float(-w)+XMVectorGetX(offset),height+XMVectorGetY(offset),float(n)+XMVectorGetZ(offset),1));
+                    }
+                }
+                // Covers source UV/position packing and float conversion; it
+                // does not change the mesh bounds used for vertex decoding.
+                box._min.x-=.05f;box._min.y-=.05f;box._min.z-=.05f;box._max.x+=.05f;box._max.y+=.05f;box._max.z+=.05f;
+                instance.ground_bounds=box;
+            }
+            else if(!spec.ground_stems.empty())throw std::runtime_error("Independent tree placement requires a registered grounding resource");
+            stream_offset+=uint32_t(spec.ground_stems.size());
             for (size_t i = 0; i < count; ++i) {
                 auto e = child(instance.root, data.parts[std::min(i, data.parts.size() - 1)],
                                spec.id + "_part" + std::to_string(i));
@@ -466,6 +563,52 @@ class WorldScene {
             }
             instances.push_back(std::move(instance));
         }
+    }
+    GroundAtlas& ground_atlas() {return ground_atlas_;}
+    void ground_bounds_before_visibility() {
+        // Scene::Update overwrites ordinary rigid bounds. Run after that update
+        // and before both main/reflection visibility and shadow rendering.
+        std::vector<GroundBoundsUpdate> patches;
+        for(const auto& instance:instances)if(instance.ground_bounds){
+            const auto& box=*instance.ground_bounds;const auto center=box.getCenter();const float radius=box.getRadius();
+            for(auto e:instance.children){
+                const auto index=scene.objects.GetIndex(e);if(index==size_t(-1))continue;
+                auto& aabb=scene.aabb_objects[index];aabb._min=box._min;aabb._max=box._max;
+                scene.objects[index].center=center;scene.objects[index].radius=radius;
+                patches.push_back({uint32_t(index),instance.ground_tree_offset_plus1,uint32_t(instance.spec.ground_stems.size()),0,{center.x,center.y,center.z,radius}});
+            }
+        }
+        ground_bounds_updater.apply(scene,patches);
+    }
+    std::vector<GroundVertexState> scenery_ground_vertices(const std::string& id,bool all_vertices=false) {
+        for(const auto& instance:instances)if(instance.spec.id==id){
+            if(!instance.ground_bounds)throw std::invalid_argument("Scenery does not declare per-tree ground deformation");
+            std::vector<std::array<uint32_t,4>> queries;std::vector<GroundVertexState> states;
+            for(auto child:instance.children){
+                const auto index=scene.objects.GetIndex(child);const auto& object=scene.objects[index];
+                const auto mesh=scene.meshes.GetComponent(object.meshID);
+                for(uint32_t subset=0;subset<mesh->subsets.size();++subset){
+                    std::set<std::pair<float,float>> seen;std::set<uint32_t> seen_vertices;const auto& part=mesh->subsets[subset];
+                    for(uint32_t k=part.indexOffset;k<part.indexOffset+part.indexCount;++k){
+                        const auto vertex=mesh->indices[k];const auto uv=mesh->vertex_uvset_1[vertex];
+                        if(all_vertices){if(!seen_vertices.insert(vertex).second)continue;}
+                        else if(!seen.emplace(uv.x,uv.y).second)continue;
+                        queries.push_back({uint32_t(index),mesh->geometryOffset+subset,vertex,0});
+                        GroundVertexState state;state.subset=subset;state.vertex_index=vertex;state.uv_anchor={uv.x,uv.y};
+                        const auto& box=scene.aabb_objects[index];state.bounds_min={box._min.x,box._min.y,box._min.z};state.bounds_max={box._max.x,box._max.y,box._max.z};states.push_back(state);
+                    }
+                }
+            }
+            auto values=ground_atlas_.vertices(scene,queries);
+            for(size_t i=0;i<states.size();++i){
+                states[i].world_position={values[i][0],values[i][1],values[i][2]};states[i].world_base={values[i][4],values[i][5],values[i][6]};
+                states[i].source_tree_active=values[i][3]>.5f;
+                states[i].surface_position={values[i][8],values[i][9],values[i][10]};states[i].previous_position={values[i][12],values[i][13],values[i][14]};
+                states[i].gpu_instance_sphere={values[i][16],values[i][17],values[i][18],values[i][19]};
+            }
+            return states;
+        }
+        throw std::invalid_argument("Scenery instance not found: "+id);
     }
     void update(const DirectX::XMFLOAT3 &eye, const bvr_sim::GameFrame &frame) {
         using namespace DirectX;

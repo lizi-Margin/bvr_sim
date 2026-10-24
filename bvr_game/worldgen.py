@@ -124,12 +124,19 @@ class Baker:
         if category=='vegetation' and self.industry.buffer(100).contains(point):return 'industry'
         return None
     def place(self,model,n,w,*,category,zone,scale=1,yaw=None,minimum=0,lod=1700,cull=35000,clearance=True):
-        m=self.metadata[model];span=m['bounds_blender']['span'];radius=max(span[0],span[1])*scale*.48
+        m=self.metadata[model]
+        if (m.get('cluster') or {}).get('ground_conform'):n,w,scale=round(n,4),round(w,4),round(scale,5)
+        span=m['bounds_blender']['span'];radius=max(span[0],span[1])*scale*.48
         stem_spacing=float(m.get('conversion_recipe',{}).get('policy',{}).get('cluster',{}).get('inter_grove_stem_spacing_m',0))
         if not 0<=stem_spacing<=10:raise ValueError('Invalid inter-grove stem spacing')
         if not hasattr(self,'grove_stems'):self.grove_stems={};self.overlapping_grove_roots=set();self.maximum_stem_spacing=0.
         if m.get('cluster'):radius=(math.hypot(span[0],span[1])/2+span[2]*math.sin(.2))*scale
         reason=self.forbidden(n,w,category,radius) if clearance else None
+        if not reason and not stem_spacing and hasattr(self,'source_tree_index'):
+            near=self.source_tree_index.query_ball_point([n,w],max(minimum,radius+self.source_tree_max_clearance))
+            if near:
+                source=self.source_tree_index.data[near];limits=np.maximum(minimum,radius+self.source_tree_clearance[near])
+                if np.any(np.sum((source-[n,w])**2,axis=1)<limits**2):reason='source_tree_clearance'
         key=(math.floor(n/50),math.floor(w/50));search=math.ceil((radius+55)/50)
         if not reason:
             for i in range(key[0]-search,key[0]+search+1):
@@ -138,13 +145,17 @@ class Baker:
                            for x,y,r in self.occupied.get((i,j),[])):reason='spacing';break
                 if reason:break
         if reason:self.rejections[reason]=self.rejections.get(reason,0)+1;return False
-        fit=None
+        fit=None;conform=None
         if m.get('cluster'):
-            from .grove_grounding import fit_grove
+            from .grove_grounding import fit_grove,conform_grove
             if yaw is None:yaw=self.rng.uniform(-math.pi,math.pi)
-            fit=fit_grove(m,n,w,yaw,scale,self.terrain.height,sample_heights=self.terrain.height_many,include_anchors=bool(stem_spacing))
-            if fit is None:self.rejections['grove_ground_fit']=self.rejections.get('grove_ground_fit',0)+1;return False
-        stems=fit.pop('_world_anchors',[]) if fit else []
+            if m['cluster'].get('ground_conform'):
+                n,w,yaw,scale=round(n,4),round(w,4),round(yaw,6),round(scale,5)
+                conform=conform_grove(m,n,w,yaw,scale,self.terrain.height,sample_heights=self.terrain.height_many,include_anchors=bool(stem_spacing))
+            else:
+                fit=fit_grove(m,n,w,yaw,scale,self.terrain.height,sample_heights=self.terrain.height_many,include_anchors=bool(stem_spacing))
+                if fit is None:self.rejections['grove_ground_fit']=self.rejections.get('grove_ground_fit',0)+1;return False
+        ground=conform or fit;stems=ground.pop('_world_anchors',[]) if ground else []
         if stems:
             search_stems=math.ceil(max(stem_spacing,self.maximum_stem_spacing)/4)
             for sn,sw,_ in stems:
@@ -153,13 +164,14 @@ class Baker:
                     for j in range(sj-search_stems,sj+search_stems+1):
                         if any(math.hypot(sn-x,sw-y)<max(stem_spacing,spacing) for x,y,spacing in self.grove_stems.get((i,j),[])):
                             self.rejections['grove_stem_spacing']=self.rejections.get('grove_stem_spacing',0)+1;return False
-        self.serial+=1;h=fit['height'] if fit else self.terrain.height(n,w)-m['bounds_blender']['min'][2]*scale
+        self.serial+=1;h=ground['height'] if ground else self.terrain.height(n,w)-m['bounds_blender']['min'][2]*scale
         self.instances.append({'id':f'{zone}_{self.serial:05d}','model':model,'position':[round(n,4),round(w,4),round(h,5)],'yaw':round(yaw if yaw is not None else self.rng.uniform(-math.pi,math.pi),6),'scale':round(scale,5),'category':category,'zone':zone,'chunk':f'{math.floor(n/self.r["chunk_m"])}:{math.floor(w/self.r["chunk_m"])}','lod_distance':lod,'cull_distance':cull,'collision_type':m['collision_type'],'radius_m':round(radius,3)})
         if fit:self.instances[-1].update(up_normal=fit['up_normal'],grove_ground_fit=fit)
+        if conform:self.instances[-1].update(up_normal=[0,1,0],grove_ground_conform=conform)
         if stems:
             self.overlapping_grove_roots.add((n,w));self.maximum_stem_spacing=max(self.maximum_stem_spacing,stem_spacing)
             for sn,sw,_ in stems:self.grove_stems.setdefault((math.floor(sn/4),math.floor(sw/4)),[]).append((sn,sw,stem_spacing))
-            self.instances[-1]['grove_ground_fit']['inter_grove_minimum_stem_m']=stem_spacing
+            self.instances[-1]['grove_ground_conform' if conform else 'grove_ground_fit']['inter_grove_minimum_stem_m']=stem_spacing
         self.occupied.setdefault(key,[]).append((n,w,radius));return True
     def surface_ribbon(self,id,points,width,material,offset=.035):
         line=LineString(points);distance=np.linspace(0,line.length,max(2,int(line.length/25)+1));vertices=[];indices=[]
@@ -279,6 +291,14 @@ class Baker:
     def build_scatter(self):
         role=self.r['asset_roles']
         for rule in self.r['scatter_rules']:
+            models=role[rule['roles']]
+            source_metadata=getattr(self,'metadata',{})
+            independent=[(source_metadata[x].get('cluster') or {}).get('ground_conform') or {} for x in models] if all(x in source_metadata for x in models) else []
+            if independent and all(x.get('anchor_encoding')=='source_tree_index_uv1' for x in independent):
+                from .source_tree_layout import build_rule
+                build_rule(self,rule);continue
+            from .source_tree_layout import flush_occupancy
+            flush_occupancy(self)
             count=0;cluster=None;cluster_steps=0;shapes=[self.forests[x] for x in rule.get('zones',[])]
             for attempt in range(rule['count']*80):
                 if rule.get('bank_only'):
@@ -312,6 +332,8 @@ class Baker:
                 if self.place(self.rng.choice(role[rule['roles']]),n,w,category='prop' if rule['roles']=='rocks' else 'vegetation',zone=rule['id'],scale=self.rng.uniform(*rule['scale_range']),minimum=rule['min_spacing_m'],lod=rule['lod_distance_m'],cull=rule['cull_distance_m']):count+=1
                 if count>=rule['count']:break
             if count<rule['count']*.9:raise RuntimeError('Scatter could not meet requested density: '+rule['id']+' '+str(count))
+        from .source_tree_layout import flush_occupancy
+        flush_occupancy(self)
     def landcover(self):
         m=self.terrain.fine_meta;s=m['spacing'];n,w=np.meshgrid(m['origin_north']+(np.arange(m['columns']-1)+.5)*s,m['origin_west']+(np.arange(m['rows']-1)+.5)*s)
         labels=np.zeros(n.shape,dtype=np.uint8);colors=np.ones((*n.shape,4),dtype=np.float32)
@@ -394,6 +416,10 @@ class Baker:
             result['terrain']['details'][1]['material']='regional_1'
             result['detail_sample']['material_mapping']='Same world-aligned regional macro and metre-scale repeated source detail as parent; fine height geometry remains independent'
             result=finish_world(self,result,out)
+            if self.r['landscape'].get('ground_atlas'):
+                from .ground_atlas import write_atlas
+                arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
+                result['terrain']['ground_atlas']=write_atlas(out,arrays,result['terrain'],self.r['landscape']['ground_atlas'])
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
         return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(result['instances']),'counts':result['counts'],'chunks':len(result['chunks']),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}
 def main():

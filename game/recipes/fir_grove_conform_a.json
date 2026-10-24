@@ -1,0 +1,48 @@
+{
+  "name": "Real source fir A, wide64 copies with encoded per-tree base anchors",
+  "tags": [
+    "vegetation",
+    "fir",
+    "source_geometry",
+    "grove",
+    "individual_tree_impostors",
+    "source_normal_maps"
+  ],
+  "select_object": "fir_tree_01_a_LOD0",
+  "cluster": {
+    "count": 64,
+    "radius_m": 50,
+    "minimum_spacing_m": 8.5,
+    "inter_grove_stem_spacing_m": 2.5,
+    "seed": 63241,
+    "scale_range": [
+      0.85,
+      1.15
+    ],
+    "ground_conform": true
+  },
+  "near_triangle_budget": 96000,
+  "foliage_cards": {
+    "materials": [
+      "fir_tree_01_twig",
+      "fir_tree_01_bark",
+      "fir_tree_01_dead_branches"
+    ],
+    "wood_triangles_per_tree": 500,
+    "resolution": 1024,
+    "normal_maps": true
+  },
+  "individual_tree_impostors": true,
+  "impostor": true,
+  "impostor_normal_maps": true,
+  "impostor_view_facing_alpha": true,
+  "impostor_resolution": 1024,
+  "impostor_engine": "CYCLES",
+  "recommended_density_per_km2": 150,
+  "physical_size_note": "Exact selected source fir A geometry and original source images; authored64-tree layout over50m radius. Source crowns use original-view cards and retained source wood. Per-tree vertical terrain translation is presentation only. Not measured forest placement or a measured BRDF.",
+  "reuse_bake_manifest": {
+    "manifest": "game/assets/registered/fir_grove_normal_a/manifest.json",
+    "sha256": "d66d09740a9940dbe830b8f1864153013bf95e1cbcc9fd7f9a388a7d8fbd9086"
+  },
+  "skip_canopy_preview": true
+}

@@ -3,7 +3,11 @@ import math
 import numpy as np
 
 def placed_stems(manifest,item):
-    """Source base anchors after the renderer's scale, yaw and rigid up fit."""
+    """Base references before per-tree height sampling, or rigid source anchors."""
+    if 'ground_stems' in item:
+        points=np.asarray(item['ground_stems'],dtype=float);count=len(manifest['cluster']['poses_before_recentering'])
+        if points.ndim!=2 or points.shape[1]!=2 or not 1<=len(points)<=count or not np.isfinite(points).all():raise ValueError('Independent source tree count/position mismatch')
+        return np.column_stack([points,np.full(len(points),item['position'][2])])
     cluster=manifest['cluster'];source=np.array([p['base_anchor'] if 'base_anchor' in p else p['position'] for p in cluster['poses_before_recentering']],dtype=float)-np.asarray(cluster['recentering'])
     anchors=source[:,[1,0,2]].copy();anchors[:,1]*=-1;anchors*=item['scale']
     c,s=math.cos(item['yaw']),math.sin(item['yaw']);anchors=anchors@np.array([[c,s,0],[-s,c,0],[0,0,1]])
@@ -13,21 +17,41 @@ def placed_stems(manifest,item):
     k=np.array([[0,-axis[2],axis[1]],[axis[2],0,-axis[0]],[-axis[1],axis[0],0]])
     return anchors@(np.eye(3)+k+k@k/(1+normal[2])).T+np.asarray(item['position'])
 
+
+def conform_grove(manifest,north,west,yaw,scale,height,*,sample_heights=None,include_anchors=False,ground_stems=None):
+    """Offline source references for upright trees independently placed on terrain.
+
+    These expected heights are not a GPU measurement. Runtime deformation uses
+    the same version's R32 atlas, with separate GPU draw-buffer validation.
+    """
+    if not manifest['cluster'].get('ground_conform'):raise ValueError('Source mesh has no per-tree base encoding')
+    root=float(height(north,west));item={'position':[north,west,root],'scale':scale,'yaw':yaw,'up_normal':[0,1,0]}
+    if ground_stems is not None:item['ground_stems']=ground_stems
+    stems=placed_stems(manifest,item)
+    values=np.array([height(n,w) for n,w,_ in stems]) if sample_heights is None else np.asarray(sample_heights(stems[:,0],stems[:,1]),dtype=float)
+    if values.shape!=(len(stems),) or not np.isfinite(values).all():raise ValueError('Invalid per-tree terrain samples')
+    stems[:,2]=values
+    result={'height':root,'up_normal':[0,1,0],'source_trees':len(stems),'source_height_span_m':float(np.ptp(values)),
+        'method':'Independent source UV1 base anchors; upright source trees; expected shared terrain heights, not measured GPU errors'}
+    if include_anchors:result['_world_anchors']=stems.tolist()
+    return result
+
 def stem_spacing_report(items,metadata,tolerance_m=.015):
     """Validate opted-in overlapping crowns using actual inter-grove stems."""
     from scipy.spatial import cKDTree
-    selected=[];points=[];owners=[];limits=[]
+    selected=[];points=[];owners=[];limits=[];independent=[]
     for item in items:
         manifest=metadata[item['model']]
         minimum=float(manifest.get('conversion_recipe',{}).get('policy',{}).get('cluster',{}).get('inter_grove_stem_spacing_m',0))
         if not manifest.get('cluster') or not minimum:continue
         if not 0<minimum<=10:raise ValueError('Invalid inter-grove stem spacing')
-        stems=placed_stems(manifest,item);owners.extend([len(selected)]*len(stems));points.append(stems[:,:2]);limits.append(minimum);selected.append(item['id'])
+        stems=placed_stems(manifest,item);owners.extend([len(selected)]*len(stems));points.append(stems[:,:2]);limits.append(minimum);selected.append(item['id']);independent.append('ground_stems' in item)
     conflicts=[];cross_pairs=0
     if points:
         points=np.concatenate(points);owners=np.asarray(owners);limits=np.asarray(limits)
         pairs=cKDTree(points).query_pairs(float(limits.max()),output_type='ndarray')
-        pairs=pairs[owners[pairs[:,0]]!=owners[pairs[:,1]]]
+        independent=np.asarray(independent)
+        pairs=pairs[(owners[pairs[:,0]]!=owners[pairs[:,1]])|independent[owners[pairs[:,0]]]]
         cross_pairs=len(pairs)
         for a,b in pairs:
             distance=float(np.linalg.norm(points[a]-points[b]));minimum=float(max(limits[owners[a]],limits[owners[b]]))

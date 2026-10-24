@@ -174,15 +174,19 @@ def finish_world(baker,document,out):
             inside=(n>=meta['origin_north'])&(n<=meta['origin_north']+meta['spacing']*(meta['columns']-1))&(w>=meta['origin_west'])&(w<=meta['origin_west']+meta['spacing']*(meta['rows']-1))
             result=np.where(inside,sample_grid(arrays[meta.get('array_key','focus')],meta,n,w),result)
         return result
-    accepted=[];grove_fits=[];rejected=0
+    accepted=[];grove_fits=[];grove_conforms=[];rejected=0
     for item in document['instances']:
         manifest=baker.metadata[item['model']]
         if manifest.get('cluster'):
-            from .grove_grounding import fit_grove
-            fit=fit_grove(manifest,*item['position'][:2],item['yaw'],item['scale'],height,sample_heights=heights)
-            if fit is None:rejected+=1;continue
-            item.update(up_normal=fit['up_normal'],grove_ground_fit=fit)
-            item['position'][2]=fit['height'];grove_fits.append(fit)
+            from .grove_grounding import fit_grove,conform_grove
+            if manifest['cluster'].get('ground_conform'):
+                conform=conform_grove(manifest,*item['position'][:2],item['yaw'],item['scale'],height,sample_heights=heights,ground_stems=item.get('ground_stems'))
+                item.update(up_normal=[0,1,0],grove_ground_conform=conform);item['position'][2]=conform['height'];grove_conforms.append(conform)
+            else:
+                fit=fit_grove(manifest,*item['position'][:2],item['yaw'],item['scale'],height,sample_heights=heights)
+                if fit is None:rejected+=1;continue
+                item.update(up_normal=fit['up_normal'],grove_ground_fit=fit)
+                item['position'][2]=fit['height'];grove_fits.append(fit)
         accepted.append(item)
     document['instances']=accepted
     document['chunks']={}
@@ -193,6 +197,11 @@ def finish_world(baker,document,out):
             'final_terrain_fit_rejections':rejected,'maximum_source_base_error_m':max(x['max_anchor_error_m'] for x in grove_fits),
             'maximum_rigid_tilt_rad':max(x['tilt_rad'] for x in grove_fits),
             'approximation':'Rigid source-tree groves aligned to local terrain plane; source base anchors within0.25m, slope <=0.2rad. Anchor method is recorded per instance; legacy sources may use bounds reference anchors. No terrain grading. Distant canopy aggregate is separately recorded in material bake.'}
+    if grove_conforms:
+        document['forest_representation']={**document.get('forest_representation',{}),
+            'independently_grounded_groves':len(grove_conforms),'independently_grounded_source_trees':sum(x['source_trees'] for x in grove_conforms),
+            'maximum_per_grove_height_span_m':max(x['source_height_span_m'] for x in grove_conforms),
+            'ground_conform_approximation':'Shared upright source trees translated vertically per encoded base anchor using an aligned core terrain atlas in all raster passes. No terrain grading. GPU error/culling and natural appearance require separate runtime inspection.'}
     for item in document['instances']:
         if item['category']!='building':continue
         bounds=baker.metadata[item['model']]['bounds_blender'];mn,mx=bounds['min'],bounds['max'];scale=item['scale'];yaw=item['yaw']

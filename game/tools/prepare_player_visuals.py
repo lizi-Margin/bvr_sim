@@ -9,9 +9,13 @@ def write_changed(path,text):
     if not path.exists() or path.read_text(encoding='utf-8')!=text:path.write_text(text,encoding='utf-8')
 def main():
     before=json.loads((ROOT/'game/recipes/visual_beta.json').read_text(encoding='utf-8'))
-    cache=ROOT/'game/assets/cache/player-daylight';source=cache/'shader-source';binary=cache/'shaders'
+    cache=ROOT/'game/assets/cache/player-daylight';source=cache/'shader-source';binary=cache/'shaders-owned-source-v1'
     source.mkdir(parents=True,exist_ok=True);binary.mkdir(parents=True,exist_ok=True)
-    for src,dest in [(Path(before['shader_source']),source),(Path(before['shader_cache']),binary)]:
+    # Inherited wishadermeta records upstream include paths. Copying those
+    # binaries silently kept old shadow/other variants after owned source edits.
+    # Compile this namespace from owned sources once; its dependency records
+    # then track the correct files. Retain the old cache as failure evidence.
+    for src,dest in [(Path(before['shader_source']),source)]:
         for p in src.rglob('*'):
             if p.is_file():
                 d=dest/p.relative_to(src);d.parent.mkdir(parents=True,exist_ok=True)
@@ -73,9 +77,21 @@ def main():
 '''
     assert object_source.count(object_anchor)==1
     object_source=object_source.replace(object_anchor,object_anchor+object_hook)
-    from bvr_game.vegetation_shaders import patch_source_card_basis,patch_source_card_rgb_normals
+    from bvr_game.vegetation_shaders import patch_source_card_basis,patch_source_card_rgb_normals,patch_source_tree_grounding,patch_source_tree_surface_grounding
     object_source=patch_source_card_basis(object_source)
     object_source=patch_source_card_rgb_normals(object_source)
+    object_source=patch_source_tree_grounding(object_source)
+    for name in ['bvrGroundHF.hlsli','bvrGroundHeightCS.hlsl','bvrGroundVertexCS.hlsl','bvrGroundBoundsCS.hlsl']:
+        write_changed(source/name,(ROOT/'game/shaders'/name).read_text(encoding='utf-8'))
+    surface=source/'surfaceHF.hlsli'
+    surface_source=patch_source_tree_surface_grounding((Path(before['shader_source'])/'surfaceHF.hlsli').read_text(encoding='utf-8'))
+    surface_changed=not surface.exists() or surface.read_text(encoding='utf-8')!=surface_source
+    write_changed(surface,surface_source)
+    if surface_changed:
+        # Includes are dependency-tracked by Wicked. Explicitly invalidate the
+        # visibility jobs that reconstruct scene geometry from primitive IDs.
+        for p in (binary/'hlsl6').glob('visibility*'):
+            if p.is_file():p.unlink()
     water_depth_anchor='water_depth = max(water_depth, -dot(float4(refraction_position, 1), water_plane));'
     assert object_source.count(water_depth_anchor)==1
     object_source=object_source.replace(water_depth_anchor,'''// The coarse depth search only chooses/rejects a refracted UV. Its
@@ -96,7 +112,7 @@ def main():
     profile={**before,'name':'player_daylight','shader_source':str(source),'shader_cache':str(binary),
         'sun_rotation':[-.4,-.65,0],'ambient':[.13,.14,.15],
         'exposure':2.,'sky_exposure':1.,'sun_energy':4.,'temporal_aa':True,'fxaa':False,
-        'source_surface_corrections':True,'source_card_full_rgb_normals':True,
+        'source_surface_corrections':True,'source_card_full_rgb_normals':True,'source_tree_grounding':True,
         'canopy_color':[.06,.045,.02],'canopy_alpha':.15,'canopy_transmission':0.,
         'f22_paint_knee':.18,'f22_paint_shoulder':.09,'f22_paint_floor':.02,
         'scenery_materials':{'leaf_albedo':[.025,.075,.018],'bark_albedo':[.09,.06,.035],
@@ -110,6 +126,9 @@ def main():
         'patched_objectHF_sha256':sha(object_file),'paint_material_flag':'0x42565250','source_card_material_flag':'0x42565256',
         'source_card_backface_normals':'For registered source-volume cards only, mirror normal depth while retaining texture tangent/bitangent components on backfaces. Source images, alpha/depth and standard materials unchanged. Opposite-side volume lighting remains an impostor approximation.',
         'source_card_normal_encoding':'Exact retained source PNG loaded once per view as linear RGBA8; decode all three averaged normal channels for explicitly marked source-volume cards. No inferred hemisphere, altered source vectors or global normal-map change.',
+        'source_tree_grounding':'Explicit source UV1 base anchors or source-tree indices with per-instance north/west position streams, shared R32 core height atlas and indexed-triangle interpolation. Same raster deformation in color/depth/shadows and GPU draw-buffer inspection. Static triangle preload shifts current/previous geometry for visibility depth/velocity. Unused partial-batch slots collapse to zero-area triangles. Owned GPU instance copy patches bounds and stream offsets/counts before visibility; indexed raster only.',
+        'cache_provenance':'Owned-source-v1 cache starts without inherited compiled programs: old copied wishadermeta referenced upstream includes and left shadow variants stale. All compiled dependencies must refer to owned shader-source files.',
+        'patched_surfaceHF_sha256':sha(surface),
         'water_refraction_depth':'Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias.',
         'flat_nwu_horizon_haze':'Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.'}
     profile['provenance']={**before['provenance'],'detail_textures':'Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes',

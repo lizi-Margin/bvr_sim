@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+#include <functional>
 #include <random>
 #include <stdexcept>
 #include <unordered_map>
@@ -41,6 +43,11 @@ struct Input {
 };
 class GamePath : public wi::RenderPath3D {
   public:
+    std::function<void()> before_visibility;
+    void PreRender() override {
+        if(before_visibility)before_visibility();
+        wi::RenderPath3D::PreRender();
+    }
     std::vector<HudText> texts;
     std::vector<HudLine> lines;
     void Compose(wi::graphics::CommandList cmd) const override {
@@ -206,6 +213,7 @@ class Renderer {
         set_quality("medium");
         auto &s = wi::scene::GetScene();
         baked_world = std::make_unique<WorldScene>(s, model_files,visual_profile);
+        path->before_visibility=[this](){baked_world->ground_bounds_before_visibility();};
         effects = std::make_unique<VisualEffects>(s,!visual_profile.is_null());
         aircraft_visuals = std::make_unique<AircraftVisuals>(s);
         aircraft_visuals->set_material_profile(visual_profile);
@@ -406,6 +414,13 @@ class Renderer {
                                outer_colors, terrain_materials);
     }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
+    void configure_ground_atlas(py::array_t<float,py::array::c_style> values,float north,float west,float spacing,const std::string& source_sha256) {
+        if(values.ndim()!=2)throw std::invalid_argument("Terrain atlas must be a contiguous float32 array [west,north]");
+        baked_world->ground_atlas().upload(values.data(),uint32_t(values.shape(1)),uint32_t(values.shape(0)),north,west,spacing,source_sha256);
+    }
+    GroundAtlasState ground_atlas_state() {return baked_world->ground_atlas().state();}
+    std::vector<float> gpu_ground_heights(const std::vector<std::array<float,2>>& points) {return baked_world->ground_atlas().heights(points);}
+    std::vector<GroundVertexState> scenery_ground_vertices(const std::string& id,bool all_vertices=false) {return baked_world->scenery_ground_vertices(id,all_vertices);}
     std::vector<SourceCardMaterialState> source_card_materials() const { return baked_world->source_card_materials(); }
     std::optional<std::array<float,4>> reflection_plane() const {
         const auto& visibility=path->visibility_main;
@@ -792,6 +807,7 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readwrite("target_uid", &ScenePlacement::target_uid)
         .def_readwrite("position", &ScenePlacement::position)
         .def_readwrite("up_normal", &ScenePlacement::up_normal)
+        .def_readwrite("ground_stems", &ScenePlacement::ground_stems)
         .def_readwrite("yaw", &ScenePlacement::yaw)
         .def_readwrite("scale", &ScenePlacement::scale)
         .def_readwrite("lod_distance", &ScenePlacement::lod_distance)
@@ -841,6 +857,20 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readonly("normal_format",&SourceCardMaterialState::normal_format).def_readonly("width",&SourceCardMaterialState::width)
         .def_readonly("height",&SourceCardMaterialState::height).def_readonly("mip_levels",&SourceCardMaterialState::mip_levels)
         .def_readonly("rgb_preserved",&SourceCardMaterialState::rgb_preserved);
+    py::class_<GroundAtlasState>(m,"GroundAtlasState")
+        .def_readonly("columns",&GroundAtlasState::columns).def_readonly("rows",&GroundAtlasState::rows)
+        .def_readonly("origin_north",&GroundAtlasState::origin_north).def_readonly("origin_west",&GroundAtlasState::origin_west)
+        .def_readonly("spacing",&GroundAtlasState::spacing).def_readonly("bytes",&GroundAtlasState::bytes)
+        .def_readonly("tree_positions_count",&GroundAtlasState::tree_positions_count).def_readonly("tree_positions_bytes",&GroundAtlasState::tree_positions_bytes)
+        .def_readonly("source_sha256",&GroundAtlasState::source_sha256);
+    py::class_<GroundVertexState>(m,"GroundVertexState")
+        .def_readonly("source_tree_active",&GroundVertexState::source_tree_active)
+        .def_readonly("subset",&GroundVertexState::subset).def_readonly("vertex_index",&GroundVertexState::vertex_index)
+        .def_readonly("uv_anchor",&GroundVertexState::uv_anchor).def_readonly("world_position",&GroundVertexState::world_position)
+        .def_readonly("world_base",&GroundVertexState::world_base).def_readonly("bounds_min",&GroundVertexState::bounds_min)
+        .def_readonly("surface_position",&GroundVertexState::surface_position).def_readonly("previous_position",&GroundVertexState::previous_position)
+        .def_readonly("gpu_instance_sphere",&GroundVertexState::gpu_instance_sphere)
+        .def_readonly("bounds_max",&GroundVertexState::bounds_max);
     py::class_<HudText>(m, "HudText")
         .def(py::init<>())
         .def_readwrite("x", &HudText::x)
@@ -901,6 +931,10 @@ PYBIND11_MODULE(bvr_game_render, m) {
              py::arg("terrain_materials")=std::vector<std::string>{})
         .def("statistics", &Renderer::statistics)
         .def("source_card_materials", &Renderer::source_card_materials)
+        .def("configure_ground_atlas", &Renderer::configure_ground_atlas,py::arg("values").noconvert(),py::arg("origin_north"),py::arg("origin_west"),py::arg("spacing"),py::arg("source_sha256"))
+        .def("ground_atlas_state", &Renderer::ground_atlas_state)
+        .def("gpu_ground_heights", &Renderer::gpu_ground_heights)
+        .def("scenery_ground_vertices", &Renderer::scenery_ground_vertices,py::arg("id"),py::arg("all_vertices")=false)
         .def("reflection_plane", &Renderer::reflection_plane)
         .def("preview_aircraft", &Renderer::preview_aircraft)
         .def("aircraft_statistics", &Renderer::aircraft_statistics)

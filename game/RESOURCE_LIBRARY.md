@@ -149,3 +149,27 @@ python game/tools/validate_vegetation_lighting.py --map PATH_TO_IMMUTABLE_MAP.js
 检查工具把一簇未修改的真实源树放在空中，暂停物理时间，以相同光照、相机和强制近/远 LOD 检查树卡片，隔离地形接触和地面阴影的影响；这不是地图或性能验收。`--classify-normals` 只用于显式输出红/绿法线诊断色的独立 shader，`--expect-up` 只用于已知向上向量的专用探针。真实源法线包含向下的枝叶，不能要求它们全部向上。正常光照下的改变主要是局部受光方向，平均明暗变化很小；森林过暗、重复圆团与最终自然画面仍需要独立处理。
 
 `--normal-error-probe --split-rgb-probe --expect-rgb-match` 仅用于专用 GPU 对照：左半实际执行旧 RG 解码，右半执行 RGB 解码，两者共用同一原始 RGBA 纹理、真实模型和相机，再与完整源向量比较，绿色为误差不超过 1°。这些诊断 shader 保存在验证目录，不写入正常配方。`capture_player_visuals.py --visual-profile PATH_TO_CANDIDATE.json` 也可直接检查独立视觉候选。曾隔离关闭树卡片接收阴影，亮度仅增加约 8%，不能解释或解决全部远景过暗；正常配置继续保留阴影。
+
+## 源树逐树接地候选
+
+`game/recipes/fir_grove_conform_a.json` 复用同一株真实源杉树和已注册的原始烘焙图片，将 64 株树的工程布局摊到 50m 半径。转换前检查源文件、原注册 GLB、外部 PNG 与 GLB 内嵌 PNG 的哈希。UV0 继续用于源贴图，UV1 存放每株树的源底部锚点；近远 LOD 使用一致的锚点。布局不是实测林区数据，卡片不是完整树冠几何。
+
+带 `ground_conform` 的资源要求地图声明 `terrain.ground_atlas`，包括原高度归档版本、R32 文件哈希、网格原点/间距/行列数。`BakedScene` 检查版本与文件后，通过 `renderer.configure_ground_atlas()` 上传连续 float32 数组。Atlas 按核心地形的相同三角形对角线插值，不能用双线性过滤替代。它只供装饰树读取；核心高度、道路接触面、水域、碰撞和 CCIP 继续使用原环境。原地图不声明 atlas 时保持原路径。
+
+项目拥有的 `game/shaders/bvrGroundHF.hlsli` 同时服务颜色、预深度、阴影顶点和 GPU 回读；`surfaceHF` 的静态三角形预载也采用相同位移，供深度重建及运动矢量使用。该候选只支持直立、静态、无骨骼/风动的源树与 indexed raster 路径，不支持未变形的 meshlet 或光追几何。每帧在引擎场景更新后修正 CPU 包围盒；独立 GPU 实例副本再批量更新实例包围球，避免写入引擎已提交的上传内存。新增 atlas 和实例副本的显存与复制开销需要单独计入完整地图性能，不能把小场景验证当作性能达标。
+
+```powershell
+python game/tools/prepare_player_visuals.py
+python game/tools/build_grounded_grove_probe.py --map PATH_TO_IMMUTABLE_MAP.json --output NEW_PROBE_DIRECTORY
+python game/tools/validate_grounded_vegetation.py --map NEW_PROBE_DIRECTORY/generated-map.json --output NEW_GPU_INSPECTION_DIRECTORY --orbit-frames 180
+```
+
+`renderer.gpu_ground_heights()` 直接回读 GPU atlas 采样。`renderer.scenery_ground_vertices(id, all_vertices=True)` 使用实际 draw instance/geometry/material/packed-position/UV 缓冲区，回读变形顶点、源底部、深度重建位置、静态上一帧位置和 GPU 实例包围球；它是共用顶点例程的 compute 检查，不是光栅后 stream-output 捕获，也不是物理碰撞验证。
+
+隔离探针检查了 12,222 个 GPU 高度点，以及三种朝向/尺度、近远 LOD 的 83,904 个顶点。早期固定 64 树簇摊宽后，整簇拒绝采样在局部林区只接受 160/200 簇；该失败 staging 与日志保留。
+
+后续 `fir_grove_stream_a.json` 使用 UV1 源树索引和 `ScenePlacement.ground_stems` 绝对北/西坐标流，先独立采样树位，再按空间分批复用同一网格。每批最多 64 树、轴向跨度不超过 250m；不足 64 树的槽位在各光栅路径收缩为零面积三角形，GPU 检查同时回读活动标记。v50c 候选包含 652,800 株实际源树、10,290 批，保留原配方目标；相对 v46 实际 644,992 株增加约 1.21%。全部树位通过空间校验，另检查 8 批的近远 LOD GPU 顶点；这不代表逐株完成全部 GPU 验证。`build_river_valley_recipe.py --rebuild-forest-map PATH` 可复用已有地图的地形、材质、接触面、任务和普通摆件，仅重建森林；旧地图缺少 atlas 时从共享高度数据生成。
+
+继承的 shader 二进制曾记录上游 include 路径，导致计算探针通过但实际阴影仍使用旧树位。`prepare_player_visuals.py` 改用空起点的 `shaders-owned-source-v1` 缓存，仅从项目拥有的源码编译；旧缓存保留为失败证据。此前依据源码和计算回读作出的完整阴影路径判断已被此发现取代，新缓存另有实际单树画面及依赖来源检查。
+
+候选已有约 195 秒实际渲染重放，390 个核心边界状态与原路线逐项一致。森林硬边、远景自然程度和完整地图性能仍未验收，默认地图和启动入口尚未切换。

@@ -62,6 +62,7 @@ def make_cluster(objects,spec,source_base_override=None,source_bounds_override=N
             if len(o.data.uv_layers)!=1:raise ValueError('Ground-anchor metadata requires an unused UV1')
             uv=o.data.uv_layers.new(name='BVR_BASE_ANCHOR');a=Vector(o['bvr_base_anchor'])-center
             pair=((a.x-minimum[0])/span[0],1-(a.y-minimum[1])/span[1])
+            if spec.get('independent_tree_positions'):pair=((int(o['bvr_tree_index'])+.5)/count,1.)
             for loop in uv.data:loop.uv=pair
             bounds=tree_bounds[o['bvr_tree_index']]
             for vertex in o.data.vertices:
@@ -71,6 +72,9 @@ def make_cluster(objects,spec,source_base_override=None,source_bounds_override=N
         encoding={'method':'UV1 normalized actual tree base anchors; glTF V flip accounted for; identity mesh nodes',
                   'min_local_xz':minimum,'span_local_xz':span,'anchor_local_y':0.,'all_passes_required':True,
                   'tree_bounds_relative_blender':tree_bounds}
+        if spec.get('independent_tree_positions'):
+            encoding.update(anchor_encoding='source_tree_index_uv1',source_tree_count=count,
+                method='UV1.x=(source_tree_index+0.5)/count, UV1.y=0 after glTF V flip. Source bases are registered separately; actual tree positions are per-instance data.')
     bounds={'min':[lo[i]-center[i] for i in range(3)],'max':[hi[i]-center[i] for i in range(3)]}
     return result,bounds,{'source_copies':count,'seed':spec['seed'],'poses_before_recentering':poses,'recentering':list(center),
         'source_base_anchor_blender':list(source_base),'base_anchor_method':'Mean of source vertices within0.03m of its lowest geometry, transformed per source copy',

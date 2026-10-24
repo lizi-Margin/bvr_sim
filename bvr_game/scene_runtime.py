@@ -9,6 +9,10 @@ class BakedScene:
         terrain=self.document['terrain'];self.height_file=(self.path.parent/terrain['file']).resolve()
         if sha(self.height_file)!=terrain['sha256']:raise ValueError('Terrain version/hash mismatch')
         self.arrays=dict(np.load(self.height_file,allow_pickle=False))
+        self.ground_atlas=None
+        if terrain.get('ground_atlas'):
+            from .ground_atlas import load_atlas
+            self.ground_atlas=load_atlas(terrain['ground_atlas'],self.path,terrain['sha256'])
         for material in self.document['materials'].values():
             for slot in ['base_color','normal','roughness_map']:
                 if slot in material and sha(material[slot])!=material[slot+'_sha256']:raise ValueError('Material hash mismatch: '+material[slot])
@@ -45,6 +49,10 @@ class BakedScene:
         return result
     def configure(self,renderer,bindings,terrain,visual_profile=None):
         from .content import ASSETS
+        if self.ground_atlas is not None:
+            meta=self.document['terrain']['ground_atlas']
+            if not hasattr(renderer,'configure_ground_atlas'):raise RuntimeError('Map requires the native source-tree ground atlas interface; rebuild the renderer')
+            renderer.configure_ground_atlas(self.ground_atlas,meta['origin_north'],meta['origin_west'],meta['spacing'],meta['sha256'])
         for id,version in self.document['resource_versions'].items():
             directory=ASSETS/'registered'/id
             for lod in version['lods']:
@@ -69,6 +77,9 @@ class BakedScene:
             if 'up_normal' in data:
                 if not hasattr(p,'up_normal'):raise RuntimeError('Map requires the scenery up-normal interface; rebuild the renderer')
                 p.up_normal=data['up_normal']
+            if 'ground_stems' in data:
+                if not hasattr(p,'ground_stems'):raise RuntimeError('Map requires the native independent source tree position interface; rebuild the renderer')
+                p.ground_stems=data['ground_stems']
             p.target_uid='depot' if data['zone']=='mission_objective' else ''
             placements.append(p)
         args=[terrain,self.arrays['landcover'].astype(int).ravel().tolist(),self.arrays['macro_color'].reshape(-1,4).tolist(),materials,surfaces,placements,self.arrays['outer_landcover'].astype(int).ravel().tolist(),self.arrays['outer_macro_color'].reshape(-1,4).tolist()]

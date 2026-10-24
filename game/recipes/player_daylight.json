@@ -3,7 +3,7 @@
   "name": "player_daylight",
   "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
   "shader_source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shader-source",
-  "shader_cache": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shaders",
+  "shader_cache": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shaders-owned-source-v1",
   "physical_sky": true,
   "aerial_perspective": true,
   "high_quality_sky": false,
@@ -54,7 +54,7 @@
   },
   "shader_patch": {
     "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
-    "patched_objectHF_sha256": "08513b20084fcd165c82a5a9ecfe41645c4317647202ece766e787b58a731e7b",
+    "patched_objectHF_sha256": "a0b62b49b95bdda79bdf167fdfb53a33ad3d898764e4f347de016a124176add4",
     "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
     "patched_skyHF_sha256": "a74dec34f77c16adc67783bc3d4d0be5e24e88c52be7c24db60a7e625d762e05",
     "flat_nwu_horizon_haze": "Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.",
@@ -65,6 +65,9 @@
     "source_card_material_flag": "0x42565256",
     "source_card_backface_normals": "For registered source-volume cards only, mirror normal depth while retaining texture tangent/bitangent components on backfaces. Source images, alpha/depth and standard materials unchanged. Opposite-side volume lighting remains an impostor approximation.",
     "source_card_normal_encoding": "Exact retained source PNG loaded once per view as linear RGBA8; decode all three averaged normal channels for explicitly marked source-volume cards. No inferred hemisphere, altered source vectors or global normal-map change.",
+    "source_tree_grounding": "Explicit source UV1 base anchors or source-tree indices with per-instance north/west position streams, shared R32 core height atlas and indexed-triangle interpolation. Same raster deformation in color/depth/shadows and GPU draw-buffer inspection. Static triangle preload shifts current/previous geometry for visibility depth/velocity. Unused partial-batch slots collapse to zero-area triangles. Owned GPU instance copy patches bounds and stream offsets/counts before visibility; indexed raster only.",
+    "cache_provenance": "Owned-source-v1 cache starts without inherited compiled programs: old copied wishadermeta referenced upstream includes and left shadow variants stale. All compiled dependencies must refer to owned shader-source files.",
+    "patched_surfaceHF_sha256": "5e0256d0777de092801d3c19908aad7d10e4f29683cd28e72cfc86939d818927",
     "water_refraction_depth": "Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias."
   },
   "provenance": {
@@ -83,6 +86,7 @@
   "fxaa": false,
   "source_surface_corrections": true,
   "source_card_full_rgb_normals": true,
+  "source_tree_grounding": true,
   "canopy_color": [
     0.06,
     0.045,
