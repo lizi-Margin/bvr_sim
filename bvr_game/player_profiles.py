@@ -5,6 +5,7 @@ from pathlib import Path
 from .content import ROOT
 
 DEFAULT=ROOT/'game/config/player_flight_profiles.json'
+OPTIONAL_CAMERA={'subject_y','zoom_dolly'}
 def canonical(value):return json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode('utf-8')
 def merge(base,overlay):
     out=copy.deepcopy(base)
@@ -45,7 +46,9 @@ class PlayerProfileStore:
             p=self.resolve(id)
             if set(p['control'])!=required:raise ValueError(f'{id}: unknown/missing control fields')
             for section in ['control','input','camera']:
-                if set(p[section])!=set(d['units'][section]):raise ValueError(f'{id}: unknown/missing {section} fields')
+                actual=set(p[section]);declared=set(d['units'][section])
+                valid=(declared-OPTIONAL_CAMERA<=actual<=declared|OPTIONAL_CAMERA) if section=='camera' else actual==declared
+                if not valid:raise ValueError(f'{id}: unknown/missing {section} fields')
                 for key,value in p[section].items():
                     if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value):raise ValueError(f'{id}: nonfinite/nonnumeric {section}.{key}')
             c=p['control'];i=p['input'];cam=p['camera']
@@ -61,6 +64,8 @@ class PlayerProfileStore:
                    and cam['lift_spans']>=0 and cam['smoothing_hz']>0
                    and .3<=cam['normal_fov']<=1.6 and .3<=cam['zoom_fov']<=cam['normal_fov']):
                 raise ValueError(f'{id}: invalid player profile envelope/input/camera bounds')
+            if 'subject_y' in cam and not .5<=cam['subject_y']<=.8:raise ValueError(f'{id}: invalid camera subject anchor')
+            if 'zoom_dolly' in cam and not 0<=cam['zoom_dolly']<=1:raise ValueError(f'{id}: invalid camera zoom dolly')
             nonpositive=[k for k,v in c.items() if v<=0 and k not in {'min_alpha','min_g','trim_gain','trim_limit','yaw_damping','sideslip_gain','recovery_pitch'}]
             if nonpositive:raise ValueError(f'{id}: nonpositive control fields {nonpositive}')
     def native_profile(self,native,aircraft_id):

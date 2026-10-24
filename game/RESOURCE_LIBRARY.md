@@ -82,3 +82,28 @@ python game/tools/build_river_valley_recipe.py --retexture-map game/maps/river_v
 原生渲染器支持可选外围材质；旧地图保持原来的材质接口。外围材质元数据不会传进核心高度结构。新版本发布前验证全部依赖，重复烘焙得到同一版本时不重写已有版本文件，只原子发布根指针。首次使用需重建 `bvr_game_render`，缺少接口的旧模块会给出明确错误。
 
 外围覆盖消除了旧焦点区域的明显矩形颜色中断，但不能因此宣布自然地景完成：近景树林仍稀疏、树冠代理平面化，农田边界规整，河面与岸线缺少可信深度。当前候选保留原地图作为默认，完整画面与性能验收尚未完成。
+
+## 共享河床与独立水面候选
+
+```powershell
+python game/tools/build_river_valley_recipe.py --bake --outer-cover --river-channel --recipe-output NEW_DIRECTORY/scene-recipe.json --output NEW_DIRECTORY
+python game/tools/validate_player_ccip.py --river-case --map NEW_DIRECTORY/generated-map.json --output NEW_CCIP_DIRECTORY
+```
+
+`--river-channel` 必须完整烘焙，不能与只改材质的 `--retexture-map` 合用。它把设计深度 4m、岸宽 22m、岸脊 0.8m 的横截面写入同一份高度 NPZ；全部高度分辨率调用相同规则，区域边界仍接回原有 BVR 地形。水面在重点河段使用配方的河流水位，外围平滑接回原有粗地形水面。核心、显示与 CCIP 继续读取烘焙后的共享三角网格，不在渲染端临时挖沟。
+
+河床和裸露岸边使用已注册土壤源材质，水色与吸收采用明确记录的工程参数，不代表实测水质或测深。`--river-case` 增加一次真实河道投弹，并要求实际落点位于河道、低于水面至少 1m，且 CCIP 与核心接触误差均不超过 0.1m。现有核心仍将航弹积分到共享河床；本轮不增加流体阻力、浮力或触水引爆。
+
+当前实际网格横截面中心深度约 3.994–4.000m，25m 区域网格的插值解释了与设计值的微小差异。完整新场景会按相同 seed 重新执行地形约束的摆放规则，因此不能声称所有实例坐标、环境或核心帧与旧地图相同；用新地图自己的输入带验证 headless/render 重放。均匀河宽、岸线细节、稀疏树林与大田块仍是画质限制，默认地图暂不切换。
+
+## 逐树远景与林下地面候选
+
+```powershell
+python game/tools/build_river_valley_recipe.py --bake --outer-cover --river-channel --forest-asset fir_grove_normal_a --forest-floor-only --recipe-output NEW_DIRECTORY/scene-recipe.json --output NEW_DIRECTORY
+```
+
+`fir_grove_normal_a` 是已注册真实源树的副本，远景保留每棵树的三维位置、源反照率、透明度与法线卡片；每簇 64 棵，远景 512 三角形。它仍是可见性与轮廓近似，不能称为完整枝叶几何。`--forest-floor-only` 让已注册林下地面材质直接留在树下，不再把顶视树冠预览投到地上；它要求逐树远景资源与完整烘焙，不能搭配只改材质的 `--retexture-map`。旧地图和旧资源保持原来的流程。
+
+林簇接地支持批量查询同一套三角网格插值，避免对每棵源树反复执行 Python 标量采样。旧标量入口保留用于比较；真实源林簇的完整倾斜、接受/拒绝、接地误差和全部根部坐标须一致。批量化只加速离线摆放，不改变地形、实时核心或 GPU 的物理判定，也不能用离线耗时作为游戏帧率证据。
+
+地图检查对明确声明 `inter_grove_stem_spacing_m` 的源林簇，允许树冠包围圆相交，并改查实际缩放、偏航、地形倾斜后的源树干间距；普通资源仍检查包围圆。水面、道路、禁建区和资源哈希检查继续生效。检测覆盖全部源树干，保留实际冲突距离；合成用例同时验证合法的树冠相交和错误的树干过近。独立 GPU 根部变换检查用于核对离线矩阵，不能只凭生成器自己的拟合结果宣布接地正确。当前装饰林簇仍允许约 0.25m 的根部拟合误差，它与物理接触面的 0.1m 验收是不同检查。

@@ -28,6 +28,11 @@ def main():
                 'runway_approach':([3550,280,-4400],[3500,220,-1400]),
                 'airport_apron':([3400,340,-2700],[2800,225,-2100]),
                 'river_valley':([1100,500,500],[-650,120,2850]),
+                'river_bank_low':([-1100,145,-300],[-680,120,500]),
+                'river_channel_overhead':([-650,900,100],[-650,120,101]),
+                'forest_edge':([2250,245,-2900],[2100,225,-2500]),
+                'forest_overflight':([2250,620,-2700],[2100,210,-2200]),
+                'forest_transition':([2900,420,-3400],[2100,210,-2200]),
                 'town_roads':([3400,600,2200],[2700,210,3500]),
                 'industry_frontage':([2400,520,1700],[1400,180,2650]),
                 'regional_transition':([3500,4200,-7000],[0,170,6000])}
@@ -78,6 +83,19 @@ def main():
                                     (n0+fraction*dn,w0+delta),(n0+fraction*dn,w0+dw+delta)]:
                             actual=g.renderer.render_height(n,w);expected=terrain.height(n,w)
                             height_samples.append({'point':[n,w],'boundary_sample':True,'core':expected,'renderer':actual,'error_m':abs(actual-expected)})
+            if g.baked_scene.document.get('landscape',{}).get('river_channel'):
+                from shapely.geometry import Point,LineString
+                for river in g.baked_scene.document['rivers']:
+                    line=LineString(river['points'])
+                    for north in [-7000,-3500,0,2500,6500]:
+                        station=line.project(Point(north,600));p=line.interpolate(station)
+                        left=line.interpolate(station-1);right=line.interpolate(station+1)
+                        dn,dw=right.x-left.x,right.y-left.y;length=math.hypot(dn,dw)
+                        half=river['width_m']/2;bank=g.baked_scene.document['landscape']['river_channel']['bank_width_m']
+                        for across in [-half-bank,-half,-half/2,0,half/2,half,half+bank]:
+                            n=p.x-dw/length*across;w=p.y+dn/length*across
+                            actual=g.renderer.render_height(n,w);expected=terrain.height(n,w)
+                            height_samples.append({'point':[n,w],'river_cross_section':True,'core':expected,'renderer':actual,'error_m':abs(actual-expected)})
             for surface in g.baked_scene.document['environment']['contact_surfaces']:
                 vertices=surface['vertices'];n=sum(v[0] for v in vertices)/len(vertices);w=sum(v[1] for v in vertices)/len(vertices)
                 expected=terrain.contact(n,w,0,float('inf')).height;actual=g.renderer.render_surface_height(n,w)

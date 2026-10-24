@@ -10,6 +10,8 @@ from bvr_game.content import ASSETS,sha,write_json
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--orbit-frames',type=int,default=0,help='Optional paused-scene camera inspection at10fps; not a flight or performance test')
+    p.add_argument('--camera-anchor',nargs=3,type=float,metavar=('NORTH','WEST','HEIGHT'),help='Optional fixed NWU orbit anchor for matched source/LOD scene comparisons; does not move any simulation object')
+    p.add_argument('--camera-path',choices=['orbit','lod_sweep'],default='orbit',help='Paused inspection path; lod_sweep approaches and retreats through the normal LOD threshold')
     p.add_argument('--visual-profile',type=Path,default=ROOT/'game/recipes/player_daylight.json')
     a=p.parse_args()
     if not 0<=a.orbit_frames<=1800:raise ValueError('Orbit frames must be0..1800')
@@ -33,11 +35,15 @@ def main():
             n,w,z=actual[:,2],-actual[:,0],actual[:,1]
             heights=np.array([g.sim.terrain().height(float(x),float(y)) for x,y in zip(n,w)])
             errors=np.abs(z-heights)
+            from bvr_game.grove_grounding import placed_stems
+            expected=placed_stems(manifest,item);rendered=np.column_stack([n,w,z]);transform_error=float(np.max(np.abs(rendered-expected)))
+            assert transform_error<.003,(item['id'],transform_error)
             rows.append({'id':item['id'],'map_fit':item['grove_ground_fit'],'actual_rendered_anchors_nwu':np.column_stack([n,w,z]).tolist(),
-                'core_heights':heights.tolist(),'maximum_error_m':float(errors.max())})
+                'core_heights':heights.tolist(),'maximum_error_m':float(errors.max()),'maximum_actual_transform_error_m':transform_error})
         captures=[]
         hero=next(i for i in groves if i['id'] in selected and i['zone']=='sample_woodland') if any(i['zone']=='sample_woodland' for i in selected.values()) else next(iter(selected.values()))
         n,w,h=hero['position'];target=[-w,h+6,n]
+        if a.camera_anchor:n,w,h=a.camera_anchor;target=[-w,h+6,n]
         for label,distance in [('near',90),('near_lod_edge',850),('far_lod_edge',950)]:
             g.set_camera([-w+distance*.8,h+max(18,distance*.16),n-distance*.6],target,.8)
             for _ in range(50):g.draw()
@@ -53,13 +59,18 @@ def main():
                 for index in range(a.orbit_frames):
                     angle=2*math.pi*index/a.orbit_frames
                     eye=[-w+90*math.cos(angle),h+18+45*(.5-.5*math.cos(angle)),n+90*math.sin(angle)]
+                    if a.camera_path=='lod_sweep':
+                        distance=90+1310*(.5-.5*math.cos(angle))
+                        eye=[-w+distance*.8,h+max(18,distance*.16),n-distance*.6]
                     g.set_camera(eye,target,.8);g.draw();encoder.stdin.write(g.renderer.capture_rgb())
-                    camera_rows.append({'index':index,'eye':eye,'target':target,'fov':.8,'tick':g.sim.frame().tick})
+                    camera_rows.append({'index':index,'eye':eye,'target':target,'fov':.8,'tick':g.sim.frame().tick,
+                        'visible_lods':list(g.renderer.statistics().visible_lods)})
                     if index%30==0:g.capture('orbit-'+str(index))
             finally:
                 encoder.stdin.close();code=encoder.wait()
             if code:raise RuntimeError('Orbit encoder failed: '+str(code))
             orbit={'file':str(movie),'frames':a.orbit_frames,'fps':10,'camera':camera_rows,
+                'camera_path':a.camera_path,
                 'scope':'Paused-scene camera orbit for source-card orientation/shading/coverage inspection; not physical flight or performance evidence'}
         for label,eye,aim in [
             ('water-low',[-700,145,-1800],[-280,120,-1800]),

@@ -274,6 +274,7 @@ class FlightGame:
         else:
             bounds=self.current_aircraft()['appearance'].get('bounds')
             self.chase.scale=max(.35,max(bounds['span'])/19) if bounds else 1
+            self.chase.subject_offset_blender=[(a+b)/2 for a,b in zip(bounds['min'],bounds['max'])] if bounds else [0,0,0]
             eye,target,fov,up=self.chase.update(p,dt,free,aim or self.aim,self.width,self.height,getattr(self,'zoom',False))
             self.camera_state=eye;self.set_camera(eye,target,fov,manual=False,up=up)
 
@@ -307,6 +308,7 @@ class FlightGame:
         if hasattr(self.renderer,'audio_available'):metadata['audio']={'available':self.renderer.audio_available(),'play_counts':self.renderer.audio_counts()}
         if hasattr(self.renderer,'aircraft_statistics'):metadata['aircraft_statistics']=serialize(self.renderer.aircraft_statistics())
         metadata['hud_layout']=self.hud_layout
+        metadata['camera_framing']=self.chase.framing_state
         if self.baked_scene:
             metadata['terrain_sha256']=self.baked_scene.document['terrain']['sha256']
             metadata['statistics']=serialize(self.renderer.statistics())

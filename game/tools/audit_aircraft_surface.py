@@ -5,6 +5,33 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from bvr_game.content import write_json,sha
 
+def scene_positions(path):
+    """Read rest-scene source vertices with their declared glTF hierarchy."""
+    data=Path(path).read_bytes();length=struct.unpack_from('<I',data,12)[0];doc=json.loads(data[20:20+length]);offset=20+length
+    size,kind=struct.unpack_from('<II',data,offset);assert kind==0x004e4942;blob=data[offset+8:offset+8+size]
+    def positions(index):
+        a=doc['accessors'][index];v=doc['bufferViews'][a['bufferView']]
+        assert a['componentType']==5126 and a['type']=='VEC3' and not a.get('sparse')
+        return np.ndarray((a['count'],3),'<f4',blob,v.get('byteOffset',0)+a.get('byteOffset',0),strides=(v.get('byteStride',12),4)).astype(float)
+    result=[]
+    def visit(index,parent):
+        node=doc['nodes'][index]
+        if 'matrix' in node:local=np.asarray(node['matrix']).reshape((4,4),order='F')
+        else:
+            x,y,z,w=node.get('rotation',[0,0,0,1]);local=np.eye(4)
+            local[:3,:3]=np.array([[1-2*(y*y+z*z),2*(x*y-z*w),2*(x*z+y*w)],
+                [2*(x*y+z*w),1-2*(x*x+z*z),2*(y*z-x*w)],
+                [2*(x*z-y*w),2*(y*z+x*w),1-2*(x*x+y*y)]])@np.diag(node.get('scale',[1,1,1]))
+            local[:3,3]=node.get('translation',[0,0,0])
+        world=parent@local
+        if 'mesh' in node:
+            if 'skin' in node:raise ValueError('Source hull audit does not approximate skinned meshes')
+            for primitive in doc['meshes'][node['mesh']]['primitives']:
+                p=positions(primitive['attributes']['POSITION']);result.append(p@world[:3,:3].T+world[:3,3])
+        for child in node.get('children',[]):visit(child,world)
+    for root in doc['scenes'][doc.get('scene',0)]['nodes']:visit(root,np.eye(4))
+    return np.concatenate(result)
+
 def inspect(path):
     data=path.read_bytes();length=struct.unpack_from('<I',data,12)[0]
     doc=json.loads(data[20:20+length]);offset=20+length

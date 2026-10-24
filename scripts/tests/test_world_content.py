@@ -14,6 +14,59 @@ from bvr_game.pilots import CombatPilot,StrikePilot
 MAP=ROOT/'game/maps/training_range_v2/generated-map.json'
 
 class ContentTests(unittest.TestCase):
+    def test_overlapping_grove_crowns_still_enforce_source_stem_spacing(self):
+        from bvr_game.grove_grounding import stem_spacing_report
+        manifest={'cluster':{'recentering':[0,0,0],'poses_before_recentering':[{'base_anchor':[0,0,0]},{'base_anchor':[0,4,0]}]},
+            'conversion_recipe':{'policy':{'cluster':{'inter_grove_stem_spacing_m':2.5}}}}
+        a={'id':'a','model':'source','position':[0,0,0],'yaw':0,'scale':1,'radius_m':10}
+        b={**a,'id':'b','position':[0,2.6,0]}
+        self.assertFalse(stem_spacing_report([a,b],{'source':manifest})['failures'])
+        b['position']=[0,2,0]
+        report=stem_spacing_report([a,b],{'source':manifest})
+        self.assertEqual(len(report['failures']),2)
+        self.assertTrue(all(x['distance_m']==2 for x in report['failures']))
+
+    def test_batch_terrain_and_grove_grounding_match_scalar_path(self):
+        from bvr_game.worldgen import BakedTerrain
+        from bvr_game.grove_grounding import fit_grove
+        scene=BakedScene(MAP);meta=scene.document['terrain'];grid=BakedTerrain(scene.arrays['base'],scene.arrays['focus'],meta['base'],meta['details'][0])
+        random=np.random.default_rng(3124);points=random.uniform(-12000,12000,(300,2))
+        boundary=meta['details'][0]['origin_north'];points=np.vstack([points,[[boundary,0],[boundary-.01,0],[boundary+.01,0]]])
+        scalar=np.array([grid.height(*p) for p in points]);batch=grid.height_many(points[:,0],points[:,1])
+        np.testing.assert_array_equal(batch,scalar)
+        # A real source's64 stem anchors exercise fitting, tilt rejection and
+        # retained world anchors. Both paths must accept/reject identically.
+        manifest=json.loads((ROOT/'game/assets/registered/fir_grove_normal_a/manifest.json').read_text())
+        accepted=0
+        for n,w in [(-2500,-2100),(-3000,-2000),(-4000,-1000),(0,0),(7000,7000)]:
+            a=fit_grove(manifest,n,w,.37,.9,grid.height,include_anchors=True)
+            b=fit_grove(manifest,n,w,.37,.9,grid.height,sample_heights=grid.height_many,include_anchors=True)
+            self.assertEqual(a,b)
+            accepted+=a is not None
+        self.assertGreater(accepted,0)
+
+    def test_channel_uses_shared_bed_banks_and_independent_level_water(self):
+        from bvr_game.river_valley import height_rule
+        baker=Baker.__new__(Baker)
+        baker.r={'terrain':{'river_level_m':120,'airport_height_m':220},'focus_area_km':[20,20],
+            'airfields':[],'rivers':[{'points':[[-20000,0],[20000,0]],'width_m':95}],
+            'landscape':{'valley_base_rise_m':95,'valley_scale_m':1800,'ridge_start_m':2200,'ridge_scale_m':6000,
+                'ridge_amplitude_m':450,'undulation_m':35,'earthwork_blend_m':180,'regional_transition_m':1200}}
+        n=np.array([0.,0.,0.,0.,11000.]);w=np.array([0.,35.,47.5,120.,0.]);outer=np.full(n.shape,125.)
+        original=height_rule(baker,n,w,outer)
+        baker.r['landscape']['river_channel']={'depth_m':4,'bank_width_m':22,'bank_height_m':.8}
+        generated=height_rule(baker,n,w,outer)
+        self.assertAlmostEqual(float(generated[0]),116.,places=4)
+        self.assertLess(generated[1],120.)
+        self.assertGreater(generated[2],120.7)
+        np.testing.assert_array_equal(generated[3:],original[3:])
+        baker.surfaces=[]
+        baker.terrain=SimpleNamespace(height=lambda n,w:float(height_rule(baker,np.asarray(n),np.asarray(w),np.asarray(125.))))
+        baker.surface_ribbon('river',[[-500,0],[500,0]],95,'water',.025)
+        water=np.asarray(baker.surfaces[0]['vertices'])
+        np.testing.assert_array_equal(water[:,2],np.full(len(water),120.))
+        self.assertGreater(water[0,2]-baker.terrain.height(-500,0),3.9)
+
     def test_material_only_base_metadata_preserves_complete_core_terrain(self):
         original=BakedScene(MAP);document=json.loads(json.dumps(original.document))
         document['terrain']['base']['material']='presentation_only'

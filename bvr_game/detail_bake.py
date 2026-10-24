@@ -217,6 +217,12 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     labels[contains_xy(baker.industry,n,w)]=3
     for road,line in baker.roads:
         shoulder=_distance_line(n,w,line)<road['width_m']/2+3;labels[shoulder]=3
+    if baker.r.get('landscape',{}).get('river_channel'):
+        # Real source soil on the bed and exposed banks. This is material
+        # appearance only; depth comes from the shared height archive above.
+        width=max(r['width_m'] for r in baker.r['rivers'])/2
+        bank=baker.r['landscape']['river_channel']['bank_width_m']
+        labels[baker.distance_river(n,w)<width+bank]=3
     names=['grass','farmland','forest','soil','rock','pavement','water','marking']
     color=np.zeros((*n.shape,3),dtype=np.float32);normal=np.zeros_like(color);rough=np.zeros(n.shape,dtype=np.float32)
     source_files={};canopy_report=None

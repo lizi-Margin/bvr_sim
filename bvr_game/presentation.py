@@ -45,6 +45,7 @@ class ChaseCamera:
             from .player_profiles import PlayerProfileStore
             settings=PlayerProfileStore().resolve('F22')['camera']
         self.settings=dict(settings)
+        self.framing_state={}
         self.eye=None;self.target=None;self.yaw=None;self.fov=self.settings['normal_fov'];self.free=[0.,0.];self.roll=0.;self.last_position=None
     def reset(self):self.__init__(self.settings)
     def update(self,entity,dt,free,aim,width,height,zoom):
@@ -61,9 +62,20 @@ class ChaseCamera:
         north,west,alt=entity.position;distance=cfg['distance_spans']*19*scale
         forward=[-math.sin(yaw)*math.cos(pitch),math.sin(pitch),math.cos(yaw)*math.cos(pitch)]
         position=[-west,alt,north];lift=cfg['lift_spans']*19*scale
+        if 'subject_y' in cfg:
+            # Source model origins need not coincide with their visible centre
+            # (the imported A-10 extends almost entirely behind its origin).
+            # Follow that measured visual offset without moving the aircraft.
+            x,y,z=getattr(self,'subject_offset_blender',(0,0,0));roll,pitch_body,yaw_body=entity.orientation
+            c,s=math.cos(yaw_body),math.sin(yaw_body);cp,sp=math.cos(pitch_body),math.sin(pitch_body)
+            f=[c*cp,s*cp,-sp];right_body=[s,-c,0];up_body=[c*sp,s*sp,cp]
+            r=[right_body[i]*math.cos(roll)-up_body[i]*math.sin(roll) for i in range(3)]
+            u=[up_body[i]*math.cos(roll)+right_body[i]*math.sin(roll) for i in range(3)]
+            offset=[x*r[i]+y*f[i]+z*u[i] for i in range(3)]
+            position=[position[0]-offset[1],position[1]+offset[2],position[2]+offset[0]]
         eye=[position[i]-forward[i]*distance+(lift if i==1 else 0) for i in range(3)]
         target=[position[i]+forward[i]*cfg['lookahead_m'] for i in range(3)]
-        current=[-west,alt,north]
+        current=position
         if self.eye is None:self.eye=eye;self.target=target
         elif self.last_position is not None:
             # Smooth the relative chase offset; carry measured translation
@@ -75,4 +87,25 @@ class ChaseCamera:
         self.eye=[a+(b-a)*alpha for a,b in zip(self.eye,eye)]
         self.target=[a+(b-a)*alpha for a,b in zip(self.target,target)]
         right=[math.cos(yaw),0,math.sin(yaw)]
-        return self.eye,self.target,self.fov,[right[i]*math.sin(self.roll)+(math.cos(self.roll) if i==1 else 0) for i in range(3)]
+        up=[right[i]*math.sin(self.roll)+(math.cos(self.roll) if i==1 else 0) for i in range(3)]
+        if 'subject_y' not in cfg:
+            # Frozen legacy profiles retain their original camera/replay path.
+            self.framing_state={}
+            return self.eye,self.target,self.fov,up
+        from .player_input import dot,cross,unit
+        zoom_scale=(math.tan(cfg['normal_fov']/2)/math.tan(self.fov/2))**cfg.get('zoom_dolly',0)
+        offset=unit([a-b for a,b in zip(self.eye,position)],unit([a-b for a,b in zip(eye,position)]))
+        # Interpolate orbital direction, retaining the declared camera radius.
+        # Apply dolly compensation after smoothing so FOV and subject size do
+        # not temporarily disagree during the zoom transition.
+        radius=math.dist(eye,position);render_eye=[position[i]+offset[i]*radius*zoom_scale for i in range(3)]
+        forward=unit([b-a for a,b in zip(self.eye,self.target)],forward)
+        r=unit(cross(up,forward),right);u=unit(cross(forward,r))
+        subject=[a-b for a,b in zip(position,render_eye)];y=dot(subject,u);z=dot(subject,forward)
+        tangent=(2*cfg['subject_y']-1)*math.tan(self.fov/2)
+        angle=math.atan2(y+tangent*z,z-tangent*y)
+        framed=[forward[i]*math.cos(angle)+u[i]*math.sin(angle) for i in range(3)]
+        framed_up=[u[i]*math.cos(angle)-forward[i]*math.sin(angle) for i in range(3)]
+        render_target=[render_eye[i]+framed[i]*(distance+cfg['lookahead_m']) for i in range(3)]
+        self.framing_state={'subject_y':cfg['subject_y'],'subject_position_wicked':position,'zoom_scale':zoom_scale,'distance_m':math.dist(render_eye,position),'pitch_reframe_rad':angle}
+        return render_eye,render_target,self.fov,framed_up

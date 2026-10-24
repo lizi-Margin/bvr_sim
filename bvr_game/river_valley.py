@@ -6,6 +6,22 @@ from shapely.geometry import Point,Polygon
 def smooth(x):
     t=np.clip(x,0,1);return t*t*(3-2*t)
 
+def channel_profile(baker,n,w):
+    """Offline channel earthwork, shared by every generated height resolution."""
+    cfg=baker.r['landscape'].get('river_channel')
+    if not cfg:return np.zeros(np.broadcast(n,w).shape)
+    depth=float(cfg['depth_m']);bank=float(cfg['bank_width_m']);rim=float(cfg['bank_height_m'])
+    if not (1<=depth<=15 and 10<=bank<=100 and 0<=rim<=3):raise ValueError('Invalid authored river channel dimensions')
+    # A single connected river reach has one declared width. Multiple reaches
+    # with differing widths need their own cross sections rather than silently
+    # applying the width of an unrelated river to the nearest centreline.
+    widths={float(r['width_m']) for r in baker.r['rivers']}
+    if len(widths)!=1:raise ValueError('Channel recipe requires a common river width')
+    half=next(iter(widths))/2;d=baker.distance_river(n,w)
+    bed=-depth*smooth((half-d)/(half*.55))
+    shoulder=rim*smooth((d-half*.65)/(half*.35))*(1-smooth((d-half)/bank))
+    return bed+shoulder
+
 def height_rule(baker,n,w,outer):
     r=baker.r;cfg=r['landscape'];d=baker.distance_river(n,w)
     h=r['terrain']['river_level_m']+cfg['valley_base_rise_m']*(1-np.exp(-(d/cfg['valley_scale_m'])**2))
@@ -13,6 +29,7 @@ def height_rule(baker,n,w,outer):
     ridge=(.6+.4*np.sin(n/2600+.5*np.sin(w/2100)))
     h+=cfg['ridge_amplitude_m']*sides*ridge
     h+=cfg['undulation_m']*(np.sin(n/730)*np.cos(w/1100)+.3*np.sin((n+w)/350))*smooth((d-120)/600)
+    if cfg.get('river_channel'):h+=channel_profile(baker,n,w)
     # Only the actual runway, taxiway and apron have graded earthworks. Towns
     # and industry follow the valley instead of sitting on rectangular mesas.
     for a in r['airfields']:
@@ -151,12 +168,18 @@ def finish_world(baker,document,out):
             if meta['origin_north']<=n<=meta['origin_north']+meta['spacing']*(meta['columns']-1) and meta['origin_west']<=w<=meta['origin_west']+meta['spacing']*(meta['rows']-1):
                 return float(sample_grid(arrays[meta.get('array_key','focus')],meta,n,w))
         return baker.terrain.height(n,w)
+    def heights(n,w):
+        n,w=np.broadcast_arrays(n,w);result=baker.terrain.height_many(n,w)
+        for meta in document['terrain']['details']:
+            inside=(n>=meta['origin_north'])&(n<=meta['origin_north']+meta['spacing']*(meta['columns']-1))&(w>=meta['origin_west'])&(w<=meta['origin_west']+meta['spacing']*(meta['rows']-1))
+            result=np.where(inside,sample_grid(arrays[meta.get('array_key','focus')],meta,n,w),result)
+        return result
     accepted=[];grove_fits=[];rejected=0
     for item in document['instances']:
         manifest=baker.metadata[item['model']]
         if manifest.get('cluster'):
             from .grove_grounding import fit_grove
-            fit=fit_grove(manifest,*item['position'][:2],item['yaw'],item['scale'],height)
+            fit=fit_grove(manifest,*item['position'][:2],item['yaw'],item['scale'],height,sample_heights=heights)
             if fit is None:rejected+=1;continue
             item.update(up_normal=fit['up_normal'],grove_ground_fit=fit)
             item['position'][2]=fit['height'];grove_fits.append(fit)

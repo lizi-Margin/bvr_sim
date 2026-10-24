@@ -76,8 +76,12 @@ def main():
     p.add_argument('--forest-asset',default='fir_grove_cards_c',help='Registered grove resource; earlier candidates: pine_grove_a or fir_grove_c')
     p.add_argument('--recipe-output',type=Path,default=ROOT/'game/recipes/river_valley_airfield.json',help='Save a candidate recipe separately while keeping the current default map recipe')
     p.add_argument('--outer-cover',action='store_true',help='Continue source-albedo land use across the full outer terrain')
+    p.add_argument('--river-channel',action='store_true',help='Generate a shared physical riverbed and banks below a separate water surface; requires a full bake')
+    p.add_argument('--forest-floor-only',action='store_true',help='Use source ground albedo under individual-tree 3D LODs, without ground-projected canopy imagery')
     p.add_argument('--retexture-map',type=Path,help='Rebake materials of a verified immutable map, preserving all terrain and scene geometry')
     a=p.parse_args()
+    if a.river_channel and a.retexture_map:p.error('--river-channel changes shared terrain and requires --bake, not --retexture-map')
+    if a.forest_floor_only and a.retexture_map:p.error('--forest-floor-only requires a full bake with an individual-tree forest asset')
     if a.retexture_map:
         if a.recipe_output==ROOT/'game/recipes/river_valley_airfield.json':a.recipe_output=a.output/'scene-recipe.json'
         source_pointer=json.loads(a.retexture_map.read_text(encoding='utf8'))
@@ -87,6 +91,15 @@ def main():
         r=json.loads((a.retexture_map.parent/'scene-recipe.json').read_text(encoding='utf8'))
     else:r=recipe(a.forest_asset)
     if a.outer_cover:r['landscape']['outer_surface']={'resolution':4096,'field_size_m':900,'forest_scale_m':3600,'focus_blend_m':2200}
+    if a.river_channel:
+        r['landscape']['river_channel']={'depth_m':4.,'bank_width_m':22.,'bank_height_m':.8,
+            'provenance':'Authored 4m channel cross section; not measured bathymetry or fluid simulation'}
+        r['materials']['water']['color']=[.045,.075,.055,.65]
+    if a.forest_floor_only:
+        forest=json.loads((ROOT/'game/assets/registered'/a.forest_asset/'manifest.json').read_text(encoding='utf8'))
+        if not (forest.get('impostor') or {}).get('source_trees'):p.error('--forest-floor-only requires individual-tree far LODs; select a registered asset such as fir_grove_normal_a')
+        r['materials']['forest'].pop('canopy_proxy',None)
+        r['landscape']['forest_floor_note']='Source ground albedo and actual individual-tree 3D LODs; no ground-projected canopy preview'
     write_json(a.recipe_output,r)
     if a.bake or a.retexture_map:
         from bvr_game.worldgen import Baker

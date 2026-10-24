@@ -39,6 +39,10 @@ class BakedTerrain:
         m=self.fine_meta
         if m['origin_north']<=n<=m['origin_north']+m['spacing']*(m['columns']-1) and m['origin_west']<=w<=m['origin_west']+m['spacing']*(m['rows']-1):return float(sample_grid(self.fine,m,n,w))
         return float(sample_grid(self.base,self.base_meta,n,w))
+    def height_many(self,n,w):
+        n,w=np.broadcast_arrays(n,w);m=self.fine_meta
+        inside=(n>=m['origin_north'])&(n<=m['origin_north']+m['spacing']*(m['columns']-1))&(w>=m['origin_west'])&(w<=m['origin_west']+m['spacing']*(m['rows']-1))
+        return np.where(inside,sample_grid(self.fine,m,n,w),sample_grid(self.base,self.base_meta,n,w))
     def slope(self,n,w):return math.hypot(self.height(n+25,w)-self.height(n-25,w),self.height(n,w+25)-self.height(n,w-25))/50
 
 class Baker:
@@ -138,7 +142,7 @@ class Baker:
         if m.get('cluster'):
             from .grove_grounding import fit_grove
             if yaw is None:yaw=self.rng.uniform(-math.pi,math.pi)
-            fit=fit_grove(m,n,w,yaw,scale,self.terrain.height,include_anchors=bool(stem_spacing))
+            fit=fit_grove(m,n,w,yaw,scale,self.terrain.height,sample_heights=self.terrain.height_many,include_anchors=bool(stem_spacing))
             if fit is None:self.rejections['grove_ground_fit']=self.rejections.get('grove_ground_fit',0)+1;return False
         stems=fit.pop('_world_anchors',[]) if fit else []
         if stems:
@@ -163,7 +167,17 @@ class Baker:
             point=line.interpolate(d);before=line.interpolate(max(0,d-1));after=line.interpolate(min(line.length,d+1));dn=after.x-before.x;dw=after.y-before.y;length=math.hypot(dn,dw)
             for sign in [-1,1]:
                 n=point.x-sign*dw/length*width/2;w=point.y+sign*dn/length*width/2
-                vertices.append([round(n,4),round(w,4),round(self.terrain.height(n,w)+offset,5)])
+                z=self.terrain.height(n,w)+offset
+                if material=='water' and self.r.get('landscape',{}).get('river_channel'):
+                    # Water is a separate free surface above the shared bed,
+                    # not a ribbon glued to either sloping bank. Keep the old
+                    # coarse outer reach, with a smooth focus-edge transition.
+                    halfn,halfw=(k*500 for k in self.r['focus_area_km'])
+                    border=min(halfn-abs(n),halfw-abs(w))
+                    from .river_valley import smooth
+                    t=float(smooth(border/self.r['landscape']['regional_transition_m']))
+                    z=z*(1-t)+self.r['terrain']['river_level_m']*t
+                vertices.append([round(n,4),round(w,4),round(z,5)])
         for i in range(len(distance)-1):
             a=i*2;indices.extend([a,a+2,a+1,a+1,a+2,a+3])
         surface={'id':id,'material':material,'vertices':vertices,'indices':indices,'width_m':width,'length_m':line.length,'collision_height_offset':offset}
@@ -355,7 +369,8 @@ class Baker:
             from .regional_cover import bake_outer_cover
             bake_outer_cover(self,result,arrays,out)
             regional={**self.r['detail_sample'],'size_m':[x*1000 for x in self.r['focus_area_km']],
-                'texture_resolution':self.r['landscape']['macro_resolution'],'seam_blend_m':self.r['landscape']['regional_transition_m'],
+                'texture_resolution':self.r['landscape']['macro_resolution'],
+                'seam_blend_m':self.r['landscape'].get('outer_surface',{}).get('focus_blend_m',self.r['landscape']['regional_transition_m']),
                 'material_detail_strength':.65,'macro_source_tile_m':160}
             _bake_material(result,arrays,result['terrain']['details'][0],regional,out,self,material_id='regional_1',prefix='regional')
             result['terrain']['details'][0]['material']='regional_1'

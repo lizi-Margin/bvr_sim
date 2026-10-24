@@ -11,9 +11,10 @@ def validate(path):
     scene=BakedScene(path);d=scene.document;failures=[];items=d['instances'];counts={}
     water=unary_union([LineString(r['points']).buffer(r['width_m']/2,cap_style=2) for r in d['rivers']])
     roads=unary_union([LineString(r['points']).buffer(r['width_m']/2+10) for r in d['roads']])
-    versions=d['resource_versions'];inventory=[]
+    versions=d['resource_versions'];inventory=[];metadata={}
     for id,version in versions.items():
         p=ASSETS/'registered'/id/'manifest.json';m=json.loads(p.read_text(encoding='utf8'))
+        metadata[id]=m
         for key in ['source_url','license','source_sha256','blender','conversion_recipe','units','bounds_blender','vertices','faces','materials','textures','lods','recommended_use','recommended_density_per_km2','collision_type','instancing_allowed','distribution_allowed']:
             if key not in m:failures.append({'asset':id,'missing_field':key})
         if m['license']!='CC0-1.0' or not m['distribution_allowed']:failures.append({'asset':id,'license':m['license']})
@@ -25,6 +26,9 @@ def validate(path):
         if len(m['lods'])<2:failures.append({'asset':id,'error':'two LODs required'})
         inventory.append(m)
     exclusions=[(e,box(e['center'][0]-e['size_m'][0]/2,e['center'][1]-e['size_m'][1]/2,e['center'][0]+e['size_m'][0]/2,e['center'][1]+e['size_m'][1]/2)) for e in d['exclusion_zones']]
+    from .grove_grounding import stem_spacing_report
+    stem_report=stem_spacing_report(items,metadata);failures.extend(stem_report['failures'])
+    overlapping_crowns={item['id'] for item in items if metadata[item['model']].get('cluster') and metadata[item['model']].get('conversion_recipe',{}).get('policy',{}).get('cluster',{}).get('inter_grove_stem_spacing_m',0)}
     seen=set();grid={};pairs=0
     for item in items:
         id=item['id'];n,w,h=item['position'];radius=item['radius_m'];point=Point(n,w);category=item['category']
@@ -42,6 +46,7 @@ def validate(path):
             for b in range(key[1]-2,key[1]+3):
                 for other in grid.get((a,b),[]):
                     pairs+=1
+                    if id in overlapping_crowns and other['id'] in overlapping_crowns:continue
                     if math.hypot(n-other['position'][0],w-other['position'][1])<radius+other['radius_m']-.015:failures.append({'instance':id,'other':other['id'],'error':'footprint overlap'})
         grid.setdefault(key,[]).append(item)
     for category,key in [('vegetation','vegetation_instances'),('building','building_instances'),('prop','prop_instances')]:
@@ -53,7 +58,7 @@ def validate(path):
     required=set(surface_names[:7]);missing=required-represented
     if missing:failures.append({'error':'missing land-use classes','missing':sorted(missing),'raster_classes':unique})
     if np.ptp(fine)<150:failures.append({'error':'insufficient genuine relief'})
-    return {'status':'passed' if not failures else 'failed','map_sha256':sha(path),'terrain_sha256':d['terrain']['sha256'],'instances':len(items),'counts':counts,'chunks':len(d['chunks']),'fine_sample_m':d['terrain']['details'][0]['spacing'],'height_range_m':[float(fine.min()),float(fine.max())],'landcover_classes':unique,'represented_land_use':sorted(represented),'checked_neighbor_pairs':pairs,'failures':failures,'resource_inventory':inventory}
+    return {'status':'passed' if not failures else 'failed','map_sha256':sha(path),'terrain_sha256':d['terrain']['sha256'],'instances':len(items),'counts':counts,'chunks':len(d['chunks']),'fine_sample_m':d['terrain']['details'][0]['spacing'],'height_range_m':[float(fine.min()),float(fine.max())],'landcover_classes':unique,'represented_land_use':sorted(represented),'checked_neighbor_pairs':pairs,'grove_stem_spacing':stem_report,'failures':failures,'resource_inventory':inventory}
 
 def main():
     import argparse

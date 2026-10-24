@@ -7,12 +7,15 @@ from bvr_game.content import sha,write_json
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--river-case',action='store_true',help='Also release over the authored physical channel and require an actual below-water bed contact')
+    a=p.parse_args()
     a.output.mkdir(parents=True,exist_ok=False);os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
     g=FlightGame(map_path=a.map,output=a.output/'client');rows=[]
     cases=[('low_airfield','F16',[-4500,-3500,500],180,[1,0,0]),
            ('valley_slope','F16',[-6000,-2300,2000],250,[1,.1,-.04]),
            ('far_offset','F22',[150000,-50000,8500],500,[1,0,0])]
+    if a.river_case:cases.append(('river_bed','F16',[-6500,380,500],180,[1,0,0]))
     try:
         for name,model,position,speed,direction in cases:
             g.select_aircraft(model,'strike');g.config.mission='training';g.config.enemy_attacks=False;g.config.seed=2201
@@ -31,6 +34,18 @@ def main():
                 'release_frame':before,'impact':impact,'predicted':predicted,'actual_contact_height':contact,
                 'position_error_m':math.dist(predicted,actual),'actual_contact_height_error_m':abs(actual[2]-contact),
                 'predicted_actual_height_difference_m':abs(predicted[2]-actual[2]),'final_frame':frame}
+            if name=='river_bed':
+                from shapely.geometry import Point,LineString
+                document=g.baked_scene.document
+                assert document.get('landscape',{}).get('river_channel'),'River case requires a shared physical channel map'
+                river=min(document['rivers'],key=lambda r:LineString(r['points']).distance(Point(*actual[:2])))
+                distance=LineString(river['points']).distance(Point(*actual[:2]))
+                # The map's authored level is carried by its immutable recipe.
+                recipe_dir=a.map.parent/'versions'/document['data_version'] if document.get('data_version') else a.map.parent
+                level=json.loads((recipe_dir/'scene-recipe.json').read_text())['terrain']['river_level_m']
+                row.update(river_center_distance_m=distance,water_surface_m=level,bed_below_water_m=level-contact,
+                    water_interaction_scope='Existing core collision reaches the shared bed; this is not fluid drag, buoyancy or water-surface detonation physics')
+                assert distance<river['width_m']/2 and level-contact>1.,row
             rows.append(row);write_json(a.output/(name+'-trace.json'),trace)
             print(name,'prediction_error_m',row['position_error_m'],'contact_height_error_m',row['actual_contact_height_error_m'],flush=True)
         maximum=max(r['position_error_m'] for r in rows);height=max(r['actual_contact_height_error_m'] for r in rows)
