@@ -117,6 +117,7 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def_property_readonly("rpy",&AircraftFDM::get_rpy)
         .def_property_readonly("terminated",&AircraftFDM::is_terminated)
         .def("flight_measurements",&AircraftFDM::flight_measurements)
+        .def("world_flight_measurements",&AircraftFDM::world_flight_measurements)
         .def("step_surfaces",&AircraftFDM::step_surfaces)
         .def("visual_properties",&AircraftFDM::visual_properties);
     py::class_<YASimFDM,AircraftFDM>(m,"YASimFDM")

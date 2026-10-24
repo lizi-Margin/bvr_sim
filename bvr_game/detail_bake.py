@@ -130,11 +130,18 @@ def refine(baker,document,out):
         document['surfaces'].append({'id':bridge['id'],'material':'pavement','vertices':vertices,'indices':indices,'drivable':True,'core_contact':True,'bridge':True})
         for side in [0,1]:
             segment=[vertices[i+side] for i in range(0,len(vertices),2)]
-            a=segment[int(ramp/5)];b=segment[-int(ramp/5)-1];dn,dw=b[0]-a[0],b[1]-a[1];l=math.hypot(dn,dw)
-            rail={'id':bridge['id']+'_rail_'+str(side),'center':[(a[0]+b[0])/2,(a[1]+b[1])/2,deck+.55],
-                  'half_size':[l/2,.06,.55],'yaw':math.atan2(dw,dn),'approximation':'bridge guard rail box'}
-            extra_obstacles.append(rail)
-            document['surfaces'].append({'id':rail['id'],'material':'marking','vertices':[[a[0],a[1],deck+.25],[b[0],b[1],deck+.25],[a[0],a[1],deck+1],[b[0],b[1],deck+1]],'indices':[0,1,2,1,3,2,2,1,0,2,3,1],'drivable':False})
+            rail_points=segment[int(ramp/5):len(segment)-int(ramp/5)]
+            rail_id=bridge['id']+'_rail_'+str(side);rail_vertices=[];rail_indices=[]
+            for a in rail_points:rail_vertices.extend([[a[0],a[1],deck+.25],[a[0],a[1],deck+1]])
+            # Both the visible ribbon and each collision box follow the same
+            # sampled deck edge. A single end-to-end chord cut across the curved
+            # river-valley bridge and blocked an otherwise centred vehicle.
+            for i,(a,b) in enumerate(zip(rail_points,rail_points[1:])):
+                dn,dw=b[0]-a[0],b[1]-a[1];l=math.hypot(dn,dw);j=i*2
+                extra_obstacles.append({'id':rail_id+'_'+str(i),'center':[(a[0]+b[0])/2,(a[1]+b[1])/2,deck+.55],
+                    'half_size':[l/2,.06,.55],'yaw':math.atan2(dw,dn),'approximation':'sampled bridge deck-edge guard rail box'})
+                rail_indices.extend([j,j+2,j+1,j+2,j+3,j+1,j+1,j+2,j,j+1,j+3,j+2])
+            document['surfaces'].append({'id':rail_id,'material':'marking','vertices':rail_vertices,'indices':rail_indices,'drivable':False})
         # A real separate lower structure makes the raised deck legible above the river.
         def structural_box(id,center,half,yaw):
             vertices=[]
@@ -212,7 +219,7 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         shoulder=_distance_line(n,w,line)<road['width_m']/2+3;labels[shoulder]=3
     names=['grass','farmland','forest','soil','rock','pavement','water','marking']
     color=np.zeros((*n.shape,3),dtype=np.float32);normal=np.zeros_like(color);rough=np.zeros(n.shape,dtype=np.float32)
-    source_files={}
+    source_files={};canopy_report=None
     def source_image(file,slot):
         source_files[file]=sha(file)
         image=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
@@ -250,6 +257,11 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
                     # Soil with variable source-grass cover: temperate parcels
                     # include pasture, growing crops and exposed/fallow soil.
                     sample=sample*(1-crop_cover[...,None])+green*crop_cover[...,None]
+                if index==2 and material.get('canopy_proxy'):
+                    from .forest_canopy import blend_canopy
+                    mask=labels==2
+                    sample[mask],canopy_report=blend_canopy(sample[mask],n[mask],w[mask],pixel,material['canopy_proxy'])
+                    source_files[canopy_report['source_file']]=canopy_report['source_sha256']
             if slot=='base_color':color+=weight[...,None]*sample*np.array(material['color'][:3],dtype=np.float32)*macro
             elif slot=='normal':normal+=weight[...,None]*(sample*2-1)
             else:rough+=weight*sample[...,0]
@@ -329,3 +341,4 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     report['material_bake']={'resolution':[resolution,resolution],'pixel_m':pixel,'blend_m':spec.get('material_blend_m',7),'source_textures':source_files,
         'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear',
         'macro_source_tile_m':source_scale,'macro_source_note':'Area-filtered real source color stretched for low-frequency variation; authored crop-cover and 18m parcel rows, plus independent true-scale detail at runtime' if source_scale else None}
+    if canopy_report:report['material_bake']['forest_canopy_aggregate']=canopy_report

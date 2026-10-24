@@ -4,7 +4,7 @@ import argparse,json,sys,hashlib,shutil,uuid
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from bvr_game.content import write_json
 
-def recipe():
+def recipe(forest_asset='fir_grove_cards_c'):
     r=json.loads((ROOT/'game/recipes/training_range_v3.json').read_text(encoding='utf-8'))
     r.update(name='river_valley_airfield',seed=3124,height_spacing_m=25,field_spacing_m=750,
         field_palette_linear=[[.88,.87,.71,1],[.76,.84,.67,1],[.91,.83,.67,1],[.67,.77,.61,1]])
@@ -12,12 +12,19 @@ def recipe():
         'valley_base_rise_m':95,'valley_scale_m':1800,'ridge_amplitude_m':450,'ridge_start_m':2200,
         'ridge_scale_m':6000,'undulation_m':35,'earthwork_blend_m':180,'regional_transition_m':1200,'macro_resolution':4096,
         'generator':'Seeded river valley and local runway/apron earthworks; source BVR terrain retained beyond20km focus',
+        'field_layout':'warped_merged_parcels',
+        'field_layout_note':'Seeded shared warped block edges with merged parcels and T junctions; authored agricultural appearance, not measured GIS',
         'individual_building_tuning':'Road frontages and source-bound footprint foundations; no region-wide settlement/industry flattening'}
     r['terrain']['airport_height_m']=220
     r['budgets']['vegetation_instances']=20000
-    r['asset_roles']['canopy']=['tree_oak','pine_sapling_source']
+    r['asset_roles']['canopy']=[forest_asset]
     r['materials']['farmland']['color']=[.98,.94,.83,1]
     r['materials']['forest']['color']=[.7,.76,.6,1]
+    directory=ROOT/'game/assets/registered'/forest_asset;top_view=directory/'source_albedo_view_3.png'
+    if not top_view.exists():raise FileNotFoundError('Register forest source '+forest_asset+' before building this map')
+    forest=json.loads((directory/'manifest.json').read_text(encoding='utf-8'))
+    r['materials']['forest']['canopy_proxy']={'asset':forest_asset,'tile_m':max(forest['bounds_blender']['span'])*1.06,'layers':4,'strength':1.,
+        'source_sha256':hashlib.sha256(top_view.read_bytes()).hexdigest()}
     r['airfields'][0].update(runway_width_m=45,taxi_offset_m=160,apron=[-2200,-3000],apron_size_m=[1100,400],hangars=6)
     r['rivers'][0].update(width_m=95,bank_width_m=120,points=[[-80000,600],[-10000,600],[-7000,820],[-5200,510],[-3400,140],[-1800,280],[-400,700],[1100,820],[2500,600],[4200,200],[6000,430],[8200,900],[10000,600],[80000,600]])
     r['roads']=[
@@ -38,10 +45,13 @@ def recipe():
         if z['id']=='sample_woodland':z['polygon']=[[-3900,-2200],[-3300,-1850],[-1900,-1800],[-1200,-2100],[-2000,-2400]]
     r['zones'].append({'id':'valley_west_woodland','type':'forest','polygon':[[-6500,-2200],[-4200,-1500],[-2500,-1800],[-1800,-800],[-400,-700],[-1000,-1800],[-3500,-2500],[-5300,-2900]]})
     for scatter in r['scatter_rules']:
-        if scatter['id']=='forest_canopy':scatter['count']=15000;scatter['zones'].extend(['valley_west_woodland','sample_woodland']);scatter['lod_distance_m']=900
+        if scatter['id']=='forest_canopy':scatter['count']=10000;scatter['zones'].extend(['valley_west_woodland','sample_woodland']);scatter['lod_distance_m']=900;scatter['area_weighted']=True
         elif scatter['id']=='riverbank_vegetation':scatter['count']=3000
         elif scatter['id']=='hedgerows':scatter['count']=1400
-        elif scatter['id']=='sample_woodland':scatter['count']=400;scatter['lod_distance_m']=900
+        elif scatter['id']=='sample_woodland':scatter['count']=200;scatter['lod_distance_m']=900
+    # Reserve the declared local woodland first. Regional groves sample by area
+    # so small polygons are not saturated while large forests remain empty.
+    r['scatter_rules'].sort(key=lambda rule:rule['id']!='sample_woodland')
     r['mission'].update(player_start=[-7000,-3500,650],speed_mps=180,enemy_range_m=160000,target=[2650,-1400])
     if 'convoy_target' in r['mission']:r['mission']['convoy_target']=[2600,-1900]
     r['mission']['strike_start']=[-4500,-1900,3200]
@@ -62,8 +72,10 @@ def recipe():
     return r
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--bake',action='store_true');p.add_argument('--output',type=Path,default=ROOT/'game/maps/river_valley_airfield');a=p.parse_args()
-    r=recipe();path=ROOT/'game/recipes/river_valley_airfield.json';write_json(path,r)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--bake',action='store_true');p.add_argument('--output',type=Path,default=ROOT/'game/maps/river_valley_airfield')
+    p.add_argument('--forest-asset',default='fir_grove_cards_c',help='Registered grove resource; earlier candidates: pine_grove_a or fir_grove_c')
+    a=p.parse_args()
+    r=recipe(a.forest_asset);path=ROOT/'game/recipes/river_valley_airfield.json';write_json(path,r)
     if a.bake:
         from bvr_game.worldgen import Baker
         from bvr_game.scene_runtime import BakedScene

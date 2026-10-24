@@ -121,6 +121,7 @@ class Baker:
         return None
     def place(self,model,n,w,*,category,zone,scale=1,yaw=None,minimum=0,lod=1700,cull=35000,clearance=True):
         m=self.metadata[model];span=m['bounds_blender']['span'];radius=max(span[0],span[1])*scale*.48
+        if m.get('cluster'):radius=(math.hypot(span[0],span[1])/2+span[2]*math.sin(.2))*scale
         reason=self.forbidden(n,w,category,radius) if clearance else None
         key=(math.floor(n/50),math.floor(w/50));search=math.ceil((radius+55)/50)
         if not reason:
@@ -129,8 +130,15 @@ class Baker:
                     if any(math.hypot(n-x,w-y)<max(minimum,radius+r) for x,y,r in self.occupied.get((i,j),[])):reason='spacing';break
                 if reason:break
         if reason:self.rejections[reason]=self.rejections.get(reason,0)+1;return False
-        self.serial+=1;h=self.terrain.height(n,w)-m['bounds_blender']['min'][2]*scale
+        fit=None
+        if m.get('cluster'):
+            from .grove_grounding import fit_grove
+            if yaw is None:yaw=self.rng.uniform(-math.pi,math.pi)
+            fit=fit_grove(m,n,w,yaw,scale,self.terrain.height)
+            if fit is None:self.rejections['grove_ground_fit']=self.rejections.get('grove_ground_fit',0)+1;return False
+        self.serial+=1;h=fit['height'] if fit else self.terrain.height(n,w)-m['bounds_blender']['min'][2]*scale
         self.instances.append({'id':f'{zone}_{self.serial:05d}','model':model,'position':[round(n,4),round(w,4),round(h,5)],'yaw':round(yaw if yaw is not None else self.rng.uniform(-math.pi,math.pi),6),'scale':round(scale,5),'category':category,'zone':zone,'chunk':f'{math.floor(n/self.r["chunk_m"])}:{math.floor(w/self.r["chunk_m"])}','lod_distance':lod,'cull_distance':cull,'collision_type':m['collision_type'],'radius_m':round(radius,3)})
+        if fit:self.instances[-1].update(up_normal=fit['up_normal'],grove_ground_fit=fit)
         self.occupied.setdefault(key,[]).append((n,w,radius));return True
     def surface_ribbon(self,id,points,width,material,offset=.035):
         line=LineString(points);distance=np.linspace(0,line.length,max(2,int(line.length/25)+1));vertices=[];indices=[]
@@ -231,7 +239,8 @@ class Baker:
                     f=self.rng.choice(self.fields);line=Polygon(f['polygon']).exterior;p=line.interpolate(self.rng.uniform(0,line.length));n,w=p.x,p.y
                 elif shapes:
                     if cluster is None or cluster_steps>=rule.get('cluster_size',34):
-                        poly=self.rng.choice(shapes);bounds=poly.bounds
+                        poly=self.rng.choices(shapes,weights=[p.area for p in shapes])[0] if rule.get('area_weighted') else self.rng.choice(shapes)
+                        bounds=poly.bounds
                         for _ in range(200):
                             center=(self.rng.uniform(bounds[0],bounds[2]),self.rng.uniform(bounds[1],bounds[3]))
                             if poly.contains(Point(center)):break
@@ -326,7 +335,7 @@ class Baker:
             result['detail_sample']['material_mapping']='Same world-aligned regional macro and metre-scale repeated source detail as parent; fine height geometry remains independent'
             result=finish_world(self,result,out)
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
-        return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(self.instances),'counts':counts,'chunks':len(chunks),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}
+        return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(result['instances']),'counts':result['counts'],'chunks':len(result['chunks']),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}
 def main():
     p=argparse.ArgumentParser();p.add_argument('--recipe',type=Path,default=ROOT/'game/recipes/training_range_v2.json');p.add_argument('--output',type=Path,default=ROOT/'game/maps/training_range_v2');a=p.parse_args()
     print(json.dumps(Baker(json.loads(a.recipe.read_text(encoding='utf8'))).bake(a.output),indent=2))

@@ -36,14 +36,30 @@ if policy:
     lo=[-(hi[0]-lo[0])*scale/2,-(hi[1]-lo[1])*scale/2,0];hi=[-lo[0],-lo[1],height]
     bpy.context.view_layer.update()
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from vegetation_lod import triangles,reduce_meshes,impostors,alpha_mask_glb,make_cluster
+from vegetation_lod import triangles,reduce_meshes,impostors,alpha_mask_glb,make_cluster,source_foliage_cards
+source_bounds=(list(lo),list(hi));backup=[];foliage_report=None
+if policy.get('foliage_cards'):
+    if not policy.get('cluster') or not policy.get('impostor'):raise ValueError('Foliage cards require the source grove/far-bake policy')
+    for o in meshes:
+        b=o.copy();b.data=o.data.copy();b.name=o.name+'_near_source_backup';b.hide_render=True
+        bpy.context.scene.collection.objects.link(b);backup.append(b)
 cluster_report=None
 if policy.get('cluster'):
     meshes,bounds,cluster_report=make_cluster(meshes,policy['cluster']);lo,hi=bounds['min'],bounds['max']
 far=None;impostor_report=None
 if policy.get('impostor'):
-    far,impostor_report=impostors(meshes,out,hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),policy.get('impostor_resolution',512))
-reduce_meshes(meshes,policy.get('near_triangle_budget',triangles(meshes)))
+    far,impostor_report=impostors(meshes,out,hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'))
+if backup:
+    for o in meshes:bpy.data.objects.remove(o,do_unlink=True)
+    slo,shi=source_bounds
+    hybrid,foliage_report=source_foliage_cards(backup,out/'near_foliage',shi[2],max(shi[0]-slo[0],shi[1]-slo[1]),policy['foliage_cards'],policy.get('impostor_engine','BLENDER_EEVEE'))
+    meshes,_,hybrid_cluster=make_cluster(hybrid,policy['cluster'],cluster_report['source_base_anchor_blender'])
+    # Transparent card bounds exceed visible foliage. Preserve the source
+    # grove's origin/bounds/anchor metadata and exact full-source far LOD.
+    delta=Vector(hybrid_cluster['recentering'])-Vector(cluster_report['recentering'])
+    for o in meshes:o.location+=delta
+    if triangles(meshes)>policy.get('near_triangle_budget',triangles(meshes)):raise ValueError('Hybrid near grove exceeds its declared budget')
+else:reduce_meshes(meshes,policy.get('near_triangle_budget',triangles(meshes)))
 if len(meshes)>1 and cluster_report:
     bpy.ops.object.select_all(action='DESELECT')
     for o in meshes:o.hide_set(False);o.select_set(True)
@@ -53,6 +69,7 @@ def export(objects,file):
     for o in objects:o.hide_set(False);o.hide_render=False;o.select_set(True)
     bpy.ops.export_scene.gltf(filepath=str(file),export_format='GLB',export_extras=True,use_selection=True)
 target=out/(asset_id+'.glb');export(meshes,target)
+if foliage_report:alpha_mask_glb(target)
 lods=[{'level':0,'file':target.name,'sha256':sha(target),'triangles':triangles(meshes)}]
 if far:
     file=out/(asset_id+'_lod1.glb');export(far,file);alpha_mask_glb(file)
@@ -61,7 +78,7 @@ r={'id':asset_id,'name':policy.get('name',asset_id),'tags':policy.get('tags',[])
     'source_files':origin.get('files',[]),'source_bundle_sha256':hashlib.sha256(json.dumps(origin.get('files',[]),sort_keys=True).encode()).hexdigest(),
     'license_evidence':[{'url':'https://polyhaven.com/license','provider_manifest_sha256':sha(manifest)}] if origin['source']=='polyhaven' else origin.get('license_evidence',[]),
     'distribution_allowed':origin['license']=='CC0-1.0','instancing_allowed':True,'physical_size_note':policy.get('physical_size_note','Source dimensions retained'),
-    'lods':lods,'impostor':impostor_report,'cluster':cluster_report,'textures':[{'name':i.name,'width':i.size[0],'height':i.size[1]} for i in bpy.data.images if i.size[0]],
+    'lods':lods,'impostor':impostor_report,'cluster':cluster_report,'foliage_representation':foliage_report,'textures':[{'name':i.name,'width':i.size[0],'height':i.size[1]} for i in bpy.data.images if i.size[0]],
     'vertices':sum(len(o.data.vertices) for o in meshes),
     'materials':[{'name':m.name,'roughness':m.roughness} for m in {s.material for o in meshes+(far or []) for s in o.material_slots if s.material}],
     'recommended_use':policy.get('recommended_use','Instanced scenery; source-bounded normalized geometry and explicit LODs'),

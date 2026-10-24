@@ -8,6 +8,7 @@
 struct ScenePlacement {
     std::string id, model, chunk, category, target_uid;
     std::array<double, 3> position{};
+    std::array<float, 3> up_normal{0,1,0};
     float yaw = 0, scale = 1, lod_distance = 1700, cull_distance = 35000;
 };
 struct SceneMaterial {
@@ -402,6 +403,16 @@ class WorldScene {
             auto t = scene.transforms.GetComponent(instance.root);
             t->Scale(XMFLOAT3(spec.scale, spec.scale, spec.scale));
             t->RotateRollPitchYaw(XMFLOAT3(0, -spec.yaw, 0));
+            // Optional rigid terrain-plane fit for decorative source groves.
+            // Yaw is applied first; +Y then maps onto the declared world normal.
+            const auto &up=spec.up_normal;
+            if (!std::isfinite(up[0]) || !std::isfinite(up[1]) || !std::isfinite(up[2]) || up[1]<=0)
+                throw std::runtime_error("Invalid scenery up normal");
+            if(up[0]!=0 || up[1]!=1 || up[2]!=0){
+                const auto normal=XMVector3Normalize(XMVectorSet(up[0],up[1],up[2],0));
+                const auto axis=XMVector3Cross(XMVectorSet(0,1,0,0),normal);
+                t->Rotate(XMQuaternionNormalize(XMVectorSet(XMVectorGetX(axis),0,XMVectorGetZ(axis),1+XMVectorGetY(normal))));
+            }
             t->Translate(
                 XMFLOAT3(float(-spec.position[1]), float(spec.position[2]), float(spec.position[0])));
             t->UpdateTransform();
@@ -451,6 +462,18 @@ class WorldScene {
                                 entity.alive ? XMFLOAT4(1, 1, 1, 1) : XMFLOAT4(.1f, .1f, .1f, 1);
                     }
         }
+    }
+    std::vector<std::array<double,3>> scenery_points(const std::string& id,const std::vector<std::array<double,3>>& points) const {
+        for(const auto& instance:instances)if(instance.spec.id==id){
+            const auto matrix=scene.transforms.GetComponent(instance.root)->GetWorldMatrix();
+            std::vector<std::array<double,3>> result;result.reserve(points.size());
+            for(const auto& p:points){
+                const auto v=DirectX::XMVector3TransformCoord(DirectX::XMVectorSet(float(p[0]),float(p[1]),float(p[2]),1),matrix);
+                result.push_back({DirectX::XMVectorGetX(v),DirectX::XMVectorGetY(v),DirectX::XMVectorGetZ(v)});
+            }
+            return result;
+        }
+        throw std::runtime_error("Scenery instance not found: "+id);
     }
     SceneStats stats(const wi::renderer::Visibility &visibility) const {
         SceneStats result;

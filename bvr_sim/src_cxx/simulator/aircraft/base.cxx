@@ -248,9 +248,10 @@ std::string Aircraft::log() noexcept {
     auto [lon, lat, alt] = NWU2LLA(position[0], position[1], position[2]);
     // auto [roll_deg_vel, pitch_deg_vel, yaw_deg_vel] = velocity_to_euler(velocity, true);
 
-    double roll_deg = rad2deg(get_roll());
-    double pitch_deg = rad2deg(get_pitch());
-    double yaw_deg = rad2deg(get_heading());
+    const auto logged=log_rpy();
+    double roll_deg = rad2deg(logged[0]);
+    double pitch_deg = rad2deg(logged[1]);
+    double yaw_deg = rad2deg(logged[2]);
 
     std::stringstream ss;
     ss << std::fixed << std::setprecision(6);

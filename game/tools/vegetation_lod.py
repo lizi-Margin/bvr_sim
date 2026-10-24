@@ -5,7 +5,7 @@ Source-derived albedo impostors, not AI imagery or replacement plant geometry.
 import bpy,math,struct,json,random
 from mathutils import Vector,Matrix
 
-def make_cluster(objects,spec):
+def make_cluster(objects,spec,source_base_override=None):
     """Seeded source copies; no generated botanical geometry or global RNG."""
     count=int(spec['count']);radius=float(spec['radius_m']);minimum=float(spec['minimum_spacing_m'])
     if not 2<=count<=64 or not 0<minimum<radius<100:raise ValueError('Invalid vegetation cluster policy')
@@ -16,9 +16,19 @@ def make_cluster(objects,spec):
         positions.append(p)
         if len(positions)==count:break
     if len(positions)!=count:raise ValueError('Cluster could not fit source copies at its declared spacing')
+    # Locate the selected source's actual lowest geometry, rather than assuming
+    # the normalized bounding-box XY centre is the stem base.
+    if source_base_override is None:
+        points=[o.matrix_world@v.co for o in objects for v in o.data.vertices]
+        base_z=min(p.z for p in points);base_points=[p for p in points if p.z<=base_z+.03]
+        source_base=sum(base_points,Vector())/len(base_points)
+        del points
+    else:source_base=Vector(source_base_override)
     result=[];poses=[]
     for i,(x,y) in enumerate(positions):
-        angle=rng.uniform(-math.pi,math.pi);scale=rng.uniform(*spec.get('scale_range',[.85,1.15]));poses.append({'position':[x,y,0],'yaw':angle,'scale':scale})
+        angle=rng.uniform(-math.pi,math.pi);scale=rng.uniform(*spec.get('scale_range',[.85,1.15]))
+        base_anchor=Vector((x,y,0))+Matrix.Rotation(angle,3,'Z')@source_base*scale
+        poses.append({'position':[x,y,0],'yaw':angle,'scale':scale,'base_anchor':list(base_anchor)})
         transform=Matrix.Translation(Vector((x,y,0)))@Matrix.Rotation(angle,4,'Z')@Matrix.Scale(scale,4)
         for original in objects:
             o=original.copy();o.data=original.data.copy();o.name=f'{original.name}_source_copy_{i}'
@@ -30,9 +40,34 @@ def make_cluster(objects,spec):
     for o in result:o.location-=center
     bounds={'min':[lo[i]-center[i] for i in range(3)],'max':[hi[i]-center[i] for i in range(3)]}
     return result,bounds,{'source_copies':count,'seed':spec['seed'],'poses_before_recentering':poses,'recentering':list(center),
+        'source_base_anchor_blender':list(source_base),'base_anchor_method':'Mean of source vertices within0.03m of its lowest geometry, transformed per source copy',
         'method':'Copies of the exact selected source tree; rigid transforms, uniform scale and offline mesh LOD simplification only'}
 
 def triangles(objects):return sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in objects if o.type=='MESH')
+
+def source_foliage_cards(objects,out,height,width,policy,render_engine):
+    """Keep source wood in 3D; replace fragile needle geometry with source views."""
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objects:
+        o.hide_set(False);o.select_set(True)
+    bpy.context.view_layer.objects.active=objects[0]
+    bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.separate(type='MATERIAL');bpy.ops.object.mode_set(mode='OBJECT')
+    parts=list(bpy.context.selected_objects);names=set(policy['materials'])
+    # A source-material split may retain unused slots; use actual polygon slots.
+    foliage=[o for o in parts if any(o.data.materials[p.material_index].name in names for p in o.data.polygons)]
+    wood=[o for o in parts if o not in foliage]
+    if not foliage or not wood:raise ValueError('Source material partition failed')
+    for o in bpy.context.scene.objects:
+        if o.type=='MESH':o.hide_render=True
+    for o in foliage:o.hide_render=False
+    out.mkdir(parents=True,exist_ok=True)
+    cards,report=impostors(foliage,out,height,width,policy.get('resolution',1024),render_engine)
+    for o in foliage:bpy.data.objects.remove(o,do_unlink=True)
+    before=triangles(wood);reduce_meshes(wood,int(policy.get('wood_triangles_per_tree',2000)))
+    return wood+cards,{'source_materials':sorted(names),'source_wood_triangles':before,'retained_wood_triangles':triangles(wood),
+        'foliage_card_triangles_per_tree':triangles(cards),'bake':report,
+        'method':'Source woody geometry with mesh LOD; individual-tree crossed source-albedo/opacity foliage views. Explicit visual approximation, no invented botanical shape. Full source grove is separately baked for far LOD.'}
 def reduce_meshes(objects,budget):
     total=triangles(objects)
     if total<=budget:return
@@ -48,8 +83,10 @@ def alpha_mask_glb(path):
     encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*((-len(encoded))%4)
     rest=data[20+length:];path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(rest))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+rest)
 
-def impostors(objects,out,height,width,resolution=512):
-    scene=bpy.context.scene;scene.render.engine='BLENDER_EEVEE';scene.render.film_transparent=True
+def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE'):
+    if render_engine not in ['BLENDER_EEVEE','CYCLES']:raise ValueError('Unsupported source-albedo bake engine')
+    scene=bpy.context.scene;scene.render.engine=render_engine;scene.render.film_transparent=True
+    if render_engine=='CYCLES':scene.cycles.device='CPU';scene.cycles.samples=8;scene.cycles.use_denoising=False
     scene.render.resolution_x=scene.render.resolution_y=resolution;scene.render.resolution_percentage=100
     scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA'
     scene.view_settings.view_transform='Standard';scene.view_settings.look='None';scene.view_settings.exposure=0;scene.view_settings.gamma=1
@@ -105,4 +142,5 @@ def impostors(objects,out,height,width,resolution=512):
     for o in planes:o.select_set(True)
     bpy.context.view_layer.objects.active=planes[0];bpy.ops.object.join();planes=[bpy.context.view_layer.objects.active]
     return planes,{'views':[str(file) for _,file in views],'resolution':resolution,'triangles':8,
+        'render_engine':render_engine,
         'method':'Three source-albedo vertical views and one top view, alpha-tested crossed planes. Approximate far silhouette and flat shading; not full source geometry or a measured BRDF.'}

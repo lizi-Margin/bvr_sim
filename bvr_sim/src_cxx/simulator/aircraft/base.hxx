@@ -69,6 +69,8 @@ public:
     virtual void hit(double damage = -1.0) noexcept;
 
     virtual std::string log() noexcept override;
+    // ACMI attitudes accompany geodetic positions, rather than fixed-map axes.
+    virtual std::array<double,3> log_rpy() const noexcept { return {get_roll(),get_pitch(),get_heading()}; }
 
     const std::map<std::string, std::shared_ptr<SensorBase>>& get_sensors() const noexcept {
         return SimulatedObject::get_sensors();

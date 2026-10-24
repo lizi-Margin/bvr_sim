@@ -658,7 +658,7 @@ void GameSession::publish_frame() {
         f.bombs_left = player->pylon_manager.num_left_weapons("Mk-82");
         if (f.bombs_left > 0 && player->is_alive) {
             f.bomb_impact =
-                predict_ballistic_impact(player->position, player->velocity, *terrain_, config_.dt);
+                predict_ballistic_impact(player->position, player->velocity, *terrain_, config_.dt,6000,player->player_flight_active());
         }
         if (player->radar)
             for (const auto &[uid, observation] : player->radar->get_data()) {

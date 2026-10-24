@@ -21,7 +21,8 @@ inline void bind_game_api(pybind11::module_ &m) {
     py::class_<FlightMeasurements>(m,"FlightMeasurements")
         RO(FlightMeasurements,position) RO(FlightMeasurements,velocity) RO(FlightMeasurements,orientation)
         RO(FlightMeasurements,body_rates) RO(FlightMeasurements,alpha) RO(FlightMeasurements,beta)
-        RO(FlightMeasurements,normal_g) RO(FlightMeasurements,speed) RO(FlightMeasurements,density);
+        RO(FlightMeasurements,normal_g) RO(FlightMeasurements,speed) RO(FlightMeasurements,density)
+        RO(FlightMeasurements,gravity_up) RO(FlightMeasurements,reference_frame);
     py::class_<FlightSurfaceControls>(m,"FlightSurfaceControls")
         .def(py::init<>()) RW(FlightSurfaceControls,aileron) RW(FlightSurfaceControls,elevator)
         RW(FlightSurfaceControls,rudder) RW(FlightSurfaceControls,throttle);

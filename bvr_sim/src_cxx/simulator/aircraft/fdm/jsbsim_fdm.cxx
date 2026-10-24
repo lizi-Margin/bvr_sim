@@ -372,6 +372,7 @@ void JSBSimFDM::step_surfaces(const FlightSurfaceControls& controls) {
 }
 FlightMeasurements JSBSimFDM::flight_measurements() const {
     auto m=AircraftFDM::flight_measurements();
+    m.reference_frame="legacy_position_map_velocity_attitude_local_nwu";
     if(!jsbsim_exec)return m;
     auto get=[&](const char* name)->std::optional<double>{
         if(!jsbsim_exec->GetPropertyManager()->HasNode(name))return std::nullopt;
@@ -381,6 +382,42 @@ FlightMeasurements JSBSimFDM::flight_measurements() const {
     if(p&&q&&r)m.body_rates=std::array<double,3>{*p,*q,*r};
     m.alpha=get("aero/alpha-rad");m.beta=get("aero/beta-rad");m.normal_g=get("accelerations/Nz");
     if(auto density=get("atmosphere/rho-slugs_ft3"))m.density=*density*515.3788183931961;
+    return m;
+}
+
+FlightMeasurements JSBSimFDM::world_flight_measurements() const {
+    auto m=flight_measurements();
+    if(!jsbsim_exec)return m;
+    using V=std::array<double,3>;
+    constexpr double radians=3.14159265358979323846/180.;
+    auto basis=[](double lon,double lat){
+        const double sl=std::sin(lon),cl=std::cos(lon),sp=std::sin(lat),cp=std::cos(lat);
+        return std::array<V,3>{{{-sp*cl,-sp*sl,cp},{sl,-cl,0},{cp*cl,cp*sl,sp}}};
+    };
+    const auto origin=basis(REFERENCE_LON*radians,REFERENCE_LAT*radians);
+    const auto local=basis(jsbsim_exec->GetPropertyValue("position/long-gc-deg")*radians,
+                           jsbsim_exec->GetPropertyValue("position/lat-geod-deg")*radians);
+    auto dot=[](const V& a,const V& b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];};
+    auto rotate=[&](const V& value){
+        V ecef{},world{};
+        for(int i=0;i<3;++i)for(int j=0;j<3;++j)ecef[j]+=value[i]*local[i][j];
+        for(int i=0;i<3;++i)world[i]=dot(ecef,origin[i]);
+        return world;
+    };
+    const auto [roll,pitch,yaw]=m.orientation;
+    const V f{std::cos(yaw)*std::cos(pitch),std::sin(yaw)*std::cos(pitch),-std::sin(pitch)};
+    const V right{std::sin(yaw),-std::cos(yaw),0};
+    const V up{std::cos(yaw)*std::sin(pitch),std::sin(yaw)*std::sin(pitch),std::cos(pitch)};
+    V body_up{};for(int i=0;i<3;++i)body_up[i]=up[i]*std::cos(roll)+right[i]*std::sin(roll);
+    const auto world_f=rotate(f),world_up=rotate(body_up);
+    const double world_yaw=std::atan2(world_f[1],world_f[0]);
+    const double world_pitch=std::atan2(-world_f[2],std::hypot(world_f[0],world_f[1]));
+    const V reference_right{std::sin(world_yaw),-std::cos(world_yaw),0};
+    const V reference_up{std::cos(world_yaw)*std::sin(world_pitch),std::sin(world_yaw)*std::sin(world_pitch),std::cos(world_pitch)};
+    m.orientation={std::atan2(dot(world_up,reference_right),dot(world_up,reference_up)),world_pitch,world_yaw};
+    m.velocity=rotate(m.velocity);m.gravity_up=rotate({0,0,1});m.reference_frame="map_nwu";
+    // Source forces, integration, body rates, speed and legacy getters are
+    // untouched. Only the new typed player's reference basis is converted.
     return m;
 }
 

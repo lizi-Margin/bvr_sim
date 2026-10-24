@@ -116,6 +116,7 @@ public:
     void step(const ActionSpace& action) override;
     void step_surfaces(const FlightSurfaceControls& controls) override;
     FlightMeasurements flight_measurements() const override;
+    FlightMeasurements world_flight_measurements() const override;
 
     double get_mach() const noexcept;
     std::map<std::string,double> visual_properties() const override;

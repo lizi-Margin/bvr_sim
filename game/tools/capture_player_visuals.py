@@ -7,10 +7,18 @@ from bvr_game.app import FlightGame,serialize
 from bvr_game.content import write_json
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--action',choices=['map','input','projection'],default='map');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--action',choices=['map','input','projection'],default='map')
+    p.add_argument('--map',type=Path,default=ROOT/'game/maps/river_valley_airfield/generated-map.json')
+    p.add_argument('--profile-file',type=Path,help='Frozen candidate player profile, without editing the game defaults')
+    p.add_argument('--views',nargs='+',help='Named map cameras to capture; default captures every map camera')
+    a=p.parse_args()
     os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
-    g=FlightGame(render=True,visible=False,map_path=ROOT/'game/maps/river_valley_airfield/generated-map.json',
+    g=FlightGame(render=True,visible=False,map_path=a.map,
         visual_profile=ROOT/'game/recipes/player_daylight.json',output=a.output/'client')
+    if a.profile_file:
+        from bvr_game.player_profiles import PlayerProfileStore
+        g.profile_store=PlayerProfileStore(a.profile_file)
+    g.player_profiles_frozen=True
     rows=[]
     try:
         g.quality='high';g.renderer.set_quality('high');g.select_aircraft('F16');g.config.mission='training';g.start()
@@ -24,14 +32,19 @@ def main():
                 'industry_frontage':([2400,520,1700],[1400,180,2650]),
                 'regional_transition':([3500,4200,-7000],[0,170,6000])}
             g.show_hud=False
+            if a.views:
+                unknown=set(a.views)-set(cameras)-{'fixed_high_horizon'}
+                if unknown:raise ValueError('Unknown map cameras: '+str(sorted(unknown)))
             for name,(eye,target) in cameras.items():
+                if a.views and name not in a.views:continue
                 g.set_camera(eye,target,fov=1.)
                 for _ in range(40):g.draw()
                 rows.append({'view':name,'capture':g.capture(name),'shader_errors':g.renderer.shader_errors()})
-            g.select_aircraft('F22');g.config.mission='training';g.start(start_position=[-20000,0,8500],initial_speed=300)
-            g.set_camera([32,8511,-20032],[0,8501,-20000],.92)
-            for _ in range(40):g.draw()
-            rows.append({'view':'fixed_high_horizon','capture':g.capture('fixed_high_horizon'),'shader_errors':g.renderer.shader_errors()})
+            if not a.views or 'fixed_high_horizon' in a.views:
+                g.select_aircraft('F22');g.config.mission='training';g.start(start_position=[-20000,0,8500],initial_speed=300)
+                g.set_camera([32,8511,-20032],[0,8501,-20000],.92)
+                for _ in range(40):g.draw()
+                rows.append({'view':'fixed_high_horizon','capture':g.capture('fixed_high_horizon'),'shader_errors':g.renderer.shader_errors()})
         elif a.action=='projection':
             from bvr_game.player_input import camera_ray
             for width,height in [(1920,1080),(1280,720),(1600,1000)]:
@@ -90,7 +103,8 @@ def main():
                         'capture':g.capture(model+'_'+key),'shader_errors':g.renderer.shader_errors(),
                         'input_path':'Real FlightGame.input handler with explicit deterministic events; not a claim of physical keyboard hardware injection'})
         write_json(a.output/'report.json',{'captures':rows,'visual_settings':json.loads(g.renderer.visual_settings()),'statistics':serialize(g.renderer.statistics()),
-            'map_sha256':g.scene_hash,'shader_errors':g.renderer.shader_errors(),'native_core':str(__import__('bvr_game.app',fromlist=['native']).native.__file__)})
+            'map_sha256':g.scene_hash,'shader_errors':g.renderer.shader_errors(),'profile_file_sha256':g.profile_store.file_sha256,
+            'native_core':str(__import__('bvr_game.app',fromlist=['native']).native.__file__)})
         print('GPU_CANDIDATE_CAPTURED',a.action,len(rows),'shader',g.renderer.shader_errors(),flush=True)
     finally:g.close()
 if __name__=='__main__':main()

@@ -110,6 +110,20 @@ TEST(CoreSurface, BridgeAboveWaterIsIndependentOfRiverbed) {
     ASSERT(bomb.impacted);
     ASSERT_NEAR(bomb.position[2], 10, 1e-5);
 }
+TEST(CoreBomb, RefinedPredictionMatchesActualSlopedTerrainContact) {
+    CoreFixture fixture;
+    auto terrain=flat_environment();
+    terrain->origin_north=0;terrain->origin_west=-500;terrain->spacing=10000;
+    terrain->heights={100,1100,150,1150};terrain->prepare_surfaces();
+    Launcher launcher({0,0,2000},{350,10,-5});
+    const auto predicted=predict_ballistic_impact(launcher.position,launcher.velocity,*terrain,.02,6000,true);
+    ASSERT(predicted.has_value());
+    Mk82Bomb bomb("slope_contact",launcher,terrain,.02);
+    for(int i=0;i<6000&&bomb.is_alive;++i)bomb.tick();
+    ASSERT(bomb.impacted);
+    ASSERT(bomb_distance(*predicted,bomb.position)<1e-5);
+    ASSERT_NEAR(bomb.position[2],terrain->collision_height(bomb.position[0],bomb.position[1]),1e-5);
+}
 TEST(CoreVehicle, RouteTurnParkResumeDamageResetDeterminism) {
     CoreFixture fixture;
     SOPool::instance().clear();

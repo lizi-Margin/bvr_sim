@@ -19,6 +19,8 @@ struct PlayerFlightIntent {
 };
 struct FlightMeasurements {
     std::array<double,3> position{},velocity{},orientation{};
+    std::array<double,3> gravity_up{0,0,1};
+    std::string reference_frame="map_nwu";
     std::optional<std::array<double,3>> body_rates;
     std::optional<double> alpha,beta,normal_g,density;
     double speed=0;

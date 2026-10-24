@@ -65,6 +65,9 @@ class BakedScene:
         for data in self.document['instances']:
             p=bindings.ScenePlacement()
             for k in ['id','model','chunk','category','position','yaw','scale','lod_distance','cull_distance']:setattr(p,k,data[k])
+            if 'up_normal' in data:
+                if not hasattr(p,'up_normal'):raise RuntimeError('Map requires the scenery up-normal interface; rebuild the renderer')
+                p.up_normal=data['up_normal']
             p.target_uid='depot' if data['zone']=='mission_objective' else ''
             placements.append(p)
         args=[terrain,self.arrays['landcover'].astype(int).ravel().tolist(),self.arrays['macro_color'].reshape(-1,4).tolist(),materials,surfaces,placements,self.arrays['outer_landcover'].astype(int).ravel().tolist(),self.arrays['outer_macro_color'].reshape(-1,4).tolist()]

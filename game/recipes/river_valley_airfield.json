@@ -29,8 +29,7 @@
   },
   "asset_roles": {
     "canopy": [
-      "tree_oak",
-      "pine_sapling_source"
+      "fir_grove_cards_c"
     ],
     "riverbank": [
       "tree_small",
@@ -101,7 +100,14 @@
         0.6,
         1
       ],
-      "roughness": 0.97
+      "roughness": 0.97,
+      "canopy_proxy": {
+        "asset": "fir_grove_cards_c",
+        "tile_m": 34.98548511505127,
+        "layers": 4,
+        "strength": 1.0,
+        "source_sha256": "d9fca8d4e520b28f8d63bf0fc7f5ccfa51564464c24eb2d5b6c82e398516d385"
+      }
     },
     "soil": {
       "provider": "ambientcg",
@@ -768,6 +774,23 @@
   ],
   "scatter_rules": [
     {
+      "id": "sample_woodland",
+      "zones": [
+        "sample_woodland"
+      ],
+      "roles": "canopy",
+      "count": 200,
+      "min_spacing_m": 9,
+      "cluster_radius_m": 70,
+      "cluster_size": 15,
+      "scale_range": [
+        0.65,
+        1.1
+      ],
+      "lod_distance_m": 900,
+      "cull_distance_m": 35000
+    },
+    {
       "id": "forest_canopy",
       "zones": [
         "forest_west",
@@ -779,7 +802,7 @@
         "sample_woodland"
       ],
       "roles": "canopy",
-      "count": 15000,
+      "count": 10000,
       "min_spacing_m": 13,
       "cluster_radius_m": 160,
       "cluster_size": 34,
@@ -788,7 +811,8 @@
         1.25
       ],
       "lod_distance_m": 900,
-      "cull_distance_m": 35000
+      "cull_distance_m": 35000,
+      "area_weighted": true
     },
     {
       "id": "riverbank_vegetation",
@@ -828,23 +852,6 @@
       ],
       "lod_distance_m": 1700,
       "cull_distance_m": 30000
-    },
-    {
-      "id": "sample_woodland",
-      "zones": [
-        "sample_woodland"
-      ],
-      "roles": "canopy",
-      "count": 400,
-      "min_spacing_m": 9,
-      "cluster_radius_m": 70,
-      "cluster_size": 15,
-      "scale_range": [
-        0.65,
-        1.1
-      ],
-      "lod_distance_m": 900,
-      "cull_distance_m": 35000
     }
   ],
   "exclusion_zones": [
@@ -1171,6 +1178,8 @@
     "regional_transition_m": 1200,
     "macro_resolution": 4096,
     "generator": "Seeded river valley and local runway/apron earthworks; source BVR terrain retained beyond20km focus",
+    "field_layout": "warped_merged_parcels",
+    "field_layout_note": "Seeded shared warped block edges with merged parcels and T junctions; authored agricultural appearance, not measured GIS",
     "individual_building_tuning": "Road frontages and source-bound footprint foundations; no region-wide settlement/industry flattening"
   },
   "display_flight": {

@@ -45,6 +45,7 @@ public:
         using namespace player_math;
         if(!configured_)throw std::logic_error("Configure a player flight profile before submitting player intent");
         validate_player_intent(intent);
+        if(m.reference_frame!="map_nwu")throw std::invalid_argument("Player flight control requires world_flight_measurements in map_nwu");
         if(!std::isfinite(dt)||dt<=0||dt>.1)throw std::invalid_argument("Player controller dt must be in(0,0.1]");
         const auto& p=profile_;const auto body=axes(m.orientation);
         const auto f=body[0],right=body[1],up=body[2];
@@ -106,7 +107,7 @@ public:
             double vertical_rate=std::hypot(omega[0],omega[1]);
             if(vertical_rate>p.max_pitch_rate){omega[0]*=p.max_pitch_rate/vertical_rate;omega[1]*=p.max_pitch_rate/vertical_rate;}
             omega=add(omega,scale(velocity_direction,-dot(omega,velocity_direction)));
-            auto acceleration=add(scale(cross(omega,velocity_direction),speed),{0,0,9.80665});
+            auto acceleration=add(scale(cross(omega,velocity_direction),speed),scale(m.gravity_up,9.80665));
             double pole=std::clamp((std::max(std::abs(f[2]),std::abs(velocity_direction[2]))-.5)/.3,0.,1.);
             auto bank_acceleration=acceleration;
             // In ordinary flight a pitch-down correction must not reverse
@@ -149,8 +150,14 @@ public:
             // Blend to the full vector solution near the vertical pole, where
             // a gravity-referenced bank angle loses meaning.
             double cos_bank=std::clamp(dot(reference_up,up),-1.,1.);
-            double coordinated=9.80665/speed*(1-cos_bank*cos_bank)/std::max(.25,cos_bank)*std::cos(flight_elevation);
-            double path_pitch=target_pitch_error*p.pitch_gain*cos_bank+coordinated;
+            // World vertical path response contains q*cos(bank). Request the
+            // inverse projection: multiplying by cos(bank) a second time made
+            // the vertical loop four times weaker at60deg bank. Keep the sign
+            // for inverted flight; the bounded denominator bridges knife-edge
+            // attitudes until geometric pole steering / roll recovery takes over.
+            double supported_cos=std::copysign(std::max(.25,std::abs(cos_bank)),cos_bank);
+            double coordinated=9.80665/speed*(1-cos_bank*cos_bank)/supported_cos*std::cos(flight_elevation);
+            double path_pitch=target_pitch_error*p.pitch_gain/supported_cos+coordinated;
             double pitch_demand=std::clamp(path_pitch*(1-pole)+dot(omega,right)*pole,-p.max_pitch_rate,p.max_pitch_rate);
             // Anticipate the normal acceleration implied by body pitch rate,
             // instead of waiting for an excessive measured G before reversing
@@ -158,8 +165,9 @@ public:
             // This limits the *request*, never the resulting forces or pose.
             auto bounded_pitch_rate=[&](double demand){
                 if(!intent.protection)return demand;
-                double lo=9.80665*(p.min_g-up[2])/speed;
-                double hi=9.80665*(p.max_g-up[2])/speed;
+                double gravity_projection=dot(up,m.gravity_up);
+                double lo=9.80665*(p.min_g-gravity_projection)/speed;
+                double hi=9.80665*(p.max_g-gravity_projection)/speed;
                 double result=std::clamp(demand,lo,hi);
                 state_.protecting|=result!=demand;
                 return result;

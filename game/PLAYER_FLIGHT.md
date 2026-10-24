@@ -57,7 +57,9 @@ finally:
 
 玩家控制算法在 `bvr_sim/src_cxx/simulator/aircraft/player_flight.hxx`。`GameSession`只适配命令、武器动作和任务；两条路径使用同一JSBSim/YASim物理、动力、执行机构和环境。
 
-也可直接构造 `native.JSBSimFDM` / `native.YASimFDM`，把 `flight_measurements()` 交给 `native.PlayerFlightController.update()`，再调用同一个FDM的 `step_surfaces()`；不需要GameSession、SimCore或渲染器。`game/tools/player_core_only.py`提供实际倒飞、近垂直和跨180度示例。测试会检查实际初始姿态，避免把被忽略的初始化误认成有效测试。
+也可直接构造 `native.JSBSimFDM` / `native.YASimFDM`，把 `world_flight_measurements()` 交给 `native.PlayerFlightController.update()`，再调用同一个FDM的 `step_surfaces()`；不需要GameSession、SimCore或渲染器。`game/tools/player_core_only.py`提供实际倒飞、近垂直和跨180度示例。测试会检查实际初始姿态，避免把被忽略的初始化误认成有效测试。
+
+玩家 typed 意图、测量、物理快照与渲染姿态统一为固定地图 NWU；测量中的 `reference_frame` 必须为 `map_nwu`，`gravity_up` 表达实际源 FDM 的反重力方向。JSBSim 原来的速度/姿态 getter 使用随位置变化的局部坐标，位置却已转换到固定地图坐标；长航迹不能混用这两种轴。新世界测量只旋转读出的向量和姿态，不改变源力学或积分。旧 AI/RL getter 和动作语义继续保留，JSBSim 旧 `flight_measurements()` 明确标记为混合坐标诊断数据，不能交给新的玩家控制器。玩家实体和武器释放使用统一后的实测速度；ACMI 继续记录地理位置配套的源局部姿态。每版修改仍须通过完整 AI/RL 帧对比与实际运动验证。
 
 ## Agent和重放
 

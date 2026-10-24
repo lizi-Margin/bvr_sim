@@ -23,6 +23,7 @@ private:
     std::optional<ActionSpace> pilot_input_;
     std::optional<PlayerFlightIntent> player_intent_;
     PlayerFlightController player_controller_;
+    std::optional<FlightMeasurements> player_world_measurements_;
 
 public:
     double min_shoot_interval;
@@ -58,16 +59,23 @@ public:
     std::map<std::string,double> visual_properties() const { return fdm->visual_properties(); }
     void configure_player_flight(const PlayerFlightProfile& p){player_controller_.configure(p);}
     PlayerFlightProfile player_flight_profile() const{return player_controller_.profile();}
+    bool player_flight_active() const noexcept {return player_intent_.has_value();}
     std::optional<double> player_throttle() const {
         auto state=player_controller_.state();return state.active?std::optional<double>(state.controls.throttle):std::nullopt;
     }
     void set_player_flight(const PlayerFlightIntent& intent){
         validate_player_intent(intent);auto profile=player_controller_.profile();
-        if(!player_intent_)player_controller_.configure(profile);
+        if(!player_intent_){
+            player_controller_.configure(profile);
+            player_world_measurements_=fdm->world_flight_measurements();
+            // Expose the measured source velocity in the map basis immediately
+            // so same-tick weapon releases inherit the correct physical vector.
+            velocity=player_world_measurements_->velocity;
+        }
         player_intent_=intent;pilot_input_.reset();
     }
     PlayerFlightState player_flight_state() const {
-        auto s=player_controller_.state();s.measured=fdm->flight_measurements();
+        auto s=player_controller_.state();s.measured=fdm->world_flight_measurements();
         s.direction_error=player_math::angle(s.target_direction,s.measured.velocity);
         s.body_direction_error=player_math::angle(s.target_direction,player_math::axes(s.measured.orientation)[0]);
         return s;
@@ -79,6 +87,7 @@ public:
     double get_pitch() const noexcept override;
     double get_roll() const noexcept override;
     std::array<double, 3> get_rpy() const noexcept override;
+    std::array<double,3> log_rpy() const noexcept override { return {fdm->get_roll(),fdm->get_pitch(),fdm->get_heading()}; }
 
     virtual std::string log() noexcept override { return Aircraft::log() + fdm->log();}
 

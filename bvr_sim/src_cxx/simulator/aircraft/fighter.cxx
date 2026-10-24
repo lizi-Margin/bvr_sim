@@ -98,7 +98,7 @@ void Fighter::step() {
     // action_space_check::wipe_out_action(register_);
 
     if(player_intent_){
-        auto controls=player_controller_.update(fdm->flight_measurements(),*player_intent_,dt);
+        auto controls=player_controller_.update(fdm->world_flight_measurements(),*player_intent_,dt);
         fdm->step_surfaces(controls);
     }else fdm->step(action_space);
     if (fdm->is_terminated()) {
@@ -110,7 +110,10 @@ void Fighter::step() {
     }
 
     position = fdm->get_position();
-    velocity = fdm->get_velocity();
+    if(player_intent_){
+        player_world_measurements_=fdm->world_flight_measurements();
+        velocity=player_world_measurements_->velocity;
+    }else velocity = fdm->get_velocity();
 
     if (get_sensors().size() == 0) {
         SL::get().printf("Warning: Fighter %s has no sensors\n", uid.c_str());
@@ -131,7 +134,7 @@ double Fighter::get_speed() const noexcept {
 void Fighter::set_pilot_input(double heading, double climb, double throttle,
                              std::optional<double> aileron, std::optional<double> elevator,
                              std::optional<double> roll_rate) {
-    player_intent_.reset();player_controller_.deactivate();
+    player_intent_.reset();player_controller_.deactivate();player_world_measurements_.reset();
     json::JSON action=json::Object();
     action["delta_heading"]=json::Float(heading);
     action["delta_altitude"]=json::Float(climb);
@@ -144,23 +147,23 @@ void Fighter::set_pilot_input(double heading, double climb, double throttle,
 }
 
 double Fighter::get_heading() const noexcept {
-    return fdm->get_heading();
+    return player_world_measurements_?player_world_measurements_->orientation[2]:fdm->get_heading();
 }
 
 double Fighter::get_yaw() const noexcept {
-    return fdm->get_heading();
+    return get_heading();
 }
 
 double Fighter::get_pitch() const noexcept {
-    return fdm->get_pitch();
+    return player_world_measurements_?player_world_measurements_->orientation[1]:fdm->get_pitch();
 }
 
 double Fighter::get_roll() const noexcept {
-    return fdm->get_roll();
+    return player_world_measurements_?player_world_measurements_->orientation[0]:fdm->get_roll();
 }
 
 std::array<double, 3> Fighter::get_rpy() const noexcept {
-    return fdm->get_rpy();
+    return player_world_measurements_?player_world_measurements_->orientation:fdm->get_rpy();
 }
 
 }

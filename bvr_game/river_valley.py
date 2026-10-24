@@ -69,6 +69,8 @@ def build_industry(baker):
         baker.place(baker.r['asset_roles']['supply'],n,w,category='building',zone='industry_supply',minimum=12)
 
 def subdivide_fields(baker,fields):
+    if baker.r['landscape'].get('field_layout')=='warped_merged_parcels':
+        return agricultural_parcels(baker,fields)
     from shapely.ops import split
     from shapely.geometry import LineString
     result=[]
@@ -96,6 +98,48 @@ def subdivide_fields(baker,fields):
                 'color':baker.rng.choice(baker.r['field_palette_linear']),'heading_rad':heading,'area_m2':parcel.area})
     return result
 
+def agricultural_parcels(baker,fields):
+    """Authored rural parcel topology, sharing warped block edges and T junctions.
+
+    The union retains the existing road, river, forest and town exclusions. A
+    private seeded RNG prevents layout choices changing other map generators.
+    """
+    import random
+    from shapely.ops import unary_union
+    from .worldgen import pieces
+    rng=random.Random(baker.r['seed']^0x4649454c)
+    farm=unary_union([Polygon(f['polygon'],f['holes']) for f in fields])
+    def axis():
+        values=[-18000.]
+        while values[-1]<18000:values.append(values[-1]+rng.uniform(280,780))
+        return values
+    us,vs=axis(),axis();angle=.22;c,s=math.cos(angle),math.sin(angle)
+    def warp(u,v):
+        return [u*c-v*s+140*math.sin(v/1400)+80*math.sin(u/2400),
+                u*s+v*c+120*math.sin(u/1800)]
+    cells={}
+    for j in range(len(vs)-1):
+        for i in range(len(us)-1):
+            poly=Polygon([warp(us[i],vs[j]),warp(us[i+1],vs[j]),warp(us[i+1],vs[j+1]),warp(us[i],vs[j+1])])
+            if poly.intersects(farm):cells[i,j]=poly
+    used=set();result=[]
+    for (i,j),cell in cells.items():
+        if (i,j) in used:continue
+        di,dj=rng.choice([(1,1),(1,1),(2,1),(1,2),(2,2)])
+        keys=[(i+x,j+y) for x in range(di) for y in range(dj)]
+        if any(k not in cells or k in used for k in keys):keys=[(i,j)]
+        used.update(keys);region=unary_union([cells[k] for k in keys]).intersection(farm)
+        for parcel in pieces(region):
+            if parcel.area<5000:continue
+            n,w=parcel.centroid.x,parcel.centroid.y;draw=rng.random()
+            cover=1. if draw<.18 else (.1 if draw<.28 else np.clip(.75+.18*math.sin(n/1600+.9*math.sin(w/2000))+rng.uniform(-.12,.12),.4,.98))
+            result.append({'id':'rural_parcel_'+str(len(result)),'polygon':list(map(list,parcel.exterior.coords)),
+                'holes':[list(map(list,h.coords)) for h in parcel.interiors],
+                'surface':'grass' if cover==1 else 'farmland','crop_cover':float(cover),
+                'color':rng.choice(baker.r['field_palette_linear']),'heading_rad':angle,'area_m2':parcel.area,
+                'appearance_source':'Authored crop-cover/season variation, not measured GIS or crop species'})
+    return result
+
 def finish_world(baker,document,out):
     # Individual footprint foundations, not landscape-wide flattening. The same
     # triangles/boxes feed rendering and the core environment.
@@ -107,6 +151,25 @@ def finish_world(baker,document,out):
             if meta['origin_north']<=n<=meta['origin_north']+meta['spacing']*(meta['columns']-1) and meta['origin_west']<=w<=meta['origin_west']+meta['spacing']*(meta['rows']-1):
                 return float(sample_grid(arrays[meta.get('array_key','focus')],meta,n,w))
         return baker.terrain.height(n,w)
+    accepted=[];grove_fits=[];rejected=0
+    for item in document['instances']:
+        manifest=baker.metadata[item['model']]
+        if manifest.get('cluster'):
+            from .grove_grounding import fit_grove
+            fit=fit_grove(manifest,*item['position'][:2],item['yaw'],item['scale'],height)
+            if fit is None:rejected+=1;continue
+            item.update(up_normal=fit['up_normal'],grove_ground_fit=fit)
+            item['position'][2]=fit['height'];grove_fits.append(fit)
+        accepted.append(item)
+    document['instances']=accepted
+    document['chunks']={}
+    for item in accepted:document['chunks'].setdefault(item['chunk'],[]).append(item['id'])
+    document['counts']={k:sum(o['category']==k for o in accepted) for k in ['vegetation','building','prop']}
+    if grove_fits:
+        document['forest_representation']={'grove_instances':len(grove_fits),'source_tree_copies':sum(x['source_trees'] for x in grove_fits),
+            'final_terrain_fit_rejections':rejected,'maximum_source_base_error_m':max(x['max_anchor_error_m'] for x in grove_fits),
+            'maximum_rigid_tilt_rad':max(x['tilt_rad'] for x in grove_fits),
+            'approximation':'Rigid source-tree groves aligned to local terrain plane; source base anchors within0.25m, slope <=0.2rad. Anchor method is recorded per instance; legacy sources may use bounds reference anchors. No terrain grading. Distant canopy aggregate is separately recorded in material bake.'}
     for item in document['instances']:
         if item['category']!='building':continue
         bounds=baker.metadata[item['model']]['bounds_blender'];mn,mx=bounds['min'],bounds['max'];scale=item['scale'];yaw=item['yaw']

@@ -16,16 +16,16 @@ def main():
         for name,roll,pitch,yaw,target in cases:
             fdm=native.JSBSimFDM(.02,model);speed=300
             fdm.reset([0,0,8500],[speed*math.cos(pitch)*math.cos(yaw),speed*math.cos(pitch)*math.sin(yaw),-speed*math.sin(pitch)],[roll,pitch,yaw])
-            initial=serialize(fdm.flight_measurements())
+            initial=serialize(fdm.world_flight_measurements())
             if abs(math.remainder(initial['orientation'][0]-roll,2*math.pi))>.02 or abs(initial['orientation'][1]-pitch)>.02:
                 raise AssertionError(('Requested initial attitude was not applied',model,name,initial))
             controller=native.PlayerFlightController();controller.configure(profiles.native_profile(native,model))
             intent=native.PlayerFlightIntent();intent.direction=target;intent.throttle=.85;samples=[]
             for tick in range(4000):
-                controls=controller.update(fdm.flight_measurements(),intent,.02);fdm.step_surfaces(controls)
-                if tick%10==0:samples.append({'tick':tick+1,'measurements':serialize(fdm.flight_measurements()),'controller':serialize(controller.state())})
+                controls=controller.update(fdm.world_flight_measurements(),intent,.02);fdm.step_surfaces(controls)
+                if tick%10==0:samples.append({'tick':tick+1,'measurements':serialize(fdm.world_flight_measurements()),'controller':serialize(controller.state())})
                 if fdm.terminated:break
-            final=serialize(fdm.flight_measurements())
+            final=serialize(fdm.world_flight_measurements())
             row={'model':model,'case':name,'initial_rpy':[roll,pitch,yaw],'target':target,'ticks':tick+1,
                 'terminated':fdm.terminated,'initial':initial,'final':final,'profile_sha256':profiles.resolve(model)['effective_sha256']}
             write_json(a.output/(model+'-'+name+'.json'),{'summary':row,'samples':samples});rows.append(row)

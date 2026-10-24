@@ -399,6 +399,7 @@ class Renderer {
                                outer_colors, terrain_materials);
     }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
+    std::vector<std::array<double,3>> scenery_points(const std::string& id,const std::vector<std::array<double,3>>& points) const {return baked_world->scenery_points(id,points);}
     double render_height(double n, double w) const { return baked_world->render_height(n, w); }
     double render_surface_height(double n,double w,double reference=INFINITY) const {return baked_world->render_surface_height(n,w,reference);}
     void presentation(bool hangar) {
@@ -775,6 +776,7 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readwrite("category", &ScenePlacement::category)
         .def_readwrite("target_uid", &ScenePlacement::target_uid)
         .def_readwrite("position", &ScenePlacement::position)
+        .def_readwrite("up_normal", &ScenePlacement::up_normal)
         .def_readwrite("yaw", &ScenePlacement::yaw)
         .def_readwrite("scale", &ScenePlacement::scale)
         .def_readwrite("lod_distance", &ScenePlacement::lod_distance)
@@ -865,6 +867,7 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("memory_usage", &Renderer::memory_usage)
         .def("entity_forward", &Renderer::entity_forward)
         .def("entity_basis", &Renderer::entity_basis)
+        .def("scenery_points", &Renderer::scenery_points)
         .def("configure_world", &Renderer::configure_world)
         .def("configure_scene", &Renderer::configure_scene, py::arg("terrain"), py::arg("cover"),
              py::arg("colors"), py::arg("materials"), py::arg("surfaces"), py::arg("placements"),

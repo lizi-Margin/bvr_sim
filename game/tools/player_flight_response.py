@@ -11,18 +11,19 @@ def direction(az,el=0):
     az,el=math.radians(az),math.radians(el)
     return [math.cos(el)*math.cos(az),math.cos(el)*math.sin(az),math.sin(el)]
 def angle(a,b):return math.degrees(math.acos(max(-1,min(1,sum(x*y for x,y in zip(unit(a),unit(b)))))))
-def intent_values(case,t):
+def intent_values(case,t,recovery_at=20):
     az=el=0
     if t>=4:
         if case.startswith('turn_'):az=float(case.split('_')[1])
         elif case=='fine':az=2;el=1
         elif case=='up':el=10
         elif case=='down':el=-10
+        elif case=='down_pulse':el=-10 if t<recovery_at else 0
         elif case=='vertical':el=85
         elif case=='circle':az=(t-4)*3
         elif case=='reversal':az=60 if t<65 else -60
         elif case=='climb_turn':az=60;el=12
-        elif case=='dive_recovery':el=-25 if t<20 else 5
+        elif case=='dive_recovery':el=-25 if t<recovery_at else 5
         elif case=='sustained':az=25*math.sin((t-4)/20);el=4*math.sin((t-4)/15)
     return {'direction':direction(az,el),'throttle':.95,'mode':'assisted'}
 
@@ -36,7 +37,11 @@ def run(a):
     snapshot=a.output/'candidate-snapshot';snapshot.mkdir()
     shutil.copy2(native.__file__,snapshot/Path(native.__file__).name)
     for relative in ['game/config/player_flight_profiles.json','game/tools/player_flight_response.py',
-        'bvr_sim/src_cxx/simulator/aircraft/player_flight.hxx','bvr_sim/src_cxx/simulator/aircraft/player_flight_types.hxx']:
+        'bvr_sim/src_cxx/simulator/aircraft/player_flight.hxx','bvr_sim/src_cxx/simulator/aircraft/player_flight_types.hxx',
+        'bvr_sim/src_cxx/simulator/aircraft/fdm/jsbsim_fdm.cxx','bvr_sim/src_cxx/simulator/aircraft/fdm/jsbsim_fdm.hxx',
+        'bvr_sim/src_cxx/simulator/aircraft/fdm/ac_fdm.hxx','bvr_sim/src_cxx/simulator/aircraft/fighter.cxx',
+        'bvr_sim/src_cxx/simulator/aircraft/fighter.hxx','bvr_sim/src_cxx/simulator/aircraft/base.cxx',
+        'bvr_sim/src_cxx/simulator/aircraft/base.hxx']:
         dest=snapshot/relative;dest.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(g.profile_store.path if relative=='game/config/player_flight_profiles.json' else ROOT/relative,dest)
     summaries=[];started=time.perf_counter()
@@ -45,7 +50,8 @@ def run(a):
         for speed in a.speeds or ([180] if model=='FG-A-10' else [300]):
             for case in a.cases:
                 seconds=300 if case=='sustained' else 150 if case=='turn_180' else 120 if case in ['circle','reversal'] else 30 if case=='down' else 90
-                plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'seed':2201+len(plan)%9,'altitude_m':a.altitude})
+                plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'seed':a.seed if a.seed is not None else 2201+len(plan)%9,'altitude_m':a.altitude,
+                    'recovery_at_s':a.recovery_at if case in ['down_pulse','dive_recovery'] else None})
     write_json(a.output/'plan.json',{'phase':'candidate diagnostics; not final held-out evaluation','cases':plan,'profile_sha256':g.profile_store.file_sha256,
         'core_sha256':sha(Path(native.__file__)),'map_sha256':g.scene_hash,'sample_ticks':5,'intent_ticks':25,'units':'NWU metres; orientation radians; body rates rad/s; alpha/beta radians; normal_g dimensionless; density kg/m^3'})
     try:
@@ -55,7 +61,7 @@ def run(a):
             g.start(start_position=[-20000,0,spec['altitude_m']],initial_speed=spec['speed_mps'])
             initial=serialize(g.sim.frame());samples=[];actions=[];last_tick=0
             for j in range(int(spec['seconds']/.5)):
-                values=intent_values(spec['case'],j*.5)
+                values=intent_values(spec['case'],j*.5,a.recovery_at)
                 g.submit_player(**values)
                 for _ in range(5):
                     g.step(5)
@@ -97,6 +103,8 @@ def main():
     p.add_argument('--map',type=Path,default=ROOT/'game/maps/training_range_v3/generated-map.json')
     p.add_argument('--models',nargs='+',default=['F22','F16','FG-A-10']);p.add_argument('--speeds',nargs='+',type=float)
     p.add_argument('--altitude',type=float,default=8500,help='Configured initial altitude in NWU metres; recorded in the frozen plan')
+    p.add_argument('--seed',type=int,help='Explicit same development seed for controlled candidate comparisons; omission retains the original rotating development seeds')
+    p.add_argument('--recovery-at',type=float,default=20,help='Explicit down-pulse/dive recovery onset in simulation seconds; recorded with the plan. Original20s protocol stays the default.')
     p.add_argument('--profile-file',type=Path,help='Explicit candidate profile file; freeze, snapshot and record its actual hash')
     p.add_argument('--cases',nargs='+',default=['turn_45','turn_90','turn_180','vertical']);run(p.parse_args())
 if __name__=='__main__':main()

@@ -1,0 +1,13 @@
+{
+  "name": "Source-derived fir grove with foliage cards",
+  "tags": ["vegetation", "fir", "source_geometry", "grove", "source_foliage_cards"],
+  "select_object": "fir_tree_01_c_LOD0",
+  "cluster": {"count": 16, "radius_m": 13, "minimum_spacing_m": 4.5, "seed": 63241, "scale_range": [0.85, 1.15]},
+  "near_triangle_budget": 96000,
+  "foliage_cards": {"materials": ["fir_tree_01_twig"], "wood_triangles_per_tree": 2000, "resolution": 1024},
+  "impostor": true,
+  "impostor_resolution": 1024,
+  "impostor_engine": "CYCLES",
+  "recommended_density_per_km2": 150,
+  "physical_size_note": "Source-sized fir geometry and measured base anchors. Near LOD preserves source 3D wood and uses individually placed source foliage views. Far LOD is baked from the complete unmodified source grove before any near simplification. Explicit albedo/opacity card approximation; not full leaf geometry."
+}

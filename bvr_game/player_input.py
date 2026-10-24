@@ -17,6 +17,10 @@ def camera_ray(x,y,width,height,camera):
     v=unit([f[i]+r[i]*nx+u[i]*ny for i in range(3)])
     return [v[2],-v[0],v[1]]
 
+def rotated(vector,axis,angle):
+    axis=unit(axis);c,s=math.cos(angle),math.sin(angle);side=cross(axis,vector);along=dot(axis,vector)*(1-c)
+    return unit([vector[i]*c+side[i]*s+axis[i]*along for i in range(3)])
+
 def aim_marker(direction,camera,projected,width,height):
     """Logical HUD point plus truthful edge/behind status for the world intent."""
     f=unit([b-a for a,b in zip(camera['eye'],camera['target'])],(0,0,1))
@@ -35,9 +39,11 @@ def aim_marker(direction,camera,projected,width,height):
 
 class PlayerInputAdapter:
     def __init__(self,profile,direction=(1,0,0)):
-        self.profile=profile;self.direction=unit(direction);self.edge_yaw=0.;self.edge_pitch=0.
-        self.mode='assisted';self.last_projection={}
-    def reset(self,direction):self.direction=unit(direction);self.edge_yaw=self.edge_pitch=0.
+        self.profile=profile;self.mode='assisted';self.last_projection={};self.reset(direction)
+    def reset(self,direction):
+        self.direction=unit(direction);self.raw_direction=list(self.direction)
+        self.last_pointer=None;self.last_viewport=None;self.edge_armed=True
+        self.edge_yaw_rate=0.;self.edge_pitch_rate=0.
     def throttle(self,current,event,dt):
         pad=getattr(event,'pad_axes',()) if getattr(event,'pad_connected',False) else ()
         if len(pad)>=6:current+=(pad[5]-pad[4])*max(0,min(dt,.1))*self.profile['input']['throttle_rate']
@@ -50,24 +56,56 @@ class PlayerInputAdapter:
         yaw=int(69 in held)-int(90 in held) # E right / Z left, raw yaw takeover.
         pad=getattr(event,'pad_axes',()) if getattr(event,'pad_connected',False) else ()
         pad_aim=len(pad)>=4 and max(abs(pad[2]),abs(pad[3]))>p['deadzone']
-        if not hold_direction and not pad_aim and getattr(event,'active',True):
-            nx=2*x/width-1;ny=1-2*y/height
-            sx=shaped(nx,p['deadzone'],p['curve'])*p['sensitivity'];sy=shaped(ny,p['deadzone'],p['curve'])*p['sensitivity']
-            ray=camera_ray((sx+1)*width/2,(1-sy)*height/2,width,height,camera)
+        nx=2*x/width-1;ny=1-2*y/height
+        def projected(pointer):
+            sx=shaped(pointer[0],p['deadzone'],p['curve'])*p['sensitivity'];sy=shaped(pointer[1],p['deadzone'],p['curve'])*p['sensitivity']
+            return camera_ray((sx+1)*width/2,(1-sy)*height/2,width,height,camera)
+        ray=projected((nx,ny));active=getattr(event,'active',True)
+        if hold_direction or pad_aim or not active:
+            # Rebase during observation/focus changes. Pointer motion used for
+            # looking must not become a flight command when control resumes.
+            self.raw_direction=list(self.direction);self.edge_armed=False
+            self.edge_yaw_rate=self.edge_pitch_rate=0.
+        else:
+            if self.last_pointer is None:self.raw_direction=ray
+            elif self.last_viewport==[width,height]:
+                previous_ray=projected(self.last_pointer)
+                axis=cross(previous_ray,ray);length=math.sqrt(dot(axis,axis))
+                moved=max(abs(nx-self.last_pointer[0]),abs(ny-self.last_pointer[1]))>1e-12
+                if moved:self.edge_armed=True
+                if length>1e-12:
+                    # Transport only the measured pointer displacement, using
+                    # this frame's actual camera/FOV for both rays. Camera
+                    # translation, roll, zoom and chase return cannot steer.
+                    self.raw_direction=rotated(self.raw_direction,axis,math.atan2(length,dot(previous_ray,ray)))
             def edge(v):return math.copysign(max(0,(abs(v)-p['edge_fraction'])/(1-p['edge_fraction'])),v)
-            ex,ey=edge(nx),edge(ny)
-            limit=p['max_edge_pan'];decay=math.exp(-dt/p['edge_recenter_seconds'])
-            self.edge_yaw=max(-limit,min(limit,self.edge_yaw-ex*p['edge_pan_rate']*dt)) if ex else self.edge_yaw*decay
-            self.edge_pitch=max(-limit,min(limit,self.edge_pitch+ey*p['edge_pan_rate']*dt)) if ey else self.edge_pitch*decay
-            az=math.atan2(ray[1],ray[0])+self.edge_yaw
-            el=max(-p['max_target_elevation'],min(p['max_target_elevation'],math.atan2(ray[2],math.hypot(*ray[:2]))+self.edge_pitch))
-            desired=[math.cos(el)*math.cos(az),math.cos(el)*math.sin(az),math.sin(el)]
+            ex,ey=(edge(nx),edge(ny)) if self.edge_armed else (0,0)
+            response=1-math.exp(-dt/p['edge_recenter_seconds'])
+            self.edge_yaw_rate+=(-ex*p['edge_pan_rate']-self.edge_yaw_rate)*response
+            self.edge_pitch_rate+=(ey*p['edge_pan_rate']-self.edge_pitch_rate)*response
+            view=unit([b-a for a,b in zip(camera['eye'],camera['target'])],(0,0,1))
+            camera_right=unit(cross(camera.get('up',[0,1,0]),view),(1,0,0))
+            camera_right=[camera_right[2],-camera_right[0],camera_right[1]]
+            candidate=rotated(self.raw_direction,[0,0,1],self.edge_yaw_rate*dt)
+            candidate=rotated(candidate,camera_right,self.edge_pitch_rate*dt)
+            forward=[view[2],-view[0],view[1]]
+            separation=lambda d:math.acos(max(-1,min(1,dot(d,forward))))
+            # Bound edge-pan lead relative to the view, not total world turn.
+            # As the aircraft/camera follow, edge input can keep turning through
+            # any heading without a permanent near-nose angular ceiling.
+            if separation(candidate)<=p['max_edge_pan'] or separation(candidate)<separation(self.raw_direction):self.raw_direction=candidate
+            az=math.atan2(self.raw_direction[1],self.raw_direction[0])
+            el=max(-p['max_target_elevation'],min(p['max_target_elevation'],math.asin(max(-1,min(1,self.raw_direction[2])))))
+            self.raw_direction=[math.cos(el)*math.cos(az),math.cos(el)*math.sin(az),math.sin(el)]
             # Core does spherical target filtering; this client filter only
             # removes pointer quantization and never rotates the aircraft.
             alpha=1-math.exp(-dt/p['direction_response'])
-            if dot(self.direction,desired)<-.95:self.direction=desired
-            else:self.direction=unit([a+(b-a)*alpha for a,b in zip(self.direction,desired)])
-            self.last_projection={'pointer':[x,y],'viewport':[width,height],'camera':camera,'projected_ray':ray,'edge_yaw':self.edge_yaw,'edge_pitch':self.edge_pitch}
+            if dot(self.direction,self.raw_direction)<-.95:self.direction=list(self.raw_direction)
+            else:self.direction=unit([a+(b-a)*alpha for a,b in zip(self.direction,self.raw_direction)])
+        self.last_pointer=(nx,ny);self.last_viewport=[width,height]
+        self.last_projection={'pointer':[x,y],'viewport':[width,height],'camera':camera,'projected_ray':ray,
+            'direction_source':'world-anchored pointer displacement and explicit edge pan','hold_direction':hold_direction,
+            'edge_yaw_rate_rad_s':self.edge_yaw_rate,'edge_pitch_rate_rad_s':self.edge_pitch_rate,'edge_lead_limit_rad':p['max_edge_pan']}
         if len(pad)>=4:
             if abs(pad[0])>p['deadzone']:manual_roll=True;roll=shaped(pad[0],p['deadzone'],p['curve'])
             if abs(pad[1])>p['deadzone']:manual_pitch=True;pitch=-shaped(pad[1],p['deadzone'],p['curve'])
@@ -75,6 +113,7 @@ class PlayerInputAdapter:
                 az=math.atan2(self.direction[1],self.direction[0])-pad[2]*p['edge_pan_rate']*dt
                 el=max(-p['max_target_elevation'],min(p['max_target_elevation'],math.asin(self.direction[2])+pad[3]*p['edge_pan_rate']*dt))
                 self.direction=[math.cos(el)*math.cos(az),math.cos(el)*math.sin(az),math.sin(el)]
+                self.raw_direction=list(self.direction)
         return {'direction':list(self.direction),'pitch_input':float(pitch),'roll_input':float(roll),'yaw_input':float(yaw),
                 'manual_pitch':manual_pitch,'manual_roll':manual_roll,'manual_yaw':bool(yaw),'mode':self.mode,'protection':True}
 

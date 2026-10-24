@@ -24,6 +24,9 @@ public:
     virtual FlightMeasurements flight_measurements() const {
         FlightMeasurements m;m.position=get_position();m.velocity=get_velocity();m.orientation=get_rpy();m.speed=get_speed();return m;
     }
+    // New typed player contract: position, velocity, attitude and gravity share
+    // the fixed map NWU basis. Legacy FDM/AI getters retain their old semantics.
+    virtual FlightMeasurements world_flight_measurements() const { return flight_measurements(); }
     virtual void step_surfaces(const FlightSurfaceControls& controls) {
         validate_surface_controls(controls);
         json::JSON action=json::Object();
