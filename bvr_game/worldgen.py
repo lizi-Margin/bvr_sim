@@ -352,6 +352,8 @@ class Baker:
             from .river_valley import finish_world
             from .detail_bake import _bake_material
             arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
+            from .regional_cover import bake_outer_cover
+            bake_outer_cover(self,result,arrays,out)
             regional={**self.r['detail_sample'],'size_m':[x*1000 for x in self.r['focus_area_km']],
                 'texture_resolution':self.r['landscape']['macro_resolution'],'seam_blend_m':self.r['landscape']['regional_transition_m'],
                 'material_detail_strength':.65,'macro_source_tile_m':160}

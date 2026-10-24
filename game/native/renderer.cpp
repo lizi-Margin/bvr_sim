@@ -773,6 +773,7 @@ class Renderer {
 PYBIND11_MODULE(bvr_game_render, m) {
     m.attr("VISUAL_BETA")=true;
     m.attr("TERRAIN_TILE_MATERIALS")=true;
+    m.attr("TERRAIN_BASE_MATERIAL")=true;
     py::class_<ScenePlacement>(m, "ScenePlacement")
         .def(py::init<>())
         .def_readwrite("id", &ScenePlacement::id)

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "player-flight-1.5-candidate",
+  "version": "player-flight-1.6-candidate",
   "provenance": "Engineering player-assistance settings. Not FDM parameters, not AI/RL gains, not certified aircraft envelope data. Tuned labels become valid only after recorded response validation.",
   "units": {
     "control": {
@@ -195,16 +195,17 @@
       "assignment_basis": "Combat configuration; separately maintained player gains",
       "overrides": {
         "control": {
-          "roll_rate_gain": 0.22,
+          "roll_rate_gain": 0.4,
           "bank_gain": 2.0,
           "schedule_max": 1.8,
           "max_roll_rate": 1.15,
           "max_g": 6.0,
-          "max_bank": 1.134464,
+          "max_bank": 1.3089969389957472,
           "max_alpha": 0.2,
           "min_speed": 150.0,
           "max_pitch_rate": 0.22,
           "trim_gain": 4.0,
+          "trim_limit": 0.5,
           "pitch_rate_gain": 4.0
         }
       }
@@ -219,7 +220,8 @@
           "trim_gain": 0.8,
           "trim_limit": 0.5,
           "surface_rate": 1.5,
-          "min_speed": 120.0
+          "min_speed": 120.0,
+          "max_bank": 1.3089969389957472
         }
       }
     },

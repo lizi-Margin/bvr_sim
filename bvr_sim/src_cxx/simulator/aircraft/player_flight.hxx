@@ -108,6 +108,15 @@ public:
             if(vertical_rate>p.max_pitch_rate){omega[0]*=p.max_pitch_rate/vertical_rate;omega[1]*=p.max_pitch_rate/vertical_rate;}
             omega=add(omega,scale(velocity_direction,-dot(omega,velocity_direction)));
             auto acceleration=add(scale(cross(omega,velocity_direction),speed),scale(m.gravity_up,9.80665));
+            auto reference_right=unit(cross(f,{0,0,1}),right);
+            auto reference_up=unit(cross(reference_right,f),up);
+            // A large downward curvature may exceed the permitted negative
+            // lift. Choose its positive-lift roll solution using the upright
+            // reference, not current bank, so starting the roll cannot cancel
+            // the decision halfway through the manoeuvre.
+            bool negative_lift_limited=intent.protection&&!intent.manual_pitch&&
+                std::max(std::abs(f[2]),std::abs(velocity_direction[2]))>.5&&
+                dot(acceleration,reference_up)<9.80665*p.min_g;
             double pole=std::clamp((std::max(std::abs(f[2]),std::abs(velocity_direction[2]))-.5)/.3,0.,1.);
             auto bank_acceleration=acceleration;
             // In ordinary flight a pitch-down correction must not reverse
@@ -116,7 +125,7 @@ public:
             // unload. Use positive vertical support for bank steering, fading
             // to the full geometric lift vector as the path nears vertical.
             if(bank_acceleration[2]<9.80665)
-                bank_acceleration[2]=9.80665+(bank_acceleration[2]-9.80665)*pole;
+                bank_acceleration[2]=9.80665+(bank_acceleration[2]-9.80665)*(negative_lift_limited?1.:pole);
             auto desired_up=unit(add(bank_acceleration,scale(f,-dot(bank_acceleration,f))),up);
             // Recovering from a steep climb can require pushing rather than
             // pulling. Do not demand an abrupt half-roll just because that
@@ -126,15 +135,14 @@ public:
             // lift can bend a steep ballistic climb down sooner than the
             // aircraft's small permitted negative-alpha lift. Let the full
             // geometric lift solution perform that manoeuvre when limited.
-            if(!state_.energy_limited&&(std::abs(f[2])>.5||std::abs(velocity_direction[2])>.5)&&
+            if(!state_.energy_limited&&!negative_lift_limited&&(std::abs(f[2])>.5||std::abs(velocity_direction[2])>.5)&&
                std::abs(omega[2])<.1*std::max(.001,std::hypot(omega[0],omega[1]))&&dot(desired_up,up)<0)
                 desired_up=scale(desired_up,-1.);
-            auto reference_right=unit(cross(f,{0,0,1}),right);
-            auto reference_up=unit(cross(reference_right,f),up);
             double desired_bank=std::atan2(dot(desired_up,reference_right),dot(desired_up,reference_up));
             // Bank about world-up ceases to be meaningful near a vertical
             // forward axis. Fade that limit, retaining vector roll feedback.
             double bank_limit=p.max_bank+(3.14159265358979323846-p.max_bank)*std::clamp((std::abs(f[2])-.7)/.25,0.,1.);
+            if(negative_lift_limited)bank_limit=3.14159265358979323846;
             bank_=std::clamp(desired_bank,-bank_limit,bank_limit);
             desired_up=add(scale(reference_up,std::cos(bank_)),scale(reference_right,std::sin(bank_)));
             auto held_up=unit(add(filtered_up_,scale(f,-dot(filtered_up_,f))),up);
@@ -183,8 +191,17 @@ public:
             else pitch_weight_=std::max(0.,pitch_weight_-dt/p.release_seconds);
             if(intent.manual_roll){roll_weight_=1;last_roll_=std::clamp(intent.roll_input,-1.,1.);}
             else roll_weight_=std::max(0.,roll_weight_-dt/p.release_seconds);
-            if(std::abs(target_pitch_error)<.25&&std::abs(roll_error)<.3&&pitch_weight_==0&&std::abs(previous_.elevator)<.95){
-                trim_=std::clamp(trim_+(pitch_demand-rates[1])*p.trim_gain*dt,-p.trim_limit,p.trim_limit);
+            double pitch_rate_error=pitch_demand-rates[1];
+            // Roll transients may suspend building trim, but must not prevent
+            // its removal. Otherwise a captured turn keeps its several-G
+            // elevator while the bank reverses, even when pitch demand is
+            // negative. Allow only the opposing increment through that gate.
+            bool unwinding_trim=trim_*pitch_rate_error<0;
+            if(((std::abs(target_pitch_error)<.25&&std::abs(roll_error)<.3)||unwinding_trim)&&
+               pitch_weight_==0&&std::abs(previous_.elevator)<.95){
+                double next_trim=trim_+pitch_rate_error*p.trim_gain*dt;
+                if(unwinding_trim&&std::abs(roll_error)>=.3&&trim_*next_trim<0)next_trim=0;
+                trim_=std::clamp(next_trim,-p.trim_limit,p.trim_limit);
             }else if(pitch_weight_>0||std::abs(target_pitch_error)>.5){
                 trim_*=std::exp(-dt/p.release_seconds);
             }

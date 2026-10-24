@@ -290,7 +290,7 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     else:tint=np.stack([sample_grid(source_tint[...,i],cm,n,w) for i in range(3)],axis=2)
     boundary=np.minimum.reduce([n-meta['origin_north'],w-meta['origin_west'],meta['origin_north']+extent[0]-n,meta['origin_west']+extent[1]-w])
     fade=np.clip(boundary/spec.get('seam_blend_m',100),0,1);fade=fade*fade*(3-2*fade)
-    parent_material=document['materials'].get(parent.get('material','')) if material_id=='detail_1' else None
+    parent_material=document['materials'].get(parent.get('material',''))
     if parent_material:
         from scipy.ndimage import map_coordinates
         for slot in ['base_color','normal','roughness_map']:

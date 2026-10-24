@@ -119,3 +119,34 @@ python game/tools/validate_standalone_player.py --catalog-smoke --map game/maps/
 独立入口现在生成带地图、有效玩家配置和资源上下文的标准输入日志，可直接交给 `bvr_game.playtest replay`。F-22/F-16/A-10 的 22 秒协议含实际窗口缩放到 1600×1000 再恢复 1920×1080、暂停/单步、重载与原始手动模式；窗口缩放阶段的录像保留原像素并加黑边，不作为性能验收。三种机型各有 220 帧录像和完整最终核心帧重放。全部 152 项另做 10 tick 的真实启动检查，只证明基本可运行，不能称为逐机型手感调校。
 
 不带 `--interactive` 的原有 `fly --seconds ...` 仍使用旧 AI `PilotCommand` 诊断入口，控制语义与环境保持；4 秒 A-10 的修改前后最终帧及四个轨迹采样完全一致。
+
+## 转弯退出与 1.6 候选配置
+
+玩家核心的俯仰积分在滚转误差较大时暂停增加，但允许释放与当前角速度误差相反的旧补偿。否则高过载转弯退出时会保留拉起舵量，即使当前要求压低机头，造成持续爬升和反复滚转。修复只作用于独立玩家控制器，不修改源 FDM、推力、姿态或 AI 增益。直接调用源 FDM 的左右高速转向测试可复现修改前的失败，并验证退出后的实际速度方向。
+
+`player-flight-1.6-candidate` 将 F-22/F-16 的辅助滚转上限设为 75°，F-22 的俯仰积分上限设为 0.5、滚转角速度反馈增益设为 0.4。其余机型数值配置保持。这些是玩家辅助策略的限制，不能当作实测或认证的飞机包线。提高航向增益的独立候选导致部分 F-16 持续盘旋变差，未采用。当前版本仍须完成正式冻结与未使用保留集验证；不能以存活或最终小误差代替过渡过程、完整包线和实际画面验收。
+
+历史组合操纵策略保留为独立诊断：
+
+```powershell
+python game/tools/diagnose_aggressive_turn.py --profile-file game/config/player_flight_profiles.json --historical-harness PATH_TO_PRESERVED_FAILED_HARNESS.py --output NEW_DIAGNOSTIC_DIRECTORY
+python -m bvr_game.playtest replay NEW_DIAGNOSTIC_DIRECTORY/player_intent-F22/intent-tape.json --output NEW_REPLAY_DIRECTORY
+```
+
+诊断保留原策略的 300 秒、30 秒交替转向及两次半秒手动反向操作。旧 AI 路径的 F-22 仍在第 3920 tick 失效；玩家入口的 F-22/F-16 均完成同一策略。两条路径各自使用本机实测高度反馈，所以这是策略对比，不能冒称输入带或核心帧相同。真实配置、地图、源代码哈希、全部输入和失败终点均记录；AI/RL 的完整冻结基线兼容性另外检查。
+
+## 陡峭姿态的受保护改出
+
+接近垂直时，若按通常的机翼朝上姿态压低所需的负升力超出机型 `min_g`，玩家核心允许选择翻滚后以正升力改出的几何解。判定使用与当前滚转无关的参考轴，避免刚开始滚转就撤销改出方向。这个策略只在陡峭姿态、保护开启且没有手动俯仰接管时使用；普通小幅压低仍按负过载限制推杆，不额外翻滚。陡峭改出与原有接近垂直的几何解一样，可以超过普通 `max_bank` 上限；实际角速度、舵面变化率和迎角/过载反馈继续生效。
+
+直接源 FDM 的 F-22 近垂直初始状态、0.85 油门、300 秒对比中，采样峰值迎角由约 52.2° 降至 10.9°，脱离原来的持续失速。中间候选使普通 10° 压低出现约 90° 滚转，已保留失败记录，并通过限定适用姿态排除；这不是通过扩大负过载限制或增强舵效改出的。
+
+```powershell
+python game/tools/player_core_only.py --seconds 300 --cases upright near_vertical --output NEW_CORE_RECOVERY_DIRECTORY
+python game/tools/player_core_only.py --seconds 300 --models F22 --cases upright near_vertical --unprotected --output NEW_UNPROTECTED_DIAGNOSTIC
+python game/tools/player_flight_response.py --cases vertical --seconds 300 --models F22 F16 FG-A-10 --speeds 180 300 500 --profile-file game/config/player_flight_profiles.json --output NEW_VERTICAL_STRESS_DIRECTORY
+```
+
+`player_core_only` 不创建 `GameSession` 或渲染器；`--unprotected` 只切换现有 typed 意图中的保护开关，默认仍开启。输出必须使用新目录。响应工具的 `--seconds` 是显式开发实验时长，写入每个计划条目；省略时保留原来的全部协议时长。
+
+不能把始终保持 85° 指向解释为机型能够持续 85° 爬升，也不能用低油门用例末端跟上目标掩盖中途失速。关闭保护的对照曾中途超过 100° 迎角；保护开启时会保留原始目标，同时用 `limited_direction` 表达能量限制后的目标。记录应同时报告原始误差、受限目标误差、整个过程的迎角/速度与饱和，不能只报告存活和最终误差。当前仍保留 F-22 的原最低速度配置；降低到 120 的实验未采用。

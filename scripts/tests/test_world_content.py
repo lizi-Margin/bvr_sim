@@ -9,11 +9,26 @@ from bvr_game.mapcheck import validate
 from bvr_game.scene_runtime import BakedScene
 from bvr_game.presentation import Labels,overlap,safe_aim,ChaseCamera,curve
 from bvr_game.geography import local_nwu
-from bvr_game.app import FlightGame,native
+from bvr_game.app import FlightGame,native,serialize
 from bvr_game.pilots import CombatPilot,StrikePilot
 MAP=ROOT/'game/maps/training_range_v2/generated-map.json'
 
 class ContentTests(unittest.TestCase):
+    def test_material_only_base_metadata_preserves_complete_core_terrain(self):
+        original=BakedScene(MAP);document=json.loads(json.dumps(original.document))
+        document['terrain']['base']['material']='presentation_only'
+        candidate=BakedScene(MAP,document)
+        self.assertEqual(serialize(original.terrain(native)),serialize(candidate.terrain(native)))
+
+    def test_outer_landcover_noise_is_world_coherent_across_bake_stripes(self):
+        from bvr_game.regional_cover import smooth_noise
+        n,w=np.meshgrid(np.linspace(-12000,14000,51),np.linspace(-10000,18000,65))
+        whole=smooth_noise(n,w,3600,3124)
+        striped=np.concatenate([smooth_noise(n[:32],w[:32],3600,3124),smooth_noise(n[32:],w[32:],3600,3124)])
+        self.assertTrue(np.array_equal(whole,striped))
+        self.assertTrue(np.isfinite(whole).all() and np.all((whole>=0)&(whole<=1)))
+        self.assertFalse(np.array_equal(whole,smooth_noise(n,w,3600,3125)))
+
     def test_water_render_batches_preserve_every_triangle_and_local_plane(self):
         # A long conformed ribbon's global bounds can sit far above its local
         # water. Splitting render batches must correct that without moving or

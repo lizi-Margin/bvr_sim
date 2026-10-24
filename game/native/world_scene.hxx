@@ -352,7 +352,10 @@ class WorldScene {
             cut = {t.origin_north, t.origin_west, t.origin_north + (t.columns - 1) * t.spacing,
                    t.origin_west + (t.rows - 1) * t.spacing};
         }
-        terrain_patch(base, 16, outer_cover, outer_colors, cut,"",&terrain);
+        const std::string base_material=terrain_materials.size()>terrain.detail_tiles.size()?terrain_materials.back():"";
+        if(!base_material.empty()&&!materials.count(base_material))
+            throw std::invalid_argument("Unknown outer terrain material: "+base_material);
+        terrain_patch(base, 16, outer_cover, outer_colors, cut,base_material,&terrain);
         for (size_t i = 0; i < terrain.detail_tiles.size(); ++i) {
             const auto &fine = terrain.detail_tiles[i];
             std::array<double, 4> inner{0, 0, 0, 0};

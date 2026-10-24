@@ -68,6 +68,16 @@ def main():
                 for w in range(-6000,2001,1000):
                     actual=g.renderer.render_height(n,w);expected=terrain.height(n,w)
                     height_samples.append({'point':[n,w],'core':expected,'renderer':actual,'error_m':abs(actual-expected)})
+            # Exercise both sides of material/height-resolution boundaries,
+            # including the outer mesh; interior samples cannot prove seams.
+            for tile in g.baked_scene.document['terrain']['details']:
+                n0,w0=tile['origin_north'],tile['origin_west'];dn=tile['spacing']*(tile['columns']-1);dw=tile['spacing']*(tile['rows']-1)
+                for fraction in [.13,.57,.89]:
+                    for delta in [-.5,.5]:
+                        for n,w in [(n0+delta,w0+fraction*dw),(n0+dn+delta,w0+fraction*dw),
+                                    (n0+fraction*dn,w0+delta),(n0+fraction*dn,w0+dw+delta)]:
+                            actual=g.renderer.render_height(n,w);expected=terrain.height(n,w)
+                            height_samples.append({'point':[n,w],'boundary_sample':True,'core':expected,'renderer':actual,'error_m':abs(actual-expected)})
             for surface in g.baked_scene.document['environment']['contact_surfaces']:
                 vertices=surface['vertices'];n=sum(v[0] for v in vertices)/len(vertices);w=sum(v[1] for v in vertices)/len(vertices)
                 expected=terrain.contact(n,w,0,float('inf')).height;actual=g.renderer.render_surface_height(n,w)

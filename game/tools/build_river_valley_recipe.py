@@ -75,9 +75,20 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--bake',action='store_true');p.add_argument('--output',type=Path,default=ROOT/'game/maps/river_valley_airfield')
     p.add_argument('--forest-asset',default='fir_grove_cards_c',help='Registered grove resource; earlier candidates: pine_grove_a or fir_grove_c')
     p.add_argument('--recipe-output',type=Path,default=ROOT/'game/recipes/river_valley_airfield.json',help='Save a candidate recipe separately while keeping the current default map recipe')
+    p.add_argument('--outer-cover',action='store_true',help='Continue source-albedo land use across the full outer terrain')
+    p.add_argument('--retexture-map',type=Path,help='Rebake materials of a verified immutable map, preserving all terrain and scene geometry')
     a=p.parse_args()
-    r=recipe(a.forest_asset);write_json(a.recipe_output,r)
-    if a.bake:
+    if a.retexture_map:
+        if a.recipe_output==ROOT/'game/recipes/river_valley_airfield.json':a.recipe_output=a.output/'scene-recipe.json'
+        source_pointer=json.loads(a.retexture_map.read_text(encoding='utf8'))
+        if source_pointer.get('data_version'):
+            a.retexture_map=a.retexture_map.parent/'versions'/source_pointer['data_version']/'generated-map.json'
+        if a.output.resolve()==a.retexture_map.resolve().parent:p.error('Use a separate output directory for a material candidate')
+        r=json.loads((a.retexture_map.parent/'scene-recipe.json').read_text(encoding='utf8'))
+    else:r=recipe(a.forest_asset)
+    if a.outer_cover:r['landscape']['outer_surface']={'resolution':4096,'field_size_m':900,'forest_scale_m':3600,'focus_blend_m':2200}
+    write_json(a.recipe_output,r)
+    if a.bake or a.retexture_map:
         from bvr_game.worldgen import Baker
         from bvr_game.scene_runtime import BakedScene
         from bvr_game.content import sha
@@ -85,7 +96,26 @@ def main():
         # Complete and verify an immutable data version before publishing one
         # root map pointer. A failed bake cannot corrupt the last working map.
         a.output=a.output.resolve();stage=a.output/('._bake-'+uuid.uuid4().hex)
-        report=Baker(r).bake(stage)
+        if a.retexture_map:
+            from bvr_game.worldgen import BakedTerrain,canonical
+            from bvr_game.detail_bake import _bake_material
+            from bvr_game.regional_cover import bake_outer_cover
+            original=BakedScene(a.retexture_map);doc=json.loads(json.dumps(original.document));arrays=original.arrays
+            stage.mkdir(parents=True,exist_ok=False);shutil.copy2(original.height_file,stage/'terrain.npz');doc['terrain']['file']='terrain.npz'
+            baker=Baker(r);baker.terrain=BakedTerrain(arrays['base'],arrays['focus'],doc['terrain']['base'],doc['terrain']['details'][0])
+            bake_outer_cover(baker,doc,arrays,stage)
+            regional={**r['detail_sample'],'size_m':[x*1000 for x in r['focus_area_km']],
+                'texture_resolution':r['landscape']['macro_resolution'],
+                'seam_blend_m':r['landscape'].get('outer_surface',{}).get('focus_blend_m',r['landscape']['regional_transition_m']),
+                'material_detail_strength':.65,'macro_source_tile_m':160}
+            _bake_material(doc,arrays,doc['terrain']['details'][0],regional,stage,baker,material_id='regional_1',prefix='regional')
+            doc['materials']['regional_1'].update(world_uv=True,uv_origin_north=doc['terrain']['details'][0]['origin_north'],uv_origin_west=doc['terrain']['details'][0]['origin_west'])
+            doc['landscape']=r['landscape'];doc['recipe_sha256']=hashlib.sha256(canonical(r)).hexdigest()
+            assert sha(stage/'terrain.npz')==original.document['terrain']['sha256']
+            for key in ['instances','surfaces','environment','mission','resource_versions']:assert doc[key]==original.document[key],key
+            write_json(stage/'scene-recipe.json',r);write_json(stage/'generated-map.json',doc)
+            report={'instances':len(doc['instances']),'counts':doc['counts'],'operation':'Material-only rebake; exact terrain, instances, surfaces, environment, mission and registered model versions preserved','source_map':str(a.retexture_map.resolve()),'source_map_sha256':sha(a.retexture_map)}
+        else:report=Baker(r).bake(stage)
         doc=json.loads((stage/'generated-map.json').read_text(encoding='utf-8'))
         arrays=np.load(stage/'terrain.npz',allow_pickle=False);fine=arrays['sample']
         if not np.isfinite(fine).all() or max(np.max(abs(np.diff(fine,axis=0))),np.max(abs(np.diff(fine,axis=1))))>25:
@@ -93,7 +123,7 @@ def main():
         def relocate(value,destination):
             if isinstance(value,str):return value.replace(str(stage),destination)
             if isinstance(value,list):return [relocate(v,destination) for v in value]
-            if isinstance(value,dict):return {k:relocate(v,destination) for k,v in value.items()}
+            if isinstance(value,dict):return {relocate(k,destination):relocate(v,destination) for k,v in value.items()}
             return value
         normalized=json.dumps(relocate(doc,'<MAP_VERSION>'),sort_keys=True,separators=(',',':')).encode('utf-8')
         id=hashlib.sha256(normalized).hexdigest()[:24];version=a.output/'versions'/id;version.mkdir(parents=True,exist_ok=True)
@@ -102,11 +132,14 @@ def main():
             dest=version/file.name
             if dest.exists() and sha(dest)!=sha(file):raise ValueError('Immutable map version collision: '+str(dest))
             if not dest.exists():shutil.copy2(file,dest)
-        resolved=relocate(doc,str(version));write_json(version/'generated-map.json',resolved)
+        resolved=relocate(doc,str(version));version_map=version/'generated-map.json'
+        if version_map.exists():
+            if json.loads(version_map.read_text(encoding='utf8'))!=resolved:raise ValueError('Immutable map document collision: '+str(version_map))
+        else:write_json(version_map,resolved)
         BakedScene(version/'generated-map.json')
         published={**resolved,'terrain':{**resolved['terrain'],'file':f'versions/{id}/terrain.npz'},'data_version':id}
         pointer=a.output/'generated-map.json';temporary=pointer.with_suffix('.pending.json');write_json(temporary,published);temporary.replace(pointer)
         print(json.dumps({**report,'map':str(pointer),'generated_map_sha256':sha(pointer),'data_version':id,'version_directory':str(version),
             'fine_height_min_max':[float(fine.min()),float(fine.max())],'publication':'Atomic root pointer after full immutable-version validation; staging data retained for diagnosis'},ensure_ascii=False,indent=2))
-    else:print(path)
+    else:print(a.recipe_output)
 if __name__=='__main__':main()

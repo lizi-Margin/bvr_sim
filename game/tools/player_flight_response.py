@@ -50,6 +50,7 @@ def run(a):
         for speed in a.speeds or ([180] if model=='FG-A-10' else [300]):
             for case in a.cases:
                 seconds=300 if case=='sustained' else 150 if case=='turn_180' else 120 if case in ['circle','reversal'] else 30 if case=='down' else 90
+                if a.seconds is not None:seconds=a.seconds
                 plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'seed':a.seed if a.seed is not None else 2201+len(plan)%9,'altitude_m':a.altitude,
                     'recovery_at_s':a.recovery_at if case in ['down_pulse','dive_recovery'] else None})
     write_json(a.output/'plan.json',{'phase':'candidate diagnostics; not final held-out evaluation','cases':plan,'profile_sha256':g.profile_store.file_sha256,
@@ -106,5 +107,8 @@ def main():
     p.add_argument('--seed',type=int,help='Explicit same development seed for controlled candidate comparisons; omission retains the original rotating development seeds')
     p.add_argument('--recovery-at',type=float,default=20,help='Explicit down-pulse/dive recovery onset in simulation seconds; recorded with the plan. Original20s protocol stays the default.')
     p.add_argument('--profile-file',type=Path,help='Explicit candidate profile file; freeze, snapshot and record its actual hash')
-    p.add_argument('--cases',nargs='+',default=['turn_45','turn_90','turn_180','vertical']);run(p.parse_args())
+    p.add_argument('--seconds',type=float,help='Explicit development duration override, recorded in every case; omission preserves the original protocol durations')
+    p.add_argument('--cases',nargs='+',default=['turn_45','turn_90','turn_180','vertical']);a=p.parse_args()
+    if a.seconds is not None and (not math.isfinite(a.seconds) or a.seconds<5):p.error('--seconds must be finite and at least five')
+    run(a)
 if __name__=='__main__':main()
