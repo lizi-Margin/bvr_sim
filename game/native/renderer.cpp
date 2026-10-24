@@ -209,6 +209,13 @@ class Renderer {
         effects = std::make_unique<VisualEffects>(s,!visual_profile.is_null());
         aircraft_visuals = std::make_unique<AircraftVisuals>(s);
         aircraft_visuals->set_material_profile(visual_profile);
+        if(!visual_profile.is_null()&&visual_profile.contains("aircraft_exhaust_profiles_file")){
+            auto file=std::filesystem::path(profile_file).parent_path()/visual_profile.at("aircraft_exhaust_profiles_file").get<std::string>();
+            std::ifstream input(file);if(!input)throw std::runtime_error("Cannot read source aircraft exhaust profiles: "+file.string());
+            nlohmann::json profiles;input>>profiles;
+            if(profiles.at("schema_version").get<int>()!=1)throw std::runtime_error("Unsupported source exhaust profile schema");
+            aircraft_visuals->set_exhaust_profiles(profiles.at("aircraft"));
+        }
         auto weather = weather_entity=wi::ecs::CreateEntity();
         auto &sky = s.weathers.Create(weather);
         sky.SetRealisticSky(false);
@@ -750,6 +757,7 @@ class Renderer {
         aircraft_visuals->update(preview_root,properties,throttle,false);
     }
     std::map<std::string,uint64_t> aircraft_statistics() const { return aircraft_visuals->stats(); }
+    std::vector<AircraftExhaustState> aircraft_exhaust_state() const { return aircraft_visuals->exhaust_state(); }
     std::map<std::string,uint64_t> aircraft_import_counts() const { return aircraft_visuals->imports(); }
     void reload() {
         auto &s = wi::scene::GetScene();
@@ -852,6 +860,12 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readonly("quit", &Input::quit)
         .def_readonly("held", &Input::held)
         .def_readonly("pressed", &Input::pressed);
+    py::class_<AircraftExhaustState>(m,"AircraftExhaustState")
+        .def_readonly("uid",&AircraftExhaustState::uid).def_readonly("engine_index",&AircraftExhaustState::engine_index)
+        .def_readonly("mode",&AircraftExhaustState::mode).def_readonly("property",&AircraftExhaustState::property)
+        .def_readonly("reason",&AircraftExhaustState::reason).def_readonly("attachment_association",&AircraftExhaustState::attachment_association)
+        .def_readonly("property_available",&AircraftExhaustState::property_available)
+        .def_readonly("visible",&AircraftExhaustState::visible).def_readonly("intensity",&AircraftExhaustState::intensity);
     py::class_<Renderer>(m, "Renderer")
         .def(py::init<int, int, bool, const std::string &, const std::string &,
                       const std::map<std::string, std::string> &,const std::string&>(),py::arg("width"),py::arg("height"),py::arg("visible"),py::arg("engine"),py::arg("shaders"),py::arg("models"),py::arg("visual_profile")="")
@@ -883,6 +897,7 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("reflection_plane", &Renderer::reflection_plane)
         .def("preview_aircraft", &Renderer::preview_aircraft)
         .def("aircraft_statistics", &Renderer::aircraft_statistics)
+        .def("aircraft_exhaust_state", &Renderer::aircraft_exhaust_state)
         .def("aircraft_import_counts", &Renderer::aircraft_import_counts)
         .def("render_height", &Renderer::render_height)
         .def("render_surface_height",&Renderer::render_surface_height,py::arg("north"),py::arg("west"),py::arg("reference_height")=INFINITY)

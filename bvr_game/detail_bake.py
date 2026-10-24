@@ -198,12 +198,15 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     labels=np.zeros(n.shape,dtype=np.uint8);macro=np.ones((*n.shape,3),dtype=np.float32)
     source_scale=spec.get('macro_source_tile_m')
     crop_cover=np.ones(n.shape,dtype=np.float32) if source_scale else None
+    rural=baker.r.get('landscape',{}).get('rural_parcels',{})
     for field in document['fields']:
         poly=Polygon(field['polygon'],field['holes']);a,b,c,d=poly.bounds
         x0=max(0,int((a-meta['origin_north'])/pixel)-1);x1=min(resolution,int((c-meta['origin_north'])/pixel)+2)
         y0=max(0,int((b-meta['origin_west'])/pixel)-1);y1=min(resolution,int((d-meta['origin_west'])/pixel)+2)
         if x0>=x1 or y0>=y1:continue
-        area=np.s_[y0:y1,x0:x1];mask=contains_xy(poly,n[area],w[area]);labels[area][mask]=0 if field.get('surface')=='grass' else 1;macro[area][mask]=field['color'][:3]
+        area=np.s_[y0:y1,x0:x1]
+        interior=poly.buffer(-rural.get('field_margin_m',0)) if rural else poly
+        mask=contains_xy(interior,n[area],w[area]);labels[area][mask]=0 if field.get('surface')=='grass' else 1;macro[area][mask]=field['color'][:3]
         if crop_cover is not None:
             crop_cover[area][mask]=field.get('crop_cover',1 if field.get('surface')=='grass' else 0)
             # Broad, low-contrast cultivation rows follow each declared parcel,
@@ -213,6 +216,8 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
             across=-n[area]*math.sin(heading)+w[area]*math.cos(heading)
             row=1+.035*np.sin(across*2*math.pi/18)
             macro[area][mask]*=row[mask,None]
+    if rural:
+        macro=gaussian_filter(macro,sigma=(rural['tint_blend_m']/pixel,rural['tint_blend_m']/pixel,0),mode='nearest')
     for forest in baker.forests.values():labels[contains_xy(forest,n,w)]=2
     labels[contains_xy(baker.industry,n,w)]=3
     for road,line in baker.roads:
@@ -254,6 +259,11 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
             file=material[slot];image=source_image(file,slot)
             # Slow deterministic UV warping breaks the grid while retaining actual source PBR detail.
             sample=source_sample(image)
+            if index==2 and rural.get('forest_ground_source_mean'):
+                # A low-resolution macro image must not enlarge metre-scale
+                # forest-floor patches into160mblobs. Retain the linear source
+                # mean; the existing independent runtime detail stays at3m.
+                sample=image.mean(axis=(0,1))
             if slot=='base_color':
                 strength=spec.get('material_detail_strength',.5)
                 sample=sample*strength+image.mean(axis=(0,1))*(1-strength)
@@ -347,4 +357,5 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     report['material_bake']={'resolution':[resolution,resolution],'pixel_m':pixel,'blend_m':spec.get('material_blend_m',7),'source_textures':source_files,
         'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear',
         'macro_source_tile_m':source_scale,'macro_source_note':'Area-filtered real source color stretched for low-frequency variation; authored crop-cover and 18m parcel rows, plus independent true-scale detail at runtime' if source_scale else None}
+    if rural:report['material_bake']['rural_sampling']={**rural,'scope':'Display masks/source means only; shared terrain height arrays are unchanged'}
     if canopy_report:report['material_bake']['forest_canopy_aggregate']=canopy_report

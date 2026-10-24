@@ -113,6 +113,12 @@ def main():
         'anti_aliasing':'Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review'}
     profile['provenance']['canopy']='Thin alpha-blended dielectric approximation, linear tint and clearcoat; original zero-opacity F16 inner layer has no depth/specular contribution. Source F16 cockpit and pilot are now included. Not measured optical data; no screen-space transmission blur.'
     profile['provenance']['geometry']='Original registered FlightGear exterior geometry retained; F16 adds original source pilot_externalview.ac and Cockpit/Main/cockpit.ac, without new invented geometry or physical changes.'
+    from bvr_game.exhaust_profiles import build_document
+    exhaust_file=ROOT/'game/config/aircraft_exhaust_profiles.json'
+    write_changed(exhaust_file,json.dumps(build_document(),ensure_ascii=False,indent=2)+'\n')
+    profile['aircraft_exhaust_profiles_file']='../config/aircraft_exhaust_profiles.json'
+    profile['aircraft_exhaust_profiles_sha256']=sha(exhaust_file)
+    profile['provenance']['imported_exhausts']='Source FDM capability and existing normalized REHEAT snapshot output required. Source dry engines and unavailable state do not get throttle-created glow. Attachments and emission remain engineering approximations; ordinary F22/F16 retain their separate legacy effect.'
     write_changed(ROOT/'game/recipes/player_daylight.json',json.dumps(profile,indent=2)+'\n')
     print(json.dumps({'profile':str(ROOT/'game/recipes/player_daylight.json'),'shader_changed':changed,'source_sha256':sha(sky)},indent=2))
 if __name__=='__main__':main()

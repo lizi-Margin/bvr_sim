@@ -1,0 +1,4628 @@
+{
+  "schema_version": 1,
+  "generator_sha256": "5151a24183eed79887a006323dd7b0e128dd101f8e7180ce40385560a84dd08d",
+  "catalog_sha256": "5b553328f5de7c723ed68edaef5c3acdaa37d67f678adc7486f9dbbc13c2cabf",
+  "scope": "Imported appearances only. Explicit source capability and existing normalized REHEAT snapshot property required. Missing data disables a visual effect; it does not classify a real engine as dry. No thrust, physics, controller, sound or source geometry changes. Ordinary F22/F16 retain their separately documented legacy effect.",
+  "intensity_units": "Existing source REHEAT output clamped to0..1; display opacity/emission are engineering approximations, not exhaust temperature or measured radiance.",
+  "aircraft": {
+    "FG-707": {
+      "source_aircraft": "FG-707",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "MK508"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "MK508"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "MK508"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "MK508"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-707\\fdm.xml": "45b23c744992d4b88287fa37982a7cb4e789467acd915e848b69ccbef5604864",
+        "bvr_sim\\resources\\aircraft\\FG-707\\MK508.xml": "34b432b83f6ec9eede431cc0d231d3ecada43b5196348af9fff4a58ef8d924f6"
+      },
+      "unresolved": []
+    },
+    "FG-717": {
+      "source_aircraft": "FG-717",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 18500.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 18500.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-717\\fdm.xml": "f029b9acd1b12d188867c2770c553fb62cc0db4c99428e55a9f6f74dddc44a58"
+      },
+      "unresolved": []
+    },
+    "FG-727-230": {
+      "source_aircraft": "FG-727-230",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-727-230\\fdm.xml": "6c8d5e79d477a98a7d705775de76308b1b10bd23c2284519cc1b6ea0a9a45c2a"
+      },
+      "unresolved": []
+    },
+    "FG-737-800": {
+      "source_aircraft": "FG-737-800",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-737-800\\fdm.xml": "46ce40cf1c48ade06dc3e038e0bfc73cade05fddf70e598b9e07ad4fb945e0c7",
+        "bvr_sim\\resources\\aircraft\\FG-737-800\\CFM56.xml": "14d449e3704e81e6df368cdabfed0c81d247c3393ff57575102a260df6a94632"
+      },
+      "unresolved": []
+    },
+    "FG-747-8i": {
+      "source_aircraft": "FG-747-8i",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 67400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 67400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 67400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 67400.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-747-8i\\fdm.xml": "94a2d93ae7deb9a58dab9c0342192f6fa02a802d0632706bd14e742c3c23f85e"
+      },
+      "unresolved": []
+    },
+    "FG-757-200": {
+      "source_aircraft": "FG-757-200",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 40100.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 40100.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-757-200\\fdm.xml": "bba4196d5f3dd96e2ff16638d14e1fe0cf6eb3ed0f858962a8a9a8b65ccc571d"
+      },
+      "unresolved": []
+    },
+    "FG-767-300": {
+      "source_aircraft": "FG-767-300",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 62100.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 62100.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-767-300\\fdm.xml": "5b4b35d0b20f83072acfc2220407b3f7752ce935588ba8002e696ff500658f1e"
+      },
+      "unresolved": []
+    },
+    "FG-777": {
+      "source_aircraft": "FG-777",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 78910.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 78910.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-777\\fdm.xml": "6c8e475b21af836685016dd2a7f65d7ee84e9e7efbb77166099686dadbd254f3"
+      },
+      "unresolved": []
+    },
+    "FG-787-8": {
+      "source_aircraft": "FG-787-8",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "trent_1000"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "trent_1000"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-787-8\\fdm.xml": "e4631b0e2cab75f33b70eff67f56e8c0fa5e9e47f1c6c35c9c3cd9128b9c5ba8",
+        "bvr_sim\\resources\\aircraft\\FG-787-8\\trent_1000.xml": "8085c0d01b2b383f9ea5cdadc954c0adef1e024999a779ad8f3182532e9deff8"
+      },
+      "unresolved": []
+    },
+    "FG-A-10": {
+      "source_aircraft": "FG-A-10",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9065.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9065.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-A-10\\fdm.xml": "641d37de48b8d162347ae658b4dedb8f96f732f9f3059bc1502ccc3632bd2a3d"
+      },
+      "unresolved": []
+    },
+    "FG-A-6E": {
+      "source_aircraft": "FG-A-6E",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "J52-P8"
+        },
+        {
+          "engine_index": 1,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "J52-P8"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-A-6E\\fdm.xml": "57f6a2699f337c9bdb9d833c7e802dc0b6f1b9c8d9aa131ced6bc0be61fa7940",
+        "bvr_sim\\resources\\aircraft\\FG-A-6E\\Systems\\jsb-propulsion.xml": "f3baf0a906f30bc6854e5c278de21624c361ef8d3e11f4e8f12ff7909251d2fa"
+      },
+      "unresolved": []
+    },
+    "FG-A300-600": {
+      "source_aircraft": "FG-A300-600",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "GE-CF6-80C2A3"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "GE-CF6-80C2A3"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-A300-600\\fdm.xml": "e71c066b53214c6d234da8b0c140361f789996fe3e09a75a8f7e7328eb6fc04c",
+        "bvr_sim\\resources\\aircraft\\FG-A300-600\\GE-CF6-80C2A3.xml": "1bfbc08021d36dddbb94a1b16523ee131084a1d3433da183a5fc597ba935d651"
+      },
+      "unresolved": []
+    },
+    "FG-A320-family": {
+      "source_aircraft": "FG-A320-family",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "v2527-a5_1"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "v2527-a5_2"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "APS3200"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-A320-family\\fdm.xml": "39876b756825bdeef3dba01d19a4e76a1e6901f4dfb5b7ab2e35b011911fad61",
+        "bvr_sim\\resources\\aircraft\\FG-A320-family\\v2527-a5_1.xml": "fcb89491b8e4d333ef8746d0baa51fa2f79e8c77a7162bea2c87e112e49f5dff",
+        "bvr_sim\\resources\\aircraft\\FG-A320-family\\v2527-a5_2.xml": "18edac74005d4862b4c6c6311ae9966e767b96917c20bc9b650936cc0384121e",
+        "bvr_sim\\resources\\aircraft\\FG-A320-family\\APS3200.xml": "da7a592b3475acfbade31f026882e55e5a6b259352e12500bd4d070702988694"
+      },
+      "unresolved": []
+    },
+    "FG-A340-600": {
+      "source_aircraft": "FG-A340-600",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 89400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 89400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 89400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 89400.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-A340-600\\fdm.xml": "f2aea3111ccb1b4d3aeaee7780e4c35a440068684aa4cd2609a24622179c2273"
+      },
+      "unresolved": []
+    },
+    "FG-A380": {
+      "source_aircraft": "FG-A380",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "TRENT-900"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "TRENT-900"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "TRENT-900"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "TRENT-900"
+        },
+        {
+          "engine_index": 4,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "APU"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-A380\\fdm.xml": "68ab355c17219737605fee80b4917e8ca1f74454dda9052b0914f878795274c4",
+        "bvr_sim\\resources\\aircraft\\FG-A380\\TRENT-900.xml": "d3c6561aea5241cdc235c2fe97bdd75ddf12a7c391eda61adcd9fcd5b82752d5",
+        "bvr_sim\\resources\\aircraft\\FG-A380\\APU.xml": "d3f120f196efdf5e63e1e151fd3167999adbdbe9465e05ff95531afa913f7692"
+      },
+      "unresolved": []
+    },
+    "FG-a4": {
+      "source_aircraft": "FG-a4",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-a4\\fdm.xml": "bdf8d8591156505b90a510ab8eb8d57efad4f9ba1a5c6049b4a82d8bbdc655ee"
+      },
+      "unresolved": []
+    },
+    "FG-Aermacchi-MB-339": {
+      "source_aircraft": "FG-Aermacchi-MB-339",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 4000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Aermacchi-MB-339\\fdm.xml": "523169ead1e38da441c699c1bc1f38b1622d4123e62911a771ddd1843082b8cd"
+      },
+      "unresolved": []
+    },
+    "FG-Aero-L-29": {
+      "source_aircraft": "FG-Aero-L-29",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1960.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Aero-L-29\\fdm.xml": "0b609224cf9d796369898d097debc618acdec356d296e874ca96e4a6b2245438"
+      },
+      "unresolved": []
+    },
+    "FG-Alphajet": {
+      "source_aircraft": "FG-Alphajet",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2970.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2970.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Alphajet\\fdm.xml": "f1563c963c97d825815761776316f6a511f58692b10b01bda9478c487c7e4c74"
+      },
+      "unresolved": []
+    },
+    "FG-AN-225": {
+      "source_aircraft": "FG-AN-225",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 51700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 51700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 51700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 51700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 4,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 51700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 5,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 51700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-AN-225\\fdm.xml": "aaaa20aa54d175e2faad0b7eddea8beba1c3c1765775f07b9269117b8d56d8b6"
+      },
+      "unresolved": []
+    },
+    "FG-AR-234": {
+      "source_aircraft": "FG-AR-234",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1980.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1980.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-AR-234\\fdm.xml": "cf0df5a1529caafa2262b036e1051826e59a5bf2275ce021a7b05dfc84ce773b"
+      },
+      "unresolved": []
+    },
+    "FG-Avro-Arrow": {
+      "source_aircraft": "FG-Avro-Arrow",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 16500.0,
+          "source_afterburner_thrust": 23500.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 16500.0,
+          "source_afterburner_thrust": 23500.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Avro-Arrow\\fdm.xml": "538f20ea1dc9818b59ffaff9cdb85d6c3dc4b8228380e3031c98bfedd272247c"
+      },
+      "unresolved": []
+    },
+    "FG-B-1B": {
+      "source_aircraft": "FG-B-1B",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 30780.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 30780.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 30780.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 17390.0,
+          "source_afterburner_thrust": 30780.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-B-1B\\fdm.xml": "d269fcff882e9df63e6446c0aa474ea76cc004e51075b2e9ec9c2a089b892717"
+      },
+      "unresolved": []
+    },
+    "FG-B-2": {
+      "source_aircraft": "FG-B-2",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-B-2\\fdm.xml": "d8ec7b4829a46b39f0909451d9f31454c839f1ab448a508a68f65b94d9c6266e"
+      },
+      "unresolved": []
+    },
+    "FG-B-36D-Peacemaker": {
+      "source_aircraft": "FG-B-36D-Peacemaker",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5200.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5200.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5200.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5200.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-B-36D-Peacemaker\\fdm.xml": "ebc980cf792ea38ec4960c0dd3f33df1e795c85928875780d947963cda287968"
+      },
+      "unresolved": []
+    },
+    "FG-B-52F": {
+      "source_aircraft": "FG-B-52F",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 4,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 5,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 6,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        },
+        {
+          "engine_index": 7,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 13750.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-B-52F\\fdm.xml": "0050625dcce890f25a5e19ea6e73ebf127cc9d09f015898f2b510c3727fc2375"
+      },
+      "unresolved": []
+    },
+    "FG-BAC-TSR2": {
+      "source_aircraft": "FG-BAC-TSR2",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19610.0,
+          "source_afterburner_thrust": 30610.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19610.0,
+          "source_afterburner_thrust": 30610.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-BAC-TSR2\\fdm.xml": "9b14ecfa5ebad4ee07a2228650736b60b17a29d82364cf988be4e18a6c5b9ca3"
+      },
+      "unresolved": []
+    },
+    "FG-BAe-125": {
+      "source_aircraft": "FG-BAe-125",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3750.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3750.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-BAe-125\\fdm.xml": "ff443e847bf675e47c4f2f34aa2612cafeab20f8053c574670d18054c69d944d"
+      },
+      "unresolved": []
+    },
+    "FG-BAe-146": {
+      "source_aircraft": "FG-BAe-146",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-BAe-146\\fdm.xml": "d86f3283aa5bb9370d4219cf93e28b68727f346cef9376a4f91af1186c2a35a6"
+      },
+      "unresolved": []
+    },
+    "FG-Bell-P-59": {
+      "source_aircraft": "FG-Bell-P-59",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Bell-P-59\\fdm.xml": "e9d9a4295f0aa619dc2305322a7cb977c4efa78e079370fe84d0d22ead0d7ec6"
+      },
+      "unresolved": []
+    },
+    "FG-Buccaneer": {
+      "source_aircraft": "FG-Buccaneer",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11300.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11300.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Buccaneer\\fdm.xml": "cd1c0752ed518a745db3bf7cbbe4e73c8921a809040bf0d16bb5709831611570"
+      },
+      "unresolved": []
+    },
+    "FG-Campini-Caproni-N1": {
+      "source_aircraft": "FG-Campini-Caproni-N1",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1600.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Campini-Caproni-N1\\fdm.xml": "a0d373263f40d4e8e4c561af36a79781e53bd5b2cd1c59e88fac874f40031696"
+      },
+      "unresolved": []
+    },
+    "FG-CanberraBI8": {
+      "source_aircraft": "FG-CanberraBI8",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 7500.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 7500.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-CanberraBI8\\fdm.xml": "3a2f30168bb43bca69c3669a1f151c602bc17405916bf7bd7a77c3d55678799c"
+      },
+      "unresolved": []
+    },
+    "FG-Caproni-C22J": {
+      "source_aircraft": "FG-Caproni-C22J",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 247.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 247.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Caproni-C22J\\fdm.xml": "b99e80b41cf8b41192777f17d113b94f0da60336b411f2f75080b61a7799a0ef"
+      },
+      "unresolved": []
+    },
+    "FG-Caravelle": {
+      "source_aircraft": "FG-Caravelle",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Caravelle\\fdm.xml": "67a6b7377863f1e8b9303b6f326faab65c239d4130cf325c40e70d123658b52a"
+      },
+      "unresolved": []
+    },
+    "FG-Carreidas": {
+      "source_aircraft": "FG-Carreidas",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 25000.0,
+          "source_afterburner_thrust": 32000.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 25000.0,
+          "source_afterburner_thrust": 32000.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[2]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 25000.0,
+          "source_afterburner_thrust": 32000.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 523.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Carreidas\\fdm.xml": "700a3a742409e78340519d335832dc57500c5775ff700e7be12e2f49a7c0cf1a"
+      },
+      "unresolved": []
+    },
+    "FG-Citation-Bravo": {
+      "source_aircraft": "FG-Citation-Bravo",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2750.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2750.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Citation-Bravo\\fdm.xml": "ce319ddf8e8b223b75dcbe6e2c4449ee7c90032b943813d10b27bfcf44df0794"
+      },
+      "unresolved": []
+    },
+    "FG-CitationX": {
+      "source_aircraft": "FG-CitationX",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6764.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6764.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-CitationX\\fdm.xml": "446dd46ba286a64f423f031c2c42bf7d2876e15dc678d840edda34bc07adc728"
+      },
+      "unresolved": []
+    },
+    "FG-Coanda-1910": {
+      "source_aircraft": "FG-Coanda-1910",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 450.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Coanda-1910\\fdm.xml": "feed2eca0a395cf13c5609e2839677d3cfef9739c828d1937408af9d10c7b9b5"
+      },
+      "unresolved": []
+    },
+    "FG-Concorde": {
+      "source_aircraft": "FG-Concorde",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "Olympus593Mrk610"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "Olympus593Mrk610"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "Olympus593Mrk610"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "Olympus593Mrk610"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Concorde\\fdm.xml": "dbcdafb5d1f242ad3013981c01e4fda0122a23d20fee746d005548de98cdf7c1",
+        "bvr_sim\\resources\\aircraft\\FG-Concorde\\Olympus593Mrk610.xml": "066ed46034b3d3202bf9882312890b5f1435ef282b5bd946a9058df66d7b7272"
+      },
+      "unresolved": []
+    },
+    "FG-CRJ-200": {
+      "source_aircraft": "FG-CRJ-200",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9220.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9220.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-CRJ-200\\fdm.xml": "f779718d8f69de09b084f6fc607cb61c2ce90c3074ac3374a6d97227d78a39f0"
+      },
+      "unresolved": []
+    },
+    "FG-CRJ700-family": {
+      "source_aircraft": "FG-CRJ700-family",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 13790.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 13790.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-CRJ700-family\\fdm.xml": "bd17e55de14a05682f2868587c94cfb63784733fa05a1576fe6032b0b1a7f736"
+      },
+      "unresolved": []
+    },
+    "FG-Dassault-Mystere-IV": {
+      "source_aircraft": "FG-Dassault-Mystere-IV",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 7716.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Dassault-Mystere-IV\\fdm.xml": "8df0259bf2ae52e8a97289d965026f7c84bd69712c7b89e7e470377c4a206ccd"
+      },
+      "unresolved": []
+    },
+    "FG-DC-10-30": {
+      "source_aircraft": "FG-DC-10-30",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 54000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 54000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 54000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-DC-10-30\\fdm.xml": "5dadb29ad19ef26bc1ce95ad8d097e123b8280926ac3d4971c18f1703f893e99"
+      },
+      "unresolved": []
+    },
+    "FG-dc8-73": {
+      "source_aircraft": "FG-dc8-73",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-dc8-73\\fdm.xml": "a508b7ba31d2f75cca66aee6288d5f7ac477d5dd1fb6763277574c2499dfd05e",
+        "bvr_sim\\resources\\aircraft\\FG-dc8-73\\CFM56.xml": "6061df223a16e6af7bd4af0ed43b99dd6150cab9809a495c88efba7faf9c0227"
+      },
+      "unresolved": []
+    },
+    "FG-DH-106": {
+      "source_aircraft": "FG-DH-106",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-DH-106\\fdm.xml": "fc7d93b474df6c1117e3542a7a32dcfc1d3261fc94fb6f97ce6f7772401dd0a5"
+      },
+      "unresolved": []
+    },
+    "FG-E3B": {
+      "source_aircraft": "FG-E3B",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "JT3D"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "JT3D"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "JT3D"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "JT3D"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-E3B\\fdm.xml": "83e14b56c396dc7e2e7699ab94c55201dff50ef7c3a06747e2f3648f04522c5b",
+        "bvr_sim\\resources\\aircraft\\FG-E3B\\JT3D.xml": "97dd8706e3d8241451bc4ec7c671e727d3f7c0e422215985aea60d88d938db76"
+      },
+      "unresolved": []
+    },
+    "FG-Embraer-ERJ-145": {
+      "source_aircraft": "FG-Embraer-ERJ-145",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 8700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 8700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Embraer-ERJ-145\\fdm.xml": "451750b3de1aad8cc5e0c322f097567b463460c6282046ae45599e956a33e9bd"
+      },
+      "unresolved": []
+    },
+    "FG-eurofighter": {
+      "source_aircraft": "FG-eurofighter",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 13490.0,
+          "source_afterburner_thrust": 20230.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 13490.0,
+          "source_afterburner_thrust": 20230.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-eurofighter\\fdm.xml": "1dbb83968e23579f61070819a30076d683e84da5503d227533004a10c901ad10"
+      },
+      "unresolved": []
+    },
+    "FG-F-106-dart": {
+      "source_aircraft": "FG-F-106-dart",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 17200.0,
+          "source_afterburner_thrust": 24500.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F-106-dart\\fdm.xml": "bac07e33115cbeb775f28aa527bc6d5f21f9beb88bb9506a99cbac76131ade6f"
+      },
+      "unresolved": []
+    },
+    "FG-F-117": {
+      "source_aircraft": "FG-F-117",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "GE_F404-F1D2"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "GE_F404-F1D2"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F-117\\fdm.xml": "a45f79867fdba496e94f612deb9bae77bfc8716f57e3cef80a3aabd3cc10fec3",
+        "bvr_sim\\resources\\aircraft\\FG-F-117\\GE_F404-F1D2.xml": "b579353bdb38f6a545f12bfa50fba44b8ccc90e7071e5646fe79a55354cc7c9a"
+      },
+      "unresolved": []
+    },
+    "FG-f-14b": {
+      "source_aircraft": "FG-f-14b",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F110-GE-400"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F110-GE-400"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-f-14b\\fdm.xml": "7f0c34c58c3f098d76552104f94f6593922804261fff5e4936ca7f385d366883",
+        "bvr_sim\\resources\\aircraft\\FG-f-14b\\F110-GE-400.xml": "0889ac9369fbb234e526845a53f9a518c5d9fa8974221f5cad5dfb7a4608a0e2"
+      },
+      "unresolved": []
+    },
+    "FG-F15C": {
+      "source_aircraft": "FG-F15C",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F100-PW-220"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F100-PW-220"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F15C\\fdm.xml": "76ac97c0347db4a8cf03082f3717fc7a83d22e68d097744f2ce6ce0b5714b147",
+        "bvr_sim\\resources\\aircraft\\FG-F15C\\F100-PW-220.xml": "b27f7a52a4ee15ef92688ff72a84163f161fc45baacb2acd7a5a3e416fbf860d"
+      },
+      "unresolved": []
+    },
+    "FG-F-35B": {
+      "source_aircraft": "FG-F-35B",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 26000.0,
+          "source_afterburner_thrust": 38000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F-35B\\fdm.xml": "f38b3bddbe9758f4d95fa2b382f941d122e194acc235532a0448db99b5690b9d"
+      },
+      "unresolved": []
+    },
+    "FG-F-86": {
+      "source_aircraft": "FG-F-86",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5425.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F-86\\fdm.xml": "e97db3736ad209f0bd689febc05fc44c508d92ae775abc1d2b9cc4097debe37c"
+      },
+      "unresolved": []
+    },
+    "FG-F-8E-Crusader": {
+      "source_aircraft": "FG-F-8E-Crusader",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "PW-J57P-new"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F-8E-Crusader\\fdm.xml": "4c8fec64387850707db13b6da97c02cc6eb8793089fe3b6763bda1f1b51bf1e3",
+        "bvr_sim\\resources\\aircraft\\FG-F-8E-Crusader\\PW-J57P-new.xml": "d05f03af0a43817f916229d1c4b9f76c2610331be24b905516f62fabd5552c28"
+      },
+      "unresolved": []
+    },
+    "FG-F11-Tiger": {
+      "source_aircraft": "FG-F11-Tiger",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 7239.0,
+          "source_afterburner_thrust": 10500.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F11-Tiger\\fdm.xml": "704dbe8d6222b102c35778e416c5c692fccf75595ec464daa283cac62510886c"
+      },
+      "unresolved": []
+    },
+    "FG-F16": {
+      "source_aircraft": "FG-F16",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F100-PW-229"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F16\\fdm.xml": "0e82bfcf3086ee27a8cf8e5d0bd77144ee8758d2c826a27eb21d692ca3954178",
+        "bvr_sim\\resources\\aircraft\\FG-F16\\Systems\\jsb-propulsion-block52.xml": "d70dfb9a627604af0e1ba333c27ff032549506d4595dd2c8c3918868ceb37af2",
+        "bvr_sim\\resources\\jsbsim\\engine\\F100-PW-229.xml": "b330b85ad6e2357280ab90ad463e618c70af08f2276681ab065b47bb56e78c9d"
+      },
+      "unresolved": []
+    },
+    "FG-F18-CAF": {
+      "source_aircraft": "FG-F18-CAF",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F100-PW-229"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F18-CAF\\fdm.xml": "366a9d3fb98e1e9dd1550bea7e83fb7fc526ab10f8e4558598038cad4dafb867",
+        "bvr_sim\\resources\\aircraft\\FG-F18-CAF\\F100-PW-229.xml": "0888f69c786335d3eca49a54d7854dc13de2384623a78a6e8102b9974cd81f06"
+      },
+      "unresolved": []
+    },
+    "FG-F80C": {
+      "source_aircraft": "FG-F80C",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "J33-A-35"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F80C\\fdm.xml": "a85621e77eef14bc5750c63b8145e1d24823e3b9dba77a3df2c3e1b84d89e81e",
+        "bvr_sim\\resources\\aircraft\\FG-F80C\\J33-A-35.xml": "a092221493d8bfe248eff350cb418b74e2b54aff3de1648f9ac39d2120d9be84"
+      },
+      "unresolved": []
+    },
+    "FG-F9F-Panther": {
+      "source_aircraft": "FG-F9F-Panther",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 7250.0,
+          "source_afterburner_thrust": 8500.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F9F-Panther\\fdm.xml": "1be0889ed978bcf28bc03b965e4905b509d2af105c342dd56da09f6f31cf9ba5"
+      },
+      "unresolved": []
+    },
+    "FG-Falcon-50": {
+      "source_aircraft": "FG-Falcon-50",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3500.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3500.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3500.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Falcon-50\\fdm.xml": "b5f5671180d5851d6ed143b7d19b7c001acf17242fed0882cd58b5dda379d780"
+      },
+      "unresolved": []
+    },
+    "FG-FMA-IA36-Condor": {
+      "source_aircraft": "FG-FMA-IA36-Condor",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 4,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-FMA-IA36-Condor\\fdm.xml": "4ee5fe6e45b1bfbe22d8fbab7176b0ad1019d8d38e2cedf609cbc1e243f9459d"
+      },
+      "unresolved": []
+    },
+    "FG-fokker100": {
+      "source_aircraft": "FG-fokker100",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Tay-620"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Tay-620"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-fokker100\\fdm.xml": "56cf7dbd2f5903e00e87a460f977c5bbc2a2db43361ce1587933bb44652cb750",
+        "bvr_sim\\resources\\aircraft\\FG-fokker100\\Tay-620.xml": "fbf8c597b4ab0db7155c66aaed216a29e74cd73726ff0c05c85e7d1432626e55"
+      },
+      "unresolved": []
+    },
+    "FG-Fouga-Magister": {
+      "source_aircraft": "FG-Fouga-Magister",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 880.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 880.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Fouga-Magister\\fdm.xml": "a61e437894e43853b2652224b33bed7a04890ff0f32bf006893b112ca1709d32"
+      },
+      "unresolved": []
+    },
+    "FG-G91-R": {
+      "source_aircraft": "FG-G91-R",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "ORPHEUS_MK_803"
+        },
+        {
+          "engine_index": 1,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "JATO-M8-Engine"
+        },
+        {
+          "engine_index": 2,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "JATO-M8-Engine"
+        },
+        {
+          "engine_index": 3,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "JATO-M8-Engine"
+        },
+        {
+          "engine_index": 4,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "JATO-M8-Engine"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-G91-R\\fdm.xml": "2a5ebbdb5554e4aeedf54e5308a9560046c20628d09e7eb81c6ce98e85c9538a",
+        "bvr_sim\\resources\\aircraft\\FG-G91-R\\Systems\\G91-propulsion.xml": "fd631254a65bc9c3e4320c9bd4642f08abcca58e72aa035491568ae9e6f88412"
+      },
+      "unresolved": []
+    },
+    "FG-Gloster-Meteor": {
+      "source_aircraft": "FG-Gloster-Meteor",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2000.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Gloster-Meteor\\fdm.xml": "d785e391da2db6bc30560469a9498118460e2ed43f53170d77de5d112e8d19a0"
+      },
+      "unresolved": []
+    },
+    "FG-Gloster-Whittle": {
+      "source_aircraft": "FG-Gloster-Whittle",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 850.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Gloster-Whittle\\fdm.xml": "7bcecdd4079168a7e99d115837f76a3a2340b78db35dab7da9e9da87f84e6366"
+      },
+      "unresolved": []
+    },
+    "FG-Grumman-EA-6B-Prowler": {
+      "source_aircraft": "FG-Grumman-EA-6B-Prowler",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11200.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Grumman-EA-6B-Prowler\\fdm.xml": "ff73b2db2abe3d54742f5dde1dbd40a08bec5643ff9b4ca5db84872fa9599522"
+      },
+      "unresolved": []
+    },
+    "FG-Hansajet": {
+      "source_aircraft": "FG-Hansajet",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "cj610"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "cj610"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Hansajet\\fdm.xml": "a3518acd30bbb7a60c61f2b14054287ff9352c374cf62eb23f2d1442c3d1d136",
+        "bvr_sim\\resources\\aircraft\\FG-Hansajet\\cj610.xml": "29d0baa57e15d26387cc688acc98dfd7f8c8284aafc05493a473288730a1ddae"
+      },
+      "unresolved": []
+    },
+    "FG-harrier": {
+      "source_aircraft": "FG-harrier",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 21500.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-harrier\\fdm.xml": "6eed6908841a356b0b4c8788b9cb86846cde990086977b556cedbf74774c464a"
+      },
+      "unresolved": []
+    },
+    "FG-Hawker-Siddeley-Nimrod": {
+      "source_aircraft": "FG-Hawker-Siddeley-Nimrod",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 12690.0,
+          "source_afterburner_thrust": 16360.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Hawker-Siddeley-Nimrod\\fdm.xml": "a19b542bdeeb0b02460c5d0cf961c772cb225158cc7c9ac0a2f96fe746ff29b9"
+      },
+      "unresolved": []
+    },
+    "FG-He162": {
+      "source_aircraft": "FG-He162",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1760.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-He162\\fdm.xml": "057faf5776069e78d543609d1888671f8162c17eeed6c26f7a89caad2e73ff7c"
+      },
+      "unresolved": []
+    },
+    "FG-Heinkel-He-178": {
+      "source_aircraft": "FG-Heinkel-He-178",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1100.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Heinkel-He-178\\fdm.xml": "39672c0d17f598f637ffa70fa8ab4464ba2d191f233ba6bb61e3382cb3a0ed0d"
+      },
+      "unresolved": []
+    },
+    "FG-Heinkel-He-280": {
+      "source_aircraft": "FG-Heinkel-He-280",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1320.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1320.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Heinkel-He-280\\fdm.xml": "e1c51f8b204951ff5d3b86cc6071383cd90e8ffe22d023d7c3e37546f1d75d56"
+      },
+      "unresolved": []
+    },
+    "FG-Horten-Ho-IX": {
+      "source_aircraft": "FG-Horten-Ho-IX",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1980.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1980.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Horten-Ho-IX\\fdm.xml": "c9f429e98308a14699a983e06c5ab9138f4608a1507f677aed65c54099f719a9"
+      },
+      "unresolved": []
+    },
+    "FG-Hunter": {
+      "source_aircraft": "FG-Hunter",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 7500.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Hunter\\fdm.xml": "18927c7012d1370b62ec0d3b3956b687f81f3a2ec0959b9310cc7ec761f425da"
+      },
+      "unresolved": []
+    },
+    "FG-IL-76": {
+      "source_aircraft": "FG-IL-76",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 26460.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 26460.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 26460.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 26460.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-IL-76\\fdm.xml": "f607894e74190337d564aa7faa67278287ab7e07d07896876236c817127ffb81"
+      },
+      "unresolved": []
+    },
+    "FG-j22": {
+      "source_aircraft": "FG-j22",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 3934.0,
+          "source_afterburner_thrust": 5057.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 3934.0,
+          "source_afterburner_thrust": 5057.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-j22\\fdm.xml": "f64238b4cf026efca5dfeb61ee3a0a4eb48626cb0c46b3c1bb2ff6dae5d6a97e"
+      },
+      "unresolved": []
+    },
+    "FG-j7w": {
+      "source_aircraft": "FG-j7w",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1984.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-j7w\\fdm.xml": "fe337622b1f6076df46c0811263a953496f83f6d5c93fc0c63e76f74e0ee836f"
+      },
+      "unresolved": []
+    },
+    "FG-JA37": {
+      "source_aircraft": "FG-JA37",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "RM8B"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-JA37\\fdm.xml": "c84a4cbafcaf172eb67f06fc4fcb731b9021f6d8910cc90118026f7874047adb",
+        "bvr_sim\\resources\\aircraft\\FG-JA37\\Systems\\jsb-propulsion-ja37.xml": "faf38f99469d2bcf22c17aa77b1cd7d31c82b21d43d1df84f8c662e7b93dc85e"
+      },
+      "unresolved": []
+    },
+    "FG-Jaguar": {
+      "source_aircraft": "FG-Jaguar",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 6000.0,
+          "source_afterburner_thrust": 8430.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 6000.0,
+          "source_afterburner_thrust": 8430.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Jaguar\\fdm.xml": "55e96a782cc291ccef448427370edbff90064300dc3d1c8a47d579f569651667"
+      },
+      "unresolved": []
+    },
+    "FG-JAS39-Gripen": {
+      "source_aircraft": "FG-JAS39-Gripen",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 13490.0,
+          "source_afterburner_thrust": 20230.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-JAS39-Gripen\\fdm.xml": "0ffc44dabd76e37437dadb713d25142b2ad4f70b4f72a12d1deab7cdb6b325f3"
+      },
+      "unresolved": []
+    },
+    "FG-KC135": {
+      "source_aircraft": "FG-KC135",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56-F108"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56-F108"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56-F108"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "CFM56-F108"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-KC135\\fdm.xml": "06d722392f84351231d593e17606cf0041f80792229fd772ba0a25fa86526bc3",
+        "bvr_sim\\resources\\aircraft\\FG-KC135\\CFM56-F108.xml": "7bfa385d2da97736ea45ec30bf991aaa0b1042bb21567c928040d06a33aa14d2"
+      },
+      "unresolved": []
+    },
+    "FG-KM": {
+      "source_aircraft": "FG-KM",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 4,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 5,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 6,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 7,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 8,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 9,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 28670.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-KM\\fdm.xml": "9a31d638c566a86da2e63c05940e70bc3c39b9d544ba5dd0c2f4f431a244423c"
+      },
+      "unresolved": []
+    },
+    "FG-L-1011-500": {
+      "source_aircraft": "FG-L-1011-500",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "RB211-524B"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "RB211-524B"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "RB211-524B"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-L-1011-500\\fdm.xml": "9708c718bcf6e448ccfb970f63f2f694aa276e366aeeb4688a30470294bfa94c",
+        "bvr_sim\\resources\\aircraft\\FG-L-1011-500\\RB211-524B.xml": "ae0b716b6396c9c6b45d598453403bcb02e43658422aedfb2e94006dd1d77031"
+      },
+      "unresolved": []
+    },
+    "FG-l39": {
+      "source_aircraft": "FG-l39",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5960.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-l39\\fdm.xml": "22f9c0c26d324863390587072bead002bac773acfb100dcf2649c181f844e49b"
+      },
+      "unresolved": []
+    },
+    "FG-Leduc-022": {
+      "source_aircraft": "FG-Leduc-022",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 7040.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 14300.0,
+          "source_afterburner_thrust": 14300.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Leduc-022\\fdm.xml": "d989d24a749c88702cec3fa7e9dea0dbecbe7f81a6561cab204d18842c0b90a0"
+      },
+      "unresolved": []
+    },
+    "FG-Lightning": {
+      "source_aircraft": "FG-Lightning",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "AvonMk210"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "AvonMk210"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Lightning\\fdm.xml": "c7b8347c34f6126e1a0b75b2027206774f0f5260f9c2403e0f91d2050bf573a4",
+        "bvr_sim\\resources\\aircraft\\FG-Lightning\\AvonMk210.xml": "d897a6ff9648f389a8194d3d2c5ddd842c39ce0c60008507c2cf8b8b743ce8c7"
+      },
+      "unresolved": []
+    },
+    "FG-F22": {
+      "source_aircraft": "FG-F22",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 23500.0,
+          "source_afterburner_thrust": 35000.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 23500.0,
+          "source_afterburner_thrust": 35000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F22\\fdm.xml": "14a9fd9ed7aa17cd06bcfb64a2e2684cf35d4864fdf49f9c608352f333134e90"
+      },
+      "unresolved": []
+    },
+    "FG-Lockheed-NF104A": {
+      "source_aircraft": "FG-Lockheed-NF104A",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 9600.0,
+          "source_afterburner_thrust": 10000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Lockheed-NF104A\\fdm.xml": "21b6f53d8d3e2810090762c8e6fc9633122fe4d0219dac8dbee1571ca7b8e660"
+      },
+      "unresolved": []
+    },
+    "FG-Lockheed-P-2-Neptune": {
+      "source_aircraft": "FG-Lockheed-P-2-Neptune",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3400.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3400.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Lockheed-P-2-Neptune\\fdm.xml": "1ee84d9d9f3e1c8c04378f37e265c56ebd557387fc581b556d908962b552c98d"
+      },
+      "unresolved": []
+    },
+    "FG-Lockheed-S3-Viking": {
+      "source_aircraft": "FG-Lockheed-S3-Viking",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9275.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9275.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Lockheed-S3-Viking\\fdm.xml": "95700e0a29362093c1578fb70329552f57962620f0b8f65b8e031c3bd8d82140"
+      },
+      "unresolved": []
+    },
+    "FG-Lockheed-SR71": {
+      "source_aircraft": "FG-Lockheed-SR71",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/controls/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 25000.0,
+          "source_afterburner_thrust": 34000.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/controls/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 25000.0,
+          "source_afterburner_thrust": 34000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Lockheed-SR71\\fdm.xml": "8ab9bd35cb4a8014890a6ff3770c25e67b6871f6a48da685023546917a313a7e"
+      },
+      "unresolved": []
+    },
+    "FG-Lockheed-U-2S": {
+      "source_aircraft": "FG-Lockheed-U-2S",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19000.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Lockheed-U-2S\\fdm.xml": "83f935a2dd17ba38d5ee4ce6723dfb05c9af01788f5d04194255fd70d0e4192d"
+      },
+      "unresolved": []
+    },
+    "FG-M-4-Bison-A": {
+      "source_aircraft": "FG-M-4-Bison-A",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19280.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19280.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19280.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 19280.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-M-4-Bison-A\\fdm.xml": "d6f91f2224a8bf38a27513eecb8f4610ab3532bddec6689b2fda3fc14a31d921"
+      },
+      "unresolved": []
+    },
+    "FG-MB326": {
+      "source_aircraft": "FG-MB326",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 4400.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MB326\\fdm.xml": "db69f5f2ee0c98e5ea58f91b163731b953453b222c0c7fa0cd653078d778b75f"
+      },
+      "unresolved": []
+    },
+    "FG-MC-15": {
+      "source_aircraft": "FG-MC-15",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "AMT_Olympus_HP"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "AMT_Olympus_HP"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MC-15\\fdm.xml": "18ef3ff77064ca6c6c3168524056e8bc1c79d95afef06ff9f72323c33b70cc26",
+        "bvr_sim\\resources\\aircraft\\FG-MC-15\\AMT_Olympus_HP.xml": "7dd0b3723ee84d81e7ddbee13ce40a46d5cf4268971978d9af1dfc6bde06cd99"
+      },
+      "unresolved": []
+    },
+    "FG-McDonnell-Douglas-T-45-Goshawk": {
+      "source_aircraft": "FG-McDonnell-Douglas-T-45-Goshawk",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 6000.0,
+          "source_afterburner_thrust": 8430.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-McDonnell-Douglas-T-45-Goshawk\\fdm.xml": "300a7442e10ef5f0ca1c5840293dbdf1ded3c4c0bdaec0681a0c25383bd53e5a"
+      },
+      "unresolved": []
+    },
+    "FG-F4": {
+      "source_aircraft": "FG-F4",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 11905.0,
+          "source_afterburner_thrust": 17845.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 11905.0,
+          "source_afterburner_thrust": 17845.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-F4\\fdm.xml": "ee0a47ce056d722d1049e13ee0380fb5f2fa778ab72552018dd96ffe2251328d"
+      },
+      "unresolved": []
+    },
+    "FG-MD-11": {
+      "source_aircraft": "FG-MD-11",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "cf6-80c2d1f_1"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "cf6-80c2d1f_2"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "cf6-80c2d1f_3"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "tscp700-4e"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MD-11\\fdm.xml": "704dfac03234328ec54d083cd2b657aa49d557023eceb3a5e9c0a31453b0421d",
+        "bvr_sim\\resources\\aircraft\\FG-MD-11\\cf6-80c2d1f_1.xml": "72639b306236f34686347ffceef7638e3cb016614d8f32fcb8432156371de34c",
+        "bvr_sim\\resources\\aircraft\\FG-MD-11\\cf6-80c2d1f_2.xml": "6066cf22c01213cbfdc69209d7ee1f61f2c0df6ab34568c2a46cc6197589380b",
+        "bvr_sim\\resources\\aircraft\\FG-MD-11\\cf6-80c2d1f_3.xml": "bdac5a06bea0dcd02b0e0184fec259e63dc268574bdd6aad90c4083a0093ddd8",
+        "bvr_sim\\resources\\aircraft\\FG-MD-11\\tscp700-4e.xml": "dceccced9154e79c873122afb68b247bf817893f5979c60d9f457121d23b4e77"
+      },
+      "unresolved": []
+    },
+    "FG-MD-80": {
+      "source_aircraft": "FG-MD-80",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "jt8d-209_1"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "jt8d-209_2"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "gtcp85-98dhf"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MD-80\\fdm.xml": "8ab1c9fee81f7935edfa6ebdce55fc63d4e71dbcf922b667efe7ee37f7bfea08",
+        "bvr_sim\\resources\\aircraft\\FG-MD-80\\jt8d-209_1.xml": "81e5ca1dd06487016d9f9e22c494152938045c223f882abb2aea4e00e8fd44af",
+        "bvr_sim\\resources\\aircraft\\FG-MD-80\\jt8d-209_2.xml": "dbfb4896865eabef2be9d7cfebe63cf8e304188bd00226905bf7816c578da03a",
+        "bvr_sim\\resources\\aircraft\\FG-MD-80\\gtcp85-98dhf.xml": "3ff5a186cff8ae801d2d7c8d7d1e7ef0b565fcbd8f33067fc801d280bd4c9627"
+      },
+      "unresolved": []
+    },
+    "FG-ME-262": {
+      "source_aircraft": "FG-ME-262",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1980.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 1980.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-ME-262\\fdm.xml": "1ceba2abf1428a6d27c6d7ba10d94381ddf202d449ea2f8a1eda043f12d689a8"
+      },
+      "unresolved": []
+    },
+    "FG-Messerschmitt-Libelle": {
+      "source_aircraft": "FG-Messerschmitt-Libelle",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Messerschmitt-Libelle\\fdm.xml": "c9547d9e0c4d669b4f467f804e9cea74b37aa8ab13474128cda449e2894a55a2"
+      },
+      "unresolved": []
+    },
+    "FG-Messerschmitt-P1101": {
+      "source_aircraft": "FG-Messerschmitt-P1101",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 2700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Messerschmitt-P1101\\fdm.xml": "df96441699de6fa269e6f5535349c148d767123ca0a8da89ce3dda2540983737"
+      },
+      "unresolved": []
+    },
+    "FG-MiG-15": {
+      "source_aircraft": "FG-MiG-15",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "VK-1"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MiG-15\\fdm.xml": "4cc164b23b0c08e17b68630d15ba3d642a3516d7b71814d5cf5a7ef08e05abf0",
+        "bvr_sim\\resources\\aircraft\\FG-MiG-15\\VK-1.xml": "575dba5154d7455f1717fbfcbc914cffa77661f43904ef5068a098f23d6eb07d"
+      },
+      "unresolved": []
+    },
+    "FG-MiG-21bis": {
+      "source_aircraft": "FG-MiG-21bis",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "Tumansky"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MiG-21bis\\fdm.xml": "a51244fb6ce0c8d4b3858c7c07c9188b050580a2f2779b1b0a3a056baa599492",
+        "bvr_sim\\resources\\aircraft\\FG-MiG-21bis\\Tumansky.xml": "a0944a278ab7cc738cfe04e361cea99559223afb799d2f9a87010ed581073b86"
+      },
+      "unresolved": []
+    },
+    "FG-Mig-29": {
+      "source_aircraft": "FG-Mig-29",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11230.0,
+          "source_afterburner_thrust": 18300.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 11230.0,
+          "source_afterburner_thrust": 18300.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Mig-29\\fdm.xml": "2ecf5cc2bafc34cadf56e551c1841334f68fbeb58fd75006dac362ccb88eca5d"
+      },
+      "unresolved": []
+    },
+    "FG-mirage2000": {
+      "source_aircraft": "FG-mirage2000",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "F100-PW-229"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-mirage2000\\fdm.xml": "dc62182c4ee42fe683b600085dc59663c7f28e4e6f960228e6e46f04c38381dc",
+        "bvr_sim\\resources\\aircraft\\FG-mirage2000\\F100-PW-229.xml": "0888f69c786335d3eca49a54d7854dc13de2384623a78a6e8102b9974cd81f06"
+      },
+      "unresolved": []
+    },
+    "FG-Mirage_F1": {
+      "source_aircraft": "FG-Mirage_F1",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 16000.0,
+          "source_afterburner_thrust": 34170.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Mirage_F1\\fdm.xml": "ac858c875e2c2b05fa71ba119225191923d4b5c91896d9ed308940b361525c50"
+      },
+      "unresolved": []
+    },
+    "FG-MirageG8": {
+      "source_aircraft": "FG-MirageG8",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 9440.0,
+          "source_afterburner_thrust": 13240.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 9440.0,
+          "source_afterburner_thrust": 13240.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MirageG8\\fdm.xml": "9a5b92459bbe71920cb20a2e71583e0a97075258925bd36a31873c962bd04c0f"
+      },
+      "unresolved": []
+    },
+    "FG-MirageIII": {
+      "source_aircraft": "FG-MirageIII",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 9436.0,
+          "source_afterburner_thrust": 13688.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MirageIII\\fdm.xml": "92226cc3f9373987039301b399fabd19dc9a163156780fd500c02b4b10f02c31"
+      },
+      "unresolved": []
+    },
+    "FG-MirageIV": {
+      "source_aircraft": "FG-MirageIV",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 13440.0,
+          "source_afterburner_thrust": 18240.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 13440.0,
+          "source_afterburner_thrust": 18240.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MirageIV\\fdm.xml": "3af67d7658db2c56f3d7f0cbf9f1c46e7de09dabb2b537b0910baab6538f29f4"
+      },
+      "unresolved": []
+    },
+    "FG-MRJ": {
+      "source_aircraft": "FG-MRJ",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "PW1000G-17K"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "PW1000G-17K"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MRJ\\fdm.xml": "507a92e8518b94e9e88fd5c94f1e212a22bca947e3d3fc5c37cdba6c0ccee376",
+        "bvr_sim\\resources\\aircraft\\FG-MRJ\\PW1000G-17K.xml": "6066b78743f0b7e4bc1a57a76ba85166d3a60e735388be62a9fe297a0516e6dd"
+      },
+      "unresolved": []
+    },
+    "FG-MS-760": {
+      "source_aircraft": "FG-MS-760",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 880.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 880.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-MS-760\\fdm.xml": "87467b24e161c6e1ead8e89fc76a35250194f2a3de71f54129b3c01811a6b837"
+      },
+      "unresolved": []
+    },
+    "FG-Nord-1405-Gerfaut-II": {
+      "source_aircraft": "FG-Nord-1405-Gerfaut-II",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 8157.1,
+          "source_afterburner_thrust": 9700.3
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Nord-1405-Gerfaut-II\\fdm.xml": "0f3551a4bd1ef21b50fcc444ecb50083822fa5ca845feb4877521b5ce9b27533"
+      },
+      "unresolved": []
+    },
+    "FG-Nord-2502": {
+      "source_aircraft": "FG-Nord-2502",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 880.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 880.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Nord-2502\\fdm.xml": "50dc0eecef41653e075f1a176e7ae874926aa5c04888a0614bb958dd312cec2d"
+      },
+      "unresolved": []
+    },
+    "FG-North-American-RA-5C-Vigilante": {
+      "source_aircraft": "FG-North-American-RA-5C-Vigilante",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 11870.0,
+          "source_afterburner_thrust": 17900.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 11870.0,
+          "source_afterburner_thrust": 17900.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-North-American-RA-5C-Vigilante\\fdm.xml": "ed21c69f6e1ec50dff1967502cda5aa77f3e864593654deb119fe7acab54b927"
+      },
+      "unresolved": []
+    },
+    "FG-Northrop-T38-Talon": {
+      "source_aircraft": "FG-Northrop-T38-Talon",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 2400.0,
+          "source_afterburner_thrust": 5000.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 2400.0,
+          "source_afterburner_thrust": 5000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Northrop-T38-Talon\\fdm.xml": "b744323eef85be58de8e013a874c0c186f6bbc4f2220c5e277abac852bd853ee"
+      },
+      "unresolved": []
+    },
+    "FG-Northrop-yb49": {
+      "source_aircraft": "FG-Northrop-yb49",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[2]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[3]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 4,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[4]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 5,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[5]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 6,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[6]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        },
+        {
+          "engine_index": 7,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[7]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 5600.0,
+          "source_afterburner_thrust": 7500.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Northrop-yb49\\fdm.xml": "9607e6b86f50d4f2e4adb091efbde0c403083a660d32b599356ad562e01d8864"
+      },
+      "unresolved": []
+    },
+    "FG-Pilatus-PC-24": {
+      "source_aircraft": "FG-Pilatus-PC-24",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3600.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3600.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Pilatus-PC-24\\fdm.xml": "4d8af2358ac929381c709de0b6a9d4b7fd6cb83546226b39d86ff7fa279cd6a4"
+      },
+      "unresolved": []
+    },
+    "FG-PZL-230F": {
+      "source_aircraft": "FG-PZL-230F",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-PZL-230F\\fdm.xml": "a337e67c48a9bfc1b82d2d1aca60bcb2103b34b5dff490d6b5ef6a1f07793c3a"
+      },
+      "unresolved": []
+    },
+    "FG-RainbowRacer71": {
+      "source_aircraft": "FG-RainbowRacer71",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 6000.0,
+          "source_afterburner_thrust": 10000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-RainbowRacer71\\fdm.xml": "f55a4f9e88e5f4bae800dfff990ba028e063c6a69bc7eb4b782cbc5a06930426"
+      },
+      "unresolved": []
+    },
+    "FG-SaabJ35F": {
+      "source_aircraft": "FG-SaabJ35F",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "unresolved-jsbsim-engine",
+          "afterburner_declared": null,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Engine definition could not be resolved",
+          "source_engine_file": "TLSvenskaFlygmotorRM6CTyp66"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-SaabJ35F\\fdm.xml": "0e4d8ee944fc1092b1267d5c6161fd430723aeef78cbb791335a7857c7a2ab26",
+        "bvr_sim\\resources\\aircraft\\FG-SaabJ35F\\Systems\\propulsion.xml": "c48399cd3b78ea851401f100206ceea830d74a5bc257142f37dab12236973cd0"
+      },
+      "unresolved": []
+    },
+    "FG-seahawk": {
+      "source_aircraft": "FG-seahawk",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 5200.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-seahawk\\fdm.xml": "6ca27058258e8a02548786d76c2f18e6911b0c88f4431b77172589efcf254c77"
+      },
+      "unresolved": []
+    },
+    "FG-SeaVixen": {
+      "source_aircraft": "FG-SeaVixen",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11250.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11250.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-SeaVixen\\fdm.xml": "27eec03e0807e4811b29517de5331e84234b3991e5969d418ae939f5b417be81"
+      },
+      "unresolved": []
+    },
+    "FG-Stiletto": {
+      "source_aircraft": "FG-Stiletto",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 3370.0,
+          "source_afterburner_thrust": 4900.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 3370.0,
+          "source_afterburner_thrust": 4900.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Stiletto\\fdm.xml": "92495cdbe9771362ae3b00bd1d117a9ca44b0162550c71a5d08728ccbc42542e"
+      },
+      "unresolved": []
+    },
+    "FG-Su-25": {
+      "source_aircraft": "FG-Su-25",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9480.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 9480.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Su-25\\fdm.xml": "25de2e12b944e4c665c5d9da8813a43ec94d70719f5b583180cda4f27c8b0423"
+      },
+      "unresolved": []
+    },
+    "FG-SU-37": {
+      "source_aircraft": "FG-SU-37",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/reheat-norm",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 19434.0,
+          "source_afterburner_thrust": 31966.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/reheat-norm",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 19434.0,
+          "source_afterburner_thrust": 31966.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-SU-37\\fdm.xml": "54f1e2dba1b7b0c1f6b0193c0379e9968ae8950d1725f715e6e6b24c19aaf4ed"
+      },
+      "unresolved": []
+    },
+    "FG-Sukhoi-Su-33": {
+      "source_aircraft": "FG-Sukhoi-Su-33",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 16200.0,
+          "source_afterburner_thrust": 28200.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 16200.0,
+          "source_afterburner_thrust": 28200.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Sukhoi-Su-33\\fdm.xml": "084d3ba843922658a52c785715f993dafda2f75573342807b9583a57e532e693"
+      },
+      "unresolved": []
+    },
+    "FG-Super-Etendard": {
+      "source_aircraft": "FG-Super-Etendard",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 11025.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Super-Etendard\\fdm.xml": "19d261de3c353a9615a818ec728c8ac6bfed1fa91903c38b8c0457f7e71d0143"
+      },
+      "unresolved": []
+    },
+    "FG-Supermarine-Swift": {
+      "source_aircraft": "FG-Supermarine-Swift",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "JSBSim augmentation state is not currently exported in the existing visual snapshot",
+          "source_engine_file": "RR-AVON-114"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Supermarine-Swift\\fdm.xml": "1cc22dc010c23b25774c11fee8591d714930030459728080c346b0f15ae36c66",
+        "bvr_sim\\resources\\aircraft\\FG-Supermarine-Swift\\RR-AVON-114.xml": "fd4f4ab8350f835ee137f69fe1e29420af444faae257242143890835a4915171"
+      },
+      "unresolved": []
+    },
+    "FG-T-4": {
+      "source_aircraft": "FG-T-4",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3682.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3682.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-T-4\\fdm.xml": "bc738a050d129f71c8e22c1843fb494926e038ba9a03dbac2b83c22ba0706017"
+      },
+      "unresolved": []
+    },
+    "FG-T-50": {
+      "source_aircraft": "FG-T-50",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 19434.0,
+          "source_afterburner_thrust": 34620.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 19434.0,
+          "source_afterburner_thrust": 34620.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-T-50\\fdm.xml": "b6443ef49718e34d67fe2fd61f49f5bc7860acb5524c36a13969621256db3636"
+      },
+      "unresolved": []
+    },
+    "FG-T37": {
+      "source_aircraft": "FG-T37",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "J69-T25"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "J69-T25"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-T37\\fdm.xml": "6fb9fd8b0b83320967d608c7e35a4fac12169bc95ee1e425e440b6d3305964d0",
+        "bvr_sim\\resources\\aircraft\\FG-T37\\J69-T25.xml": "6072c02d3563575ad602309283ff51a38ac26230979af7f500a912830c55443d"
+      },
+      "unresolved": []
+    },
+    "FG-T7-RedHawk": {
+      "source_aircraft": "FG-T7-RedHawk",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 11000.0,
+          "source_afterburner_thrust": 17200.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-T7-RedHawk\\fdm.xml": "8a7d297f84db8ae3d535a76885440dee8bd5088fcba87e6d14a9ddd0afa131cd"
+      },
+      "unresolved": []
+    },
+    "FG-Tu-134": {
+      "source_aircraft": "FG-Tu-134",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 23150.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 23150.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Tu-134\\fdm.xml": "d87730b20dc0272919143099eb5a2a89d9206cc6c768ec11560cf8c788296fc2"
+      },
+      "unresolved": []
+    },
+    "FG-Tu-22-Blinder": {
+      "source_aircraft": "FG-Tu-22-Blinder",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 24300.0,
+          "source_afterburner_thrust": 36400.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/afterburner",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 24300.0,
+          "source_afterburner_thrust": 36400.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Tu-22-Blinder\\fdm.xml": "441c20a326000eccc8c12b81abd7ed3258551bf512077b0f699347f3ef3a6ed9"
+      },
+      "unresolved": []
+    },
+    "FG-tu154b": {
+      "source_aircraft": "FG-tu154b",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "nk-8-2u"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "nk-8-2u"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "nk-8-2u"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "tsa-6a"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-tu154b\\fdm.xml": "7a78d02cf305d51af7d197f270303e01ce2b65c0bc66498e4b8e26d072a0f5f2",
+        "bvr_sim\\resources\\aircraft\\FG-tu154b\\nk-8-2u.xml": "89b37afa36adf5cc3de235abc10d34b7660d43f1dfd14cc00eaf685fcb99b302",
+        "bvr_sim\\resources\\aircraft\\FG-tu154b\\tsa-6a.xml": "7a0304a99274e78bb7ddfea528337714dd6423c2eaa9565976f460e648473382"
+      },
+      "unresolved": []
+    },
+    "FG-victor": {
+      "source_aircraft": "FG-victor",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Conway-Rco11"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Conway-Rco11"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Conway-Rco11"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Conway-Rco11"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-victor\\fdm.xml": "92ebe551b6dc0a8d705b6e0e8175c71dd240a9a9b367f7bde009412434898da3",
+        "bvr_sim\\resources\\aircraft\\FG-victor\\Conway-Rco11.xml": "926e6aab6871dd4e12b75357b258744b2b0e8740c79d56f092dc9d91a3ff458d"
+      },
+      "unresolved": []
+    },
+    "FG-vulcanb2": {
+      "source_aircraft": "FG-vulcanb2",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Olympus_301"
+        },
+        {
+          "engine_index": 1,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Olympus_301"
+        },
+        {
+          "engine_index": 2,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Olympus_301"
+        },
+        {
+          "engine_index": 3,
+          "type": "turbine_engine",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "Source engine has no augmentation",
+          "source_engine_file": "Olympus_301"
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-vulcanb2\\fdm.xml": "648f4d04522ab6f47f9e016b8e653453d65a6aebacac06bc1cabbe0ecfb478fe",
+        "bvr_sim\\resources\\aircraft\\FG-vulcanb2\\Olympus_301.xml": "f0fc52817b54822dc88583d3d493b078b951910d63bddc1a75c5919a02f8f1b4"
+      },
+      "unresolved": []
+    },
+    "FG-Westwind-II": {
+      "source_aircraft": "FG-Westwind-II",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3700.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3700.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Westwind-II\\fdm.xml": "fcece566f0cadcb87c333f3c6a41858eaf890b493fd4e777c50929aa9cef9a43"
+      },
+      "unresolved": []
+    },
+    "FG-XB-70": {
+      "source_aircraft": "FG-XB-70",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19900.0,
+          "source_afterburner_thrust": 28800.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19900.0,
+          "source_afterburner_thrust": 28800.0
+        },
+        {
+          "engine_index": 2,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19900.0,
+          "source_afterburner_thrust": 28800.0
+        },
+        {
+          "engine_index": 3,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19900.0,
+          "source_afterburner_thrust": 28800.0
+        },
+        {
+          "engine_index": 4,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19900.0,
+          "source_afterburner_thrust": 28800.0
+        },
+        {
+          "engine_index": 5,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "unavailable",
+          "property": "",
+          "reason": "Declared afterburner without normalized snapshot output",
+          "source_thrust": 19900.0,
+          "source_afterburner_thrust": 28800.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-XB-70\\fdm.xml": "d7de0882eb5e604b6e74d9d4a82e890aa404b7ff83b3adb2a97d3fdb25fb7f48"
+      },
+      "unresolved": []
+    },
+    "FG-Yak-130": {
+      "source_aircraft": "FG-Yak-130",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6280.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 6280.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Yak-130\\fdm.xml": "b57c6d2ffe5c98bfe923e66d1cbf9c1548424a3027cb969ca4b3d993ffc027f3"
+      },
+      "unresolved": []
+    },
+    "FG-Yak-23": {
+      "source_aircraft": "FG-Yak-23",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 3600.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Yak-23\\fdm.xml": "6f88794e4c605c15ad9420337218c89632f30b4f38359eedcda1a979a92ec0e2"
+      },
+      "unresolved": []
+    },
+    "FG-Yak-36": {
+      "source_aircraft": "FG-Yak-36",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 14001.0,
+          "source_afterburner_thrust": 0.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": false,
+          "mode": "disabled",
+          "property": "",
+          "reason": "No source afterburner thrust declared",
+          "source_thrust": 14001.0,
+          "source_afterburner_thrust": 0.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-Yak-36\\fdm.xml": "3ef31f9c5271e03ebd7e57b19d39f5b8a2063f3ed54ae2d083bc1ab6bb9dd1fe"
+      },
+      "unresolved": []
+    },
+    "FG-YF-23": {
+      "source_aircraft": "FG-YF-23",
+      "engines": [
+        {
+          "engine_index": 0,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[0]/reheat-norm",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 24500.0,
+          "source_afterburner_thrust": 35000.0
+        },
+        {
+          "engine_index": 1,
+          "type": "yasim-jet",
+          "afterburner_declared": true,
+          "mode": "property",
+          "property": "/engines/engine[1]/reheat-norm",
+          "reason": "Declared normalized REHEAT output",
+          "source_thrust": 24500.0,
+          "source_afterburner_thrust": 35000.0
+        }
+      ],
+      "sources": {
+        "bvr_sim\\resources\\aircraft\\FG-YF-23\\fdm.xml": "7bfb81cf1276ea942e84e663ad8655bbab94feb6c6f213e491cda8f8d9b70a79"
+      },
+      "unresolved": []
+    }
+  }
+}

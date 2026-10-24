@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "player-flight-1.6-candidate",
+  "version": "player-flight-1.8-camera-candidate",
   "provenance": "Engineering player-assistance settings. Not FDM parameters, not AI/RL gains, not certified aircraft envelope data. Tuned labels become valid only after recorded response validation.",
   "units": {
     "control": {
@@ -58,7 +58,9 @@
       "normal_fov": "rad",
       "zoom_fov": "rad",
       "free_yaw_range": "rad",
-      "free_pitch_range": "rad"
+      "free_pitch_range": "rad",
+      "subject_y": "normalized viewport y;0top1bottom; omitted preserves legacy camera",
+      "zoom_dolly": "0..1; tangent-FOV dolly compensation;1keeps subject scale through zoom"
     }
   },
   "templates": {
@@ -118,7 +120,9 @@
         "normal_fov": 1.0,
         "zoom_fov": 0.55,
         "free_yaw_range": 2.5,
-        "free_pitch_range": 1.2
+        "free_pitch_range": 1.2,
+        "subject_y": 0.62,
+        "zoom_dolly": 1.0
       }
     },
     "fighter": {

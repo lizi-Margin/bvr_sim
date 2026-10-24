@@ -107,3 +107,30 @@ python game/tools/build_river_valley_recipe.py --bake --outer-cover --river-chan
 林簇接地支持批量查询同一套三角网格插值，避免对每棵源树反复执行 Python 标量采样。旧标量入口保留用于比较；真实源林簇的完整倾斜、接受/拒绝、接地误差和全部根部坐标须一致。批量化只加速离线摆放，不改变地形、实时核心或 GPU 的物理判定，也不能用离线耗时作为游戏帧率证据。
 
 地图检查对明确声明 `inter_grove_stem_spacing_m` 的源林簇，允许树冠包围圆相交，并改查实际缩放、偏航、地形倾斜后的源树干间距；普通资源仍检查包围圆。水面、道路、禁建区和资源哈希检查继续生效。检测覆盖全部源树干，保留实际冲突距离；合成用例同时验证合法的树冠相交和错误的树干过近。独立 GPU 根部变换检查用于核对离线矩阵，不能只凭生成器自己的拟合结果宣布接地正确。当前装饰林簇仍允许约 0.25m 的根部拟合误差，它与物理接触面的 0.1m 验收是不同检查。
+
+## 导入飞机的源排气资料
+
+```powershell
+python -m bvr_game.exhaust_profiles build
+python -m bvr_game.exhaust_profiles validate
+python -m bvr_game.exhaust_profiles show FG-A-10
+python -m bvr_game.exhaust_profiles show FG-F22
+```
+
+生成器读取已导入的 FDM、引用的发动机文件及其哈希，生成 `game/config/aircraft_exhaust_profiles.json`，供 `player_daylight.json` 相对路径引用。`prepare_player_visuals.py` 也会重建这份资料并保存其哈希。它不改 FDM、发动机参数、源模型或原有机库目录。当前覆盖 147 项导入外观：源 YASim 明确声明加力推力且提供归一化 `REHEAT` 输出时使用 `property`；未声明加力的发动机为 `disabled`；缺少源定义或当前快照状态的情况为 `unavailable`，不会推断成真实发动机没有加力。
+
+运行时只消费已有 `GameEntity.animation_properties`。例如 FG-F22 的 `engines/engine[0]/afterburner` 与第二台发动机的对应输出包含源模型自身的过渡时间；效果不再仅按油门超过 35% 开启。A-10 的两台源发动机未声明加力，因而不会生成这种发光几何。缺少或非有限的输出不会启用效果。普通 F22/F16 仍保留单独的旧油门效果，它不属于此次导入外观策略，也不能称为真实加力遥测。
+
+Agent 可调用 `renderer.aircraft_exhaust_state()` 获取 typed 状态，包含机体 UID、发动机索引、模式、属性、属性是否可用、显示强度及可见性；`aircraft_statistics()` 另区分附件数、实际效果几何数与活动效果数。这些是表现层诊断，不决定推力、温度或燃油消耗。附件位置仍沿用原注册资料的几何测量或投影近似；缺少显式发动机索引时按附件顺序关联，并在状态中标记近似。发光形状、颜色与强度不是测量所得的排气光谱或热场，仍需逐机型画面复核。旧视觉配置未引用这份资料时保留原排气路径。
+
+## 道路方向田块与均匀林区候选
+
+```powershell
+python game/tools/build_river_valley_recipe.py --bake --outer-cover --river-channel --forest-asset fir_grove_normal_a --forest-floor-only --rural-layout --recipe-output NEW_DIRECTORY/scene-recipe.json --output NEW_DIRECTORY
+```
+
+`--rural-layout` 使用完整烘焙，并要求 `--forest-floor-only`；它改变田块与装饰植物摆放，不能用于仅重烘焙材质的 `--retexture-map`。田块在现有道路、河流、林区、机场和乡镇排除区域内递归切分，参考附近道路方向，坡地倾向于较小地块。地块共享边界和 T 形连接，耕作纹理跟随各自长轴，边界保留 4m 的源草地过渡。固定私有 RNG 保证布局复现，同时不消耗建筑等其他生成器的随机序列。`rural_parcels.area_range_m2` 是递归停止阈值的采样范围，切分、坡度和排除区可产生小于其下界的地块，不能把它解释为每块田的严格面积范围。
+
+林簇继续使用原源树、数量预算、尺度、LOD 和视距，中心改为按林区面积均匀采样；实际接地拒绝仍可能使最终簇数略有差别。林下宏观颜色使用真实源材质的线性均值，独立的 3m 运行时地面细节保留，避免把米级源林下斑块放大到 160m。布局与农作物覆盖均为工程创作，不是 GIS、实测农业或树种密度资料。
+
+当前候选有 5,123 块田、10,078 个源林簇，比旧候选多 9 簇。所有高度数组、道路/接触面和障碍物均与旧图相同；土地覆盖、颜色与装饰实例数据变化，因此高度 NPZ 整体哈希不同，必须固定新的不可变版本进行重放。均匀分布减少了大空洞，但源簇的重复圆团轮廓仍明显，森林尚未通过自然画面验收；默认地图与主启动入口暂不切换。

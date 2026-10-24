@@ -78,10 +78,12 @@ def main():
     p.add_argument('--outer-cover',action='store_true',help='Continue source-albedo land use across the full outer terrain')
     p.add_argument('--river-channel',action='store_true',help='Generate a shared physical riverbed and banks below a separate water surface; requires a full bake')
     p.add_argument('--forest-floor-only',action='store_true',help='Use source ground albedo under individual-tree 3D LODs, without ground-projected canopy imagery')
+    p.add_argument('--rural-layout',action='store_true',help='Full bake: road-oriented recursive fields and area-uniform forest placement; requires --forest-floor-only')
     p.add_argument('--retexture-map',type=Path,help='Rebake materials of a verified immutable map, preserving all terrain and scene geometry')
     a=p.parse_args()
     if a.river_channel and a.retexture_map:p.error('--river-channel changes shared terrain and requires --bake, not --retexture-map')
     if a.forest_floor_only and a.retexture_map:p.error('--forest-floor-only requires a full bake with an individual-tree forest asset')
+    if a.rural_layout and (a.retexture_map or not a.forest_floor_only):p.error('--rural-layout requires a full bake with --forest-floor-only')
     if a.retexture_map:
         if a.recipe_output==ROOT/'game/recipes/river_valley_airfield.json':a.recipe_output=a.output/'scene-recipe.json'
         source_pointer=json.loads(a.retexture_map.read_text(encoding='utf8'))
@@ -100,6 +102,14 @@ def main():
         if not (forest.get('impostor') or {}).get('source_trees'):p.error('--forest-floor-only requires individual-tree far LODs; select a registered asset such as fir_grove_normal_a')
         r['materials']['forest'].pop('canopy_proxy',None)
         r['landscape']['forest_floor_note']='Source ground albedo and actual individual-tree 3D LODs; no ground-projected canopy preview'
+    if a.rural_layout:
+        r['landscape']['field_layout']='road_recursive'
+        r['landscape']['rural_parcels']={'area_range_m2':[30000,280000],
+            'palette_linear':[[.88,.91,.86,1],[.94,.93,.87,1],[.85,.90,.82,1],[.94,.94,.92,1]],
+            'field_margin_m':4.,'tint_blend_m':8.,'forest_ground_source_mean':True}
+        r['landscape']['field_layout_note']='Shared recursive boundaries follow nearby road directions; smaller areas on slopes, source grass/soil cover and4mgrass margins. Authored appearance, not GIS.'
+        for rule in r['scatter_rules']:
+            if rule['roles']=='canopy':rule['distribution']='area_uniform'
     write_json(a.recipe_output,r)
     if a.bake or a.retexture_map:
         from bvr_game.worldgen import Baker

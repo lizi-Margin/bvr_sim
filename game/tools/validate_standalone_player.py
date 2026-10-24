@@ -59,7 +59,8 @@ def main():
             frame=game.sim.frame();maximum_basis=max(maximum_basis,basis_error(game))
             samples.append({'client_frame':index-1,'phase':label(index-1),'tick':frame.tick,'time':frame.sim_time,
                 'intent':list(game.player_input.direction),'state':serialize(game.sim.player_flight_state()),'own':serialize(game.player()),
-                'camera':dict(game.camera_params),'viewport':[game.width,game.height],'dynamic_contact_label_count':len(game.hud_layout)})
+                'camera':dict(game.camera_params),'camera_framing':dict(game.chase.framing_state),
+                'viewport':[game.width,game.height],'dynamic_contact_label_count':len(game.hud_layout)})
             if encoder:
                 pixels=game.renderer.capture_rgb()
                 if [game.width,game.height]!=[1920,1080]:
@@ -105,6 +106,8 @@ def main():
     write_json(a.output/'report.json',{'status':'passed','model':a.model,'flight':flight,'checks':checks,'samples':samples,'phases':phases,'captures':captures,
         'maximum_render_basis_error':maximum_basis,'video_frames':movie_frames,'nominal_client_seconds':22,'core_seconds':flight['frame']['sim_time'],
         'headless_replay':comparison,'core_sha256':sha(Path(native.__file__)),'source_sha256':sha(ROOT/'bvr_game/aircraft_library.py'),
+        'camera_implementation_sha256':sha(ROOT/'bvr_game/presentation.py'),
+        'player_profile_file_sha256':sha(ROOT/'game/config/player_flight_profiles.json'),
         'scope':'Real fly_interactive entry, shared run_client_frame, native FDM/DX12. Exercises pitch/roll,free-look,zoom,actualwindowresize,pause/exactstep,reload,rawmode andresumedmouse. Resize movie frames are padded without resampling. No performance or complete-envelope claim.'})
     print('STANDALONE_PLAYER',a.model,'passed',flight['frame']['tick'],movie_frames,maximum_basis)
 

@@ -5,6 +5,12 @@
 #include <cstring>
 // Presentation-only FlightGear hierarchy, source animation pivots and nozzle
 // attachments. Inputs are immutable values from the typed simulation snapshot.
+struct AircraftExhaustState {
+    std::string uid,mode,property,reason,attachment_association;
+    int engine_index=0;
+    bool property_available=false,visible=false;
+    double intensity=0;
+};
 class AircraftVisuals {
     using Entity=wi::ecs::Entity;
     using Transform=wi::scene::TransformComponent;
@@ -16,7 +22,8 @@ class AircraftVisuals {
         double factor=1,offset=0,initial=0,min=-1e12,max=1e12;
         std::vector<std::pair<double,double>> table;
     };
-    struct Instance { std::string uid; std::vector<Motion> motions; std::vector<Entity> exhausts; };
+    struct Exhaust { Entity entity=wi::ecs::INVALID_ENTITY; AircraftExhaustState state; };
+    struct Instance { std::string uid; std::vector<Motion> motions; std::vector<Exhaust> exhausts; };
     struct Node { Entity original,parent=wi::ecs::INVALID_ENTITY,mesh=wi::ecs::INVALID_ENTITY; std::string name; Transform transform; DirectX::XMFLOAT4 color{1,1,1,1}; };
     struct Prototype { std::vector<Node> nodes; nlohmann::json metadata; };
     wi::scene::Scene& scene;
@@ -26,6 +33,7 @@ class AircraftVisuals {
     uint64_t updates=0;
     uint64_t corrected_surfaces=0,nozzle_meshes=0;
     nlohmann::json material_profile;
+    nlohmann::json exhaust_profiles;
     void apply_materials(wi::scene::Scene& loaded,const std::string& file){
         if(material_profile.is_null())return;
         auto id=std::filesystem::path(file).parent_path().filename().string();
@@ -122,6 +130,10 @@ class AircraftVisuals {
 public:
     explicit AircraftVisuals(wi::scene::Scene& s):scene(s){}
     void set_material_profile(const nlohmann::json& profile){material_profile=profile;}
+    void set_exhaust_profiles(const nlohmann::json& profiles){
+        if(!profiles.is_object())throw std::runtime_error("Aircraft exhaust profiles must be an object");
+        exhaust_profiles=profiles;
+    }
     Entity instantiate(const std::string& uid,const std::string& file) {
         using namespace DirectX;
         auto found=prototypes.find(file);
@@ -183,7 +195,28 @@ public:
                     m.table.push_back({number(p.at(0)),number(p.at(1))});
                 std::sort(m.table.begin(),m.table.end());item.motions.push_back(std::move(m));
             }
+            int attachment_index=0;
             if(data.contains("exhausts"))for(const auto& a:data.at("exhausts")){
+                Exhaust effect;auto& state=effect.state;state.uid=uid;
+                state.engine_index=a.value("engine_index",attachment_index++);
+                state.attachment_association=a.contains("engine_index")?"registered engine_index":"attachment order; approximate association";
+                state.mode="legacy_throttle";state.reason="Legacy visual profile without source exhaust policy";
+                if(!exhaust_profiles.is_null()){
+                    state.mode="unavailable";state.reason="No source engine policy for this attachment";
+                    auto id=data.value("id",std::filesystem::path(file).parent_path().filename().string());
+                    if(exhaust_profiles.contains(id))for(const auto& engine:exhaust_profiles.at(id).at("engines")){
+                        if(engine.at("engine_index").get<int>()!=state.engine_index)continue;
+                        state.mode=engine.at("mode").get<std::string>();state.property=engine.value("property",std::string());state.reason=engine.at("reason").get<std::string>();
+                        if(state.mode!="property"&&state.mode!="disabled"&&state.mode!="unavailable")throw std::runtime_error("Invalid source exhaust mode");
+                        if(state.mode=="property"&&state.property.empty())throw std::runtime_error("Source exhaust requires a snapshot property");
+                        break;
+                    }
+                }
+                // Source dry engines and missing state never gain luminous
+                // geometry merely because the pilot asks for more throttle.
+                if(state.mode!="property"&&state.mode!="legacy_throttle"){
+                    item.exhausts.push_back(std::move(effect));continue;
+                }
                 const auto& p=a.at("position");float radius=float(field(a,"radius_m",.2));
                 auto e=scene.Entity_CreateSphere(uid+"_engine_glow",1,10,8);
                 auto t=scene.transforms.GetComponent(e);t->Scale(XMFLOAT3(radius,radius,radius*1.6f));
@@ -191,7 +224,8 @@ public:
                 t->UpdateTransform();scene.Component_Attach(e,root,true);
                 auto mat=scene.materials.GetComponent(e);mat->SetCastShadow(false);
                 mat->SetBaseColor({1,.25f,.02f,1});mat->SetEmissiveColor({1,.2f,.01f,0});
-                item.exhausts.push_back(e);
+                scene.objects.GetComponent(e)->SetRenderable(false);effect.entity=e;
+                item.exhausts.push_back(std::move(effect));
             }
         }
         instances[root]=std::move(item);return root;
@@ -224,8 +258,17 @@ public:
             }
             t->SetDirty();++updates;
         }
-        for(auto e:it->second.exhausts){
-            float intensity=studio?0.f:float(std::clamp((throttle-.35)/.65,0.,1.));
+        for(auto& effect:it->second.exhausts){
+            auto& state=effect.state;state.property_available=false;double value=0;
+            if(state.mode=="legacy_throttle")value=(throttle-.35)/.65;
+            else if(state.mode=="property"){
+                auto found=values.find(canonical(state.property));
+                state.property_available=found!=values.end()&&std::isfinite(found->second);
+                if(state.property_available)value=found->second;
+            }
+            float intensity=studio?0.f:float(std::clamp(value,0.,1.));
+            auto e=effect.entity;state.intensity=intensity;state.visible=e!=wi::ecs::INVALID_ENTITY&&intensity>.02f;
+            if(e==wi::ecs::INVALID_ENTITY)continue;
             if(auto obj=scene.objects.GetComponent(e))obj->SetRenderable(intensity>.02f);
             if(auto mat=scene.materials.GetComponent(e))mat->SetEmissiveColor({1,.25f,.03f,intensity*4});
         }
@@ -233,9 +276,17 @@ public:
     void remove(Entity root){instances.erase(root);}
     void clear(){instances.clear();updates=0;}
     const std::map<std::string,uint64_t>& imports() const { return import_counts; }
+    std::vector<AircraftExhaustState> exhaust_state() const {
+        std::vector<AircraftExhaustState> result;
+        for(const auto& [_,a]:instances)for(const auto& e:a.exhausts)result.push_back(e.state);
+        return result;
+    }
     std::map<std::string,uint64_t> stats() const {
-        uint64_t animations=0,exhausts=0;
-        for(const auto& [_,a]:instances){animations+=a.motions.size();exhausts+=a.exhausts.size();}
-        return {{"cached_models",prototypes.size()},{"mesh_resources",scene.meshes.GetCount()},{"material_resources",scene.materials.GetCount()},{"instances",instances.size()},{"animations",animations},{"property_updates",updates},{"exhausts",exhausts},{"corrected_source_materials",corrected_surfaces},{"separate_nozzle_meshes",nozzle_meshes}};
+        uint64_t animations=0,exhausts=0,attachments=0,active=0;
+        for(const auto& [_,a]:instances){
+            animations+=a.motions.size();attachments+=a.exhausts.size();
+            for(const auto& e:a.exhausts){exhausts+=e.entity!=wi::ecs::INVALID_ENTITY;active+=e.state.visible;}
+        }
+        return {{"cached_models",prototypes.size()},{"mesh_resources",scene.meshes.GetCount()},{"material_resources",scene.materials.GetCount()},{"instances",instances.size()},{"animations",animations},{"property_updates",updates},{"exhausts",exhausts},{"exhaust_attachments",attachments},{"active_exhausts",active},{"corrected_source_materials",corrected_surfaces},{"separate_nozzle_meshes",nozzle_meshes}};
     }
 };

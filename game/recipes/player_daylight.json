@@ -74,7 +74,8 @@
     "aircraft_surfaces": "Source normals/UVs audited; original exterior positions/indices/normals/UVs/images retained. F16 source pilot and cockpit-main geometry added at their declared identity transforms. F22 exterior-atlas luminance uses configurable linear knee/shoulder/dark-ink lift; source-named F119/vector meshes retain separate metal material. F16 source internal-flame white emissive disc uses non-emissive metal; actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.",
     "daylight": "Sun energy4/ACES; exposure2 selected after fixed-camera exposure1/2 and sun4/10 comparisons. Higher sun elevation and neutral ambient; no additional fog.",
     "anti_aliasing": "Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review",
-    "canopy": "Thin alpha-blended dielectric approximation, linear tint and clearcoat; original zero-opacity F16 inner layer has no depth/specular contribution. Source F16 cockpit and pilot are now included. Not measured optical data; no screen-space transmission blur."
+    "canopy": "Thin alpha-blended dielectric approximation, linear tint and clearcoat; original zero-opacity F16 inner layer has no depth/specular contribution. Source F16 cockpit and pilot are now included. Not measured optical data; no screen-space transmission blur.",
+    "imported_exhausts": "Source FDM capability and existing normalized REHEAT snapshot output required. Source dry engines and unavailable state do not get throttle-created glow. Attachments and emission remain engineering approximations; ordinary F22/F16 retain their separate legacy effect."
   },
   "temporal_aa": true,
   "fxaa": false,
@@ -99,5 +100,7 @@
       0.035
     ],
     "basis": "Engineering linear-light albedo for existing stylized Kenney leaf/bark palette only. Source-derived textured pine is unchanged; not measured species reflectance."
-  }
+  },
+  "aircraft_exhaust_profiles_file": "../config/aircraft_exhaust_profiles.json",
+  "aircraft_exhaust_profiles_sha256": "230c37be95f7c3b4f5491c0cdff68914268fae556eef203dba5097d64bb41158"
 }

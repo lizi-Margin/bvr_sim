@@ -150,3 +150,20 @@ python game/tools/player_flight_response.py --cases vertical --seconds 300 --mod
 `player_core_only` 不创建 `GameSession` 或渲染器；`--unprotected` 只切换现有 typed 意图中的保护开关，默认仍开启。输出必须使用新目录。响应工具的 `--seconds` 是显式开发实验时长，写入每个计划条目；省略时保留原来的全部协议时长。
 
 不能把始终保持 85° 指向解释为机型能够持续 85° 爬升，也不能用低油门用例末端跟上目标掩盖中途失速。关闭保护的对照曾中途超过 100° 迎角；保护开启时会保留原始目标，同时用 `limited_direction` 表达能量限制后的目标。记录应同时报告原始误差、受限目标误差、整个过程的迎角/速度与饱和，不能只报告存活和最终误差。当前仍保留 F-22 的原最低速度配置；降低到 120 的实验未采用。
+
+## 相机构图与 1.8 相机候选
+
+当前 `player-flight-1.8-camera-candidate` 保留 1.6 的全部 152 项有效 `control`、`input` 数值，只增加独立的相机参数。源模型包围盒的中心用于构图，物理原点、机体姿态、速度方向和飞行意图继续分别维护。这样可以处理 A-10 等模型原点接近机头、可见机身主要位于原点后方的资源；这是源模型静态边界的近似，没有修改或居中飞机几何，也没有逐帧追踪起落架等动画边界。
+
+- `camera.subject_y`：画面从上到下的归一化构图位置，当前 0.62，允许 0.5–0.8。通过真实相机基向量调整视线，支持滚转、爬升、自由观察和不同窗口比例。
+- `camera.zoom_dolly`：0–1 的光学缩放距离补偿，当前 1。缩小 FOV 时按正切比增大相机距离，使本机尺寸保持相近，同时放大远处景物；0 保留固定距离的光学缩放。补偿在轨道平滑之后应用，避免过渡期间本机突然放大。
+
+```powershell
+python -m bvr_game.player_profiles show FG-A-10
+python -m bvr_game.player_profiles set F16 --key camera.subject_y --value 0.62
+python game/tools/validate_player_camera.py --tape PATH_TO_FROZEN_INTENT_TAPE.json --camera-profile game/config/player_flight_profiles.json --source-hull --seconds 195 --output NEW_CAMERA_COMPARISON_DIRECTORY
+```
+
+保存修改后在暂停状态按 F6 重载；正式冻结的评测拒绝重载。旧日志中的完整配置继续按原哈希恢复，缺少新字段的配置走原相机路径，不能用新默认画面冒充旧录像。相机比较工具只覆盖相机设置和显式声明的缩放时段，冻结输入和核心帧仍逐项核对。`--source-hull` 投影实际源 glTF 静态顶点的凸包，并验证注册边界与坐标系；它比空的包围盒角点更接近可见轮廓，但仍不是像素分割或实时动画网格，必须结合原始 DX12 录像检查。
+
+105 秒河谷航线的 1,050 个绘制采样中，旧相机的源轮廓有 448 次进入底部操作栏，新候选为 0，最近间距约 24 像素；390 个完整核心帧保持一致。独立的三条冻结输入带另核对 960 个核心端点和完整玩家状态，状态差异只有明确记录的配置哈希。它们证明此次构图改动的范围，不能替代全部机型、任意自由观察角度或最终画面验收；正式手感冻结与未使用保留集仍待完成。

@@ -258,6 +258,9 @@ class Baker:
         exclusions.extend(poly for _,poly in self.exclusions)
         exclusions.extend(Point(s['center']).buffer(s['radius_m']) for s in self.r['settlements'])
         farm=box(-9800,-9800,9800,9800).difference(unary_union(exclusions))
+        if self.r.get('landscape',{}).get('field_layout')=='road_recursive':
+            from .rural_parcels import road_parcels
+            self.fields=road_parcels(self,farm);return self.fields
         field_spacing=self.r.get('field_spacing_m',1600)
         seeds=[[n+self.rng.uniform(-350,350),w+self.rng.uniform(-350,350)] for n in range(-8800,8801,field_spacing) for w in range(-8800,8801,field_spacing)]
         fields=[]
@@ -284,16 +287,24 @@ class Baker:
                 elif rule.get('field_edges'):
                     f=self.rng.choice(self.fields);line=Polygon(f['polygon']).exterior;p=line.interpolate(self.rng.uniform(0,line.length));n,w=p.x,p.y
                 elif shapes:
-                    if cluster is None or cluster_steps>=rule.get('cluster_size',34):
-                        poly=self.rng.choices(shapes,weights=[p.area for p in shapes])[0] if rule.get('area_weighted') else self.rng.choice(shapes)
+                    if rule.get('distribution')=='area_uniform':
+                        poly=self.rng.choices(shapes,weights=[p.area for p in shapes])[0]
                         bounds=poly.bounds
                         for _ in range(200):
-                            center=(self.rng.uniform(bounds[0],bounds[2]),self.rng.uniform(bounds[1],bounds[3]))
-                            if poly.contains(Point(center)):break
-                        cluster=(poly,center);cluster_steps=0
-                    poly,center=cluster;cluster_steps+=1
-                    n=self.rng.gauss(center[0],rule.get('cluster_radius_m',100)/3);w=self.rng.gauss(center[1],rule.get('cluster_radius_m',100)/3)
-                    if not poly.contains(Point(n,w)):continue
+                            n=self.rng.uniform(bounds[0],bounds[2]);w=self.rng.uniform(bounds[1],bounds[3])
+                            if poly.contains(Point(n,w)):break
+                        else:continue
+                    else:
+                        if cluster is None or cluster_steps>=rule.get('cluster_size',34):
+                            poly=self.rng.choices(shapes,weights=[p.area for p in shapes])[0] if rule.get('area_weighted') else self.rng.choice(shapes)
+                            bounds=poly.bounds
+                            for _ in range(200):
+                                center=(self.rng.uniform(bounds[0],bounds[2]),self.rng.uniform(bounds[1],bounds[3]))
+                                if poly.contains(Point(center)):break
+                            cluster=(poly,center);cluster_steps=0
+                        poly,center=cluster;cluster_steps+=1
+                        n=self.rng.gauss(center[0],rule.get('cluster_radius_m',100)/3);w=self.rng.gauss(center[1],rule.get('cluster_radius_m',100)/3)
+                        if not poly.contains(Point(n,w)):continue
                 else:
                     n=self.rng.uniform(-9500,9500);w=self.rng.uniform(-9500,9500)
                     if self.terrain.slope(n,w)<rule.get('slope_min',0):continue
