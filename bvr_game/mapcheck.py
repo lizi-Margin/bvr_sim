@@ -54,3 +54,13 @@ def validate(path):
     if missing:failures.append({'error':'missing land-use classes','missing':sorted(missing),'raster_classes':unique})
     if np.ptp(fine)<150:failures.append({'error':'insufficient genuine relief'})
     return {'status':'passed' if not failures else 'failed','map_sha256':sha(path),'terrain_sha256':d['terrain']['sha256'],'instances':len(items),'counts':counts,'chunks':len(d['chunks']),'fine_sample_m':d['terrain']['details'][0]['spacing'],'height_range_m':[float(fine.min()),float(fine.max())],'landcover_classes':unique,'represented_land_use':sorted(represented),'checked_neighbor_pairs':pairs,'failures':failures,'resource_inventory':inventory}
+
+def main():
+    import argparse
+    from .content import write_json
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path)
+    a=p.parse_args();report=validate(a.map)
+    if a.output:write_json(a.output,report)
+    print(json.dumps({k:v for k,v in report.items() if k!='resource_inventory'},indent=2))
+    if report['status']!='passed':raise SystemExit(1)
+if __name__=='__main__':main()

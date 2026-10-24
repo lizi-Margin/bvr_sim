@@ -51,6 +51,9 @@ class BakedScene:
         materials=[];surfaces=[];placements=[]
         for id,data in self.document['materials'].items():
             m=bindings.SceneMaterial();m.id=id;m.color=data['color'];m.roughness=data['roughness'];m.tile_m=data['tile_m'];m.base_color=data.get('base_color','');m.normal=data.get('normal','');m.roughness_map=data.get('roughness_map','');m.water=id=='water';materials.append(m)
+            if data.get('world_uv'):
+                if not hasattr(m,'world_uv'):raise RuntimeError('Map requires the native world-aligned material UV interface; rebuild the renderer')
+                m.world_uv=True;m.uv_origin_north=data['uv_origin_north'];m.uv_origin_west=data['uv_origin_west']
             if (id=='detail_1' or data.get('repeat_detail')) and visual_profile and visual_profile.get('terrain_detail'):
                 d=visual_profile['terrain_detail']
                 for slot in ['base_color','normal','roughness_map']:

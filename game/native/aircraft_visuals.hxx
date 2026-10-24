@@ -23,6 +23,7 @@ class AircraftVisuals {
     std::map<std::string,uint64_t> import_counts;
     std::map<Entity,Instance> instances;
     uint64_t updates=0;
+    uint64_t corrected_surfaces=0,nozzle_meshes=0;
     nlohmann::json material_profile;
     void apply_materials(wi::scene::Scene& loaded,const std::string& file){
         if(material_profile.is_null())return;
@@ -44,8 +45,45 @@ class AircraftVisuals {
                 m.SetBaseColor({c.x*factor,c.y*factor,c.z*factor,c.w});m.SetRoughness(material_profile.value("paint_roughness",.64f));
                 m.SetMetalness(0);m.SetReflectance(.04f);
                 if(name.find("engine")!=std::string::npos||name.find("Nozzle")!=std::string::npos){m.SetMetalness(.7f);m.SetRoughness(.35f);}
+                if(material_profile.value("source_surface_corrections",false)){
+                    if(id=="F22"&&name=="ac3dmat1.007"){
+                        // Source atlas contains pure-white RAM borders. Bound
+                        // their diffuse reflectance in the shader, retaining
+                        // positions, normals, UVs, markings and source images.
+                        m.userdata.x=0x42565250u;
+                        ++corrected_surfaces;
+                    }
+                    if(id=="F16"&&name=="emissiveMat.001"){
+                        // Verified InternalFlame node: z=3.262m, inside the
+                        // nozzle at z=4.34..4.62m in source glTF. The .000
+                        // material belongs to navigation lights and is kept.
+                        m.SetEmissiveColor({0,0,0,0});m.SetBaseColor({.075f,.07f,.065f,1});
+                        m.SetMetalness(.55f);m.SetRoughness(.48f);
+                        ++corrected_surfaces;
+                    }
+                }
             }
             m.SetDirty();
+        }
+        if(id=="F22"&&material_profile.value("source_surface_corrections",false)){
+            std::map<Entity,Entity> nozzle_materials;
+            for(size_t i=0;i<loaded.meshes.GetCount();++i){
+                auto entity=loaded.meshes.GetEntity(i);auto n=loaded.names.GetComponent(entity);
+                std::string name=n?n->name:"";
+                if(name.find("F119")==std::string::npos&&name.find("vector")==std::string::npos&&name.find("reheat")==std::string::npos)continue;
+                ++nozzle_meshes;
+                for(auto& subset:loaded.meshes[i].subsets){
+                    auto found=nozzle_materials.find(subset.materialID);
+                    if(found==nozzle_materials.end()){
+                        auto source=loaded.materials.GetComponent(subset.materialID);if(!source)continue;
+                        auto copy=*source;auto e=loaded.Entity_CreateMaterial("F22_nozzle_source_atlas");
+                        auto m=loaded.materials.GetComponent(e);*m=copy;m->userdata.x=0;
+                        m->SetMetalness(.65f);m->SetRoughness(.38f);m->SetBaseColor({.5f,.48f,.46f,1});m->SetDirty();
+                        found=nozzle_materials.emplace(subset.materialID,e).first;
+                    }
+                    subset.materialID=found->second;
+                }
+            }
         }
     }
     static double number(const nlohmann::json& v) {
@@ -176,6 +214,6 @@ public:
     std::map<std::string,uint64_t> stats() const {
         uint64_t animations=0,exhausts=0;
         for(const auto& [_,a]:instances){animations+=a.motions.size();exhausts+=a.exhausts.size();}
-        return {{"cached_models",prototypes.size()},{"mesh_resources",scene.meshes.GetCount()},{"material_resources",scene.materials.GetCount()},{"instances",instances.size()},{"animations",animations},{"property_updates",updates},{"exhausts",exhausts}};
+        return {{"cached_models",prototypes.size()},{"mesh_resources",scene.meshes.GetCount()},{"material_resources",scene.materials.GetCount()},{"instances",instances.size()},{"animations",animations},{"property_updates",updates},{"exhausts",exhausts},{"corrected_source_materials",corrected_surfaces},{"separate_nozzle_meshes",nozzle_meshes}};
     }
 };

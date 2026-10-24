@@ -89,9 +89,10 @@ def subdivide_fields(baker,fields):
                 divided.extend(p for p in split(parcel,cutter).geoms if p.area>1000)
             parcels=divided
         for parcel in parcels:
+            cover=baker.rng.choice([1.,1.,.95,.8,.65,.4,.05])
             result.append({'id':field['id']+'_parcel_'+str(len(result)),'polygon':list(map(list,parcel.exterior.coords)),
                 'holes':[list(map(list,h.coords)) for h in parcel.interiors],
-                'surface':'grass' if baker.rng.random()<.6 else 'farmland',
+                'surface':'grass' if cover==1 else 'farmland','crop_cover':cover,
                 'color':baker.rng.choice(baker.r['field_palette_linear']),'heading_rad':heading,'area_m2':parcel.area})
     return result
 

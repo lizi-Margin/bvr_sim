@@ -17,6 +17,22 @@ def camera_ray(x,y,width,height,camera):
     v=unit([f[i]+r[i]*nx+u[i]*ny for i in range(3)])
     return [v[2],-v[0],v[1]]
 
+def aim_marker(direction,camera,projected,width,height):
+    """Logical HUD point plus truthful edge/behind status for the world intent."""
+    f=unit([b-a for a,b in zip(camera['eye'],camera['target'])],(0,0,1))
+    r=unit(cross(camera.get('up',[0,1,0]),f),(1,0,0));u=unit(cross(f,r),(0,1,0))
+    d=[-direction[1],direction[2],direction[0]];behind=dot(d,f)<=0
+    x,y=projected[0]*1920/width,projected[1]*1080/height
+    if not behind and 0<projected[2]<1 and 450<=x<=1480 and 180<=y<=810:
+        return {'point':[x,y],'edge':False,'behind':False,'bearing':0.}
+    tangent=math.tan(camera['fov']/2)
+    dx=dot(d,r)/(tangent*width/height)*960;dy=-dot(d,u)/tangent*540
+    if math.hypot(dx,dy)<1e-6:dx=1. # Exactly aft has no unique turn direction.
+    limits=[(1480-960)/dx if dx>0 else (450-960)/dx] if dx else []
+    if dy:limits.append((810-540)/dy if dy>0 else (180-540)/dy)
+    scale=min(limits)
+    return {'point':[960+dx*scale,540+dy*scale],'edge':True,'behind':behind,'bearing':math.atan2(dy,dx)}
+
 class PlayerInputAdapter:
     def __init__(self,profile,direction=(1,0,0)):
         self.profile=profile;self.direction=unit(direction);self.edge_yaw=0.;self.edge_pitch=0.

@@ -91,10 +91,13 @@ class PlayerProfileStore:
             if temp.exists():temp.unlink()
         self.reload();return self.resolve(aircraft_id)
     def export(self):return {'schema_version':1,'version':self.document['version'],'source_file':str(self.path),'file_sha256':getattr(self,'file_sha256',hashlib.sha256(canonical(self.document)).hexdigest()),'units':self.document['units'],'aircraft':[self.resolve(k) for k in self.document['aircraft']]}
+    def describe(self,aircraft_id):
+        return {'profile':self.resolve(aircraft_id),'units':self.document['units'],
+            'source_file':str(self.path),'file_sha256':self.file_sha256}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['show','validate','list','set']);p.add_argument('aircraft',nargs='?');p.add_argument('--file',type=Path,default=DEFAULT);p.add_argument('--key');p.add_argument('--value',type=float);args=p.parse_args();store=PlayerProfileStore(args.file)
-    if args.action=='show':result=store.resolve(args.aircraft)
+    if args.action=='show':result=store.describe(args.aircraft)
     elif args.action=='set':result=store.save_override(args.aircraft,args.key,args.value)
     elif args.action=='list':result=[{'aircraft_id':k,'template':v['template'],'tuning_status':v['tuning_status']} for k,v in store.document['aircraft'].items()]
     else:

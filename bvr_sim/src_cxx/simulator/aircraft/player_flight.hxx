@@ -26,7 +26,7 @@ class PlayerFlightController {
     PlayerFlightProfile profile_;
     bool configured_=false,initialized_=false;
     bool recovering_=false;
-    double bank_=0,trim_=0,pitch_weight_=0,roll_weight_=0,last_pitch_=0,last_roll_=0;
+    double bank_=0,trim_=0,manual_trim_=0,pitch_weight_=0,roll_weight_=0,last_pitch_=0,last_roll_=0;
     player_math::V filtered_target_{1,0,0};
     player_math::V filtered_up_{0,0,1};
     FlightSurfaceControls previous_;
@@ -35,7 +35,7 @@ public:
     void configure(const PlayerFlightProfile& profile){
         profile.validate();profile_=profile;configured_=true;
         // Reset only this player's finite controller state on safe reload.
-        initialized_=false;recovering_=false;trim_=0;pitch_weight_=roll_weight_=0;previous_={};
+        initialized_=false;recovering_=false;trim_=manual_trim_=0;pitch_weight_=roll_weight_=0;previous_={};
         state_={};state_.configured=true;state_.profile_id=profile.id;state_.profile_hash=profile.source_hash;
     }
     const PlayerFlightProfile& profile() const {if(!configured_)throw std::logic_error("Player profile not configured");return profile_;}
@@ -66,7 +66,7 @@ public:
         FlightSurfaceControls out;out.throttle=std::clamp(intent.throttle,0.,1.);
         if(intent.mode==PlayerFlightMode::RawManual){
             out.aileron=std::clamp(intent.roll_input,-1.,1.);out.elevator=-std::clamp(intent.pitch_input,-1.,1.);
-            out.rudder=std::clamp(intent.yaw_input,-1.,1.);trim_=0;pitch_weight_=roll_weight_=1;
+            out.rudder=std::clamp(intent.yaw_input,-1.,1.);trim_=manual_trim_=0;pitch_weight_=roll_weight_=1;
         }else{
             double speed=std::max(m.speed,1.);
             double density=m.density.value_or(p.reference_density);
@@ -107,7 +107,16 @@ public:
             if(vertical_rate>p.max_pitch_rate){omega[0]*=p.max_pitch_rate/vertical_rate;omega[1]*=p.max_pitch_rate/vertical_rate;}
             omega=add(omega,scale(velocity_direction,-dot(omega,velocity_direction)));
             auto acceleration=add(scale(cross(omega,velocity_direction),speed),{0,0,9.80665});
-            auto desired_up=unit(add(acceleration,scale(f,-dot(acceleration,f))),up);
+            double pole=std::clamp((std::max(std::abs(f[2]),std::abs(velocity_direction[2]))-.5)/.3,0.,1.);
+            auto bank_acceleration=acceleration;
+            // In ordinary flight a pitch-down correction must not reverse
+            // the bank reference through180deg. That made high-speed level
+            // captures roll repeatedly instead of letting the pitch loop
+            // unload. Use positive vertical support for bank steering, fading
+            // to the full geometric lift vector as the path nears vertical.
+            if(bank_acceleration[2]<9.80665)
+                bank_acceleration[2]=9.80665+(bank_acceleration[2]-9.80665)*pole;
+            auto desired_up=unit(add(bank_acceleration,scale(f,-dot(bank_acceleration,f))),up);
             // Recovering from a steep climb can require pushing rather than
             // pulling. Do not demand an abrupt half-roll just because that
             // signed pitch curvature makes the required lift vector reverse.
@@ -142,12 +151,27 @@ public:
             double cos_bank=std::clamp(dot(reference_up,up),-1.,1.);
             double coordinated=9.80665/speed*(1-cos_bank*cos_bank)/std::max(.25,cos_bank)*std::cos(flight_elevation);
             double path_pitch=target_pitch_error*p.pitch_gain*cos_bank+coordinated;
-            double pole=std::clamp((std::max(std::abs(f[2]),std::abs(velocity_direction[2]))-.5)/.3,0.,1.);
             double pitch_demand=std::clamp(path_pitch*(1-pole)+dot(omega,right)*pole,-p.max_pitch_rate,p.max_pitch_rate);
+            // Anticipate the normal acceleration implied by body pitch rate,
+            // instead of waiting for an excessive measured G before reversing
+            // the elevator. n ~= q*V/g + vertical component of body up.
+            // This limits the *request*, never the resulting forces or pose.
+            auto bounded_pitch_rate=[&](double demand){
+                if(!intent.protection)return demand;
+                double lo=9.80665*(p.min_g-up[2])/speed;
+                double hi=9.80665*(p.max_g-up[2])/speed;
+                double result=std::clamp(demand,lo,hi);
+                state_.protecting|=result!=demand;
+                return result;
+            };
+            pitch_demand=bounded_pitch_rate(pitch_demand);
             auto rates=m.body_rates.value_or(V{});
             double schedule=std::clamp(std::pow(p.reference_speed/std::max(1.,equivalent_speed),2),p.schedule_min,p.schedule_max);
             double ail=(roll_demand-rates[0])*p.roll_rate_gain*schedule;
-            if(intent.manual_pitch){pitch_weight_=1;last_pitch_=std::clamp(intent.pitch_input,-1.,1.);trim_=0;}
+            if(intent.manual_pitch){
+                if(pitch_weight_<1)manual_trim_=0;
+                pitch_weight_=1;last_pitch_=std::clamp(intent.pitch_input,-1.,1.);trim_=0;
+            }
             else pitch_weight_=std::max(0.,pitch_weight_-dt/p.release_seconds);
             if(intent.manual_roll){roll_weight_=1;last_roll_=std::clamp(intent.roll_input,-1.,1.);}
             else roll_weight_=std::max(0.,roll_weight_-dt/p.release_seconds);
@@ -165,7 +189,13 @@ public:
             // produced a violent pitch reversal while S was still held.
             // The same rate feedback damps takeover and its release; raw mode
             // retains exact direct surfaces for intentional full-stick tests.
-            double manual_pull=(last_pitch_*p.max_pitch_rate-rates[1])*p.pitch_rate_gain*schedule;
+            double manual_rate=pitch_weight_>0?bounded_pitch_rate(last_pitch_*p.max_pitch_rate):0;
+            // A proportional rate loop alone has a permanent aerodynamic trim
+            // error (notably while pushing). Integrate only the owned manual
+            // axis; its bounded trim fades out with that axis on release.
+            if(intent.manual_pitch&&std::abs(previous_.elevator)<.95)
+                manual_trim_=std::clamp(manual_trim_+(manual_rate-rates[1])*p.trim_gain*dt,-p.trim_limit,p.trim_limit);
+            double manual_pull=(manual_rate-rates[1])*p.pitch_rate_gain*schedule+manual_trim_;
             pull=pull*(1-pitch_weight_)+manual_pull*pitch_weight_;
             ail=ail*(1-roll_weight_)+last_roll_*roll_weight_;
             if(intent.protection){
@@ -190,7 +220,7 @@ public:
                 state_.protecting|=surface_capped;
                 // Energy limiting already changes the rate demand upstream.
                 // Its status alone must not continuously erase valid trim.
-                if(surface_capped)trim_*=std::exp(-dt/p.release_seconds);
+                if(surface_capped){trim_*=std::exp(-dt/p.release_seconds);manual_trim_*=std::exp(-dt/p.release_seconds);}
             }
             double rud=intent.manual_yaw?intent.yaw_input:-(m.beta.value_or(0)*p.sideslip_gain+rates[2]*p.yaw_damping);
             state_.saturated=std::abs(ail)>1||std::abs(pull)>1||std::abs(rud)>1;
@@ -200,10 +230,10 @@ public:
             out.elevator=move(previous_.elevator,-std::clamp(pull,-1.,1.),p.surface_rate*dt);
             out.rudder=move(previous_.rudder,std::clamp(rud,-1.,1.),p.surface_rate*dt);
             state_.target_bank=bank_;state_.roll_error=roll_error;
-            state_.desired_roll_rate=roll_demand;state_.desired_pitch_rate=pitch_demand;
+            state_.desired_roll_rate=roll_demand;state_.desired_pitch_rate=pitch_demand*(1-pitch_weight_)+manual_rate*pitch_weight_;
         }
         state_.pitch_manual_weight=pitch_weight_;state_.roll_manual_weight=roll_weight_;
-        state_.pitch_trim=trim_;
+        state_.pitch_trim=trim_*(1-pitch_weight_)+manual_trim_*pitch_weight_;
         previous_=state_.controls=out;return out;
     }
 };

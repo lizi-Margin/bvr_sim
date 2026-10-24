@@ -7,17 +7,24 @@ def inspect(asset_id):
     root=GAME/'assets/registered'/asset_id;m=json.loads((root/'manifest.json').read_text(encoding='utf8'))
     path=root/m['file']
     if hashlib.sha256(path.read_bytes()).hexdigest()!=m['glb_sha256']:raise ValueError('Asset hash mismatch: '+asset_id)
+    for lod in m.get('lods',[]):
+        file=(root/lod['file']).resolve()
+        if not file.is_relative_to(root.resolve()) or hashlib.sha256(file.read_bytes()).hexdigest()!=lod['sha256']:
+            raise ValueError('Asset LOD path/hash mismatch: '+asset_id)
     if m['faces']>100000:raise ValueError('Asset exceeds prototype face budget')
     return m
 def main():
     p=argparse.ArgumentParser(description=__doc__);s=p.add_subparsers(dest='action',required=True)
     r=s.add_parser('register');r.add_argument('id');r.add_argument('--entry',type=Path,required=True);r.add_argument('--manifest',type=Path,required=True);r.add_argument('--blender',default=BLENDER)
+    r.add_argument('--recipe',type=Path,help='Optional source-object selection, explicit height and LOD/impostor conversion policy')
     i=s.add_parser('inspect');i.add_argument('id')
     a=s.add_parser('place');a.add_argument('id');a.add_argument('--map',type=Path,default=GAME/'maps/training.json');a.add_argument('--name',required=True);a.add_argument('--position',nargs=3,type=float,required=True);a.add_argument('--scale',type=float,default=1)
     args=p.parse_args()
     if args.action=='register':
         if not args.id.replace('_','').replace('-','').isalnum():raise ValueError('Invalid asset id')
-        subprocess.run([args.blender,'--background','--python-exit-code','1','--python',str(HERE/'convert_environment.py'),'--',str(args.entry),str(args.manifest),args.id,str(GAME/'assets/registered'/args.id)],check=True,stdout=sys.stderr)
+        command=[args.blender,'--background','--python-exit-code','1','--python',str(HERE/'convert_environment.py'),'--',str(args.entry),str(args.manifest),args.id,str(GAME/'assets/registered'/args.id)]
+        if args.recipe:command.append(str(args.recipe.resolve()))
+        subprocess.run(command,check=True,stdout=sys.stderr)
     m=inspect(args.id)
     if args.action in ('register','place'):
         runtime=GAME/'runtime.json';r=json.loads(runtime.read_text(encoding='utf8'));r['models'][args.id]=str((GAME/'assets/registered'/args.id/m['file']).resolve());runtime.write_text(json.dumps(r,indent=2),encoding='utf8')

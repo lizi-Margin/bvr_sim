@@ -26,6 +26,8 @@ python -m bvr_game.player_profiles list
 python -m bvr_game.player_profiles set F22 --key input.sensitivity --value 1.1
 ```
 
+`show` 返回 `profile`、`units`、源文件与文件哈希；有效配置自身的哈希仍只覆盖配置及其继承元数据。资源获取、转换、注册和地图生成命令见 [RESOURCE_LIBRARY.md](RESOURCE_LIBRARY.md)。
+
 配置在 `game/config/player_flight_profiles.json`。152个机库条目均显式关联模板，允许机型覆盖。查询结果包含继承链、最终参数、版本、调校状态和有效配置SHA256。文件区分 `control`、`input`、`camera`，并列出单位。
 
 保存先验证完整候选，再原子替换文件。重新加载在暂停边界生效，仅清理玩家控制器状态，不改变 dt、核心 tick 或随机序列。正式评测应冻结配置；客户端的 `player_profiles_frozen` 会拒绝F6重新加载。出击日志保存有效配置，重放验证记录哈希后应用记录值。

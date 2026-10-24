@@ -30,18 +30,22 @@ def run(a):
     a.output.mkdir(parents=True,exist_ok=False)
     os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
     g=FlightGame(map_path=a.map,output=a.output/'client');g.player_profiles_frozen=True
+    if a.profile_file:
+        from bvr_game.player_profiles import PlayerProfileStore
+        g.profile_store=PlayerProfileStore(a.profile_file)
     snapshot=a.output/'candidate-snapshot';snapshot.mkdir()
     shutil.copy2(native.__file__,snapshot/Path(native.__file__).name)
     for relative in ['game/config/player_flight_profiles.json','game/tools/player_flight_response.py',
         'bvr_sim/src_cxx/simulator/aircraft/player_flight.hxx','bvr_sim/src_cxx/simulator/aircraft/player_flight_types.hxx']:
-        dest=snapshot/relative;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/relative,dest)
+        dest=snapshot/relative;dest.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(g.profile_store.path if relative=='game/config/player_flight_profiles.json' else ROOT/relative,dest)
     summaries=[];started=time.perf_counter()
     plan=[]
     for model in a.models:
         for speed in a.speeds or ([180] if model=='FG-A-10' else [300]):
             for case in a.cases:
-                seconds=300 if case=='sustained' else 150 if case=='turn_180' else 120 if case in ['circle','reversal'] else 90
-                plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'seed':2201+len(plan)%9,'altitude_m':8500})
+                seconds=300 if case=='sustained' else 150 if case=='turn_180' else 120 if case in ['circle','reversal'] else 30 if case=='down' else 90
+                plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'seed':2201+len(plan)%9,'altitude_m':a.altitude})
     write_json(a.output/'plan.json',{'phase':'candidate diagnostics; not final held-out evaluation','cases':plan,'profile_sha256':g.profile_store.file_sha256,
         'core_sha256':sha(Path(native.__file__)),'map_sha256':g.scene_hash,'sample_ticks':5,'intent_ticks':25,'units':'NWU metres; orientation radians; body rates rad/s; alpha/beta radians; normal_g dimensionless; density kg/m^3'})
     try:
@@ -92,5 +96,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--map',type=Path,default=ROOT/'game/maps/training_range_v3/generated-map.json')
     p.add_argument('--models',nargs='+',default=['F22','F16','FG-A-10']);p.add_argument('--speeds',nargs='+',type=float)
+    p.add_argument('--altitude',type=float,default=8500,help='Configured initial altitude in NWU metres; recorded in the frozen plan')
+    p.add_argument('--profile-file',type=Path,help='Explicit candidate profile file; freeze, snapshot and record its actual hash')
     p.add_argument('--cases',nargs='+',default=['turn_45','turn_90','turn_180','vertical']);run(p.parse_args())
 if __name__=='__main__':main()

@@ -200,8 +200,11 @@ def replay(tape,output,render=False,video=False,window_start=None,window_end=Non
                 while remaining:
                     count=min(remaining,video_sample_ticks);host.step(count,exact=a.get('exact',False));remaining-=count
                     if start_time<=host.game.sim.frame().sim_time<=end_time:
-                        image=Path(output)/'video-frame.png';host.game.renderer.capture(str(image))
-                        with Image.open(image) as pixels:encoder.stdin.write(pixels.convert('RGB').tobytes())
+                        if hasattr(host.game.renderer,'capture_rgb'):
+                            encoder.stdin.write(host.game.renderer.capture_rgb())
+                        else:
+                            image=Path(output)/'video-frame.png';host.game.renderer.capture(str(image))
+                            with Image.open(image) as pixels:encoder.stdin.write(pixels.convert('RGB').tobytes())
                         if video_frames%100==0:keyframes.append({'image':host.game.capture('keyframe-'+str(video_frames)),'tick':host.game.sim.frame().tick})
                         video_frames+=1
             else:host.step(a['ticks'],a.get('command'),a.get('exact',False),a.get('player_intent'))
@@ -211,6 +214,7 @@ def replay(tape,output,render=False,video=False,window_start=None,window_end=Non
         report={'status':'passed' if all(rows) and len(rows)==len(data['actions']) else 'failed','complete_frames_compared':len(rows),'sample_interval_s':.5,'first_difference':next((i for i,v in enumerate(rows) if not v),None),'rendered':render,'core_sha256':host.core_sha,'tape':str(tape),'tape_sha256':sha(tape),'logs':host.game.log_paths(),'capture':host.game.capture('replay') if render else None,'shader_errors':host.game.renderer.shader_errors() if render else None}
         if video:
             movie={'file':str(video_path),'frames':video_frames,'fps':10,'sim_window_s':[start_time,end_time],'sim_sample_ticks':video_sample_ticks,'playback_speed':video_sample_ticks*.02*10,'seed':data['config']['seed'],'aircraft':data['config']['player_model'],'mission':data['config']['mission'],'resolution':[1920,1080],'quality':'high','map_sha256':host.game.scene_hash,'visual_profile':host.game.visual_profile,'keyframes':keyframes,'shader_errors':report['shader_errors']}
+            movie['capture_method']='Direct sRGB backbuffer RGB readback' if hasattr(host.game.renderer,'capture_rgb') else 'Backbuffer PNG readback followed by RGB decoding'
             write_json(video_path.with_suffix('.json'),movie);report['video']=movie
         write_json(Path(output)/'replay-report.json',report);return report
     finally:
@@ -260,7 +264,7 @@ def serve(output,render):
                 if action=='reset':value=asdict(host.reset(r.get('seed',101),r.get('model','F22')))
                 elif action=='observe':value=asdict(host.observe())
                 elif action=='step':value=asdict(host.step(r.get('ticks',25),r.get('command'),r.get('exact',False),r.get('player_intent')))
-                elif action=='player_profile':value=host.game.player_profile
+                elif action=='player_profile':value={'profile':host.game.player_profile,'units':host.game.profile_store.document['units'],'file_sha256':host.game.profile_store.file_sha256}
                 elif action=='pause':host.pause(r.get('paused',True));value={'paused':host.game.sim.frame().paused}
                 elif action=='diagnose':value=host.diagnostics()
                 elif action=='logs':value=host.game.log_paths()

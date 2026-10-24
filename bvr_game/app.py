@@ -5,7 +5,7 @@ import textwrap
 from .aircraft import aircraft_catalog,aircraft,loadout,runtime_models
 from .presentation import ChaseCamera,Labels,safe_aim,curve,mouse_pitch,mouse_roll_rate
 from .player_profiles import PlayerProfileStore
-from .player_input import PlayerInputAdapter,native_intent,body_forward,unit
+from .player_input import PlayerInputAdapter,native_intent,body_forward,unit,aim_marker
 from contextlib import redirect_stdout
 from pathlib import Path
 from .sortie_logs import SortieJournal,open_logs_directory
@@ -294,6 +294,7 @@ class FlightGame:
         metadata['mouse_projection']=self.player_input.last_projection
         metadata['flight_marks']=getattr(self,'flight_marks',{})
         metadata['flight_mark_labels']=getattr(self,'flight_mark_labels',{})
+        metadata['flight_mark_projection']=getattr(self,'flight_mark_projection',{})
         metadata['hud_visible']=self.show_hud
         if hasattr(self.renderer,'audio_available'):metadata['audio']={'available':self.renderer.audio_available(),'play_counts':self.renderer.audio_counts()}
         if hasattr(self.renderer,'aircraft_statistics'):metadata['aircraft_statistics']=serialize(self.renderer.aircraft_statistics())
@@ -377,21 +378,30 @@ class FlightGame:
         if self.menu_notice:text(610,992,self.menu_notice[:75],15,RED)
         # Three different symbols: amber aim ring, white nose cross, cyan path
         # ring/wings. All positions are projected from real world directions.
-        self.flight_marks={};self.flight_mark_labels={};mark_label_boxes=[]
+        self.flight_marks={};self.flight_mark_labels={};self.flight_mark_projection={};mark_label_boxes=[]
         if p:
             distance=self.player_profile['input']['aim_distance_m']
             for name,direction,color in [('AIM',self.player_input.direction,0xff77dfff),('NOSE',body_forward(p.orientation),WHITE),('PATH',unit(p.velocity),0xfff5e575)]:
                 mark=self.renderer.project([p.position[i]+direction[i]*distance for i in range(3)])
-                if not 0<mark[2]<1:continue
+                if name!='AIM' and not 0<mark[2]<1:continue
                 x,y=mark[0]/sx,mark[1]/sy
+                caption=name
                 if name=='AIM':
-                    x=min(max(x,450),1480);y=min(max(y,180),810);circle(x,y,12,color)
+                    placement=aim_marker(direction,self.camera_params,mark,self.width,self.height)
+                    x,y=placement['point']
+                    self.flight_mark_projection['AIM']=placement
+                    if placement['edge']:
+                        a=placement['bearing'];dx,dy=math.cos(a),math.sin(a)
+                        for side in [-1,1]:segment(x,y,x-dx*18-side*dy*8,y-dy*18+side*dx*8,color,2)
+                        caption='AIM / BEHIND' if placement['behind'] else 'AIM / OFF VIEW'
+                    else:circle(x,y,12,color)
                 elif name=='NOSE':line(x-9,y,18,2,color);line(x,y-9,2,18,color)
                 else:circle(x,y,5,color);line(x-16,y,9,2,color);line(x+7,y,9,2,color);line(x,y-12,2,5,color)
                 for dy in [-24,0,24,-48,48]:
-                    label=(x+18,y+dy,52,18)
-                    if not any(abs(label[0]-b[0])<52 and abs(label[1]-b[1])<20 for b in mark_label_boxes):break
-                mark_label_boxes.append(label);text(label[0],label[1],name,12,color)
+                    label=(x+18,y+dy,max(52,len(caption)*7),18)
+                    if not any(label[0]<b[0]+b[2] and label[0]+label[2]>b[0] and abs(label[1]-b[1])<20 for b in mark_label_boxes):break
+                mark_label_boxes.append(label);text(label[0],label[1],caption,12,color)
+                labels.rectangles.extend([(label[0],label[1],label[0]+label[2],label[1]+label[3]),(x-16,y-16,x+16,y+16)])
                 self.flight_mark_labels[name]=list(label);self.flight_marks[name]=[x*sx,y*sy]
         for c in frame.contacts:
             v=self.renderer.project(c.position)
@@ -668,7 +678,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['play','run','benchmark'],nargs='?',default='play')
     p.add_argument('--render',action='store_true');p.add_argument('--hidden',action='store_true');p.add_argument('--mission',choices=['intercept_patrol','air','strike','combined','convoy','training']);p.add_argument('--aircraft',choices=[r['id'] for r in aircraft_catalog(include_library=True)['aircraft']],default='F22');p.add_argument('--loadout');p.add_argument('--seed',type=int,default=7)
     p.add_argument('--width',type=int,default=1920);p.add_argument('--height',type=int,default=1080);p.add_argument('--quality',choices=['low','medium','high'],default='high');p.add_argument('--frames',type=int,default=300);p.add_argument('--output',type=Path,default=GAME/'captures');p.add_argument('--runtime',type=Path,default=GAME/'runtime.json');p.add_argument('--map',type=Path,default=GAME/'maps/training_range_v3/generated-map.json')
-    a=p.parse_args();game=FlightGame(render=a.render or a.command=='play' or a.command=='benchmark',visible=not a.hidden,width=a.width,height=a.height,runtime=a.runtime,map_path=a.map,output=a.output)
+    p.add_argument('--visual-profile',type=Path,default=GAME/'recipes/visual_beta.json')
+    a=p.parse_args();game=FlightGame(render=a.render or a.command=='play' or a.command=='benchmark',visible=not a.hidden,width=a.width,height=a.height,runtime=a.runtime,map_path=a.map,output=a.output,visual_profile=a.visual_profile)
     row=game.select_aircraft(a.aircraft,a.loadout)
     a.mission=a.mission or ('air' if a.command=='run' and 'air' in row['missions'] else row['missions'][0])
     if a.mission not in row['missions']:game.close();raise ValueError('Mission '+a.mission+' is unsupported for '+a.aircraft)

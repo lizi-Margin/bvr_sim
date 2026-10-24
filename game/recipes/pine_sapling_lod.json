@@ -1,0 +1,10 @@
+{
+  "name": "Source-derived young pine windbreak",
+  "tags": ["vegetation", "pine", "source_geometry", "alpha_tested_lod"],
+  "select_object": "pine_sapling_small_a",
+  "height_m": 7.0,
+  "near_triangle_budget": 8000,
+  "impostor": true,
+  "impostor_resolution": 512,
+  "physical_size_note": "One exact Poly Haven sapling variant, uniformly scaled to a declared 7m scenery tree. Original needle/branch geometry and source albedo drive the conversion; not a surveyed mature pine or species-growth model. Far LOD is an explicit crossed-plane albedo approximation."
+}

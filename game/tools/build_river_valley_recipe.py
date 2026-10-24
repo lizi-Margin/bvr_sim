@@ -15,6 +15,7 @@ def recipe():
         'individual_building_tuning':'Road frontages and source-bound footprint foundations; no region-wide settlement/industry flattening'}
     r['terrain']['airport_height_m']=220
     r['budgets']['vegetation_instances']=20000
+    r['asset_roles']['canopy']=['tree_oak','pine_sapling_source']
     r['materials']['farmland']['color']=[.98,.94,.83,1]
     r['materials']['forest']['color']=[.7,.76,.6,1]
     r['airfields'][0].update(runway_width_m=45,taxi_offset_m=160,apron=[-2200,-3000],apron_size_m=[1100,400],hangars=6)
@@ -37,10 +38,10 @@ def recipe():
         if z['id']=='sample_woodland':z['polygon']=[[-3900,-2200],[-3300,-1850],[-1900,-1800],[-1200,-2100],[-2000,-2400]]
     r['zones'].append({'id':'valley_west_woodland','type':'forest','polygon':[[-6500,-2200],[-4200,-1500],[-2500,-1800],[-1800,-800],[-400,-700],[-1000,-1800],[-3500,-2500],[-5300,-2900]]})
     for scatter in r['scatter_rules']:
-        if scatter['id']=='forest_canopy':scatter['count']=15000;scatter['zones'].extend(['valley_west_woodland','sample_woodland'])
+        if scatter['id']=='forest_canopy':scatter['count']=15000;scatter['zones'].extend(['valley_west_woodland','sample_woodland']);scatter['lod_distance_m']=900
         elif scatter['id']=='riverbank_vegetation':scatter['count']=3000
         elif scatter['id']=='hedgerows':scatter['count']=1400
-        elif scatter['id']=='sample_woodland':scatter['count']=400
+        elif scatter['id']=='sample_woodland':scatter['count']=400;scatter['lod_distance_m']=900
     r['mission'].update(player_start=[-7000,-3500,650],speed_mps=180,enemy_range_m=160000,target=[2650,-1400])
     if 'convoy_target' in r['mission']:r['mission']['convoy_target']=[2600,-1900]
     r['mission']['strike_start']=[-4500,-1900,3200]

@@ -205,7 +205,7 @@ class Renderer {
         path->camera->CreatePerspective(float(w), float(h), .2f,600000.f, 1.05f);
         set_quality("medium");
         auto &s = wi::scene::GetScene();
-        baked_world = std::make_unique<WorldScene>(s, model_files);
+        baked_world = std::make_unique<WorldScene>(s, model_files,visual_profile);
         effects = std::make_unique<VisualEffects>(s,!visual_profile.is_null());
         aircraft_visuals = std::make_unique<AircraftVisuals>(s);
         aircraft_visuals->set_material_profile(visual_profile);
@@ -227,6 +227,8 @@ class Renderer {
         t->RotateRollPitchYaw(XMFLOAT3(-.65f, -.6f, 0));
         t->UpdateTransform();
         s.lights.GetComponent(sun)->SetCastShadow(true);
+        if(!visual_profile.is_null()&&visual_profile.contains("sun_shadow_cascades_m"))
+            set_shadow_cascades(visual_profile.at("sun_shadow_cascades_m").get<std::vector<float>>());
         if(!visual_profile.is_null()){
             sky.SetRealisticSky(visual_profile.value("physical_sky",true));
             sky.SetRealisticSkyAerialPerspective(visual_profile.value("aerial_perspective",true));
@@ -654,12 +656,39 @@ class Renderer {
             throw std::runtime_error("GPU capture failed");
         return filename;
     }
+    py::bytes capture_rgb() {
+        if(closed||!last_frame.IsValid())throw std::runtime_error("Render a frame before capture");
+        const auto desc=last_frame.GetDesc();
+        using wi::graphics::Format;
+        if(desc.format!=Format::R8G8B8A8_UNORM&&desc.format!=Format::R8G8B8A8_UNORM_SRGB&&desc.format!=Format::R10G10B10A2_UNORM)
+            throw std::runtime_error("Unsupported video backbuffer pixel format");
+        wi::vector<uint8_t> pixels;
+        if(!wi::helper::saveTextureToMemory(last_frame,pixels))throw std::runtime_error("GPU video readback failed");
+        size_t count=size_t(desc.width)*desc.height;std::string rgb(count*3,'\0');
+        for(size_t i=0;i<count;++i){
+            if(desc.format==Format::R10G10B10A2_UNORM){
+                uint32_t packed;std::memcpy(&packed,pixels.data()+i*4,4);
+                for(int c=0;c<3;++c)rgb[i*3+c]=char((((packed>>(c*10))&1023)*255+511)/1023);
+            }else for(int c=0;c<3;++c)rgb[i*3+c]=char(pixels[i*4+c]);
+        }
+        return py::bytes(rgb);
+    }
     int shader_errors() const {
         return wi::renderer::GetShaderErrorCount() + wi::renderer::GetShaderMissingCount();
+    }
+    void set_shadow_cascades(const std::vector<float>& distances){
+        if(distances.empty()||distances.size()>4)throw std::invalid_argument("Directional shadows require1..4 cascade distances");
+        float previous=0;
+        for(float v:distances){if(!std::isfinite(v)||v<=previous||v>50000)throw std::invalid_argument("Shadow cascade distances must increase in(0,50000] metres");previous=v;}
+        auto light=wi::scene::GetScene().lights.GetComponent(sun_entity);
+        if(!light)throw std::runtime_error("Sun is not initialized");
+        light->cascade_distances.assign(distances.begin(),distances.end());
     }
     std::string visual_settings() const {
         auto result=visual_profile.is_null()?nlohmann::json::object():visual_profile;
         result["actual_output"]={{"width",width},{"height",height},{"vertical_fov",path->camera->fov},{"temporal_aa",wi::renderer::GetTemporalAAEnabled()},{"fxaa",path->getFXAAEnabled()}};
+        const auto light=wi::scene::GetScene().lights.GetComponent(sun_entity);
+        if(light){result["actual_output"]["sun_shadow_cascades_m"]=std::vector<float>(light->cascade_distances.begin(),light->cascade_distances.end());result["actual_output"]["sun_cast_shadow"]=light->IsCastingShadow();}
         auto colorspace=wi::graphics::GetDevice()->GetSwapChainColorSpace(&app->swapChain);
         result["actual_output"]["color_space"]=colorspace==wi::graphics::ColorSpace::SRGB?"sRGB":colorspace==wi::graphics::ColorSpace::HDR10_ST2084?"HDR10_ST2084":"HDR_LINEAR";
         const auto& sky=wi::scene::GetScene().weather;
@@ -764,6 +793,9 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readwrite("detail_strength", &SceneMaterial::detail_strength)
         .def_readwrite("color", &SceneMaterial::color)
         .def_readwrite("tile_m", &SceneMaterial::tile_m)
+        .def_readwrite("world_uv", &SceneMaterial::world_uv)
+        .def_readwrite("uv_origin_north", &SceneMaterial::uv_origin_north)
+        .def_readwrite("uv_origin_west", &SceneMaterial::uv_origin_west)
         .def_readwrite("roughness", &SceneMaterial::roughness)
         .def_readwrite("water", &SceneMaterial::water);
     py::class_<SceneSurface>(m, "SceneSurface")
@@ -821,6 +853,8 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("camera_up", &Renderer::camera_up)
         .def("project", &Renderer::project)
         .def("capture", &Renderer::capture)
+        .def("capture_rgb", &Renderer::capture_rgb)
+        .def("set_shadow_cascades", &Renderer::set_shadow_cascades)
         .def("reload", &Renderer::reload)
         .def("set_quality", &Renderer::set_quality)
         .def("shader_errors", &Renderer::shader_errors)

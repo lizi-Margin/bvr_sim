@@ -1,0 +1,12 @@
+{
+  "name": "Source-derived pine grove",
+  "tags": ["vegetation", "pine", "source_geometry", "grove", "alpha_tested_lod"],
+  "select_object": "pine_sapling_small_a",
+  "height_m": 12.0,
+  "cluster": {"count": 16, "radius_m": 13, "minimum_spacing_m": 4.5, "seed": 63241, "scale_range": [0.85, 1.15]},
+  "near_triangle_budget": 64000,
+  "impostor": true,
+  "impostor_resolution": 1024,
+  "recommended_density_per_km2": 150,
+  "physical_size_note": "Sixteen copies of one exact source pine variant, each uniformly scaled from the source sapling to12m nominal scenery height with declared variation. A batch/LOD representation of a grove, not sixteen renderer objects and not a surveyed mature forest. Far crossed planes use source albedo with original opacity."
+}

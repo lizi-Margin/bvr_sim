@@ -189,12 +189,23 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     n,w=np.meshgrid(meta['origin_north']+(np.arange(resolution)+.5)*pixel,
                     meta['origin_west']+(np.arange(resolution)+.5)*extent[1]/resolution)
     labels=np.zeros(n.shape,dtype=np.uint8);macro=np.ones((*n.shape,3),dtype=np.float32)
+    source_scale=spec.get('macro_source_tile_m')
+    crop_cover=np.ones(n.shape,dtype=np.float32) if source_scale else None
     for field in document['fields']:
         poly=Polygon(field['polygon'],field['holes']);a,b,c,d=poly.bounds
         x0=max(0,int((a-meta['origin_north'])/pixel)-1);x1=min(resolution,int((c-meta['origin_north'])/pixel)+2)
         y0=max(0,int((b-meta['origin_west'])/pixel)-1);y1=min(resolution,int((d-meta['origin_west'])/pixel)+2)
         if x0>=x1 or y0>=y1:continue
         area=np.s_[y0:y1,x0:x1];mask=contains_xy(poly,n[area],w[area]);labels[area][mask]=0 if field.get('surface')=='grass' else 1;macro[area][mask]=field['color'][:3]
+        if crop_cover is not None:
+            crop_cover[area][mask]=field.get('crop_cover',1 if field.get('surface')=='grass' else 0)
+            # Broad, low-contrast cultivation rows follow each declared parcel,
+            # rather than a global grid. They are authored crop appearance,
+            # not measured crop/species data or changes to physical terrain.
+            heading=field.get('heading_rad',0)
+            across=-n[area]*math.sin(heading)+w[area]*math.cos(heading)
+            row=1+.035*np.sin(across*2*math.pi/18)
+            macro[area][mask]*=row[mask,None]
     for forest in baker.forests.values():labels[contains_xy(forest,n,w)]=2
     labels[contains_xy(baker.industry,n,w)]=3
     for road,line in baker.roads:
@@ -202,33 +213,69 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     names=['grass','farmland','forest','soil','rock','pavement','water','marking']
     color=np.zeros((*n.shape,3),dtype=np.float32);normal=np.zeros_like(color);rough=np.zeros(n.shape,dtype=np.float32)
     source_files={}
+    def source_image(file,slot):
+        source_files[file]=sha(file)
+        image=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
+        if slot=='base_color':image=np.where(image<=.04045,image/12.92,((image+.055)/1.055)**2.4)
+        if source_scale:
+            # Area-filter in linear light before spatial stretching. Sampling
+            # a metre-scale source every 4.88m had aliased into nearly uniform
+            # fields. The independent 3m shader detail retains its real scale.
+            h,w0=image.shape[:2];target=128
+            if h%target==0 and w0%target==0:image=image.reshape(target,h//target,target,w0//target,3).mean(axis=(1,3))
+        return image
+    def source_sample(image):
+        if source_scale:
+            from scipy.ndimage import map_coordinates
+            u=np.mod(n/source_scale+.08*np.sin(w/370),1)*image.shape[1]
+            v=np.mod(w/source_scale+.08*np.cos(n/410),1)*image.shape[0]
+            return np.stack([map_coordinates(image[...,i],[v,u],order=1,mode='grid-wrap') for i in range(3)],axis=2)
+        u=((n/4+.15*np.sin(w/61))*image.shape[1]).astype(np.int64)%image.shape[1]
+        v=((w/4+.15*np.cos(n/73))*image.shape[0]).astype(np.int64)%image.shape[0]
+        return image[v,u]
     for index in np.unique(labels):
         material=document['materials'][names[int(index)]]
         weight=gaussian_filter((labels==index).astype(np.float32),sigma=spec.get('material_blend_m',7)/pixel,mode='nearest')
         for slot in ['base_color','normal','roughness_map']:
             if slot not in material:continue
-            file=material[slot];source_files[file]=sha(file)
-            image=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
-            if slot=='base_color':image=np.where(image<=.04045,image/12.92,((image+.055)/1.055)**2.4)
+            file=material[slot];image=source_image(file,slot)
             # Slow deterministic UV warping breaks the grid while retaining actual source PBR detail.
-            u=((n/4+.15*np.sin(w/61))*image.shape[1]).astype(np.int64)%image.shape[1]
-            v=((w/4+.15*np.cos(n/73))*image.shape[0]).astype(np.int64)%image.shape[0]
-            sample=image[v,u]
+            sample=source_sample(image)
             if slot=='base_color':
                 strength=spec.get('material_detail_strength',.5)
                 sample=sample*strength+image.mean(axis=(0,1))*(1-strength)
+                if crop_cover is not None and index==1:
+                    grass=document['materials']['grass'];green=source_image(grass[slot],slot)
+                    green=source_sample(green)*strength+green.mean(axis=(0,1))*(1-strength)
+                    # Soil with variable source-grass cover: temperate parcels
+                    # include pasture, growing crops and exposed/fallow soil.
+                    sample=sample*(1-crop_cover[...,None])+green*crop_cover[...,None]
             if slot=='base_color':color+=weight[...,None]*sample*np.array(material['color'][:3],dtype=np.float32)*macro
             elif slot=='normal':normal+=weight[...,None]*(sample*2-1)
             else:rough+=weight*sample[...,0]
     # Match the actual surrounding 50m mesh materials in a smooth boundary band.
     # Its per-cell biome and interpolated macro tint remain unchanged outside the sample.
-    parent=document['terrain']['details'][0];cover=arrays['landcover']
+    # The regional material meets the *outer* mesh, not its own focus raster.
+    # Blending a regional image back to focus colors left a20km rectangle even
+    # though height vertices were stitched correctly to the outer height grid.
+    outer_seam=material_id=='regional_1'
+    parent=document['terrain']['base'] if outer_seam else document['terrain']['details'][0]
+    cover=arrays['outer_landcover'] if outer_seam else arrays['landcover']
     ci=np.clip(((n-parent['origin_north'])/parent['spacing']).astype(int),0,cover.shape[1]-1)
     ri=np.clip(((w-parent['origin_west'])/parent['spacing']).astype(int),0,cover.shape[0]-1)
     coarse_labels=cover[ri,ci]
     cm={**parent,'columns':cover.shape[1],'rows':cover.shape[0],
         'origin_north':parent['origin_north']+parent['spacing']/2,'origin_west':parent['origin_west']+parent['spacing']/2}
-    tint=np.stack([sample_grid(arrays['macro_color'][...,i],cm,n,w) for i in range(3)],axis=2)
+    source_tint=arrays['outer_macro_color'] if outer_seam else arrays['macro_color']
+    if outer_seam:
+        from scipy.ndimage import map_coordinates
+        rows,cols=np.meshgrid(np.arange(parent['rows'])-.5,np.arange(parent['columns'])-.5,indexing='ij')
+        vertex_tint=np.stack([map_coordinates(source_tint[...,i],[rows,cols],order=1,mode='nearest') for i in range(3)],axis=2)
+        # Match the renderer's packed per-vertex linear tint, then its actual
+        # triangle interpolation; cell-centre interpolation is a different field.
+        vertex_tint=np.floor(np.clip(vertex_tint,0,1)*255)/255
+        tint=np.stack([sample_grid(vertex_tint[...,i],parent,n,w) for i in range(3)],axis=2)
+    else:tint=np.stack([sample_grid(source_tint[...,i],cm,n,w) for i in range(3)],axis=2)
     boundary=np.minimum.reduce([n-meta['origin_north'],w-meta['origin_west'],meta['origin_north']+extent[0]-n,meta['origin_west']+extent[1]-w])
     fade=np.clip(boundary/spec.get('seam_blend_m',100),0,1);fade=fade*fade*(3-2*fade)
     parent_material=document['materials'].get(parent.get('material','')) if material_id=='detail_1' else None
@@ -253,6 +300,11 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
             u=(np.mod(n/m['tile_m'],1)*image.shape[1]).astype(int)%image.shape[1]
             v=(np.mod(w/m['tile_m'],1)*image.shape[0]).astype(int)%image.shape[0]
             sample=image[v,u]
+            if outer_seam and slot=='base_color' and pixel>=m['tile_m']:
+                # A regional texel spans several complete source repeats. Use
+                # the linear-light average, consistent with the outer texture's
+                # minification mip instead of baking a random aliased texel.
+                sample=image.mean(axis=(0,1))
             if slot=='base_color':
                 if index==np.unique(coarse_labels)[0]:color*=fade[...,None]
                 color+=weight[...,None]*sample*tint*np.array(m['color'][:3])
@@ -275,4 +327,5 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     document['materials'][material_id]['repeat_detail']=True
     report=document['detail_sample'] if material_id=='detail_1' else document.setdefault('regional_surface',{})
     report['material_bake']={'resolution':[resolution,resolution],'pixel_m':pixel,'blend_m':spec.get('material_blend_m',7),'source_textures':source_files,
-        'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear'}
+        'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear',
+        'macro_source_tile_m':source_scale,'macro_source_note':'Area-filtered real source color stretched for low-frequency variation; authored crop-cover and 18m parcel rows, plus independent true-scale detail at runtime' if source_scale else None}

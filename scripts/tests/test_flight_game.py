@@ -50,6 +50,16 @@ class FlightGameTests(unittest.TestCase):
         self.game.input(SimpleNamespace(held=[],pressed=[],x=960,y=540,quit=False),.02);self.game.step()
         self.assertLess(abs(self.game.player().animation_properties['controls/flight/elevator']),1)
 
+    def test_offscreen_aim_is_an_edge_direction_and_aft_is_explicit(self):
+        from bvr_game.player_input import aim_marker
+        camera={'eye':[0,0,0],'target':[0,0,1],'fov':1.}
+        inside=aim_marker([1,0,0],camera,[960,540,.5],1920,1080)
+        self.assertFalse(inside['edge']);self.assertEqual(inside['point'],[960,540])
+        right=aim_marker([.1,-1,0],camera,[8000,540,.5],1920,1080)
+        self.assertTrue(right['edge']);self.assertFalse(right['behind']);self.assertEqual(right['point'][0],1480)
+        aft=aim_marker([-1,0,0],camera,[960,540,1.1],1920,1080)
+        self.assertTrue(aft['edge']);self.assertTrue(aft['behind'])
+
     def test_imported_hangar_search_select_fly_and_return_to_combat_aircraft(self):
         self.assertGreaterEqual(len(self.game.aircraft_rows),152)
         def event(keys=(),x=960,y=540):

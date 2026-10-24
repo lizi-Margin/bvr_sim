@@ -313,12 +313,17 @@ class Baker:
             arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
             regional={**self.r['detail_sample'],'size_m':[x*1000 for x in self.r['focus_area_km']],
                 'texture_resolution':self.r['landscape']['macro_resolution'],'seam_blend_m':self.r['landscape']['regional_transition_m'],
-                'material_detail_strength':.03}
+                'material_detail_strength':.65,'macro_source_tile_m':160}
             _bake_material(result,arrays,result['terrain']['details'][0],regional,out,self,material_id='regional_1',prefix='regional')
             result['terrain']['details'][0]['material']='regional_1'
-            # Fine-patch edges sample the actual parent macro material, rather
-            # than the old 25m landcover approximation that made a rectangle.
-            _bake_material(result,arrays,result['terrain']['details'][1],self.r['detail_sample'],out,self)
+            # Both height resolutions sample the identical macro image in the
+            # same world coordinates. Independent bakes cannot change the
+            # material mean or texture phase at a rectangular height-tile edge.
+            result['materials']['regional_1'].update(world_uv=True,
+                uv_origin_north=result['terrain']['details'][0]['origin_north'],
+                uv_origin_west=result['terrain']['details'][0]['origin_west'])
+            result['terrain']['details'][1]['material']='regional_1'
+            result['detail_sample']['material_mapping']='Same world-aligned regional macro and metre-scale repeated source detail as parent; fine height geometry remains independent'
             result=finish_world(self,result,out)
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
         return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(self.instances),'counts':counts,'chunks':len(chunks),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}

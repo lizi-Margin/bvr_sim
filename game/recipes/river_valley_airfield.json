@@ -30,7 +30,7 @@
   "asset_roles": {
     "canopy": [
       "tree_oak",
-      "tree_pine"
+      "pine_sapling_source"
     ],
     "riverbank": [
       "tree_small",
@@ -787,7 +787,7 @@
         0.75,
         1.25
       ],
-      "lod_distance_m": 1600,
+      "lod_distance_m": 900,
       "cull_distance_m": 35000
     },
     {
@@ -843,7 +843,7 @@
         0.65,
         1.1
       ],
-      "lod_distance_m": 1600,
+      "lod_distance_m": 900,
       "cull_distance_m": 35000
     }
   ],

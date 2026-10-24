@@ -4,6 +4,7 @@
 #include <set>
 #include <map>
 #include <bit>
+#include "json.hpp"
 struct ScenePlacement {
     std::string id, model, chunk, category, target_uid;
     std::array<double, 3> position{};
@@ -15,7 +16,8 @@ struct SceneMaterial {
     float detail_tile_m=3,detail_mean_linear=.2f,detail_strength=0;
     std::array<float, 4> color{1, 1, 1, 1};
     float tile_m = 2, roughness = .9f;
-    bool water = false;
+    float uv_origin_north=0,uv_origin_west=0;
+    bool water = false,world_uv=false;
 };
 struct SceneSurface {
     std::string id, material;
@@ -68,6 +70,8 @@ class WorldScene {
     std::vector<TerrainMesh> terrain_meshes;
     std::vector<SurfaceMesh> contact_meshes;
     std::map<std::string, wi::ecs::Entity> materials;
+    std::set<std::string> world_uv_materials;
+    nlohmann::json material_profile;
     Prototype &prototype(const std::string &model) {
         auto found = prototypes.find(model);
         if (found != prototypes.end())
@@ -77,6 +81,18 @@ class WorldScene {
             throw std::runtime_error("Missing registered model/LOD: " + model);
         wi::scene::Scene loaded;
         ImportModel_GLTF(file->second, loaded);
+        auto base_model=model.substr(0,model.find("::"));
+        if(material_profile.contains("scenery_materials")&&
+           (base_model=="tree_oak"||base_model=="tree_pine"||base_model=="tree_small"||base_model=="bush")){
+            const auto& policy=material_profile.at("scenery_materials");
+            for(size_t i=0;i<loaded.materials.GetCount();++i){
+                auto n=loaded.names.GetComponent(loaded.materials.GetEntity(i));std::string name=n?n->name:"";
+                const char* role=name.find("leaf")!=std::string::npos?"leaf_albedo":name.find("woodBark")!=std::string::npos?"bark_albedo":nullptr;
+                if(!role||!policy.contains(role))continue;
+                auto c=policy.at(role).get<std::array<float,3>>();auto& m=loaded.materials[i];
+                m.SetBaseColor({c[0],c[1],c[2],1});m.SetMetalness(0);m.SetRoughness(.9f);m.SetDirty();
+            }
+        }
         if (loaded.objects.GetCount() == 0)
             throw std::runtime_error("Empty GLB: " + file->second);
         loaded.Update(0);
@@ -111,7 +127,9 @@ class WorldScene {
         auto m = scene.materials.GetComponent(e);
         m->SetBaseColor({spec.color[0], spec.color[1], spec.color[2], spec.color[3]});
         m->SetRoughness(spec.roughness);
-        m->texMulAdd = {2 / spec.tile_m, 2 / spec.tile_m, 0, 0};
+        m->texMulAdd = {2 / spec.tile_m, 2 / spec.tile_m,
+            -spec.uv_origin_north/spec.tile_m,-spec.uv_origin_west/spec.tile_m};
+        if(spec.world_uv)world_uv_materials.insert(spec.id);
         if (!spec.base_color.empty()) {
             if (!std::filesystem::exists(spec.base_color))
                 throw std::runtime_error("Missing material texture: " + spec.base_color);
@@ -203,9 +221,9 @@ class WorldScene {
                         positions.push_back({float(-w),
                                              float(patch.heights[(row0 + row) * patch.columns + col0 + col]),
                                              float(n)});
-                        uvs.push_back(
-                            {float(override_material.empty()?n/2:(n-patch.origin_north)/2),
-                             float(override_material.empty()?w/2:(w-patch.origin_west)/2)});
+                        bool world_uv=override_material.empty()||world_uv_materials.contains(override_material);
+                        uvs.push_back({float(world_uv?n/2:(n-patch.origin_north)/2),
+                                        float(world_uv?w/2:(w-patch.origin_west)/2)});
                         detail_uvs.push_back({float(n/detail_tile_m_),float(w/detail_tile_m_)});
                         if(full_terrain){
                             double step=std::min(50.,patch.spacing);
@@ -271,8 +289,8 @@ class WorldScene {
     }
 
   public:
-    WorldScene(wi::scene::Scene &s, const std::unordered_map<std::string, std::string> &files)
-        : scene(s), model_files(files) {}
+    WorldScene(wi::scene::Scene &s, const std::unordered_map<std::string, std::string> &files,const nlohmann::json& profile=nullptr)
+        : scene(s), model_files(files),material_profile(profile) {}
     wi::ecs::Entity instantiate(const std::string &uid, const std::string &model) {
         auto &data = prototype(model);
         auto root = scene.Entity_CreateTransform(uid);
@@ -294,6 +312,7 @@ class WorldScene {
         for (auto [_, e] : materials)
             scene.Entity_Remove(e);
         materials.clear();
+        world_uv_materials.clear();
     }
     void configure(const bvr_sim::GameTerrain &terrain, const std::vector<int> &cover,
                    const std::vector<std::array<float, 4>> &colors, const std::vector<SceneMaterial> &mats,
