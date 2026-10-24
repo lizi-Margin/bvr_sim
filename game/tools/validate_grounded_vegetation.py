@@ -25,6 +25,17 @@ def main():
     try:
         g.select_aircraft('F16');g.config.mission='training';g.start();g.sim.set_paused(True);g.show_hud=False;g.renderer.set_quality('high')
         baseline=serialize(g.sim.frame());terrain=g.sim.terrain();meta=g.baked_scene.document['terrain']['ground_atlas']
+        def inspection_eye(n,w,h,distance,minimum_height):
+            x=-w+distance*.8;z=n-distance*.6
+            y=max(h+max(minimum_height,distance*.16),terrain.height(z,-x)+45)
+            # Above-ground eyes can still look through an intervening ridge.
+            # Raise only the diagnostic camera, sampling the same core surface.
+            for t in np.linspace(0,.984375,64):
+                ground=terrain.height(z+(n-z)*t,-(x+(-w-x)*t))
+                y=max(y,(ground+3-t*(h+14))/(1-t))
+            return [x,y,z]
+        def sight_clearance(eye,n,w,h):
+            return min(eye[1]+(h+14-eye[1])*t-terrain.height(eye[2]+(n-eye[2])*t,-(eye[0]+(-w-eye[0])*t)) for t in np.linspace(0,1,65))
         candidates=[i for i in g.baked_scene.document['instances'] if 'ground_stems' in i or 'grove_ground_conform' in i]
         if a.sample_groves and len(candidates)>a.sample_groves:
             chosen={}
@@ -60,7 +71,8 @@ def main():
             g.baked_scene.configure(g.renderer,g.r,terrain,g.visual_profile)
             for item in candidates:
                 n,w,h=item['position'];distance=160 if lod=='near' else 1150
-                g.set_camera([-w+distance*.8,h+max(55,distance*.16),n-distance*.6],[-w,h+14,n],.8)
+                eye=inspection_eye(n,w,h,distance,55)
+                g.set_camera(eye,[-w,h+14,n],.8)
                 for _ in range(45):g.draw()
                 rows=g.renderer.scenery_ground_vertices(item['id'],all_vertices=True)
                 gpu=np.array([r.world_position for r in rows]);bases=np.array([r.world_base for r in rows]);uv=np.array([r.uv_anchor for r in rows]);indices=np.array([[r.subset,r.vertex_index] for r in rows],dtype=np.uint32)
@@ -96,7 +108,7 @@ def main():
                     'gpu_instance_bounds_sphere_error_m':sphere_error,
                     'bounds_min':lo.tolist(),'bounds_max':hi.tolist(),'source_height_span_m':float(np.ptp(true_heights))}
                 report['groves'].append(record);capture=g.capture(item['id']+'-'+lod)
-                report['captures'].append({'id':item['id'],'lod':lod,'file':str(capture),'statistics':serialize(g.renderer.statistics())})
+                report['captures'].append({'id':item['id'],'lod':lod,'file':str(capture),'eye':eye,'camera_ground_clearance_m':eye[1]-terrain.height(eye[2],-eye[0]),'sampled_sight_clearance_m':sight_clearance(eye,n,w,h),'statistics':serialize(g.renderer.statistics())})
                 write_json(a.output/'partial-report.json',report)
                 print('GPU_GROVE',item['id'],lod,'vertices',len(rows),'height_error',vertical.max(),'outside',outside.max(),flush=True)
         if a.orbit_frames:
@@ -109,12 +121,14 @@ def main():
             try:
                 for index in range(a.orbit_frames):
                     phase=math.tau*index/max(1,a.orbit_frames-1);distance=110+1290*(.5-.5*math.cos(phase))
-                    eye=[-w+distance*.8,h+max(45,distance*.16),n-distance*.6];g.set_camera(eye,[-w,h+14,n],.8);g.draw();encoder.stdin.write(g.renderer.capture_rgb())
-                    frames.append({'index':index,'eye':eye,'visible_lods':list(g.renderer.statistics().visible_lods),'tick':g.sim.frame().tick})
+                    eye=inspection_eye(n,w,h,distance,45);g.set_camera(eye,[-w,h+14,n],.8);g.draw();encoder.stdin.write(g.renderer.capture_rgb())
+                    frames.append({'index':index,'eye':eye,'camera_ground_clearance_m':eye[1]-terrain.height(eye[2],-eye[0]),'sampled_sight_clearance_m':sight_clearance(eye,n,w,h),'visible_lods':list(g.renderer.statistics().visible_lods),'tick':g.sim.frame().tick})
                     if index%15==0:g.capture('dolly-'+str(index));print('GROUND_DOLLY',index,flush=True)
             finally:encoder.stdin.close();code=encoder.wait()
             if code:raise RuntimeError('Ground dolly encoder failed: '+str(code))
-            report['motion_inspection']={'file':str(movie),'fps':10,'frames':frames,'scope':'Paused-scene ordinary near/far LOD camera dolly; not a physical flight route or performance benchmark'}
+            assert min(f['camera_ground_clearance_m'] for f in frames)>=44.99
+            assert min(f['sampled_sight_clearance_m'] for f in frames)>=2.99
+            report['motion_inspection']={'file':str(movie),'fps':10,'frames':frames,'minimum_camera_ground_clearance_m':min(f['camera_ground_clearance_m'] for f in frames),'minimum_sampled_sight_clearance_m':min(f['sampled_sight_clearance_m'] for f in frames),'scope':'Paused-scene ordinary near/far LOD camera dolly with shared-terrain camera and65-sample sight clearance; not a continuous occlusion proof, physical flight route or performance benchmark'}
         report['core_frame_unchanged']=baseline==serialize(g.sim.frame());report['shader_errors']=g.renderer.shader_errors()
         assert report['core_frame_unchanged'] and report['shader_errors']==0
         report['status']='passed';write_json(a.output/'report.json',report);print('GROUND_GPU_VALIDATION_PASSED',flush=True)

@@ -39,6 +39,9 @@ struct SceneStats {
 };
 struct SourceCardMaterialState {
     std::string name, normal_resource;
+    std::string albedo_resource;
+    uint32_t albedo_format=0, albedo_mip_levels=0;
+    bool explicit_mips=false;
     uint32_t normal_format=0, width=0, height=0, mip_levels=0;
     bool rgb_preserved=false;
 };
@@ -144,7 +147,23 @@ class WorldScene {
                     auto n=loaded.names.GetComponent(loaded.materials.GetEntity(i));
                     if(n&&n->name.starts_with("source_impostor_")){
                         auto& m=loaded.materials[i];m.userdata.x=0x42565256u;m.SetDirty();
-                        if(declared_source_normals&&material_profile.is_object()&&material_profile.value("source_card_full_rgb_normals",false)){
+                        const bool explicit_mips=manifest.contains("source_card_mips");
+                        if(explicit_mips){
+                            if(!material_profile.value("source_card_full_rgb_normals",false))throw std::runtime_error("Explicit source-card mip normals require full RGB decoding");
+                            const auto& slots=manifest.at("source_card_mips").at("materials_by_lod_file").at(std::filesystem::path(file->second).filename().string()).at(n->name);
+                            for(auto [name,index]:std::array<std::pair<const char*,int>,2>{{{"base_color",wi::scene::MaterialComponent::BASECOLORMAP},{"normal",wi::scene::MaterialComponent::NORMALMAP}}}){
+                                const auto& entry=slots.at(name);const auto path=std::filesystem::path(file->second).parent_path()/entry.at("file").get<std::string>();
+                                auto resource=wi::resourcemanager::Load(path.string(),wi::resourcemanager::Flags::IMPORT_RETAIN_FILEDATA);
+                                if(!resource.IsValid())throw std::runtime_error("Cannot load registered source-card DDS mip chain");
+                                const auto& desc=resource.GetTexture().GetDesc();
+                                if(desc.width!=entry.at("width").get<uint32_t>()||desc.height!=entry.at("height").get<uint32_t>()||desc.mip_levels!=entry.at("mip_levels").get<uint32_t>())throw std::runtime_error("Source-card DDS mip dimensions mismatch");
+                                const auto expected=index==wi::scene::MaterialComponent::NORMALMAP?wi::graphics::Format::R8G8B8A8_UNORM:wi::graphics::Format::R8G8B8A8_UNORM_SRGB;
+                                if(desc.format!=expected)throw std::runtime_error("Source-card DDS mip color space/format mismatch");
+                                auto& slot=m.textures[index];slot.name=path.string();slot.resource=resource;
+                            }
+                            m.userdata.y=0x5247424eu;
+                        }
+                        if(!explicit_mips&&declared_source_normals&&material_profile.is_object()&&material_profile.value("source_card_full_rgb_normals",false)){
                             // These are projected, averaged source-volume normals,
                             // not small tangent-space bumps. BC5 discards their
                             // independent blue component and cannot reconstruct it
@@ -706,6 +725,8 @@ class WorldScene {
             SourceCardMaterialState item;
             auto name=scene.names.GetComponent(scene.materials.GetEntity(i));item.name=name?name->name:"";
             item.normal_resource=slot.name;
+            const auto& albedo=material.textures[wi::scene::MaterialComponent::BASECOLORMAP];item.albedo_resource=albedo.name;item.explicit_mips=std::filesystem::path(albedo.name).extension()==".dds";
+            if(albedo.resource.IsValid()){const auto& d=albedo.resource.GetTexture().GetDesc();item.albedo_format=uint32_t(d.format);item.albedo_mip_levels=d.mip_levels;}
             if(slot.resource.IsValid()){
                 const auto& desc=slot.resource.GetTexture().GetDesc();
                 item.normal_format=uint32_t(desc.format);item.width=desc.width;item.height=desc.height;item.mip_levels=desc.mip_levels;

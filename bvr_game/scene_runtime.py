@@ -57,6 +57,16 @@ class BakedScene:
             directory=ASSETS/'registered'/id
             for lod in version['lods']:
                 if sha(directory/lod['file'])!=lod['sha256']:raise ValueError('Baked map resource version mismatch: '+id)
+            manifest=json.loads((directory/'manifest.json').read_text(encoding='utf8'))
+            if manifest.get('source_card_mips'):
+                if not getattr(bindings,'SOURCE_CARD_AREA_MIPS',False):raise RuntimeError('Map requires native explicit source-card mip loading; rebuild the renderer')
+                checked={}
+                for materials in manifest['source_card_mips']['materials_by_lod_file'].values():
+                    for slots in materials.values():
+                        for item in slots.values():
+                            path=(directory/item['file']).resolve()
+                            if not path.is_relative_to(directory.resolve()):raise ValueError('Source-card mip path leaves registered asset')
+                            if checked.setdefault(path,item['sha256'])!=item['sha256'] or sha(path)!=item['sha256']:raise ValueError('Source-card mip sidecar changed: '+id)
         materials=[];surfaces=[];placements=[]
         for id,data in self.document['materials'].items():
             m=bindings.SceneMaterial();m.id=id;m.color=data['color'];m.roughness=data['roughness'];m.tile_m=data['tile_m'];m.base_color=data.get('base_color','');m.normal=data.get('normal','');m.roughness_map=data.get('roughness_map','');m.water=id=='water';materials.append(m)

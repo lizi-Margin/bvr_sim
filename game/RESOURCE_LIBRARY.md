@@ -173,3 +173,33 @@ python game/tools/validate_grounded_vegetation.py --map NEW_PROBE_DIRECTORY/gene
 继承的 shader 二进制曾记录上游 include 路径，导致计算探针通过但实际阴影仍使用旧树位。`prepare_player_visuals.py` 改用空起点的 `shaders-owned-source-v1` 缓存，仅从项目拥有的源码编译；旧缓存保留为失败证据。此前依据源码和计算回读作出的完整阴影路径判断已被此发现取代，新缓存另有实际单树画面及依赖来源检查。
 
 候选已有约 195 秒实际渲染重放，390 个核心边界状态与原路线逐项一致。森林硬边、远景自然程度和完整地图性能仍未验收，默认地图和启动入口尚未切换。
+
+独立树位重建可加 `--forest-edge-width-m 160`：在原林区边界内，以共享平滑噪声调制约 160m 的密度过渡，保留少量稀疏边缘树；总树量、道路/建筑避让和树干间距继续完整校验。v51 仍有 652,800 株树，地形数组、接触面、任务、普通摆件和实际地表贴图均保留。此参数改变工程生成的树位，不是实测生态分布；原棕色林地底色和远景色块仍需处理。
+
+山坡上的 GPU 检查工具会读取共享核心高度，令诊断相机离地至少 45m，并在到检查目标的 65 个视线样点上保留至少 3m 净空。旧版绕行镜头按树簇根点高度飞行，可能钻入地表；其计算顶点结果仍有效，穿地录像不能用于画面验收。净空采样也不等于连续遮挡证明，实际近远 LOD 画面仍须复核。
+
+已有渐变树位的地图可单独重烘焙地表，让森林边缘的草地与源森林地表共用同一密度场：
+
+```powershell
+python game/tools/build_river_valley_recipe.py --retexture-map SOURCE_IMMUTABLE_MAP.json --forest-floor-transition --output NEW_CANDIDATE_DIRECTORY --recipe-output CANDIDATE_RECIPE.json
+```
+
+源配方的每条 canopy 规则须已声明 `edge_density`，并采用没有 `canopy_proxy` 的源地表。该操作冻结全部树位、普通摆件、地形数组、接触面、任务和资源版本；颜色在线性光下混合，法线和粗糙度采用相同互补权重及现有模糊核。道路、工业区和河床标签继续优先，模糊仍作用于相邻材质边界。密度场按64行分块计算，不在运行时增加纹理或着色步骤。
+
+v52 对照重烘焙逐字节复现 v51 的实际贴图；开启过渡只改变区域地表贴图内森林及有限高斯核覆盖范围。实际近景中，稀疏林缘下的棕色带已与草地衔接；这仍是工程地表近似，远处树冠色块、树卡片和整张地图的自然程度尚未验收。对照版本与早期过小的局部变化审计范围失败样本均保留。
+
+## 源树卡片的面积 mip 候选
+
+原 PNG 导入路径会在下一层 mip 取四个子像素的最大 alpha；当前压缩 albedo 实际有9级，末级为4×4。杉树源图平均 alpha 约6%–10%，最大值链到4×4时已扩为约25%–50%；完整11级的最大值诊断链到1×1则为100%。这会放大远景卡片的不透明覆盖，不能将其当作真实冠幅。源树稀疏透明分支在线性光下生成颜色 mip、按面积平均 alpha，更适合当前开启TAA的软覆盖路径。
+
+```powershell
+python game/tools/assets.py mip-variant fir_grove_stream_area_a --source fir_grove_stream_a
+python game/tools/assets.py inspect fir_grove_stream_area_a
+python game/tools/build_river_valley_recipe.py --replace-forest-map SOURCE_IMMUTABLE_MAP.json --forest-asset fir_grove_stream_area_a --output NEW_CANDIDATE_DIRECTORY --recipe-output CANDIDATE_RECIPE.json
+```
+
+新变体保留全部 GLB 字节和 mip0 RGBA 字节，附带带哈希的完整 DDS 链。颜色使用线性光、alpha加权平均，法线保持线性编码向量平均；alpha为面积平均。`BakedScene` 在载入前校验 sidecar 路径与SHA，原生端验证尺寸/级数/颜色空间，并通过只读材质状态报告实际资源与格式。旧资源保持原路径；新变体要求已重建的renderer和完整RGB源法线配置。替换工具仅接受 GLB、源锚点与包围盒完全相同的资源，保存新地图版本并冻结全部树位与物理环境。
+
+`--maximum-alpha-control` 只用于负对照：与面积版本每级RGB、法线DDS、mip0、纹理格式和级数相同，仅albedo低级alpha不同。另有保留alpha/法线、仅改为编码RGB过滤的私有诊断，不能当作正常资源。完整地图实际对照保留652,800株树、相同视距及输入三角形量；面积版本减弱了远处实心色块。原引擎基线还与DDS对照存在压缩、级数和法线过滤差别，不能把全部改善只归因于一个alpha开关。
+
+该候选采用未压缩RGBA8 DDS，按唯一纹理估算比原压缩albedo增加约32MiB GPU纹理数据，实际预算与性能仍需最终地图测量。硬alpha-test、关闭TAA、跨视角卡片及完整动态自然度尚未验收；面积平均也不等于多张交叉卡片光学厚度的准确积分。默认地图和启动入口未切换。

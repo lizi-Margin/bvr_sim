@@ -797,6 +797,7 @@ class Renderer {
 PYBIND11_MODULE(bvr_game_render, m) {
     m.attr("VISUAL_BETA")=true;
     m.attr("TERRAIN_TILE_MATERIALS")=true;
+    m.attr("SOURCE_CARD_AREA_MIPS")=true;
     m.attr("TERRAIN_BASE_MATERIAL")=true;
     py::class_<ScenePlacement>(m, "ScenePlacement")
         .def(py::init<>())
@@ -853,6 +854,8 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readonly("visible_lods", &SceneStats::visible_lods)
         .def_readonly("visible_chunks", &SceneStats::visible_chunks);
     py::class_<SourceCardMaterialState>(m,"SourceCardMaterialState")
+        .def_readonly("albedo_resource",&SourceCardMaterialState::albedo_resource).def_readonly("albedo_format",&SourceCardMaterialState::albedo_format)
+        .def_readonly("albedo_mip_levels",&SourceCardMaterialState::albedo_mip_levels).def_readonly("explicit_mips",&SourceCardMaterialState::explicit_mips)
         .def_readonly("name",&SourceCardMaterialState::name).def_readonly("normal_resource",&SourceCardMaterialState::normal_resource)
         .def_readonly("normal_format",&SourceCardMaterialState::normal_format).def_readonly("width",&SourceCardMaterialState::width)
         .def_readonly("height",&SourceCardMaterialState::height).def_readonly("mip_levels",&SourceCardMaterialState::mip_levels)

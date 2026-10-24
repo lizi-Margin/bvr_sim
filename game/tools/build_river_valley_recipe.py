@@ -86,25 +86,36 @@ def main():
     p.add_argument('--rural-layout',action='store_true',help='Full bake: road-oriented recursive fields and area-uniform forest placement; requires --forest-floor-only')
     p.add_argument('--retexture-map',type=Path,help='Rebake materials of a verified immutable map, preserving all terrain and scene geometry')
     p.add_argument('--rebuild-forest-map',type=Path,help='Resample source trees through the existing Baker, preserving source terrain/material/contact/mission and ordinary placements')
+    p.add_argument('--replace-forest-map',type=Path,help='Replace canopy references with a registered texture variant having exactly the same GLBs and source anchors; preserve every placement')
+    p.add_argument('--forest-edge-width-m',type=float,help='Independent source trees: gradual boundary density width; preserves total tree count')
+    p.add_argument('--forest-floor-transition',action='store_true',help='Material-only rebake: mix source grass/forest ground with existing declared canopy edge density')
     a=p.parse_args()
+    if a.replace_forest_map and (a.retexture_map or a.rebuild_forest_map or a.river_channel or a.outer_cover or a.rural_layout or a.forest_edge_width_m is not None or a.forest_floor_only):p.error('--replace-forest-map only changes resource references; omit generation/rebake flags')
+    if a.forest_floor_transition and not a.retexture_map:p.error('--forest-floor-transition requires --retexture-map so tree placements remain frozen')
     if a.rebuild_forest_map and (a.retexture_map or a.river_channel or a.outer_cover or a.rural_layout):p.error('--rebuild-forest-map preserves terrain/materials; omit material/terrain rebake flags')
     if a.river_channel and a.retexture_map:p.error('--river-channel changes shared terrain and requires --bake, not --retexture-map')
     if a.forest_floor_only and a.retexture_map:p.error('--forest-floor-only requires a full bake with an individual-tree forest asset')
     if a.rural_layout and (a.retexture_map or not a.forest_floor_only):p.error('--rural-layout requires a full bake with --forest-floor-only')
-    if a.retexture_map or a.rebuild_forest_map:
-        source_map=a.retexture_map or a.rebuild_forest_map
+    if a.retexture_map or a.rebuild_forest_map or a.replace_forest_map:
+        source_map=a.retexture_map or a.rebuild_forest_map or a.replace_forest_map
         if a.recipe_output==ROOT/'game/recipes/river_valley_airfield.json':a.recipe_output=a.output/'scene-recipe.json'
         source_pointer=json.loads(source_map.read_text(encoding='utf8'))
         if source_pointer.get('data_version'):
             source_map=source_map.parent/'versions'/source_pointer['data_version']/'generated-map.json'
         if a.retexture_map:a.retexture_map=source_map
-        else:a.rebuild_forest_map=source_map
+        elif a.rebuild_forest_map:a.rebuild_forest_map=source_map
+        else:a.replace_forest_map=source_map
         if a.output.resolve()==source_map.resolve().parent:p.error('Use a separate candidate output directory')
         r=json.loads((source_map.parent/'scene-recipe.json').read_text(encoding='utf8'))
-        if a.rebuild_forest_map:
+        if a.rebuild_forest_map or a.replace_forest_map:
             forest=json.loads((ROOT/'game/assets/registered'/a.forest_asset/'manifest.json').read_text(encoding='utf8'))
-            if not (forest.get('cluster') or {}).get('ground_conform',{}).get('anchor_encoding')=='source_tree_index_uv1':p.error('--rebuild-forest-map requires an independent source-tree resource')
+            if not (forest.get('cluster') or {}).get('ground_conform',{}).get('anchor_encoding')=='source_tree_index_uv1':p.error('Forest rebuild/replacement requires an independent source-tree resource')
             if r['materials']['forest'].get('canopy_proxy'):p.error('Rebuild a source map with forest-floor-only materials')
+            source_canopy=list(r['asset_roles']['canopy'])
+            if a.replace_forest_map:
+                for old in source_canopy:
+                    original_manifest=json.loads((ROOT/'game/assets/registered'/old/'manifest.json').read_text(encoding='utf8'))
+                    if any(original_manifest[k]!=forest[k] for k in ['lods','cluster','bounds_blender']):p.error('Resource replacement requires exact source GLBs, anchors and bounds')
             r['asset_roles']['canopy']=[a.forest_asset]
             for rule in r['scatter_rules']:
                 if rule['roles']=='canopy':rule['spatial_batch_extent_m']=250
@@ -127,8 +138,19 @@ def main():
         r['landscape']['field_layout_note']='Shared recursive boundaries follow nearby road directions; smaller areas on slopes, source grass/soil cover and4mgrass margins. Authored appearance, not GIS.'
         for rule in r['scatter_rules']:
             if rule['roles']=='canopy':rule['distribution']='area_uniform'
+    if a.forest_edge_width_m is not None:
+        if not 0<a.forest_edge_width_m<=500:p.error('--forest-edge-width-m must be greater than0 and at most500')
+        if a.retexture_map:p.error('Forest edge density changes tree placement; use --rebuild-forest-map or a full bake')
+        edge_assets=[json.loads((ROOT/'game/assets/registered'/model/'manifest.json').read_text(encoding='utf8')) for model in r['asset_roles']['canopy']]
+        if any((asset.get('cluster') or {}).get('ground_conform',{}).get('anchor_encoding')!='source_tree_index_uv1' for asset in edge_assets):p.error('Forest edge density requires independent source-tree assets')
+        for rule in r['scatter_rules']:
+            if rule['roles']=='canopy':rule['edge_density']={'width_m':a.forest_edge_width_m,'variation_m':a.forest_edge_width_m*.45,'patch_scale_m':180}
+    if a.forest_floor_transition:
+        if any(not rule.get('edge_density') for rule in r['scatter_rules'] if rule['roles']=='canopy'):p.error('Source recipe must declare edge_density for every canopy rule')
+        if r['materials']['forest'].get('canopy_proxy'):p.error('Forest floor transition requires source ground materials without canopy_proxy')
+        r['landscape']['forest_floor_transition']=True
     write_json(a.recipe_output,r)
-    if a.bake or a.retexture_map or a.rebuild_forest_map:
+    if a.bake or a.retexture_map or a.rebuild_forest_map or a.replace_forest_map:
         from bvr_game.worldgen import Baker
         from bvr_game.scene_runtime import BakedScene
         from bvr_game.content import sha
@@ -136,7 +158,24 @@ def main():
         # Complete and verify an immutable data version before publishing one
         # root map pointer. A failed bake cannot corrupt the last working map.
         a.output=a.output.resolve();stage=a.output/('._bake-'+uuid.uuid4().hex)
-        if a.rebuild_forest_map:
+        if a.replace_forest_map:
+            from bvr_game.worldgen import canonical
+            original=BakedScene(a.replace_forest_map);doc=json.loads(json.dumps(original.document));stage.mkdir(parents=True,exist_ok=False)
+            shutil.copy2(original.height_file,stage/'terrain.npz');doc['terrain']['file']='terrain.npz'
+            from bvr_game.ground_atlas import copy_or_build_atlas
+            doc['terrain']['ground_atlas']=copy_or_build_atlas(original,doc['terrain'],stage)
+            changed=0
+            for item in doc['instances']:
+                if item['model'] in source_canopy:item['model']=a.forest_asset;changed+=1
+            for old in source_canopy:doc['resource_versions'].pop(old)
+            doc['resource_versions'][a.forest_asset]={'sha256':forest['glb_sha256'],'lods':forest['lods']}
+            doc['recipe_sha256']=hashlib.sha256(canonical(r)).hexdigest()
+            doc['source_card_resource_swap']={'source_map':str(a.replace_forest_map),'source_map_sha256':sha(a.replace_forest_map),'changed_model_references':changed,'registered_manifest_sha256':sha(ROOT/'game/assets/registered'/a.forest_asset/'manifest.json'),'operation':'Exact GLB/source-anchor texture variant; all placements and physical environment frozen'}
+            for key in ['surfaces','environment','mission','fields','roads','rivers','airfields','settlements','chunks','counts','forest_representation']:assert doc[key]==original.document[key],key
+            assert sha(stage/'terrain.npz')==original.document['terrain']['sha256']
+            write_json(stage/'scene-recipe.json',r);write_json(stage/'generated-map.json',doc)
+            report={'instances':len(doc['instances']),'counts':doc['counts'],'operation':doc['source_card_resource_swap']}
+        elif a.rebuild_forest_map:
             from bvr_game.source_tree_layout import rebuild_forests
             from bvr_game.worldgen import canonical
             original=BakedScene(a.rebuild_forest_map);doc=json.loads(json.dumps(original.document));stage.mkdir(parents=True,exist_ok=False)

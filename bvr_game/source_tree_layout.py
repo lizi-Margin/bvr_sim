@@ -1,7 +1,7 @@
 """Independent source-tree locations, spatially batched for shared source meshes."""
 import math
 import numpy as np
-from shapely import contains_xy
+from shapely import contains_xy,distance,points as shape_points
 from shapely.geometry import Point,box
 from shapely.ops import unary_union
 
@@ -36,6 +36,21 @@ def forbidden_geometry(baker):
     return unary_union(blocked)
 
 
+def edge_density_probability(forest,locations,config,seed):
+    """Authored density transition inside unchanged forest/exclusion polygons."""
+    from .regional_cover import smooth_noise
+    width=float(config['width_m']);variation=float(config['variation_m']);scale=float(config['patch_scale_m'])
+    if not all(math.isfinite(v) for v in [width,variation,scale]) or not 0<width<=500 or not 0<=variation<=width or not 20<=scale<=1000:
+        raise ValueError('Invalid source-tree edge density dimensions')
+    locations=np.asarray(locations);n,w=locations.T
+    depth=distance(forest.boundary,shape_points(locations))
+    local_width=width*(.5+smooth_noise(n,w,scale,seed+191))
+    setback=variation*smooth_noise(n,w,scale*.63,seed+197)
+    u=np.clip((depth-setback)/local_width,0,1);smooth=u*u*(3-2*u)
+    # Sparse outliers retain a soft fringe rather than moving a hard wall inward.
+    return .005+.995*smooth**1.5
+
+
 def build_rule(baker,rule):
     models=baker.r['asset_roles'][rule['roles']]
     manifests=[baker.metadata[x] for x in models]
@@ -49,13 +64,17 @@ def build_rule(baker,rule):
     minimum=max(float(m['conversion_recipe']['policy']['cluster']['inter_grove_stem_spacing_m']) for m in manifests)
     if not 0<minimum<=10:raise ValueError('Independent source-tree minimum spacing must be0..10m')
     radius=max(math.hypot(x,y) for m in manifests for b in m['cluster']['ground_conform']['tree_bounds_relative_blender'] for x in [b['min'][0],b['max'][0]] for y in [b['min'][1],b['max'][1]])*max(rule['scale_range'])
-    allowed=unary_union([baker.forests[z] for z in rule['zones']]).intersection(box(-9800,-9800,9800,9800)).difference(baker.source_tree_blocked.buffer(radius+.15))
+    forest=unary_union([baker.forests[z] for z in rule['zones']])
+    allowed=forest.intersection(box(-9800,-9800,9800,9800)).difference(baker.source_tree_blocked.buffer(radius+.15))
     if allowed.is_empty:raise ValueError('No source-tree area remains after source crown clearance')
     n0,w0,n1,w1=allowed.bounds;seed=baker.rng.getrandbits(64);rng=np.random.default_rng(seed);accepted=[];attempted=0
     search=math.ceil(max(minimum,baker.maximum_stem_spacing)/4);squared=minimum*minimum
     while len(accepted)<target and attempted<target*100:
         batch=min(131072,max(4096,(target-len(accepted))*4));candidates=np.round(rng.uniform([n0,w0],[n1,w1],(batch,2)),4);attempted+=batch
         mask=contains_xy(allowed,candidates[:,0],candidates[:,1]);candidates=candidates[mask]
+        if len(candidates) and rule.get('edge_density'):
+            probability=edge_density_probability(forest,candidates,rule['edge_density'],baker.r['seed'])
+            candidates=candidates[rng.random(len(candidates))<probability]
         if len(candidates):
             n,w=candidates.T;t=baker.terrain
             slope=np.hypot(t.height_many(n+25,w)-t.height_many(n-25,w),t.height_many(n,w+25)-t.height_many(n,w-25))/50
@@ -85,6 +104,7 @@ def build_rule(baker,rule):
             'radius_m':extent,'up_normal':[0,1,0],'ground_stems':points.tolist(),'stem_clearance_radius_m':radius,
             'independent_source_layout':{'source_trees':len(points),'source_slots':count,'minimum_stem_m':minimum,'placement_seed':seed,'forest_zones':rule['zones'],
                 'maximum_axis_extent_m':float(rule.get('spatial_batch_extent_m',250)),
+                **({'edge_density':rule['edge_density']} if rule.get('edge_density') else {}),
                 'spatial_batch':'Equal-count KD partition, split sparse tails at largest gaps; unused source slots collapse to zero-area triangles. Authored positions, not GIS.'}})
     baker.source_tree_pending.extend((n,w,radius) for n,w in accepted)
     baker.rejections['independent_source_candidates_'+rule['id']]=attempted-target

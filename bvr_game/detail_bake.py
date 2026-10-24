@@ -191,6 +191,40 @@ def refine(baker,document,out):
     document['terrain']['version']=3
     return document
 
+def forest_floor_density(baker,labels,n,w):
+    """Reuse authored canopy probability without altering trees or core land."""
+    from shapely.ops import unary_union
+    from .source_tree_layout import edge_density_probability
+    groups={}
+    for rule in baker.r['scatter_rules']:
+        if rule['roles']!='canopy':continue
+        cfg=rule.get('edge_density')
+        if not cfg:raise ValueError('Forest floor transition requires declared canopy edge density')
+        key=json.dumps(cfg,sort_keys=True)
+        groups.setdefault(key,{'config':cfg,'zones':set()})['zones'].update(rule['zones'])
+    shapes=[(unary_union([baker.forests[z] for z in group['zones']]),group['config']) for group in groups.values()]
+    result=np.zeros(labels.shape,dtype=np.float32)
+    # Keep Shapely point construction bounded for the4096-square regional bake.
+    for first in range(0,labels.shape[0],64):
+        area=np.s_[first:first+64,:];mask=labels[area]==2
+        if not mask.any():continue
+        coords=np.column_stack([n[area][mask],w[area][mask]]);values=np.zeros(len(coords));covered=np.zeros(len(coords),dtype=bool)
+        for shape,cfg in shapes:
+            inside=contains_xy(shape,coords[:,0],coords[:,1]);covered|=inside
+            if inside.any():values[inside]=np.maximum(values[inside],edge_density_probability(shape,coords[inside],cfg,baker.r['seed']))
+        if not covered.all():raise ValueError('Forest floor pixels have no declared canopy density zone')
+        result[area][mask]=values
+    return result
+
+
+def material_mask(labels,index,forest_density=None):
+    mask=(labels==index).astype(np.float32)
+    if forest_density is not None:
+        if index==2:mask=forest_density
+        elif index==0:mask=mask+(labels==2)-forest_density
+    return mask
+
+
 def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',prefix='sample'):
     resolution=int(spec.get('texture_resolution',2048));extent=spec['size_m'];pixel=extent[0]/resolution
     n,w=np.meshgrid(meta['origin_north']+(np.arange(resolution)+.5)*pixel,
@@ -229,6 +263,7 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         bank=baker.r['landscape']['river_channel']['bank_width_m']
         labels[baker.distance_river(n,w)<width+bank]=3
     names=['grass','farmland','forest','soil','rock','pavement','water','marking']
+    forest_density=forest_floor_density(baker,labels,n,w) if baker.r.get('landscape',{}).get('forest_floor_transition') else None
     color=np.zeros((*n.shape,3),dtype=np.float32);normal=np.zeros_like(color);rough=np.zeros(n.shape,dtype=np.float32)
     source_files={};canopy_report=None
     def source_image(file,slot):
@@ -251,9 +286,10 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         u=((n/4+.15*np.sin(w/61))*image.shape[1]).astype(np.int64)%image.shape[1]
         v=((w/4+.15*np.cos(n/73))*image.shape[0]).astype(np.int64)%image.shape[0]
         return image[v,u]
-    for index in np.unique(labels):
+    indices=np.union1d(np.unique(labels),[0]) if forest_density is not None else np.unique(labels)
+    for index in indices:
         material=document['materials'][names[int(index)]]
-        weight=gaussian_filter((labels==index).astype(np.float32),sigma=spec.get('material_blend_m',7)/pixel,mode='nearest')
+        weight=gaussian_filter(material_mask(labels,index,forest_density),sigma=spec.get('material_blend_m',7)/pixel,mode='nearest')
         for slot in ['base_color','normal','roughness_map']:
             if slot not in material:continue
             file=material[slot];image=source_image(file,slot)
@@ -358,4 +394,8 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear',
         'macro_source_tile_m':source_scale,'macro_source_note':'Area-filtered real source color stretched for low-frequency variation; authored crop-cover and 18m parcel rows, plus independent true-scale detail at runtime' if source_scale else None}
     if rural:report['material_bake']['rural_sampling']={**rural,'scope':'Display masks/source means only; shared terrain height arrays are unchanged'}
+    if forest_density is not None:report['material_bake']['forest_floor_transition']={'source':'Same edge_density_probability and recipe seed as independent source-tree placement; union of declared canopy zones',
+        'mixture':'Grass and forest source color, normal and roughness share complementary linear masks before the existing blur. Soil/roads/industry/river labels stay protected.',
+        'canopy_edge_rules':[{k:rule[k] for k in ['id','zones','edge_density']} for rule in baker.r['scatter_rules'] if rule['roles']=='canopy'],
+        'scope':'Authored density-based ground-cover approximation, not measured ecology, canopy shadow baking or new physical terrain'}
     if canopy_report:report['material_bake']['forest_canopy_aggregate']=canopy_report

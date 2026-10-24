@@ -4,7 +4,7 @@ import argparse,json,math,os,sys
 from types import SimpleNamespace
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from bvr_game.app import FlightGame,serialize
-from bvr_game.content import write_json
+from bvr_game.content import write_json,sha
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);p.add_argument('--action',choices=['map','input','projection'],default='map')
@@ -132,6 +132,7 @@ def main():
                         'capture':g.capture(model+'_'+key),'shader_errors':g.renderer.shader_errors(),
                         'input_path':'Real FlightGame.input handler with explicit deterministic events; not a claim of physical keyboard hardware injection'})
         write_json(a.output/'report.json',{'captures':rows,'visual_settings':json.loads(g.renderer.visual_settings()),'statistics':serialize(g.renderer.statistics()),
+            'inspector_sha256':sha(Path(__file__)),'renderer_sha256':sha(Path(g.r.__file__)),'vram':serialize(g.renderer.memory_usage()),
             'source_card_materials':serialize(g.renderer.source_card_materials()) if hasattr(g.renderer,'source_card_materials') else None,
             'map_sha256':g.scene_hash,'shader_errors':g.renderer.shader_errors(),'profile_file_sha256':g.profile_store.file_sha256,
             'native_core':str(__import__('bvr_game.app',fromlist=['native']).native.__file__)})

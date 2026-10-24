@@ -3,7 +3,7 @@ import random,unittest
 from types import SimpleNamespace
 import numpy as np
 from shapely.geometry import box,GeometryCollection
-from bvr_game.source_tree_layout import spatial_batches,build_rule,flush_occupancy,forbidden_geometry
+from bvr_game.source_tree_layout import spatial_batches,build_rule,flush_occupancy,forbidden_geometry,edge_density_probability
 from bvr_game.grove_grounding import stem_spacing_report
 
 
@@ -50,6 +50,23 @@ class SourceTreeLayoutTests(unittest.TestCase):
         from shapely import points,distance
         angles=np.linspace(0,2*np.pi,1000,endpoint=False);boundary=points(np.column_stack([850*np.cos(angles),850*np.sin(angles)]))
         self.assertTrue(np.all(distance(shape,boundary)<1e-9))
+
+    def test_edge_density_has_sparse_fringe_and_retains_deep_interior(self):
+        forest=box(-1000,-1000,1000,1000);cfg={'width_m':160,'variation_m':72,'patch_scale_m':180}
+        west=np.linspace(-500,500,1000)
+        samples=[np.column_stack([np.full(1000,-1000+d),west]) for d in [0,20,80,350]]
+        values=[edge_density_probability(forest,p,cfg,3124) for p in samples]
+        self.assertTrue(np.all(values[0]==.005));self.assertTrue(np.all(values[-1]==1))
+        self.assertLess(values[1].mean(),values[2].mean());self.assertLess(values[2].mean(),.5)
+        np.testing.assert_array_equal(values[2],edge_density_probability(forest,samples[2],cfg,3124))
+        self.assertGreater(np.ptp(values[2]),.05)
+
+    def test_edge_sampling_keeps_full_target_and_clearance(self):
+        b=self.baker();b.r['seed']=3124
+        rule={'id':'forest','roles':'canopy','zones':['forest'],'count':16,'scale_range':[1,1],'lod_distance_m':900,'cull_distance_m':35000,
+            'edge_density':{'width_m':35,'variation_m':15,'patch_scale_m':180}}
+        build_rule(b,rule);self.assertEqual(sum(len(i['ground_stems']) for i in b.instances),64)
+        self.assertFalse(stem_spacing_report(b.instances,b.metadata)['failures'])
 
 
 if __name__=='__main__':unittest.main()
