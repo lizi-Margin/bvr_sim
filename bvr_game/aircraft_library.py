@@ -14,11 +14,8 @@ import os
 from pathlib import Path
 import sys
 import time
-from .app import native, serialize, ROOT
-from .presentation import curve,safe_aim,mouse_pitch,mouse_roll_rate
-from .presentation import ChaseCamera
+from .app import native, serialize, ROOT,FlightGame,DEFAULT_VISUAL_PROFILE,DEFAULT_WORLD_MAP
 from .player_profiles import PlayerProfileStore
-from .player_input import PlayerInputAdapter,native_intent,unit
 from .sortie_logs import SortieJournal,open_logs_directory
 
 
@@ -26,7 +23,7 @@ def catalog():
     return json.loads((ROOT / 'bvr_sim/resources/imported_aircraft_catalog.json').read_text(encoding='utf8'))['aircraft']
 
 
-def renderer_for(row, visible=False, width=960, height=640):
+def renderer_for(row, visible=False, width=960, height=640,visual_profile=DEFAULT_VISUAL_PROFILE):
     config = json.loads((ROOT / 'game/runtime.json').read_text(encoding='utf8'))
     visual = row['appearance']
     file = ROOT / visual['file']
@@ -35,11 +32,70 @@ def renderer_for(row, visible=False, width=960, height=640):
     sys.path.insert(0, config['renderer_module'])
     dll = os.add_dll_directory(config['renderer_module']) if os.name == 'nt' else None
     module = importlib.import_module('bvr_game_render')
-    return module.Renderer(width, height, visible, config['engine_source'], config['shader_cache'],
-                           {row['simulation_model']: str(file)}), dll
+    args=[width,height,visible,config['engine_source'],config['shader_cache'],{row['simulation_model']:str(file)}]
+    if getattr(module,'VISUAL_BETA',False) and Path(visual_profile).is_file():args.append(str(visual_profile))
+    return module.Renderer(*args), dll
 
 
-def preview(row, output, visible=False, properties=None):
+def player_test_flight(row,output,*,render=True,visible=True,width=1920,height=1080,
+                       map_path=DEFAULT_WORLD_MAP,visual_profile=DEFAULT_VISUAL_PROFILE,start=True):
+    """Prepare the ordinary client as an unarmed standalone player flight."""
+    game=FlightGame(render=render,visible=visible,width=width,height=height,map_path=map_path,
+        output=output,visual_profile=visual_profile)
+    try:
+        game.entry_point='aircraft_library.fly';game.select_aircraft(row['id'])
+        game.config.mission='training';game.config.enemy_attacks=False
+        game.config.missiles=game.config.bombs=0;game.quality='high';game.weapon='UNARMED'
+        if game.renderer:game.renderer.set_quality('high')
+        if start:
+            altitude=max(1000.,min(19500.,row['validation'].get('initial_altitude_m',5000.)))
+            altitude=max(altitude,game.sim.terrain().height(0,0)+500)
+            speed=max(80.,min(800.,row['validation'].get('initial_speed_mps',250.)))
+            game.start(start_position=[0,0,altitude],initial_speed=speed)
+        return game
+    except BaseException:
+        game.close();raise
+
+
+def fly_interactive(row,output,*,map_path=DEFAULT_WORLD_MAP,visual_profile=DEFAULT_VISUAL_PROFILE,
+                    width=1920,height=1080,event_source=None,frame_dt=None,visible=True,max_client_frames=None):
+    """Use the game's input/tick/camera/HUD path; optional typed events aid Agents."""
+    if frame_dt is not None and (not math.isfinite(frame_dt) or frame_dt<=0 or frame_dt>.1):
+        raise ValueError('Fixed client frame time must be in(0,0.1]seconds')
+    if max_client_frames is not None and (not isinstance(max_client_frames,int) or max_client_frames<=0):
+        raise ValueError('Maximum client frames must be a positive integer')
+    game=player_test_flight(row,output,map_path=map_path,visual_profile=visual_profile,
+        width=width,height=height,visible=visible)
+    game.interactive=True;last=time.perf_counter();accumulator=0.;trajectory=[];last_sample=-1;index=0;processed=0
+    try:
+        while True:
+            if max_client_frames is not None and processed>=max_client_frames:break
+            now=time.perf_counter();dt=frame_dt if frame_dt is not None else min(now-last,.1);last=now
+            event=event_source(game,index) if event_source else game.renderer.poll();index+=1
+            # Standalone Escape closes the window; the game keeps its hangar flow.
+            if event.quit or 27 in event.pressed:break
+            running,accumulator=game.run_client_frame(event,dt,accumulator)
+            if not running:break
+            processed+=1
+            frame=game.sim.frame()
+            if frame.tick//50!=last_sample:trajectory.append(serialize(frame));last_sample=frame.tick//50
+        frame=serialize(game.sim.frame());image=game.capture(row['id']+'-flight')
+        # Retain the former standalone PNG name as well as normal capture metadata.
+        import shutil
+        shutil.copy2(image,Path(output)/(row['id']+'-flight.png'))
+        report={'id':row['id'],'backend':row['fdm']['type'],'frame':frame,'trajectory':trajectory,'logs':game.log_paths(),
+            'renderer_statistics':game.renderer.aircraft_statistics(),'shader_errors':game.renderer.shader_errors(),
+            'capture':image,'entry':'aircraft_library.fly','player_flight_profile':game.player_profile,
+            'map':str(game.map_path),'map_sha256':game.scene_hash,'visual_profile':game.visual_profile,
+            'resolution':[game.width,game.height],'quality':game.quality,'client_frames':processed}
+        (Path(output)/'flight.json').write_text(json.dumps(report,indent=2),encoding='utf8')
+        return report
+    except BaseException as error:
+        game.finish_sortie('exception',repr(error));raise
+    finally:game.close()
+
+
+def preview(row, output, visible=False, properties=None,*,visual_profile=DEFAULT_VISUAL_PROFILE,width=960,height=640):
     output.mkdir(parents=True, exist_ok=True)
     session = native.GameSession(str(output / 'preview.log'))
     config = native.GameConfig()
@@ -50,7 +106,7 @@ def preview(row, output, visible=False, properties=None):
     try:
         session.reset(config)
         session.set_paused(True)
-        renderer, dll = renderer_for(row, visible)
+        renderer, dll = renderer_for(row, visible,width,height,visual_profile)
         renderer.presentation(True)
         renderer.preview_aircraft(row['simulation_model'], properties or {}, 0.)
         bounds = row['appearance']['bounds']
@@ -75,7 +131,8 @@ def preview(row, output, visible=False, properties=None):
         session.close()
 
 
-def fly(row, output, seconds=10, render=False, interactive=False):
+def fly(row, output, seconds=10, render=False, interactive=False,**player_options):
+    if interactive:return fly_interactive(row,output,**player_options)
     if not row['available_for_test_flight']:
         raise ValueError(row['unavailable_reason'])
     output.mkdir(parents=True, exist_ok=True)
@@ -95,17 +152,14 @@ def fly(row, output, seconds=10, render=False, interactive=False):
         config.player_north = config.player_west = 0
         session.reset(config)
         profiles=PlayerProfileStore();profile=profiles.apply(session,native,row['id'])
-        adapter=PlayerInputAdapter(profile);chase=ChaseCamera(profile['camera'])
-        chase.scale=max(row['appearance']['bounds']['span'])/19
-        camera_params={};free=False;zoom=False;exact=False;viewport=[960,640];aim=[480,320]
         journal.start(serialize(config),{'entry':'aircraft_library.fly','aircraft_id':row['id'],'fdm':row['fdm'],'appearance':row['appearance'],'player_flight_profile':profile})
-        if render or interactive:
-            renderer, dll = renderer_for(row, interactive)
+        if render:
+            renderer, dll = renderer_for(row,False,player_options.get('width',960),player_options.get('height',640),
+                player_options.get('visual_profile',DEFAULT_VISUAL_PROFILE))
             renderer.presentation(False)
         throttle, trajectory = .7, []
         ticks = 0
-        while interactive or ticks < round(seconds / config.dt):
-            start = time.perf_counter()
+        while ticks < round(seconds / config.dt):
             frame = session.frame()
             player = next(e for e in frame.entities if e.uid == 'player')
             command = native.PilotCommand()
@@ -117,32 +171,8 @@ def fly(row, output, seconds=10, render=False, interactive=False):
                     break
                 if 120 in event.pressed:
                     open_logs_directory(journal.paths());continue
-                if interactive:
-                    held = set(event.held)
-                    if getattr(event,'width',0)>0:viewport=[event.width,event.height]
-                    throttle = max(0, min(1, throttle + event.wheel*.05))
-                    throttle = adapter.throttle(throttle,event,config.dt)
-                    free=67 in held;zoom=2 in held;aim=[event.x,event.y]
-                    if 80 in event.pressed:
-                        session.set_paused(not frame.paused);journal.record('pause',not frame.paused,frame.tick)
-                    exact=190 in event.pressed
-                    if 116 in event.pressed:adapter.mode='raw_manual' if adapter.mode=='assisted' else 'assisted'
-                    if 117 in event.pressed:
-                        if not session.frame().paused:print('Pause with P before reloading player profiles',file=sys.stderr)
-                        else:
-                            candidate=PlayerProfileStore(profiles.path);profile=candidate.apply(session,native,row['id']);profiles=candidate
-                            adapter.profile=profile;chase.settings=profile['camera'];journal.record('player_profile_reload',profile,frame.tick)
-                    if not camera_params:
-                        n,w,h=player.position;d=unit(player.velocity)
-                        camera_params={'eye':[-w,h,n],'target':[-w-d[1]*1000,h+d[2]*1000,n+d[0]*1000],'fov':profile['camera']['normal_fov'],'up':[0,1,0]}
-                    values=adapter.update(event,config.dt,player,camera_params,*viewport,
-                        hold_direction=free or max(map(abs,chase.free))>.01)
-                    intent=native_intent(native,{**values,'throttle':throttle})
-                    session.submit_player(intent);journal.record('player_intent',serialize(intent),frame.tick)
-            if not interactive:session.submit(command);journal.record('command',serialize(command),frame.tick)
-            if exact:session.step_exact(1)
-            else:session.step(1)
-            journal.record('step',{'ticks':1,'exact':exact},frame.tick)
+            session.submit(command);journal.record('command',serialize(command),frame.tick)
+            session.step(1);journal.record('step',{'ticks':1,'exact':False},frame.tick)
             frame = session.frame()
             if ticks % 50 == 0:
                 trajectory.append(serialize(frame))
@@ -153,17 +183,11 @@ def fly(row, output, seconds=10, render=False, interactive=False):
                 distance = max(row['appearance']['bounds']['span'])*2.2
                 eye = [position[i]-forward[i]*distance+(distance*.35 if i == 1 else 0) for i in range(3)]
                 target = [position[i]+forward[i]*distance*.2 for i in range(3)]
-                if interactive:
-                    eye,target,fov,up=chase.update(p,config.dt,free,aim,*viewport,zoom)
-                    camera_params={'eye':eye,'target':target,'fov':fov,'up':up}
-                    renderer.camera(eye,target,fov);renderer.camera_up(up)
-                else:renderer.camera(eye, target, .85)
+                renderer.camera(eye, target, .85)
                 renderer.render(frame, [], [])
             ticks += 1
             if not player.alive:
                 break
-            if interactive:
-                time.sleep(max(0, config.dt-(time.perf_counter()-start)))
         final = serialize(session.frame())
         if renderer:
             renderer.capture(str(output / (row['id'] + '-flight.png')))
@@ -187,15 +211,27 @@ def main():
     p.add_argument('--seconds', type=float, default=10)
     p.add_argument('--render', action='store_true')
     p.add_argument('--interactive', action='store_true')
+    p.add_argument('--hidden',action='store_true',help='Keep the native preview/test-flight window hidden')
+    p.add_argument('--max-client-frames',type=int,help='Bound an interactive fly run for Agent/CLI inspection; default runs until Escape/close')
+    p.add_argument('--map',type=Path,default=DEFAULT_WORLD_MAP,help='World map for interactive player test flight; noninteractive fly retains its legacy diagnostic environment')
+    p.add_argument('--visual-profile',type=Path,default=DEFAULT_VISUAL_PROFILE)
+    p.add_argument('--width',type=int,default=1920);p.add_argument('--height',type=int,default=1080)
     args = p.parse_args()
+    if not args.interactive and args.map!=DEFAULT_WORLD_MAP:p.error('--map requires --interactive')
+    if args.max_client_frames is not None and (args.action!='fly' or not args.interactive or args.max_client_frames<=0):p.error('--max-client-frames requires interactive fly and a positive count')
     rows = catalog()
     if args.action == 'list':
         return print(json.dumps([{'id': r['id'], 'name': r['display_name'], 'backend': r['fdm']['type'],
                                   'test_flight_ready': r['available_for_test_flight'], 'reason': r['unavailable_reason']} for r in rows], indent=2))
     row = next((r for r in rows if r['id'] == args.id), None)
+    if row is None and args.action=='fly' and args.interactive:
+        from .aircraft import aircraft
+        try:row=aircraft(args.id,require_available=True)
+        except ValueError as error:p.error(str(error))
     if row is None:
         p.error('Unknown imported aircraft ID: ' + str(args.id))
-    report = preview(row, args.output, args.interactive) if args.action == 'preview' else fly(row, args.output, args.seconds, args.render, args.interactive)
+    report = preview(row,args.output,args.interactive and not args.hidden,visual_profile=args.visual_profile,width=args.width,height=args.height) if args.action == 'preview' else fly(row, args.output, args.seconds, args.render, args.interactive,
+        map_path=args.map,visual_profile=args.visual_profile,width=args.width,height=args.height,visible=not args.hidden,max_client_frames=args.max_client_frames)
     print(json.dumps(report, indent=2))
 
 

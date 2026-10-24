@@ -1,6 +1,6 @@
 """Inspect actual DX12 grove root transforms and core terrain contact heights."""
 from pathlib import Path
-import argparse,json,math,os,sys
+import argparse,json,math,os,sys,subprocess
 import numpy as np
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from bvr_game.app import FlightGame,serialize
@@ -8,10 +8,14 @@ from bvr_game.content import ASSETS,sha,write_json
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--orbit-frames',type=int,default=0,help='Optional paused-scene camera inspection at10fps; not a flight or performance test')
+    p.add_argument('--visual-profile',type=Path,default=ROOT/'game/recipes/player_daylight.json')
+    a=p.parse_args()
+    if not 0<=a.orbit_frames<=1800:raise ValueError('Orbit frames must be0..1800')
     if (a.output/'report.json').exists():raise FileExistsError(a.output/'report.json')
     os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
-    g=FlightGame(render=True,visible=False,map_path=a.map,visual_profile=ROOT/'game/recipes/player_daylight.json',output=a.output/'client')
+    g=FlightGame(render=True,visible=False,map_path=a.map,visual_profile=a.visual_profile,output=a.output/'client')
     try:
         g.select_aircraft('F16');g.config.mission='training';g.start();g.sim.set_paused(True);g.show_hud=False;g.renderer.set_quality('high')
         document=g.baked_scene.document;groves=[i for i in document['instances'] if 'grove_ground_fit' in i]
@@ -37,11 +41,38 @@ def main():
         for label,distance in [('near',90),('near_lod_edge',850),('far_lod_edge',950)]:
             g.set_camera([-w+distance*.8,h+max(18,distance*.16),n-distance*.6],target,.8)
             for _ in range(50):g.draw()
-            captures.append({'view':label,'capture':g.capture(label),'statistics':serialize(g.renderer.statistics())})
+            captures.append({'view':label,'capture':g.capture(label),'statistics':serialize(g.renderer.statistics()),
+                'reflection_plane':g.renderer.reflection_plane()})
+        orbit=None
+        if a.orbit_frames:
+            import imageio_ffmpeg
+            movie=a.output/'orbit.mp4';camera_rows=[]
+            encoder=subprocess.Popen([imageio_ffmpeg.get_ffmpeg_exe(),'-y','-loglevel','error','-f','rawvideo','-pix_fmt','rgb24',
+                '-s','1920x1080','-r','10','-i','-','-c:v','libx264','-preset','fast','-crf','20','-pix_fmt','yuv420p',str(movie)],stdin=subprocess.PIPE)
+            try:
+                for index in range(a.orbit_frames):
+                    angle=2*math.pi*index/a.orbit_frames
+                    eye=[-w+90*math.cos(angle),h+18+45*(.5-.5*math.cos(angle)),n+90*math.sin(angle)]
+                    g.set_camera(eye,target,.8);g.draw();encoder.stdin.write(g.renderer.capture_rgb())
+                    camera_rows.append({'index':index,'eye':eye,'target':target,'fov':.8,'tick':g.sim.frame().tick})
+                    if index%30==0:g.capture('orbit-'+str(index))
+            finally:
+                encoder.stdin.close();code=encoder.wait()
+            if code:raise RuntimeError('Orbit encoder failed: '+str(code))
+            orbit={'file':str(movie),'frames':a.orbit_frames,'fps':10,'camera':camera_rows,
+                'scope':'Paused-scene camera orbit for source-card orientation/shading/coverage inspection; not physical flight or performance evidence'}
+        for label,eye,aim in [
+            ('water-low',[-700,145,-1800],[-280,120,-1800]),
+            ('water-high',[-1100,450,-2000],[-280,120,-1800])]:
+            g.set_camera(eye,aim,.8)
+            for _ in range(50):g.draw()
+            captures.append({'view':label,'capture':g.capture(label),'statistics':serialize(g.renderer.statistics()),
+                'reflection_plane':g.renderer.reflection_plane()})
         maximum=max(row['maximum_error_m'] for row in rows)
         write_json(a.output/'report.json',{'status':'passed' if maximum<=.255 else 'failed','map_sha256':sha(a.map),
+            'visual_profile':str(a.visual_profile),'visual_profile_sha256':sha(a.visual_profile),
             'checked_groves':len(rows),'maximum_actual_render_anchor_error_m':maximum,'rows':rows,'captures':captures,
-            'forest_representation':document['forest_representation'],'shader_errors':g.renderer.shader_errors(),
+            'forest_representation':document['forest_representation'],'shader_errors':g.renderer.shader_errors(),'orbit':orbit,
             'scope':'Actual native world transforms against independent core terrain height. Checks source-copy base reference anchors, not every bark vertex or terrain collision outcomes.'})
         assert maximum<=.255,maximum
         assert g.renderer.shader_errors()==0

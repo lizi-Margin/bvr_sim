@@ -43,6 +43,15 @@ class PlayerInputTests(unittest.TestCase):
         values=self.update(keys=[87,83])
         self.assertTrue(values['manual_pitch']);self.assertEqual(values['pitch_input'],0)
         self.assertFalse(values['manual_roll'])
+    def test_external_vertical_and_aft_intents_survive_pointer_rebase_and_camera_changes(self):
+        from bvr_game.player_input import unit
+        self.settled()
+        for requested in [[0,0,1],[0,0,-1],[-1,.01,.1]]:
+            target=unit(requested);self.adapter.adopt_direction(target)
+            for index in range(100):
+                self.update(x=1919,y=5,camera=self.camera if index%2 else
+                    {'eye':[50,200,800],'target':[-100,300,790],'up':[1,1,0],'fov':.5})
+                self.assertDirection(target)
 
 
 if __name__=='__main__':unittest.main()

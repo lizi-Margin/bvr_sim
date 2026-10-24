@@ -399,6 +399,11 @@ class Renderer {
                                outer_colors, terrain_materials);
     }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
+    std::optional<std::array<float,4>> reflection_plane() const {
+        const auto& visibility=path->visibility_main;
+        if(!visibility.planar_reflection_visible)return std::nullopt;
+        const auto& p=visibility.reflectionPlane;return std::array<float,4>{p.x,p.y,p.z,p.w};
+    }
     std::vector<std::array<double,3>> scenery_points(const std::string& id,const std::vector<std::array<double,3>>& points) const {return baked_world->scenery_points(id,points);}
     double render_height(double n, double w) const { return baked_world->render_height(n, w); }
     double render_surface_height(double n,double w,double reference=INFINITY) const {return baked_world->render_surface_height(n,w,reference);}
@@ -874,6 +879,7 @@ PYBIND11_MODULE(bvr_game_render, m) {
              py::arg("outer_cover"), py::arg("outer_colors"),
              py::arg("terrain_materials")=std::vector<std::string>{})
         .def("statistics", &Renderer::statistics)
+        .def("reflection_plane", &Renderer::reflection_plane)
         .def("preview_aircraft", &Renderer::preview_aircraft)
         .def("aircraft_statistics", &Renderer::aircraft_statistics)
         .def("aircraft_import_counts", &Renderer::aircraft_import_counts)

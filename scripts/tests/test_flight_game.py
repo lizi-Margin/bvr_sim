@@ -26,6 +26,26 @@ class FlightGameTests(unittest.TestCase):
         after=self.game.player().orientation
         self.assertGreater(abs(after[2]-before[2]),.05)
         self.assertGreater(self.game.sim.frame().applied_command_tick,0)
+    def test_typed_player_intent_hands_back_to_stationary_mouse_without_old_target(self):
+        from bvr_game.player_input import unit
+        self.game.config.mission='training';self.game.select_aircraft('F16')
+        event=SimpleNamespace(held=[],pressed=[],x=1919,y=540,quit=False)
+        direction=unit([.8,-.5,.2])
+        for pointer_already_seen in [False,True]:
+            with self.subTest(pointer_already_seen=pointer_already_seen):
+                self.game.start()
+                if pointer_already_seen:
+                    for _ in range(10):self.game.input(event,.02);self.game.step()
+                self.game.submit_player(direction=direction,throttle=.8)
+                for _ in range(100):
+                    self.game.input(event,.02);self.game.step()
+                    self.assertLess(math.dist(direction,self.game.player_input.direction),1e-10)
+                state=self.game.sim.player_flight_state()
+                self.assertLess(math.dist(direction,state.target_direction),.005)
+                self.assertTrue(self.game.player().alive)
+                # Real pointer motion resumes steering after the handoff.
+                self.game.input(SimpleNamespace(held=[],pressed=[],x=1800,y=500,quit=False),.02)
+                self.assertGreater(math.dist(direction,self.game.player_input.direction),.001)
     def test_pitch_reaches_full_aim_range_and_keyboard_moves_real_aircraft(self):
         self.assertAlmostEqual(mouse_pitch(230,1080),math.pi/4)
         self.assertAlmostEqual(mouse_pitch(780,1080),-math.pi/4)

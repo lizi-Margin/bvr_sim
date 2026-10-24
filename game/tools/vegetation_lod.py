@@ -67,7 +67,8 @@ def source_foliage_cards(objects,out,height,width,policy,render_engine):
         if o.type=='MESH':o.hide_render=True
     for o in foliage:o.hide_render=False
     out.mkdir(parents=True,exist_ok=True)
-    cards,report=impostors(foliage,out,height,width,policy.get('resolution',1024),render_engine)
+    cards,report=impostors(foliage,out,height,width,policy.get('resolution',1024),render_engine,
+        normal_maps=policy.get('normal_maps',False))
     for o in foliage:bpy.data.objects.remove(o,do_unlink=True)
     before=triangles(wood);reduce_meshes(wood,int(policy.get('wood_triangles_per_tree',2000)))
     return wood+cards,{'source_materials':sorted(names),'source_wood_triangles':before,'retained_wood_triangles':triangles(wood),
@@ -88,7 +89,7 @@ def alpha_mask_glb(path):
     encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*((-len(encoded))%4)
     rest=data[20+length:];path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(rest))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+rest)
 
-def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE'):
+def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False):
     if render_engine not in ['BLENDER_EEVEE','CYCLES']:raise ValueError('Unsupported source-albedo bake engine')
     out.mkdir(parents=True,exist_ok=True)
     scene=bpy.context.scene;scene.render.engine=render_engine;scene.render.film_transparent=True
@@ -117,13 +118,40 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
             o.data.materials[i]=copies[original]
     camera_data=bpy.data.cameras.new('source_albedo_bake');camera=bpy.data.objects.new('source_albedo_bake',camera_data)
     scene.collection.objects.link(camera);scene.camera=camera;camera_data.type='ORTHO'
-    side=max(height,width)*1.06;camera_data.ortho_scale=side;target=Vector((0,0,height/2));views=[]
+    side=max(height,width)*1.06;camera_data.ortho_scale=side;target=Vector((0,0,height/2));views=[];normal_views=[]
     for i,angle in enumerate([0,math.pi/3,2*math.pi/3,None]):
         distance=max(20,side*2)
         camera.location=Vector((0,0,height+distance)) if angle is None else Vector((math.sin(angle)*distance,-math.cos(angle)*distance,height/2))
         camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
         file=out/f'source_albedo_view_{i}.png';scene.render.filepath=str(file);bpy.ops.render.render(write_still=True)
         views.append((angle,file))
+    if normal_maps:
+        # Bake actual source surface normals into each card's tangent frame.
+        # Emission + Raw avoids both illumination and sRGB encoding of vectors.
+        # Keep the source opacity graph, including its transparent cutouts.
+        normal_nodes=[]
+        for m in copies.values():
+            nodes=m.node_tree.nodes;links=m.node_tree.links
+            emission=next(n for n in nodes if n.type=='EMISSION')
+            geometry=nodes.new('ShaderNodeNewGeometry');combine=nodes.new('ShaderNodeCombineXYZ');axes=[]
+            for axis in range(3):
+                dot=nodes.new('ShaderNodeVectorMath');dot.operation='DOT_PRODUCT'
+                links.new(geometry.outputs['Normal'],dot.inputs[0])
+                encode=nodes.new('ShaderNodeMath');encode.operation='MULTIPLY_ADD';encode.inputs[1].default_value=.5;encode.inputs[2].default_value=.5
+                links.new(dot.outputs['Value'],encode.inputs[0]);links.new(encode.outputs[0],combine.inputs[axis]);axes.append(dot)
+            links.new(combine.outputs[0],emission.inputs['Color']);normal_nodes.append(axes)
+        scene.view_settings.view_transform='Raw'
+        for i,(angle,_) in enumerate(views):
+            if angle is None:
+                basis=[(1,0,0),(0,1,0),(0,0,1)];camera.location=(0,0,height+distance)
+            else:
+                basis=[(math.cos(angle),math.sin(angle),0),(0,0,1),(math.sin(angle),-math.cos(angle),0)]
+                camera.location=(math.sin(angle)*distance,-math.cos(angle)*distance,height/2)
+            camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
+            for axes in normal_nodes:
+                for node,axis in zip(axes,basis):node.inputs[1].default_value=axis
+            file=out/f'source_normal_view_{i}.png';scene.render.filepath=str(file);bpy.ops.render.render(write_still=True);normal_views.append(file)
+        scene.view_settings.view_transform='Standard'
     for o,materials in restored.items():
         for i,m in enumerate(materials):o.data.materials[i]=m
         o.hide_render=True;o.select_set(False)
@@ -141,6 +169,11 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
         bsdf=material.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Roughness'].default_value=1;bsdf.inputs['Specular IOR Level'].default_value=0
         tex=material.node_tree.nodes.new('ShaderNodeTexImage');tex.image=bpy.data.images.load(str(file));tex.image.pack()
         material.node_tree.links.new(tex.outputs['Color'],bsdf.inputs['Base Color']);material.node_tree.links.new(tex.outputs['Alpha'],bsdf.inputs['Alpha'])
+        if normal_maps:
+            normal_tex=material.node_tree.nodes.new('ShaderNodeTexImage');normal_tex.image=bpy.data.images.load(str(normal_views[i]))
+            normal_tex.image.colorspace_settings.name='Non-Color';normal_tex.image.pack()
+            normal=material.node_tree.nodes.new('ShaderNodeNormalMap')
+            material.node_tree.links.new(normal_tex.outputs['Color'],normal.inputs['Color']);material.node_tree.links.new(normal.outputs['Normal'],bsdf.inputs['Normal'])
         mesh.materials.append(material);obj=bpy.data.objects.new(f'source_impostor_{i}',mesh);scene.collection.objects.link(obj);planes.append(obj)
     # One shared mesh/object per far tree; four independent objects would
     # multiply scene traversal/instance transforms even with only eight faces.
@@ -148,5 +181,7 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
     for o in planes:o.select_set(True)
     bpy.context.view_layer.objects.active=planes[0];bpy.ops.object.join();planes=[bpy.context.view_layer.objects.active]
     return planes,{'views':[str(file) for _,file in views],'resolution':resolution,'triangles':8,
+        'normal_views':[str(file) for file in normal_views],
+        'normal_basis':'Actual source geometry normals projected onto per-card tangent/bitangent/front-normal, Raw linear RGB; no baked directional lighting' if normal_maps else None,
         'render_engine':render_engine,
-        'method':'Three source-albedo vertical views and one top view, alpha-tested crossed planes. Approximate far silhouette and flat shading; not full source geometry or a measured BRDF.'}
+        'method':'Three source-albedo vertical views and one top view, alpha-tested crossed planes. Approximate silhouette; not full source geometry or a measured BRDF.'}

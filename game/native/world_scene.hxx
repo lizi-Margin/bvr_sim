@@ -4,6 +4,7 @@
 #include <set>
 #include <map>
 #include <bit>
+#include <fstream>
 #include "json.hpp"
 struct ScenePlacement {
     std::string id, model, chunk, category, target_uid;
@@ -83,6 +84,19 @@ class WorldScene {
         wi::scene::Scene loaded;
         ImportModel_GLTF(file->second, loaded);
         auto base_model=model.substr(0,model.find("::"));
+        const auto manifest_path=std::filesystem::path(file->second).parent_path()/"manifest.json";
+        if(std::filesystem::exists(manifest_path)){
+            std::ifstream manifest_stream(manifest_path);nlohmann::json manifest;manifest_stream>>manifest;
+            const auto& impostor=manifest.value("impostor",nlohmann::json::object());
+            if(impostor.is_object()&&impostor.value("view_facing_alpha",false)){
+                for(size_t i=0;i<loaded.materials.GetCount();++i){
+                    auto n=loaded.names.GetComponent(loaded.materials.GetEntity(i));
+                    if(n&&n->name.starts_with("source_impostor_")){
+                        auto& m=loaded.materials[i];m.userdata.x=0x42565256u;m.SetDirty();
+                    }
+                }
+            }
+        }
         if(material_profile.contains("scenery_materials")&&
            (base_model=="tree_oak"||base_model=="tree_pine"||base_model=="tree_small"||base_model=="bush")){
             const auto& policy=material_profile.at("scenery_materials");

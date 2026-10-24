@@ -14,6 +14,29 @@ from bvr_game.pilots import CombatPilot,StrikePilot
 MAP=ROOT/'game/maps/training_range_v2/generated-map.json'
 
 class ContentTests(unittest.TestCase):
+    def test_water_render_batches_preserve_every_triangle_and_local_plane(self):
+        # A long conformed ribbon's global bounds can sit far above its local
+        # water. Splitting render batches must correct that without moving or
+        # removing even one triangle. No asset library or GPU is needed.
+        baker=Baker.__new__(Baker);baker.r={};baker.surfaces=[]
+        baker.terrain=SimpleNamespace(height=lambda n,w:120+max(n,0)*.001)
+        points=[[-80000,600],[-2000,280],[80000,600]]
+        baker.surface_ribbon('river',points,95,'water',.025)
+        original=baker.surfaces[0]
+        def triangles(surfaces):
+            return np.concatenate([np.asarray(s['vertices'])[np.asarray(s['indices']).reshape(-1,3)] for s in surfaces])
+        before=triangles(baker.surfaces)
+        baker.surfaces=[];baker.r={'landscape':{'water_render_chunk_m':500}}
+        baker.surface_ribbon('river',points,95,'water',.025)
+        self.assertTrue(np.array_equal(before,triangles(baker.surfaces)))
+        self.assertTrue(all(s['length_m']<=500 for s in baker.surfaces))
+        self.assertTrue(all(s['source_surface']=='river' for s in baker.surfaces))
+        old_height=np.asarray(original['vertices'])[:,2]
+        self.assertGreater((old_height.min()+old_height.max())/2-120,30)
+        local=min(baker.surfaces,key=lambda s:abs(np.asarray(s['vertices'])[:,0].mean()+2000))
+        height=np.asarray(local['vertices'])[:,2]
+        self.assertLess(abs((height.min()+height.max())/2-120),.1)
+
     def test_baked_scene_resources_geometry_and_exclusions(self):
         result=validate(MAP);self.assertEqual(result['failures'],[])
         self.assertGreaterEqual(result['instances'],8000);self.assertGreater(result['chunks'],100)

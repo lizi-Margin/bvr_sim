@@ -6,6 +6,7 @@
 
 - 鼠标指定世界方向；靠近窗口边缘可持续转向。投影使用真实窗口尺寸、相机姿态和垂直 FOV。
 - 鼠标移动按当前投影转换为世界目标的方向变化；相机追随、滚转、缩放本身不改变目标。窗口尺寸变化与自由观察结束会重设指针基准，停在原位不会产生新的飞行意图。将光标移回屏幕中心会反向修正目标，并不直接命令机翼水平。
+- Agent 经 `FlightGame.submit_player(...)` 提交世界意图后，客户端会同步已滤波与未滤波目标，清除旧边缘转向并在下一次鼠标采样时重建指针基准。静止光标不会把意图拉回旧目标，即使此前从未采样鼠标、光标停在边缘或目标接近垂直/位于后方。真实鼠标位移后重新开始指向控制。普通鼠标帧走同一个核心提交入口，但保留自身的连续滤波状态。
 - W 压低机头，S 拉起；A/D 滚转。W/S 同按表示中立俯仰请求，仍接管该轴并阻尼角速度。
 - 辅助模式的手动俯仰请求角速度，实际舵面仍受变化率、迎角和可取得的过载反馈约束。松键后按机型配置平滑恢复指向跟随。
 - 辅助模式的 A/D 也请求配置中的最大滚转角速度，通过源 FDM 实测角速度闭环控制；原始手动模式仍直接控制副翼。`max_edge_pan` 限制边缘持续转向领先当前视线的夹角，不限制累计转过的世界航向；`edge_recenter_seconds` 是边缘角速度请求的平滑时间。
@@ -83,9 +84,12 @@ python game/tools/player_core_only.py --output NEW_CORE_EXPERIMENT_DIRECTORY
 python game/tools/capture_player_visuals.py --action projection --output NEW_GPU_EXPERIMENT_DIRECTORY
 python game/tools/validate_player_handler.py --case edge --model F16 --map game/maps/river_valley_airfield/generated-map.json --profile-file game/config/player_flight_profiles.json --output NEW_EDGE_INPUT_DIRECTORY --video
 python game/tools/validate_player_handler.py --case manual --model FG-A-10 --map game/maps/river_valley_airfield/generated-map.json --profile-file game/config/player_flight_profiles.json --output NEW_MANUAL_INPUT_DIRECTORY --video
+python game/tools/validate_player_handler.py --case handoff --model F16 --map game/maps/river_valley_airfield/generated-map.json --profile-file game/config/player_flight_profiles.json --output NEW_HANDOFF_INPUT_DIRECTORY --video
 ```
 
 `validate_player_handler` 经实际 `FlightGame.input` 输入键鼠事件，运行同一源 FDM 和追随相机；`--video` 保存 DX12 画面。默认边缘转向持续120秒，手动协议79秒，涵盖接管/松键、W/S同按、自由观察加俯仰及有限组合操纵。`--headless` 可独立诊断核心响应。它检查具体协议中的操纵方向、意图保持、舵面变化率和渲染姿态，不能代替完整包线、稳定时间、地图和性能验收。事件为确定性的客户端处理器输入，不代表物理键鼠硬件注入。
+
+`handoff` 是 18 秒衔接协议：普通输入、相对本机实测航向的 typed 方向请求、静止鼠标保持、C 自由观察/返回及真实鼠标位移恢复。F-22、F-16 和 FG-A-10 的当前协议均有实际录像、渲染姿态矩阵核对和完整最终核心帧重放，验证的是衔接语义，不代表其完整机动包线已经调好。
 
 响应实验保存候选模块、控制器源码、参数、输入带、原始观测和摘要；意图每0.5秒更新，当前实现每0.1秒记录状态。摘要中的极值是采样极值，不能当作每个0.02秒核心tick的严格包线保证。最终调参后仍需冻结配置、重新生成正式输入带并完成渲染/无渲染重放。
 
@@ -98,3 +102,20 @@ python game/tools/capture_player_visuals.py --action map --output NEW_MAP_REVIEW
 ```
 
 生成器保留不可变地图版本，验证完成后原子更新根指针。依赖同一地图的重放应固定其版本目录和哈希。地图校验、零shader错误、参数存在和文件齐全均不代表画面已经验收。
+
+## 独立玩家试飞
+
+交互试飞现在直接使用 `FlightGame.run_client_frame`，与普通游戏共享键鼠/手柄适配、固定核心 tick 调度、相机、HUD、暂停/单步、F6 和 F9。两种入口默认加载 `player_daylight.json`。独立入口提供无武装训练，Escape 直接关闭窗口；普通游戏仍返回机库。全部 152 项目录（含 147 项导入飞机）均可选择，其他机型继续保持原有模板/未逐架调校标记。
+
+```powershell
+python -m bvr_game.aircraft_library fly FG-A-10 --interactive --map game/maps/river_valley_airfield/generated-map.json
+python -m bvr_game.aircraft_library fly F16 --interactive --hidden --max-client-frames 120 --map game/maps/river_valley_airfield/generated-map.json --output NEW_BOUNDED_OUTPUT
+python game/tools/validate_standalone_player.py --model F22 --map game/maps/river_valley_airfield/generated-map.json --output NEW_STANDALONE_VALIDATION --video
+python game/tools/validate_standalone_player.py --catalog-smoke --map game/maps/training.json --output NEW_CATALOG_READINESS
+```
+
+`--max-client-frames` 限制客户端帧数；物理仍按原有 `config.dt` 推进，它不表示核心 tick 或仿真秒数。Agent 也可调用 `player_test_flight(aircraft(id), output, render=False, map_path=...)` 得到同一个客户端，再用 `submit_player`/`step` 调试，或向 `run_client_frame` 提交事件。`fly_interactive` 的 `event_source(game,index)` 与 `frame_dt` 用于可复现的入口验证，不需要点击屏幕。
+
+独立入口现在生成带地图、有效玩家配置和资源上下文的标准输入日志，可直接交给 `bvr_game.playtest replay`。F-22/F-16/A-10 的 22 秒协议含实际窗口缩放到 1600×1000 再恢复 1920×1080、暂停/单步、重载与原始手动模式；窗口缩放阶段的录像保留原像素并加黑边，不作为性能验收。三种机型各有 220 帧录像和完整最终核心帧重放。全部 152 项另做 10 tick 的真实启动检查，只证明基本可运行，不能称为逐机型手感调校。
+
+不带 `--interactive` 的原有 `fly --seconds ...` 仍使用旧 AI `PilotCommand` 诊断入口，控制语义与环境保持；4 秒 A-10 的修改前后最终帧及四个轨迹采样完全一致。

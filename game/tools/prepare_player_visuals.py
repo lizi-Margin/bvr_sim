@@ -44,6 +44,15 @@ def main():
     object_source=(Path(before['shader_source'])/'objectHF.hlsli').read_text(encoding='utf-8')
     object_anchor='surface.baseColor *= material.textures[BASECOLORMAP].Sample(sampler_objectshader, uvsets);'
     object_hook='''
+        // Opt-in source-tree cards: suppress nearly edge-on planes in both
+        // depth/prepass and color. Derivatives work in textured prepass too,
+        // which has no interpolated normal. Normal maps only affect lighting.
+        if (material.userdata.x == 0x42565256u)
+        {
+            float3 face = cross(ddx_coarse(surface.P), ddy_coarse(surface.P));
+            float facing = abs(dot(face, surface.V)) * rsqrt(max(dot(face, face), 1e-20));
+            surface.baseColor.a *= smoothstep(0.15, 0.6, facing);
+        }
 #ifndef PREPASS
         // Engineering correction for the registered F22 exterior atlas only:
         // retain dark markings/camouflage, compress its pure-white RAM paint.
@@ -64,6 +73,13 @@ def main():
 '''
     assert object_source.count(object_anchor)==1
     object_source=object_source.replace(object_anchor,object_anchor+object_hook)
+    water_depth_anchor='water_depth = max(water_depth, -dot(float4(refraction_position, 1), water_plane));'
+    assert object_source.count(water_depth_anchor)==1
+    object_source=object_source.replace(water_depth_anchor,'''// The coarse depth search only chooses/rejects a refracted UV. Its
+        // mip footprints represent neighbouring rays, not this exact ray.
+        // Keeping their maximum depth in final attenuation produced visible
+        // screen-row bands on shallow water. Use the selected full-res sample.
+        water_depth = -dot(float4(refraction_position, 1), water_plane);''')
     object_file=source/'objectHF.hlsli'
     object_changed=not object_file.exists() or object_file.read_text(encoding='utf-8')!=object_source
     write_changed(object_file,object_source)
@@ -88,7 +104,8 @@ def main():
             'tile_m':3.,'mean_linear_luminance':mean,'strength':.45}}
     for key in ['base_color','normal','roughness_map']:profile['terrain_detail'][key+'_sha256']=sha(grass[key])
     profile['shader_patch']={**before['shader_patch'],'patched_skyHF_sha256':sha(sky),
-        'patched_objectHF_sha256':sha(object_file),'paint_material_flag':'0x42565250',
+        'patched_objectHF_sha256':sha(object_file),'paint_material_flag':'0x42565250','source_card_material_flag':'0x42565256',
+        'water_refraction_depth':'Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias.',
         'flat_nwu_horizon_haze':'Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.'}
     profile['provenance']={**before['provenance'],'detail_textures':'Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes',
         'aircraft_surfaces':'Source normals/UVs audited; original exterior positions/indices/normals/UVs/images retained. F16 source pilot and cockpit-main geometry added at their declared identity transforms. F22 exterior-atlas luminance uses configurable linear knee/shoulder/dark-ink lift; source-named F119/vector meshes retain separate metal material. F16 source internal-flame white emissive disc uses non-emissive metal; actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.',

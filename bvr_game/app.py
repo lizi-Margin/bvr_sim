@@ -14,6 +14,8 @@ with redirect_stdout(sys.stderr):
 
 ROOT=Path(__file__).resolve().parents[1]
 GAME=Path(os.environ.get('BVR_GAME_ROOT',ROOT/'game'))
+DEFAULT_VISUAL_PROFILE=GAME/'recipes/player_daylight.json'
+DEFAULT_WORLD_MAP=GAME/'maps/training_range_v3/generated-map.json'
 WHITE=0xffeeeeee; GREEN=0xff86f2a6; RED=0xff6d75ff; BLUE=0xffffc885; MUTED=0xffb3b6ad
 
 def serialize(value):
@@ -40,7 +42,7 @@ def load_runtime(path):
 
 class FlightGame:
     """One owner steps GameSession. Renderer receives a value snapshot only."""
-    def __init__(self,*,render=False,visible=True,width=1920,height=1080,runtime=GAME/'runtime.json',map_path=GAME/'maps/training.json',output=GAME/'captures',visual_profile=GAME/'recipes/visual_beta.json'):
+    def __init__(self,*,render=False,visible=True,width=1920,height=1080,runtime=GAME/'runtime.json',map_path=GAME/'maps/training.json',output=GAME/'captures',visual_profile=DEFAULT_VISUAL_PROFILE):
         self.output=Path(output).resolve();self.output.mkdir(parents=True,exist_ok=True)
         self.map_path=Path(map_path).resolve();self.map=json.loads(self.map_path.read_text(encoding='utf8'))
         self.baked_scene=None
@@ -125,6 +127,7 @@ class FlightGame:
             context['visual_profile']=self.visual_profile
             context['player_flight_profile']=self.player_profile
             context['core_sha256']=hashlib.sha256(Path(native.__file__).read_bytes()).hexdigest()
+            context['entry']=getattr(self,'entry_point','flight_game')
             self.journal.start(serialize(self.config),context)
         pilot=native.PilotCommand();pilot.throttle=self.throttle;self.submit_command(pilot)
         if self.renderer:self.renderer.reload()
@@ -203,10 +206,15 @@ class FlightGame:
 
     def submit_player(self,intent=None,**values):
         if intent is None:intent=native_intent(native,values)
+        self._dispatch_player_intent(intent)
+        self.player_input.adopt_direction(intent.direction)
+        self.player_input.mode='raw_manual' if intent.mode==native.PlayerFlightMode.RawManual else 'assisted'
+
+    def _dispatch_player_intent(self,intent):
+        # The client adapter already owns its filtered/raw pointer state.
+        # Only the public typed API performs an external-input handoff.
         self.throttle=max(0,min(1,float(intent.throttle)))
         self.sim.submit_player(intent)
-        self.player_input.direction=unit(intent.direction)
-        self.player_input.mode='raw_manual' if intent.mode==native.PlayerFlightMode.RawManual else 'assisted'
         self.journal.record('player_intent',serialize(intent),self._journal_tick)
 
     def submit_command(self,command):
@@ -355,7 +363,8 @@ class FlightGame:
             text(550,1020,'FlightGear / Wicked Engine / Kenney / ambientCG / Poly Haven',17,MUTED)
             return texts,lines
         speed=math.sqrt(sum(v*v for v in p.velocity)) if p else 0
-        text(40,30,'BVR / '+frame.mission.upper(),22)
+        standalone=getattr(self,'entry_point','')=='aircraft_library.fly'
+        text(40,30,'UNARMED PLAYER TEST FLIGHT' if standalone else 'BVR / '+frame.mission.upper(),22)
         text(40,77,f'THR   {(p.throttle if p else self.throttle)*100:3.0f} %',22)
         text(40,108,f'SPD   {speed*3.6:4.0f} km/h',22)
         text(40,139,f'ALT   {p.position[2] if p else 0:5.0f} m',22)
@@ -375,7 +384,9 @@ class FlightGame:
         text(610,1018,'F5 '+self.player_input.mode.upper()+'  /  F6 reload while paused',15,MUTED)
         if state.energy_limited:text(610,968,'ENERGY / CLIMB DEMAND LIMITED',15,0xff77dfff)
         elif state.protecting:text(610,968,'ASSIST / ENVELOPE LIMIT',15,0xff77dfff)
-        if self.menu_notice:text(610,992,self.menu_notice[:75],15,RED)
+        if self.menu_notice:
+            for index,part in enumerate(textwrap.wrap(self.menu_notice,42)[:2]):text(40,380+index*18,part,14,RED)
+            labels.rectangles.append((30,375,410,425))
         # Three different symbols: amber aim ring, white nose cross, cyan path
         # ring/wings. All positions are projected from real world directions.
         self.flight_marks={};self.flight_mark_labels={};self.flight_mark_projection={};mark_label_boxes=[]
@@ -496,7 +507,7 @@ class FlightGame:
             message=('INCOMING MISSILE HIT' if e.kind=='missile_hit' else 'YOUR AIRCRAFT DESTROYED') if own_loss else e.message
             text(650,840+i*28,message,22,RED if own_loss else GREEN if 'hit' in e.kind or 'destroyed' in e.kind else WHITE)
         panel(580,980,760,60)
-        text(600,995,'V weapon   R lock   SPACE launch   B release   ESC hangar',18)
+        text(600,995,'W/S pitch  A/D roll  C look  RMB zoom  ESC close' if standalone else 'V weapon   R lock   SPACE launch   B release   ESC hangar',18)
         if self.mode=='result':
             panel(600,310,720,410);text(665,355,'MISSION '+frame.result.upper(),38,GREEN if frame.result=='succeeded' else RED)
             text(665,440,f'AIR KILLS {frame.air_kills}    GROUND KILLS {frame.ground_kills}',24)
@@ -525,6 +536,23 @@ class FlightGame:
         else:self.renderer.render(self.sim.frame(),texts,lines)
         self.frame_times.append(time.perf_counter()-start)
         if not self.interactive:self.fps=1/max(statistics.median(self.frame_times[-60:]),1e-6)
+
+    def run_client_frame(self,event,dt,accumulator=0.):
+        """Shared interactive frame for the game and standalone test flight.
+
+        Frame time schedules unchanged fixed core ticks; presentation never
+        changes the core dt. Headless clients advance the same camera math.
+        """
+        if not math.isfinite(dt) or dt<0:raise ValueError('Client frame time must be finite and nonnegative')
+        dt=min(dt,.1);self.fps=.9*self.fps+.1/max(dt,.0001)
+        if not self.input(event,dt):return False,0.
+        if self.mode=='flight':
+            accumulator+=dt;ticks=min(int(accumulator/self.config.dt),5)
+            if ticks:self.step(ticks);accumulator-=ticks*self.config.dt
+        else:accumulator=0.
+        if self.renderer:self.draw(dt,free=67 in event.held)
+        else:self.follow_camera(dt,free=67 in event.held)
+        return True,accumulator
 
     def input(self,event,dt):
         held=set(event.held);pressed=set(event.pressed)
@@ -617,7 +645,7 @@ class FlightGame:
                 c.lock=True;c.target_uid=self.target
         c.fire=(32 in pressed or 1 in pressed) and self.weapon=='AIM-120C7';c.target_uid=self.target;c.weapon='AIM-120C7'
         c.drop_bomb=66 in pressed or (32 in pressed and self.weapon=='Mk-82')
-        self.submit_player(c);return True
+        self._dispatch_player_intent(c);return True
 
 def acceptance(game,mission,max_ticks=5000):
     """Repeatable real combat using the same typed commands as human input."""
@@ -677,8 +705,8 @@ def acceptance_alpha(game,mission):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['play','run','benchmark'],nargs='?',default='play')
     p.add_argument('--render',action='store_true');p.add_argument('--hidden',action='store_true');p.add_argument('--mission',choices=['intercept_patrol','air','strike','combined','convoy','training']);p.add_argument('--aircraft',choices=[r['id'] for r in aircraft_catalog(include_library=True)['aircraft']],default='F22');p.add_argument('--loadout');p.add_argument('--seed',type=int,default=7)
-    p.add_argument('--width',type=int,default=1920);p.add_argument('--height',type=int,default=1080);p.add_argument('--quality',choices=['low','medium','high'],default='high');p.add_argument('--frames',type=int,default=300);p.add_argument('--output',type=Path,default=GAME/'captures');p.add_argument('--runtime',type=Path,default=GAME/'runtime.json');p.add_argument('--map',type=Path,default=GAME/'maps/training_range_v3/generated-map.json')
-    p.add_argument('--visual-profile',type=Path,default=GAME/'recipes/visual_beta.json')
+    p.add_argument('--width',type=int,default=1920);p.add_argument('--height',type=int,default=1080);p.add_argument('--quality',choices=['low','medium','high'],default='high');p.add_argument('--frames',type=int,default=300);p.add_argument('--output',type=Path,default=GAME/'captures');p.add_argument('--runtime',type=Path,default=GAME/'runtime.json');p.add_argument('--map',type=Path,default=DEFAULT_WORLD_MAP)
+    p.add_argument('--visual-profile',type=Path,default=DEFAULT_VISUAL_PROFILE)
     a=p.parse_args();game=FlightGame(render=a.render or a.command=='play' or a.command=='benchmark',visible=not a.hidden,width=a.width,height=a.height,runtime=a.runtime,map_path=a.map,output=a.output,visual_profile=a.visual_profile)
     row=game.select_aircraft(a.aircraft,a.loadout)
     a.mission=a.mission or ('air' if a.command=='run' and 'air' in row['missions'] else row['missions'][0])
@@ -711,15 +739,10 @@ def main():
             game.interactive=True
             game.sim.reset(game.config);game.sim.set_paused(True);last=time.perf_counter();accumulator=0
             while True:
-                now=time.perf_counter();dt=min(now-last,.1);last=now;game.fps=.9*game.fps+.1/max(dt,.0001)
+                now=time.perf_counter();dt=min(now-last,.1);last=now
                 event=game.renderer.poll()
-                if not game.input(event,dt):break
-                if game.mode=='flight':
-                    accumulator+=dt
-                    ticks=min(int(accumulator/game.config.dt),5)
-                    if ticks:game.step(ticks);accumulator-=ticks*game.config.dt
-                else:accumulator=0
-                game.draw(dt,free=67 in event.held)
+                running,accumulator=game.run_client_frame(event,dt,accumulator)
+                if not running:break
     except BaseException as error:
         game.finish_sortie('exception',repr(error));raise
     finally:game.close()

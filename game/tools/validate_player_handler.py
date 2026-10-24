@@ -26,7 +26,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--map',type=Path,required=True);p.add_argument('--profile-file',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--model',default='F16')
-    p.add_argument('--case',choices=['edge','manual'],default='edge');p.add_argument('--seconds',type=float,default=120)
+    p.add_argument('--case',choices=['edge','manual','handoff'],default='edge');p.add_argument('--seconds',type=float,default=120)
     p.add_argument('--headless',action='store_true');p.add_argument('--video',action='store_true');a=p.parse_args()
     if not math.isfinite(a.seconds) or a.seconds<2: p.error('--seconds must be finite and at least two')
     if a.video and a.headless:p.error('--video requires DX12 rendering')
@@ -43,6 +43,8 @@ def main():
         ('push',1,[87]),('release_push',8,[]),('both_pitch',1,[87,83]),('release_both',5,[]),
         ('free_pull',1,[67,83]),('release_free',8,[]),('aggressive_pull_roll',3,[68,83]),
         ('aggressive_push_roll',3,[65,87]),('release_aggressive',20,[])]
+    handoff=[('neutral',2,[]),('typed_hold',6,[]),('typed_free_look',2,[67]),('typed_release_look',6,[]),('mouse_resume',2,[])]
+    requested=None
     try:
         g.select_aircraft(a.model);g.config.mission='training';g.config.seed=3301
         g.start(start_position=[-20000,0,5000],initial_speed=180 if a.model=='FG-A-10' else 250);g.throttle=.85
@@ -54,7 +56,8 @@ def main():
                 '-pix_fmt','rgb24','-s','1920x1080','-r','10','-i','-','-c:v','libx264','-preset','fast','-crf','20',
                 '-pix_fmt','yuv420p',str(a.output/'handler.mp4')],stdin=subprocess.PIPE)
         target_turn=aircraft_turn=0.;old_target=old_yaw=None;old_controls=None
-        duration=a.seconds if a.case=='edge' else sum(x[1] for x in manual)
+        protocol=handoff if a.case=='handoff' else manual
+        duration=a.seconds if a.case=='edge' else sum(x[1] for x in protocol)
         current=None;phase_start=0;phase_index=0
         for tick in range(round(duration/.02)):
             t=tick*.02
@@ -62,11 +65,19 @@ def main():
                 label='neutral' if t<2 else 'edge_right';keys=[]
                 x=960 if t<2 else 960+959*min(1,(t-2)/.5);y=540
             else:
-                while t>=phase_start+manual[phase_index][1]-.000001:
-                    phase_start+=manual[phase_index][1];phase_index+=1
-                label,_,keys=manual[phase_index];x,y=(1300,400) if 67 in keys or label=='release_free' else (960,540)
+                while t>=phase_start+protocol[phase_index][1]-.000001:
+                    phase_start+=protocol[phase_index][1];phase_index+=1
+                label,_,keys=protocol[phase_index];x,y=(1300,400) if 67 in keys or label=='release_free' else (960,540)
+                if a.case=='handoff':
+                    x,y=(1600,150) if label in ['typed_free_look','typed_release_look'] else (1850,400) if label=='mouse_resume' else (960,540)
             if label!=current:
                 if current and g.renderer:captures.append({'phase':current,'capture':g.capture(current)})
+                if a.case=='handoff' and label=='typed_hold':
+                    # A public world intent relative only to measured own
+                    # heading; no hidden target or direct aircraft pose setter.
+                    yaw=g.player().orientation[2]+math.radians(30);pitch=math.radians(3)
+                    requested=[math.cos(yaw)*math.cos(pitch),math.sin(yaw)*math.cos(pitch),math.sin(pitch)]
+                    g.submit_player(direction=requested,throttle=.85)
                 phases.append({'phase':label,'tick':g.sim.frame().tick,'own':serialize(g.player()),'intent':list(g.player_input.direction)})
                 current=label
             event=SimpleNamespace(held=keys,pressed=[],x=x,y=y,wheel=0,quit=False,active=True)
@@ -91,6 +102,14 @@ def main():
         if a.case=='edge':
             assert -math.degrees(target_turn)>180,('Target did not continue around',math.degrees(target_turn))
             assert -math.degrees(aircraft_turn)>180,('Aircraft did not turn around',math.degrees(aircraft_turn))
+        elif a.case=='handoff':
+            held=[r for r in rows if r['phase'] in ['typed_hold','typed_free_look','typed_release_look']]
+            error=max(math.dist(requested,r['intent']) for r in held)
+            manual_checks.append({'phase':'typed_handoff_hold','maximum_world_intent_component_distance':error})
+            assert error<1e-8,('Stationary/free-look input changed typed intent',error)
+            resume=next(r for r in reversed(rows) if r['phase']=='mouse_resume')
+            changed=math.dist(requested,resume['intent']);assert changed>.01,('Real pointer motion did not resume control',changed)
+            manual_checks.append({'phase':'mouse_resume','world_intent_component_distance':changed})
         else:
             for label,axis,sign in [('roll_right',0,1),('roll_left',0,-1),('pull',1,-1),('push',1,1)]:
                 initial=next(r for r in phases if r['phase']==label)['own']
@@ -119,7 +138,7 @@ def main():
             'manual_checks':manual_checks,
             'shader_errors':g.renderer.shader_errors() if g.renderer else None,'video_frames':frames,
             'phases':phases,'captures':captures,'samples':rows,
-            'acceptance_scope':'This protocol checks actual signed manual response, owned neutral W/S, frozen free-look intent, surface slew, sustained edge turn and rendered basis as applicable. It does not certify the full envelope, final settling, scenery, mission success or performance.',
+            'acceptance_scope':'This protocol checks actual signed manual response, owned neutral W/S, frozen free-look/typed-handoff intent, surface slew, sustained edge turn and rendered basis as applicable. It does not certify the full envelope, final settling, scenery, mission success or performance.',
             'method':'Actual FlightGame.input with deterministic handler events, native FDM and own-state chase camera at50Hz; DX12/film sampled at10Hz. Not hardware input injection or a performance benchmark.'})
         g.close()
     print('HANDLER',a.model,a.case,'failed' if failure else 'passed','target',math.degrees(target_turn),'aircraft',math.degrees(aircraft_turn),'failure',failure,flush=True)

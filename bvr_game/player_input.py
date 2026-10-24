@@ -43,7 +43,12 @@ class PlayerInputAdapter:
     def reset(self,direction):
         self.direction=unit(direction);self.raw_direction=list(self.direction)
         self.last_pointer=None;self.last_viewport=None;self.edge_armed=True
-        self.edge_yaw_rate=0.;self.edge_pitch_rate=0.
+        self.edge_yaw_rate=0.;self.edge_pitch_rate=0.;self.rebase_pointer=False
+    def adopt_direction(self,direction):
+        """Hand an external world intent to the pointer without stale filtering."""
+        self.direction=unit(direction);self.raw_direction=list(self.direction)
+        self.edge_armed=False;self.edge_yaw_rate=self.edge_pitch_rate=0.
+        self.rebase_pointer=True
     def throttle(self,current,event,dt):
         pad=getattr(event,'pad_axes',()) if getattr(event,'pad_connected',False) else ()
         if len(pad)>=6:current+=(pad[5]-pad[4])*max(0,min(dt,.1))*self.profile['input']['throttle_rate']
@@ -57,6 +62,8 @@ class PlayerInputAdapter:
         pad=getattr(event,'pad_axes',()) if getattr(event,'pad_connected',False) else ()
         pad_aim=len(pad)>=4 and max(abs(pad[2]),abs(pad[3]))>p['deadzone']
         nx=2*x/width-1;ny=1-2*y/height
+        if self.rebase_pointer:
+            self.last_pointer=(nx,ny);self.last_viewport=[width,height];self.rebase_pointer=False
         def projected(pointer):
             sx=shaped(pointer[0],p['deadzone'],p['curve'])*p['sensitivity'];sy=shaped(pointer[1],p['deadzone'],p['curve'])*p['sensitivity']
             return camera_ray((sx+1)*width/2,(1-sy)*height/2,width,height,camera)
@@ -67,6 +74,7 @@ class PlayerInputAdapter:
             self.raw_direction=list(self.direction);self.edge_armed=False
             self.edge_yaw_rate=self.edge_pitch_rate=0.
         else:
+            moved=False
             if self.last_pointer is None:self.raw_direction=ray
             elif self.last_viewport==[width,height]:
                 previous_ray=projected(self.last_pointer)
@@ -94,9 +102,10 @@ class PlayerInputAdapter:
             # As the aircraft/camera follow, edge input can keep turning through
             # any heading without a permanent near-nose angular ceiling.
             if separation(candidate)<=p['max_edge_pan'] or separation(candidate)<separation(self.raw_direction):self.raw_direction=candidate
-            az=math.atan2(self.raw_direction[1],self.raw_direction[0])
-            el=max(-p['max_target_elevation'],min(p['max_target_elevation'],math.asin(max(-1,min(1,self.raw_direction[2])))))
-            self.raw_direction=[math.cos(el)*math.cos(az),math.cos(el)*math.sin(az),math.sin(el)]
+            if moved or self.edge_yaw_rate or self.edge_pitch_rate:
+                az=math.atan2(self.raw_direction[1],self.raw_direction[0])
+                el=max(-p['max_target_elevation'],min(p['max_target_elevation'],math.asin(max(-1,min(1,self.raw_direction[2])))))
+                self.raw_direction=[math.cos(el)*math.cos(az),math.cos(el)*math.sin(az),math.sin(el)]
             # Core does spherical target filtering; this client filter only
             # removes pointer quantization and never rotates the aircraft.
             alpha=1-math.exp(-dt/p['direction_response'])

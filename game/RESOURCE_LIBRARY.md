@@ -49,3 +49,22 @@ python game/tools/capture_aircraft_surfaces.py --output NEW_AIRCRAFT_VIEWS
 原有 F-16 的 102 个绘制部分，其位置、索引、法线、UV、节点变换和源贴图已与新增部件前逐项核对；新增后为 184 个绘制部分、95122 个三角形，原版本为 15869 个三角形。新增部件有实际渲染开销，最终性能测试必须包含。显式 runtime 配方中的已注册飞机变体通过 manifest/文件哈希验证后优先保留，目录展开只补充未指定的飞机。
 
 日光配置的 `canopy_color` 是线性 RGB 色调，`canopy_alpha` 为薄层 alpha 混合不透明度；当前不使用屏幕空间透射模糊。源 F-16 透明度为 0 的内层不参与深度、高光或阴影，避免两层玻璃产生噪点。F-22 外部贴图可用 `f22_paint_knee`、`f22_paint_shoulder`、`f22_paint_floor` 调整局部线性反照率映射，保留原 UV 和源图像。这些是工程外观近似，不是实测玻璃/隐身涂层 BRDF，也不能把旧漫反射贴图称为完整 PBR。旧源图的粗面板线仍是可见限制。
+
+## 逐树法线与河面反射候选
+
+`fir_grove_normal_a` 选择原始 `fir_tree_01_a_LOD0`，以固定 seed 保留 64 棵树的位置，近远景为 32512/512 三角形，各只有一个共享网格。源颜色/透明度与 `fir_grove_individual_a` 的八张逐树颜色图像素一致，网格位置、索引、法线与 UV 也一致。新增法线由真实源几何投影到各卡片的切线坐标系，用 Raw 线性 RGB 烘焙；它不把固定方向的光照烘进颜色图。注册 manifest 明确启用 `view_facing_alpha` 后，渲染器仅对 `source_impostor_*` 材质应用视角透明度衰减，深度和颜色通道使用同一条件。法线仍不能补回完整叶冠体积。
+
+```powershell
+python game/tools/assets.py register fir_grove_normal_a --entry game/assets/cache/polyhaven/fir_tree_01/fir_tree_01_1k.gltf --manifest game/assets/cache/polyhaven/fir_tree_01/manifest.json --recipe game/recipes/fir_grove_normal_a.json
+python game/tools/prepare_player_visuals.py
+python game/tools/build_river_valley_recipe.py --forest-asset fir_grove_normal_a --recipe-output NEW_RECIPE.json --bake --output NEW_MAP_DIRECTORY
+python game/tools/validate_grove_render.py --map NEW_MAP_DIRECTORY/generated-map.json --output NEW_RENDER_DIRECTORY --orbit-frames 180
+```
+
+渲染源码改变后先结束自己启动的验证进程并重建 `bvr_game_render`，再运行验证。环绕录像是暂停场景的 18 秒相机检查，不是实际飞行或性能测试。
+
+配方的 `landscape.water_render_chunk_m=500` 将长河面的原有三角形分批，保持全部位置、索引展开顺序及共享地形不变。固定版本对比为 1→338 个水面批次，实际最大批次长约 475.07m。引擎按最近水面对象的包围盒中心取反射平面，当前低空测试点由错误的 169.43m 改为 120.094m；可通过只读 `renderer.reflection_plane()` 取得真实渲染读数，无可见反射面时返回 `None`。
+
+这仍是未通过自然画面验收的候选：树林存在卡片感、重复团块与平面地表代理；河面高视角出现条纹。独立 shader 诊断中，关闭反射后条纹仍在，关闭折射后消失，后续需继续定位折射采样和实际河床表达。诊断配置不作为正式质量配置；默认地图未切换。
+
+后续同机位诊断已定位并修正条纹：直接显示折射采样的颜色没有条纹，显示计算水深则复现条纹。原着色器将 mip2 邻域深度搜索的结果继续取最大值用于最终衰减，但这些粗深度来自邻近屏幕射线；现在粗搜索仍用于折射 UV 选择，最终衰减仅使用选定 UV 的完整分辨率深度。修复由 `prepare_player_visuals.py` 生成到本地 shader 缓存，未改第三方源码。反射、折射都保留；实际高视角条纹已消失。同一裁剪区的行亮度二阶差分降至原来的约 6.34%，仅作为该条纹的局部诊断，不能代表整体画质。地图仍是贴地约 0.025m 的浅层水面，俯视过于透明，河床、岸线和自然树林仍未验收。
