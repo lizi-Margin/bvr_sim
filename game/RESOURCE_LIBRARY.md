@@ -31,3 +31,21 @@ python -m bvr_game.mapcheck --map game/maps/river_valley_airfield/generated-map.
 当前河谷配方默认使用 `fir_grove_cards_c`；`--forest-asset pine_grove_a` 或 `--forest-asset fir_grove_c` 可复现早期候选。冷杉选择真实源包的 `fir_tree_01_c_LOD0`，保留原米制尺寸，再按配方复制成 16 棵一组。直接整体减面版本的近景丢失大量细叶，已保留为失败候选。卡片版本保留简化的三维源木质几何，每棵树的叶冠使用从原始叶材质单独烘焙的透明视图；近远景为 92480/8 三角形。远景视图先从完整源几何以 CPU Cycles 烘焙反照率和透明度，再制作近景近似。源底部 0.03m 内几何顶点测得的锚点保存在注册元数据中，用于坡地拟合。叶片卡片没有完整叶片体积，阴影和转动效果仍需运动验收。取回的完整 1k 源依赖约 487MB，不能只按入口 glTF 的大小估计下载量。
 
 `game/assets/cache/`、`game/assets/registered/` 和生成地图目录不入 Git；上述命令用于重新获取和生成。构建地图先写独立暂存目录，验证完毕后发布不可变版本，最后原子更新入口 JSON。失败暂存和旧版本保留供诊断。
+
+## 飞机源部件与材质
+
+F-16 的原始外形导入不含独立 XML 引用的座舱和飞行员。当前转换配方在保留原有外形的同时，加入同一源包的 `Models/pilot_externalview.ac` 和 `Models/Cockpit/Main/cockpit.ac`。转换器核对 `Models/F-16.xml` 中唯一对应的模型声明，只接受本例的零偏移；存在非零子模型变换时会报错，需使用完整 XML 导入流程，不能猜测摆放位置。它没有递归实现内部仪表系统。GPL 原始通知继续保留，manifest 保存每个新增源文件、源 XML、声明 XML 与转换器哈希。
+
+本机复现已注册配方：
+
+```powershell
+& 'C:\Program Files (x86)\Steam\steamapps\common\Blender\blender.exe' --background --python-exit-code 1 --python game/tools/convert_aircraft.py -- game/assets/registered/F16/recipe.json
+python game/tools/enrich_inventory.py
+python game/tools/audit_aircraft_surface.py --output NEW_AIRCRAFT_AUDIT
+python game/tools/prepare_player_visuals.py
+python game/tools/capture_aircraft_surfaces.py --output NEW_AIRCRAFT_VIEWS
+```
+
+原有 F-16 的 102 个绘制部分，其位置、索引、法线、UV、节点变换和源贴图已与新增部件前逐项核对；新增后为 184 个绘制部分、95122 个三角形，原版本为 15869 个三角形。新增部件有实际渲染开销，最终性能测试必须包含。显式 runtime 配方中的已注册飞机变体通过 manifest/文件哈希验证后优先保留，目录展开只补充未指定的飞机。
+
+日光配置的 `canopy_color` 是线性 RGB 色调，`canopy_alpha` 为薄层 alpha 混合不透明度；当前不使用屏幕空间透射模糊。源 F-16 透明度为 0 的内层不参与深度、高光或阴影，避免两层玻璃产生噪点。F-22 外部贴图可用 `f22_paint_knee`、`f22_paint_shoulder`、`f22_paint_floor` 调整局部线性反照率映射，保留原 UV 和源图像。这些是工程外观近似，不是实测玻璃/隐身涂层 BRDF，也不能把旧漫反射贴图称为完整 PBR。旧源图的粗面板线仍是可见限制。

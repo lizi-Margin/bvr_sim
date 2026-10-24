@@ -121,24 +121,41 @@ class Baker:
         return None
     def place(self,model,n,w,*,category,zone,scale=1,yaw=None,minimum=0,lod=1700,cull=35000,clearance=True):
         m=self.metadata[model];span=m['bounds_blender']['span'];radius=max(span[0],span[1])*scale*.48
+        stem_spacing=float(m.get('conversion_recipe',{}).get('policy',{}).get('cluster',{}).get('inter_grove_stem_spacing_m',0))
+        if not 0<=stem_spacing<=10:raise ValueError('Invalid inter-grove stem spacing')
+        if not hasattr(self,'grove_stems'):self.grove_stems={};self.overlapping_grove_roots=set();self.maximum_stem_spacing=0.
         if m.get('cluster'):radius=(math.hypot(span[0],span[1])/2+span[2]*math.sin(.2))*scale
         reason=self.forbidden(n,w,category,radius) if clearance else None
         key=(math.floor(n/50),math.floor(w/50));search=math.ceil((radius+55)/50)
         if not reason:
             for i in range(key[0]-search,key[0]+search+1):
                 for j in range(key[1]-search,key[1]+search+1):
-                    if any(math.hypot(n-x,w-y)<max(minimum,radius+r) for x,y,r in self.occupied.get((i,j),[])):reason='spacing';break
+                    if any(math.hypot(n-x,w-y)<(minimum if stem_spacing and (x,y) in self.overlapping_grove_roots else max(minimum,radius+r))
+                           for x,y,r in self.occupied.get((i,j),[])):reason='spacing';break
                 if reason:break
         if reason:self.rejections[reason]=self.rejections.get(reason,0)+1;return False
         fit=None
         if m.get('cluster'):
             from .grove_grounding import fit_grove
             if yaw is None:yaw=self.rng.uniform(-math.pi,math.pi)
-            fit=fit_grove(m,n,w,yaw,scale,self.terrain.height)
+            fit=fit_grove(m,n,w,yaw,scale,self.terrain.height,include_anchors=bool(stem_spacing))
             if fit is None:self.rejections['grove_ground_fit']=self.rejections.get('grove_ground_fit',0)+1;return False
+        stems=fit.pop('_world_anchors',[]) if fit else []
+        if stems:
+            search_stems=math.ceil(max(stem_spacing,self.maximum_stem_spacing)/4)
+            for sn,sw,_ in stems:
+                si,sj=math.floor(sn/4),math.floor(sw/4)
+                for i in range(si-search_stems,si+search_stems+1):
+                    for j in range(sj-search_stems,sj+search_stems+1):
+                        if any(math.hypot(sn-x,sw-y)<max(stem_spacing,spacing) for x,y,spacing in self.grove_stems.get((i,j),[])):
+                            self.rejections['grove_stem_spacing']=self.rejections.get('grove_stem_spacing',0)+1;return False
         self.serial+=1;h=fit['height'] if fit else self.terrain.height(n,w)-m['bounds_blender']['min'][2]*scale
         self.instances.append({'id':f'{zone}_{self.serial:05d}','model':model,'position':[round(n,4),round(w,4),round(h,5)],'yaw':round(yaw if yaw is not None else self.rng.uniform(-math.pi,math.pi),6),'scale':round(scale,5),'category':category,'zone':zone,'chunk':f'{math.floor(n/self.r["chunk_m"])}:{math.floor(w/self.r["chunk_m"])}','lod_distance':lod,'cull_distance':cull,'collision_type':m['collision_type'],'radius_m':round(radius,3)})
         if fit:self.instances[-1].update(up_normal=fit['up_normal'],grove_ground_fit=fit)
+        if stems:
+            self.overlapping_grove_roots.add((n,w));self.maximum_stem_spacing=max(self.maximum_stem_spacing,stem_spacing)
+            for sn,sw,_ in stems:self.grove_stems.setdefault((math.floor(sn/4),math.floor(sw/4)),[]).append((sn,sw,stem_spacing))
+            self.instances[-1]['grove_ground_fit']['inter_grove_minimum_stem_m']=stem_spacing
         self.occupied.setdefault(key,[]).append((n,w,radius));return True
     def surface_ribbon(self,id,points,width,material,offset=.035):
         line=LineString(points);distance=np.linspace(0,line.length,max(2,int(line.length/25)+1));vertices=[];indices=[]
@@ -149,7 +166,22 @@ class Baker:
                 vertices.append([round(n,4),round(w,4),round(self.terrain.height(n,w)+offset,5)])
         for i in range(len(distance)-1):
             a=i*2;indices.extend([a,a+2,a+1,a+1,a+2,a+3])
-        self.surfaces.append({'id':id,'material':material,'vertices':vertices,'indices':indices,'width_m':width,'length_m':line.length,'collision_height_offset':offset})
+        surface={'id':id,'material':material,'vertices':vertices,'indices':indices,'width_m':width,'length_m':line.length,'collision_height_offset':offset}
+        water_chunk=float(self.r.get('landscape',{}).get('water_render_chunk_m',0)) if material=='water' else 0
+        if water_chunk:
+            if not 100<=water_chunk<=5000:raise ValueError('Water rendering chunks must be100..5000m')
+            # Wicked derives a visible planar-reflection plane from each
+            # water object's bounds centre. One160km conformed ribbon gave
+            # the local120m river a169m reflection plane. Split only render
+            # batches, preserving every original triangle/height/UV position.
+            count=max(1,int(water_chunk/(line.length/(len(distance)-1))))
+            for start in range(0,len(distance)-1,count):
+                end=min(len(distance)-1,start+count)
+                self.surfaces.append({**surface,'id':id+'_chunk_'+str(start//count),
+                    'vertices':vertices[start*2:(end+1)*2],
+                    'indices':[i-start*2 for i in indices[start*6:end*6]],
+                    'length_m':float(distance[end]-distance[start]),'source_surface':id,'source_segment_start':start})
+        else:self.surfaces.append(surface)
     def surface_rectangle(self,id,center,size,material):
         # Dense ribbons conform to the shared height field, even on a gently sloping courtyard.
         self.surface_ribbon(id,[[center[0]-size[0]/2,center[1]],[center[0]+size[0]/2,center[1]]],size[1],material,.095 if material=='marking' else .035)

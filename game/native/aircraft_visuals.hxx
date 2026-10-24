@@ -2,6 +2,7 @@
 #include "json.hpp" // nlohmann, supplied by Wicked Engine Editor include path
 #include <fstream>
 #include <sstream>
+#include <cstring>
 // Presentation-only FlightGear hierarchy, source animation pivots and nozzle
 // attachments. Inputs are immutable values from the typed simulation snapshot.
 class AircraftVisuals {
@@ -34,8 +35,22 @@ class AircraftVisuals {
             auto n=loaded.names.GetComponent(e);std::string name=n?n->name:"";
             bool glass=id=="F22"?name=="Default":name=="glassOutsideMat"||name=="glassInsideMat";
             if(glass){
-                m.SetBaseColor({.62f,.70f,.76f,material_profile.value("canopy_alpha",.48f)});
+                // The registered F16 inner material is deliberately invisible.
+                // A global canopy override must not turn it into a second
+                // diffuse shell over the transparent outside surface.
+                if(id=="F16"&&name=="glassInsideMat"&&m.baseColor.w==0){
+                    // Retain the source's fully invisible inner layer. Force
+                    // alpha blending with no specular response as well: its
+                    // source MASK mode must not leave a depth/specular shell.
+                    m.SetBaseColor({0,0,0,0});m.SetSpecularColor({0,0,0,0});
+                    m.SetTransmissionAmount(0);m.SetCastShadow(false);m.alphaRef=1;
+                    m.userBlendMode=wi::enums::BLENDMODE_ALPHA;m.SetDirty();continue;
+                }
+                auto color=material_profile.value("canopy_color",std::vector<float>{.62f,.70f,.76f});
+                if(color.size()!=3)throw std::runtime_error("canopy_color requires three linear RGB values");
+                m.SetBaseColor({color[0],color[1],color[2],material_profile.value("canopy_alpha",.48f)});
                 m.SetRoughness(material_profile.value("canopy_roughness",.09f));m.SetMetalness(0);m.SetReflectance(.04f);
+                m.SetSpecularColor({1,1,1,1});
                 m.SetTransmissionAmount(material_profile.value("canopy_transmission",.12f));m.refraction=.02f;
                 m.shaderType=wi::scene::MaterialComponent::SHADERTYPE_PBR_CLEARCOAT;
                 m.SetClearcoatFactor(1);m.SetClearcoatRoughness(.08f);m.SetCastShadow(false);
@@ -51,6 +66,13 @@ class AircraftVisuals {
                         // their diffuse reflectance in the shader, retaining
                         // positions, normals, UVs, markings and source images.
                         m.userdata.x=0x42565250u;
+                        auto bits=[](float value){uint32_t result;std::memcpy(&result,&value,sizeof(result));return result;};
+                        float knee=material_profile.value("f22_paint_knee",.28f);
+                        float shoulder=material_profile.value("f22_paint_shoulder",.12f);
+                        float floor=material_profile.value("f22_paint_floor",0.f);
+                        if(!(knee>0&&knee<=1&&shoulder>=0&&shoulder<=1&&floor>=0&&floor<1))
+                            throw std::runtime_error("Invalid F22 linear albedo mapping parameters");
+                        m.userdata.y=bits(knee);m.userdata.z=bits(shoulder);m.userdata.w=bits(floor);
                         ++corrected_surfaces;
                     }
                     if(id=="F16"&&name=="emissiveMat.001"){

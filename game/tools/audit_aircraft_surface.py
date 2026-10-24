@@ -18,17 +18,21 @@ def inspect(path):
             strides=(v.get('byteStride',width*dtype.itemsize),dtype.itemsize)).copy()
     rows=[];geometry_hash=hashlib.sha256()
     for mesh in doc['meshes']:
-        for p in mesh['primitives']:
+        for primitive_index,p in enumerate(mesh['primitives']):
             a=p['attributes'];pos=accessor(a['POSITION']);indices=accessor(p['indices']).ravel().reshape(-1,3)
             uv=accessor(a['TEXCOORD_0']) if 'TEXCOORD_0' in a else None
             for value in [pos,indices,uv]:
                 if value is not None:geometry_hash.update(value.tobytes())
             normals=accessor(a['NORMAL']) if 'NORMAL' in a else None
+            primitive_hash=hashlib.sha256()
+            for value in [pos,indices,uv,normals]:
+                if value is not None:primitive_hash.update(value.tobytes())
             face=np.cross(pos[indices[:,1]]-pos[indices[:,0]],pos[indices[:,2]]-pos[indices[:,0]])
             area=np.linalg.norm(face,axis=1);valid=area>1e-9
             unit=face[valid]/area[valid,None]
             dots=np.einsum('ij,ikj->ik',unit,normals[indices[valid]]) if normals is not None else None
-            row={'mesh':mesh.get('name'),'material':doc['materials'][p['material']].get('name'),
+            row={'mesh':mesh.get('name'),'primitive_index':primitive_index,'material':doc['materials'][p['material']].get('name'),
+                'position_index_normal_uv_sha256':primitive_hash.hexdigest(),
                 'vertices':len(pos),'triangles':len(indices),'degenerate_triangles':int((~valid).sum()),
                 'finite_positions':bool(np.isfinite(pos).all()),'has_uv':uv is not None,
                 'uv_range':[uv.min(axis=0).tolist(),uv.max(axis=0).tolist()] if uv is not None else None,

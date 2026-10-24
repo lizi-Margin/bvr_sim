@@ -1,0 +1,14 @@
+{
+  "name": "Source fir A grove with individual-tree far LOD",
+  "tags": ["vegetation", "fir", "source_geometry", "grove", "individual_tree_impostors"],
+  "select_object": "fir_tree_01_a_LOD0",
+  "cluster": {"count": 64, "radius_m": 25, "minimum_spacing_m": 4.5, "inter_grove_stem_spacing_m": 2.5, "seed": 63241, "scale_range": [0.85, 1.15]},
+  "near_triangle_budget": 96000,
+  "foliage_cards": {"materials": ["fir_tree_01_twig", "fir_tree_01_bark", "fir_tree_01_dead_branches"], "wood_triangles_per_tree": 500, "resolution": 1024},
+  "individual_tree_impostors": true,
+  "impostor": true,
+  "impostor_resolution": 1024,
+  "impostor_engine": "CYCLES",
+  "recommended_density_per_km2": 150,
+  "physical_size_note": "Exact source-sized fir A.64declared source copies share real positions in both LODs. Near: simplified original trunk plus source-derived crown/branch cards. Far:8source-albedo/opacity triangles per individual tree, not a single grove billboard. Ground proxy uses an explicitly approximate top-view composition of these cards. Not invented botanical geometry or full original needles."
+}

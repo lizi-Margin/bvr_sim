@@ -1,5 +1,6 @@
 """Blender background entry point. Recipe coordinates must be reviewed per aircraft."""
 import bpy, sys, json, math, hashlib
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from mathutils import Matrix,Vector
 recipe=Path(sys.argv[sys.argv.index('--')+1]).resolve()
@@ -8,6 +9,22 @@ source=Path(r['source']).resolve();out=Path(r['output']).resolve();out.mkdir(par
 sys.path.insert(0,r['addon_root']);import io_scene_ac3d;io_scene_ac3d.register()
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.import_ac3d(filepath=str(source))
+components=[]
+for component in r.get('additional_sources',[]):
+    path=Path(component['path']).resolve()
+    declaration=Path(component['declaration_xml']).resolve()
+    model_path=Path(component['source_xml']).resolve()
+    matches=[m for m in ET.parse(declaration).findall('.//model')
+             if (m.findtext('path') or '').replace('\\','/').endswith('/'+model_path.name)]
+    if len(matches)!=1:raise ValueError('Additional source requires one explicit source XML model declaration: '+str(model_path))
+    offsets=matches[0].find('offsets')
+    if offsets is not None and any(float(x.text or 0)!=0 for x in offsets):
+        raise ValueError('Additional source has nonidentity source offsets; use the full XML importer: '+str(model_path))
+    bpy.ops.import_scene.import_ac3d(filepath=str(path))
+    components.append({**component,'path':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
+        'source_xml_sha256':hashlib.sha256(Path(component['source_xml']).read_bytes()).hexdigest(),
+        'declaration_xml_sha256':hashlib.sha256(declaration.read_bytes()).hexdigest(),
+        'placement':'Source aircraft coordinates, identity child-model transform; common reviewed body rotation below'})
 objects=list(bpy.context.scene.objects)
 hidden=[]
 for rootname in r.get('hide_roots',[]):
@@ -43,7 +60,6 @@ target=out/(r['id']+'.glb')
 bpy.ops.export_scene.gltf(filepath=str(target),export_format='GLB',use_selection=True,export_extras=True)
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 animations=[]
-import xml.etree.ElementTree as ET
 for xml in source.parent.glob('*.xml'):
     try:
         tree=ET.parse(xml)
@@ -51,6 +67,8 @@ for xml in source.parent.glob('*.xml'):
             animations.append({'file':xml.name,'type':node.findtext('type'),'objects':[x.text for x in node.findall('object-name')],'property':node.findtext('property'),'xml':ET.tostring(node,encoding='unicode')})
     except ET.ParseError:pass
 metadata={'id':r['id'],'source':str(source),'source_url':r['source_url'],'license':r['license'],'source_sha256':sha(source),'glb_sha256':sha(target),'file':target.name,'bounds_blender':{'min':lo,'max':hi,'span':span},'units':'meters','runtime_axes':'+Z nose, +Y up, +X starboard (Wicked LH)','nodes':[o.name for o in visible],'hidden_static_flight_nodes':hidden,'faces':sum(len(o.data.polygons) for o in visible),'blender':bpy.app.version_string,'conversion_recipe':r,'animation_status':'XML preserved in animation_inventory.json; static flight pose only; no dynamic animation playback'}
+metadata['source_components']=components
+metadata['converter_sha256']=sha(Path(__file__))
 (out/'manifest.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2),encoding='utf8')
 (out/'animation_inventory.json').write_text(json.dumps(animations,ensure_ascii=False,indent=2),encoding='utf8')
 (out/'recipe.json').write_text(json.dumps(r,ensure_ascii=False,indent=2),encoding='utf8')

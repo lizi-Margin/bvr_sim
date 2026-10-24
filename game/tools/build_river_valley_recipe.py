@@ -12,7 +12,7 @@ def recipe(forest_asset='fir_grove_cards_c'):
         'valley_base_rise_m':95,'valley_scale_m':1800,'ridge_amplitude_m':450,'ridge_start_m':2200,
         'ridge_scale_m':6000,'undulation_m':35,'earthwork_blend_m':180,'regional_transition_m':1200,'macro_resolution':4096,
         'generator':'Seeded river valley and local runway/apron earthworks; source BVR terrain retained beyond20km focus',
-        'field_layout':'warped_merged_parcels',
+        'field_layout':'warped_merged_parcels','water_render_chunk_m':500,
         'field_layout_note':'Seeded shared warped block edges with merged parcels and T junctions; authored agricultural appearance, not measured GIS',
         'individual_building_tuning':'Road frontages and source-bound footprint foundations; no region-wide settlement/industry flattening'}
     r['terrain']['airport_height_m']=220
@@ -74,8 +74,9 @@ def recipe(forest_asset='fir_grove_cards_c'):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--bake',action='store_true');p.add_argument('--output',type=Path,default=ROOT/'game/maps/river_valley_airfield')
     p.add_argument('--forest-asset',default='fir_grove_cards_c',help='Registered grove resource; earlier candidates: pine_grove_a or fir_grove_c')
+    p.add_argument('--recipe-output',type=Path,default=ROOT/'game/recipes/river_valley_airfield.json',help='Save a candidate recipe separately while keeping the current default map recipe')
     a=p.parse_args()
-    r=recipe(a.forest_asset);path=ROOT/'game/recipes/river_valley_airfield.json';write_json(path,r)
+    r=recipe(a.forest_asset);write_json(a.recipe_output,r)
     if a.bake:
         from bvr_game.worldgen import Baker
         from bvr_game.scene_runtime import BakedScene

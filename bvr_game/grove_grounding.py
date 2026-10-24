@@ -3,7 +3,7 @@ import math
 import numpy as np
 
 
-def fit_grove(manifest, north, west, yaw, scale, height, *, tolerance_m=.25, max_tilt_rad=.2):
+def fit_grove(manifest, north, west, yaw, scale, height, *, tolerance_m=.25, max_tilt_rad=.2, include_anchors=False):
     cluster = manifest['cluster']; center = np.asarray(cluster['recentering'])
     source = np.array([p.get('base_anchor',p['position']) for p in cluster['poses_before_recentering']]) - center
     # Blender source XY -> north/west, then the same yaw used by ScenePlacement.
@@ -27,7 +27,9 @@ def fit_grove(manifest, north, west, yaw, scale, height, *, tolerance_m=.25, max
     maximum = float(np.max(np.abs(errors)))
     if maximum > tolerance_m:
         return None
-    return {'height': root_height, 'up_normal': [-float(normal[1]), float(normal[2]), float(normal[0])],
+    result={'height': root_height, 'up_normal': [-float(normal[1]), float(normal[2]), float(normal[0])],
         'source_trees': len(anchors), 'max_anchor_error_m': maximum,
         'base_anchor_method':cluster.get('base_anchor_method','Legacy normalized source bounds base reference; not actual stem vertices'),
         'rms_anchor_error_m': float(np.sqrt(np.mean(errors**2))), 'tilt_rad': tilt}
+    if include_anchors:result['_world_anchors']=np.column_stack([placed[:,0]+north,placed[:,1]+west,placed[:,2]+root_height]).tolist()
+    return result

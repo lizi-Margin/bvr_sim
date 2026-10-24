@@ -55,7 +55,10 @@ def loadout(row,id=None):
 def runtime_models(runtime,resource_versions=None):
     result=dict(runtime['models'])
     for row in aircraft_catalog()['aircraft']:
-        if row['available']:result[row['id']]=row['appearance']['file']
+        # Explicit runtime entries have already passed manifest/hash validation.
+        # Expand missing catalog aircraft without silently replacing a reviewed
+        # registered variant supplied by a caller's runtime recipe.
+        if row['available']:result.setdefault(row['id'],row['appearance']['file'])
     if IMPORTED.exists():
         for row in json.loads(IMPORTED.read_text(encoding='utf8'))['aircraft']:
             file=ROOT/row['appearance']['file']

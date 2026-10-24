@@ -74,31 +74,41 @@ class FlightGameTests(unittest.TestCase):
         self.assertEqual(self.game.player().model,'F22');self.assertGreater(self.game.sim.frame().missiles_left,0)
 
     def test_yasim_keyboard_release_with_mouse_still_off_center(self):
-        # The earlier exact-center regression missed the normal parked cursor:
-        # its tiny heading offset used to reengage near-zero bank-angle assist.
+        # A parked cursor retains a world direction; it is not a persistent
+        # heading-offset/bank command. Release must recover that direction.
         for model in ['FG-A-10','FG-SU-37','FG-Hunter','FG-YF-23']:
             for direction in [-1,1]:
                 with self.subTest(model=model,direction=direction):
                     self.game.select_aircraft(model);self.game.start()
                     mouse_x=960+77*direction
-                    for tick in range(60):
+                    for _ in range(100):
+                        self.game.input(SimpleNamespace(held=[],pressed=[],x=mouse_x,y=540,quit=False),.02);self.game.step()
+                    target=list(self.game.player_input.direction)
+                    for tick in range(100):
                         event=SimpleNamespace(held=[68 if direction>0 else 65],pressed=[],x=mouse_x,y=540,quit=False)
                         self.game.input(event,.02);self.game.step()
                         if self.game.player().orientation[0]*direction>.4:break
                     banked=self.game.player()
                     self.assertGreater(banked.orientation[0]*direction,.4)
-                    for _ in range(300):
+                    weights=[];previous=None;maximum_rate=0
+                    for _ in range(1500):
                         event=SimpleNamespace(held=[],pressed=[],x=mouse_x,y=540,quit=False)
                         self.game.input(event,.02);self.game.step()
+                        state=self.game.sim.player_flight_state();weights.append(state.roll_manual_weight)
+                        maximum_rate=max(maximum_rate,abs(state.measured.body_rates[0]))
+                        self.assertLessEqual(abs(state.desired_roll_rate),self.game.player_profile['control']['max_roll_rate']+1e-10)
+                        if previous is not None:
+                            self.assertLessEqual(abs(state.controls.aileron-previous),self.game.player_profile['control']['surface_rate']*.02+1e-10)
+                        previous=state.controls.aileron
                     final=self.game.player()
                     self.assertTrue(final.alive)
-                    # New pointing assistance tracks the small off-centre
-                    # direction; it no longer latches the old bank-rate input.
                     state=self.game.sim.player_flight_state()
                     self.assertEqual(state.roll_manual_weight,0)
-                    self.assertGreater(final.orientation[0]*direction,.1)
-                    self.assertLess(abs(final.orientation[0]-state.target_bank),.15)
-                    self.assertLess(math.remainder(final.orientation[2]-banked.orientation[2],2*math.pi)*direction,-.02)
+                    self.assertTrue(all(a>=b for a,b in zip(weights,weights[1:])))
+                    self.assertLess(math.dist(target,self.game.player_input.direction),1e-10)
+                    self.assertLess(state.direction_error,math.radians(1))
+                    self.assertLess(abs(final.orientation[0]),math.radians(2))
+                    self.assertLess(maximum_rate,self.game.player_profile['control']['max_roll_rate']*1.5)
 
     def test_yasim_mouse_can_establish_bank_and_countersteer(self):
         self.game.select_aircraft('FG-A-10');self.game.start()
@@ -109,11 +119,11 @@ class FlightGameTests(unittest.TestCase):
         banked=self.game.player()
         self.assertTrue(banked.alive)
         self.assertGreater(banked.orientation[0],math.radians(25))
-        move(960,250)
+        move(960,1500)
         centered=self.game.player()
         self.assertTrue(centered.alive)
         self.assertLess(abs(centered.orientation[0]),math.radians(5))
-        self.assertLess(centered.orientation[2]-banked.orientation[2],-.02)
+        self.assertLess(self.game.sim.player_flight_state().direction_error,math.radians(1))
         move(420,100)
         self.assertLess(self.game.player().orientation[0],centered.orientation[0]-.2)
 

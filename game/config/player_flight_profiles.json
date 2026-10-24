@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "player-flight-1.4-candidate",
+  "version": "player-flight-1.5-candidate",
   "provenance": "Engineering player-assistance settings. Not FDM parameters, not AI/RL gains, not certified aircraft envelope data. Tuned labels become valid only after recorded response validation.",
   "units": {
     "control": {
@@ -204,7 +204,7 @@
           "max_alpha": 0.2,
           "min_speed": 150.0,
           "max_pitch_rate": 0.22,
-          "trim_gain": 1.0,
+          "trim_gain": 4.0,
           "pitch_rate_gain": 4.0
         }
       }
@@ -303,7 +303,8 @@
         "control": {
           "trim_gain": 0.7,
           "trim_limit": 0.35,
-          "pitch_rate_gain": 5.0
+          "pitch_rate_gain": 5.0,
+          "min_speed": 105.0
         },
         "camera": {
           "distance_spans": 2.3,

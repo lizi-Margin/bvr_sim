@@ -51,8 +51,14 @@ def main():
         if (material.userdata.x == 0x42565250u)
         {
             float luma = dot(surface.baseColor.rgb, float3(0.2126, 0.7152, 0.0722));
-            float mapped = min(luma, 0.28) + 0.12 * (1.0 - exp(-max(0.0, luma - 0.28) * 3.0));
+            float knee = asfloat(material.userdata.y);
+            float shoulder = asfloat(material.userdata.z);
+            float floor = asfloat(material.userdata.w);
+            float mapped = min(luma, knee) + shoulder * (1.0 - exp(-max(0.0, luma - knee) * 3.0));
             surface.baseColor.rgb *= mapped / max(luma, 0.00001);
+            // Explicit low-visibility paint approximation: lift only the
+            // source's darkest ink when requested, retaining UVs and images.
+            surface.baseColor.rgb += floor * exp(-luma / max(floor, 0.00001));
         }
 #endif
 '''
@@ -72,6 +78,8 @@ def main():
         'sun_rotation':[-.4,-.65,0],'ambient':[.13,.14,.15],
         'exposure':2.,'sky_exposure':1.,'sun_energy':4.,'temporal_aa':True,'fxaa':False,
         'source_surface_corrections':True,
+        'canopy_color':[.06,.045,.02],'canopy_alpha':.15,'canopy_transmission':0.,
+        'f22_paint_knee':.18,'f22_paint_shoulder':.09,'f22_paint_floor':.02,
         'scenery_materials':{'leaf_albedo':[.025,.075,.018],'bark_albedo':[.09,.06,.035],
             'basis':'Engineering linear-light albedo for existing stylized Kenney leaf/bark palette only. Source-derived textured pine is unchanged; not measured species reflectance.'},
         'horizon_height_fog':{'enabled':False,'start_m':100000,'density_per_m':0.,'base_m':0,'top_m':16000,
@@ -83,9 +91,11 @@ def main():
         'patched_objectHF_sha256':sha(object_file),'paint_material_flag':'0x42565250',
         'flat_nwu_horizon_haze':'Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.'}
     profile['provenance']={**before['provenance'],'detail_textures':'Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes',
-        'aircraft_surfaces':'Source normals/UVs audited; all positions/indices/UVs/images unchanged. F22 white RAM albedo bounded; source-named F119/vector meshes use separate metal material. F16 constant white emissive exhaust disc replaced with non-emissive metal; existing actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.',
+        'aircraft_surfaces':'Source normals/UVs audited; original exterior positions/indices/normals/UVs/images retained. F16 source pilot and cockpit-main geometry added at their declared identity transforms. F22 exterior-atlas luminance uses configurable linear knee/shoulder/dark-ink lift; source-named F119/vector meshes retain separate metal material. F16 source internal-flame white emissive disc uses non-emissive metal; actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.',
         'daylight':'Sun energy4/ACES; exposure2 selected after fixed-camera exposure1/2 and sun4/10 comparisons. Higher sun elevation and neutral ambient; no additional fog.',
         'anti_aliasing':'Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review'}
+    profile['provenance']['canopy']='Thin alpha-blended dielectric approximation, linear tint and clearcoat; original zero-opacity F16 inner layer has no depth/specular contribution. Source F16 cockpit and pilot are now included. Not measured optical data; no screen-space transmission blur.'
+    profile['provenance']['geometry']='Original registered FlightGear exterior geometry retained; F16 adds original source pilot_externalview.ac and Cockpit/Main/cockpit.ac, without new invented geometry or physical changes.'
     write_changed(ROOT/'game/recipes/player_daylight.json',json.dumps(profile,indent=2)+'\n')
     print(json.dumps({'profile':str(ROOT/'game/recipes/player_daylight.json'),'shader_changed':changed,'source_sha256':sha(sky)},indent=2))
 if __name__=='__main__':main()

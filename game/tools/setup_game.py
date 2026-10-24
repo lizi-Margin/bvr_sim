@@ -30,6 +30,12 @@ def main():
             shutil.copytree(unpacked,aircraft/package,dirs_exist_ok=True)
         out=ROOT/'game/assets/registered'/id
         recipe={'id':id,'source':str(source),'addon_root':str(addon),'output':str(out),'blender_z_rotation_deg':-90,'hide_roots':hide,'length_range_m':span,'source_url':'ssh://hulc@172.24.147.18:1145/home/hulc/Aircraft-2024/'+package+'.zip','license':'GPL-2.0; retain package notices'}
+        if id=='F16':
+            recipe['additional_sources']=[
+                {'path':str(source.parent/'pilot_externalview.ac'),'source_xml':str(source.parent/'pilot_externalview.xml'),
+                 'declaration_xml':str(source.parent/'F-16.xml'),'role':'Original source external pilot in source aircraft coordinates'},
+                {'path':str(source.parent/'Cockpit/Main/cockpit.ac'),'source_xml':str(source.parent/'Cockpit/Main/cockpit.xml'),
+                 'declaration_xml':str(source.parent/'F-16.xml'),'role':'Original source cockpit main shell/seat; static external-view detail'}]
         out.mkdir(parents=True,exist_ok=True);r=out/'recipe_input.json';r.write_text(json.dumps(recipe),encoding='utf8')
         run(a.blender,'--background','--python-exit-code','1','--python',HERE/'convert_aircraft.py','--',r)
         models[id]=str(out/(id+'.glb'))

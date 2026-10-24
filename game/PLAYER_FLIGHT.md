@@ -5,8 +5,10 @@
 ## 控制和显示
 
 - 鼠标指定世界方向；靠近窗口边缘可持续转向。投影使用真实窗口尺寸、相机姿态和垂直 FOV。
+- 鼠标移动按当前投影转换为世界目标的方向变化；相机追随、滚转、缩放本身不改变目标。窗口尺寸变化与自由观察结束会重设指针基准，停在原位不会产生新的飞行意图。将光标移回屏幕中心会反向修正目标，并不直接命令机翼水平。
 - W 压低机头，S 拉起；A/D 滚转。W/S 同按表示中立俯仰请求，仍接管该轴并阻尼角速度。
 - 辅助模式的手动俯仰请求角速度，实际舵面仍受变化率、迎角和可取得的过载反馈约束。松键后按机型配置平滑恢复指向跟随。
+- 辅助模式的 A/D 也请求配置中的最大滚转角速度，通过源 FDM 实测角速度闭环控制；原始手动模式仍直接控制副翼。`max_edge_pan` 限制边缘持续转向领先当前视线的夹角，不限制累计转过的世界航向；`edge_recenter_seconds` 是边缘角速度请求的平滑时间。
 - C 自由观察冻结原世界飞行意图，期间键盘仍可接管。右键缩放。
 - F5 切换辅助/原始手动模式。原始手动模式保留直接舵面和正常失速、失控可能。
 - P 暂停；暂停时 F6 安全加载配置，`.` 精确推进。F9 打开本次或最近一次出击日志目录。
@@ -79,7 +81,11 @@ python -m bvr_game.playtest replay RESPONSE_TAPE.json --output REPLAY_OUTPUT --r
 python game/tools/player_flight_response.py --output NEW_EXPERIMENT_DIRECTORY --speeds 180 300 500 --cases fine up down turn_45 turn_90 turn_180 vertical circle reversal climb_turn dive_recovery sustained
 python game/tools/player_core_only.py --output NEW_CORE_EXPERIMENT_DIRECTORY
 python game/tools/capture_player_visuals.py --action projection --output NEW_GPU_EXPERIMENT_DIRECTORY
+python game/tools/validate_player_handler.py --case edge --model F16 --map game/maps/river_valley_airfield/generated-map.json --profile-file game/config/player_flight_profiles.json --output NEW_EDGE_INPUT_DIRECTORY --video
+python game/tools/validate_player_handler.py --case manual --model FG-A-10 --map game/maps/river_valley_airfield/generated-map.json --profile-file game/config/player_flight_profiles.json --output NEW_MANUAL_INPUT_DIRECTORY --video
 ```
+
+`validate_player_handler` 经实际 `FlightGame.input` 输入键鼠事件，运行同一源 FDM 和追随相机；`--video` 保存 DX12 画面。默认边缘转向持续120秒，手动协议79秒，涵盖接管/松键、W/S同按、自由观察加俯仰及有限组合操纵。`--headless` 可独立诊断核心响应。它检查具体协议中的操纵方向、意图保持、舵面变化率和渲染姿态，不能代替完整包线、稳定时间、地图和性能验收。事件为确定性的客户端处理器输入，不代表物理键鼠硬件注入。
 
 响应实验保存候选模块、控制器源码、参数、输入带、原始观测和摘要；意图每0.5秒更新，当前实现每0.1秒记录状态。摘要中的极值是采样极值，不能当作每个0.02秒核心tick的严格包线保证。最终调参后仍需冻结配置、重新生成正式输入带并完成渲染/无渲染重放。
 

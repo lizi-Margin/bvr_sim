@@ -5,7 +5,7 @@ Source-derived albedo impostors, not AI imagery or replacement plant geometry.
 import bpy,math,struct,json,random
 from mathutils import Vector,Matrix
 
-def make_cluster(objects,spec,source_base_override=None):
+def make_cluster(objects,spec,source_base_override=None,source_bounds_override=None):
     """Seeded source copies; no generated botanical geometry or global RNG."""
     count=int(spec['count']);radius=float(spec['radius_m']);minimum=float(spec['minimum_spacing_m'])
     if not 2<=count<=64 or not 0<minimum<radius<100:raise ValueError('Invalid vegetation cluster policy')
@@ -24,17 +24,22 @@ def make_cluster(objects,spec,source_base_override=None):
         source_base=sum(base_points,Vector())/len(base_points)
         del points
     else:source_base=Vector(source_base_override)
-    result=[];poses=[]
+    result=[];poses=[];source_corners=[]
+    if source_bounds_override:
+        low,high=source_bounds_override
+        source_corners=[Vector((x,y,z)) for x in [low[0],high[0]] for y in [low[1],high[1]] for z in [low[2],high[2]]]
+    bounded_points=[]
     for i,(x,y) in enumerate(positions):
         angle=rng.uniform(-math.pi,math.pi);scale=rng.uniform(*spec.get('scale_range',[.85,1.15]))
         base_anchor=Vector((x,y,0))+Matrix.Rotation(angle,3,'Z')@source_base*scale
         poses.append({'position':[x,y,0],'yaw':angle,'scale':scale,'base_anchor':list(base_anchor)})
         transform=Matrix.Translation(Vector((x,y,0)))@Matrix.Rotation(angle,4,'Z')@Matrix.Scale(scale,4)
+        bounded_points.extend(transform@p for p in source_corners)
         for original in objects:
             o=original.copy();o.data=original.data.copy();o.name=f'{original.name}_source_copy_{i}'
             bpy.context.scene.collection.objects.link(o);o.matrix_world=transform@original.matrix_world;result.append(o)
     for o in objects:bpy.data.objects.remove(o,do_unlink=True)
-    bpy.context.view_layer.update();points=[o.matrix_world@Vector(c) for o in result for c in o.bound_box]
+    bpy.context.view_layer.update();points=bounded_points or [o.matrix_world@Vector(c) for o in result for c in o.bound_box]
     lo=[min(p[i] for p in points) for i in range(3)];hi=[max(p[i] for p in points) for i in range(3)]
     center=Vector(((lo[0]+hi[0])/2,(lo[1]+hi[1])/2,lo[2]))
     for o in result:o.location-=center
@@ -85,6 +90,7 @@ def alpha_mask_glb(path):
 
 def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE'):
     if render_engine not in ['BLENDER_EEVEE','CYCLES']:raise ValueError('Unsupported source-albedo bake engine')
+    out.mkdir(parents=True,exist_ok=True)
     scene=bpy.context.scene;scene.render.engine=render_engine;scene.render.film_transparent=True
     if render_engine=='CYCLES':scene.cycles.device='CPU';scene.cycles.samples=8;scene.cycles.use_denoising=False
     scene.render.resolution_x=scene.render.resolution_y=resolution;scene.render.resolution_percentage=100

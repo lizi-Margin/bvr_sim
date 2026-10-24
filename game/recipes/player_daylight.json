@@ -39,8 +39,8 @@
   "paint_factor": 0.72,
   "paint_roughness": 0.64,
   "canopy_roughness": 0.09,
-  "canopy_alpha": 0.48,
-  "canopy_transmission": 0.12,
+  "canopy_alpha": 0.15,
+  "canopy_transmission": 0.0,
   "terrain_detail": {
     "base_color": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Color.jpg",
     "normal": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_NormalDX.jpg",
@@ -54,7 +54,7 @@
   },
   "shader_patch": {
     "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
-    "patched_objectHF_sha256": "8153d160746d0bb97671b443547a197ecd40453343e7a62f542cd09a2f7f6757",
+    "patched_objectHF_sha256": "2ae960121354fd3919b025d23ee33684f91f0ce643e71ef7e640c05f5fd5d31f",
     "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
     "patched_skyHF_sha256": "a74dec34f77c16adc67783bc3d4d0be5e24e88c52be7c24db60a7e625d762e05",
     "flat_nwu_horizon_haze": "Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.",
@@ -64,18 +64,27 @@
     "paint_material_flag": "0x42565250"
   },
   "provenance": {
-    "geometry": "Existing registered FlightGear geometry unchanged",
+    "geometry": "Original registered FlightGear exterior geometry retained; F16 adds original source pilot_externalview.ac and Cockpit/Main/cockpit.ac, without new invented geometry or physical changes.",
     "material_parameters": "Engineering paint/glass/metal approximations based on source material names and roles, not measured BRDFs",
     "detail_textures": "Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes",
     "detail_mean": "Computed from source color in linear sRGB to preserve macro mean brightness",
     "shader_source": "Pinned Wicked Engine MIT source copied to cache; upstream checkout not edited",
-    "aircraft_surfaces": "Source normals/UVs audited; all positions/indices/UVs/images unchanged. F22 white RAM albedo bounded; source-named F119/vector meshes use separate metal material. F16 constant white emissive exhaust disc replaced with non-emissive metal; existing actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.",
+    "aircraft_surfaces": "Source normals/UVs audited; original exterior positions/indices/normals/UVs/images retained. F16 source pilot and cockpit-main geometry added at their declared identity transforms. F22 exterior-atlas luminance uses configurable linear knee/shoulder/dark-ink lift; source-named F119/vector meshes retain separate metal material. F16 source internal-flame white emissive disc uses non-emissive metal; actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.",
     "daylight": "Sun energy4/ACES; exposure2 selected after fixed-camera exposure1/2 and sun4/10 comparisons. Higher sun elevation and neutral ambient; no additional fog.",
-    "anti_aliasing": "Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review"
+    "anti_aliasing": "Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review",
+    "canopy": "Thin alpha-blended dielectric approximation, linear tint and clearcoat; original zero-opacity F16 inner layer has no depth/specular contribution. Source F16 cockpit and pilot are now included. Not measured optical data; no screen-space transmission blur."
   },
   "temporal_aa": true,
   "fxaa": false,
   "source_surface_corrections": true,
+  "canopy_color": [
+    0.06,
+    0.045,
+    0.02
+  ],
+  "f22_paint_knee": 0.18,
+  "f22_paint_shoulder": 0.09,
+  "f22_paint_floor": 0.02,
   "scenery_materials": {
     "leaf_albedo": [
       0.025,

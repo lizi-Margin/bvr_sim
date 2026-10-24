@@ -205,7 +205,13 @@ public:
                 manual_trim_=std::clamp(manual_trim_+(manual_rate-rates[1])*p.trim_gain*dt,-p.trim_limit,p.trim_limit);
             double manual_pull=(manual_rate-rates[1])*p.pitch_rate_gain*schedule+manual_trim_;
             pull=pull*(1-pitch_weight_)+manual_pull*pitch_weight_;
-            ail=ail*(1-roll_weight_)+last_roll_*roll_weight_;
+            // Assisted roll owns a configured body-rate request, just like
+            // assisted pitch. Direct full aileron could build several times
+            // that rate on sensitive imported aircraft and keep rolling
+            // through release. RawManual above still owns direct surfaces.
+            double manual_roll_rate=last_roll_*p.max_roll_rate;
+            double manual_ail=(manual_roll_rate-rates[0])*p.roll_rate_gain*schedule;
+            ail=ail*(1-roll_weight_)+manual_ail*roll_weight_;
             if(intent.protection){
                 bool surface_capped=false;
                 if(m.alpha){
@@ -238,7 +244,7 @@ public:
             out.elevator=move(previous_.elevator,-std::clamp(pull,-1.,1.),p.surface_rate*dt);
             out.rudder=move(previous_.rudder,std::clamp(rud,-1.,1.),p.surface_rate*dt);
             state_.target_bank=bank_;state_.roll_error=roll_error;
-            state_.desired_roll_rate=roll_demand;state_.desired_pitch_rate=pitch_demand*(1-pitch_weight_)+manual_rate*pitch_weight_;
+            state_.desired_roll_rate=roll_demand*(1-roll_weight_)+manual_roll_rate*roll_weight_;state_.desired_pitch_rate=pitch_demand*(1-pitch_weight_)+manual_rate*pitch_weight_;
         }
         state_.pitch_manual_weight=pitch_weight_;state_.roll_manual_weight=roll_weight_;
         state_.pitch_trim=trim_*(1-pitch_weight_)+manual_trim_*pitch_weight_;

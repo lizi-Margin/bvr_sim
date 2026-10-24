@@ -38,16 +38,48 @@ if policy:
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from vegetation_lod import triangles,reduce_meshes,impostors,alpha_mask_glb,make_cluster,source_foliage_cards
 source_bounds=(list(lo),list(hi));backup=[];foliage_report=None
-if policy.get('foliage_cards'):
+per_tree_far=bool(policy.get('individual_tree_impostors'))
+cluster_report=None;far=None;impostor_report=None
+if per_tree_far:
+    if not policy.get('cluster') or not policy.get('foliage_cards') or not policy.get('impostor'):
+        raise ValueError('Individual tree impostors require cluster, foliage cards and impostor policies')
+    points=[o.matrix_world@v.co for o in meshes for v in o.data.vertices]
+    base_z=min(p.z for p in points);base_points=[p for p in points if p.z<=base_z+.03]
+    source_base=list(sum(base_points,Vector())/len(base_points));del points,base_points
+    # Bake one complete real source tree, then retain every tree's placement
+    # in the far mesh. Never expand the multi-million-triangle tree64times
+    # merely to produce a single flat whole-grove billboard.
+    tree_far,tree_report=impostors(meshes,out/'single_tree',hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),
+        policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'))
+    far,bounds,cluster_report=make_cluster(tree_far,policy['cluster'],source_base,source_bounds)
+    lo,hi=bounds['min'],bounds['max']
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in far:o.hide_set(False);o.select_set(True)
+    bpy.context.view_layer.objects.active=far[0];bpy.ops.object.join();far=[bpy.context.view_layer.objects.active]
+    for o in far:o.hide_render=False
+    # Existing ground-canopy material expects a grove top-view aggregate.
+    # This preview is composed from the positioned source-tree cards; only
+    # the individual-tree mesh above is exported as the actual far LOD.
+    preview,aggregate_report=impostors(far,out,hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),
+        policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'))
+    for o in preview:bpy.data.objects.remove(o,do_unlink=True)
+    slo,shi=source_bounds
+    hybrid,foliage_report=source_foliage_cards(meshes,out/'near_foliage',shi[2],max(shi[0]-slo[0],shi[1]-slo[1]),
+        policy['foliage_cards'],policy.get('impostor_engine','BLENDER_EEVEE'))
+    meshes,_,near_report=make_cluster(hybrid,policy['cluster'],source_base,source_bounds)
+    assert near_report['poses_before_recentering']==cluster_report['poses_before_recentering']
+    if triangles(meshes)>policy.get('near_triangle_budget',triangles(meshes)):raise ValueError('Near source grove exceeds declared budget')
+    impostor_report={**aggregate_report,'triangles':triangles(far),'source_tree_bake':tree_report,
+        'method':'Individual positioned source-tree crossed cards in one shared mesh. Grove preview images are for the existing ground-canopy proxy only; no whole-grove far billboard.',
+        'source_trees':cluster_report['source_copies'],'aggregate_preview_bake':aggregate_report}
+elif policy.get('foliage_cards'):
     if not policy.get('cluster') or not policy.get('impostor'):raise ValueError('Foliage cards require the source grove/far-bake policy')
     for o in meshes:
         b=o.copy();b.data=o.data.copy();b.name=o.name+'_near_source_backup';b.hide_render=True
         bpy.context.scene.collection.objects.link(b);backup.append(b)
-cluster_report=None
-if policy.get('cluster'):
+if policy.get('cluster') and not per_tree_far:
     meshes,bounds,cluster_report=make_cluster(meshes,policy['cluster']);lo,hi=bounds['min'],bounds['max']
-far=None;impostor_report=None
-if policy.get('impostor'):
+if policy.get('impostor') and not per_tree_far:
     far,impostor_report=impostors(meshes,out,hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'))
 if backup:
     for o in meshes:bpy.data.objects.remove(o,do_unlink=True)
@@ -59,7 +91,7 @@ if backup:
     delta=Vector(hybrid_cluster['recentering'])-Vector(cluster_report['recentering'])
     for o in meshes:o.location+=delta
     if triangles(meshes)>policy.get('near_triangle_budget',triangles(meshes)):raise ValueError('Hybrid near grove exceeds its declared budget')
-else:reduce_meshes(meshes,policy.get('near_triangle_budget',triangles(meshes)))
+elif not per_tree_far:reduce_meshes(meshes,policy.get('near_triangle_budget',triangles(meshes)))
 if len(meshes)>1 and cluster_report:
     bpy.ops.object.select_all(action='DESELECT')
     for o in meshes:o.hide_set(False);o.select_set(True)
@@ -84,5 +116,6 @@ r={'id':asset_id,'name':policy.get('name',asset_id),'tags':policy.get('tags',[])
     'recommended_use':policy.get('recommended_use','Instanced scenery; source-bounded normalized geometry and explicit LODs'),
     'recommended_density_per_km2':policy.get('recommended_density_per_km2',2000),
     'collision_type':'decorative vegetation' if policy.get('impostor') else 'source bounds'}
+r['converter_sha256']=sha(Path(__file__));r['vegetation_helper_sha256']=sha(Path(__file__).with_name('vegetation_lod.py'))
 (out/'manifest.json').write_text(json.dumps(r,ensure_ascii=False,indent=2),encoding='utf8')
 print('REGISTERED',asset_id,'LOD_TRIANGLES',[x['triangles'] for x in lods])
