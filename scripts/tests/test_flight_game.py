@@ -13,14 +13,14 @@ class FlightGameTests(unittest.TestCase):
         return self.game.input(SimpleNamespace(held=[key],pressed=[key],x=960,y=540,quit=False),1/60)
     def test_hangar_fly_lock_fire_result_fly_again(self):
         self.assertEqual(self.game.mode,'hangar');self.key(50);self.assertEqual(self.game.config.player_model,'F16')
-        self.key(13);self.assertEqual(self.game.mode,'flight');self.game.step(10)
+        self.key(13);self.assertEqual(self.game.frontend.page,'prepare');self.key(13);self.assertEqual(self.game.mode,'flight');self.game.step(10)
         self.key(82);self.game.step();self.assertEqual(self.game.sim.frame().selected_target,'bandit')
         self.key(32);self.game.step();self.assertEqual(self.game.sim.frame().missiles_left,3)
         self.game.step(1500);self.assertEqual(self.game.mode,'result');self.assertEqual(self.game.sim.frame().result,'succeeded')
         self.key(13);self.assertEqual(self.game.mode,'flight');self.assertEqual(self.game.sim.frame().tick,0)
         self.key(27);self.assertEqual(self.game.mode,'hangar')
     def test_mouse_aim_controls_real_aircraft(self):
-        self.key(13);before=self.game.player().orientation
+        self.key(13);self.key(13);before=self.game.player().orientation
         event=SimpleNamespace(held=[],pressed=[],x=700,y=400,quit=False)
         for _ in range(150):self.game.input(event,.02);self.game.step()
         after=self.game.player().orientation
@@ -88,7 +88,7 @@ class FlightGameTests(unittest.TestCase):
         rows=self.game.filtered_aircraft();self.assertTrue(any(r['id']=='FG-737-800' for r in rows))
         self.game.select_aircraft('FG-737-800');self.assertTrue(self.game.config.library_aircraft)
         self.assertEqual(self.game.config.mission,'training');self.assertEqual(self.game.config.missiles,0)
-        event([13]);self.game.step(20);self.assertEqual(self.game.mode,'flight');self.assertTrue(self.game.player().alive)
+        event([13]);self.assertEqual(self.game.frontend.page,'prepare');event([13]);self.game.step(20);self.assertEqual(self.game.mode,'flight');self.assertTrue(self.game.player().alive)
         event([27]);self.game.select_aircraft('F22');self.assertFalse(self.game.config.library_aircraft)
         self.game.config.mission='air';self.game.start();self.game.step(10)
         self.assertEqual(self.game.player().model,'F22');self.assertGreater(self.game.sim.frame().missiles_left,0)

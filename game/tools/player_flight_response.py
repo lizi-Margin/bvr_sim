@@ -51,10 +51,10 @@ def run(a):
             for case in a.cases:
                 seconds=300 if case=='sustained' else 150 if case=='turn_180' else 120 if case in ['circle','reversal'] else 30 if case=='down' else 90
                 if a.seconds is not None:seconds=a.seconds
-                plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'seed':a.seed if a.seed is not None else 2201+len(plan)%9,'altitude_m':a.altitude,
+                plan.append({'model':model,'speed_mps':speed,'case':case,'seconds':seconds,'sample_ticks':a.sample_ticks,'seed':a.seed if a.seed is not None else 2201+len(plan)%9,'altitude_m':a.altitude,
                     'recovery_at_s':a.recovery_at if case in ['down_pulse','dive_recovery'] else None})
     write_json(a.output/'plan.json',{'phase':'candidate diagnostics; not final held-out evaluation','cases':plan,'profile_sha256':g.profile_store.file_sha256,
-        'core_sha256':sha(Path(native.__file__)),'map_sha256':g.scene_hash,'sample_ticks':5,'intent_ticks':25,'units':'NWU metres; orientation radians; body rates rad/s; alpha/beta radians; normal_g dimensionless; density kg/m^3'})
+        'core_sha256':sha(Path(native.__file__)),'map_sha256':g.scene_hash,'sample_ticks':a.sample_ticks,'intent_ticks':25,'units':'NWU metres; orientation radians; body rates rad/s; alpha/beta radians; normal_g dimensionless; density kg/m^3'})
     try:
         for spec in plan:
             assert sha(g.profile_store.path)==g.profile_store.file_sha256,'Profile changed during frozen experiment'
@@ -64,8 +64,8 @@ def run(a):
             for j in range(int(spec['seconds']/.5)):
                 values=intent_values(spec['case'],j*.5,a.recovery_at)
                 g.submit_player(**values)
-                for _ in range(5):
-                    g.step(5)
+                for _ in range(25//a.sample_ticks):
+                    g.step(a.sample_ticks)
                     f=g.sim.frame();p=g.player(f);s=serialize(g.sim.player_flight_state());v=list(p.velocity)
                     samples.append({'time':f.sim_time,'tick':f.tick,'target':values['direction'],'direction_error_deg':angle(values['direction'],v),
                         'limited_direction_error_deg':angle(s['limited_direction'],v),
@@ -74,10 +74,10 @@ def run(a):
                     if not p.alive or f.result!='running':break
                 actions.append({'tick':last_tick,'ticks':f.tick-last_tick,'player_intent':values,'frame_sha256':digest(serialize(f))});last_tick=f.tick
                 if not p.alive or f.result!='running':break
-            tail=samples[-min(200,len(samples)):]
+            tail=samples[-min(round(20/(.02*a.sample_ticks)),len(samples)):]
             error=[x['direction_error_deg'] for x in tail]
             steady=spec['case'] in ['fine','up','down','turn_45','turn_90','turn_180']
-            settled=next((x['time']-4 for i,x in enumerate(samples) if x['time']>=4 and len(samples[i:])>=20 and all(y['direction_error_deg']<2 for y in samples[i:])),None) if steady else None
+            settled=next((x['time']-4 for i,x in enumerate(samples) if x['time']>=4 and len(samples[i:])>=round(2/(.02*a.sample_ticks)) and all(y['direction_error_deg']<2 for y in samples[i:])),None) if steady else None
             summary={**spec,'actual_duration_s':f.sim_time,'alive':p.alive,'result':f.result,'final_error_deg':error[-1],
                 'tail_max_error_deg':max(error),'settle_to_2deg_seconds':settled,'final_speed_mps':math.sqrt(sum(x*x for x in v)),
                 'minimum_speed_mps':min(x['state']['measured']['speed'] for x in samples),'minimum_height_m':min(x['state']['measured']['position'][2] for x in samples),
@@ -93,7 +93,7 @@ def run(a):
             write_json(folder/'samples.json',samples)
             write_json(folder/'intent-tape.json',{'schema':2,'kind':'player_intent','map':str(a.map.resolve()),'map_sha256':g.scene_hash,
                 'config':serialize(g.config),'initial_position':[-20000,0,spec['altitude_m']],'initial_speed':spec['speed_mps'],
-                'player_profile':g.player_profile,'profile_file_sha256':g.profile_store.file_sha256,'initial_frame':initial,'actions':actions,'final_frame':serialize(f)})
+                'player_profile':g.player_profile,'profile_file_sha256':g.profile_store.file_sha256,'sample_ticks':a.sample_ticks,'initial_frame':initial,'actions':actions,'final_frame':serialize(f)})
             summaries.append(summary);write_json(a.output/'summary.json',{'phase':'candidate','cases':summaries,'wall_seconds':time.perf_counter()-started})
             print(json.dumps(summary),flush=True)
     finally:g.close()
@@ -108,6 +108,7 @@ def main():
     p.add_argument('--recovery-at',type=float,default=20,help='Explicit down-pulse/dive recovery onset in simulation seconds; recorded with the plan. Original20s protocol stays the default.')
     p.add_argument('--profile-file',type=Path,help='Explicit candidate profile file; freeze, snapshot and record its actual hash')
     p.add_argument('--seconds',type=float,help='Explicit development duration override, recorded in every case; omission preserves the original protocol durations')
+    p.add_argument('--sample-ticks',type=int,choices=[1,5],default=5,help='Record every core tick or the original five-tick interval; intent still updates every25ticks')
     p.add_argument('--cases',nargs='+',default=['turn_45','turn_90','turn_180','vertical']);a=p.parse_args()
     if a.seconds is not None and (not math.isfinite(a.seconds) or a.seconds<5):p.error('--seconds must be finite and at least five')
     run(a)

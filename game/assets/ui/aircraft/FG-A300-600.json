@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-A300-600",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A300-600\\FG-A300-600.glb",
+  "source_sha256": "e3e75ea2ba68ea7f27746e9831ae2ddbd0c6cad770f450ac8e97fbd70d3525ce",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A300-600.png",
+  "png_sha256": "112bfb62c5de687b8b307951c2d01954bd20bed35e7875ca1ffcb88ac134fd48",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

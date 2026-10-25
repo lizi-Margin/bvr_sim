@@ -7,6 +7,7 @@
 #include "support/support.hxx"
 #include "c3utils/c3utils.hxx"
 #include "resource_paths.hxx"
+#include "simulator/weapon_catalog.hxx"
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -29,23 +30,14 @@ constexpr bool prevent_low_loft = false;
 // ─── Parameter factory ────────────────────────────────────────────────────────
 
 ParamStore MModelA::_make_params(const std::string& missile_model) noexcept {
-    static const std::map<std::string, std::string> config_mapping = {
-        {"AIM-9", "aim9m.json"},
-        {"AIM-9M", "aim9m.json"},
-        {"AIM-9M-Omni", "aim9m_omni.json"},
-        {"AIM-120C", "aim120c_mmodela.json"},
-        {"AIM-120C-MModelA", "aim120c_mmodela.json"},
-        {"AIM-120C-MModelA-Poor", "aim120c_mmodela_poor.json"},
-    };
-
-    auto it = config_mapping.find(missile_model);
-    if (it == config_mapping.end()) {
+    const auto* definition=find_weapon(missile_model);
+    if (!definition || definition->parameter_file.empty()) {
         colorful::printHONG("[MModelA] Unknown missile model: " + missile_model + ", returning empty ParamStore");
         return ParamStore{};
     }
 
     try {
-        const auto path = resource_paths::get_resource_path("missile/mmodelA/" + it->second);
+        const auto path = resource_paths::get_resource_path(definition->parameter_file);
         return ParamStore::from_file(path.string());
     } catch (const std::exception& e) {
         colorful::printHONG("[MModelA] Failed to load params for " + missile_model + ": " + e.what());
@@ -137,7 +129,7 @@ bool MModelA::_can_track_from(const std::shared_ptr<SimulatedObject>& friend_) c
 
 bool MModelA::can_track_target() noexcept {
     if (!target) {
-        radar_on = false;
+        seeker_active_ = false;
         guide_cmd_valid = false;
         return false;
     }
@@ -154,7 +146,7 @@ bool MModelA::can_track_target() noexcept {
         precise_cue = true;
     }
 
-    if (losstime > 0.1 && !radar_on) {
+    if (losstime > 0.1 && !seeker_active_) {
         if (!loss) {
             _before_loss_real_last_known_target_pos = last_known_target_pos;
             loss = true;
@@ -216,11 +208,11 @@ bool MModelA::can_track_target() noexcept {
 
         if (attack_angle < params_.get_double_("track_gimbal_limit")) {
             if (guide_cmd_valid) {
-                radar_on = true;
+                seeker_active_ = true;
             } else if (precise_cue) {
-                radar_on = true;
+                seeker_active_ = true;
             } else if (attack_angle < params_.get_double_("search_fov")) {
-                radar_on = true;
+                seeker_active_ = true;
             } else {
                 Vector3 to_last_known(
                     last_known_target_pos[0] - position[0],
@@ -229,16 +221,19 @@ bool MModelA::can_track_target() noexcept {
                 );
                 Vector3 to_target(rel[0], rel[1], rel[2]);
                 const double search_angle = to_last_known.get_angle(to_target);
-                radar_on = (search_angle < params_.get_double_("search_fov"));
+                seeker_active_ = (search_angle < params_.get_double_("search_fov"));
             }
         } else {
-            radar_on = false;
+            seeker_active_ = false;
         }
     } else {
-        radar_on = false;
+        seeker_active_ = false;
     }
 
-    if (guide_cmd_valid || radar_on) {
+    const auto* definition=find_weapon(missile_model);
+    ir_on=definition&&definition->seeker=="infrared"&&seeker_active_;
+    radar_on=definition&&definition->seeker!="infrared"&&seeker_active_;
+    if (guide_cmd_valid || seeker_active_) {
         losstime = 0.0;
         return true;
     }
@@ -266,7 +261,7 @@ double MModelA::K_func(double range_to_target) const noexcept {
     const double K = params_.get_double_("K");
 
     const double base_K = std::max(K * (t_max - elapsed) / t_max, 0.5);
-    if (radar_on || elapsed < t_thrust) {
+    if (seeker_active_ || elapsed < t_thrust) {
         return K;
     }
 
@@ -431,7 +426,7 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     }
     L_eps = eps;
 
-    if (params_.get_bool_("enable_loft") && !radar_on && elapsed < 4.0) {
+    if (params_.get_bool_("enable_loft") && !seeker_active_ && elapsed < 4.0) {
         const double min_val = std::min(meters_to_nm(range_to_target), 10.0);
         if (rad2deg(fdm_.get_pitch()) < min_val) {
             deps = std::max(deps, 0.1);
@@ -443,7 +438,7 @@ std::pair<double, double> MModelA::update_guidance() noexcept {
     const double angle_error = norm_pi(beta - phi);
 
     double desired_dbeta = dbeta;
-    if (radar_on && range_to_target < feet_to_meters(5000.0)) {
+    if (seeker_active_ && range_to_target < feet_to_meters(5000.0)) {
         desired_dbeta = dbeta;
     } else if (enable_angle_navigation && elapsed < t_thrust) {
         const double angle_blend_min = 0.0;

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-harrier",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-harrier\\FG-harrier.glb",
+  "source_sha256": "86134aa66cb8ce40728b9137e9e0accb3702bc7fb15ec56ce2877b2428b42bbf",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-harrier.png",
+  "png_sha256": "e175a90f1ee51211e2be66cbafd297eb429f5c6eb6e300a7fccd62840d35e95c",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

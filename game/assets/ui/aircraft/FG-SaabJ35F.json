@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-SaabJ35F",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-SaabJ35F\\FG-SaabJ35F.glb",
+  "source_sha256": "9dcf18b553faf26ad4fd112a9ca57cd3eaac801c41438c4594146792e5e70c9b",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-SaabJ35F.png",
+  "png_sha256": "8f5a8e013f2be6ca9a8ba81d88766a3a895f1e392bca9ea8d4d8f607e8e92081",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

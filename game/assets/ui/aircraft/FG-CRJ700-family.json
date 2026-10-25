@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-CRJ700-family",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CRJ700-family\\FG-CRJ700-family.glb",
+  "source_sha256": "db207c15f487c82f8c048478b49de9d21e3ca6d004d3e61ee733293e17a4a038",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CRJ700-family.png",
+  "png_sha256": "a3a6fb11c68b59a237a99f792e5ed29d4618e4f987c226444bc7067933c1431a",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-SU-37",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-SU-37\\FG-SU-37.glb",
+  "source_sha256": "74d2c23efce7a2e8c30ac34870282aae02d7afd951733a15e3814ddbae59bccd",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-SU-37.png",
+  "png_sha256": "7d47da91434cf75a3d2642470c7d2965d88519a6ebadd03557965c89492cd577",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

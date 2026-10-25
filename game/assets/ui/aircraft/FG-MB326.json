@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-MB326",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MB326\\FG-MB326.glb",
+  "source_sha256": "27df8a9398efb911c832190c222849abc65ebfae125757bbe737b1e7e6e8d978",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MB326.png",
+  "png_sha256": "6e2140f839a7fa627112053c748597ef0403175e6b43bbc927b5dbb05847a90c",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

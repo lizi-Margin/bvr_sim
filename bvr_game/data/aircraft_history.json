@@ -1,0 +1,5189 @@
+{
+  "schema_version": 1,
+  "date_policy": "Decade of reference aircraft family first flight; non-flying designs use documented design/exhibition decade. Fictional aircraft have no historical decade. No within-decade chronological claim.",
+  "country_policy": "Design origin, not livery/operator. USSR and Russia remain separate. Multinational programmes use a joint tab with participating countries in notes. Czech tab includes former Czechoslovakia.",
+  "connection_policy": "Connections show role-based chronological browsing only, not unlock prerequisites or asserted historical derivation.",
+  "countries": [
+    {
+      "id": "usa",
+      "label": "美国"
+    },
+    {
+      "id": "ussr",
+      "label": "苏联"
+    },
+    {
+      "id": "russia",
+      "label": "俄罗斯"
+    },
+    {
+      "id": "uk",
+      "label": "英国"
+    },
+    {
+      "id": "france",
+      "label": "法国"
+    },
+    {
+      "id": "germany",
+      "label": "德国"
+    },
+    {
+      "id": "italy",
+      "label": "意大利"
+    },
+    {
+      "id": "sweden",
+      "label": "瑞典"
+    },
+    {
+      "id": "japan",
+      "label": "日本"
+    },
+    {
+      "id": "canada",
+      "label": "加拿大"
+    },
+    {
+      "id": "netherlands",
+      "label": "荷兰"
+    },
+    {
+      "id": "brazil",
+      "label": "巴西"
+    },
+    {
+      "id": "czech",
+      "label": "捷克"
+    },
+    {
+      "id": "switzerland",
+      "label": "瑞士"
+    },
+    {
+      "id": "israel",
+      "label": "以色列"
+    },
+    {
+      "id": "poland",
+      "label": "波兰"
+    },
+    {
+      "id": "romania",
+      "label": "罗马尼亚"
+    },
+    {
+      "id": "argentina",
+      "label": "阿根廷"
+    },
+    {
+      "id": "joint",
+      "label": "联合研制"
+    },
+    {
+      "id": "fictional",
+      "label": "虚构"
+    }
+  ],
+  "aircraft": [
+    {
+      "id": "F22",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-22",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_Martin_F-22_Raptor",
+          "title": "Lockheed Martin F-22 Raptor",
+          "html_sha256": "a28627972b6060d3228a737b187eafb87984752afd96e5b9b274333a4c85277a"
+        }
+      ]
+    },
+    {
+      "id": "F16",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-16",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/General_Dynamics_F-16_Fighting_Falcon",
+          "title": "General Dynamics F-16 Fighting Falcon",
+          "html_sha256": "ba9c7c6fa0aa5fdf499459a58419b9236494ec4726310073ef1e5e49ea7ddce1"
+        }
+      ]
+    },
+    {
+      "id": "F15",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-15",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_F-15_Eagle",
+          "title": "McDonnell Douglas F-15 Eagle",
+          "html_sha256": "37adeb580f7ed696348ee067f6b98fb1a346c1b17db0b6d5628c0431ec713ad3"
+        }
+      ]
+    },
+    {
+      "id": "F18",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F/A-18",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "美国研制的Hornet家族，当前源模型为加拿大CF-18外观。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_F/A-18_Hornet",
+          "title": "McDonnell Douglas F/A-18 Hornet",
+          "html_sha256": "7a2fbfb2506eb5e9256a869858183b17a989f2984e0250ee8d12a2ae084c08c8"
+        }
+      ]
+    },
+    {
+      "id": "F4N",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-4",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_F-4_Phantom_II",
+          "title": "McDonnell Douglas F-4 Phantom II",
+          "html_sha256": "4dbe296216feb8847b4d12986f6f80385f44e69606ea8f265df886fef6becc54"
+        }
+      ]
+    },
+    {
+      "id": "FG-707",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 707",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_707",
+          "title": "Boeing 707",
+          "html_sha256": "a87cd721543b07ea774f14ad95e6d71c46f39d165de84f5a83dd65636e7be4dc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\707.zip",
+          "member": "707/EC-137D-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "5b83d577dd15982937b953b93660554089621cec3e33b34d5758843fbeff87c0"
+        }
+      ]
+    },
+    {
+      "id": "FG-717",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 717",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_717",
+          "title": "Boeing 717",
+          "html_sha256": "fb4b604febfb3aca291f379793d501c7b0c40bd5b0cb38bbdf96bb7beb2c15bc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\717.zip",
+          "member": "717/717-200-set.xml",
+          "tags": [
+            "boeing",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "transport",
+            "t-tail",
+            "1990s",
+            "2000s",
+            "ifr"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "c9bafcaf1766395daa829de3d6f535fd44399d27b179d331fec05daa287ec320"
+        }
+      ]
+    },
+    {
+      "id": "FG-727-230",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 727",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_727",
+          "title": "Boeing 727",
+          "html_sha256": "1ca039daeaad743a91f63b5c6f01a42f9aaaaeca2796bce7af690b57f3f20d6b"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\727-230.zip",
+          "member": "727-230/727-230-set.xml",
+          "tags": [
+            "transport",
+            "boeing",
+            "jet",
+            "retractable-gear",
+            "twin-engine",
+            "t-tail",
+            "ifr",
+            "1960s",
+            "1970s",
+            "1980s"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "d8bc033adac1d5f25049897c2c2ac50fa358572131dcbec384fb676815f27099"
+        }
+      ]
+    },
+    {
+      "id": "FG-737-800",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 737",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_737_Next_Generation",
+          "title": "Boeing 737 Next Generation",
+          "html_sha256": "103a5191b4c49337e92ec2896f9ed9f887c057f579f93596cecae14ef00267a2"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\737-800.zip",
+          "member": "737-800/738-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "fab6898a21b9aeed949e2795152ef79d604f9f35f90c83fb44852aa26056b861"
+        }
+      ]
+    },
+    {
+      "id": "FG-747-8i",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 747",
+      "decade": 2010,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "目录标题与资源描述分别为8i/货机，按747-8共同年代排序，保留原始资源身份。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_747-8",
+          "title": "Boeing 747-8",
+          "html_sha256": "018488e88ab9cc7514100c728fcc0701e34d71044d27c1da63247f1be25d0889"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\747-8i.zip",
+          "member": "747-8i/747-8i-set.xml",
+          "tags": [
+            "transport",
+            "boeing",
+            "jet",
+            "retractable-gear",
+            "glass-cockpit",
+            "ifr",
+            "2010s"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "1f56195d87f482a01cdebaf729a690a6bc8de8f553cec61dad987e2e1687e821"
+        }
+      ]
+    },
+    {
+      "id": "FG-757-200",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 757",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_757",
+          "title": "Boeing 757",
+          "html_sha256": "769b0e35d6e144c93e33365565f987320658a9b05b266b2e306bc71a780e2ff2"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\757-200.zip",
+          "member": "757-200/C-32A-set.xml",
+          "tags": [
+            "transport",
+            "boeing",
+            "jet",
+            "retractable-gear",
+            "glass-cockpit",
+            "ifr",
+            "2010s",
+            "2000s",
+            "1990s",
+            "etops",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "bce825df717dc3cc6bcc0eb01eff20ebcd89462ac3a672da3122ac9e08b8d466"
+        }
+      ]
+    },
+    {
+      "id": "FG-767-300",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 767",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_767",
+          "title": "Boeing 767",
+          "html_sha256": "7081aceba861c05b8654b51a730573f629e4a52cb3f1d20eb4633c3bb937025c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\767-300.zip",
+          "member": "767-300/767-300ER-set.xml",
+          "tags": [
+            "transport",
+            "boeing",
+            "jet",
+            "retractable-gear",
+            "glass-cockpit",
+            "ifr",
+            "2010s",
+            "2000s",
+            "1990s",
+            "1980s",
+            "etops",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b5045408b1fd5b2f374548f4f0fd5212086d1dd86b09096a9c00fcff92062d59"
+        }
+      ]
+    },
+    {
+      "id": "FG-777",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 777",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_777",
+          "title": "Boeing 777",
+          "html_sha256": "1fa5d8cfcd7f7e8791c08cea22372e0c34cd02599d5e36c4ce58c75a3a9d2c34"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\777.zip",
+          "member": "777/777-300ER-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "d77451fce3ab13f351f2857e4f35897233443d5d205b396beed3e9a8ed15ce70"
+        }
+      ]
+    },
+    {
+      "id": "FG-787-8",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Boeing 787",
+      "decade": 2000,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_787_Dreamliner",
+          "title": "Boeing 787 Dreamliner",
+          "html_sha256": "76033aff5760faf8d857783ce00ffdbc9abd1aeb1513cc2225babfd14905c986"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\787-8.zip",
+          "member": "787-8/787-8-set.xml",
+          "tags": [
+            "transport",
+            "boeing",
+            "2010s",
+            "etops",
+            "glass-cockpit",
+            "hud",
+            "ifr",
+            "retractable-gear",
+            "tricycle",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "146b6330115d93dc1ac480ac1229332c9510244fd4580bb84d556ef298080792"
+        }
+      ]
+    },
+    {
+      "id": "FG-A-10",
+      "country": "usa",
+      "role": "attack",
+      "family": "A-10",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Fairchild_Republic_A-10_Thunderbolt_II",
+          "title": "Fairchild Republic A-10 Thunderbolt II",
+          "html_sha256": "f6a59ffb1bf1e39e72a44934839d5b6391b3585f189d2bd224a1253a4a5c2eec"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\A-10.zip",
+          "member": "A-10/A-10-set.xml",
+          "tags": [
+            "bomber",
+            "fairchild",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "gulfwar1",
+            "gulfwar2",
+            "hud",
+            "ifr",
+            "refuel",
+            "retractable-gear",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "af414d7916f19ffa94f46ddaec47f55a08c0f594b4741d73a5098982daac2f00"
+        }
+      ]
+    },
+    {
+      "id": "FG-A-6E",
+      "country": "usa",
+      "role": "attack",
+      "family": "A-6",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Grumman_A-6_Intruder",
+          "title": "Grumman A-6 Intruder",
+          "html_sha256": "11b2a8bf24b2efe2125cf8a4800e8dd98c5491722074aba96d2de8d7d9cef82d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\A-6E.zip",
+          "member": "A-6E/A-6E-set.xml",
+          "tags": [
+            "bomber",
+            "grumman",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "vietnam",
+            "gulfwar1",
+            "hud",
+            "ifr",
+            "refuel",
+            "retractable-gear",
+            "tail-hook",
+            "wing-fold",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "20ddbda77f953cb8b10187b068c219075b76f638c914286ab78e168d8b6ed2b7"
+        }
+      ]
+    },
+    {
+      "id": "FG-A300-600",
+      "country": "joint",
+      "role": "airliner",
+      "family": "Airbus A300",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。 Airbus欧洲联合项目。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Airbus_A300",
+          "title": "Airbus A300",
+          "html_sha256": "78174f7f20cad3acd75c18623016c62929cf494cf0eee087eead15effcede210"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\A300-600.zip",
+          "member": "A300-600/A300-603-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "78ef5e5506ced7a33c63c5f27888e4718fa4de18e28b920fbe1183598d748d42"
+        }
+      ]
+    },
+    {
+      "id": "FG-A320-family",
+      "country": "joint",
+      "role": "airliner",
+      "family": "Airbus A320",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。 Airbus欧洲联合项目。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Airbus_A320_family",
+          "title": "Airbus A320 family",
+          "html_sha256": "cb0acc9160eab4345f6d6eca4996dc04d9adecaf0861f8fe337b44f8232bd058"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\A320-family.zip",
+          "member": "A320-family/A320neo-CFM-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "263eb12f42b3774cf0d9403025d9fda5b306d9c7c3f10e65e0511a4e63cc0950"
+        }
+      ]
+    },
+    {
+      "id": "FG-A340-600",
+      "country": "joint",
+      "role": "airliner",
+      "family": "Airbus A340",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。 Airbus欧洲联合项目。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Airbus_A340",
+          "title": "Airbus A340",
+          "html_sha256": "5d9caa2e7fc90114916b1bd28c2bd9c7b55d25810c4adf168e86d0a602284fe5"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\A340-600.zip",
+          "member": "A340-600/A340-600-set.xml",
+          "tags": [
+            "airbus",
+            "transport",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "four-engine",
+            "jet",
+            "glass-cockpit",
+            "etops",
+            "ifr",
+            "1990s",
+            "2000s",
+            "2010s"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "1906aaa0dae90a23c7e62d0da2379e38c01ab7ff7b21f58880e1575fd59eab24"
+        }
+      ]
+    },
+    {
+      "id": "FG-A380",
+      "country": "joint",
+      "role": "airliner",
+      "family": "Airbus A380",
+      "decade": 2000,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。 Airbus欧洲联合项目。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Airbus_A380",
+          "title": "Airbus A380",
+          "html_sha256": "e72ddd424fbdb44c8161d1e8c7561d78a1d75930547dbc25fd48f3f6e74432a7"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\A380.zip",
+          "member": "A380/A380-set.xml",
+          "tags": [
+            "transport",
+            "airbus",
+            "2000s",
+            "2010s",
+            "ifr",
+            "tricycle",
+            "jet",
+            "retractable-gear",
+            "glass-cockpit",
+            "ifr"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "09a9e6c2aaf548dc6e122b617e9a62431eb66cad3a43c0f022f466f78ef71790"
+        }
+      ]
+    },
+    {
+      "id": "FG-a4",
+      "country": "usa",
+      "role": "attack",
+      "family": "A-4",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Douglas_A-4_Skyhawk",
+          "title": "Douglas A-4 Skyhawk",
+          "html_sha256": "922b8f3c7a0d475d2cd9890ec6dbe26644d6fa1278591c87e7f2b53c91415ccf"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\a4.zip",
+          "member": "a4/a4f-set.xml",
+          "tags": [
+            "bomber",
+            "carrier",
+            "douglas",
+            "1960s",
+            "1970s",
+            "1980s",
+            "coldwar",
+            "vietnam",
+            "retractable-gear",
+            "refuel",
+            "tail-hook",
+            "tricycle",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "2b01ae0138d7185b16e7f897fea5796702a2be90d1acfda76c078547959a4316"
+        }
+      ]
+    },
+    {
+      "id": "FG-Aermacchi-MB-339",
+      "country": "italy",
+      "role": "trainer",
+      "family": "MB-339",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Aermacchi_MB-339",
+          "title": "Aermacchi MB-339",
+          "html_sha256": "7fedf318c1542886d0f0b7a020c17989a9317f5af14d6f4746acad5f1382ca32"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Aermacchi-MB-339.zip",
+          "member": "Aermacchi-MB-339/mb339-set.xml",
+          "tags": [
+            "aermacchi",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "single-engine",
+            "jet",
+            "ifr",
+            "trainer",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2020s",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "2ff4cc9fed46809b6b0edf5ccd2b970a14a261e2540503caac09f77efd0f4523"
+        }
+      ]
+    },
+    {
+      "id": "FG-Aero-L-29",
+      "country": "czech",
+      "role": "trainer",
+      "family": "L-29",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Aero_L-29_Delf%C3%ADn",
+          "title": "Aero L-29 Delfín",
+          "html_sha256": "66678ef34319eab34314b31cf8060873b25151bf449b234b67ed31766b3d5f6e"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Aero-L-29.zip",
+          "member": "Aero-L-29/aerol29-set.xml",
+          "tags": [
+            "Aero-Vodochody",
+            "trainer",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "jet",
+            "tricycle",
+            "single-engine",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "ce509190a50ff85862c91e83444ec772d733373a7da9f54514b8c370c396db8e"
+        }
+      ]
+    },
+    {
+      "id": "FG-Alphajet",
+      "country": "joint",
+      "role": "trainer",
+      "family": "Alpha Jet",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "法国/德国联合研制。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault/Dornier_Alpha_Jet",
+          "title": "Dassault/Dornier Alpha Jet",
+          "html_sha256": "3896ac7b9980baea22ef7ee714c050985839c3cc03cc5f2dc97bb745ea995696"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Alphajet.zip",
+          "member": "Alphajet/alphajet-set.xml",
+          "tags": [
+            "dassault",
+            "high-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "trainer",
+            "aerobatic",
+            "ifr",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "8fac442a6c9b802acda5e932522fc8a4f4a08a03c7bc89a47f69d1074ba40ba7"
+        }
+      ]
+    },
+    {
+      "id": "FG-AN-225",
+      "country": "ussr",
+      "role": "support",
+      "family": "An-225",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "苏联时期基辅安东诺夫设计局研制；位于今乌克兰。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Antonov_An-225_Mriya",
+          "title": "Antonov An-225 Mriya",
+          "html_sha256": "1cb489fa64ddda92a2f080aecffe1d620ba7239dc561b9785b397c1604ec23de"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\AN-225.zip",
+          "member": "AN-225/AN-225-set.xml",
+          "tags": [
+            "antonov",
+            "high-wing",
+            "tricycle",
+            "retractable-gear",
+            "multi-engine",
+            "jet",
+            "ifr",
+            "cargo",
+            "etops",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "65179b57f06aab89dbb061676861e6a815501dea0c68c29a2d145b429034f6c8"
+        }
+      ]
+    },
+    {
+      "id": "FG-AR-234",
+      "country": "germany",
+      "role": "attack",
+      "family": "Ar 234",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Arado_Ar_234",
+          "title": "Arado Ar 234",
+          "html_sha256": "57816bc0b62c4b2f2fae9788fe110c540d557676bf55ccde7a00ca8fd0cdd312"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\AR-234.zip",
+          "member": "AR-234/ar234-C-set.xml",
+          "tags": [
+            "arado",
+            "bomber",
+            "reconnaissance",
+            "high-wing",
+            "tricycle",
+            "retractable-gear",
+            "four-engine",
+            "jet",
+            "1940s",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "62a7daf6e84e1758815fa409119723f0881d12bb524ead81cebad82c03898822"
+        }
+      ]
+    },
+    {
+      "id": "FG-Avro-Arrow",
+      "country": "canada",
+      "role": "fighter",
+      "family": "CF-105",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Avro_Canada_CF-105_Arrow",
+          "title": "Avro Canada CF-105 Arrow",
+          "html_sha256": "36dae31927839fb022e7455cdae4739f8c2f58766544858e0a964a48b7e47755"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Avro-Arrow.zip",
+          "member": "Avro-Arrow/arrow-set.xml",
+          "tags": [
+            "avro",
+            "fighter",
+            "1950s",
+            "high-wing",
+            "delta-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "afterburner",
+            "compositor"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "248017719ecc65fdca463b341bcaed44e5718c53deecea301270b56bcfd9d9f8"
+        }
+      ]
+    },
+    {
+      "id": "FG-B-1B",
+      "country": "usa",
+      "role": "attack",
+      "family": "B-1",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Rockwell_B-1_Lancer",
+          "title": "Rockwell B-1 Lancer",
+          "html_sha256": "fb01cb75fecafeef26e2da2e3c56c81ad9b9288753b08850ad219c4c6a6f0e7f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\B-1B.zip",
+          "member": "B-1B/B-1B-set.xml",
+          "tags": [
+            "bomber",
+            "boeing",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "gulfwar1",
+            "gulfwar2",
+            "retractable-gear",
+            "variable-geometry",
+            "ifr",
+            "hud",
+            "supersonic",
+            "afterburner",
+            "jet"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "248c08888096ffffbaf7b5b7bd3e300db6994d1b40dff48c9e71dd069114f725"
+        }
+      ]
+    },
+    {
+      "id": "FG-B-2",
+      "country": "usa",
+      "role": "attack",
+      "family": "B-2",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Northrop_B-2_Spirit",
+          "title": "Northrop B-2 Spirit",
+          "html_sha256": "07c899cc142bab5fc13da93557b9dbd94602aea97e785c00c8df101273ae042d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\B-2.zip",
+          "member": "B-2/B-2-set.xml",
+          "tags": [
+            "bomber",
+            "grumman",
+            "northrop",
+            "1990s",
+            "2000s",
+            "2010s",
+            "gulfwar2",
+            "glass-cockpit",
+            "hud",
+            "ifr",
+            "retractable-gear",
+            "jet",
+            "refuel"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "33c62ef32a86088c58130b7b612878bb8750ade558b73b2f9c3cb75534379b58"
+        }
+      ]
+    },
+    {
+      "id": "FG-B-36D-Peacemaker",
+      "country": "usa",
+      "role": "attack",
+      "family": "B-36",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Convair_B-36_Peacemaker",
+          "title": "Convair B-36 Peacemaker",
+          "html_sha256": "fe35838f8e0a8fcfff8008cc354c671b1be73e36450d734daa1443e15be0d23b"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\B-36D-Peacemaker.zip",
+          "member": "B-36D-Peacemaker/b36d-set.xml",
+          "tags": [
+            "convair",
+            "bomber",
+            "1940s",
+            "1950s",
+            "piston",
+            "jet",
+            "10-engines",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "37c4db6196bc4c0c482b5b021777d0d1af74643e2b83de9fae3dbf61c1c9a4c1"
+        }
+      ]
+    },
+    {
+      "id": "FG-B-52F",
+      "country": "usa",
+      "role": "attack",
+      "family": "B-52",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_B-52_Stratofortress",
+          "title": "Boeing B-52 Stratofortress",
+          "html_sha256": "3701e836e2521a82ac44ce94c3ece9b05c71083cf43d82a70f60db74764243cf"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\B-52F.zip",
+          "member": "B-52F/B-52F-set.xml",
+          "tags": [
+            "bomber",
+            "boeing",
+            "jet",
+            "retractable-gear",
+            "coldwar"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b2c3e9f93fcde0c52f0092e4d0ed5ca37992a4d953b5da7075129d36693e7675"
+        }
+      ]
+    },
+    {
+      "id": "FG-BAC-TSR2",
+      "country": "uk",
+      "role": "attack",
+      "family": "TSR-2",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/BAC_TSR-2",
+          "title": "BAC TSR-2",
+          "html_sha256": "14df450092a6b601a77e7614461bdd7a5c97b6a9c438a868fb37ea03b4b19573"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\BAC-TSR2.zip",
+          "member": "BAC-TSR2/BAC-TSR2-set.xml",
+          "tags": [
+            "bomber",
+            "1960s",
+            "coldwar",
+            "prototype",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "30138d34c253c248b4bf4afc2b8f8d1c52e699795efa67ddf2313641bda1a818"
+        }
+      ]
+    },
+    {
+      "id": "FG-BAe-125",
+      "country": "uk",
+      "role": "airliner",
+      "family": "BAe 125",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/British_Aerospace_125",
+          "title": "British Aerospace 125",
+          "html_sha256": "b52adb18a2c41e76ccdaea1ee43a4c77a1510df008230b1fb3c5f084c28e5dd4"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\BAe-125.zip",
+          "member": "BAe-125/bae125-set.xml",
+          "tags": [
+            "bae",
+            "transport",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "ifr",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "842f1905dc38b60460398219ca3cf07a5aa8442630e5ba7633ab8026457c2a64"
+        }
+      ]
+    },
+    {
+      "id": "FG-BAe-146",
+      "country": "uk",
+      "role": "airliner",
+      "family": "BAe 146",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/British_Aerospace_146",
+          "title": "British Aerospace 146",
+          "html_sha256": "ec7e0fddb56c056d4c67084430ebf36eb6196805fed28329692fd2fd8ce4995d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\BAe-146.zip",
+          "member": "BAe-146/bae146-set.xml",
+          "tags": [
+            "British-Aerospace",
+            "regional-jet",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "tricycle",
+            "retractable-gear",
+            "4-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "213f00388c25a890acc722892b93ce8a421a9a251502e237cf63a263c4de4fe7"
+        }
+      ]
+    },
+    {
+      "id": "FG-Bell-P-59",
+      "country": "usa",
+      "role": "fighter",
+      "family": "P-59",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Bell_P-59_Airacomet",
+          "title": "Bell P-59 Airacomet",
+          "html_sha256": "3ae94f2079afb0fa582b3a69573e2cb0977d731038c370aa0b353a2b4f309964"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Bell-P-59.zip",
+          "member": "Bell-P-59/p59-set.xml",
+          "tags": [
+            "bell",
+            "fighter",
+            "1940s",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "4338143e5e72e7c56cf4ffb1dda28515a417af4ad2fc59fca9225258010f56af"
+        }
+      ]
+    },
+    {
+      "id": "FG-Buccaneer",
+      "country": "uk",
+      "role": "attack",
+      "family": "Buccaneer",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Blackburn_Buccaneer",
+          "title": "Blackburn Buccaneer",
+          "html_sha256": "46f7a151fac815469b194065b375be33471fb9b8c23fcc5147b7014b677c81b6"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Buccaneer.zip",
+          "member": "Buccaneer/buccaneer-wingman-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "b1989c9407a99e2f423f0b6f03553903b2d7eacb1930bb9c9791dbb02adc8cd8"
+        }
+      ]
+    },
+    {
+      "id": "FG-Campini-Caproni-N1",
+      "country": "italy",
+      "role": "trainer",
+      "family": "Campini N.1",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Caproni_Campini_N.1",
+          "title": "Caproni Campini N.1",
+          "html_sha256": "8aacd700b3ce3f8393498b63abe2cbc41a9f879ff3e6236660267ef8796283a2"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Campini-Caproni-N1.zip",
+          "member": "Campini-Caproni-N1/ccn1-set.xml",
+          "tags": [
+            "1940s",
+            "prototype",
+            "retractable-gear",
+            "tail-dragger",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "840f26e96f136fc1c3a9595b0cc996bdd6c32a2b226acc3e16944938b614bab5"
+        }
+      ]
+    },
+    {
+      "id": "FG-CanberraBI8",
+      "country": "uk",
+      "role": "attack",
+      "family": "Canberra",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/English_Electric_Canberra",
+          "title": "English Electric Canberra",
+          "html_sha256": "cbd4fb656f2a940098e1069fe14821f5c73cd6b1a0814e593b224b1bd650e5ab"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\CanberraBI8.zip",
+          "member": "CanberraBI8/CanberraBI8-set.xml",
+          "tags": [
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "bomber",
+            "vietnam",
+            "retractable-gear",
+            "jet",
+            "ifr",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "628f84c10c095af9b1fbc5b25973d199183d14161c75b56e0d96d3975eebc537"
+        }
+      ]
+    },
+    {
+      "id": "FG-Caproni-C22J",
+      "country": "italy",
+      "role": "trainer",
+      "family": "C.22J",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Caproni_Vizzola_C22J",
+          "title": "Caproni Vizzola C22J",
+          "html_sha256": "bb51989b03c5d72328df4facbfda53a674dae54e429460ec4e68dfa466df72cc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Caproni-C22J.zip",
+          "member": "Caproni-C22J/c22j-set.xml",
+          "tags": [
+            "caproni",
+            "trainer",
+            "prototype",
+            "1980s",
+            "high-wing",
+            "t-tail",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "0a25cc084299c2ef968b6067acae86f1716797835d4b828976d8c14ceb2b6b3b"
+        }
+      ]
+    },
+    {
+      "id": "FG-Caravelle",
+      "country": "france",
+      "role": "airliner",
+      "family": "Caravelle",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sud_Aviation_Caravelle",
+          "title": "Sud Aviation Caravelle",
+          "html_sha256": "846b3ca7e30da7b64a3ee9c0dd772d4d23a819167fd4184e956f660dc054e65d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Caravelle.zip",
+          "member": "Caravelle/caravelle-set.xml",
+          "tags": [
+            "sud-aviation",
+            "transport",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "retractable-gear",
+            "ifr",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "5b457dd5e7fe327f9eee13c438edc0105a86cdf9ab3a5c3168ce163ba8752ba6"
+        }
+      ]
+    },
+    {
+      "id": "FG-Carreidas",
+      "country": "fictional",
+      "role": "airliner",
+      "family": "Carreidas 160",
+      "decade": null,
+      "date_basis": "fictional",
+      "status": "fictional",
+      "note": "虚构机型，无现实研发年代。",
+      "references": [
+        {
+          "url": "https://wiki.flightgear.org/Carreidas_160",
+          "title": "Source review for non-flying/fictional aircraft"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Carreidas.zip",
+          "member": "Carreidas/carreidas-set.xml",
+          "tags": [
+            "transport",
+            "fictional",
+            "supersonic",
+            "1960s",
+            "ifr",
+            "variable-geometry",
+            "retractable-gear",
+            "3-engine",
+            "jet",
+            "afterburner",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b9458e4dd5f012f3a87a7b62a6032192509aac92f95ded7699bb5541d70bdd83"
+        }
+      ]
+    },
+    {
+      "id": "FG-Citation-Bravo",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Citation II",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "Citation Bravo改型，年代按Citation II家族。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Cessna_Citation_II",
+          "title": "Cessna Citation II",
+          "html_sha256": "0586016bfdb52c898d1bd47f76ce70fb7f887374d297266cfb473b4dd251746d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Citation-Bravo.zip",
+          "member": "Citation-Bravo/Bravo-set.xml",
+          "tags": [
+            "bizjet",
+            "cessna",
+            "jet",
+            "retractable-gear",
+            "ifr",
+            "twin-engine",
+            "glass-cockpit"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "adf352a8ce4bf11a707a73d52c8b49f3de404f05774e9cb435b40a7393f13c81"
+        }
+      ]
+    },
+    {
+      "id": "FG-CitationX",
+      "country": "usa",
+      "role": "airliner",
+      "family": "Citation X",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Cessna_Citation_X",
+          "title": "Cessna Citation X",
+          "html_sha256": "4f813653e8a88217765601286f103355a160bb3a8eb7e0cb1d3ba8c57fd35e81"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\CitationX.zip",
+          "member": "CitationX/CitationX-set.xml",
+          "tags": [
+            "bizjet",
+            "cessna",
+            "jet",
+            "retractable-gear",
+            "ifr",
+            "twin-engine",
+            "glass-cockpit"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "84763cfb2792728ed92accad8bb1ee038db8619c24be408f080295b06a4c234d"
+        }
+      ]
+    },
+    {
+      "id": "FG-Coanda-1910",
+      "country": "romania",
+      "role": "trainer",
+      "family": "Coanda 1910",
+      "decade": 1910,
+      "date_basis": "design_or_exhibition",
+      "status": "experimental",
+      "note": "1910年展出的试验机；首飞存在争议，按展出年代排序。 罗马尼亚设计师在法国建造；单列罗马尼亚并保留跨国说明。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Coand%C4%83-1910",
+          "title": "Coandă-1910",
+          "html_sha256": "23625b60502a08b4063be1285f7820a35cf9135f2732d5f35b306c25e2b67ced"
+        },
+        {
+          "url": "https://www.smithsonianmag.com/air-space-magazine/coandas-claim-73647227/",
+          "title": "Source review for non-flying/fictional aircraft"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Coanda-1910.zip",
+          "member": "Coanda-1910/coanda1910-set.xml",
+          "tags": [
+            "1910s",
+            "fixed-gear",
+            "tail-dragger",
+            "experimental",
+            "biplane",
+            "piston",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "9fdb1e1b16c5c00679a10f423ce9cf9113d2f0ccbfdc5ca525592ee12dbe3ea1"
+        }
+      ]
+    },
+    {
+      "id": "FG-Concorde",
+      "country": "joint",
+      "role": "airliner",
+      "family": "Concorde",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "法国/英国联合研制。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Concorde",
+          "title": "Concorde",
+          "html_sha256": "e741ac92a25ba2a283ce74ef9bc90240e0d05d1ab90096009bec40ffda02aaf2"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Concorde.zip",
+          "member": "Concorde/Concorde-set.xml",
+          "tags": [
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "afterburner",
+            "delta",
+            "four-engine",
+            "ifr",
+            "jet",
+            "low-wing",
+            "rembrandt",
+            "retractable-gear",
+            "supersonic",
+            "transport",
+            "tricycle"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "15cb3f433416675bf0db7442cc116c528276e83771853b19cc3a9895176ccf84"
+        }
+      ]
+    },
+    {
+      "id": "FG-CRJ-200",
+      "country": "canada",
+      "role": "airliner",
+      "family": "CRJ100/200",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Bombardier_CRJ100/200",
+          "title": "Bombardier CRJ100/200",
+          "html_sha256": "dd782e233e1308a8b0bdcc8b7e4b020484eb69a401a10542db639a9b96ccf6bc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\CRJ-200.zip",
+          "member": "CRJ-200/CRJ-200-set.xml",
+          "tags": [
+            "transport",
+            "1990s",
+            "2000s",
+            "2010s",
+            "bombardier",
+            "glass-cockpit",
+            "retractable-gear",
+            "ifr",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "1283081523ec59d3f1c19cec445011887df36e6ca4b9d2c9d6ce75d0970b8525"
+        }
+      ]
+    },
+    {
+      "id": "FG-CRJ700-family",
+      "country": "canada",
+      "role": "airliner",
+      "family": "CRJ700",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Bombardier_CRJ700_series",
+          "title": "Bombardier CRJ700 series",
+          "html_sha256": "1ca5b11096851a4a3971f6f36e9b4c5ed10ae6db387ae201d195e4ad8ccd01ae"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\CRJ700-family.zip",
+          "member": "CRJ700-family/CRJ900ER-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "30ea074b5176c010eb29c03f6fbd86d2af03ef94628d38db36ae2273e4936b4d"
+        }
+      ]
+    },
+    {
+      "id": "FG-Dassault-Mystere-IV",
+      "country": "france",
+      "role": "fighter",
+      "family": "Mystere IV",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Myst%C3%A8re_IV",
+          "title": "Dassault Mystère IV",
+          "html_sha256": "9f54a47b5803e39ad97046f5758d0d0e6969f3067333b4ff3e8257fbd0413a2e"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Dassault-Mystere-IV.zip",
+          "member": "Dassault-Mystere-IV/mystereIV-set.xml",
+          "tags": [
+            "dassault",
+            "fighter",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "retractable-gear",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "ba7e1b3ca173af5e1fcdc0bd97095501d970f53b6020e69504c7ee0c6c84a912"
+        }
+      ]
+    },
+    {
+      "id": "FG-DC-10-30",
+      "country": "usa",
+      "role": "airliner",
+      "family": "DC-10",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_DC-10",
+          "title": "McDonnell Douglas DC-10",
+          "html_sha256": "87e7cf2c44d40bb3c4d4c37acbc6425264b48d6d9aee2e0aebd50d6089e9a451"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\DC-10-30.zip",
+          "member": "DC-10-30/DC-10-30CF-set.xml",
+          "tags": [
+            "transport",
+            "mc-donnell-douglas",
+            "1970s",
+            "1980s",
+            "1990s",
+            "jet",
+            "ifr",
+            "retractable-gear"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b3dd5d03ac1c71c8fc0d13e372cc9e6ace5c5d20377d1d826b8634eb564e61d8"
+        }
+      ]
+    },
+    {
+      "id": "FG-dc8-73",
+      "country": "usa",
+      "role": "airliner",
+      "family": "DC-8",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Douglas_DC-8",
+          "title": "Douglas DC-8",
+          "html_sha256": "270ddb33df047dec103953003b783ee603962ca876b2644c69ff58aec90474d0"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\dc8-73.zip",
+          "member": "dc8-73/dc8-73-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "8b9f6909d3beaf36a255c7f47287a1938b5800693f04aab951e3bab3f3da3e44"
+        }
+      ]
+    },
+    {
+      "id": "FG-DH-106",
+      "country": "uk",
+      "role": "airliner",
+      "family": "Comet",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/De_Havilland_Comet",
+          "title": "De Havilland Comet",
+          "html_sha256": "233155ad1aa0283ccb4a7facad6cd6f7e89ac85773f30f99be4d4a97ca9d5e95"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\DH-106.zip",
+          "member": "DH-106/dh106-set.xml",
+          "tags": [
+            "de-havilland",
+            "transport",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "ifr",
+            "retractable-gear",
+            "tricycle",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "f12ce68b9b6a98f9bed9cb510946cfc7d1d1471b36f2d51055bb31e07f420cc4"
+        }
+      ]
+    },
+    {
+      "id": "FG-E3B",
+      "country": "usa",
+      "role": "support",
+      "family": "E-3",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_E-3_Sentry",
+          "title": "Boeing E-3 Sentry",
+          "html_sha256": "a17b748bef0b7f92b3c5a8f831a1d7f57b8eb883d3e5c717ea9d172e864012d4"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\E3B.zip",
+          "member": "E3B/E3B-set.xml",
+          "tags": [
+            "boeing",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "coldwar",
+            "gulfwar1",
+            "gulfwar2",
+            "ifr",
+            "retractable-gear",
+            "jet"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b592bba8453f717a04678b12e475b34ea2b001b18dee3a28c3959d50bf6ab9a1"
+        }
+      ]
+    },
+    {
+      "id": "FG-Embraer-ERJ-145",
+      "country": "brazil",
+      "role": "airliner",
+      "family": "ERJ145",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Embraer_ERJ_family",
+          "title": "Embraer ERJ family",
+          "html_sha256": "35468d37b41dc7d4b713411645e64e602621baed320ba5571a1ff9b230d6661f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Embraer-ERJ-145.zip",
+          "member": "Embraer-ERJ-145/erj145-set.xml",
+          "tags": [
+            "Embraer",
+            "transport",
+            "1990s",
+            "2000s",
+            "twin-engine",
+            "jet",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "224bea25bfc7350e4f77c2d91ba38f689d147d9ae623845303cbdd38b59ec9bb"
+        }
+      ]
+    },
+    {
+      "id": "FG-eurofighter",
+      "country": "joint",
+      "role": "fighter",
+      "family": "Typhoon",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "英国/德国/意大利/西班牙联合研制。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Eurofighter_Typhoon",
+          "title": "Eurofighter Typhoon",
+          "html_sha256": "2309ad4ba36757f34bbd02adf37d9bd00777747f2ca7c0d292e260660fb3ffa2"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\eurofighter.zip",
+          "member": "eurofighter/typhoonb-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "6b74f1665ae2b4ee2184f558772f8081ced594fff567f4d2d74ecef4e1c2aa5a"
+        }
+      ]
+    },
+    {
+      "id": "FG-F-106-dart",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-106",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Convair_F-106_Delta_Dart",
+          "title": "Convair F-106 Delta Dart",
+          "html_sha256": "4458b6291f57684e768f4da4d93bc39927546ea97734505f6a941f0936f9487c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F-106-dart.zip",
+          "member": "F-106-dart/f106-set.xml",
+          "tags": [
+            "convair",
+            "fighter",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "coldwar",
+            "delta",
+            "retractable-gear",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "dc981e98e7d6296b59672c44e720f9ddbd30e92ddc4c3d26b733882b4e1fc64c"
+        }
+      ]
+    },
+    {
+      "id": "FG-F-117",
+      "country": "usa",
+      "role": "attack",
+      "family": "F-117",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_F-117_Nighthawk",
+          "title": "Lockheed F-117 Nighthawk",
+          "html_sha256": "7301072a65d903b0a4451d649debc414e4169e3c0020be21c8a551275b003f75"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F-117.zip",
+          "member": "F-117/F-117-set.xml",
+          "tags": [
+            "fighter",
+            "bomber",
+            "lockheed",
+            "gulfwar1",
+            "1980s",
+            "1990s",
+            "2000s",
+            "ifr",
+            "retractable-gear",
+            "hud",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "7b07109e8277d6170d8722e8c9a85a5427451cbd7f6e0bb6fe58de873db7a9bc"
+        }
+      ]
+    },
+    {
+      "id": "FG-f-14b",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-14",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Grumman_F-14_Tomcat",
+          "title": "Grumman F-14 Tomcat",
+          "html_sha256": "aeba9bb2a57a32946e8b10e1681183546ce1f32629feab3016f273d7b7b0696b"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\f-14b.zip",
+          "member": "f-14b/f-14b-bs-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "a7d8b392fbafc2d750f95e7f8747ebbc3e7bd3ac7ff0e56b228988e4eb0a83fa"
+        }
+      ]
+    },
+    {
+      "id": "FG-F15C",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-15",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_F-15_Eagle",
+          "title": "McDonnell Douglas F-15 Eagle",
+          "html_sha256": "37adeb580f7ed696348ee067f6b98fb1a346c1b17db0b6d5628c0431ec713ad3"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F-15.zip",
+          "member": "F-15/f15c-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "c634fd089538690d74abc90b8feab4a801a4f0379b8763537e95d3d57a281ea7"
+        }
+      ]
+    },
+    {
+      "id": "FG-F-35B",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-35",
+      "decade": 2000,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_Martin_F-35_Lightning_II",
+          "title": "Lockheed Martin F-35 Lightning II",
+          "html_sha256": "2b67b2743c781e5ddb3dc15db551683e494ffe5dc22f0e70b4067553b6588d72"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F-35B.zip",
+          "member": "F-35B/F-35B-jsbsim-set.xml",
+          "tags": [
+            "fighter",
+            "lockheed",
+            "fighter",
+            "2000s",
+            "glass-cockpit",
+            "hud",
+            "ifr",
+            "retractable-gear",
+            "stol",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "cef40528e6443aa3b9a7a3b202d02b07102e0e7dc968c5aeb5bb10660e8ec6ab"
+        }
+      ]
+    },
+    {
+      "id": "FG-F-86",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-86",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/North_American_F-86_Sabre",
+          "title": "North American F-86 Sabre",
+          "html_sha256": "f0ece382c25f38af22d54d21ac524916832c8fbe530256e4358de57b7094c53a"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F-86.zip",
+          "member": "F-86/F-86F-set.xml",
+          "tags": [
+            "fighter",
+            "north-american",
+            "1950s",
+            "1960s",
+            "coldwar",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b57ae633834d7b13d82ecf54dd4737574cebb0729e014ff4218e7133637eecf3"
+        }
+      ]
+    },
+    {
+      "id": "FG-F-8E-Crusader",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-8",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Vought_F-8_Crusader",
+          "title": "Vought F-8 Crusader",
+          "html_sha256": "d594887749fcda52712c36307421aaf23b701e1a4fe579a6eb21a9a73c414e44"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F-8E-Crusader.zip",
+          "member": "F-8E-Crusader/Crusader-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "355dce7f6887c2850fe6075cf26699e60d856ac757abebde17a148bc4ab318f3"
+        }
+      ]
+    },
+    {
+      "id": "FG-F11-Tiger",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F11F",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Grumman_F-11_Tiger",
+          "title": "Grumman F-11 Tiger",
+          "html_sha256": "f1a0ba74831ab4ad2d9d0353cb9c14b08f9606d458c3089eedcbe427cacf323f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F11-Tiger.zip",
+          "member": "F11-Tiger/f11-set.xml",
+          "tags": [
+            "grumman",
+            "fighter",
+            "1950s",
+            "1960s",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "0a3c2ec3f84e8d5160681e5c4d92349b2b40bf7dc68333ffd23ae5e2701f52d5"
+        }
+      ]
+    },
+    {
+      "id": "FG-F16",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-16",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/General_Dynamics_F-16_Fighting_Falcon",
+          "title": "General Dynamics F-16 Fighting Falcon",
+          "html_sha256": "ba9c7c6fa0aa5fdf499459a58419b9236494ec4726310073ef1e5e49ea7ddce1"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\f16.zip",
+          "member": "f16/f16-block-30-set.xml",
+          "tags": [
+            "fighter",
+            "general-dynamics",
+            "1980s",
+            "coldwar",
+            "gulfwar1",
+            "gulfwar2",
+            "combat",
+            "low-wing",
+            "hud",
+            "ifr",
+            "refuel",
+            "retractable-gear",
+            "supersonic",
+            "tricycle",
+            "afterburner",
+            "jet",
+            "single-engine",
+            "tail-hook",
+            "f-16"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "aef60626f8f792f09ef661067d0a23cfac78d0b142e1312b07a0337556b9bc50"
+        }
+      ]
+    },
+    {
+      "id": "FG-F18-CAF",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F/A-18",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "美国研制、加拿大使用的CF-18，按研制来源归美国。按Hornet家族1970年代排序。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_CF-18_Hornet",
+          "title": "McDonnell Douglas CF-18 Hornet",
+          "html_sha256": "74e782228e8d1776df1a50d960d2ce2d2cb2ed5b5baa256898778c550f35bb21"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\f18.zip",
+          "member": "f18/f183d-set.xml",
+          "tags": [
+            "fighter",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "gulfwar1",
+            "gulfwar2",
+            "douglas",
+            "northrop",
+            "boeing",
+            "hud",
+            "glass-cockpit",
+            "ifr",
+            "supersonic",
+            "retractable-gear",
+            "v-tail",
+            "tail-hook",
+            "refuel",
+            "wing-fold",
+            "jet",
+            "afterburner",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "fe20aa9d996470b92b23f986197db1219efe5c2403bd9c29c4fc387ffd482d56"
+        }
+      ]
+    },
+    {
+      "id": "FG-F80C",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-80",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_P-80_Shooting_Star",
+          "title": "Lockheed P-80 Shooting Star",
+          "html_sha256": "53ea0cd16e56eeed9592647405a2954fdcb52ca3c8c9fdec336b8e71c543a376"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F80C.zip",
+          "member": "F80C/F80C-set.xml",
+          "tags": [
+            "fighter",
+            "lockheed",
+            "ww2",
+            "1940s",
+            "1950s",
+            "1960s",
+            "1970s",
+            "retractable-gear",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "469b00ffdc11b3d14c282280a04db1ccbec6b23ebdf711de84a31e44cfa15038"
+        }
+      ]
+    },
+    {
+      "id": "FG-F9F-Panther",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F9F",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Grumman_F9F_Panther",
+          "title": "Grumman F9F Panther",
+          "html_sha256": "22f7ddcc4b521cc6e3459655d4a0413187d1232ab29a253f592003160d71da1a"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\F9F-Panther.zip",
+          "member": "F9F-Panther/f9f-set.xml",
+          "tags": [
+            "grumman",
+            "fighter",
+            "bomber",
+            "1950s",
+            "1960s",
+            "1970s",
+            "retractable-gear",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "e21fa8c699646641bce03b1fe625e37f935dffa2a824dc7cf363f2359606a10d"
+        }
+      ]
+    },
+    {
+      "id": "FG-Falcon-50",
+      "country": "france",
+      "role": "airliner",
+      "family": "Falcon 50",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Falcon_50",
+          "title": "Dassault Falcon 50",
+          "html_sha256": "a679181682754a7131d41c417c2101a1c5c3f0613dee7330fc31cc988e87da51"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Falcon-50.zip",
+          "member": "Falcon-50/falcon50-set.xml",
+          "tags": [
+            "dassault",
+            "business",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "retractable-gear",
+            "low-wing",
+            "ifr",
+            "jet",
+            "three-engine",
+            "variable-pitch",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "5fc769dab9ced32c5cbbdc90dcfb0fe67f38aed14f11b48d005fcbff912c3ed1"
+        }
+      ]
+    },
+    {
+      "id": "FG-FMA-IA36-Condor",
+      "country": "argentina",
+      "role": "airliner",
+      "family": "IA 36",
+      "decade": 1950,
+      "date_basis": "design_or_exhibition",
+      "status": "paper",
+      "note": "1951年开始的未建成客机方案，无首飞。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/FMA_IA_36_C%C3%B3ndor",
+          "title": "FMA IA 36 Cóndor",
+          "html_sha256": "0a8f43bb67e3ecd50398129c239962fae4f1b0b17dd5a04da5a2544761a9f76d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\FMA-IA36-Condor.zip",
+          "member": "FMA-IA36-Condor/FMA-IA36-set.xml",
+          "tags": [
+            "FMA",
+            "IAME",
+            "transport",
+            "prototype",
+            "1950s",
+            "retractable-gear",
+            "jet",
+            "5-engines",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "4a2d34a421ec198d7d9d6f4b115d18241abcf2244f36e8c0ce354db18c9fea9b"
+        }
+      ]
+    },
+    {
+      "id": "FG-fokker100",
+      "country": "netherlands",
+      "role": "airliner",
+      "family": "Fokker 100",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Fokker_100",
+          "title": "Fokker 100",
+          "html_sha256": "7e998aab4c104113abdb1759a5d03d7f21c8b02ee69243d2f0547d9120c0328c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\fokker100.zip",
+          "member": "fokker100/fokker70-set.xml",
+          "tags": [
+            "1980s",
+            "1990s",
+            "2000s",
+            "transport",
+            "fokker",
+            "jet",
+            "t-tail",
+            "tricycle",
+            "twin-engine",
+            "retractable-gear",
+            "glass-cockpit",
+            "ifr"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "9df69126f404e6b76f424d01250c620f43a75bfd1ce67b013115200d38412241"
+        }
+      ]
+    },
+    {
+      "id": "FG-Fouga-Magister",
+      "country": "france",
+      "role": "trainer",
+      "family": "Magister",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Fouga_CM.170_Magister",
+          "title": "Fouga CM.170 Magister",
+          "html_sha256": "7a096b5aaa6a0ae1d12c033f3d3be3f3c315e6161d097d1a9c678dfb23ce0405"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Fouga-Magister.zip",
+          "member": "Fouga-Magister/fouga-set.xml",
+          "tags": [
+            "Aerospatiale-Potez",
+            "trainer",
+            "aerobatic",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "jet",
+            "tricycle",
+            "twin-engine",
+            "retractable-gear",
+            "ifr",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "2ca4fe1e5980b962b16765ca305544f8762c2d9e3c138ae2ed212a1bbce325b9"
+        }
+      ]
+    },
+    {
+      "id": "FG-G91-R",
+      "country": "italy",
+      "role": "attack",
+      "family": "G.91",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Fiat_G.91",
+          "title": "Fiat G.91",
+          "html_sha256": "262e2af49f345d3b66d3f0db08559f67892e055d56be0ff56a389d87178bb97e"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\G91-R.zip",
+          "member": "G91-R/G91-R-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "42b6217facbb7e016dd2ceb8c92b9f9cccb55c1aedd209252acfa45509916055"
+        }
+      ]
+    },
+    {
+      "id": "FG-Gloster-Meteor",
+      "country": "uk",
+      "role": "fighter",
+      "family": "Meteor",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Gloster_Meteor",
+          "title": "Gloster Meteor",
+          "html_sha256": "b551a090a7499fa16d36a1bfbf3c24d4ad0ce88b8c289bb0b5dcfd4d6f077a3c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Gloster-Meteor.zip",
+          "member": "Gloster-Meteor/gloster-meteor-set.xml",
+          "tags": [
+            "fighter",
+            "ww2",
+            "1940s",
+            "1950s",
+            "retractable-gear",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "386a7959b2b6fc7bf9882f9e3d8e3a1347a550f744cfd09f4a9e4584df66f34e"
+        }
+      ]
+    },
+    {
+      "id": "FG-Gloster-Whittle",
+      "country": "uk",
+      "role": "trainer",
+      "family": "E.28/39",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Gloster_E.28/39",
+          "title": "Gloster E.28/39",
+          "html_sha256": "6928557ede5cdad92ad2624d56d4d332ab0444e90c2cd544971ab3083974ff2f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Gloster-Whittle.zip",
+          "member": "Gloster-Whittle/whittle-set.xml",
+          "tags": [
+            "gloster",
+            "experimental",
+            "prototype",
+            "1940s",
+            "retractable-gear",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "970cefd3433d948206bbbe9d73caf6a24d7e8703eaff1594e0242b3fc90272d7"
+        }
+      ]
+    },
+    {
+      "id": "FG-Grumman-EA-6B-Prowler",
+      "country": "usa",
+      "role": "support",
+      "family": "EA-6B",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Grumman_EA-6B_Prowler",
+          "title": "Grumman EA-6B Prowler",
+          "html_sha256": "6a99852759fdecc7efdcfcb053244890af83135ba53138d319d5738cfad34320"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Grumman-EA-6B-Prowler.zip",
+          "member": "Grumman-EA-6B-Prowler/ea-6b-set.xml",
+          "tags": [
+            "grumman",
+            "Electronic warfare",
+            "Attack",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "propeller",
+            "turbojet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "13a36475bf745d58468913b1132a956324a55ec48e995caccfa2b04203ab3989"
+        }
+      ]
+    },
+    {
+      "id": "FG-Hansajet",
+      "country": "germany",
+      "role": "airliner",
+      "family": "HFB 320",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Hamburger_Flugzeugbau_HFB_320_Hansa_Jet",
+          "title": "Hamburger Flugzeugbau HFB 320 Hansa Jet",
+          "html_sha256": "8b4bb27fd0aa9b486c37789da168a2b42cf1074705064eab4fa74825e22d1233"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Hansajet.zip",
+          "member": "Hansajet/Hansajet-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "1324a35d6abe525b647cd2426f24fd426803195c1b2cdeac284f74e6b2fc4f70"
+        }
+      ]
+    },
+    {
+      "id": "FG-harrier",
+      "country": "uk",
+      "role": "attack",
+      "family": "Harrier",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Hawker_Siddeley_Harrier",
+          "title": "Hawker Siddeley Harrier",
+          "html_sha256": "f8f9ed6bdb68b2e6eae9938fb4d770f449182e9820af56b7660715734fb73976"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\harrier.zip",
+          "member": "harrier/harrier-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "763371bd2606eca1a33f3e1b74cd437ab59b7f1fa49493ff943d4c6cba1325aa"
+        }
+      ]
+    },
+    {
+      "id": "FG-Hawker-Siddeley-Nimrod",
+      "country": "uk",
+      "role": "support",
+      "family": "Nimrod",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Hawker_Siddeley_Nimrod",
+          "title": "Hawker Siddeley Nimrod",
+          "html_sha256": "f70e9a084017a88d08faf536b4c4eb4e624d2b7ff8ea7837fe5532478b2d0a9a"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Hawker-Siddeley-Nimrod.zip",
+          "member": "Hawker-Siddeley-Nimrod/nimrod-set.xml",
+          "tags": [
+            "Hawker-Siddeley",
+            "transport",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "ifr",
+            "retractable-gear",
+            "tricycle",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b7770abd6c95630bc3d795a11de103a7f1ddca6b1a1a1aba58297f6127ed21d9"
+        }
+      ]
+    },
+    {
+      "id": "FG-He162",
+      "country": "germany",
+      "role": "fighter",
+      "family": "He 162",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Heinkel_He_162_Volksj%C3%A4ger",
+          "title": "Heinkel He 162 Volksjäger",
+          "html_sha256": "5f102c1f73c7076cdc086ecb6999cfbca61011494f0e0d13ee50855dd92ef5a1"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\He162.zip",
+          "member": "He162/He162-set.xml",
+          "tags": [
+            "fighter",
+            "heinkel",
+            "1940s",
+            "ww2",
+            "retractable-gear",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "787058b0888e9180fce7087353a4c7e50b962167ad054757f62da1eb77313d90"
+        }
+      ]
+    },
+    {
+      "id": "FG-Heinkel-He-178",
+      "country": "germany",
+      "role": "trainer",
+      "family": "He 178",
+      "decade": 1930,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Heinkel_He_178",
+          "title": "Heinkel He 178",
+          "html_sha256": "a3e9a549c3d03cdec13a18411db9f26ddca35fc4d8ca983e07276e0fe1f19340"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Heinkel-He-178.zip",
+          "member": "Heinkel-He-178/he178-set.xml",
+          "tags": [
+            "heinkel",
+            "1930s",
+            "experimental",
+            "prototype",
+            "jet",
+            "retractable-gear",
+            "tail-dragger",
+            "single-engine",
+            "compositor"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "0d57bc36e9f6df979de311b095a3e8c2465c1dbacffd073ecb559ac2a012bf7e"
+        }
+      ]
+    },
+    {
+      "id": "FG-Heinkel-He-280",
+      "country": "germany",
+      "role": "fighter",
+      "family": "He 280",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Heinkel_He_280",
+          "title": "Heinkel He 280",
+          "html_sha256": "ba3716657dc3322d7e1f2f1cf7d2227695e4acf41b6a4ee2a25cab1eab9a7c3e"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Heinkel-He-280.zip",
+          "member": "Heinkel-He-280/he280-set.xml",
+          "tags": [
+            "fighter",
+            "heinkel",
+            "1940s",
+            "ww2",
+            "prototype",
+            "retractable-gear",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "a952950e349803a971454cf4995e06dee06564d9c6fa493bb859abf0a61baa56"
+        }
+      ]
+    },
+    {
+      "id": "FG-Horten-Ho-IX",
+      "country": "germany",
+      "role": "fighter",
+      "family": "Ho 229",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Horten_Ho_229",
+          "title": "Horten Ho 229",
+          "html_sha256": "39dd51ff998230530dcabf84a8353bff53e91644cdeb6f3b3bd1db0a5451b55b"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Horten-Ho-IX.zip",
+          "member": "Horten-Ho-IX/ho-ix-set.xml",
+          "tags": [
+            "horten",
+            "fighter",
+            "bomber",
+            "1940s",
+            "ww2",
+            "jet",
+            "twin-engine",
+            "flying-wing",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "661fb4257891481216165c62f09d9fd5cfeb7c54365744ddfd5fbe8cf718dd5c"
+        }
+      ]
+    },
+    {
+      "id": "FG-Hunter",
+      "country": "uk",
+      "role": "fighter",
+      "family": "Hunter",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Hawker_Hunter",
+          "title": "Hawker Hunter",
+          "html_sha256": "6fe869aebb177deb8c955bd22313074c3478b0fdeeb6bb448647adaade4605b3"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Hunter.zip",
+          "member": "Hunter/hunter-set.xml",
+          "tags": [
+            "fighter",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "retractable-gear",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "6414b99980b9530462f186abe38ec16a67c506facc9d6b16086477e237b0316b"
+        }
+      ]
+    },
+    {
+      "id": "FG-IL-76",
+      "country": "ussr",
+      "role": "support",
+      "family": "Il-76",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Ilyushin_Il-76",
+          "title": "Ilyushin Il-76",
+          "html_sha256": "505d58ed44ed04ff3f5eb7a5002df4f291c8dac9c1084ca262b2d1dc03d1a05c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\IL-76.zip",
+          "member": "IL-76/il76-set.xml",
+          "tags": [
+            "Ilyushin",
+            "transport",
+            "military",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "tricycle",
+            "retractable-gear",
+            "4-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "871ead79f48a840ae523c665174c1ee6717891d4edd9e16d1b00a6291f961f8a"
+        }
+      ]
+    },
+    {
+      "id": "FG-j22",
+      "country": "joint",
+      "role": "attack",
+      "family": "J-22/IAR-93",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "南斯拉夫/罗马尼亚联合研制，J-22与IAR-93项目。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Soko_J-22_Orao",
+          "title": "Soko J-22 Orao",
+          "html_sha256": "ea49ea4a4cc5eee9a54f929b36b243e16cfa8edb0e78de62469d220209806f95"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\j22.zip",
+          "member": "j22/j22-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "73ce60f41aca629d90ca3b94c824c036f767a589d5924238e797f8c53167f37a"
+        }
+      ]
+    },
+    {
+      "id": "FG-j7w",
+      "country": "japan",
+      "role": "fighter",
+      "family": "J7W2",
+      "decade": 1940,
+      "date_basis": "design_or_exhibition",
+      "status": "paper",
+      "note": "J7W2是未建成喷气方案；不能将J7W1的首飞当作J7W2首飞。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Kyushu_J7W_Shinden",
+          "title": "Kyushu J7W Shinden",
+          "html_sha256": "8d4914fb7e346b3223dcd7a8fb0979a89881920f5eafa42c314a70922a24ddf9"
+        },
+        {
+          "url": "https://reviews.ipmsusa.org/review/j7w2-interceptor-fighter-jet-version",
+          "title": "Source review for non-flying/fictional aircraft"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\j7w.zip",
+          "member": "j7w/j7w2-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "ed245c229dab06e7f2053d002cbce0e504d6c1e2f994f23dc0815219a7d9bdc6"
+        }
+      ]
+    },
+    {
+      "id": "FG-JA37",
+      "country": "sweden",
+      "role": "fighter",
+      "family": "Viggen",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "JA37改型，年代按Viggen家族。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Saab_37_Viggen",
+          "title": "Saab 37 Viggen",
+          "html_sha256": "e848e458061b64a121a70c51baf3860bd99e264691859d957a67e56bac7f2afc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\JA37.zip",
+          "member": "JA37/JA37-Viggen-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "470ca442d2219d21d06c993a0b6808ebe1233d9952505ef62466ba00b5cf9101"
+        }
+      ]
+    },
+    {
+      "id": "FG-Jaguar",
+      "country": "joint",
+      "role": "attack",
+      "family": "Jaguar",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/SEPECAT_Jaguar",
+          "title": "SEPECAT Jaguar",
+          "html_sha256": "864143e506da867a6512d839a11d090d66eaf12805adbf8efdb70c283993e16b"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Jaguar.zip",
+          "member": "Jaguar/jaguar-set.xml",
+          "tags": [
+            "Sepecat",
+            "attack",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b381db13f7636d8bacc476a8fb5d5c8df888681333096bb950737d73bf3fb587"
+        }
+      ]
+    },
+    {
+      "id": "FG-JAS39-Gripen",
+      "country": "sweden",
+      "role": "fighter",
+      "family": "Gripen",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Saab_JAS_39_Gripen",
+          "title": "Saab JAS 39 Gripen",
+          "html_sha256": "2440f57024656f0d2b9341bcb8f7b1404a05e6fa3a5868075a798509b707dc76"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\JAS39-Gripen.zip",
+          "member": "JAS39-Gripen/gripen-set.xml",
+          "tags": [
+            "saab",
+            "fighter",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "delta",
+            "canard",
+            "retractable-gear",
+            "glass-cockpit",
+            "hud",
+            "ifr",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "f6643d076965e8146cbb4708a990349b0005b0781f81a77fb9e7b58d16fe77ee"
+        }
+      ]
+    },
+    {
+      "id": "FG-KC135",
+      "country": "usa",
+      "role": "support",
+      "family": "KC-135",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing_KC-135_Stratotanker",
+          "title": "Boeing KC-135 Stratotanker",
+          "html_sha256": "4584caacca6d1ca69e6bc8064224f9c48a23ab9185ea7bcdd199a9d095afc087"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\KC135.zip",
+          "member": "KC135/KC135-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "c37d77dbba8b6cc8ed03678fccdfa2188afcf52318b3b54e7ddfdb1d99033acf"
+        }
+      ]
+    },
+    {
+      "id": "FG-KM",
+      "country": "ussr",
+      "role": "support",
+      "family": "KM",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Caspian_Sea_Monster",
+          "title": "Caspian Sea Monster",
+          "html_sha256": "304112372894edcaf5c7d64ce061918d40afec3fbf5f03c023f5657c3fc4bcc5"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\KM.zip",
+          "member": "KM/km-set.xml",
+          "tags": [
+            "Alekseyev-Central-Hydrofoil-Design-Bureau",
+            "ekranoplan",
+            "bomber",
+            "1960s",
+            "1970s",
+            "1980s",
+            "jet",
+            "10-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "54f37bd7df5085249d770dc2e58a47eb0bb7ccb7a35033c070a0b4df2d4f24ca"
+        }
+      ]
+    },
+    {
+      "id": "FG-L-1011-500",
+      "country": "usa",
+      "role": "airliner",
+      "family": "L-1011",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_L-1011_TriStar",
+          "title": "Lockheed L-1011 TriStar",
+          "html_sha256": "597604d4bd82e99b2b32b879da2e90bc9f25922ad6f6616b6a0120e9f3bcc167"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\L-1011-500.zip",
+          "member": "L-1011-500/L-1011-500-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "fe6247a984d896551694effc1d166e694d85dd2a5a31d79c0db28376ba5b20cf"
+        }
+      ]
+    },
+    {
+      "id": "FG-l39",
+      "country": "czech",
+      "role": "trainer",
+      "family": "L-39",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Aero_L-39_Albatros",
+          "title": "Aero L-39 Albatros",
+          "html_sha256": "59ef058b82264f3222f5fc13690358991e1b65c60de2a4ca1f3fe34cb99e09c4"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\l39.zip",
+          "member": "l39/l39-set.xml",
+          "tags": [
+            "trainer",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "low-wing",
+            "pressurised",
+            "retractable-gear",
+            "tricycle",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "c4462a2f651f1be9782d2c4594c87a3b29aaef16263a13c367954a007affab7d"
+        }
+      ]
+    },
+    {
+      "id": "FG-Leduc-022",
+      "country": "france",
+      "role": "trainer",
+      "family": "Leduc 022",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Leduc_022",
+          "title": "Leduc 022",
+          "html_sha256": "7461b84c6ca15c31446913c9153d2e917a83e4a5e8229ddb062be96a4aa58a69"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Leduc-022.zip",
+          "member": "Leduc-022/leduc022-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "b5941daba3cdce483cba8a0d23907d72e34a6fe613e054a0a43bd9ff376ae0d4"
+        }
+      ]
+    },
+    {
+      "id": "FG-Lightning",
+      "country": "uk",
+      "role": "fighter",
+      "family": "Lightning",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/English_Electric_Lightning",
+          "title": "English Electric Lightning",
+          "html_sha256": "4bf51fdfeb3a3fc29fed71c5f1af90474be5872a8c4b717443e48b371f7eeb3d"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lightning.zip",
+          "member": "Lightning/lightning-set.xml",
+          "tags": [
+            "fighter",
+            "1960s",
+            "1970s",
+            "1980s",
+            "coldwar",
+            "delta",
+            "supersonic",
+            "refuel",
+            "retractable-gear",
+            "afterburner",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "afbccf87e5fc8ffef731bbf0e03a8e771d31ec56ee86928387b7a8cc2af8eea5"
+        }
+      ]
+    },
+    {
+      "id": "FG-F22",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-22",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_Martin_F-22_Raptor",
+          "title": "Lockheed Martin F-22 Raptor",
+          "html_sha256": "a28627972b6060d3228a737b187eafb87984752afd96e5b9b274333a4c85277a"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lockheed-Martin-FA-22A-Raptor.zip",
+          "member": "Lockheed-Martin-FA-22A-Raptor/f22-yasim-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "20d88fefa60de619eb71ecde4686a07626d3a627ced6e2a959f2f3cf33d2f7b9"
+        }
+      ]
+    },
+    {
+      "id": "FG-Lockheed-NF104A",
+      "country": "usa",
+      "role": "trainer",
+      "family": "NF-104",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_NF-104A",
+          "title": "Lockheed NF-104A",
+          "html_sha256": "38e22bc0fe48945e61712b8d5df7bf7d9877d46fd484ea51c06158f49000a3c5"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lockheed-NF104A.zip",
+          "member": "Lockheed-NF104A/f-104-tank-set.xml",
+          "tags": [
+            "trainer",
+            "lockheed",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "retractable-gear",
+            "supersonic",
+            "t-tail",
+            "jet",
+            "afterburner",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "2501d4361c550153bc70a35447cd28be2b45b54ef796c8d2b0f6b83cf7d5dc3c"
+        }
+      ]
+    },
+    {
+      "id": "FG-Lockheed-P-2-Neptune",
+      "country": "usa",
+      "role": "support",
+      "family": "P-2",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_P-2_Neptune",
+          "title": "Lockheed P-2 Neptune",
+          "html_sha256": "61c0c0ffd55899b3a8d941d4779a6542bf7cdde522d41af78f3a79e3f4d4d71f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lockheed-P-2-Neptune.zip",
+          "member": "Lockheed-P-2-Neptune/p2v-set.xml",
+          "tags": [
+            "Lockheed",
+            "low-wings",
+            "marine-patrol",
+            "retractable-gear",
+            "4-engine",
+            "piston",
+            "propeller",
+            "jet",
+            "1940s",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "e59ac43654ffc65b1ce443937e6be878411667df090f676aa039a7e1574fded6"
+        }
+      ]
+    },
+    {
+      "id": "FG-Lockheed-S3-Viking",
+      "country": "usa",
+      "role": "support",
+      "family": "S-3",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_S-3_Viking",
+          "title": "Lockheed S-3 Viking",
+          "html_sha256": "97da6002b637de347db6c725e025471016af589d98fe2d3696fa66e601df8948"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lockheed-S3-Viking.zip",
+          "member": "Lockheed-S3-Viking/s3-set.xml",
+          "tags": [
+            "lockheed",
+            "marine-patrol",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "high-wing",
+            "retractable-gear",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b99f7a136b6c173645cf17121a679ba451419b2d8921e20d97ebdbd33ce7e69e"
+        }
+      ]
+    },
+    {
+      "id": "FG-Lockheed-SR71",
+      "country": "usa",
+      "role": "support",
+      "family": "SR-71",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_SR-71_Blackbird",
+          "title": "Lockheed SR-71 Blackbird",
+          "html_sha256": "59b26d26807d179c1844358a1be85ded1b821426c768bdb0f07dca1cd24dd984"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lockheed-SR71.zip",
+          "member": "Lockheed-SR71/sr71-set.xml",
+          "tags": [
+            "lockheed",
+            "jet",
+            "twin-engine",
+            "retractable-gear",
+            "supersonic",
+            "coldwar",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "c3925532df33ce1b4709d0523fba059a65564d79f5824cf3824284ff36c5de8a"
+        }
+      ]
+    },
+    {
+      "id": "FG-Lockheed-U-2S",
+      "country": "usa",
+      "role": "support",
+      "family": "U-2",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Lockheed_U-2",
+          "title": "Lockheed U-2",
+          "html_sha256": "a9291d7996808ab53325fa4dae116f129980c85938a9dcd09cbcce0fed605879"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Lockheed-U-2S.zip",
+          "member": "Lockheed-U-2S/u-2s-set.xml",
+          "tags": [
+            "reconnaissance",
+            "lockheed",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "coldwar",
+            "retractable-gear",
+            "ifr",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "63644a3be193588a13b3bb7d16c0e24083eb90cb3499b5ead71ed000d91bb00d"
+        }
+      ]
+    },
+    {
+      "id": "FG-M-4-Bison-A",
+      "country": "ussr",
+      "role": "attack",
+      "family": "M-4",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Myasishchev_M-4",
+          "title": "Myasishchev M-4",
+          "html_sha256": "5ce3d163d10fda4d0f61961ae8a9fea7ae4ff31c67a93e45667582f3d7e08593"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\M-4-Bison-A.zip",
+          "member": "M-4-Bison-A/m4-set.xml",
+          "tags": [
+            "Miassichtchev",
+            "bomber",
+            "high-wing",
+            "4-engine",
+            "jet",
+            "1950s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "single-track",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "e641e5623fbe9e37cb1401cbc883f7a5f4d572b12504d151962dc07ee47054c7"
+        }
+      ]
+    },
+    {
+      "id": "FG-MB326",
+      "country": "italy",
+      "role": "trainer",
+      "family": "MB-326",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Aermacchi_MB-326",
+          "title": "Aermacchi MB-326",
+          "html_sha256": "f8ec416060be03e0f9692e10a58e044448ed202198cb8daa99298af04b8b7bcd"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MB326.zip",
+          "member": "MB326/MB326-set.xml",
+          "tags": [
+            "fighter",
+            "trainer",
+            "1960s",
+            "combat",
+            "low-wing",
+            "retractable-gear",
+            "tricycle",
+            "jet"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "a1e6756116262e8281df31e2b3e9a7766e8487c98d833319b33ea53e24288ed4"
+        }
+      ]
+    },
+    {
+      "id": "FG-MC-15",
+      "country": "france",
+      "role": "trainer",
+      "family": "Cri-Cri",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "喷气改装资源，年代按Cri-Cri机体家族。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Colomban_Cri-cri",
+          "title": "Colomban Cri-cri",
+          "html_sha256": "07e08a3a48fe882cb81295584a493c1989221d4468dc23bf040a08673bcb806f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MC-15.zip",
+          "member": "MC-15/mc-15-jet-set.xml",
+          "tags": [
+            "aerobatic",
+            "ga",
+            "ultralight",
+            "aerobatic",
+            "1970s",
+            "1980s",
+            "1990s",
+            "fixed-gear",
+            "low-wing",
+            "t-tail",
+            "tricycle",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "bba0100d0787f52fddfb0910930e41c87ea3a542200308d02246f953dc690e3e"
+        }
+      ]
+    },
+    {
+      "id": "FG-McDonnell-Douglas-T-45-Goshawk",
+      "country": "joint",
+      "role": "trainer",
+      "family": "T-45",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "美国/英国联合项目，源自英国Hawk。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_T-45_Goshawk",
+          "title": "McDonnell Douglas T-45 Goshawk",
+          "html_sha256": "b65ecc9ddc97b3cfb3325f01ea72e00edfb090f7fbcb3cb638dcb041439bab6f"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\McDonnell-Douglas-T-45-Goshawk.zip",
+          "member": "McDonnell-Douglas-T-45-Goshawk/t45-set.xml",
+          "tags": [
+            "mcdonnell douglas",
+            "high-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "trainer",
+            "aerobatic",
+            "ifr",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "c9da984b7781dabc37dfa85bc1aa05221fe039f62450bff507e1b5e8a4e0a19d"
+        }
+      ]
+    },
+    {
+      "id": "FG-F4",
+      "country": "usa",
+      "role": "fighter",
+      "family": "F-4",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_F-4_Phantom_II",
+          "title": "McDonnell Douglas F-4 Phantom II",
+          "html_sha256": "4dbe296216feb8847b4d12986f6f80385f44e69606ea8f265df886fef6becc54"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\McDonnell-F-4-Phantom.zip",
+          "member": "McDonnell-F-4-Phantom/f4-set.xml",
+          "tags": [
+            "mcdonnell-douglas",
+            "interceptor",
+            "fighter-bomber",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "a7fc1d31dd24bc105bcbb0b8ebb6a90f6255bfcfd11a9451c9588e2bfc0b3bdf"
+        }
+      ]
+    },
+    {
+      "id": "FG-MD-11",
+      "country": "usa",
+      "role": "airliner",
+      "family": "MD-11",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_MD-11",
+          "title": "McDonnell Douglas MD-11",
+          "html_sha256": "bf99b367d1f875d379a736b6cd81b3ca413ac0b0772c4fa5a8c7f932067b3c3b"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MD-11.zip",
+          "member": "MD-11/MD-11F-GE-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "48f14465dd784f5c986c628772fe61f4006fda25766b736ce5ef0d7ad324a62f"
+        }
+      ]
+    },
+    {
+      "id": "FG-MD-80",
+      "country": "usa",
+      "role": "airliner",
+      "family": "MD-80",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/McDonnell_Douglas_MD-80",
+          "title": "McDonnell Douglas MD-80",
+          "html_sha256": "a280b6cf5be6ef3a017da8735317b3f31f8415aeda854f1e2e01d250cfb88be6"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MD-80.zip",
+          "member": "MD-80/MD-87-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "d975df1a3484f154c389901b8b570369f72bf7362b0cdca1ae86995ebf5cba19"
+        }
+      ]
+    },
+    {
+      "id": "FG-ME-262",
+      "country": "germany",
+      "role": "fighter",
+      "family": "Me 262",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Messerschmitt_Me_262",
+          "title": "Messerschmitt Me 262",
+          "html_sha256": "7d8cc4039426861ee636fd3155b520118b1c1f80aae77a62224bbc0fd60798d4"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\ME-262.zip",
+          "member": "ME-262/me262-set.xml",
+          "tags": [
+            "messerschmitt",
+            "fighter",
+            "bomber",
+            "1940s",
+            "ww2",
+            "jet",
+            "twin-engine",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "01b538f6fe09efe509062ab3763dfca7eb9459dd715437e6f4c81fa88d255c81"
+        }
+      ]
+    },
+    {
+      "id": "FG-Messerschmitt-Libelle",
+      "country": "germany",
+      "role": "fighter",
+      "family": "Libelle",
+      "decade": 1940,
+      "date_basis": "design_or_exhibition",
+      "status": "paper",
+      "note": "未建成方案；1940年代取自原始源包。",
+      "references": [
+        {
+          "file": "D:\\Aircraft-2024\\Messerschmitt-Libelle.zip",
+          "member": "Messerschmitt-Libelle/libelle-set.xml",
+          "tags": [
+            "messerschmitt",
+            "fighter",
+            "prototype",
+            "1940s",
+            "ww2",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "single-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "06fb553b77451c1945cd1b40c0a7ba00d5452752620986846200dbe13d41d887"
+        }
+      ]
+    },
+    {
+      "id": "FG-Messerschmitt-P1101",
+      "country": "germany",
+      "role": "fighter",
+      "family": "P.1101",
+      "decade": 1940,
+      "date_basis": "design_or_exhibition",
+      "status": "paper",
+      "note": "1940年代方案，原型未完成、未首飞。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Messerschmitt_P.1101",
+          "title": "Messerschmitt P.1101",
+          "html_sha256": "1697f20b255ba556c5429e066d253381c842cd55119d4cb05155dcbdd82b8ab4"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Messerschmitt-P1101.zip",
+          "member": "Messerschmitt-P1101/p1101-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "657f3371e09adfd67ec0e65bbeac5ac371f51519ac63e6574184b3781620c32f"
+        }
+      ]
+    },
+    {
+      "id": "FG-MiG-15",
+      "country": "ussr",
+      "role": "fighter",
+      "family": "MiG-15",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Mikoyan-Gurevich_MiG-15",
+          "title": "Mikoyan-Gurevich MiG-15",
+          "html_sha256": "769f380e775272ce0ac957251a139aa8c7a580625438eafd83d45db093836305"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MiG-15.zip",
+          "member": "MiG-15/MiG-15bis-set.xml",
+          "tags": [
+            "1940s",
+            "1950s",
+            "coldwar",
+            "combat",
+            "fighter",
+            "interceptor",
+            "jet",
+            "mikoyan-gurevich",
+            "retractable-gear",
+            "single-engine",
+            "tricycle",
+            "castering-wheel",
+            "low-wing",
+            "t-tail"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "369f63c04712bb6567c28ad2927b9cf48114758a533f912b01bc69d6fcd8bc80"
+        }
+      ]
+    },
+    {
+      "id": "FG-MiG-21bis",
+      "country": "ussr",
+      "role": "fighter",
+      "family": "MiG-21",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Mikoyan-Gurevich_MiG-21",
+          "title": "Mikoyan-Gurevich MiG-21",
+          "html_sha256": "61194b4f7dfa45d45cc772bf263cb031f26166ddbf243a3f81e6d73654c019ca"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MiG-21bis.zip",
+          "member": "MiG-21bis/MiG-21bis-yasim-set.xml",
+          "tags": [
+            "fighter",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "coldwar",
+            "vietnam",
+            "delta",
+            "retractable-gear",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "d77866540dcdfc15e34aef71245972018262a2ac17e5f33604b3d5bf538fee72"
+        }
+      ]
+    },
+    {
+      "id": "FG-Mig-29",
+      "country": "ussr",
+      "role": "fighter",
+      "family": "MiG-29",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Mikoyan_MiG-29",
+          "title": "Mikoyan MiG-29",
+          "html_sha256": "f9745e072cda7fb31ba72461a8d3f65dea995414e08775c2e4cb12ae7d3e46dc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Mig-29.zip",
+          "member": "Mig-29/Mig-29-set.xml",
+          "tags": [
+            "fighter",
+            "mikoyan-gurevich",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "hud",
+            "retractable-gear",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "63354fc8e5c92f6281b339a198b0772e55662dd6324bfa9f08f3cf9954af79ea"
+        }
+      ]
+    },
+    {
+      "id": "FG-mirage2000",
+      "country": "france",
+      "role": "fighter",
+      "family": "Mirage 2000",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Mirage_2000",
+          "title": "Dassault Mirage 2000",
+          "html_sha256": "b7b0969e48696fe81336e135521fdc3f8eb55ef841a92aaa54d4c0b1aa6e50cc"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\mirage2000.zip",
+          "member": "mirage2000/mirage2000-set.xml",
+          "tags": [
+            "fighter",
+            "dassault",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "delta",
+            "retractable-gear",
+            "hud",
+            "ifr",
+            "refuel",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b3eacd3265a30f1c6b6b58e84ef611689eb4f201e546cdf343b256a67f26c49b"
+        }
+      ]
+    },
+    {
+      "id": "FG-Mirage_F1",
+      "country": "france",
+      "role": "fighter",
+      "family": "Mirage F1",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Mirage_F1",
+          "title": "Dassault Mirage F1",
+          "html_sha256": "407dcd6c486657c755a2b354a88bfae1ca62b657d865355235edb1d36b7fe856"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Mirage_F1.zip",
+          "member": "Mirage_F1/Mirage_F1-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "9b36751dbaa31b73be303bfe2d80a1887f3b108fcbe877620004b07453bf3db6"
+        }
+      ]
+    },
+    {
+      "id": "FG-MirageG8",
+      "country": "france",
+      "role": "fighter",
+      "family": "Mirage G",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Mirage_G",
+          "title": "Dassault Mirage G",
+          "html_sha256": "5b05a3516e668e26dfb27727c0d094eb9b1466b250209a04b7681473dda92b21"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MirageG8.zip",
+          "member": "MirageG8/mirageG8-01-set.xml",
+          "tags": [
+            "dassault",
+            "interceptor",
+            "fighter-bomber",
+            "1960s",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "twin-engine",
+            "compositor"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "2186e4ae6804ab8b31dd3c00e8ac41499872d073a2de473adf7515367f142bc3"
+        }
+      ]
+    },
+    {
+      "id": "FG-MirageIII",
+      "country": "france",
+      "role": "fighter",
+      "family": "Mirage III",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "当前资源是Mirage III NG；年代按Mirage III家族，不表示NG型的研发年代。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Mirage_III",
+          "title": "Dassault Mirage III",
+          "html_sha256": "c5de3a2f1da9dd70e9919d78e9116c341467fd2ae4919843502688e9e5ea74fe"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MirageIII.zip",
+          "member": "MirageIII/mirageIIIE-set.xml",
+          "tags": [
+            "fighter",
+            "dassault",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "radial",
+            "single-engine",
+            "supercharged",
+            "afterburner",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "f8f89fb76c08dd9d1ae63808e501b855e4b1e8e733161d73bc18bf72273e65df"
+        }
+      ]
+    },
+    {
+      "id": "FG-MirageIV",
+      "country": "france",
+      "role": "attack",
+      "family": "Mirage IV",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault_Mirage_IV",
+          "title": "Dassault Mirage IV",
+          "html_sha256": "161a74630cd0a9778c719c42ecf54b9f2776f5fe04c0cffe44c5358569466fb2"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MirageIV.zip",
+          "member": "MirageIV/mirageIV-set.xml",
+          "tags": [
+            "dassault",
+            "bomber",
+            "reconnaissance",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "delta",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "23900bb2fef76d220dfee9f48f925d14207c4ce995adb103298ca0815bebe66e"
+        }
+      ]
+    },
+    {
+      "id": "FG-MRJ",
+      "country": "japan",
+      "role": "airliner",
+      "family": "SpaceJet",
+      "decade": 2010,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Mitsubishi_SpaceJet",
+          "title": "Mitsubishi SpaceJet",
+          "html_sha256": "cce99b338144a591d0d944ef8dbb3b04c8b75f4166e72677e577f9ebd9164d68"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MRJ.zip",
+          "member": "MRJ/MRJ90-STD-set.xml",
+          "tags": [
+            "passenger",
+            "mitsubishi",
+            "2010s",
+            "tricycle",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "1a99bdb42349bc60eaaa57397cbbe42b6e20ecabf64bf1eb80e55d94e8d0c7f6"
+        }
+      ]
+    },
+    {
+      "id": "FG-MS-760",
+      "country": "france",
+      "role": "trainer",
+      "family": "MS.760",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Morane-Saulnier_MS.760_Paris",
+          "title": "Morane-Saulnier MS.760 Paris",
+          "html_sha256": "931fef8cb4500c6ac4d26e8442cfc132fd3376fd83044e4aaf35648e714c82a9"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\MS-760.zip",
+          "member": "MS-760/ms760-set.xml",
+          "tags": [
+            "morane-saulnier",
+            "trainer",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "5b5dbe4bbd88554ae04981727ede3804fefe8d5f1e582345994cf6e181dad135"
+        }
+      ]
+    },
+    {
+      "id": "FG-Nord-1405-Gerfaut-II",
+      "country": "france",
+      "role": "trainer",
+      "family": "Gerfaut",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Nord_Gerfaut",
+          "title": "Nord Gerfaut",
+          "html_sha256": "5f4cb182ec3fed26216703a76dd53b8aa017dacce11238b59a942bf565ae5775"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Nord-1405-Gerfaut-II.zip",
+          "member": "Nord-1405-Gerfaut-II/gerfaut-set.xml",
+          "tags": [
+            "Nord-Aviation",
+            "delta-wing-research-aircraft",
+            "1950s",
+            "1960s",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "a301fa552b7adb63464f3f7df2ddc615419930e7aef35663395e119ca656937b"
+        }
+      ]
+    },
+    {
+      "id": "FG-Nord-2502",
+      "country": "france",
+      "role": "support",
+      "family": "Noratlas",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Nord_Noratlas",
+          "title": "Nord Noratlas",
+          "html_sha256": "c83061994eb114878e8aee38eb7aea283e061ad00de8e4399217c696c7e0e414"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Nord-2502.zip",
+          "member": "Nord-2502/nord2501-set.xml",
+          "tags": [
+            "Nord-Aviation",
+            "transport",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "retractable-gear",
+            "high-wing",
+            "two-engine",
+            "propeller",
+            "piston",
+            "variable-pitch",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "89841d23245c031fec97b3ea77f186e9ca9646449d01aa3974a28cea97d85627"
+        }
+      ]
+    },
+    {
+      "id": "FG-North-American-RA-5C-Vigilante",
+      "country": "usa",
+      "role": "support",
+      "family": "A-5/RA-5",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/North_American_A-5_Vigilante",
+          "title": "North American A-5 Vigilante",
+          "html_sha256": "901227e2ac5ff824e14f6460fde87680a5dfcce71c5162de05f08a7fbbd4fcce"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\North-American-RA-5C-Vigilante.zip",
+          "member": "North-American-RA-5C-Vigilante/vigilante-set.xml",
+          "tags": [
+            "north-american",
+            "nuclear-bomber",
+            "Reconnaissance",
+            "1950s",
+            "1960s",
+            "1970s",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "supersonic",
+            "jet",
+            "afterburner",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "49edd7776e309e97cd6f135b9395a4fe96d7faa1f48120e3dd495e3ae98bf2ed"
+        }
+      ]
+    },
+    {
+      "id": "FG-Northrop-T38-Talon",
+      "country": "usa",
+      "role": "trainer",
+      "family": "T-38",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Northrop_T-38_Talon",
+          "title": "Northrop T-38 Talon",
+          "html_sha256": "d18d3680b5d0e2c1c350aa95618a910df9043de3650b9d29a6ad1fcb0dcce7f7"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Northrop-T38-Talon.zip",
+          "member": "Northrop-T38-Talon/t38talon-set.xml",
+          "tags": [
+            "northrop",
+            "trainer",
+            "low-wing",
+            "twin-engine",
+            "jet",
+            "afterburner",
+            "tricycle",
+            "retractable-gear",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "eee1239f8ae6248ace3ed943804842b916f2f811a6a46b0e4e3562e14501f317"
+        }
+      ]
+    },
+    {
+      "id": "FG-Northrop-yb49",
+      "country": "usa",
+      "role": "attack",
+      "family": "YB-49",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Northrop_YB-49",
+          "title": "Northrop YB-49",
+          "html_sha256": "50969a862a7e61e7ab2b7eda6d6dc4fea95a1c02e77a6cd825af042bbf9b7781"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Northrop-yb49.zip",
+          "member": "Northrop-yb49/yb49-set.xml",
+          "tags": [
+            "northrop",
+            "bomber",
+            "1940s",
+            "ww2",
+            "flying-wing",
+            "jet",
+            "8-engine",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "589dd0a05f24d8029febdfce0d499bc7c29b2e220fc1f45fd69d8deb9b50b4ae"
+        }
+      ]
+    },
+    {
+      "id": "FG-Pilatus-PC-24",
+      "country": "switzerland",
+      "role": "airliner",
+      "family": "PC-24",
+      "decade": 2010,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Pilatus_PC-24",
+          "title": "Pilatus PC-24",
+          "html_sha256": "68aecfd5bb33037137125b8902c5a057870f69271bb712ac011fe8b794e560be"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Pilatus-PC-24.zip",
+          "member": "Pilatus-PC-24/pc24-set.xml",
+          "tags": [
+            "pilatus",
+            "business",
+            "2010s",
+            "2020s",
+            "retractable-gear",
+            "low-wing",
+            "ifr",
+            "jet",
+            "2-engines",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "1aa52150380ef056f9a260adb3fbff145e646771e46bef8c6cb268f8c40f50c2"
+        }
+      ]
+    },
+    {
+      "id": "FG-PZL-230F",
+      "country": "poland",
+      "role": "attack",
+      "family": "PZL-230",
+      "decade": 1990,
+      "date_basis": "design_or_exhibition",
+      "status": "paper",
+      "note": "PZL-230F喷气方案与1992年模型，未建成飞行原型。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/PZL-230_Skorpion",
+          "title": "PZL-230 Skorpion",
+          "html_sha256": "2960cc6ba2a29faf0d898ea6fff651034dcade15624acdb386a4d7d9dae0809b"
+        },
+        {
+          "url": "https://www.samolotypolskie.pl/samoloty/2342/126/PZL-230",
+          "title": "Source review for non-flying/fictional aircraft"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\PZL-230F.zip",
+          "member": "PZL-230F/pzl230f-set.xml",
+          "tags": [
+            "pzl",
+            "fighter",
+            "1990s",
+            "twin-engine",
+            "jet",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "08bca9d64f0ba7fc83bdf2e6d388319d83fb5fa5b02f8e701bd309a37b7620c2"
+        }
+      ]
+    },
+    {
+      "id": "FG-RainbowRacer71",
+      "country": "fictional",
+      "role": "trainer",
+      "family": "Rainbow Racer 71",
+      "decade": null,
+      "date_basis": "fictional",
+      "status": "fictional",
+      "note": "源包标记 Imaginary，无现实研发年代。",
+      "references": [
+        {
+          "file": "D:\\Aircraft-2024\\RainbowRacer71.zip",
+          "member": "RainbowRacer71/rr71-set.xml",
+          "tags": [
+            "Imaginary",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "single-engine",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "53042abdb9059dd7c91e0cca694d956cf0efc0a78aef52eab03263cc793d9b08"
+        }
+      ]
+    },
+    {
+      "id": "FG-SaabJ35F",
+      "country": "sweden",
+      "role": "fighter",
+      "family": "Draken",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Saab_35_Draken",
+          "title": "Saab 35 Draken",
+          "html_sha256": "fb2a1b02a2e7fba491595418c64703b46add2c3fad761b3e3b54fe6677c5d11e"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\SaabJ35F.zip",
+          "member": "SaabJ35F/SaabJ35F-set.xml",
+          "tags": [
+            "fighter",
+            "saab",
+            "jet",
+            "supersonic",
+            "ifr",
+            "coldwar",
+            "1960s",
+            "1970s"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b3798ab133054276ea0850e36b94a55d6d91658e8154a949e85e47fd131f6ded"
+        }
+      ]
+    },
+    {
+      "id": "FG-seahawk",
+      "country": "uk",
+      "role": "fighter",
+      "family": "Sea Hawk",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Hawker_Sea_Hawk",
+          "title": "Hawker Sea Hawk",
+          "html_sha256": "3760aed1a07902a7e5d6a60ba8716753b6e6d9325709f2ae3cc75bc25868e700"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\seahawk.zip",
+          "member": "seahawk/seahawk-RNHF-set.xml",
+          "tags": [
+            "fighter",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "retractable-gear",
+            "tail-hook",
+            "jet",
+            "single-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "b2aabece87198455bf49fdc8464ccd6de742ceae46994045a15fc4baf1fbf993"
+        }
+      ]
+    },
+    {
+      "id": "FG-SeaVixen",
+      "country": "uk",
+      "role": "fighter",
+      "family": "Sea Vixen",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/De_Havilland_Sea_Vixen",
+          "title": "De Havilland Sea Vixen",
+          "html_sha256": "1e7fe534dab6d5e0c537a956e61148055d6a7be61dd745b445cca2cc5ecd89f5"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\SeaVixen.zip",
+          "member": "SeaVixen/sea-vixen-set.xml",
+          "tags": [
+            "fighter",
+            "1950s",
+            "1960s",
+            "1970s",
+            "retractable-gear",
+            "tail-hook",
+            "t-tail",
+            "jet",
+            "twin-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "8da13ff020a26536999ca3cdd49b8ec6c3224143210b4cc2b0abee808cd6aa1f"
+        }
+      ]
+    },
+    {
+      "id": "FG-Stiletto",
+      "country": "usa",
+      "role": "trainer",
+      "family": "X-3",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Douglas_X-3_Stiletto",
+          "title": "Douglas X-3 Stiletto",
+          "html_sha256": "8da14351fc654a4952a034cfee81e8e3fe74238db16e38bf789253211c431064"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Stiletto.zip",
+          "member": "Stiletto/stiletto-set.xml",
+          "tags": [
+            "douglas",
+            "experimental",
+            "1950s",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "compositor"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "972db1972a219cddcbbef35d6dcc7ca9fc9cbe14fe5383e69e3e73c8b21051f6"
+        }
+      ]
+    },
+    {
+      "id": "FG-Su-25",
+      "country": "ussr",
+      "role": "attack",
+      "family": "Su-25",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sukhoi_Su-25",
+          "title": "Sukhoi Su-25",
+          "html_sha256": "bdfcd65c253cf14c5b9692c9ad706d91c7da047f72b70375b9fd9f9a8cad54ee"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Su-25.zip",
+          "member": "Su-25/Su-25-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "14c4b3248b7f35b4631abc298610dea9683cc43d4f8f17004b9ed9544b017cc0"
+        }
+      ]
+    },
+    {
+      "id": "FG-SU-37",
+      "country": "russia",
+      "role": "fighter",
+      "family": "Su-37",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sukhoi_Su-37",
+          "title": "Sukhoi Su-37",
+          "html_sha256": "3df17c61ebc4302b8331ce66c016397f0cde1edda518f1d6760b4f8d7963e969"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\SU-37.zip",
+          "member": "SU-37/SU-37-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "4c1700ba9714ad14ae401fe0f391fe2b01f0079a687f0e96818a8a9e86a392f3"
+        }
+      ]
+    },
+    {
+      "id": "FG-Sukhoi-Su-33",
+      "country": "ussr",
+      "role": "fighter",
+      "family": "Su-33",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sukhoi_Su-33",
+          "title": "Sukhoi Su-33",
+          "html_sha256": "15d5b445879d31bab9ec0b172fa083b58d49a806a558b56e0456a177b6a7d225"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Sukhoi-Su-33.zip",
+          "member": "Sukhoi-Su-33/su33-set.xml",
+          "tags": [
+            "Sukhoi",
+            "fighter",
+            "bomber",
+            "1940s",
+            "ww2",
+            "jet",
+            "twin-engine",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "8fd409178357c5dd1e4dbc89387a88f84da8e62b2845617f668668d8f2f5e783"
+        }
+      ]
+    },
+    {
+      "id": "FG-Super-Etendard",
+      "country": "france",
+      "role": "attack",
+      "family": "Super Etendard",
+      "decade": 1970,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Dassault-Breguet_Super_%C3%89tendard",
+          "title": "Dassault-Breguet Super Étendard",
+          "html_sha256": "dee6665b69653495b60941a7a4039f6c87278809a96e710707ce0becbb139faf"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Super-Etendard.zip",
+          "member": "Super-Etendard/super-etendard-set.xml",
+          "tags": [
+            "dassault",
+            "fighter",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "jet",
+            "single-engine",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "6aee9cc9406db01f957860f69b5ad9a583956d95c67bb3b3c1d493203110bfac"
+        }
+      ]
+    },
+    {
+      "id": "FG-Supermarine-Swift",
+      "country": "uk",
+      "role": "fighter",
+      "family": "Swift",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Supermarine_Swift",
+          "title": "Supermarine Swift",
+          "html_sha256": "5593585f94099ced8007aec39daac9b7255737ba642a45919761eacbc59b5c2c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Supermarine-Swift.zip",
+          "member": "Supermarine-Swift/SwiftFR5-set.xml",
+          "tags": [
+            "fighter",
+            "jet",
+            "single-engine",
+            "retractable-gear"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "de8c49211e80e8e8e3d05bddacf8bbcf33cb3b0b91a74bbec8988960a5769bdb"
+        }
+      ]
+    },
+    {
+      "id": "FG-T-4",
+      "country": "japan",
+      "role": "trainer",
+      "family": "T-4",
+      "decade": 1980,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Kawasaki_T-4",
+          "title": "Kawasaki T-4",
+          "html_sha256": "0491f79e79b088d12dd9c6084ec36cd8c05be98a1af949cd62499cd2cebab0f7"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\T-4.zip",
+          "member": "T-4/T-4-jsbsim-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "4f38d60c8d28c901ee4631378c7c11933d481ed061e9b8b6e523e0b270c44c71"
+        }
+      ]
+    },
+    {
+      "id": "FG-T-50",
+      "country": "russia",
+      "role": "fighter",
+      "family": "Su-57/T-50",
+      "decade": 2010,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Sukhoi_Su-57",
+          "title": "Sukhoi Su-57",
+          "html_sha256": "5b2b11c0e5ae4281de181633c456b705d2ea828e233cc8ffe6de15921205903a"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\T-50.zip",
+          "member": "T-50/T-50-jsbsim-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "fd42e9c06d0e94e2f1398095f47479abcfa178a45124cc062953315b7c272def"
+        }
+      ]
+    },
+    {
+      "id": "FG-T37",
+      "country": "usa",
+      "role": "trainer",
+      "family": "T-37",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Cessna_T-37_Tweet",
+          "title": "Cessna T-37 Tweet",
+          "html_sha256": "da60c7fe40e4ec8016bcfbec4210e430a3c0f22f3be9ffb4bf957bec7a20a107"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\T37.zip",
+          "member": "T37/t37-set.xml",
+          "tags": [
+            "cessna",
+            "low-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "trainer"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "bd991c50c6ecd1b12df759f2763e5ebec97a94f87202eea48644ae68c659f122"
+        }
+      ]
+    },
+    {
+      "id": "FG-T7-RedHawk",
+      "country": "joint",
+      "role": "trainer",
+      "family": "T-7",
+      "decade": 2010,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "美国Boeing/瑞典Saab联合项目。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Boeing-Saab_T-7_Red_Hawk",
+          "title": "Boeing-Saab T-7 Red Hawk",
+          "html_sha256": "f2f2cf2076a1dc7bcb4bcc1a2e6cf3f30521b29a929671fd855aa2673ea681ce"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\T7-RedHawk.zip",
+          "member": "T7-RedHawk/t7-set.xml",
+          "tags": [
+            "boeing-saab",
+            "fighter",
+            "2010s",
+            "2020s",
+            "delta",
+            "retractable-gear",
+            "glass-cockpit",
+            "hud",
+            "ifr",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "single-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "dd6ba709716b7cb8d66085c995c349cb29b279998f06efe7f5699003bfd91f6b"
+        }
+      ]
+    },
+    {
+      "id": "FG-Tu-134",
+      "country": "ussr",
+      "role": "airliner",
+      "family": "Tu-134",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Tupolev_Tu-134",
+          "title": "Tupolev Tu-134",
+          "html_sha256": "fbc9f66f7cecbfb5809056a36048122dd6f1121c33291665aeec246e5e94b384"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Tu-134.zip",
+          "member": "Tu-134/tu134-set.xml",
+          "tags": [
+            "tupolev",
+            "transport",
+            "1960s",
+            "1970s",
+            "1980s",
+            "low-wing",
+            "retractable-gear",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "ee68cec6a5afae8c997f0ffba66224ef6f719468043904f9b1a7eefd13a21583"
+        }
+      ]
+    },
+    {
+      "id": "FG-Tu-22-Blinder",
+      "country": "ussr",
+      "role": "attack",
+      "family": "Tu-22",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Tupolev_Tu-22",
+          "title": "Tupolev Tu-22",
+          "html_sha256": "d67666798db40337918a06260ecb0bb2e8f435dcc928a9eb9a4bba03dcbb90e7"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Tu-22-Blinder.zip",
+          "member": "Tu-22-Blinder/tu22-set.xml",
+          "tags": [
+            "Tupolev",
+            "supersonic-bomber",
+            "1960s",
+            "low-wing",
+            "retractable-gear",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "5f5d90dfba792c745f3a5105a8f552e8a7da4ebace065969631f8b952a740aa5"
+        }
+      ]
+    },
+    {
+      "id": "FG-tu154b",
+      "country": "ussr",
+      "role": "airliner",
+      "family": "Tu-154",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Tupolev_Tu-154",
+          "title": "Tupolev Tu-154",
+          "html_sha256": "a09cc4b024539b49903e4e61eff165dd12c0993f9ee929514ae2a15974ec20b5"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\tu154b.zip",
+          "member": "tu154b/tu154b-set.xml",
+          "tags": [
+            "transport",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "ifr",
+            "retractable-gear",
+            "t-tail",
+            "jet",
+            "rembrandt"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "20ee1dd2756a5f6084441ad0cde2781106a50130e2d49b2dfb5de52dcb740079"
+        }
+      ]
+    },
+    {
+      "id": "FG-victor",
+      "country": "uk",
+      "role": "attack",
+      "family": "Victor",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Handley_Page_Victor",
+          "title": "Handley Page Victor",
+          "html_sha256": "ce1651a93651d4fa634bb71d33c8dcc26a2a1d35abe7564bf62c9cedff37c102"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\victor.zip",
+          "member": "victor/victor-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "cef9486d9e5a1bcd5a06f66da94fd61109af57bb62a368cd8eaa5af5ecc3a6bf"
+        }
+      ]
+    },
+    {
+      "id": "FG-vulcanb2",
+      "country": "uk",
+      "role": "attack",
+      "family": "Vulcan",
+      "decade": 1950,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Avro_Vulcan",
+          "title": "Avro Vulcan",
+          "html_sha256": "9ef7dbc5149f5f952999eac7049a37cc865f3a32e6cf97815298862a498f7010"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\vulcanb2.zip",
+          "member": "vulcanb2/vulcanb2-set.xml",
+          "tags": [
+            "bomber",
+            "avro",
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s",
+            "coldwar",
+            "retractable-gear",
+            "delta",
+            "refuel",
+            "jet",
+            "4-engine"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "7491562ee3085a22259638d38aa0733624b13e5b104c0116218f6af91c8d1622"
+        }
+      ]
+    },
+    {
+      "id": "FG-Westwind-II",
+      "country": "israel",
+      "role": "airliner",
+      "family": "Westwind",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "以色列IAI发展的Westwind II，源自美国Jet Commander；按II型来源归以色列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/IAI_Westwind",
+          "title": "IAI Westwind",
+          "html_sha256": "fc5d3e6fcb869da74e6777fb73dc5d014d9ea6c0593c5f3c303846a4a5d74e73"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Westwind-II.zip",
+          "member": "Westwind-II/westwind-set.xml",
+          "tags": [
+            "aero-commander",
+            "israel-aircraft-industries",
+            "business",
+            "1960s",
+            "1970s",
+            "1980s",
+            "1990s",
+            "2000s",
+            "2010s",
+            "2020s",
+            "retractable-gear",
+            "jet",
+            "twin-engine",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "c3ba41fa22f82949e9581c09071ee16cd0c00e9d944f8fa8c9156726dcfb1b46"
+        }
+      ]
+    },
+    {
+      "id": "FG-XB-70",
+      "country": "usa",
+      "role": "attack",
+      "family": "XB-70",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/North_American_XB-70_Valkyrie",
+          "title": "North American XB-70 Valkyrie",
+          "html_sha256": "4e66cadeaaea5590231aa7af9c65a03ce780759ae53e1fc7f69f6db481afa944"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\XB-70.zip",
+          "member": "XB-70/XB-70-set.xml",
+          "tags": [
+            "north-american",
+            "bomber",
+            "prototype",
+            "1960s",
+            "delta",
+            "canard",
+            "retractable-gear",
+            "supersonic",
+            "afterburner",
+            "jet",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "86190e845ff143b69f3e8acd24f9d4a1eee89ae01e683ad2610e5ff926e2678b"
+        }
+      ]
+    },
+    {
+      "id": "FG-Yak-130",
+      "country": "russia",
+      "role": "trainer",
+      "family": "Yak-130",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Yakovlev_Yak-130",
+          "title": "Yakovlev Yak-130",
+          "html_sha256": "eec93a2d83538246aaac6a305661188a20eeac146377c217224133eaffa7bfcf"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Yak-130.zip",
+          "member": "Yak-130/Yak-130-set.xml",
+          "tags": [
+            "yakovlev",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "trainer",
+            "ifr",
+            "jet",
+            "1990s",
+            "2000s",
+            "2010s"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "7809d38a657b1c3a90ca7eeb90c0475d3ec8bd6cc4d1a8334699a7cb2a8259dc"
+        }
+      ]
+    },
+    {
+      "id": "FG-Yak-23",
+      "country": "ussr",
+      "role": "fighter",
+      "family": "Yak-23",
+      "decade": 1940,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Yakovlev_Yak-23",
+          "title": "Yakovlev Yak-23",
+          "html_sha256": "6c96775b4a8f7f83f3e947b0eea4d26f1bf5d78fd189e60d9b609c2882f82333"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Yak-23.zip",
+          "member": "Yak-23/yak23-set.xml",
+          "tags": [
+            "yakovlev",
+            "fighter",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "single-engine",
+            "jet",
+            "ifr",
+            "1950s",
+            "1960s",
+            "compositor"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "249b8da99717ae1c68621dbbd4693cd1ff1e6e81f281f7bef028305a77bea5c7"
+        }
+      ]
+    },
+    {
+      "id": "FG-Yak-36",
+      "country": "ussr",
+      "role": "trainer",
+      "family": "Yak-36",
+      "decade": 1960,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Yakovlev_Yak-36",
+          "title": "Yakovlev Yak-36",
+          "html_sha256": "f54b50bc67123586109f6bef053c975c33b3ec66bc4887bd4c764702d8c44f3c"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\Yak-36.zip",
+          "member": "Yak-36/Yak-36-set.xml",
+          "tags": [
+            "yakovlev",
+            "fighter",
+            "1960s",
+            "vtol",
+            "mid-wing",
+            "tricycle",
+            "retractable-gear",
+            "twin-engine",
+            "jet",
+            "prototype",
+            "compositor",
+            "HDR"
+          ],
+          "archive_sha256": null,
+          "xml_sha256": "e6aa8c889b55606899a1fa48365f7fbcefb762c4519803e5afc3608b9e15eb45"
+        }
+      ]
+    },
+    {
+      "id": "FG-YF-23",
+      "country": "usa",
+      "role": "fighter",
+      "family": "YF-23",
+      "decade": 1990,
+      "date_basis": "family_first_flight",
+      "status": "historical",
+      "note": "按参考机型家族首次飞行年代作粗略排列。",
+      "references": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Northrop_YF-23",
+          "title": "Northrop YF-23",
+          "html_sha256": "d2008dc57ff5744e9c8681d34f26cca68ab022b9190959737d5acc04ff58da58"
+        },
+        {
+          "file": "D:\\Aircraft-2024\\YF-23.zip",
+          "member": "YF-23/NTPS-set.xml",
+          "tags": [],
+          "archive_sha256": null,
+          "xml_sha256": "945782ebc83a009962f9eafa79c0468754f0583f569b376cb463a36ce9ccdb24"
+        }
+      ]
+    }
+  ]
+}

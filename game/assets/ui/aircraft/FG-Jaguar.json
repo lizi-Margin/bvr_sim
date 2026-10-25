@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Jaguar",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Jaguar\\FG-Jaguar.glb",
+  "source_sha256": "e3dd6a329ba3c90aa42bffe19200ca1d153b87c3d2a53df45a4a91855986a20c",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Jaguar.png",
+  "png_sha256": "b0507b7a818629e52609335501bf53bbb75a59355a53e5aabe8c03ed3601d222",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

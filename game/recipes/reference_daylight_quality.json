@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "name": "reference_daylight_quality",
+  "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
+  "shader_source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shader-source",
+  "shader_cache": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shaders-owned-source-v1",
+  "physical_sky": true,
+  "aerial_perspective": true,
+  "high_quality_sky": true,
+  "volumetric_clouds": true,
+  "planet_albedo": [
+    0.12,
+    0.16,
+    0.1
+  ],
+  "legacy_distance_fog_density": 0.0,
+  "horizon_height_fog": {
+    "enabled": false,
+    "start_m": 100000,
+    "density_per_m": 0.0,
+    "base_m": 0,
+    "top_m": 16000,
+    "approximation": "No additional height fog; retain actual physical aerial perspective"
+  },
+  "sun_energy": 4.0,
+  "sun_rotation": [
+    -0.4,
+    -0.65,
+    0
+  ],
+  "ambient": [
+    0.13,
+    0.14,
+    0.15
+  ],
+  "sky_exposure": 1.0,
+  "exposure": 2.0,
+  "saturation": 1.0,
+  "paint_factor": 0.72,
+  "paint_roughness": 0.64,
+  "canopy_roughness": 0.09,
+  "canopy_alpha": 0.15,
+  "canopy_transmission": 0.0,
+  "terrain_detail": {
+    "base_color": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Color.jpg",
+    "normal": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_NormalDX.jpg",
+    "roughness_map": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Roughness.jpg",
+    "tile_m": 3.0,
+    "mean_linear_luminance": 0.09249167933424425,
+    "strength": 0.45,
+    "base_color_sha256": "b9b6d61bc3b6137b868a3447eef18737896acd26d58fe2f4b83ce8c0e9d3f8ad",
+    "normal_sha256": "69add2a30fec8812b6d630073a941d709f5060a2ddf5bd6696004b1e577a4897",
+    "roughness_map_sha256": "8810effd44756341170d551501b7d0c645dc2395dbce46a8c7f1e61045258a06"
+  },
+  "shader_patch": {
+    "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
+    "patched_objectHF_sha256": "a0b62b49b95bdda79bdf167fdfb53a33ad3d898764e4f347de016a124176add4",
+    "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
+    "patched_skyHF_sha256": "a74dec34f77c16adc67783bc3d4d0be5e24e88c52be7c24db60a7e625d762e05",
+    "flat_nwu_horizon_haze": "Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.",
+    "planet_ground_radiance": true,
+    "material_flag": "0x42565244",
+    "pipeline": "Existing forward raster path; visibility compute shading remains off",
+    "paint_material_flag": "0x42565250",
+    "source_card_material_flag": "0x42565256",
+    "source_card_backface_normals": "For registered source-volume cards only, mirror normal depth while retaining texture tangent/bitangent components on backfaces. Source images, alpha/depth and standard materials unchanged. Opposite-side volume lighting remains an impostor approximation.",
+    "source_card_normal_encoding": "Exact retained source PNG loaded once per view as linear RGBA8; decode all three averaged normal channels for explicitly marked source-volume cards. No inferred hemisphere, altered source vectors or global normal-map change.",
+    "source_tree_grounding": "Explicit source UV1 base anchors or source-tree indices with per-instance north/west position streams, shared R32 core height atlas and indexed-triangle interpolation. Same raster deformation in color/depth/shadows and GPU draw-buffer inspection. Static triangle preload shifts current/previous geometry for visibility depth/velocity. Unused partial-batch slots collapse to zero-area triangles. Owned GPU instance copy patches bounds and stream offsets/counts before visibility; indexed raster only.",
+    "cache_provenance": "Owned-source-v1 cache starts without inherited compiled programs: old copied wishadermeta referenced upstream includes and left shadow variants stale. All compiled dependencies must refer to owned shader-source files.",
+    "patched_surfaceHF_sha256": "5e0256d0777de092801d3c19908aad7d10e4f29683cd28e72cfc86939d818927",
+    "water_refraction_depth": "Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias."
+  },
+  "provenance": {
+    "geometry": "Original registered FlightGear exterior geometry retained; F16 adds original source pilot_externalview.ac and Cockpit/Main/cockpit.ac, without new invented geometry or physical changes.",
+    "material_parameters": "Engineering paint/glass/metal approximations based on source material names and roles, not measured BRDFs",
+    "detail_textures": "Existing registered CC0 grass color/normal/roughness; exact unchanged source hashes",
+    "detail_mean": "Computed from source color in linear sRGB to preserve macro mean brightness",
+    "shader_source": "Pinned Wicked Engine MIT source copied to cache; upstream checkout not edited",
+    "aircraft_surfaces": "Source normals/UVs audited; original exterior positions/indices/normals/UVs/images retained. F16 source pilot and cockpit-main geometry added at their declared identity transforms. F22 exterior-atlas luminance uses configurable linear knee/shoulder/dark-ink lift; source-named F119/vector meshes retain separate metal material. F16 source internal-flame white emissive disc uses non-emissive metal; actual-throttle glow retained. Engineering approximations, not measured BRDFs or a PBR texture set.",
+    "daylight": "Sun energy4/ACES; exposure2 selected after fixed-camera exposure1/2 and sun4/10 comparisons. Higher sun elevation and neutral ambient; no additional fog.",
+    "anti_aliasing": "Pinned engine temporalAA was disabled; explicit TAA candidate replaces FXAA, subject to actual motion/ghosting review",
+    "canopy": "Thin alpha-blended dielectric approximation, linear tint and clearcoat; original zero-opacity F16 inner layer has no depth/specular contribution. Source F16 cockpit and pilot are now included. Not measured optical data; no screen-space transmission blur.",
+    "imported_exhausts": "Source FDM capability and existing normalized REHEAT snapshot output required. Source dry engines and unavailable state do not get throttle-created glow. Attachments and emission remain engineering approximations; ordinary F22/F16 retain their separate legacy effect.",
+    "reference_map_goal": "Reference-image quality goal,2026-10-25: actual high-quality atmosphere and volumetric clouds enabled for visual review; exposure, source lighting and existing fog remain frozen. No performance gate."
+  },
+  "temporal_aa": true,
+  "fxaa": false,
+  "source_surface_corrections": true,
+  "source_card_full_rgb_normals": true,
+  "source_tree_grounding": true,
+  "canopy_color": [
+    0.06,
+    0.045,
+    0.02
+  ],
+  "f22_paint_knee": 0.18,
+  "f22_paint_shoulder": 0.09,
+  "f22_paint_floor": 0.02,
+  "scenery_materials": {
+    "leaf_albedo": [
+      0.025,
+      0.075,
+      0.018
+    ],
+    "bark_albedo": [
+      0.09,
+      0.06,
+      0.035
+    ],
+    "basis": "Engineering linear-light albedo for existing stylized Kenney leaf/bark palette only. Source-derived textured pine is unchanged; not measured species reflectance."
+  },
+  "aircraft_exhaust_profiles_file": "../config/aircraft_exhaust_profiles.json",
+  "aircraft_exhaust_profiles_sha256": "230c37be95f7c3b4f5491c0cdff68914268fae556eef203dba5097d64bb41158"
+}

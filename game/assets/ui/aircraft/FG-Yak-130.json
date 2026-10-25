@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Yak-130",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Yak-130\\FG-Yak-130.glb",
+  "source_sha256": "b138722dc49c8649bdc95d96dab4ff04b1ae0bfc7628419545f776cde28f6675",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Yak-130.png",
+  "png_sha256": "53a58faaea59b6e9e09b890a5a6a262d4ab762d0af808642bdfeae1cdebe3e24",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

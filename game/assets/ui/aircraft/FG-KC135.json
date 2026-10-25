@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-KC135",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-KC135\\FG-KC135.glb",
+  "source_sha256": "2e38f3dd010e9e6f3455faaeef0fc159949481ba8a2c225c64a269f3c34a8d05",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-KC135.png",
+  "png_sha256": "1cb99e1d5502807ac90e5a5921bd2ce6959f8a50f75144369166e5e0d752a671",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

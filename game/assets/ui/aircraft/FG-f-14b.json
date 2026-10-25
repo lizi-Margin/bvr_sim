@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-f-14b",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-f-14b\\FG-f-14b.glb",
+  "source_sha256": "4d3fff0165871f45e6041bbbe2710e2f5ef2b86e2a7946e07807914fb79db99b",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-f-14b.png",
+  "png_sha256": "9126b0a0f295a8b8c6649b4c69a46537413b5ac7897ae5c353f03bdce3a216c6",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Dassault-Mystere-IV",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Dassault-Mystere-IV\\FG-Dassault-Mystere-IV.glb",
+  "source_sha256": "2a2519c868f7078ddd5e2e196ed83854eb299ef47404849ddde78e597e8eeaa3",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Dassault-Mystere-IV.png",
+  "png_sha256": "a67a848d6c4abae1cf0cab8bd0a1bf5c2d8d83baa2bac0b640f0f9a9479dbf62",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

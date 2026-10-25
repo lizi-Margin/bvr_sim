@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-tu154b",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-tu154b\\FG-tu154b.glb",
+  "source_sha256": "82e118b66a4af6c800b94dd583b2d0c40e35478d832f1e2b148ec143544d6cf6",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-tu154b.png",
+  "png_sha256": "7553ccab73050402a8bbe1f4d4547bb12d44e291d63e0d41a1193f9ff07cc20f",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

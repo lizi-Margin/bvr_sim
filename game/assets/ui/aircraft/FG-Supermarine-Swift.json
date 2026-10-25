@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Supermarine-Swift",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Supermarine-Swift\\FG-Supermarine-Swift.glb",
+  "source_sha256": "ccf9df0a3c38015fd053520857cb3639aca1c448fb9d7851370f3343c6a3cfd9",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Supermarine-Swift.png",
+  "png_sha256": "3700513df7ba23735c7c814035ef674fe433f3ba5ccfee02f02d6836cac5e3c1",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -18,9 +18,13 @@
 #include "audio_presenter.hxx"
 #include "visual_effects.hxx"
 #include "aircraft_visuals.hxx"
+#include "hangar_scene.hxx"
+#include "cloud_profile.hxx"
 namespace py = pybind11;
 using namespace DirectX;
 using wi::ecs::Entity;
+namespace wi::profiler { std::map<std::string,double> GetTimingSnapshot(bool gpu); }
+namespace wi::graphics { std::map<std::string,uint64_t> GetBvrDescriptorState(); }
 struct HudText {
     float x = 0, y = 0;
     int size = 20;
@@ -41,16 +45,56 @@ struct Input {
     std::array<float,6> pad_axes{};
     std::vector<int> held, pressed;
 };
+struct HudImage {
+    float x=0,y=0,w=1,h=1;
+    std::string file;
+};
 class GamePath : public wi::RenderPath3D {
   public:
     std::function<void()> before_visibility;
+    bool presentation_paused=false;
+    bool planar_reflections_enabled=true;
+    std::map<std::string,double> cpu_timings;
+    const wi::graphics::Texture& sampled_depth() const {return depthBuffer_Copy;}
+    void Update(float dt) override {
+        const auto begin=std::chrono::steady_clock::now();
+        wi::RenderPath3D::Update(dt);
+        cpu_timings["engine_update_ms"]=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();
+    }
     void PreRender() override {
+        const auto begin=std::chrono::steady_clock::now();
         if(before_visibility)before_visibility();
+        const auto bounds_end=std::chrono::steady_clock::now();
+        cpu_timings["ground_bounds_ms"]=std::chrono::duration<double,std::milli>(bounds_end-begin).count();
+        // Scene::Update needs positive dt to allocate/upload new geometry.
+        // Freeze only shader time while constructing this frame's constants;
+        // camera, visibility, glyphs and scene uploads must keep working.
+        struct RestoreSpeed {
+            float previous;bool active;
+            ~RestoreSpeed(){if(active)wi::renderer::SetGameSpeed(previous);}
+        } restore{wi::renderer::GetGameSpeed(),presentation_paused};
+        if(presentation_paused)wi::renderer::SetGameSpeed(0);
         wi::RenderPath3D::PreRender();
+        if(!planar_reflections_enabled){
+            // Retain water geometry/SSR/sky lighting, but avoid rendering the
+            // full forest again through the mirrored camera. Never sample a
+            // stale or uninitialised planar target when that pass is disabled.
+            visibility_main.planar_reflection_visible=false;
+            camera->texture_reflection_index=-1;
+            camera->texture_reflection_depth_index=-1;
+        }
+        cpu_timings["engine_prerender_ms"]=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-bounds_end).count();
     }
     std::vector<HudText> texts;
     std::vector<HudLine> lines;
+    std::vector<HudImage> images;
+    std::map<std::string,wi::Resource> image_resources;
+    int ui_font=0;
+    bool menu_blur=false;
     void Compose(wi::graphics::CommandList cmd) const override {
+        // Profiling is an Agent-readable API, not a product overlay. Keep
+        // diagnostic text out of scene captures while retaining timestamps.
+        wi::profiler::DisableDrawForThisFrame();
         wi::RenderPath3D::Compose(cmd);
         // HUD coordinates are physical pixels; do not apply Windows DPI a second time.
         wi::Canvas hud;
@@ -65,8 +109,15 @@ class GamePath : public wi::RenderPath3D {
             p.rotation = l.rotation;
             wi::image::Draw(wi::texturehelper::getWhite(), p, cmd);
         }
+        for(const auto& i:images){
+            const auto found=image_resources.find(i.file);
+            if(found==image_resources.end())continue;
+            wi::image::Params p;p.pos={i.x,i.y,0};p.siz={i.w,i.h};
+            wi::image::Draw(&found->second.GetTexture(),p,cmd);
+        }
         for (const auto &t : texts) {
             wi::font::Params p(t.x, t.y, t.size);
+            p.style=ui_font;
             p.color = wi::Color(t.color);
             p.shadowColor = wi::Color(0, 0, 0, 200);
             p.shadow_offset_x = p.shadow_offset_y = 1;
@@ -102,6 +153,7 @@ class Renderer {
     std::unique_ptr<AircraftVisuals> aircraft_visuals;
     std::map<Entity, Entity> weapon_flames;
     nlohmann::json visual_profile;
+    std::map<std::string,double> cpu_timings;
     Entity weather_entity=wi::ecs::INVALID_ENTITY;
     Entity sun_entity=wi::ecs::INVALID_ENTITY;
     static LRESULT CALLBACK wndproc(HWND h, UINT m, WPARAM w, LPARAM l) {
@@ -162,6 +214,9 @@ class Renderer {
     Renderer(int w, int h, bool visible, const std::string &engine, const std::string &shaders,
              const std::map<std::string, std::string> &models,const std::string& profile_file="")
         : model_files(models.begin(), models.end()), width(w), height(h) {
+        auto core=py::module_::import("bvr_sim.bvr_sim_cpp");
+        if(!py::hasattr(core,"GAME_API_ABI")||core.attr("GAME_API_ABI").cast<int>()!=2)
+            throw std::runtime_error("Core/renderer Game API ABI mismatch: rebuild matching native modules");
         if (w < 320 || h < 240)
             throw std::invalid_argument("Window too small");
         // Wicked owns process-global GPU jobs/resources; rebuilding that
@@ -177,6 +232,15 @@ class Renderer {
             if(!file)throw std::runtime_error("Cannot read visual profile: "+profile_file);
             file>>visual_profile;
         }
+        const int worker_threads=visual_profile.value("worker_threads",0);
+        if(worker_threads<0||worker_threads>64)throw std::invalid_argument("worker_threads must be0(auto) or1..64");
+        if(worker_threads>0)wi::jobsystem::Initialize(uint32_t(worker_threads));
+#ifdef BVR_WIDE_PRIMITIVE_IDS
+        if(visual_profile.is_null()||!visual_profile.value("wide_primitive_id_raster",false))throw std::runtime_error("Direct64-bit renderer requires its prepared wide primitive-ID shader profile");
+        wi::renderer::SetMeshShaderAllowed(false);
+#else
+        if(!visual_profile.is_null()&&visual_profile.value("wide_primitive_id_raster",false))throw std::runtime_error("Wide primitive-ID shaders require the matching native renderer");
+#endif
         wi::renderer::SetShaderSourcePath((visual_profile.is_null()?engine+"/WickedEngine/shaders":visual_profile.value("shader_source",engine+"/WickedEngine/shaders"))+"/");
         wi::renderer::SetShaderPath((visual_profile.is_null()?shaders:visual_profile.value("shader_cache",shaders))+"/");
         SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -209,11 +273,17 @@ class Renderer {
         }
         path = std::make_unique<GamePath>();
         app->ActivatePath(path.get());
+        path->planar_reflections_enabled=visual_profile.value("planar_reflections",true);
         path->camera->CreatePerspective(float(w), float(h), .2f,600000.f, 1.05f);
         set_quality("medium");
+        set_render_scale(visual_profile.value("render_scale",1.f));
         auto &s = wi::scene::GetScene();
         baked_world = std::make_unique<WorldScene>(s, model_files,visual_profile);
+        wi::renderer::SetOcclusionCullingEnabled(visual_profile.value("occlusion_culling",true));
         path->before_visibility=[this](){baked_world->ground_bounds_before_visibility();};
+#ifdef BVR_WIDE_PRIMITIVE_IDS
+        set_visibility_compute(visual_profile.value("visibility_compute_shading",false));
+#endif
         effects = std::make_unique<VisualEffects>(s,!visual_profile.is_null());
         aircraft_visuals = std::make_unique<AircraftVisuals>(s);
         aircraft_visuals->set_material_profile(visual_profile);
@@ -244,6 +314,10 @@ class Renderer {
         s.lights.GetComponent(sun)->SetCastShadow(true);
         if(!visual_profile.is_null()&&visual_profile.contains("sun_shadow_cascades_m"))
             set_shadow_cascades(visual_profile.at("sun_shadow_cascades_m").get<std::vector<float>>());
+        if(!visual_profile.is_null()&&visual_profile.contains("sun_shadow_resolution")&&!visual_profile.at("sun_shadow_resolution").is_number_integer())
+            throw std::invalid_argument("Sun shadow resolution must be an integer");
+        if(!visual_profile.is_null()&&visual_profile.contains("sun_shadow_resolution"))
+            set_shadow_resolution(visual_profile.at("sun_shadow_resolution").get<int>());
         if(!visual_profile.is_null()){
             sky.SetRealisticSky(visual_profile.value("physical_sky",true));
             sky.SetRealisticSkyAerialPerspective(visual_profile.value("aerial_perspective",true));
@@ -265,13 +339,12 @@ class Renderer {
             path->setTonemap(wi::renderer::Tonemap::ACES);
         }
         s.layers.Create(sun).layerMask = 1;
-        auto floor = cube("hangar_floor", {0, -.4f, 0}, {55, .3f, 45}, {.23f, .25f, .28f, 1});
-        auto wall = cube("hangar_back", {0, 15, 34}, {55, 15, 1}, {.18f, .21f, .25f, 1});
-        auto side = cube("hangar_side", {-55, 15, 0}, {1, 15, 35}, {.18f, .21f, .25f, 1});
-        for (auto e : {floor, wall, side}) {
-            s.layers.GetComponent(e)->layerMask = 2;
-            studio_entities.push_back(e);
-        }
+        apply_cloud_profile(sky,visual_profile);
+        build_hangar_apron([&](auto name,auto position,auto scale,auto color){return cube(name,position,scale,color);},studio_entities);
+        auto hangar_sun=s.Entity_CreateLight("hangar_daylight",{0,100,0},{1,.94f,.84f},3.2f,100000,wi::scene::LightComponent::DIRECTIONAL);
+        s.layers.Create(hangar_sun).layerMask=2;
+        auto hs=s.transforms.GetComponent(hangar_sun);hs->RotateRollPitchYaw(XMFLOAT3(-.8f,-.5f,0));hs->UpdateTransform();
+        s.lights.GetComponent(hangar_sun)->SetCastShadow(true);studio_entities.push_back(hangar_sun);
         for (auto position : {XMFLOAT3(-18, 16, -12), XMFLOAT3(22, 12, 8), XMFLOAT3(0, 18, 20)}) {
             auto light = s.Entity_CreateLight("hangar_softbox", position, {.9f, .95f, 1}, 1800, 90,
                                               wi::scene::LightComponent::POINT);
@@ -312,10 +385,42 @@ class Renderer {
         path->setEyeAdaptionEnabled(false);
         path->setFSR2Enabled(false);
     }
+    void set_visibility_compute(bool enabled){
+        if(enabled&&!visual_profile.value("wide_visibility_compute_v1",false))
+            throw std::invalid_argument("Visibility shading requires its prepared direct64 material-parity shaders");
+        path->setVisibilityComputeShadingEnabled(enabled);
+    }
+    void set_occlusion_culling(bool enabled){wi::renderer::SetOcclusionCullingEnabled(enabled);}
+    void set_planar_reflections(bool enabled){path->planar_reflections_enabled=enabled;}
+    void set_ui_font(const std::string& file) {
+        if(!std::filesystem::is_regular_file(file))throw std::runtime_error("Missing UI font: "+file);
+        path->ui_font=wi::font::AddFontStyle(file);
+    }
+    void set_menu_overlay(bool blur,const std::vector<HudImage>& images) {
+        path->menu_blur=blur;path->images=images;
+        path->setDepthOfFieldEnabled(blur);
+        path->camera->focal_length=1.f;
+        path->camera->aperture_size=blur?.7f:0.f;
+        for(const auto& i:images)if(!path->image_resources.count(i.file)){
+            if(!std::filesystem::is_regular_file(i.file))throw std::runtime_error("Missing UI thumbnail: "+i.file);
+            path->image_resources[i.file]=wi::resourcemanager::Load(i.file);
+        }
+    }
+    void set_audio_volume(float volume){wi::audio::SetVolume(std::clamp(volume,0.f,1.f));}
+    void set_hangar_floor_texture(const std::string& file){
+        auto& s=wi::scene::GetScene();
+        for(auto e:studio_entities)if(auto name=s.names.GetComponent(e);name&&name->name=="apron_concrete"){
+            auto mat=s.materials.GetComponent(e);auto mesh=s.meshes.GetComponent(e);
+            auto& slot=mat->textures[wi::scene::MaterialComponent::BASECOLORMAP];slot.name=file;slot.resource=wi::resourcemanager::Load(file);
+            mat->texMulAdd={60,60,0,0};mat->SetBaseColor({.7f,.7f,.7f,1});mat->SetDirty();
+        }
+    }
     void configure_world(const bvr_sim::GameTerrain &terrain, const std::array<double, 3> &target,
                          const std::array<double, 3> &runway, float length, float width, uint32_t seed,
                          const std::string &asphalt, const std::string &grass) {
         auto &s = wi::scene::GetScene();
+        wi::graphics::GetDevice()->WaitForGPU();
+        baked_world->clear();
         for (auto e : world_entities)
             s.Entity_Remove(e);
         world_entities.clear();
@@ -392,6 +497,8 @@ class Renderer {
             add("field", {-w, float(terrain.height(n, w) + .04), n}, {size(rng), .015f, size(rng)},
                 {.18f * c, .21f * c, .10f * c, 1});
         }
+        // Legacy terrain must not leak through the independent hangar apron.
+        for(auto e:world_entities)s.layers.Create(e).layerMask=1;
     }
     void place_asset(const std::string &uid, const std::string &model, const std::array<double, 3> &pos,
                      float scale) {
@@ -410,10 +517,26 @@ class Renderer {
                          const std::vector<ScenePlacement> &placements, const std::vector<int> &outer_cover,
                          const std::vector<std::array<float, 4>> &outer_colors,
                          const std::vector<std::string> &terrain_materials) {
+        wi::graphics::GetDevice()->WaitForGPU();
+        auto& scene = wi::scene::GetScene();
+        for (auto e : world_entities) scene.Entity_Remove(e);
+        world_entities.clear();
         baked_world->configure(terrain, cover, colors, materials, surfaces, placements, outer_cover,
                                outer_colors, terrain_materials);
     }
+    void register_scene_models(const std::unordered_map<std::string, std::string>& models) {
+        // Registered asset IDs are immutable. A different resource version must
+        // use a distinct ID so cached prototype meshes cannot silently change.
+        for (const auto& [id, file] : models) {
+            auto old = model_files.find(id);
+            if (old != model_files.end() && std::filesystem::path(old->second).lexically_normal() != std::filesystem::path(file).lexically_normal())
+                throw std::invalid_argument("Map asset ID already names a different resource: " + id);
+        }
+        for (const auto& [id, file] : models) model_files.emplace(id, file);
+    }
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
+    void set_vegetation_lod_distance(double meters){baked_world->set_vegetation_lod_distance(meters);}
+    std::string vegetation_state() const{return baked_world->vegetation_state().dump();}
     void configure_ground_atlas(py::array_t<float,py::array::c_style> values,float north,float west,float spacing,const std::string& source_sha256) {
         if(values.ndim()!=2)throw std::invalid_argument("Terrain atlas must be a contiguous float32 array [west,north]");
         baked_world->ground_atlas().upload(values.data(),uint32_t(values.shape(1)),uint32_t(values.shape(0)),north,west,spacing,source_sha256);
@@ -422,6 +545,21 @@ class Renderer {
     std::vector<float> gpu_ground_heights(const std::vector<std::array<float,2>>& points) {return baked_world->ground_atlas().heights(points);}
     std::vector<GroundVertexState> scenery_ground_vertices(const std::string& id,bool all_vertices=false) {return baked_world->scenery_ground_vertices(id,all_vertices);}
     std::vector<SourceCardMaterialState> source_card_materials() const { return baked_world->source_card_materials(); }
+    std::string facing_leaf_state() const { return baked_world->facing_leaf_state().dump(); }
+    std::string primitive_id_state() const {
+        const auto& scene=wi::scene::GetScene();
+        const uint64_t allocated=scene.meshletAllocator.load();
+        constexpr uint64_t capacity=(uint64_t(1)<<25)-1;
+        return nlohmann::json({{"allocated_meshlets",allocated},{"raster_packed_meshlet_capacity",capacity},
+            {"raster_packed_meshlet_overflow",allocated>capacity},{"meshlet_buffer_bytes",scene.meshletBuffer.desc.size},
+            {"mesh_shader_allowed",wi::renderer::IsMeshShaderAllowed()},
+#ifdef BVR_WIDE_PRIMITIVE_IDS
+            {"id_encoding","direct64_indexed"},{"global_meshlet_lookup_enabled",false},
+#else
+            {"id_encoding","packed32_meshlet25"},{"global_meshlet_lookup_enabled",true},
+#endif
+            {"scope","Actual scene allocation versus pinned shader PrimitiveID::pack25-bit meshlet field;not a GPU pixel correctness certificate."}}).dump();
+    }
     std::optional<std::array<float,4>> reflection_plane() const {
         const auto& visibility=path->visibility_main;
         if(!visibility.planar_reflection_visible)return std::nullopt;
@@ -528,7 +666,11 @@ class Renderer {
                 const std::vector<HudLine> &lines,float presentation_dt=1.f/60) {
         if (closed)
             throw std::runtime_error("Renderer closed");
+        const auto frame_begin=std::chrono::steady_clock::now();
+        auto stamp=frame_begin;
+        const auto measure=[&](const char* name){const auto now=std::chrono::steady_clock::now();cpu_timings[name]=std::chrono::duration<double,std::milli>(now-stamp).count();stamp=now;};
         baked_world->update(camera_eye, f);
+        measure("scenery_update_ms");
         audio.update(f, studio);
         if (!studio)
             effects->update(f,camera_eye,presentation_dt);
@@ -665,17 +807,51 @@ class Renderer {
             c.SetDirty();
             c.UpdateCamera();
         }
+        measure("dynamic_entities_ms");
+        baked_world->update_facing_leaves(*path->camera);
+        measure("facing_leaves_ms");
         path->texts = texts;
         path->lines = lines;
         // Queue new glyphs before Application::Run updates the atlas. This also
         // makes the first flight/debrief capture complete after a menu change.
         for (const auto &text : texts) {
             wi::font::Params params(text.x, text.y, text.size);
+            params.style=path->ui_font;
             wi::font::TextSize(text.text, params);
         }
         // Retain the buffer BEFORE Present advances the swapchain index.
         last_frame = wi::graphics::GetDevice()->GetBackBuffer(&app->swapChain);
+        measure("hud_setup_ms");
         app->Run();
+        measure("application_run_ms");
+        cpu_timings["native_frame_ms"]=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-frame_begin).count();
+    }
+    void set_profiling(bool enabled) {wi::profiler::SetEnabled(enabled);}
+    std::string frame_timings() const {
+        auto cpu=cpu_timings;cpu.insert(path->cpu_timings.begin(),path->cpu_timings.end());
+        return nlohmann::json({{"native_cpu_ms",cpu},{"descriptors",wi::graphics::GetBvrDescriptorState()},{"engine_cpu_ms",wi::profiler::GetTimingSnapshot(false)},
+            {"engine_gpu_ms",wi::profiler::GetTimingSnapshot(true)},
+            {"scope","CPU wall times; engine GPU timestamp ranges are buffered and smoothed, nested ranges must not be summed."}}).dump();
+    }
+    std::string depth_coverage() const {
+        const auto& texture=path->sampled_depth();
+        if(texture.desc.format!=wi::graphics::Format::R32_FLOAT)throw std::runtime_error("Depth coverage requires R32_FLOAT depth copy");
+        wi::vector<uint8_t> bytes;
+        if(!wi::helper::saveTextureToMemory(texture,bytes))throw std::runtime_error("Cannot read rendered GPU depth");
+        const size_t count=size_t(texture.desc.width)*texture.desc.height;
+        if(bytes.size()<count*sizeof(float))throw std::runtime_error("Incomplete rendered depth readback");
+        std::array<uint64_t,16*9> occupied{},totals{};uint64_t valid=0,invalid=0;
+        for(size_t i=0;i<count;++i){
+            float depth;std::memcpy(&depth,bytes.data()+i*sizeof(float),sizeof(float));
+            const auto bin=((i/texture.desc.width)*9/texture.desc.height)*16+(i%texture.desc.width)*16/texture.desc.width;
+            ++totals[bin];
+            if(!std::isfinite(depth)||depth<0||depth>1)++invalid;
+            else if(depth>0){++valid;++occupied[bin];}
+        }
+        std::array<double,16*9> coverage{};for(size_t i=0;i<coverage.size();++i)coverage[i]=double(occupied[i])/std::max<uint64_t>(1,totals[i]);
+        return nlohmann::json({{"width",texture.desc.width},{"height",texture.desc.height},{"occupied_fraction",double(valid)/count},
+            {"invalid_pixels",invalid},{"tile_columns",16},{"tile_rows",9},{"tile_coverage",coverage},
+            {"scope","Actual GPU reversed-Z depth copy; positive samples certify geometry coverage, not material or glyph correctness."}}).dump();
     }
     std::string capture(const std::string &filename) {
         if (closed || !last_frame.IsValid())
@@ -684,6 +860,10 @@ class Renderer {
         if (!wi::helper::saveTextureToFile(last_frame, filename))
             throw std::runtime_error("GPU capture failed");
         return filename;
+    }
+    void capture_menu_background(const std::string& filename){
+        wi::helper::saveTextureToFile(*path->GetGUIBlurredBackground(),filename);
+        wi::helper::saveTextureToFile(path->GetRenderResult3D(),filename+".scene.png");
     }
     py::bytes capture_rgb() {
         if(closed||!last_frame.IsValid())throw std::runtime_error("Render a frame before capture");
@@ -705,22 +885,118 @@ class Renderer {
     int shader_errors() const {
         return wi::renderer::GetShaderErrorCount() + wi::renderer::GetShaderMissingCount();
     }
-    void set_shadow_cascades(const std::vector<float>& distances){
+    static void validate_sun_shadows(const std::vector<float>& distances,int resolution){
         if(distances.empty()||distances.size()>4)throw std::invalid_argument("Directional shadows require1..4 cascade distances");
         float previous=0;
         for(float v:distances){if(!std::isfinite(v)||v<=previous||v>50000)throw std::invalid_argument("Shadow cascade distances must increase in(0,50000] metres");previous=v;}
+        if(resolution!=-1&&(resolution<128||resolution>8192||(resolution&(resolution-1))!=0||size_t(resolution)*distances.size()>16384))
+            throw std::invalid_argument("Sun shadow resolution must be auto(-1) or power-of-two128..8192;cascade atlas width must fit16384");
+    }
+    void set_shadow_cascades(const std::vector<float>& distances){
         auto light=wi::scene::GetScene().lights.GetComponent(sun_entity);
         if(!light)throw std::runtime_error("Sun is not initialized");
+        validate_sun_shadows(distances,light->forced_shadow_resolution);
         light->cascade_distances.assign(distances.begin(),distances.end());
+    }
+    void set_shadow_resolution(int resolution){
+        auto light=wi::scene::GetScene().lights.GetComponent(sun_entity);
+        if(!light)throw std::runtime_error("Sun is not initialized");
+        validate_sun_shadows(std::vector<float>(light->cascade_distances.begin(),light->cascade_distances.end()),resolution);
+        light->forced_shadow_resolution=resolution;
+    }
+    void apply_environment(const std::string& encoded) {
+        const auto profile=nlohmann::json::parse(encoded);
+        if(!profile.is_object())throw std::invalid_argument("Baked environment must be an object");
+        auto& scene=wi::scene::GetScene();auto weather=scene.weathers.GetComponent(weather_entity);
+        if(!weather)throw std::runtime_error("Weather is not initialized");
+        auto candidate=*weather;
+        auto number=[&](const nlohmann::json& object,const char* key,float fallback,float lo,float hi){
+            const float v=object.value(key,fallback);
+            if(!std::isfinite(v)||v<lo||v>hi)throw std::invalid_argument(std::string("Invalid environment value: ")+key);
+            return v;
+        };
+        auto color=[&](const char* key,std::vector<float> fallback,float maximum){
+            auto v=profile.value(key,fallback);
+            if(v.size()!=3)throw std::invalid_argument(std::string("Environment vector requires3 values: ")+key);
+            for(float value:v)if(!std::isfinite(value)||value<0||value>maximum)throw std::invalid_argument(std::string("Invalid environment color: ")+key);
+            return XMFLOAT3(v[0],v[1],v[2]);
+        };
+        const auto ambient=color("ambient",{.13f,.14f,.15f},10.f);
+        candidate.ambient=studio?XMFLOAT3(.12f,.14f,.18f):ambient;
+        candidate.skyExposure=number(profile,"sky_exposure",1.f,.01f,64.f);
+        candidate.SetRealisticSky(!studio&&profile.value("physical_sky",true));
+        candidate.SetRealisticSkyAerialPerspective(!studio&&profile.value("aerial_perspective",true));
+        candidate.SetRealisticSkyHighQuality(profile.value("high_quality_sky",false));
+        candidate.SetVolumetricClouds(!studio&&profile.value("volumetric_clouds",false));
+        candidate.atmosphereParameters.groundAlbedo=color("planet_albedo",{.12f,.16f,.1f},1.f);
+        const auto haze=profile.value("horizon_height_fog",nlohmann::json::object());
+        candidate.SetHeightFog(haze.value("enabled",false));
+        candidate.fogStart=number(haze,"start_m",100000.f,0.f,1e7f);
+        candidate.fogDensity=number(haze,"density_per_m",0.f,0.f,.1f);
+        candidate.fogHeightStart=number(haze,"base_m",0.f,-1e6f,1e6f);
+        candidate.fogHeightEnd=number(haze,"top_m",16000.f,candidate.fogHeightStart,1e6f);
+        candidate.volumetricCloudParameters.init();apply_cloud_profile(candidate,profile);
+        auto rotation=profile.value("sun_rotation",std::vector<float>{-.4f,-.65f,0.f});
+        if(rotation.size()!=3)throw std::invalid_argument("sun_rotation requires3 values");
+        for(float v:rotation)if(!std::isfinite(v))throw std::invalid_argument("Invalid sun rotation");
+        const float energy=number(profile,"sun_energy",4.f,0.f,100.f);
+        const float exposure=number(profile,"exposure",2.f,.01f,64.f);
+        const float saturation=number(profile,"saturation",1.f,0.f,4.f);
+        const auto cascades=profile.value("sun_shadow_cascades_m",std::vector<float>{8,80,800});
+        if(profile.contains("sun_shadow_resolution")&&!profile.at("sun_shadow_resolution").is_number_integer())throw std::invalid_argument("Sun shadow resolution must be an integer");
+        const int shadow_resolution=profile.value("sun_shadow_resolution",-1);
+        validate_sun_shadows(cascades,shadow_resolution);
+        // Commit only after all validation, preserving material/shader settings.
+        *weather=std::move(candidate);
+        scene.lights.GetComponent(sun_entity)->intensity=energy;
+        scene.lights.GetComponent(sun_entity)->cascade_distances.assign(cascades.begin(),cascades.end());
+        scene.lights.GetComponent(sun_entity)->forced_shadow_resolution=shadow_resolution;
+        auto transform=scene.transforms.GetComponent(sun_entity);transform->ClearTransform();
+        transform->RotateRollPitchYaw(XMFLOAT3(rotation[0],rotation[1],rotation[2]));transform->UpdateTransform();
+        path->setExposure(exposure);path->setSaturation(saturation);
+        for(const char* key:{"physical_sky","aerial_perspective","high_quality_sky","volumetric_clouds","planet_albedo",
+                "sky_exposure","ambient","sun_rotation","sun_energy","exposure","saturation","horizon_height_fog","cloud_layer","cloud_weather_map"}){
+            visual_profile.erase(key);if(profile.contains(key))visual_profile[key]=profile.at(key);
+        }
     }
     std::string visual_settings() const {
         auto result=visual_profile.is_null()?nlohmann::json::object():visual_profile;
         result["actual_output"]={{"width",width},{"height",height},{"vertical_fov",path->camera->fov},{"temporal_aa",wi::renderer::GetTemporalAAEnabled()},{"fxaa",path->getFXAAEnabled()}};
+        auto internal=path->GetInternalResolution();
+        result["actual_output"]["internal_resolution"]={internal.x,internal.y};
+        result["actual_output"]["render_scale"]=path->resolutionScale;
+        result["actual_output"]["visibility_compute_shading"]=path->getVisibilityComputeShadingEnabled();
+        result["actual_output"]["occlusion_culling"]=wi::renderer::GetOcclusionCullingEnabled();
+        result["actual_output"]["worker_threads"]=wi::jobsystem::GetThreadCount();
+        result["actual_output"]["planar_reflections"]=path->planar_reflections_enabled;
+        result["actual_output"]["ssr"]=path->getSSREnabled();
+        result["actual_output"]["ssgi"]=path->getSSGIEnabled();
+        result["actual_output"]["presentation_paused"]=path->presentation_paused;
+        result["actual_output"]["presentation_time_s"]=path->frameCB.time;
+        result["actual_output"]["render_frame_count"]=path->frameCB.frame_count;
+        const auto weather_state=wi::scene::GetScene().weathers.GetComponent(weather_entity);
+        result["actual_output"]["height_fog_color_override"]=weather_state->IsOverrideFogColor();
+        result["actual_output"]["height_fog_color_linear"]={weather_state->horizon.x,weather_state->horizon.y,weather_state->horizon.z};
+        const auto& cloud_map=wi::scene::GetScene().weathers.GetComponent(weather_entity)->volumetricCloudsWeatherMapFirst;
+        if(cloud_map.IsValid()){
+            const auto& desc=cloud_map.GetTexture().GetDesc();
+            result["actual_output"]["cloud_weather_map"]={{"width",desc.width},{"height",desc.height},{"format",uint32_t(desc.format)}};
+        }
         const auto light=wi::scene::GetScene().lights.GetComponent(sun_entity);
-        if(light){result["actual_output"]["sun_shadow_cascades_m"]=std::vector<float>(light->cascade_distances.begin(),light->cascade_distances.end());result["actual_output"]["sun_cast_shadow"]=light->IsCastingShadow();}
+        if(light){result["actual_output"]["sun_shadow_cascades_m"]=std::vector<float>(light->cascade_distances.begin(),light->cascade_distances.end());result["actual_output"]["sun_cast_shadow"]=light->IsCastingShadow();result["actual_output"]["sun_forced_shadow_resolution"]=light->forced_shadow_resolution;}
         auto colorspace=wi::graphics::GetDevice()->GetSwapChainColorSpace(&app->swapChain);
         result["actual_output"]["color_space"]=colorspace==wi::graphics::ColorSpace::SRGB?"sRGB":colorspace==wi::graphics::ColorSpace::HDR10_ST2084?"HDR10_ST2084":"HDR_LINEAR";
         const auto& sky=wi::scene::GetScene().weather;
+        result["actual_environment"]={{"sky_exposure",sky.skyExposure},{"physical_sky",sky.IsRealisticSky()},
+            {"aerial_perspective",sky.IsRealisticSkyAerialPerspective()},{"high_quality_sky",sky.IsRealisticSkyHighQuality()},
+            {"volumetric_clouds",sky.IsVolumetricClouds()},{"height_fog",sky.IsHeightFog()}};
+        const auto& clouds=sky.volumetricCloudParameters;
+        result["actual_cloud_layer"]={{"base_height_m",clouds.cloudStartHeight},{"thickness_m",clouds.cloudThickness},
+            {"coverage",clouds.layerFirst.coverageAmount},{"type",clouds.layerFirst.typeAmount},
+            {"noise_scale_per_m",clouds.layerFirst.totalNoiseScale},{"weather_scale_per_m",clouds.layerFirst.weatherScale},
+            {"ray_steps",clouds.maxStepCount},{"step_distribution_m",clouds.inverseDistanceStepCount},
+            {"initial_step_scale",clouds.bigStepMarch},{"shadow_samples",clouds.shadowSampleCount},
+            {"ground_samples",clouds.groundContributionSampleCount}};
         result["actual_lighting"]={{"sun_direction",{sky.sunDirection.x,sky.sunDirection.y,sky.sunDirection.z}},
             {"sun_radiance",{sky.sunColor.x,sky.sunColor.y,sky.sunColor.z}},
             {"ambient",{sky.ambient.x,sky.ambient.y,sky.ambient.z}},{"exposure",path->getExposure()}};
@@ -742,6 +1018,15 @@ class Renderer {
         if(visual_profile.is_null())throw std::runtime_error("Cloud evaluation requires the visual profile");
         visual_profile["volumetric_clouds"]=enabled;
         wi::scene::GetScene().weathers.GetComponent(weather_entity)->SetVolumetricClouds(enabled&&!studio);
+    }
+    void set_presentation_paused(bool enabled){
+        // Shader weather/wave clock only. The simulator owns its clock.
+        path->presentation_paused=enabled;
+    }
+    void set_render_scale(float value){
+        if(!std::isfinite(value)||value<.5f||value>4.f)throw std::invalid_argument("Render scale must be in[0.5,4]");
+        if(path->resolutionScale==value)return;
+        path->resolutionScale=value;path->ResizeBuffers();
     }
     std::map<std::string,uint64_t> memory_usage() const {
         auto v=wi::graphics::GetDevice()->GetMemoryUsage();return {{"usage_bytes",v.usage},{"budget_bytes",v.budget}};
@@ -765,8 +1050,8 @@ class Renderer {
         auto& s=wi::scene::GetScene();preview_root=aircraft_visuals->instantiate("asset_review",file->second);
         s.layers.GetComponent(preview_root)->layerMask=2;
         // Asset review can contain 80-m airliners: hide finite hangar walls.
-        for(auto e:studio_entities)if(auto o=s.objects.GetComponent(e))o->SetRenderable(false);
-        float lift=2.1f;
+        // Keep the presentation apron for imported aircraft too.
+        float lift=.02f;
         std::ifstream manifest(std::filesystem::path(file->second).parent_path()/"manifest.json");
         if(manifest){nlohmann::json m;manifest>>m;lift+=std::max(0.f,-m.at("bounds_blender").at("min").at(2).get<float>());}
         s.transforms.GetComponent(preview_root)->Translate(XMFLOAT3(0,lift,0));
@@ -796,8 +1081,29 @@ class Renderer {
 };
 PYBIND11_MODULE(bvr_game_render, m) {
     m.attr("VISUAL_BETA")=true;
+    m.attr("BAKED_ENVIRONMENT")=true;
+    m.attr("SUN_SHADOW_PROFILE_V1")=true;
+    m.attr("SURFACE_DETAIL_UVS_V1")=true;
+    m.attr("CACHED_TREE_HEIGHTS_V1")=true;
+    m.attr("WIDE_VISIBILITY_COMPUTE_V1")=true;
+    m.attr("STATIC_VEGETATION_WORLD_TRANSFORMS_V1")=true;
+#ifdef BVR_SCENE_MATERIAL_CACHE
+    m.attr("SCENE_MATERIAL_CACHE_V1")=true;
+#else
+    m.attr("SCENE_MATERIAL_CACHE_V1")=false;
+#endif
+#ifdef BVR_WIDE_PRIMITIVE_IDS
+    m.attr("WIDE_PRIMITIVE_ID_RASTER")=true;
+#else
+    m.attr("WIDE_PRIMITIVE_ID_RASTER")=false;
+#endif
+    m.attr("GAME_API_ABI")=2;
+    m.attr("CLOUD_LAYER_SAMPLING")=true;
     m.attr("TERRAIN_TILE_MATERIALS")=true;
     m.attr("SOURCE_CARD_AREA_MIPS")=true;
+    m.attr("SOURCE_FACING_LEAVES_CPU_V1")=true;
+    m.attr("BAKED_CLOUD_WEATHER_MAP")=true;
+    m.attr("FOG_COLOR_PROFILE_V1")=true;
     m.attr("TERRAIN_BASE_MATERIAL")=true;
     py::class_<ScenePlacement>(m, "ScenePlacement")
         .def(py::init<>())
@@ -889,6 +1195,10 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readwrite("h", &HudLine::h)
         .def_readwrite("color", &HudLine::color)
         .def_readwrite("rotation", &HudLine::rotation);
+    py::class_<HudImage>(m,"HudImage").def(py::init<>())
+        .def_readwrite("x",&HudImage::x).def_readwrite("y",&HudImage::y)
+        .def_readwrite("w",&HudImage::w).def_readwrite("h",&HudImage::h)
+        .def_readwrite("file",&HudImage::file);
     py::class_<Input>(m, "Input")
         .def_readonly("x", &Input::x)
         .def_readonly("y", &Input::y)
@@ -909,15 +1219,30 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def(py::init<int, int, bool, const std::string &, const std::string &,
                       const std::map<std::string, std::string> &,const std::string&>(),py::arg("width"),py::arg("height"),py::arg("visible"),py::arg("engine"),py::arg("shaders"),py::arg("models"),py::arg("visual_profile")="")
         .def("render", &Renderer::render,py::arg("frame"),py::arg("texts"),py::arg("lines"),py::arg("presentation_dt")=1.f/60)
+        .def("set_profiling", &Renderer::set_profiling)
+        .def("frame_timings", &Renderer::frame_timings)
+        .def("set_visibility_compute", &Renderer::set_visibility_compute)
+        .def("set_occlusion_culling", &Renderer::set_occlusion_culling)
+        .def("set_planar_reflections", &Renderer::set_planar_reflections)
+        .def("depth_coverage", &Renderer::depth_coverage)
         .def("poll", &Renderer::poll)
         .def("camera", &Renderer::camera)
         .def("camera_up", &Renderer::camera_up)
         .def("project", &Renderer::project)
         .def("capture", &Renderer::capture)
+        .def("capture_menu_background", &Renderer::capture_menu_background)
         .def("capture_rgb", &Renderer::capture_rgb)
         .def("set_shadow_cascades", &Renderer::set_shadow_cascades)
+        .def("set_shadow_resolution", &Renderer::set_shadow_resolution)
+        .def("apply_environment", &Renderer::apply_environment)
+        .def("set_presentation_paused", &Renderer::set_presentation_paused)
+        .def("set_render_scale", &Renderer::set_render_scale)
         .def("reload", &Renderer::reload)
         .def("set_quality", &Renderer::set_quality)
+        .def("set_ui_font", &Renderer::set_ui_font)
+        .def("set_menu_overlay", &Renderer::set_menu_overlay)
+        .def("set_audio_volume", &Renderer::set_audio_volume)
+        .def("set_hangar_floor_texture", &Renderer::set_hangar_floor_texture)
         .def("shader_errors", &Renderer::shader_errors)
         .def("visual_settings", &Renderer::visual_settings)
         .def("set_daylight", &Renderer::set_daylight,py::arg("sun_energy"),py::arg("exposure"),py::arg("sky_exposure"),py::arg("ambient"))
@@ -928,17 +1253,22 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("entity_basis", &Renderer::entity_basis)
         .def("scenery_points", &Renderer::scenery_points)
         .def("configure_world", &Renderer::configure_world)
+        .def("register_scene_models", &Renderer::register_scene_models)
         .def("configure_scene", &Renderer::configure_scene, py::arg("terrain"), py::arg("cover"),
              py::arg("colors"), py::arg("materials"), py::arg("surfaces"), py::arg("placements"),
              py::arg("outer_cover"), py::arg("outer_colors"),
              py::arg("terrain_materials")=std::vector<std::string>{})
         .def("statistics", &Renderer::statistics)
+        .def("set_vegetation_lod_distance", &Renderer::set_vegetation_lod_distance)
+        .def("vegetation_state", &Renderer::vegetation_state)
         .def("source_card_materials", &Renderer::source_card_materials)
+        .def("facing_leaf_state", &Renderer::facing_leaf_state)
         .def("configure_ground_atlas", &Renderer::configure_ground_atlas,py::arg("values").noconvert(),py::arg("origin_north"),py::arg("origin_west"),py::arg("spacing"),py::arg("source_sha256"))
         .def("ground_atlas_state", &Renderer::ground_atlas_state)
         .def("gpu_ground_heights", &Renderer::gpu_ground_heights)
         .def("scenery_ground_vertices", &Renderer::scenery_ground_vertices,py::arg("id"),py::arg("all_vertices")=false)
         .def("reflection_plane", &Renderer::reflection_plane)
+        .def("primitive_id_state", &Renderer::primitive_id_state)
         .def("preview_aircraft", &Renderer::preview_aircraft)
         .def("aircraft_statistics", &Renderer::aircraft_statistics)
         .def("aircraft_exhaust_state", &Renderer::aircraft_exhaust_state)

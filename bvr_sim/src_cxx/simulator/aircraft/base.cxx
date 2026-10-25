@@ -1,4 +1,5 @@
 #include "base.hxx"
+#include "simulator/weapon_launch.hxx"
 #include "../sense/base.hxx"
 #include "../missile/base.hxx"
 #include "../so_pool.hxx"
@@ -84,76 +85,13 @@ bool Aircraft::can_shoot_enm(const std::shared_ptr<SimulatedObject>& enemy) cons
     return false;
 }
 
-bool Aircraft::shoot(
-    const std::string& missile_spec,
-    const std::string& target_uid
-) noexcept {
-    if (!can_shoot()) {
-        // std::cout << "Warning: Aircraft::shoot: " << uid << " cannot shoot" << std::endl;
-        SL::get().printf("Warning: Aircraft::shoot: %s cannot shoot\n", uid.c_str());
-        return false;
-    }
-
-    auto target = SOPool::instance().get(target_uid);
-    if (!target) {
-        std::cout << "Warning: Aircraft::shoot: target " << target_uid << " not found" << std::endl;
-        return false;
-    }
-    if (!can_shoot_enm(target)) {
-        // std::cout << "Warning: Aircraft::shoot: " << uid << " cannot shoot !can_shoot_enm(target)" << target->uid << std::endl;
-        SL::get().printf("Warning: Aircraft::shoot: %s cannot shoot enm !can_shoot_enm %s\n", uid.c_str(), target->uid.c_str());
-        return false;
-    }
-
-    auto self = std::dynamic_pointer_cast<SimulatedObject>(shared_from_this());
-    if (!self) {
-        std::cout << "Error: Aircraft::shoot: failed to cast self to SimulatedObject" << std::endl;
-        return false;
-    }
-
-    int num_left = pylon_manager.num_left_weapons(missile_spec);
-    if (num_left <= 0) {
-        // std::cout << "Warning: Aircraft::shoot: " << uid << " no more " << missile_spec << std::endl;
-        SL::get().printf("Warning: Aircraft::shoot: %s no more %s\n", uid.c_str(), missile_spec.c_str());
-        return false;
-    }
-
-    const auto missile_name = pylon_manager.release_weapon(missile_spec);
-    check(!missile_name.empty(), "missile_name.empty() == true");
-
-    auto missile = WeaponFactory::create_missile(missile_name, self, target);
-    if (!missile) {
-        std::cout << "Warning: Aircraft::shoot: failed to create missile " << missile_name << std::endl;
-        return false;
-    }
-
-    launched_missiles.push_back(missile);
-    SOPool::instance().add(missile);
-
-    if (target->Type == SOT::Aircraft) {
-        auto aircraft_target = std::dynamic_pointer_cast<Aircraft>(target);
-        if (aircraft_target) {
-            bool already_under = false;
-            for (const auto& m : aircraft_target->under_missiles) {
-                if (m == missile) {
-                    already_under = true;
-                    break;
-                }
-            }
-
-            if (!already_under) {
-                aircraft_target->under_missiles.push_back(missile);
-            } else {
-                std::cout << "Error: missile " << missile->uid << " already under " << aircraft_target->uid << std::endl;
-                SL::get().print("[Aircraft] Error: missile " + missile->uid + " already under " + aircraft_target->uid);
-            }
-        } else {
-            colorful::printHONG("Warning: Aircraft::shoot: dynamic cast failed for " + target->uid);
-            std::abort();
-        }
-    }
-
-    return true;
+bool Aircraft::shoot(const std::string& missile_spec,const std::string& target_uid) noexcept {
+    // Legacy AI prefix queries resolve once, then use the same exact transactional launch path.
+    if(missile_spec.empty())return false;
+    for(const auto& [station,weapon]:pylon_manager.get_all_mounts())
+        if(pylon_manager.weapon_matches(weapon,missile_spec))
+            return launch_weapon(*this,weapon,SOPool::instance().get(target_uid),station);
+    return false;
 }
 
 bool Aircraft::add_sensor(const std::string& name, const std::shared_ptr<SensorBase>& sensor) noexcept {

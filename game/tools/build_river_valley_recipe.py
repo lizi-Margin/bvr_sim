@@ -87,24 +87,27 @@ def main():
     p.add_argument('--retexture-map',type=Path,help='Rebake materials of a verified immutable map, preserving all terrain and scene geometry')
     p.add_argument('--rebuild-forest-map',type=Path,help='Resample source trees through the existing Baker, preserving source terrain/material/contact/mission and ordinary placements')
     p.add_argument('--replace-forest-map',type=Path,help='Replace canopy references with an exact-GLB texture variant or independently verified transparent-card crop; preserve every placement')
+    p.add_argument('--rebuild-airport-map',type=Path,help='Replace rectangular apron with connected declared courts/service access, preserving the complete source heightfield and non-airport scene')
     p.add_argument('--forest-edge-width-m',type=float,help='Independent source trees: gradual boundary density width; preserves total tree count')
     p.add_argument('--forest-floor-transition',action='store_true',help='Material-only rebake: mix source grass/forest ground with existing declared canopy edge density')
     a=p.parse_args()
+    if a.rebuild_airport_map and (a.retexture_map or a.rebuild_forest_map or a.replace_forest_map or a.river_channel or a.outer_cover or a.rural_layout or a.forest_edge_width_m is not None or a.forest_floor_only or a.forest_floor_transition):p.error('--rebuild-airport-map is an isolated airport layout edit; omit forest/material/terrain rebake flags')
     if a.replace_forest_map and (a.retexture_map or a.rebuild_forest_map or a.river_channel or a.outer_cover or a.rural_layout or a.forest_edge_width_m is not None or a.forest_floor_only):p.error('--replace-forest-map only changes resource references; omit generation/rebake flags')
     if a.forest_floor_transition and not a.retexture_map:p.error('--forest-floor-transition requires --retexture-map so tree placements remain frozen')
     if a.rebuild_forest_map and (a.retexture_map or a.river_channel or a.outer_cover or a.rural_layout):p.error('--rebuild-forest-map preserves terrain/materials; omit material/terrain rebake flags')
     if a.river_channel and a.retexture_map:p.error('--river-channel changes shared terrain and requires --bake, not --retexture-map')
     if a.forest_floor_only and a.retexture_map:p.error('--forest-floor-only requires a full bake with an individual-tree forest asset')
     if a.rural_layout and (a.retexture_map or not a.forest_floor_only):p.error('--rural-layout requires a full bake with --forest-floor-only')
-    if a.retexture_map or a.rebuild_forest_map or a.replace_forest_map:
-        source_map=a.retexture_map or a.rebuild_forest_map or a.replace_forest_map
+    if a.retexture_map or a.rebuild_forest_map or a.replace_forest_map or a.rebuild_airport_map:
+        source_map=a.retexture_map or a.rebuild_forest_map or a.replace_forest_map or a.rebuild_airport_map
         if a.recipe_output==ROOT/'game/recipes/river_valley_airfield.json':a.recipe_output=a.output/'scene-recipe.json'
         source_pointer=json.loads(source_map.read_text(encoding='utf8'))
         if source_pointer.get('data_version'):
             source_map=source_map.parent/'versions'/source_pointer['data_version']/'generated-map.json'
         if a.retexture_map:a.retexture_map=source_map
         elif a.rebuild_forest_map:a.rebuild_forest_map=source_map
-        else:a.replace_forest_map=source_map
+        elif a.replace_forest_map:a.replace_forest_map=source_map
+        else:a.rebuild_airport_map=source_map
         if a.output.resolve()==source_map.resolve().parent:p.error('Use a separate candidate output directory')
         r=json.loads((source_map.parent/'scene-recipe.json').read_text(encoding='utf8'))
         if a.rebuild_forest_map or a.replace_forest_map:
@@ -153,8 +156,12 @@ def main():
         if any(not rule.get('edge_density') for rule in r['scatter_rules'] if rule['roles']=='canopy'):p.error('Source recipe must declare edge_density for every canopy rule')
         if r['materials']['forest'].get('canopy_proxy'):p.error('Forest floor transition requires source ground materials without canopy_proxy')
         r['landscape']['forest_floor_transition']=True
+    if a.rebuild_airport_map:
+        from bvr_game.airport_layout import court_recipe,taxi_marking_material
+        for airfield in r['airfields']:airfield['ground_layout']=court_recipe()
+        r['materials']['airport_taxi_marking']=taxi_marking_material()
     write_json(a.recipe_output,r)
-    if a.bake or a.retexture_map or a.rebuild_forest_map or a.replace_forest_map:
+    if a.bake or a.retexture_map or a.rebuild_forest_map or a.replace_forest_map or a.rebuild_airport_map:
         from bvr_game.worldgen import Baker
         from bvr_game.scene_runtime import BakedScene
         from bvr_game.content import sha
@@ -162,7 +169,23 @@ def main():
         # Complete and verify an immutable data version before publishing one
         # root map pointer. A failed bake cannot corrupt the last working map.
         a.output=a.output.resolve();stage=a.output/('._bake-'+uuid.uuid4().hex)
-        if a.replace_forest_map:
+        if a.rebuild_airport_map:
+            from bvr_game.airport_layout import rebuild_airport
+            from bvr_game.worldgen import canonical
+            original=BakedScene(a.rebuild_airport_map);doc=json.loads(json.dumps(original.document));stage.mkdir(parents=True,exist_ok=False)
+            shutil.copy2(original.height_file,stage/'terrain.npz');doc['terrain']['file']='terrain.npz'
+            from bvr_game.ground_atlas import copy_or_build_atlas
+            doc['terrain']['ground_atlas']=copy_or_build_atlas(original,doc['terrain'],stage)
+            doc=rebuild_airport(r,original,doc);doc['recipe_sha256']=hashlib.sha256(canonical(r)).hexdigest()
+            doc['airport_layout_rebuild']={'source_map':str(a.rebuild_airport_map),'source_map_sha256':sha(a.rebuild_airport_map),
+                'operation':'Connected courts/service access; shared height archive and all non-airport content frozen'}
+            for key in ['mission','fields','roads','rivers','settlements','counts','forest_representation','resource_versions']:assert doc[key]==original.document[key],key
+            unchanged=lambda d:[i for i in d['instances'] if i.get('zone') not in ('airport_hangars','apron_equipment')]
+            assert unchanged(doc)==unchanged(original.document),'non-airport instances changed'
+            assert sha(stage/'terrain.npz')==original.document['terrain']['sha256']
+            write_json(stage/'scene-recipe.json',r);write_json(stage/'generated-map.json',doc)
+            report={'instances':len(doc['instances']),'counts':doc['counts'],'operation':doc['airport_layout_rebuild']}
+        elif a.replace_forest_map:
             from bvr_game.worldgen import canonical
             original=BakedScene(a.replace_forest_map);doc=json.loads(json.dumps(original.document));stage.mkdir(parents=True,exist_ok=False)
             shutil.copy2(original.height_file,stage/'terrain.npz');doc['terrain']['file']='terrain.npz'

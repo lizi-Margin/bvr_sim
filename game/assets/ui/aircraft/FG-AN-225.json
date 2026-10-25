@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-AN-225",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-AN-225\\FG-AN-225.glb",
+  "source_sha256": "2850b0cabac8714c894305676330d131b470b6ed9a4aa1a1d445c6a5cfe76793",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-AN-225.png",
+  "png_sha256": "877ad9dc5cba55c4637896072ac4ba0534b961ab391df022a586c5da4e6f99c4",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Nord-2502",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Nord-2502\\FG-Nord-2502.glb",
+  "source_sha256": "b110fc4c1965c508bbd3e2c54d6e137f1395ecc7995b58232fa890647a5e6f59",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Nord-2502.png",
+  "png_sha256": "00e4d6a9a50d4e403069409a0f2f126eb67cdc9e9c3c54e4bb86737d2d2f3c55",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

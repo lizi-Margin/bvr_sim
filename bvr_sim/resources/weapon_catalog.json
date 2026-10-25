@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "weapons": [
+    {
+      "id": "AIM-120",
+      "name": "AIM-120",
+      "category": "missile",
+      "seeker": "active_radar",
+      "description": "中距空空导弹",
+      "selectable": false,
+      "backend": "aim120c"
+    },
+    {
+      "id": "AIM-120C",
+      "name": "AIM-120C",
+      "category": "missile",
+      "seeker": "active_radar",
+      "description": "中距空空导弹",
+      "selectable": false,
+      "backend": "aim120c"
+    },
+    {
+      "id": "AIM-120C5",
+      "name": "AIM-120C5",
+      "category": "missile",
+      "seeker": "active_radar",
+      "description": "中距空空导弹",
+      "selectable": true,
+      "backend": "aim120c"
+    },
+    {
+      "id": "AIM-120C7",
+      "name": "AIM-120C7",
+      "category": "missile",
+      "seeker": "active_radar",
+      "description": "中距空空导弹",
+      "selectable": true,
+      "backend": "aim120c"
+    },
+    {
+      "id": "AIM-120C-MModelA",
+      "name": "AIM-120C-MModelA",
+      "category": "missile",
+      "seeker": "active_radar",
+      "description": "中距空空导弹",
+      "selectable": false,
+      "backend": "mmodelA",
+      "parameter_file": "missile/mmodelA/aim120c_mmodela.json"
+    },
+    {
+      "id": "AIM-120C-MModelA-Poor",
+      "name": "AIM-120C-MModelA-Poor",
+      "category": "missile",
+      "seeker": "active_radar",
+      "description": "中距空空导弹",
+      "selectable": false,
+      "backend": "mmodelA",
+      "parameter_file": "missile/mmodelA/aim120c_mmodela_poor.json"
+    },
+    {
+      "id": "AIM-9",
+      "name": "AIM-9",
+      "category": "missile",
+      "seeker": "infrared",
+      "description": "近距空空导弹",
+      "selectable": false,
+      "backend": "mmodelA",
+      "parameter_file": "missile/mmodelA/aim9m.json"
+    },
+    {
+      "id": "AIM-9M",
+      "name": "AIM-9M",
+      "category": "missile",
+      "seeker": "infrared",
+      "description": "近距空空导弹",
+      "selectable": true,
+      "backend": "mmodelA",
+      "parameter_file": "missile/mmodelA/aim9m.json"
+    },
+    {
+      "id": "AIM-9M-Omni",
+      "name": "AIM-9M-Omni",
+      "category": "missile",
+      "seeker": "infrared",
+      "description": "近距空空导弹",
+      "selectable": false,
+      "backend": "mmodelA",
+      "parameter_file": "missile/mmodelA/aim9m_omni.json"
+    },
+    {
+      "id": "Mk-82",
+      "name": "Mk-82",
+      "category": "bomb",
+      "seeker": "none",
+      "description": "无制导航弹",
+      "selectable": true,
+      "backend": "mk82"
+    }
+  ]
+}

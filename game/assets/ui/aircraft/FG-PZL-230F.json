@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-PZL-230F",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-PZL-230F\\FG-PZL-230F.glb",
+  "source_sha256": "ee8f31d161621883b250b8038c779cd27e53767cf4e6442f229b123c5a5c6a14",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-PZL-230F.png",
+  "png_sha256": "021a17d0b18abea4da8a57495560d35db5503b5bf34c705527f8fff1f5462fa4",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

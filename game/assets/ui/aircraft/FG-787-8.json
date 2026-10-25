@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-787-8",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-787-8\\FG-787-8.glb",
+  "source_sha256": "f1fee06f8a8b4c4c6e1c4d39110474d12131a7e74fe14579ac5488a32118dabb",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-787-8.png",
+  "png_sha256": "d966f8b0551c8efbd9c6a5d6ddb02e18eaa9231259acfcec81dd0e54cb50b5cd",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

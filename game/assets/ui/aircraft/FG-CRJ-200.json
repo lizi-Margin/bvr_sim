@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-CRJ-200",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CRJ-200\\FG-CRJ-200.glb",
+  "source_sha256": "02e5cd2ca01d817d5a4b723d617f011b08319f689d8c03fcbfac59cd24c813e1",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CRJ-200.png",
+  "png_sha256": "dec729b8fec58c52b6cf8393a261f521f4e8aea0161f3b036c4db2f0f75c7ddd",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

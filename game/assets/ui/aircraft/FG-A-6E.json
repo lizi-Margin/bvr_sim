@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-A-6E",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A-6E\\FG-A-6E.glb",
+  "source_sha256": "995d52ca0c1aa977b25e0f0ffbc23c789f5c962eee430196eecc51ca005d12a3",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A-6E.png",
+  "png_sha256": "c5e798ba497e098744a6fc0dd2dec1b72c92c1be78259ef49678f63fc13b9d53",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

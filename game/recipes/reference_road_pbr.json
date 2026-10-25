@@ -1,0 +1,71 @@
+{
+  "road_asphalt": {
+    "id": "Asphalt033",
+    "color": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "roughness": 0.95,
+    "tile_m": 3.0,
+    "world_uv": true,
+    "uv_origin_north": 0,
+    "uv_origin_west": 0,
+    "license": "CC0-1.0",
+    "distribution_allowed": true,
+    "source_url": "https://ambientcg.com/view?id=Asphalt033",
+    "base_color": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Asphalt033\\unpacked\\Asphalt033_1K-JPG_Color.jpg",
+    "base_color_sha256": "126edfd31019dcc0e108ce6966eb0c23f772f130a3abcc3be6daedc590cbb7f8",
+    "normal": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Asphalt033\\unpacked\\Asphalt033_1K-JPG_NormalDX.jpg",
+    "normal_sha256": "e3e234d48575b320c33255e8c639bbb45f3cc53c22ecf64e38a1fd759e6d45cc",
+    "roughness_map": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Asphalt033\\unpacked\\Asphalt033_1K-JPG_Roughness.jpg",
+    "roughness_map_sha256": "ab1dee12de196e7f1462fd01ebb629e0ae68af9de08c26d38abd2d11dfe2022a"
+  },
+  "road_dirt": {
+    "id": "dirt_floor",
+    "color": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "roughness": 0.95,
+    "tile_m": 2.1,
+    "world_uv": true,
+    "uv_origin_north": 0,
+    "uv_origin_west": 0,
+    "license": "CC0-1.0",
+    "distribution_allowed": true,
+    "source_url": "https://polyhaven.com/a/dirt_floor",
+    "base_color": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\dirt_floor\\dirt_floor_diff_2k.jpg",
+    "base_color_sha256": "1afaf974bc016e5019f48f6590a53e3e3730f48ae2eb5a1717519ad89038f661",
+    "normal": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\dirt_floor\\dirt_floor_nor_dx_2k.jpg",
+    "normal_sha256": "8fda5c8e53d10f529df245c1e710167137d5a63de4d9e0f953a4daa188885fe7",
+    "roughness_map": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\dirt_floor\\dirt_floor_rough_2k.jpg",
+    "roughness_map_sha256": "56d3faa1f0624c3e366d057596f50fe3264415a64c967830f61ca139b9a94bfc"
+  },
+  "road_shoulder": {
+    "id": "gravel_floor_03",
+    "color": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "roughness": 0.95,
+    "tile_m": 2.5,
+    "world_uv": true,
+    "uv_origin_north": 0,
+    "uv_origin_west": 0,
+    "license": "CC0-1.0",
+    "distribution_allowed": true,
+    "source_url": "https://polyhaven.com/a/gravel_floor_03",
+    "base_color": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\gravel_floor_03\\gravel_floor_03_diff_2k.jpg",
+    "base_color_sha256": "06465933a54619900230fe85bff4c29f83fd3237a76b600e9845def4a206aece",
+    "normal": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\gravel_floor_03\\gravel_floor_03_nor_dx_2k.jpg",
+    "normal_sha256": "375ef340eb10577729902f20d63d31d9bda8ded43986c84d6816a490bd8351b0",
+    "roughness_map": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\gravel_floor_03\\gravel_floor_03_rough_2k.jpg",
+    "roughness_map_sha256": "4cee65a1df8b7c919df83d6a7b9a79fbf6a5a53f08e1eede2a3a4ecf5ece9a17"
+  }
+}

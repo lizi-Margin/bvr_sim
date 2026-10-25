@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-IL-76",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-IL-76\\FG-IL-76.glb",
+  "source_sha256": "85753350a0eead715a990c91d29a71f1644ed0fd6858cb9c5a8c497c09eb962d",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-IL-76.png",
+  "png_sha256": "62645d624cfdc0bb16c45e4229354e411388742a2af049588ec423c7165fa294",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

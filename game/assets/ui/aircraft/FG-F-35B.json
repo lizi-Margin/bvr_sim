@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-F-35B",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-35B\\FG-F-35B.glb",
+  "source_sha256": "113ead73062e920f2cc15caed9242efa561b3f19f4b1be7cd5e3199bc59f1d03",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-35B.png",
+  "png_sha256": "3bbe0379e5d20721892826862a7bae0e0ad4435e13ec1a44ce11689cc738e612",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Bell-P-59",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Bell-P-59\\FG-Bell-P-59.glb",
+  "source_sha256": "c04bfe50b225ff9bbc5fe394b4879ffc5398e55aa5d45ee3b2f7ba749b1f011a",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Bell-P-59.png",
+  "png_sha256": "e55b6f4f7869042ef57bbfd853f91fe60dd5bd2456d80d57238687b0d710aa97",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

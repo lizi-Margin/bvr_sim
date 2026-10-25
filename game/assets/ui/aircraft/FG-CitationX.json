@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-CitationX",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CitationX\\FG-CitationX.glb",
+  "source_sha256": "e5c3f25b346307217c360ba3df05b9ee4ec1e08efa1068a3cbf365bb79398235",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CitationX.png",
+  "png_sha256": "287c48e2ada68453ce76b6315c1ea4817bbf5639f9f654f96dfe64ec0172c66d",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

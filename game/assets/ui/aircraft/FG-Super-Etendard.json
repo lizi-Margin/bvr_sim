@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Super-Etendard",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Super-Etendard\\FG-Super-Etendard.glb",
+  "source_sha256": "fc48f6694816405dc960bae8969af655057d2b973426663b48b51db6fef02119",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Super-Etendard.png",
+  "png_sha256": "d5922535271becd875ee1a94bc1495e1b9c0048fa25eb9da263073a9ec76e1d9",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

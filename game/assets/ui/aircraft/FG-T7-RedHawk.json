@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-T7-RedHawk",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-T7-RedHawk\\FG-T7-RedHawk.glb",
+  "source_sha256": "77231b8c2b88b4a87c72d2a96f9c2e53bf651b889ad8925f5762f37a4deb1b0e",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-T7-RedHawk.png",
+  "png_sha256": "5051744e9da656847da4b330e32f02f6107fe511d4296acb010f2e623247c25e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -167,3 +167,45 @@ python game/tools/validate_player_camera.py --tape PATH_TO_FROZEN_INTENT_TAPE.js
 保存修改后在暂停状态按 F6 重载；正式冻结的评测拒绝重载。旧日志中的完整配置继续按原哈希恢复，缺少新字段的配置走原相机路径，不能用新默认画面冒充旧录像。相机比较工具只覆盖相机设置和显式声明的缩放时段，冻结输入和核心帧仍逐项核对。`--source-hull` 投影实际源 glTF 静态顶点的凸包，并验证注册边界与坐标系；它比空的包围盒角点更接近可见轮廓，但仍不是像素分割或实时动画网格，必须结合原始 DX12 录像检查。
 
 105 秒河谷航线的 1,050 个绘制采样中，旧相机的源轮廓有 448 次进入底部操作栏，新候选为 0，最近间距约 24 像素；390 个完整核心帧保持一致。独立的三条冻结输入带另核对 960 个核心端点和完整玩家状态，状态差异只有明确记录的配置哈希。它们证明此次构图改动的范围，不能替代全部机型、任意自由观察角度或最终画面验收；正式手感冻结与未使用保留集仍待完成。
+
+## JSBSim 内圈步长与俯仰数值振荡
+
+F-16在3000m、500m/s的测试中，20ms源FDM步长会在小幅指向前产生持续俯仰振荡。保持原玩家参数和20ms外层控制周期，独立源FDM对照使用10/5/2.5ms子步后振荡消失；5ms案例的每tick采样过载约0.80–2.56g，原20ms为−6.25–13.01g。这是源FCS/执行机构/气动积分的时间分辨率问题，不能用降低玩家增益来宣称修复。
+
+共享`JSBSimFDM`现在默认最大内圈步长5ms，子步数为`ceil(outer_dt/max_inner_dt)`，实际内圈步长为`outer_dt/子步数`。普通20ms核心tick执行4个子步，外层输入和核心时间步不变；这不是实时玩家调参，也不承诺源FDM内部采样序列与旧步长相同。玩家与AI使用相同的源FDM子步，YASim没有跟随此项更改。AI外层命令滤波器按其实际调用周期更新，内圈AI控制器按实际子步周期构造；没有更改任何AI或玩家增益、气动表、推力或舵面参数。
+
+```python
+from bvr_sim.bvr_env_cpp import bvr_sim_cpp as native
+fdm = native.JSBSimFDM(0.02, "F16")
+print(fdm.inner_dt, fdm.inner_steps, fdm.max_inner_dt)  # 0.005, 4, 0.005
+legacy_diagnostic = native.JSBSimFDM(0.02, "F16", max_inner_dt=0.02)
+```
+
+最后一行仅用于重现旧20ms失败。C++工厂的对应数值设置是构造参数`kwargs["max_inner_dt"]`，独立于玩家手感配置。Python原有两个构造参数保持可用；只读属性可直接查询实际积分设置。
+
+```powershell
+python game/tools/diagnose_jsbsim_substeps.py --output NEW_SUBSTEP_DIAGNOSTIC_DIRECTORY
+python game/tools/player_flight_response.py --models F16 --speeds 500 --cases fine down --altitude 3000 --seconds 40 --sample-ticks 1 --output NEW_RESPONSE_DIRECTORY
+python game/tools/validate_player_response_replay.py NEW_RESPONSE_DIRECTORY --output NEW_REPLAY_DIRECTORY
+```
+
+响应工具默认仍每5tick记录一次；`--sample-ticks 1`记录每个20ms控制tick，意图更新继续保持每25tick。重放按输入带记录的采样间隔比较完整玩家状态，同时比较完整GameFrame。相机验证的`--video-sample-ticks 1`记录50Hz实际画面，按10fps编码为明确的0.2倍慢放，不是运行FPS统计。
+
+积分精度修复会改变JSBSim的AI/RL数值轨迹。旧冻结基线必须保留并逐字段比较，不能重录后声称旧结果完全一致。`validate_numerical_compatibility.py --kind ai|rl --baseline-root BASELINE_ROOT --output NEW_DIRECTORY`分别记录这种差异；其中AI测试还单独证明只改变玩家参数不影响新积分设置下的AI完整帧。v57原历史F-22旧AI激烈策略从3920tick失败变为完成15000tick，F-16和两架玩家入口也完成300秒；这是策略结果变化，不能冒称与原输入带逐帧相同。
+
+运行中不得覆盖已加载的PYD/DLL。可把原生模块构建到独立目录，通过进程环境`BVR_SIM_CPP_PATH`选择候选，再运行验证或启动游戏；既有游戏进程保留原模块。完整目标的最终手感、画质、地图、战斗、日志和性能仍须在冻结后的最终模块上重新验收。
+
+## 更新积分设置后的任务回归
+
+`record_armed_mission.py`记录真实旧AI入口的空战、投弹或联合任务，每5tick保存完整核心帧哈希，另存配置、事件、日志和原始失败。它复用现有CombatPilot与StrikePilot，不改变核心物理、AI控制器增益或玩家Instructor。CombatPilot读取本机状态、雷达观测、发射区、本方导弹状态及告警；StrikePilot读取公开目标、本机状态及核心CCIP。这不是玩家意图接口或操作系统键盘验收。
+
+```powershell
+python game/tools/record_armed_mission.py --map IMMUTABLE_GENERATED_MAP --mission air --aircraft F16 --output NEW_RECORD_DIRECTORY
+python -m bvr_game.playtest replay NEW_RECORD_DIRECTORY/input-tape.json --render --output NEW_DX12_REPLAY_DIRECTORY
+```
+
+`--altitude 8500 --enemy-range 60000`可声明另一套正常高度、60公里初始间隔场景，覆盖值写入报告；省略时保留地图原始出击位置与间隔。新场景不能替代原场景的失败记录。重放使用已记录的配置与动作，逐端点比较完整GameFrame；报告中的`endpoint_tick_counts`列出实际步数。如果任务在最后一个5tick区间内终止，`sample_interval_s`为空，不能把不规则端点误标为固定0.5秒。
+
+旧AI输入带还需记录每次动作的`selected_weapon`，才能恢复武器名称和CCIP等HUD状态。该字段只适配客户端选择，不能决定航弹或导弹物理。旧输入带没有此字段时保留原回放行为。v58原投弹带与原录像保留；另录的修正版只增加此字段，配置、初始帧、全部336个命令/完整帧哈希及最终帧保持一致。重放报告分别记录核心一致性与最终武器选择，不能用前者冒充HUD一致性。
+
+v58在5ms核心下发现：河谷展示地图的低空、160公里间隔与旧CombatPilot的无目标平飞策略会使F16在75.66秒撞地，F22也未完成原出击。旧20ms核心F16虽显示任务成功，事件实际为敌机撞地，没有玩家发射记录。另行声明的8500米/60公里F16任务出现双方真实锁定、导弹发射与命中，旧策略在104.8秒被击落；未通过修改敌人或飞控来伪造胜利。真实Mk82投弹任务成功，失败输入带继续保留。最终任务适配和联合任务成功流程仍须复核，不能将任务运行、任务获胜及武器命中混为同一结论。

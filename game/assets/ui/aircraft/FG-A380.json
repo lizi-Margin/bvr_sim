@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-A380",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A380\\FG-A380.glb",
+  "source_sha256": "151bafb7dc224d5c31454b53a6032744f5a655820ac9d014698aaf73012203e9",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A380.png",
+  "png_sha256": "f13110cbe347daaeb268f81f6293200c4cfbb7b8acb500cc7b37a3c4b10da8ad",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -44,6 +44,7 @@ public:
 
 private:
     // params_ MUST be declared before fdm_ — initializer list order matters
+    bool seeker_active_ = false;
     ParamStore         params_;   // owned by MModelA
     GenericMissileFDM  fdm_;      // holds const ref to params_
 

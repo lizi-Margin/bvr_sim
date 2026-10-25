@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Hunter",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Hunter\\FG-Hunter.glb",
+  "source_sha256": "7cf88c0be604cf3c303a19f9d9f268ffc414868420b02980b78f4f53e2cadc5b",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Hunter.png",
+  "png_sha256": "823f1336a51b978f066578fca891dbb2ddd8bab1e6296c1a7fec3204adb12370",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

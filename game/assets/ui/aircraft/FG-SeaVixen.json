@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-SeaVixen",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-SeaVixen\\FG-SeaVixen.glb",
+  "source_sha256": "08f080a5b81bde41dd895d43bab048eae9c5ed60fddd1ecd3aa90bd40559d3fa",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-SeaVixen.png",
+  "png_sha256": "d2664b46ce6d52502e8db2ec3f6962cb485626d9591791b1f2d92cd64e5d748f",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

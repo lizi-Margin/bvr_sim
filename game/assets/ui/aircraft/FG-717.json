@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-717",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-717\\FG-717.glb",
+  "source_sha256": "720d41699f3ca2813ca199467e8cb097d5360ab9f3e6d8f821ccbac84dbef681",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-717.png",
+  "png_sha256": "f31ce4127278612115cdf6f5b353fb477b104fafd262130602d7c650992acb74",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

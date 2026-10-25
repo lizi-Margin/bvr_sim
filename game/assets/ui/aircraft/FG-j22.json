@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-j22",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-j22\\FG-j22.glb",
+  "source_sha256": "cd15899a09fdc04fb2c17f454e0689b6a77c82f68477a52f53757db5c77c3ae7",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-j22.png",
+  "png_sha256": "8c493a92efeff76a477f34109d63d7b3f6d7437bc9489e8bf9a98fd788e83fca",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

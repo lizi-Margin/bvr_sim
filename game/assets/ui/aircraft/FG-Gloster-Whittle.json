@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Gloster-Whittle",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Gloster-Whittle\\FG-Gloster-Whittle.glb",
+  "source_sha256": "7dae91a6d5a33eeb25f101e1bed53b68e677c2141ede71f27f30c7ea6b25c500",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Gloster-Whittle.png",
+  "png_sha256": "26455f5ae2b30bf6ad15cb1e7c0724d9afb58824a121cc5bf30e108add88d006",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

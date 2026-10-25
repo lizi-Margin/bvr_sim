@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-F18-CAF",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F18-CAF\\FG-F18-CAF.glb",
+  "source_sha256": "e0f10fdc1fe5fb72af879e6242c3032f0ba831f92aed7cfbb828f60b6e375b87",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F18-CAF.png",
+  "png_sha256": "b8ae00a819c8bf632dcdb9266146c66285128ef29db72cb20022fa73fe3fc8e7",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

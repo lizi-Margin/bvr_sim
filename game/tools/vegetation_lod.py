@@ -77,7 +77,7 @@ def make_cluster(objects,spec,source_base_override=None,source_bounds_override=N
                 method='UV1.x=(source_tree_index+0.5)/count, UV1.y=0 after glTF V flip. Source bases are registered separately; actual tree positions are per-instance data.')
     bounds={'min':[lo[i]-center[i] for i in range(3)],'max':[hi[i]-center[i] for i in range(3)]}
     return result,bounds,{'source_copies':count,'seed':spec['seed'],'poses_before_recentering':poses,'recentering':list(center),
-        'source_base_anchor_blender':list(source_base),'base_anchor_method':'Mean of source vertices within0.03m of its lowest geometry, transformed per source copy',
+        'source_base_anchor_blender':list(source_base),'base_anchor_method':spec.get('base_anchor_note','Mean of source vertices within0.03m of its lowest geometry, transformed per source copy'),
         'ground_conform':encoding,
         'method':'Copies of the exact selected source tree; rigid transforms, uniform scale and offline mesh LOD simplification only'}
 

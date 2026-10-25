@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Lightning",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lightning\\FG-Lightning.glb",
+  "source_sha256": "052b5be5aead6bc9357cd18ab60b2b8b7c84a3c86c8145c2aae7e3b0ef651d24",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lightning.png",
+  "png_sha256": "cb56973e436fae12b097daa526c4cc1ba7414e834bdb0d26041bbdd1af1bfad5",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

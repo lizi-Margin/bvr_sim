@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-fokker100",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-fokker100\\FG-fokker100.glb",
+  "source_sha256": "57683cf31168e1cb431995499aa5aecf28113810beaebd21b670c2d084b8475f",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-fokker100.png",
+  "png_sha256": "ff7c50973de18f1a00187222b922df755096601a779cbfd4a984d3c48717eeaf",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

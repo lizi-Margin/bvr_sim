@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Avro-Arrow",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Avro-Arrow\\FG-Avro-Arrow.glb",
+  "source_sha256": "5a1af8b76fbf6b16ec87181446b054cb1c4cd371d9b2cd47bff6e6dc08dd9b62",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Avro-Arrow.png",
+  "png_sha256": "7a0b7ede35165c31cf0ba0691d686bec16e2251211292cf5da91ae40e0f87911",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

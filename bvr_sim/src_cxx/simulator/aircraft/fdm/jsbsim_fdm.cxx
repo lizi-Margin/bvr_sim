@@ -90,16 +90,32 @@ namespace Catalog {
     }
 }
 
+namespace {
+double source_max_step(const std::map<std::string,std::string>& kwargs) {
+    auto found=kwargs.find("max_inner_dt");
+    if(found==kwargs.end())return JSBSimFDM::default_max_inner_dt;
+    size_t used=0;double value=std::stod(found->second,&used);
+    if(used!=found->second.size()||!std::isfinite(value)||value<=0||value>.02)
+        throw std::invalid_argument("JSBSim max_inner_dt must be finite in(0,0.02]seconds;0.02is a legacy diagnostic override");
+    return value;
+}
+int source_substeps(double outer,double maximum) {
+    if(!std::isfinite(outer)||outer<=0)throw std::invalid_argument("JSBSim outer dt must be finite and positive");
+    double count=std::ceil(outer/maximum);
+    if(count>100000)throw std::invalid_argument("JSBSim integration requests too many substeps");
+    return std::max(1,static_cast<int>(count));
+}
+}
+
 JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs)
     : AircraftFDM(dt),
       aircraft_model("F16"),
       jsbsim_exec(nullptr),
       initialized(false),
-    //   jsbsim_dt_max(0.025),
-      jsbsim_dt_max(0.02),
-      jsbsim_inner_dt(dt),
-      jsbsim_inner_steps(1),
-      fc(dt, aircraft_model),
+      jsbsim_dt_max(source_max_step(kwargs)),
+      jsbsim_inner_dt(dt/source_substeps(dt,jsbsim_dt_max)),
+      jsbsim_inner_steps(source_substeps(dt,jsbsim_dt_max)),
+      fc(jsbsim_inner_dt, aircraft_model),
       fc_delta_heading_filter({0.25, 0.0}),
       fc_delta_pitch_filter({0.25, 0.0}),
       mach(0.0),
@@ -116,10 +132,8 @@ JSBSimFDM::JSBSimFDM(double dt, const std::map<std::string, std::string>& kwargs
         if(imported)SL::optional().print("Imported JSBSim aircraft uses approximate F16 host flight controller: "+aircraft_model);
     }
 
-    if (this->dt > jsbsim_dt_max) {
-        jsbsim_inner_steps = static_cast<int>(this->dt / jsbsim_dt_max) + 1;
-        jsbsim_inner_dt = this->dt / jsbsim_inner_steps;
-    }
+    // Source FCS/actuators and force integration require a finer step than
+    // the outer command/simulation tick. Both AI and player paths share it.
     set_env("JSBSIM_DEBUG", std::to_string(jsb_debug_level));  // disable init log in CTOR
 }
 
@@ -460,11 +474,13 @@ void JSBSimFDM::run_jsbsim_step(const ActionSpace& action) {
 
     double delta_heading_raw = norm(action.delta_heading(), -1, 1) * deg2rad(85);
     // double delta_heading_raw = norm(action.at("delta_heading"), -1, 1) * deg2rad(40);
-    double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw, jsbsim_inner_dt);
+    // These command filters run once per outer step. The source FCS and AI
+    // inner controller below run once per integration substep instead.
+    double delta_heading_filt = fc_delta_heading_filter.update(delta_heading_raw, this->dt);
     delta_heading = delta_heading_filt;
 
     double delta_pitch_raw = -norm(action.delta_altitude(), -1, 1) * deg2rad(45);
-    double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw, jsbsim_inner_dt);
+    double delta_pitch_filt = fc_delta_pitch_filter.update(delta_pitch_raw, this->dt);
     delta_pitch = delta_pitch_filt;
     // delta_pitch = -deg2rad(20);
     // delta_pitch = 0;

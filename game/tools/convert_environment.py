@@ -38,13 +38,53 @@ if policy:
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from vegetation_lod import triangles,reduce_meshes,impostors,alpha_mask_glb,make_cluster,source_foliage_cards
 source_bounds=(list(lo),list(hi));backup=[];foliage_report=None
+ground_anchor_override=None
+if 'source_ground_anchor_blender' in policy:
+    anchor=policy['source_ground_anchor_blender']
+    if len(anchor)!=3:raise ValueError('Source ground anchor needs three coordinates')
+    ground_anchor_override=list(transform@Vector(anchor))
 reuse=None
 if policy.get('reuse_bake_manifest'):
     from vegetation_bake_cache import reusable_bakes
     reuse=reusable_bakes(policy['reuse_bake_manifest'],sha(source),policy)
 per_tree_far=bool(policy.get('individual_tree_impostors'))
 cluster_report=None;far=None;impostor_report=None
-if per_tree_far:
+geometry_lods=policy.get('source_geometry_lods')
+geometry_report=None
+if geometry_lods:
+    if not policy.get('cluster') or per_tree_far or policy.get('foliage_cards') or policy.get('impostor'):
+        raise ValueError('Source geometry LODs require a cluster and no whole-tree card bake')
+    near_budget=int(geometry_lods['near_triangles_per_tree']);far_budget=int(geometry_lods['far_triangles_per_tree'])
+    if not 500<=far_budget<=near_budget<=100000:
+        raise ValueError('Invalid declared per-tree source geometry budgets')
+    points=[o.matrix_world@v.co for o in meshes for v in o.data.vertices]
+    base_z=min(p.z for p in points);base_points=[p for p in points if p.z<=base_z+.03]
+    source_base=list(sum(base_points,Vector())/len(base_points));del points,base_points
+    if ground_anchor_override is not None:source_base=ground_anchor_override
+    original_triangles=triangles(meshes)
+    # Simplify one real source tree before making copies. Expanding the full
+    # multi-million-triangle botanical source64times is unnecessary and can
+    # exhaust memory before an otherwise modest runtime mesh is exported.
+    reduce_meshes(meshes,near_budget)
+    far_source=[]
+    for o in meshes:
+        f=o.copy();f.data=o.data.copy();f.name=o.name+'_source_geometry_far'
+        bpy.context.scene.collection.objects.link(f);far_source.append(f)
+    reduce_meshes(far_source,far_budget)
+    near_actual=triangles(meshes);far_actual=triangles(far_source)
+    meshes,bounds,cluster_report=make_cluster(meshes,policy['cluster'],source_base,source_bounds)
+    far,far_bounds,far_cluster=make_cluster(far_source,policy['cluster'],source_base,source_bounds)
+    assert cluster_report['poses_before_recentering']==far_cluster['poses_before_recentering']
+    assert bounds==far_bounds
+    lo,hi=bounds['min'],bounds['max']
+    for near_box,far_box in zip(cluster_report['ground_conform']['tree_bounds_relative_blender'],far_cluster['ground_conform']['tree_bounds_relative_blender']):
+        for axis in range(3):
+            near_box['min'][axis]=min(near_box['min'][axis],far_box['min'][axis])
+            near_box['max'][axis]=max(near_box['max'][axis],far_box['max'][axis])
+    geometry_report={'source_triangles_per_tree':original_triangles,'near_triangles_per_tree':near_actual,
+                     'far_triangles_per_tree':far_actual,'source_object':policy.get('select_object'),
+                     'method':'Original textured source geometry, offline mesh simplification, shared seeded copies; no whole-tree billboard or baked light.'}
+elif per_tree_far:
     if not policy.get('cluster') or not policy.get('foliage_cards') or not policy.get('impostor'):
         raise ValueError('Individual tree impostors require cluster, foliage cards and impostor policies')
     points=[o.matrix_world@v.co for o in meshes for v in o.data.vertices]
@@ -91,8 +131,8 @@ elif policy.get('foliage_cards'):
     for o in meshes:
         b=o.copy();b.data=o.data.copy();b.name=o.name+'_near_source_backup';b.hide_render=True
         bpy.context.scene.collection.objects.link(b);backup.append(b)
-if policy.get('cluster') and not per_tree_far:
-    meshes,bounds,cluster_report=make_cluster(meshes,policy['cluster']);lo,hi=bounds['min'],bounds['max']
+if policy.get('cluster') and not per_tree_far and not geometry_lods:
+    meshes,bounds,cluster_report=make_cluster(meshes,policy['cluster'],ground_anchor_override);lo,hi=bounds['min'],bounds['max']
 if policy.get('impostor') and not per_tree_far:
     far,impostor_report=impostors(meshes,out,hi[2],max(hi[0]-lo[0],hi[1]-lo[1]),policy.get('impostor_resolution',512),policy.get('impostor_engine','BLENDER_EEVEE'))
 if backup:
@@ -105,11 +145,15 @@ if backup:
     delta=Vector(hybrid_cluster['recentering'])-Vector(cluster_report['recentering'])
     for o in meshes:o.location+=delta
     if triangles(meshes)>policy.get('near_triangle_budget',triangles(meshes)):raise ValueError('Hybrid near grove exceeds its declared budget')
-elif not per_tree_far:reduce_meshes(meshes,policy.get('near_triangle_budget',triangles(meshes)))
+elif not per_tree_far and not geometry_lods:reduce_meshes(meshes,policy.get('near_triangle_budget',triangles(meshes)))
 if len(meshes)>1 and cluster_report:
     bpy.ops.object.select_all(action='DESELECT')
     for o in meshes:o.hide_set(False);o.select_set(True)
     bpy.context.view_layer.objects.active=meshes[0];bpy.ops.object.join();meshes=[bpy.context.view_layer.objects.active]
+if geometry_lods and len(far)>1:
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in far:o.hide_set(False);o.select_set(True)
+    bpy.context.view_layer.objects.active=far[0];bpy.ops.object.join();far=[bpy.context.view_layer.objects.active]
 def export(objects,file):
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:o.hide_set(False);o.hide_render=False;o.select_set(True)
@@ -124,7 +168,7 @@ r={'id':asset_id,'name':policy.get('name',asset_id),'tags':policy.get('tags',[])
     'source_files':origin.get('files',[]),'source_bundle_sha256':hashlib.sha256(json.dumps(origin.get('files',[]),sort_keys=True).encode()).hexdigest(),
     'license_evidence':[{'url':'https://polyhaven.com/license','provider_manifest_sha256':sha(manifest)}] if origin['source']=='polyhaven' else origin.get('license_evidence',[]),
     'distribution_allowed':origin['license']=='CC0-1.0','instancing_allowed':True,'physical_size_note':policy.get('physical_size_note','Source dimensions retained'),
-    'lods':lods,'impostor':impostor_report,'cluster':cluster_report,'foliage_representation':foliage_report,'textures':[{'name':i.name,'width':i.size[0],'height':i.size[1]} for i in bpy.data.images if i.size[0]],
+    'lods':lods,'impostor':impostor_report,'cluster':cluster_report,'foliage_representation':foliage_report,'source_geometry_lods':geometry_report,'textures':[{'name':i.name,'width':i.size[0],'height':i.size[1]} for i in bpy.data.images if i.size[0]],
     'vertices':sum(len(o.data.vertices) for o in meshes),
     'materials':[{'name':m.name,'roughness':m.roughness} for m in {s.material for o in meshes+(far or []) for s in o.material_slots if s.material}],
     'recommended_use':policy.get('recommended_use','Instanced scenery; source-bounded normalized geometry and explicit LODs'),

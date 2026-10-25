@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-JA37",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-JA37\\FG-JA37.glb",
+  "source_sha256": "03fc2fa6f5dfa5d0a7ccd661117e47b422e66db2364806f5f9e4f2fbb5130268",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-JA37.png",
+  "png_sha256": "51ae288617c7388db2c17dcdb91200298da095887c5dbf9bb59be80bc38590df",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

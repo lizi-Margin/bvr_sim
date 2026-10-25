@@ -4,6 +4,17 @@
 
 namespace bvr_sim {
 
+std::string PylonManager::find_station(const std::string& weapon, const std::string& station) const noexcept {
+    for(const auto& [id,mounted]:pylon_mounts)
+        if(!weapon.empty()&&mounted==weapon&&(station.empty()||station==id))return id;
+    return "";
+}
+bool PylonManager::consume(const std::string& station,const std::string& expected) noexcept {
+    auto it=pylon_mounts.find(station);
+    if(expected.empty()||it==pylon_mounts.end()||it->second!=expected)return false;
+    it->second.clear();return true;
+}
+
 bool PylonManager::weapon_matches(const std::string& weapon_name, const std::string& query) const noexcept {
     if (weapon_name.empty()) {
         return false;

@@ -10,6 +10,12 @@ from .content import ASSETS,sha
 
 def validate(path):
     scene=BakedScene(path);d=scene.document;failures=[];items=d['instances'];counts={}
+    use=d.get('resource_use',{})
+    recipe_path=Path(path).parent/'scene-recipe.json'
+    if not use and recipe_path.is_file():
+        recipe=json.loads(recipe_path.read_text(encoding='utf8'))
+        canonical=json.dumps(recipe,sort_keys=True,separators=(',',':')).encode()
+        if hashlib.sha256(canonical).hexdigest()==d.get('recipe_sha256'):use=recipe.get('resource_use',{})
     water=unary_union([LineString(r['points']).buffer(r['width_m']/2,cap_style=2) for r in d['rivers']])
     roads=unary_union([LineString(r['points']).buffer(r['width_m']/2+10) for r in d['roads']])
     versions=d['resource_versions'];inventory=[];metadata={}
@@ -18,7 +24,9 @@ def validate(path):
         metadata[id]=m
         for key in ['source_url','license','source_sha256','blender','conversion_recipe','units','bounds_blender','vertices','faces','materials','textures','lods','recommended_use','recommended_density_per_km2','collision_type','instancing_allowed','distribution_allowed']:
             if key not in m:failures.append({'asset':id,'missing_field':key})
-        if m['license']!='CC0-1.0' or not m['distribution_allowed']:failures.append({'asset':id,'license':m['license']})
+        if m['license']!='CC0-1.0' or not m['distribution_allowed']:
+            if use.get('mode')!='local_private' or use.get('asset_manifest_sha256',{}).get(id)!=sha(p):
+                failures.append({'asset':id,'license':m['license'],'error':'local resource use requires the exact manifest pin'})
         if version['sha256']!=sha(p.parent/m['file']):failures.append({'asset':id,'error':'map resource version changed'})
         for lod in m['lods']:
             if sha(p.parent/lod['file'])!=lod['sha256']:failures.append({'asset':id,'error':'LOD hash mismatch'})
@@ -48,7 +56,7 @@ def validate(path):
                 if recipe_rules is None:recipe_rules={r['id']:r for r in json.loads((Path(path).parent/'scene-recipe.json').read_text(encoding='utf8'))['scatter_rules']}
                 declared_zones=recipe_rules[item['zone']]['zones']
             zones=tuple(declared_zones)
-            if zones not in forest_masks:forest_masks[zones]=unary_union([Polygon(z['polygon']) for z in d['zones'] if z['id'] in zones and z['type']=='forest'])
+            if zones not in forest_masks:forest_masks[zones]=unary_union([Polygon(z['polygon'],z.get('holes',[])) for z in d['zones'] if z['id'] in zones and z['type']=='forest'])
             if not contains_xy(forest_masks[zones],stems[:,0],stems[:,1]).all():failures.append({'instance':id,'error':'independent source tree outside declared forest'})
             if np.ptp(stems,axis=0).max()>item['independent_source_layout']['maximum_axis_extent_m']+.001:failures.append({'instance':id,'error':'independent spatial batch extent exceeded'})
             if clearance<source_radius-.001:failures.append({'instance':id,'error':'independent source crown clearance understated'})

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Tu-22-Blinder",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Tu-22-Blinder\\FG-Tu-22-Blinder.glb",
+  "source_sha256": "0f378b835287d6065bbd19fdcd12e5a3c1d3a342357ead824b717066b0674518",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Tu-22-Blinder.png",
+  "png_sha256": "c0abadefc4fab12fe3e6f611f9989040ed50c99b169a35fb7bfc13e04c8032b9",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

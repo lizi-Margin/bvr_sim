@@ -40,12 +40,34 @@ def bake_outer_cover(baker,document,arrays,out):
     sources={};grass=mean_albedo(document['materials']['grass'],sources);soil=mean_albedo(document['materials']['farmland'],sources)
     rock=mean_albedo(document['materials']['rock'],sources)
     proxy=document['materials']['forest'].get('canopy_proxy');forest=mean_albedo(document['materials']['forest'],sources)
+    woodland=baker.r['landscape'].get('reference_woodland')
+    if woodland and not document['materials']['forest'].get('aerial_canopy_albedo'):
+        file=woodland['crown_color_source_file'];assert sha(file)==woodland['crown_color_source_sha256'];sources[file]=sha(file)
+        fraction=woodland['aerial_crown_color_fraction']
+        forest=forest*(1-fraction)+np.asarray(woodland['crown_mean_linear'])*fraction
     if proxy:
         p=ASSETS/'registered'/proxy['asset']/'source_albedo_view_3.png';assert sha(p)==proxy['source_sha256'];sources[str(p)]=sha(p)
         image=np.asarray(Image.open(p).convert('RGBA'),dtype=np.float32)/255;a=image[...,3]
         rgb=np.where(image[...,:3]<=.04045,image[...,:3]/12.92,((image[...,:3]+.055)/1.055)**2.4)
         forest=(rgb*a[...,None]).sum(axis=(0,1))/max(a.sum(),1)
     color=np.empty((resolution,resolution,3),dtype=np.uint8);pixel=extent[0]/resolution
+    photographic={}
+    for name in ('grass','farmland','forest'):
+        mat=document['materials'][name]
+        if not mat.get('macro_tile_m'):continue
+        file=mat['base_color'];assert sha(file)==mat['base_color_sha256'];sources[file]=sha(file)
+        rgb=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
+        linear=np.where(rgb<=.04045,rgb/12.92,((rgb+.055)/1.055)**2.4)
+        h,w0=linear.shape[:2];target=min(h,w0,2**math.ceil(math.log2(max(1,float(mat['macro_tile_m'])/pixel))))
+        if h%target==0 and w0%target==0:linear=linear.reshape(target,h//target,target,w0//target,3).mean(axis=(1,3))
+        photographic[name]=(linear,float(mat['macro_tile_m']),np.asarray(mat['color'][:3]))
+    def surface(name,mean,n,w):
+        if name not in photographic:return mean
+        from scipy.ndimage import map_coordinates
+        image,tile,tint=photographic[name]
+        u=np.mod(n/tile+.08*np.sin(w/370),1)*image.shape[1]
+        v=np.mod(w/tile+.08*np.cos(n/410),1)*image.shape[0]
+        return np.stack([map_coordinates(image[...,i],[v,u],order=1,mode='grid-wrap') for i in range(3)],axis=2)*tint
     for row in range(0,resolution,128):
         stop=min(resolution,row+128)
         n,w=np.meshgrid(meta['origin_north']+(np.arange(resolution)+.5)*pixel,meta['origin_west']+(np.arange(row,stop)+.5)*pixel)
@@ -60,9 +82,17 @@ def bake_outer_cover(baker,document,arrays,out):
         fields=(smooth_noise(n,w,forest_scale*1.4,seed+23)>.39)&(slope<.17)&(distance>180)&(h<700)
         wood=np.clip((smooth_noise(n,w,forest_scale,seed+31)-.43)*5+(h-450)/500,0,1)
         wood*=np.clip((distance-130)/250,0,1)
-        farmland=soil*(1-cover[...,None])+grass*cover[...,None]
-        base=np.where(fields[...,None],farmland,grass)*(0.9+.2*parcel[...,None])
-        base=base*(1-wood[...,None])+forest*wood[...,None]
+        ground=surface('grass',grass,n,w);woods=surface('forest',forest,n,w);bare=surface('farmland',soil,n,w)
+        farmland=bare*(1-cover[...,None])+ground*cover[...,None]
+        base=np.where(fields[...,None],farmland,ground)*(0.9+.2*parcel[...,None])
+        if woodland:
+            # The reference landscape is mostly woodland with irregular open
+            # country. Avoid carrying the old square agricultural cells into
+            # the distant hemisphere of the same map.
+            wood=np.clip(.55+1.1*smooth_noise(n,w,forest_scale,seed+31),0,1)
+            wood*=np.clip((distance-80)/180,0,1)
+            base=ground*(.9+.15*smooth_noise(n,w,800,seed+17)[...,None])
+        base=base*(1-wood[...,None])+woods*wood[...,None]
         stone=np.clip((slope-.28)*3+(h-950)/450,0,1)
         base=base*(1-stone[...,None])+rock*stone[...,None]
         base*=.92+.16*smooth_noise(n,w,14000,seed+41)[...,None]
@@ -77,6 +107,9 @@ def bake_outer_cover(baker,document,arrays,out):
         'world_uv':True,'uv_origin_north':meta['origin_north'],'uv_origin_west':meta['origin_west'],'repeat_detail':True,
         'license':'CC0 source albedos; authored land-use recipe follows project license','source_url':'derived:registered ambientCG/Poly Haven sources','source_files':sources}
     meta['material']='outer_1'
+    local_sources=[m for m in document['materials'].values() if m.get('distribution_allowed') is False]
+    if local_sources:document['materials']['outer_1'].update(license='user-local source material blend',distribution_allowed=False,
+        source_url='derived:hash-pinned source textures',source_licenses=sorted({m['license'] for m in local_sources}))
     document['outer_surface']={**cfg,'seed':seed,'pixel_m':pixel,'extent_m':extent,'source_files':sources,
         'method':'Warped seeded parcels, continuous woodland/height/slope masks, linear-light source means, sRGB storage; no geometry or physical environmental edit',
         'normal_roughness_note':'Flat macro placeholders; runtime applies the same registered metre-scale normal/roughness detail as the focus tile',

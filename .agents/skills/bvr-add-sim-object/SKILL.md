@@ -33,11 +33,11 @@ description: "Add or refactor physical simulation objects in bvr_sim, including 
 4. **接入创建和生命周期。** 根据实际需要更新工厂、模型名映射、`SOT`/字符串映射、参数加载、挂载释放及编译源文件。核对生成 UID/seed、出生时刻、dt、回收、reset、所属阵营与所有者。保持失败时弹药与创建结果一致，命中/引爆/毁伤只结算一次。
 5. **接入调用方。** `GameSession` 将释放/发射指令交给核心，读取真实对象状态和结果，再生成任务事件或评分。typed snapshot/绑定只按需要扩展；已有遥测消费者需要兼容时才更新遥测，不能让遥测成为物理依赖。渲染/音效从快照与真实事件生成展示，不参与积分或战果修改。
 
-## Mk-82 的现有迁移目标
+## Mk-82 的现有核心实现
 
-当前 `GameBomb`、`ballistic_step()`、地形撞击和固定半径毁伤仍写在 `gameplay/game_session.cxx`，CCIP 预测循环也在那里。这个布局是已知待修正项，不能作为后续对象模板。
+当前 `Mk82Bomb`、`ballistic_step()`、地形撞击、固定半径毁伤与 CCIP 预测位于 `simulator/bomb/mk82.hxx/.cxx`，共享 `Terrain` 位于 `simulator/environment.hxx`。`WeaponFactory::create_bomb` 和核心 `release_bomb` 执行创建及精确挂点扣弹，`GameSession` 只请求释放并读取结果。Agent 可通过 `SimCore.release_weapon`、`predict_bomb_impact`、`set_environment` 和 `spawn_ground` 直接验证，不构造游戏会话。
 
-当任务要求迁移时，应让航弹、实际弹道、预测和相关环境依赖成为核心能力，再让会话调用它。先保存原轨迹、释放弹药、命中事件和任务结果作为基线；纯重构尽量保持行为。调整气动精度、毁伤模型或引信规则应与目录/依赖重构分开说明和验证。本 Skill 本身不代表迁移已发生，也不授权顺便修改其他武器模型。
+这次接入保留原有 Alpha 弹道与毁伤近似。后续重构仍须保存原轨迹、释放弹药、命中事件和任务结果作为基线；调整气动精度、毁伤模型或引信规则应与目录/依赖重构分开说明和验证。本 Skill 不授权顺便修改其他武器模型。
 
 ## 验证完成标准
 

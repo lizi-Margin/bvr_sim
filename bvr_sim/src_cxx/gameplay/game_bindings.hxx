@@ -17,7 +17,7 @@ inline void bind_game_api(pybind11::module_ &m) {
         RW(PlayerFlightIntent,manual_pitch) RW(PlayerFlightIntent,manual_roll) RW(PlayerFlightIntent,manual_yaw)
         RW(PlayerFlightIntent,protection) RW(PlayerFlightIntent,mode)
         RW(PlayerFlightIntent,fire) RW(PlayerFlightIntent,drop_bomb) RW(PlayerFlightIntent,lock)
-        RW(PlayerFlightIntent,target_uid) RW(PlayerFlightIntent,weapon);
+        RW(PlayerFlightIntent,target_uid) RW(PlayerFlightIntent,weapon) RW(PlayerFlightIntent,station);
     py::class_<FlightMeasurements>(m,"FlightMeasurements")
         RO(FlightMeasurements,position) RO(FlightMeasurements,velocity) RO(FlightMeasurements,orientation)
         RO(FlightMeasurements,body_rates) RO(FlightMeasurements,alpha) RO(FlightMeasurements,beta)
@@ -78,6 +78,7 @@ inline void bind_game_api(pybind11::module_ &m) {
                     RW(GameConfig, enemy_attacks) RW(GameConfig, enemy_evasion) RW(GameConfig, player_north)
                         RW(GameConfig, player_west) RW(GameConfig, ground_north) RW(GameConfig, ground_west)
                             RW(GameConfig, missiles) RW(GameConfig, bombs) RW(GameConfig, ground_units)
+                                RW(GameConfig, use_station_loadout) RW(GameConfig, loadout)
                                 RW(GameConfig, intercept_waves) RW(GameConfig, intercept_interval) RW(GameConfig, intercept_timeout);
     py::class_<PilotCommand>(m, "PilotCommand")
         .def(py::init<>()) RW(PilotCommand, uid) RW(PilotCommand, heading) RW(PilotCommand, pitch)
@@ -85,7 +86,7 @@ inline void bind_game_api(pybind11::module_ &m) {
                 RW(PilotCommand, roll_rate)
                 RW(PilotCommand, pitch_input) RW(PilotCommand, manual_pitch)
                 RW(PilotCommand, fire) RW(PilotCommand, drop_bomb) RW(PilotCommand, lock)
-                    RW(PilotCommand, target_uid) RW(PilotCommand, weapon);
+                    RW(PilotCommand, target_uid) RW(PilotCommand, weapon) RW(PilotCommand,station);
     py::class_<GameContact>(m, "GameContact") RO(GameContact, uid) RO(GameContact, sensor)
         RO(GameContact, position) RO(GameContact, velocity) RO(GameContact, locked);
     py::class_<GameWarning>(m, "GameWarning") RO(GameWarning, uid) RO(GameWarning, bearing)
@@ -99,6 +100,7 @@ inline void bind_game_api(pybind11::module_ &m) {
         RO(LaunchEnvelope, closing_speed) RO(LaunchEnvelope, bearing) RO(LaunchEnvelope, rmax)
             RO(LaunchEnvelope, rtr) RO(LaunchEnvelope, eta) RO(LaunchEnvelope, in_range);
     py::class_<MissileFlight>(m, "MissileFlight") RO(MissileFlight, uid) RO(MissileFlight, owner)
+        RO(MissileFlight,model)
         RO(MissileFlight, target) RO(MissileFlight, age) RO(MissileFlight, range)
             RO(MissileFlight, closing_speed) RO(MissileFlight, eta) RO(MissileFlight, seeker_active)
                 RO(MissileFlight, motor_burning);
@@ -110,6 +112,7 @@ inline void bind_game_api(pybind11::module_ &m) {
             RO(GameFrame, selected_target) RO(GameFrame, entities) RO(GameFrame, contacts)
                 RO(GameFrame, warnings) RO(GameFrame, ground_units) RO(GameFrame, events)
                     RO(GameFrame, missiles_left) RO(GameFrame, bombs_left) RO(GameFrame, air_kills)
+                        RO(GameFrame,selected_weapon) RO(GameFrame,weapon_counts) RO(GameFrame,launch_ready) RO(GameFrame,launch_reason)
                         RO(GameFrame, ground_kills) RO(GameFrame, radar_warning)
                             RO(GameFrame, missile_warning) RO(GameFrame, bomb_impact)
                                     RO(GameFrame, mission_wave) RO(GameFrame, mission_total) RO(GameFrame, mission_kills_required) RO(GameFrame, next_wave_time)

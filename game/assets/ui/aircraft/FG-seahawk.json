@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-seahawk",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-seahawk\\FG-seahawk.glb",
+  "source_sha256": "07fadd3e239a3b84de95c40d906622246399f3d47453aab53b97ec561054caa8",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-seahawk.png",
+  "png_sha256": "306ccb03304fb1617cb8bcef4bfe0570572aeda8d6d6bd9aec549d04e64a09c5",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

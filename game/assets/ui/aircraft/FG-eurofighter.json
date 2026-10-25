@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-eurofighter",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-eurofighter\\FG-eurofighter.glb",
+  "source_sha256": "0490f90e39e7e19f58ca5075f9c9db495f3e3ec92e2d45e2cf751ee2bccfdec3",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-eurofighter.png",
+  "png_sha256": "184f66afcb4f5e7f9ceea9a5b8a622e3d761e792c9eebc292d1cfa048be4999f",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

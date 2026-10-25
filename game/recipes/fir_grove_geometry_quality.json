@@ -1,0 +1,22 @@
+{
+  "name": "Source fir C, full three dimensional crown and branches at both distance levels",
+  "tags": ["vegetation", "fir", "source_geometry", "quality_first", "no_whole_tree_billboards"],
+  "select_object": "fir_tree_01_c_LOD0",
+  "cluster": {
+    "count": 64,
+    "radius_m": 50,
+    "minimum_spacing_m": 8.5,
+    "inter_grove_stem_spacing_m": 2.5,
+    "seed": 63241,
+    "scale_range": [0.85, 1.15],
+    "ground_conform": true,
+    "independent_tree_positions": true
+  },
+  "source_geometry_lods": {
+    "near_triangles_per_tree": 30000,
+    "far_triangles_per_tree": 5000
+  },
+  "near_triangle_budget": 2000000,
+  "recommended_density_per_km2": 3000,
+  "physical_size_note": "Original CC0 Poly Haven fir C source LOD0 dimensions and material textures. Source mesh simplified once before shared64copy batching, per-tree source bases and terrain grounding retained. Both distance levels contain true three dimensional source crown geometry. Not measured forest GIS or a new botanical model."
+}

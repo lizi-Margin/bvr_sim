@@ -1,0 +1,35 @@
+{
+  "kind": "source_grass_dry_mix",
+  "seed": 212,
+  "dry": {
+    "provider": "local_texture",
+    "id": "polyhaven-withered-grass-2k",
+    "license": "CC0-1.0",
+    "distribution_allowed": true,
+    "source_url": "https://polyhaven.com/a/withered_grass",
+    "tile_m": 2.0,
+    "macro_tile_m": 24.0,
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "roughness": 0.95,
+    "base_color": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\withered_grass\\withered_grass_diff_2k.jpg",
+    "base_color_sha256": "0cf0fca68cbf4277199a2b9b7b3a8013357e4087247b1367f86d4a53b4fafa7e",
+    "normal": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\withered_grass\\withered_grass_nor_dx_2k.jpg",
+    "normal_sha256": "ce7acf1b8436562d8edaa06bd79b56c724632a755041c414ce40093303753951",
+    "roughness_map": "D:\\bvr_sim_resources\\asset-cache\\polyhaven\\withered_grass\\withered_grass_rough_2k.jpg",
+    "roughness_map_sha256": "86adb8d6f24d0a38eb96c6b625f2dd027b805f59af46fe2a05ffe29f633e33c8"
+  },
+  "green": {
+    "base_color": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Color.jpg",
+    "normal": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_NormalDX.jpg",
+    "roughness_map": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\ambientcg\\Grass001\\unpacked\\Grass001_1K-JPG_Roughness.jpg",
+    "base_color_sha256": "b9b6d61bc3b6137b868a3447eef18737896acd26d58fe2f4b83ce8c0e9d3f8ad",
+    "normal_sha256": "69add2a30fec8812b6d630073a941d709f5060a2ddf5bd6696004b1e577a4897",
+    "roughness_map_sha256": "8810effd44756341170d551501b7d0c645dc2395dbce46a8c7f1e61045258a06"
+  },
+  "scope": "Actual downloaded source grass/dry-grass channels,authored mean mixing and low-frequency variation. No photographic town/road patterns retained in open ground."
+}

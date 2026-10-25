@@ -31,7 +31,9 @@
       "max_bombs": 4,
       "supported_weapons": [
         "AIM-120C7",
-        "Mk-82"
+        "Mk-82",
+        "AIM-120C5",
+        "AIM-9M"
       ],
       "legal_loadouts": [
         {
@@ -79,7 +81,8 @@
       "validation": {
         "flight": "Response tested (Alpha)",
         "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
-      }
+      },
+      "station_definition": "aircraft_stations.json#F22"
     },
     {
       "id": "F16",
@@ -110,7 +113,9 @@
       "max_bombs": 4,
       "supported_weapons": [
         "AIM-120C7",
-        "Mk-82"
+        "Mk-82",
+        "AIM-120C5",
+        "AIM-9M"
       ],
       "legal_loadouts": [
         {
@@ -158,7 +163,8 @@
       "validation": {
         "flight": "Response tested (Alpha)",
         "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
-      }
+      },
+      "station_definition": "aircraft_stations.json#F16"
     },
     {
       "id": "F15",
@@ -188,7 +194,9 @@
       "max_missiles": 8,
       "max_bombs": 0,
       "supported_weapons": [
-        "AIM-120C7"
+        "AIM-120C7",
+        "AIM-120C5",
+        "AIM-9M"
       ],
       "legal_loadouts": [
         {
@@ -222,7 +230,8 @@
       "validation": {
         "flight": "Imported FG-F15C dynamics; ordinary/imported trajectory equivalence covered by regression tests.",
         "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
-      }
+      },
+      "station_definition": "aircraft_stations.json#F15"
     },
     {
       "id": "F18",
@@ -253,7 +262,9 @@
       "max_bombs": 4,
       "supported_weapons": [
         "AIM-120C7",
-        "Mk-82"
+        "Mk-82",
+        "AIM-120C5",
+        "AIM-9M"
       ],
       "legal_loadouts": [
         {
@@ -300,7 +311,8 @@
       "validation": {
         "flight": "Response tested (Alpha)",
         "weapons": "Real supported weapon qualification; per-mission reports record opponent policy and outcome"
-      }
+      },
+      "station_definition": "aircraft_stations.json#F18"
     },
     {
       "id": "F4N",

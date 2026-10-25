@@ -228,3 +228,153 @@ python game/tools/build_river_valley_recipe.py --replace-forest-map ORIGINAL_RES
 新烘焙、森林重建及替换配方会把外置mip资源的manifest SHA写进resource_versions，运行时同时校验manifest及其DDS哈希。此前不可变替换候选已有source_card_resource_swap.registered_manifest_sha256，加载器继续使用其冻结值；移除mip声明也不能绕过它。没有冻结manifest版本的早期外置mip诊断地图需生成新版本，普通GLB地图的读取保持原有行为。
 
 离线源树转换现在允许配方声明impostor_aerial_views（方位/仰角，度）。它生成真实源几何的额外无光照颜色和RGB法线，原四张验证过的图可以逐字节复用；尚无方向采样器时，额外视图只能离线审计，不能把所有平面直接叠入游戏。v55的45°/70°两圈、每圈8个方位仅存于独立work原型，未注册为运行资源。实际六组对照显示：简单最近视图在70°明显改善，但部分低角度更差；沿源twig面积重心调整深度也不足以解决，尚未通过连续视角验收。
+
+## 机场前场与共享接触面
+
+```powershell
+python game/tools/build_river_valley_recipe.py --rebuild-airport-map SOURCE_IMMUTABLE_MAP.json --output NEW_CANDIDATE_DIRECTORY --recipe-output NEW_CANDIDATE_RECIPE.json
+python game/tools/validate_airport_layout.py --source SOURCE_IMMUTABLE_MAP.json --map NEW_IMMUTABLE_MAP.json --output NEW_CONTACT_REPORT.json
+python game/tools/validate_player_ccip.py --map NEW_IMMUTABLE_MAP.json --airport-case --river-case --output NEW_RELEASE_DIRECTORY
+```
+
+该派生保留完整高度归档、接地高度图、树林、乡镇、任务及注册资源版本，只调整机场铺装、六栋仓库的位姿/基础/碰撞盒和十二个前场锥桶的位置。`airfields[].ground_layout` 声明滑行主通道、分开的前场、机库偏移、服务路、路宽、倒角与5m网格；原先1100×400m的停机坪范围仍用于原有局部土方，空出的部分恢复显示原有草地。服务路连接现有乡镇道路、油料区、行政建筑和塔台。源仓库只是通用机库替代物，配方与引导线不是实测机场或认证滑行布局。
+
+新增离线网格生成依赖Shapely≥2.1的约束三角剖分。每个铺装三角形先裁到现有高度网格及其相同对角线，防止长条网格穿过起伏地表；保持跑道与原滑行道平面尺寸，同时消除旧条带局部埋入地面的断段。渲染与核心直接消费同一份顶点/索引，不在显示层增加接触算法。生成器检查铺装面积守恒，验证工具直接构造typed Terrain检查接触、草地间隙和旋转后的源包围盒，不构造GameSession。实际投弹与CCIP另由上述工具验证，固定视角和连续飞行画面仍需独立审阅。
+
+v56候选通过6569处核心接触采样、443处旧停机坪内草地间隙以及包含新滑行通道的5次真实投弹；地图空间校验通过。约束剖分前的版本因弯曲/凹边界漏三角形被拒绝，原始版本与失败报告保留。默认地图和主启动入口尚未切换；这项机场改进不代表完整画质、飞控或性能目标已经验收。
+
+## 离线地图创作入口
+
+地图离线创作、Agent 固定机位闭环、带哈希的发布与游戏内版本选择见 [MAP_AUTHORING.md](MAP_AUTHORING.md)。游戏进程不负责生成或下载地图。
+
+## Tacview 本地载具模型
+
+本地 Tacview 库已接入同一个搜索/获取入口：
+
+```powershell
+python game/tools/asset_library.py search tacview F22
+python game/tools/asset_library.py search tacview S300
+python game/tools/asset_library.py fetch tacview FixedWing.F-22
+```
+
+默认从 `D:/Tacview-models` 读取，支持 `--local-root`。适配器解析 DefaultProperties 的继承和别名，记录每项真正引用的 OBJ、形状来自哪个基础声明，以及是否为共享形状。缓存包含原 OBJ、默认属性、源哈希与原库 LICENSE；没有真实模型的数据库条目不会自行生成替代外形。OBJ 源坐标和尺寸保持不变，官方源约定为米、-Z 向前、Y 向上；导入时需显式转换到项目坐标。该库提供外观/显示属性，不推导气动、碰撞、伤害或飞控数据。
+
+### 原地图地表类与植树配方的离线导入
+
+`game/tools/import_wt_landclasses.py` 接受官方 `dbldUtil -dumpData` 导出的
+`RIGz.field.bin`，以及官方 `dumpGrp -exp` 导出的 `locations.grp` 目录。
+它保留原始区域位图、局部密度位图和类型化配方，包括重复的
+`obj_plant_generate` 块、密度、随机种子、缩放范围、`riResId` 和摆放矩阵。
+原文件只读；导入目录必须是新目录。示例：
+
+```powershell
+python game/tools/import_wt_landclasses.py `
+  --rigz-field D:/bvr_sim_resources/war_thunder/level-smolensk-v94/RIGz.field.bin `
+  --exported-assets D:/bvr_sim_resources/war_thunder/landclass-assets-v108 `
+  --output D:/bvr_sim_resources/war_thunder/my-landclass-import `
+  --locations-pack 'D:/SteamLibrary/steamapps/common/War Thunder/content/base/res/locations.grp' `
+  --exporter D:/bvr_sim_resources/tools/dagor-2026-08-01/tools/dagor_cdk/windows-x86_64/dumpGrp-dev.exe `
+  --oodle-dll 'C:/Program Files/Epic Games/UE_5.7/Engine/Source/Programs/Shared/EpicGames.Oodle/Sdk/2.9.10/win/redist/oo2core_9_win64.dll'
+```
+
+输出 `report.json` 记录源文件、工具、位图和配方哈希。
+`bvr_game.wt_landscape.RoBitmap.sample(x,y)` 可供 Agent 直接查询原始位图；
+大尺寸 sweep 位图使用稀疏查询与注明采样步长的预览，无需展开为几十亿像素。
+坐标保留源 X/Z，尚未自动变换成游戏 NWU。`riResId` 应结合官方
+`dumpGrp locations.grp -dumpR` 的资源引用表解析（渲染资源与碰撞资源成对引用）。
+不能仅根据地表类名称 `forest` 推断所有树林：田地、草甸等配方也有植树密度图。
+
+目前仅支持当前格式的单个主 RIGz 层；遇到额外层明确报错。
+这些数据是离线创作输入，尚未实现源引擎随机数、重叠消除、碰撞摆放或完整材质着色。
+不据此认定游戏地图已经接入或画质已验收。
+
+## 旧式 War Thunder 视角跟随树叶
+
+`import_wt_models.py` 现在按官方资源头中的完整 LOD dump 长度定位网格，
+并处理 `voxelDataOffset` 与随后有长度的体素尾部。源包围盒用于检查实际解出的
+顶点；解析成功但顶点异常膨胀的模型会报错。
+
+旧式 `rendinst_facing_leaves` 不能直接当作 float XYZ 导出。
+默认明确拒绝；使用 `--facing-pose identity` 才会按原始半精度中心与偏移
+生成一个静止检查姿态，同时保留原始叶片数据 NPZ。
+普通橡树导出路径保持原有格式。
+
+`convert_wt_facing_pose.py` 在 Blender 后台运行，读取上述模型报告和纹理报告，
+连接原始颜色及 alpha。`--native-facing` 额外输出 `.facing.json`，把原始偏移
+编码进 UV1 和颜色数据。对应原生模块必须声明
+`SOURCE_FACING_LEAVES_CPU_V1`；旧模块不支持这些带偏移数据的 GLB。
+该格式的颜色流是几何数据，不能交给普通材质直接乘到颜色上。
+
+原生实现随相机方向更新共享叶片网格，并一起重建上传几何和包围盒。
+目前支持竖直、无实例旋转、均匀缩放的静态地景；不支持的旋转会明确报错。
+该路径保持最高几何，不按距离删树。风动画、原始打包法线、源颜色混合和
+与逐树地形锚点共享 UV1 的批量格式尚未接通。
+侧面/俯视实拍通过不代表整张地图已达到参考画质；这些模型仍处于创作验证阶段。
+
+## 本地 War Thunder 地表贴图
+
+`warthunder` 搜索和获取已离线解码的本地纹理，输出 JSON，供 Agent 直接选取。默认导入报告为 `D:/bvr_sim_resources/war_thunder/v84/report.json`，可用 `--local-report` 改为其他目录。原游戏文件不变；缓存按像素文件 SHA256 校验。素材保留本地来源声明，发布地图时不能改标为 CC0。
+
+```powershell
+python game/tools/asset_library.py --cache D:/bvr_sim_resources/library search warthunder forest
+python game/tools/asset_library.py --cache D:/bvr_sim_resources/library fetch warthunder landclass_color_and_detail/forest_land_tex_d
+```
+
+2026-10-25 实际导入了 `landclass_color_and_detail`、`air_smolensk`、`air_colormap`、`tree_oak`、`tree_pine` 五个原始资源包中的63张纹理。另21张浮点枢轴数据无法由 Pillow 转成普通图片，报告记录为失败，不进入素材搜索；它们的 DDS 数据仍保留。纹理名字不能证明法线或打包 PBR 通道的语义，当前地表候选只使用已查看的原始颜色图，法线和粗糙度明确采用平坦近似。
+
+可重复解码入口是 `game/tools/import_wt_textures.py`：先用 [官方 Dagor 工具](https://github.com/GaijinEntertainment/DagorEngine/releases/tag/dagor_2026_08_01) 的 `dumpGrp-dev.exe` 对本地 `.dxp.bin` 执行 `-exp:OUTPUT_DIRECTORY`，按包名分目录存储原始 `.ddsx`。再运行：
+
+```powershell
+python game/tools/import_wt_textures.py --source RAW_DDSX_DIRECTORY --output NEW_IMPORT_DIRECTORY --converter PATH_TO_DDSX2DDS_EXE --oodle-dll PATH_TO_EXISTING_LOCAL_OO2CORE_DLL --packs-root PATH_TO_GAME_CONTENT_BASE_RES
+```
+
+Oodle DLL 从已有的本地安装加载，不复制到仓库。官方 `ddsx2dds` 负责 DDS 格式和 mip 顺序；解码报告记录原包、原 DDSx、转换工具、DLL 和 PNG 的哈希。输出目录必须是新目录；重新导入不覆盖已被地图引用的文件。该入口只导入贴图；模型使用下面的独立入口，完整 Dagor 材质仍未复现。
+
+## War Thunder 原始树木模型
+
+已实际读取 `tree_oak.grp` 的10个最高级橡树模型。原生渲染已检查大型1883面、中型412面的两个模型；颜色RGB和独立透明遮罩与原贴图逐字节一致。Agent 可从同一库搜索、取用已注册 GLB：
+
+```powershell
+python game/tools/asset_library.py search warthunder oak --kind model
+python game/tools/asset_library.py --cache D:/bvr_sim_resources/library fetch warthunder WT-OakMediumA-v90
+python game/tools/asset_library.py --cache D:/bvr_sim_resources/library fetch warthunder WT-OakMediumGrove64-v91
+```
+
+64棵共享批次中的每棵树仍是原始412面，两级网格均为26368面，不减面，也不把树换成整棵贴片。`game/recipes/wt_oak_source_grove.json` 声明原模型零点为地面锚点，使原本埋在地下的树根保持原关系。最高级网格在远处保留，单棵原树和共享批次的源尺寸、模型及manifest哈希均可查看。
+
+重新提取可使用已有 [Dagor Asset Explorer](https://github.com/quentin-dh/Dagor-Asset-Explorer) 源码和 `game/tools/import_wt_models.py`。依赖可装到独立目录（`python -m pip install --target DEPS_DIRECTORY PyQt5`），不修改系统或 UE Python。工具不创建图形窗口，保留原解析器的几何读取逻辑；仅替换旧 DLL 序号调用，并兼容 Python3.14 移除的 classmethod/property 组合。
+
+```powershell
+python game/tools/import_wt_models.py --parser-root DAE_CHECKOUT --deps-root DEPS_DIRECTORY --oodle-dll EXISTING_OO2CORE_DLL --description GAME_RES/riDesc.bin --pack GAME_RES/tree_oak.grp --output NEW_OBJ_DIRECTORY
+blender --background --python-exit-code 1 --python game/tools/convert_wt_oak.py -- --models NEW_OBJ_DIRECTORY/report.json --textures OAK_TEXTURE_REPORT.json --bark-textures TILIA_TEXTURE_REPORT.json --model tree_oak_medium_a --id NEW_ASSET_ID --output NEW_SOURCE_GLB_DIRECTORY
+python game/tools/assets.py register NEW_ASSET_ID --entry NEW_SOURCE_GLB_DIRECTORY/NEW_ASSET_ID-source.glb --manifest NEW_SOURCE_GLB_DIRECTORY/provider.json
+```
+
+中间 OBJ 保留源顶点、UV和面，但坐标/UV保留四位小数，法线由现成解析器重新计算；转换只做轴变换及真实颜色/遮罩连接。粗糙度0.9为近似，打包法线/PBR、风、枢轴变形、交叉消隐和次表面材质尚未复现。橡树转换器仅支持已核对的橡树/树皮材质族，遇到其他材质会报错，不会编造替代材质。单树GLB重放已得到完全相同的文件哈希。模型库记录本地来源，不标为可公开分发素材。
+
+## 参考画质的源树冠体积候选
+
+```powershell
+python game/tools/assets.py crown-volume NEW_ASSET_ID --source fir_grove_stream_a --near-cell 0.8 --far-cell 1.6
+python game/tools/build_reference_map_quality.py --source-map IMMUTABLE_MAP.json --forest-asset NEW_ASSET_ID --output NEW_MAP_DIRECTORY
+python game/tools/capture_reference_map.py --map NEW_IMMUTABLE_MAP.json --output NEW_CAPTURE_DIRECTORY
+python game/tools/validate_grounded_vegetation.py --map NEW_IMMUTABLE_MAP.json --sample-groves 2 --anchor-samples-only --output NEW_GPU_PROBE_DIRECTORY
+```
+
+这是源针叶体积的显式近似：从已核验CC0原始glTF读取真实顶点及其UV贴图颜色，在局部空间单元内构造凸包。所有新表面顶点仍来自原树，颜色为实际源贴图的线性光平均；单元之间填充的表面、遮光与粗糙度是工程近似，不是原三角形、测量过的植物体积或完整PBR资产。它保留树冠覆盖体积，避免直接减面把大量细针叶删掉；也不使用整棵树的交叉贴片。注册资料保存原始依赖哈希、生成脚本哈希、单元尺寸、三角形数量与源树批次索引。
+
+源几何转换另支持`source_geometry_lods`，先简化单棵源树再共享批次，避免先展开数百万面原树。仅对此类声明了预算的质量候选，资源校验允许显式最多640万面共享网格；其余资源仍使用原10万面原型限制。两级网格都由资源manifest和地图resource_versions冻结，不能把面数增加当作视觉验收。
+
+v59的直接减面候选已因实际树冠稀疏被拒绝。v60的局部源体积候选每树近景13894面、远景3074面，固定低空画面树冠更完整，但高空森林/地表分布仍不符合参考图。当前仍保留652800个原树位；256条GPU顶点抽样的接地误差小于0.15毫米。`--anchor-samples-only`只核对每个源树索引的代表顶点，不能声称全部顶点或整张地图都完成GPU边界审计。所有候选均未切换默认地图。
+
+## 直接复用战雷原始顶点法线
+
+`WT-OakLargeGrove64-NativeNormals-v257` 和 `WT-OakMediumGrove64-NativeNormals-v257` 直接复用本机战雷 LOD0、颜色/透明度贴图，并恢复原包的作者顶点法线。资源库可检索并返回注册路径和哈希：
+
+```powershell
+python game/tools/asset_library.py search warthunder NativeNormals --kind model
+```
+
+`restore_wt_oak_normals.py` 对原始顶点数据块按导出顺序去重，通过原 OBJ 顶点编号恢复 BGR 压缩法线；要求所有位置、UV 顺序逐项相符，拒绝最近点猜测。其输出仍经 `convert_wt_oak.py` 和既有 Blender 注册流程。实际源 GLB 审计确认位置、UV、索引、材质、节点和嵌入图像逐字节相同，只有法线改变；批次三角形、原布局及尺寸保留。此路径的完整地图候选是 v259。
+
+这次恢复的是顶点法线；原切线法线贴图、背面观察项、风和其他 Dagor 着色项仍未完整适配。完整地图实拍的叶片蓝色伪影仍存在，不能把原资源接入当作参考画质验收。局部探针与整图的表现不同；同进程切换两个探针出现的缺失地面结果已单独拒绝，材质对照改用每版独立渲染进程。

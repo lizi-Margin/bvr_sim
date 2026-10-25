@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-KM",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-KM\\FG-KM.glb",
+  "source_sha256": "2f36a6fad72470ff5ed4deb4e47bb80e0c314ca7fce8f814271a9eb6cd99f95a",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-KM.png",
+  "png_sha256": "ba4058dce8ada749f24ecce38188b7b2dfa82ec76cadba9c32984e9e79a7d241",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

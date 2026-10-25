@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Falcon-50",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Falcon-50\\FG-Falcon-50.glb",
+  "source_sha256": "bb9415ca38d9d8d9932b6595685452e41282df867cae1f46debe12bcb7dbf74c",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Falcon-50.png",
+  "png_sha256": "453ea53fe6fd807adda31135b6d51ec6d800650e7f59482f57a74fe408b1e1ed",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

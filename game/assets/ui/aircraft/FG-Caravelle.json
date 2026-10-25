@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Caravelle",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Caravelle\\FG-Caravelle.glb",
+  "source_sha256": "5a1ce8ed7f569e1279d5c6b6f410c3410e8dd7c251739af65771029c10b53a92",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Caravelle.png",
+  "png_sha256": "afe1f302eb2521badaaf2b13ac9bfcbe28d788e3c4d782e3b6339de2f2c645ed",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

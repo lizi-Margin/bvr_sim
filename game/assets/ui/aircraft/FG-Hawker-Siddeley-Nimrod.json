@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Hawker-Siddeley-Nimrod",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Hawker-Siddeley-Nimrod\\FG-Hawker-Siddeley-Nimrod.glb",
+  "source_sha256": "90399aff579ad45fcf5a2102ead8061fa82fafec87ed26f65eafe173cc45309d",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Hawker-Siddeley-Nimrod.png",
+  "png_sha256": "f24c1d71752d63bc6ea563d83bf69e2fee58bf2bfafba95ff571af8d7353b465",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

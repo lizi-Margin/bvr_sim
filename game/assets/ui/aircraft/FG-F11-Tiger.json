@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-F11-Tiger",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F11-Tiger\\FG-F11-Tiger.glb",
+  "source_sha256": "91fb293470c86d1157a462ef60099e7efedd17decd07b09287318d9406c3d4dc",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F11-Tiger.png",
+  "png_sha256": "9355f93ff72a99e985ee094b28bbd10279513a7c43b2cf1dd2c6c05b3300ddaf",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

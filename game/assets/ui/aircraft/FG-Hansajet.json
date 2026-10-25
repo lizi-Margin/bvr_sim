@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Hansajet",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Hansajet\\FG-Hansajet.glb",
+  "source_sha256": "79b14ef1338563cf484140df511e5c655c29923be68ef7de079fc58f67378486",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Hansajet.png",
+  "png_sha256": "0c84bb439ff68fd06596205c03862063ee965ed4cfd415d97704fbb666461df1",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Messerschmitt-Libelle",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Messerschmitt-Libelle\\FG-Messerschmitt-Libelle.glb",
+  "source_sha256": "acf5407ffd4c1cf62277af45f9bc8e189b9db439fbc2f5ba1d8e818659fbaf74",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Messerschmitt-Libelle.png",
+  "png_sha256": "b3f7ac484bd465f189277c1976bfc23cffec6576d3277ee808498f6123788e90",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Fouga-Magister",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Fouga-Magister\\FG-Fouga-Magister.glb",
+  "source_sha256": "22a7e5ff04914560467a96cf4b49bab7c930d6819c2cc616a4faf9c218892584",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Fouga-Magister.png",
+  "png_sha256": "5d2c4dd24d359c3d787761ba6dcc942e8002d80e16361be14ae86625976d847e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-l39",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-l39\\FG-l39.glb",
+  "source_sha256": "14c5bd6237bf46c28a0a0fb3bd1166a9c185adc29529178e555826973e2aba60",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-l39.png",
+  "png_sha256": "87d4188d752657f9874c60a81d3e26ed4e14f90bc26930ab18794b1785a0677d",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

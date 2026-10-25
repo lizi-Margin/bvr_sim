@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-B-36D-Peacemaker",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-B-36D-Peacemaker\\FG-B-36D-Peacemaker.glb",
+  "source_sha256": "a1b34e78d39bfd48356ff31c9b979dcb2e815c582532048d27001301f34abfb5",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-B-36D-Peacemaker.png",
+  "png_sha256": "5d2f1b6cd7a7f06b58b500ea18b5c7a0bb9cd9667f9957dd0caa9924e243560a",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

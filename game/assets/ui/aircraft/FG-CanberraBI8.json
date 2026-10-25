@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-CanberraBI8",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CanberraBI8\\FG-CanberraBI8.glb",
+  "source_sha256": "67af6477789ad2165d008fdca8fec287d403a74d74406c04dfa8daaf9fe25b15",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CanberraBI8.png",
+  "png_sha256": "93f0c6bc57c7e302eee94cf262309a253fe0c0b54fa1b9a073f3c18c4ffbd927",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

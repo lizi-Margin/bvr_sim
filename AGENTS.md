@@ -12,7 +12,7 @@
 
 When adding or refactoring a bomb, missile, vehicle, sensor or other simulated object, read and apply `.agents/skills/bvr-add-sim-object/SKILL.md` before implementation. This also applies when a task starts from a game feature but adds physical behavior.
 
-Known debt: `GameBomb` and `ballistic_step()` currently remain in `bvr_sim/src_cxx/gameplay/game_session.cxx`, and shared `GameTerrain` is declared in `game_session.hxx`. This is a migration target, not an approved template. A Mk-82 migration should move shared dependencies as necessary and prove direct core use; relocating a class while importing `GameSession` headers into `simulator/` does not fix the boundary. Do not claim this migration is already complete.
+Mk-82 now uses `simulator/bomb/mk82.hxx/.cxx` and core `Terrain` in `simulator/environment.hxx`; `GameTerrain` is a compatibility alias. Keep prediction, released-bomb trajectories, terrain contact and ground damage in that core service. `WeaponFactory::create_bomb` and `release_bomb` own construction and exact station consumption; `GameSession` requests release and reads results. `scripts/tests/test_weapon_loadouts.py` covers direct typed `SimCore` use without `GameSession`, in addition to native ground-object tests. Preserve the documented Alpha physical approximations unless a separate task changes them.
 
 ## Verification and review
 

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-dc8-73",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-dc8-73\\FG-dc8-73.glb",
+  "source_sha256": "b9c22505d7e66ca2c80a084f62a379ca4d227ba5503cbe4663a14da6bfc74ff6",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-dc8-73.png",
+  "png_sha256": "293ddcb1b64a09168d2cb03a17e68c560950d3179fcb4413162567c7961bdf2b",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

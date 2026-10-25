@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-MS-760",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MS-760\\FG-MS-760.glb",
+  "source_sha256": "fa53911ca044d45c929b3334e3a6f13c21fcdeb447463052c722b690a83c8372",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MS-760.png",
+  "png_sha256": "63adc4189af0f6dc3d168250d9e3115f4e2d70a43a88437f379a94d18aa877f4",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

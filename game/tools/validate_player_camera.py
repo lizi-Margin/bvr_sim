@@ -15,6 +15,7 @@ def main():
     p.add_argument('--camera-profile',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--seconds',type=float,default=195);p.add_argument('--zoom-windows',nargs='*',type=float,default=[50,58,90,98])
     p.add_argument('--source-hull',action='store_true',help='Also project a convex hull of actual source rest-scene vertices; no geometry is rewritten')
+    p.add_argument('--video-sample-ticks',type=int,choices=[1,5],default=5,help='Sample actual render/core ticks; encoding remains10fps, so1tick is explicit0.2xslowmotion')
     a=p.parse_args()
     if len(a.zoom_windows)%2:p.error('--zoom-windows needs start/end pairs')
     a.output.mkdir(parents=True,exist_ok=False);camera_store=PlayerProfileStore(a.camera_profile)
@@ -73,7 +74,7 @@ def main():
         rows.append(row)
         if len(rows)%100==1:captures.append(game.capture('framing-'+str(last_tick)))
     with patch.object(FlightGame,'apply_recorded_player_profile',apply),patch.object(FlightGame,'draw',draw):
-        result=replay(a.tape,a.output/'replay',render=True,video=True,window_start=0,window_end=a.seconds,
+        result=replay(a.tape,a.output/'replay',render=True,video=True,window_start=0,window_end=a.seconds,video_sample_ticks=a.video_sample_ticks,
             visual_profile=ROOT/'game/recipes/player_daylight.json')
     report={'status':result['status'],'core_sha256':sha(Path(native.__file__)),'camera_profile_sha256':sha(a.camera_profile),
         'effective_camera':settings,'camera_implementation_sha256':camera_implementation_sha256,'tape_sha256':sha(a.tape),'replay':result,'samples':rows,'captures':captures,

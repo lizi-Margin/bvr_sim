@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Aermacchi-MB-339",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Aermacchi-MB-339\\FG-Aermacchi-MB-339.glb",
+  "source_sha256": "6d5fce8bb4eba2bf2a91d342131762c3edfd871baa527f746832d0b213cd6698",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Aermacchi-MB-339.png",
+  "png_sha256": "9b9010014da9129ea408b40264c25a334a019560efbe881c87633cb19f69c32e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

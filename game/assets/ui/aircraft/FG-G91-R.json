@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-G91-R",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-G91-R\\FG-G91-R.glb",
+  "source_sha256": "973eebee7bc802b3f963c316e94fbca60d7cbfcad9ff9dcae2777eb3aad829f9",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-G91-R.png",
+  "png_sha256": "6e043a8d1464098340436cb381a02a07b13ef0ba1012b351064184e08e9cd7ca",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

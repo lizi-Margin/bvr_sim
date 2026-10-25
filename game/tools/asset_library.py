@@ -1,4 +1,4 @@
-"""Small JSON CLI for Poly Haven, ambientCG v3, and a FlightGear archive mirror.
+"""JSON resource CLI: Poly Haven, ambientCG, FlightGear, Tacview and local WT textures.
 Powered by Poly Haven. No third-party Python packages required.
 """
 import argparse, hashlib, json, os, re, subprocess, sys, urllib.parse, urllib.request, zipfile
@@ -38,6 +38,12 @@ def extract(archive,root):
         for item in z.infolist():checked_path(root,item.filename)
         z.extractall(root)
 def search(args,cache):
+    if args.source=='warthunder':
+        sys.path.insert(0,str(HERE.parents[1]));from bvr_game.wt_assets import search as local_search
+        return local_search(args.local_report,args.query,args.limit,HERE.parent/'assets/registered',args.kind)
+    if args.source=='tacview':
+        sys.path.insert(0,str(HERE.parents[1]));from bvr_game.tacview_assets import search as local_search
+        return local_search(args.local_root,cache,args.query,args.limit)
     if args.source=='polyhaven':
         words=args.query.lower().split();matches=[]
         for key,value in catalog(cache).items():
@@ -53,6 +59,12 @@ def search(args,cache):
     matches=[{'source':'aircraft','id':Path(a['name']).stem,'archive':a['name'],'bytes':a['bytes'],'license':'inspect package','formats':a['formats']} for a in data['archives'] if args.query.casefold() in a['name'].casefold()]
     return {'total':len(matches),'results':matches[:args.limit]}
 def fetch(args,cache):
+    if args.source=='warthunder':
+        sys.path.insert(0,str(HERE.parents[1]));from bvr_game.wt_assets import fetch as local_fetch
+        return local_fetch(args.local_report,cache,args.id,args.max_mb,HERE.parent/'assets/registered')
+    if args.source=='tacview':
+        sys.path.insert(0,str(HERE.parents[1]));from bvr_game.tacview_assets import fetch as local_fetch
+        return local_fetch(args.local_root,cache,args.id,args.max_mb)
     if not re.fullmatch(r'[A-Za-z0-9_.-]+',args.id):raise ValueError('This prototype accepts ASCII asset IDs without spaces')
     root=cache/args.source/args.id;root.mkdir(parents=True,exist_ok=True)
     pending=[];license_name='CC0-1.0';entry=None
@@ -65,7 +77,7 @@ def fetch(args,cache):
         elif kind=='hdri':
             chosen=files['hdri'][args.resolution]['hdr'];entry=Path(urllib.parse.urlparse(chosen['url']).path).name;pending=[(entry,chosen)]
         else:
-            for map_name in ['Diffuse','nor_gl','Rough','Metal','AO']:
+            for map_name in ['Diffuse','nor_gl','nor_dx','Rough','Metal','AO']:
                 if map_name not in files:continue
                 variants=files[map_name].get(args.resolution,{})
                 chosen=variants.get('jpg') or variants.get('png')
@@ -92,12 +104,16 @@ def fetch(args,cache):
     (root/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf8')
     return {'directory':str(root),'manifest':str(root/'manifest.json'),'files':len(artifacts),'bytes':sum(a['bytes'] for a in artifacts),'entry':entry}
 def main():
+    if hasattr(sys.stdout,'reconfigure'):sys.stdout.reconfigure(encoding='utf8')
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cache',type=Path,default=HERE.parent/'assets/cache')
     parser.add_argument('--inventory',default=str(HERE.parent/'assets/aircraft_inventory.json'))
     sub=parser.add_subparsers(dest='command',required=True)
-    s=sub.add_parser('search');s.add_argument('source',choices=['polyhaven','ambientcg','aircraft']);s.add_argument('query');s.add_argument('--kind',choices=['any',*TYPES],default='any');s.add_argument('--limit',type=int,default=8)
-    f=sub.add_parser('fetch');f.add_argument('source',choices=['polyhaven','ambientcg','aircraft']);f.add_argument('id');f.add_argument('--resolution',default='1k');f.add_argument('--max-mb',type=float,default=80);f.add_argument('--ssh-host',default='hulc@172.24.147.18');f.add_argument('--ssh-port',type=int,default=1145);f.add_argument('--remote-root',default='/home/hulc/Aircraft-2024')
+    providers=['polyhaven','ambientcg','aircraft','tacview','warthunder']
+    s=sub.add_parser('search');s.add_argument('source',choices=providers);s.add_argument('query');s.add_argument('--kind',choices=['any',*TYPES],default='any');s.add_argument('--limit',type=int,default=8)
+    f=sub.add_parser('fetch');f.add_argument('source',choices=providers);f.add_argument('id');f.add_argument('--resolution',default='1k');f.add_argument('--max-mb',type=float,default=80);f.add_argument('--ssh-host',default='hulc@172.24.147.18');f.add_argument('--ssh-port',type=int,default=1145);f.add_argument('--remote-root',default='/home/hulc/Aircraft-2024')
+    s.add_argument('--local-root',type=Path,default=Path('D:/Tacview-models'));f.add_argument('--local-root',type=Path,default=Path('D:/Tacview-models'))
+    for command in (s,f):command.add_argument('--local-report',type=Path,default=Path('D:/bvr_sim_resources/war_thunder/v84/report.json'))
     args=parser.parse_args();args.cache=args.cache.resolve();emit((search if args.command=='search' else fetch)(args,args.cache))
 if __name__=='__main__':
     try:main()

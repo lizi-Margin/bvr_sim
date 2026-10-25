@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Lockheed-P-2-Neptune",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-P-2-Neptune\\FG-Lockheed-P-2-Neptune.glb",
+  "source_sha256": "2636dca2d73803e491dbb3706de93a8c9e2101c5186396df4e478abffb3f465e",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-P-2-Neptune.png",
+  "png_sha256": "0667474b853c36e67caf06f60725e6eb66dcb21bfb527cf51f217fa20d45bb85",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

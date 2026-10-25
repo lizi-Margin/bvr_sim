@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Carreidas",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Carreidas\\FG-Carreidas.glb",
+  "source_sha256": "ce43f706927750f32bd9c1578f2d25631abc4d0c144a594018d77f1fd09de036",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Carreidas.png",
+  "png_sha256": "d07252ed561a220ccbc049330ded746d4d3f987c686cb4674c776c85804230e9",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

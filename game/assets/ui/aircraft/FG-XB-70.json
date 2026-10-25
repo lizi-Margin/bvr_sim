@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-XB-70",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-XB-70\\FG-XB-70.glb",
+  "source_sha256": "32848e82bef260a68eab8de153b7488127e67d74270e2f46cf8e7bdd70b12102",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-XB-70.png",
+  "png_sha256": "8a13611ffee81e1ed9a6f7c36ef6781b142b08a75f8a5ba2b164578175ecaa9e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

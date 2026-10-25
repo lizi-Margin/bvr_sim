@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-E3B",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-E3B\\FG-E3B.glb",
+  "source_sha256": "ea6e57079266a27efbe47cc378e482a68c66da7b6a0c69370579967b206e7e0b",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-E3B.png",
+  "png_sha256": "b2b8d580605de493dbcd80c8e569388334c992c00440e22053f179c5d4f53e90",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

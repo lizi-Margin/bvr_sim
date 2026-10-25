@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Mig-29",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Mig-29\\FG-Mig-29.glb",
+  "source_sha256": "fe5e47001a9de64a4a6379f5aa44301e4bee46ad4929f6c07c092337584fe53f",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Mig-29.png",
+  "png_sha256": "07ca8fe32d9937226df5b0e77cc0885c77887c7bfb6ec44d0319f4730b00da0f",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

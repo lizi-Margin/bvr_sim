@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Lockheed-U-2S",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-U-2S\\FG-Lockheed-U-2S.glb",
+  "source_sha256": "c94e05677dea485af32d177492042167ed0bcd05c10b62aa5efb9d1bbc81b574",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-U-2S.png",
+  "png_sha256": "6c18b3f4efdfa0d850274dda1cd8f65a20d6adef26145ce313c74352cb2b1422",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

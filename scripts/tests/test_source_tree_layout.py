@@ -8,6 +8,22 @@ from bvr_game.grove_grounding import stem_spacing_report
 
 
 class SourceTreeLayoutTests(unittest.TestCase):
+    def test_accelerated_edge_density_matches_exact_boundary_distances(self):
+        from shapely import distance,points
+        from shapely.geometry import Point
+        from bvr_game.regional_cover import smooth_noise
+        forest=box(-2000,-2000,2000,2000).difference(Point(150,100).buffer(250)).difference(box(-1700,-80,-1200,70))
+        locations=np.random.default_rng(901).uniform(-2200,2200,(20000,2))
+        for width,variation in [(30.,12.),(160.,72.)]:
+            cfg={'width_m':width,'variation_m':variation,'patch_scale_m':90.}
+            n,w=locations.T
+            exact_depth=distance(forest.boundary,points(locations))
+            local_width=width*(.5+smooth_noise(n,w,90.,3124+191))
+            setback=variation*smooth_noise(n,w,90.*.63,3124+197)
+            u=np.clip((exact_depth-setback)/local_width,0,1)
+            expected=.005+.995*(u*u*(3-2*u))**1.5
+            np.testing.assert_array_equal(edge_density_probability(forest,locations,cfg,3124),expected)
+
     def test_spatial_batches_preserve_every_input_point_and_are_local(self):
         points=np.random.default_rng(5001).uniform(-1000,1000,(4096,2));groups=list(spatial_batches(points,64))
         self.assertEqual(len(groups),64);self.assertTrue(all(len(g)==64 for g in groups))

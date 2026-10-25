@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-MD-80",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MD-80\\FG-MD-80.glb",
+  "source_sha256": "e8fdaac375ec0a161bdd8d94e161f06429deb1f1b8519d0007ee741d2019c453",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MD-80.png",
+  "png_sha256": "f5e0da7b26d6015a3eb934e62f0ce084df953780503404914044405547c8c73e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

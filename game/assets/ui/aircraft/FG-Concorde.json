@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Concorde",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Concorde\\FG-Concorde.glb",
+  "source_sha256": "392cf9896c2463c0a3c1727e74a6d9052cc8b7c6ad4c27c9d9b4e769da1a61fe",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Concorde.png",
+  "png_sha256": "bb5277720a093958a545cc9174df82879cb35cc89c54727b03e0fdcd48c5e08d",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

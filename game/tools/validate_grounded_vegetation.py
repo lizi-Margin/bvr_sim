@@ -11,16 +11,19 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--visual-profile',type=Path,default=ROOT/'game/recipes/player_daylight.json')
     p.add_argument('--orbit-frames',type=int,default=0,help='Paused camera dolly across the ordinary900mLOD boundary; not physical flight or performance evidence')
-    p.add_argument('--sample-groves',type=int,default=0,help='Select bounded diagnostic samples in a complete map;0inspects every grounding batch');a=p.parse_args()
+    p.add_argument('--sample-groves',type=int,default=0,help='Select bounded diagnostic samples in a complete map;0inspects every grounding batch')
+    p.add_argument('--anchor-samples-only',action='store_true',help='One actual GPU vertex per source-tree index/subset; not an all-vertex bounds audit')
+    a=p.parse_args()
     if not 0<=a.sample_groves<=24:raise ValueError('Use0..24grounding samples')
     if not 0<=a.orbit_frames<=600:raise ValueError('Use0..600 paused camera frames')
     if a.output.exists():raise FileExistsError(a.output)
     a.output.mkdir(parents=True);os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
-    from bvr_game.app import FlightGame,serialize
+    from bvr_game.app import FlightGame,serialize,native
     g=FlightGame(render=True,visible=False,map_path=a.map,visual_profile=a.visual_profile,output=a.output/'client')
     report={'status':'running','map_sha256':sha(a.map),'visual_profile_sha256':sha(a.visual_profile),
-        'core_sha256':sha(ROOT/'bvr_sim/build/Release/bvr_sim_cpp.cp314-win_amd64.pyd'),
-        'renderer_sha256':sha(ROOT/'game/build/Release/bvr_game_render.cp314-win_amd64.pyd'),
+        'core_sha256':sha(Path(native.__file__)),
+        'renderer_sha256':sha(Path(g.r.__file__)),
+        'vertex_scope':'One GPU vertex per source-tree/subset' if a.anchor_samples_only else 'Every indexed draw vertex',
         'scope':'Compute readback executes the raster vertex grounding helper over actual draw instance/geometry/material/packed-position/UV buffers. It is not a post-raster stream-output capture or collision/CCIP certification.', 'groves':[],'captures':[]}
     try:
         g.select_aircraft('F16');g.config.mission='training';g.start();g.sim.set_paused(True);g.show_hud=False;g.renderer.set_quality('high')
@@ -74,7 +77,7 @@ def main():
                 eye=inspection_eye(n,w,h,distance,55)
                 g.set_camera(eye,[-w,h+14,n],.8)
                 for _ in range(45):g.draw()
-                rows=g.renderer.scenery_ground_vertices(item['id'],all_vertices=True)
+                rows=g.renderer.scenery_ground_vertices(item['id'],all_vertices=not a.anchor_samples_only)
                 gpu=np.array([r.world_position for r in rows]);bases=np.array([r.world_base for r in rows]);uv=np.array([r.uv_anchor for r in rows]);indices=np.array([[r.subset,r.vertex_index] for r in rows],dtype=np.uint32)
                 manifest=json.loads((ASSETS/'registered'/item['model']/'manifest.json').read_text(encoding='utf8'));cluster=manifest['cluster'];encoding=cluster['ground_conform'];center=np.asarray(cluster['recentering'])
                 anchors=np.array([pose['base_anchor'] for pose in cluster['poses_before_recentering']])-center

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Messerschmitt-P1101",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Messerschmitt-P1101\\FG-Messerschmitt-P1101.glb",
+  "source_sha256": "174b8cc5b16426b5cd98fefedac487472fd9ed52d52a16c902883acf01059602",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Messerschmitt-P1101.png",
+  "png_sha256": "3fdea6168b631cb64f8d626fefb19ef774117b83363194404352bba48749e0b2",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

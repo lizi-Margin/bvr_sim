@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-j7w",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-j7w\\FG-j7w.glb",
+  "source_sha256": "8980dc784086d50239b56555824dec90ef7b639c368d2aab32a8041cb0f96722",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-j7w.png",
+  "png_sha256": "62c1ffb5ec47eeea5b077cb0e7377c5f87355d0094091457907d1439432029a2",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

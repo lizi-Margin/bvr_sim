@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Caproni-C22J",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Caproni-C22J\\FG-Caproni-C22J.glb",
+  "source_sha256": "f706053fec958ab6c2916ca161e82710f31dfaabbff764bf4b4cc1e2a561197c",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Caproni-C22J.png",
+  "png_sha256": "5282c0844690f799309b10bd71abefb51887f444cb92884f671e59bae9d4c191",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

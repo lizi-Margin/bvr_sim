@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Gloster-Meteor",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Gloster-Meteor\\FG-Gloster-Meteor.glb",
+  "source_sha256": "07bc61e0da4c37760ef617a07e1c03167d382debc018325e8fd5d5bd9e610382",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Gloster-Meteor.png",
+  "png_sha256": "81dc39c9bc97a09de14609da9aef00755763fb571b9fb4eb7bc18b7ab55b70fb",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

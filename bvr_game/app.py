@@ -1,10 +1,15 @@
 """Flight Operations: typed simulation, optional Wicked renderer, CLI acceptance runs."""
 from __future__ import annotations
-import argparse, hashlib, importlib, json, math, os, statistics, sys, time
+import argparse, copy, hashlib, importlib, json, math, os, statistics, sys, time
 import textwrap
+from .native_runtime import configure_native_core
+configure_native_core()
 from .aircraft import aircraft_catalog,aircraft,loadout,runtime_models
 from .presentation import ChaseCamera,Labels,safe_aim,curve,mouse_pitch,mouse_roll_rate
 from .player_profiles import PlayerProfileStore
+from .frontend import Frontend
+from . import loadouts
+from .client_settings import ClientSettings
 from .player_input import PlayerInputAdapter,native_intent,body_forward,unit,aim_marker
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -42,7 +47,7 @@ def load_runtime(path):
 
 class FlightGame:
     """One owner steps GameSession. Renderer receives a value snapshot only."""
-    def __init__(self,*,render=False,visible=True,width=1920,height=1080,runtime=GAME/'runtime.json',map_path=GAME/'maps/training.json',output=GAME/'captures',visual_profile=DEFAULT_VISUAL_PROFILE):
+    def __init__(self,*,render=False,visible=True,width=1920,height=1080,runtime=GAME/'runtime.json',map_path=GAME/'maps/training.json',output=GAME/'captures',visual_profile=DEFAULT_VISUAL_PROFILE,user_settings=None,map_catalog=None,map_environment=True):
         self.output=Path(output).resolve();self.output.mkdir(parents=True,exist_ok=True)
         self.map_path=Path(map_path).resolve();self.map=json.loads(self.map_path.read_text(encoding='utf8'))
         self.baked_scene=None
@@ -50,46 +55,130 @@ class FlightGame:
             from .scene_runtime import BakedScene
             self.baked_scene=BakedScene(self.map_path,self.map);self.map=self.baked_scene.compatibility_view()
         self.scene_hash=hashlib.sha256(self.map_path.read_bytes()).hexdigest()
+        from .map_library import MapLibrary,DEFAULT_CATALOG
+        self.map_library=MapLibrary(map_catalog or DEFAULT_CATALOG)
         self.sim=native.GameSession(str(self.output/'simulation.log'))
         self.journal=SortieJournal(self.sim,os.environ.get('BVR_SORTIE_LOG_ROOT',GAME/'logs/sorties'))
         self.logs_enabled=True;self._journal_tick=0
         terrain=self.baked_scene.terrain(native) if self.baked_scene else native.GameTerrain()
         if not self.baked_scene:
             for k,v in self.map['terrain'].items():setattr(terrain,k,v)
-        self.sim.set_terrain(terrain)
+        self.sim.set_terrain(terrain);self._terrain=terrain
         self.config=native.GameConfig();self.config.enemy_range=9000;self.config.altitude=self.map['player_start'][2]
         if self.baked_scene:
             self.config.enemy_range=self.map['mission']['enemy_range_m'];self.config.speed=self.map['mission']['speed_mps'];self.config.enemy_evasion=True
         self.config.player_north,self.config.player_west=self.map['player_start'][:2]
         self.config.ground_north,self.config.ground_west=self.map['ground_target']['position'][:2]
-        self.width,self.height=width,height;self.renderer=None;self.r=None;self.runtime={};self.visual_profile={}
+        self.width,self.height=width,height;self.renderer=None;self.r=None;self.runtime={}
+        profile=Path(visual_profile);self._base_visual_profile=json.loads(profile.read_text(encoding='utf8')) if profile.is_file() else {}
+        self.map_environment=map_environment;self.visual_profile=copy.deepcopy(self._base_visual_profile)
+        self._environment_applied=False
+        self._apply_scene_environment(self.baked_scene)
         self.mode='hangar';self.weapon='AIM-120C7';self.target='';self.throttle=.85
         self.camera_state=None;self.camera_params={};self.camera_manual=False;self.aim=(width/2,height/2)
         self.chase=ChaseCamera();self.hud_layout=[]
         self.show_hud=True
         self.aircraft_rows=aircraft_catalog(include_library=True)['aircraft'];self.aircraft_scroll=0;self.menu_notice=''
+        initial_row=self.current_aircraft();initial_mounts=loadouts.preset(initial_row,initial_row['default_loadout'])
+        loadouts.configure(self.config,initial_row,initial_mounts);self.weapon=loadouts.initial_weapon(initial_mounts)
         self.aircraft_search='';self.search_active=False;self._preview_model=None
-        self.quality='medium';self.last_event_tick=-1;self.fps=0;self.frame_times=[];self.closed=False;self.interactive=False
+        self.quality='medium';self.last_event_tick=-1;self.fps=0;self.frame_times=[];self.client_frame_times=[];self.closed=False;self.interactive=False
         self.profile_store=PlayerProfileStore();self.player_profile=None;self.player_input=None;self.player_profiles_frozen=False
         self.start(record=False)
         self.mode='hangar';self.sim.set_paused(True)
+        self.frontend=Frontend(self,user_settings)
         if render:
             self.runtime=load_runtime(runtime)
             self.runtime['models']=runtime_models(self.runtime,self.baked_scene.document.get('resource_versions',{}) if self.baked_scene else None)
             sys.path.insert(0,self.runtime['renderer_module'])
             self.dll=os.add_dll_directory(self.runtime['renderer_module']) if os.name=='nt' else None
             self.r=importlib.import_module('bvr_game_render')
-            profile=Path(visual_profile)
+            if getattr(self.r,'GAME_API_ABI',0)!=getattr(native,'GAME_API_ABI',0):
+                raise RuntimeError('Renderer/core API mismatch. Rebuild game/native against the current core and select a matching runtime recipe.')
+            if self.visual_profile.get('cloud_weather_map') and not getattr(self.r,'BAKED_CLOUD_WEATHER_MAP',False):
+                raise ValueError('Rebuild the renderer for baked cloud weather maps')
+            if 'color_linear' in self.visual_profile.get('horizon_height_fog',{}) and not getattr(self.r,'FOG_COLOR_PROFILE_V1',False):
+                raise ValueError('Rebuild the renderer for authored height-fog color')
+            if self.visual_profile.get('wide_primitive_id_raster') and not getattr(self.r,'WIDE_PRIMITIVE_ID_RASTER',False):
+                raise ValueError('Wide primitive-ID shaders require the matching native renderer')
+            if self.visual_profile.get('cached_tree_heights') and not getattr(self.r,'CACHED_TREE_HEIGHTS_V1',False):
+                raise ValueError('Cached tree-height shaders require the matching native renderer')
+            if self.visual_profile.get('visibility_compute_shading') and not getattr(self.r,'WIDE_VISIBILITY_COMPUTE_V1',False):
+                raise ValueError('Wide visibility shading requires the matching native renderer and prepared shader profile')
+            if self.visual_profile.get('vegetation_full_detail',True) is False and not hasattr(self.r.Renderer,'vegetation_state'):
+                raise ValueError('Vegetation distance LOD requires the renderer that preserves far-tree visibility')
+            if self.visual_profile.get('flatten_static_vegetation') and not getattr(self.r,'STATIC_VEGETATION_WORLD_TRANSFORMS_V1',False):
+                raise ValueError('Static vegetation world transforms require their matching renderer')
             args=[width,height,visible,self.runtime['engine_source'],self.runtime['shader_cache'],self.runtime['models']]
             if getattr(self.r,'VISUAL_BETA',False) and profile.is_file():
-                self.visual_profile=json.loads(profile.read_text(encoding='utf8'));args.append(str(profile))
+                args.append(str(profile))
             self.renderer=self.r.Renderer(*args)
+            if hasattr(self.renderer,'set_ui_font'):
+                self.renderer.set_ui_font(str(Path(os.environ.get('WINDIR','C:/Windows'))/'Fonts/msyh.ttc'))
             if self.runtime.get('audio') and hasattr(self.renderer,'configure_audio'):self.renderer.configure_audio(self.runtime['audio'],visible)
+            if hasattr(self.renderer,'set_hangar_floor_texture') and self.runtime.get('asphalt_texture'):
+                self.renderer.set_hangar_floor_texture(self.runtime['asphalt_texture'])
+            self._apply_scene_environment(self.baked_scene)
             if self.baked_scene:self.baked_scene.configure(self.renderer,self.r,terrain,self.visual_profile)
             else:
                 self.renderer.configure_world(terrain,self.map['ground_target']['position'],self.map['runway']['position'],self.map['runway']['length_m'],self.map['runway']['width_m'],self.map.get('scenery_seed',7),self.runtime.get('asphalt_texture',''),self.runtime.get('terrain_texture',''))
                 for obj in self.map.get('assets',[]):
                     self.renderer.place_asset(obj['id'],obj['model'],obj['position'],obj.get('scale',1))
+
+        self.frontend.apply_preferences()
+
+    def map_versions(self):
+        from .map_library import choices
+        return choices(self.map_library,self.map_path)
+
+    def _apply_scene_environment(self,scene):
+        from .map_library import scene_profile,ENVIRONMENT_KEYS,shadow_cascades
+        document=scene.document if scene else {}
+        profile=scene_profile(self._base_visual_profile,document,use_environment=self.map_environment,asset_root=scene.path.parent if scene else None)
+        saved=self.map_environment and 'baked_environment' in document
+        if self.renderer and (saved or self._environment_applied):
+            if not getattr(self.r,'BAKED_ENVIRONMENT',False):raise ValueError('Rebuild the renderer for saved map weather')
+            if profile.get('cloud_weather_map') and not getattr(self.r,'BAKED_CLOUD_WEATHER_MAP',False):raise ValueError('Rebuild the renderer for baked cloud weather maps')
+            if 'color_linear' in profile.get('horizon_height_fog',{}) and not getattr(self.r,'FOG_COLOR_PROFILE_V1',False):raise ValueError('Rebuild the renderer for authored height-fog color')
+            if 'sun_shadow_cascades_m' in profile and not hasattr(self.renderer,'set_shadow_cascades'):raise ValueError('Rebuild the renderer for saved aerial shadow cascades')
+            if 'sun_shadow_resolution' in profile and not getattr(self.r,'SUN_SHADOW_PROFILE_V1',False):raise ValueError('Rebuild the renderer for saved sun shadow resolution')
+            self.renderer.apply_environment(json.dumps({k:profile[k] for k in ENVIRONMENT_KEYS if k in profile}))
+            if hasattr(self.renderer,'set_shadow_cascades'):self.renderer.set_shadow_cascades(shadow_cascades(profile))
+            self._environment_applied=True
+        self.visual_profile=profile
+
+    def load_map_version(self,id):
+        """Load saved data only, after the user confirms the preparation draft."""
+        if self.mode!='hangar':raise ValueError('Return to the hangar before changing maps')
+        current=next((r for r in self.map_versions() if r['id']==id),None)
+        if current is None:raise ValueError('Unknown map version')
+        row=current if current.get('quality')=='external' else self.map_library.resolve(id)
+        path=Path(row['map']).resolve()
+        if path==self.map_path:return
+        from .scene_runtime import BakedScene
+        scene=BakedScene(path)
+        if scene.document.get('schema_version')!=2:raise ValueError('Only baked maps can be selected')
+        data=scene.compatibility_view();terrain=scene.terrain(native)
+        models=runtime_models(self.runtime or {'models':{}},scene.document['resource_versions'])
+        if self.renderer:
+            if not hasattr(self.renderer,'register_scene_models'):raise ValueError('Rebuild the renderer for baked map switching')
+            try:
+                self._apply_scene_environment(scene)
+                scene.configure(self.renderer,self.r,terrain,self.visual_profile)
+            except Exception:
+                self._apply_scene_environment(self.baked_scene)
+                if self.baked_scene:self.baked_scene.configure(self.renderer,self.r,self.baked_scene.terrain(native),self.visual_profile)
+                else:self.renderer.configure_world(self._terrain,self.map['ground_target']['position'],self.map['runway']['position'],self.map['runway']['length_m'],self.map['runway']['width_m'],self.map.get('scenery_seed',7),self.runtime.get('asphalt_texture',''),self.runtime.get('terrain_texture',''))
+                raise
+            self.runtime['models']=models
+        else:self._apply_scene_environment(scene)
+        self.finish_sortie('map_changed');self.sim.set_terrain(terrain);self._terrain=terrain
+        self.map_path=path;self.map=data;self.baked_scene=scene;self.scene_hash=hashlib.sha256(path.read_bytes()).hexdigest()
+        self.config.player_north,self.config.player_west,self.config.altitude=data['player_start']
+        self.config.ground_north,self.config.ground_west=data['ground_target']['position'][:2]
+        self.config.enemy_range=data['mission']['enemy_range_m'];self.config.speed=data['mission']['speed_mps']
+        self.config.ground_units=[];self._map_ground_units=False
+        self.camera_state=None;self.camera_manual=False
 
     def start(self,record=True,*,start_position=None,initial_speed=None):
         self.finish_sortie('restarted')
@@ -111,7 +200,7 @@ class FlightGame:
             self.config.enemy_attacks=self.config.enemy_evasion=True
             self.config.enemy_range=spec['initial_enemy_range_m'];self.config.speed=spec['initial_speed_mps'];self.config.altitude=spec['initial_altitude_m']
             self.config.intercept_waves=spec['wave_count'];self.config.intercept_interval=spec['wave_interval_s'];self.config.intercept_timeout=spec['timeout_s']
-            self.config.missiles=6;self.config.bombs=0
+            if not self.config.use_station_loadout:self.config.missiles=6;self.config.bombs=0
         if start_position is not None:
             if len(start_position)!=3 or not all(math.isfinite(float(v)) for v in start_position):raise ValueError('Start position must be finite NWU metres')
             self.config.player_north,self.config.player_west,self.config.altitude=map(float,start_position)
@@ -128,6 +217,7 @@ class FlightGame:
             context['player_flight_profile']=self.player_profile
             context['core_sha256']=hashlib.sha256(Path(native.__file__).read_bytes()).hexdigest()
             context['entry']=getattr(self,'entry_point','flight_game')
+            context['client_preferences']=self.frontend.settings.values if hasattr(self,'frontend') else {}
             self.journal.start(serialize(self.config),context)
         pilot=native.PilotCommand();pilot.throttle=self.throttle;self.submit_command(pilot)
         if self.renderer:self.renderer.reload()
@@ -139,10 +229,11 @@ class FlightGame:
         self.config.player_model=row['simulation_model'];self.config.fdm=row['fdm']['type']
         self.config.library_aircraft=row.get('library_aircraft',False)
         if self.config.library_aircraft:self.config.enemy_attacks=False
-        self.config.missiles=preset['missiles'];self.config.bombs=preset['bombs']
-        self.weapon='AIM-120C7' if self.config.missiles else 'Mk-82'
+        mounts=loadouts.preset(row,preset['id']);loadouts.configure(self.config,row,mounts)
+        self.weapon=loadouts.initial_weapon(mounts)
         if self.config.mission not in row['missions']:self.config.mission=row['missions'][0]
-        if self.config.mission=='intercept_patrol':self.config.missiles=6;self.config.bombs=0
+        if self.config.mission=='intercept_patrol':
+            mounts=loadouts.preset(row,'intercept');loadouts.configure(self.config,row,mounts);self.weapon=loadouts.initial_weapon(mounts)
         filtered=self.filtered_aircraft()
         index=next((i for i,r in enumerate(filtered) if r['id']==id),None)
         if index is None:self.aircraft_search='';filtered=self.filtered_aircraft();index=next(i for i,r in enumerate(filtered) if r['id']==id)
@@ -157,6 +248,7 @@ class FlightGame:
         self.camera_manual=False;self.chase.reset();self.menu_notice=''
         self._preview_model=None
         if self.renderer:self.renderer.reload()
+        if hasattr(self,'frontend'):self.frontend.selection_changed(row)
         return row
 
     def filtered_aircraft(self):
@@ -166,8 +258,8 @@ class FlightGame:
 
     def set_loadout(self,id):
         row=aircraft(self.config.player_model);preset=loadout(row,id)
-        self.config.missiles=preset['missiles'];self.config.bombs=preset['bombs']
-        self.weapon='AIM-120C7' if self.config.missiles else 'Mk-82'
+        mounts=loadouts.preset(row,preset['id']);loadouts.configure(self.config,row,mounts)
+        self.weapon=loadouts.initial_weapon(mounts)
         if self.mode=='hangar':self.sim.reset(self.config);self.sim.set_paused(True);self.configure_player_flight()
 
     def current_aircraft(self):
@@ -189,6 +281,7 @@ class FlightGame:
         self.player_profile=self.profile_store.apply(self.sim,native,self.current_aircraft()['id'])
         self.player_input=PlayerInputAdapter(self.player_profile,unit(self.player().velocity))
         self.chase.settings=self.player_profile['camera']
+        if hasattr(self,'frontend'):self.frontend.apply_preferences()
 
     def reload_player_flight(self):
         if self.player_profiles_frozen:raise ValueError('Player profiles are frozen for this evaluation')
@@ -196,6 +289,7 @@ class FlightGame:
         candidate=PlayerProfileStore(self.profile_store.path)
         resolved=candidate.apply(self.sim,native,self.current_aircraft()['id'])
         self.profile_store=candidate;self.player_profile=resolved;self.player_input.profile=resolved;self.chase.settings=resolved['camera']
+        self.frontend.apply_preferences()
         self.journal.record('player_profile_reload',resolved,self._journal_tick)
         return resolved
 
@@ -264,13 +358,14 @@ class FlightGame:
         north,west,alt=p.position;yaw=p.orientation[2]
         if self.mode=='hangar':
             row=self.current_aircraft();bounds=row['appearance'].get('bounds')
-            center=[0,3,0];scale=1
+            center=[0,1,0];scale=1
             if bounds:
-                lo,hi=bounds['min'],bounds['max'];center=[(lo[0]+hi[0])/2,2.1+(lo[2]+hi[2])/2,(lo[1]+hi[1])/2]
+                lo,hi=bounds['min'],bounds['max'];center=[(lo[0]+hi[0])/2,.02+(lo[2]+hi[2])/2,(lo[1]+hi[1])/2]
                 scale=max(.35,max(bounds['span'])/19)
-                if row.get('library_aircraft'):center[1]+=max(0,-lo[2])
-            self.set_camera([center[0]+26*scale,center[1]+9*scale,center[2]-26*scale],
-                            [center[0]-6*scale,center[1],center[2]],.92,manual=False);return
+                center[1]+=max(0,-lo[2])
+            orbit=.82+self.frontend.orbit
+            self.set_camera([center[0]+math.sin(orbit)*30*scale,center[1]+10*scale,center[2]-math.cos(orbit)*30*scale],
+                            [center[0]-4*scale,center[1]-.5*scale,center[2]],.68,manual=False);return
         else:
             bounds=self.current_aircraft()['appearance'].get('bounds')
             self.chase.scale=max(.35,max(bounds['span'])/19) if bounds else 1
@@ -297,6 +392,8 @@ class FlightGame:
         metadata['core_sha256']=hashlib.sha256(Path(native.__file__).read_bytes()).hexdigest()
         metadata['renderer_sha256']=hashlib.sha256(Path(self.r.__file__).read_bytes()).hexdigest()
         if hasattr(self.renderer,'memory_usage'):metadata['vram']=self.renderer.memory_usage()
+        if hasattr(self.renderer,'frame_timings'):metadata['frame_timings']=json.loads(self.renderer.frame_timings())
+        if hasattr(self.renderer,'depth_coverage'):metadata['depth_coverage']=json.loads(self.renderer.depth_coverage())
         metadata['camera_mode']='manual' if self.camera_manual else 'follow'
         metadata['player_flight_profile']=self.player_profile
         metadata['player_flight_state']=serialize(self.sim.player_flight_state())
@@ -336,34 +433,7 @@ class FlightGame:
             for i in range(24):
                 a=math.tau*i/24;b=math.tau*(i+1)/24
                 segment(x+r*math.cos(a),y+r*math.sin(a),x+r*math.cos(b),y+r*math.sin(b),color,2)
-        if self.mode=='hangar':
-            panel(0,0,520,1080);text(30,35,'BVR / FLIGHT OPERATIONS',28)
-            text(30,90,'SELECT AIRCRAFT  /  CLICK OR SCROLL',17,GREEN)
-            rows=self.filtered_aircraft()
-            line(26,128,466,36,0xff35483c if self.search_active else 0xff25342c)
-            text(38,135,('/ SEARCH: '+self.aircraft_search+('_' if self.search_active else ''))[:51],16,GREEN)
-            text(30,1010,f'{len(rows)} aircraft | wheel / arrows / PgUp PgDn',15,MUTED)
-            for index,row in enumerate(rows[self.aircraft_scroll:self.aircraft_scroll+4]):
-                y=180+index*74;selected=row['id']==self.config.player_model
-                line(26,y,466,66,0xff31583b if selected else 0xd52c342e)
-                text(38,y+8,row['display_name'][:38],20,WHITE if row['available'] else MUTED)
-                caption=' / '.join(row['supported_weapons']) or 'UNARMED'
-                text(38,y+37,caption+'  |  '+(('TEST FLIGHT' if row.get('library_aircraft') else 'READY') if row['available'] else 'UNAVAILABLE'),14,GREEN if row['available'] else RED)
-            row=self.current_aircraft();text(30,495,row['id']+'  /  '+row['fdm']['type'].upper(),22)
-            for index,part in enumerate(textwrap.wrap(row['appearance']['variant_note'],59)[:3]):text(30,530+index*19,part,14,MUTED)
-            text(30,599,'[M] MISSION: '+self.config.mission.upper(),20)
-            text(30,633,'[L] LOADOUT',16,MUTED)
-            text(30,660,f'{self.config.missiles} AIM-120C7  /  {self.config.bombs} Mk-82',21)
-            text(30,700,'[G] ENEMY WEAPONS: '+('LIVE' if self.config.enemy_attacks else 'TRAINING'),16)
-            text(30,729,'[Q] QUALITY: '+self.quality.upper(),16)
-            line(40,760,390,70,0xff31583b);text(85,780,'ENTER  /  TAKE TO THE SKY',24)
-            notice=self.menu_notice or row['unavailable_reason'] or ('Flight: '+row['validation']['flight'])
-            for index,part in enumerate(textwrap.wrap(notice,55)[:3]):text(30,855+index*19,part,14,RED if self.menu_notice else MUTED)
-            text(30,912,'F9 LOGS / game/logs/sorties',16,MUTED)
-            text(30,943,'Mouse aim | W push DOWN / S pull UP',16)
-            text(30,975,'R lock | Space fire | B bomb | C look | P pause',15)
-            text(550,1020,'FlightGear / Wicked Engine / Kenney / ambientCG / Poly Haven',17,MUTED)
-            return texts,lines
+        if self.mode=='hangar':return self.frontend.hud()
         speed=math.sqrt(sum(v*v for v in p.velocity)) if p else 0
         standalone=getattr(self,'entry_point','')=='aircraft_library.fly'
         text(40,30,'UNARMED PLAYER TEST FLIGHT' if standalone else 'BVR / '+frame.mission.upper(),22)
@@ -371,12 +441,13 @@ class FlightGame:
         text(40,108,f'SPD   {speed*3.6:4.0f} km/h',22)
         text(40,139,f'ALT   {p.position[2] if p else 0:5.0f} m',22)
         text(40,170,f'MACH  {p.mach if p else 0:.2f}',22)
-        text(40,213,f'AAM   {frame.missiles_left}   AIM-120C7',20)
-        text(40,244,f'BOMB  {frame.bombs_left}   Mk-82',20)
-        text(40,285,'SELECTED  '+self.weapon,18,GREEN)
-        text(40,320,'P / PAUSE' if not frame.paused else 'PAUSED  |  P resume, . step',18,GREEN)
-        text(40,350,'F9 / OPEN SORTIE LOGS',16,MUTED)
-        text(40,1018,f'{self.fps:.0f} FPS   {frame.sim_time:6.1f}s',18,MUTED)
+        text(40,213,f'AAM   {frame.missiles_left}   /   BOMB {frame.bombs_left}',20)
+        text(40,244,'  /  '.join(f'{w}: {n}' for w,n in frame.weapon_counts.items()),17)
+        text(40,285,'SELECTED  '+(self.weapon or 'NONE'),18,GREEN)
+        if self.target and self.weapon.startswith('AIM-'):text(40,309,frame.launch_reason or 'Select target',14,GREEN if frame.launch_ready else MUTED)
+        text(40,340,'P / PAUSE' if not frame.paused else 'PAUSED  |  P resume, . step',18,GREEN)
+        text(40,372,'F9 / OPEN SORTIE LOGS',16,MUTED)
+        text(40,1018,f'{self.fps:.1f} FPS   {frame.sim_time:6.1f}s',18,MUTED)
         line(610,35,350,4,BLUE);line(960,35,350,4,RED)
         text(610,57,'BLUE: PLAYER',18,BLUE);text(1110,57,'RED: HOSTILE',18,RED)
         if frame.mission=='intercept_patrol':
@@ -482,7 +553,7 @@ class FlightGame:
                     segment(cx+(outer-9)*math.cos(a),cy+(outer-9)*math.sin(a),cx+(outer+1)*math.cos(a),cy+(outer+1)*math.sin(a),RED,4)
         if frame.envelope.target_uid:
             z=frame.envelope;panel(1535,650,355,270)
-            text(1550,670,'AIM-120 / LAUNCH ZONE',19,GREEN)
+            text(1550,670,self.weapon+' / LAUNCH ZONE',19,GREEN)
             text(1550,705,f'R {z.range/1000:.1f} km / AZ {math.degrees(z.bearing):+.0f} deg',18)
             text(1550,738,f'Vc {z.closing_speed:+.0f} m/s',18)
             text(1550,771,f'Rmax {z.rmax/1000:.1f} / Rtr {z.rtr/1000:.1f} km',17)
@@ -490,7 +561,7 @@ class FlightGame:
             text(1550,843,'1-D estimate / no kill guarantee',15,MUTED)
         for i,m in enumerate([x for x in frame.missiles if x.owner=='player'][-3:]):
             eta=f'{m.eta:.1f}s' if m.eta>=0 else 'opening'
-            text(40,440+i*62,f'AIM-120 IN FLIGHT / {m.age:.1f}s',18,GREEN)
+            text(40,440+i*62,f'{m.model} IN FLIGHT / {m.age:.1f}s',18,GREEN)
             text(40,465+i*62,f'{m.range/1000:.1f} km / ETA ~{eta} / '+('ACTIVE' if m.seeker_active else 'MIDCOURSE'),17)
         if frame.mission in ('strike','combined') and self.mode!='result':
             target=self.map['ground_target']['position'];q=self.renderer.project(target)
@@ -525,13 +596,14 @@ class FlightGame:
     def draw(self,dt=1/60,*,free=False):
         if not self.renderer:return
         if hasattr(self.renderer,'presentation'):self.renderer.presentation(self.mode=='hangar')
-        if self.mode=='hangar' and self.current_aircraft().get('library_aircraft'):
+        if self.mode=='hangar':
             model=self.config.player_model
             if self._preview_model!=model:
                 self.renderer.preview_aircraft(model,self.player().animation_properties,0.)
                 self._preview_model=model
         self.follow_camera(dt,free=free)
-        texts,lines=self.hud() if self.show_hud else ([],[])
+        if self.mode!='hangar' and hasattr(self.renderer,'set_menu_overlay'):self.renderer.set_menu_overlay(False,[])
+        texts,lines=self.hud() if self.show_hud or self.mode=='hangar' else ([],[])
         if not self.show_hud:self.hud_layout=[]
         start=time.perf_counter()
         if getattr(self.r,'VISUAL_BETA',False):self.renderer.render(self.sim.frame(),texts,lines,dt)
@@ -546,7 +618,10 @@ class FlightGame:
         changes the core dt. Headless clients advance the same camera math.
         """
         if not math.isfinite(dt) or dt<0:raise ValueError('Client frame time must be finite and nonnegative')
-        dt=min(dt,.1);self.fps=.9*self.fps+.1/max(dt,.0001)
+        if dt>0:
+            self.client_frame_times.append(dt);del self.client_frame_times[:-60]
+            self.fps=len(self.client_frame_times)/max(sum(self.client_frame_times),1e-6)
+        dt=min(dt,.1)
         if not self.input(event,dt):return False,0.
         if self.mode=='flight':
             accumulator+=dt;ticks=min(int(accumulator/self.config.dt),5)
@@ -567,53 +642,10 @@ class FlightGame:
         self.aim=(min(max(event.x,0),self.width),min(max(event.y,0),self.height))
         if 123 in pressed:self.capture('manual') # F12
         if 81 in pressed:
-            self.quality=['low','medium','high'][(['low','medium','high'].index(self.quality)+1)%3];self.renderer.set_quality(self.quality)
-        if self.mode=='hangar':
-            if 191 in pressed or (1 in pressed and 26<=event.x/self.width*1920<=492 and 128<=event.y/self.height*1080<=164):
-                self.search_active=True;return True
-            if self.search_active:
-                if 27 in pressed:self.aircraft_search='';self.search_active=False
-                elif 13 in pressed:self.search_active=False
-                else:
-                    if 8 in pressed:self.aircraft_search=self.aircraft_search[:-1]
-                    for key in sorted(pressed):
-                        if 65<=key<=90 or 48<=key<=57:self.aircraft_search+=chr(key)
-                        elif key==32:self.aircraft_search+=' '
-                        elif key in (189,109):self.aircraft_search+='-'
-                    self.aircraft_search=self.aircraft_search[:48]
-                self.aircraft_scroll=0;return True
-            rows=self.filtered_aircraft()
-            wheel=getattr(event,'wheel',0)
-            if wheel or pressed.intersection({38,40,33,34,36,35}):
-                delta=-int(math.copysign(1,wheel)) if wheel else (4 if 34 in pressed else -4 if 33 in pressed else 1 if 40 in pressed else -1)
-                self.aircraft_scroll=max(0,min(max(0,len(rows)-4),self.aircraft_scroll+delta))
-                if 36 in pressed:self.aircraft_scroll=0
-                if 35 in pressed:self.aircraft_scroll=max(0,len(rows)-4)
-            selected=None
-            for index,row in enumerate(self.aircraft_rows[:5]):
-                if 49+index in pressed:selected=row['id']
-            if 1 in pressed and 26<=event.x/self.width*1920<=492:
-                slot=int((event.y/self.height*1080-180)//74)
-                if 0<=slot<4 and self.aircraft_scroll+slot<len(rows):selected=rows[self.aircraft_scroll+slot]['id']
-            if selected:
-                try:self.select_aircraft(selected)
-                except (ValueError,FileNotFoundError) as error:self.menu_notice=str(error)
-            row=self.current_aircraft()
-            if 77 in pressed:
-                missions=[m for m in ['intercept_patrol','air','strike','combined','convoy','training'] if m in row['missions'] and (m!='convoy' or self.map.get('mission',{}).get('ground_units'))]
-                self.config.mission=missions[(missions.index(self.config.mission)+1)%len(missions)] if self.config.mission in missions else missions[0]
-                if self.config.mission=='intercept_patrol':self.config.missiles=6;self.config.bombs=0;self.config.enemy_attacks=True
-            if 76 in pressed:
-                if self.config.mission=='intercept_patrol':self.menu_notice='Patrol uses the fixed 6 x AIM-120C7 intercept loadout'
-                else:
-                    presets=row['legal_loadouts'];index=next((i for i,v in enumerate(presets) if (v['missiles'],v['bombs'])==(self.config.missiles,self.config.bombs)),-1)
-                    self.set_loadout(presets[(index+1)%len(presets)]['id'])
-            if 71 in pressed and not row.get('library_aircraft') and self.config.mission!='intercept_patrol':self.config.enemy_attacks=not self.config.enemy_attacks
-            click=1 in pressed and 40/1920*self.width<=event.x<=430/1920*self.width and 760/1080*self.height<=event.y<=830/1080*self.height
-            if 13 in pressed or click:self.start()
-            if 27 in pressed:return False
-            return True
-        if 27 in pressed:self.finish_sortie('returned_to_hangar');self.mode='hangar';self.sim.set_paused(True);return True
+            self.quality=['low','medium','high'][(['low','medium','high'].index(self.quality)+1)%3]
+            if self.renderer:self.renderer.set_quality(self.quality)
+        if self.mode=='hangar':return self.frontend.input(event,dt)
+        if 27 in pressed:self.finish_sortie('returned_to_hangar');self.mode='hangar';self.frontend.home();self.sim.set_paused(True);return True
         if self.mode=='result':
             if 13 in pressed:self.start()
             return True
@@ -627,7 +659,7 @@ class FlightGame:
             except (ValueError,RuntimeError) as error:self.menu_notice=str(error)
         if 190 in pressed:self.step_exact()
         if 86 in pressed:
-            weapons=self.current_aircraft()['supported_weapons']
+            weapons=[w for w,n in frame.weapon_counts.items() if n>0]
             if weapons:self.weapon=weapons[(weapons.index(self.weapon)+1)%len(weapons)] if self.weapon in weapons else weapons[0]
         self.throttle=max(0,min(1,self.throttle+getattr(event,'wheel',0)*.05))
         self.throttle=self.player_input.throttle(self.throttle,event,dt)
@@ -645,7 +677,8 @@ class FlightGame:
             if candidates:
                 self.target=candidates[(candidates.index(self.target)+1)%len(candidates)] if self.target in candidates else candidates[0]
                 c.lock=True;c.target_uid=self.target
-        c.fire=(32 in pressed or 1 in pressed) and self.weapon=='AIM-120C7';c.target_uid=self.target;c.weapon='AIM-120C7'
+        definition=loadouts.weapons().get(self.weapon)
+        c.fire=(32 in pressed or 1 in pressed) and bool(definition and definition.category=='missile');c.target_uid=self.target;c.weapon=self.weapon
         c.drop_bomb=66 in pressed or (32 in pressed and self.weapon=='Mk-82')
         self._dispatch_player_intent(c);return True
 
@@ -707,12 +740,19 @@ def acceptance_alpha(game,mission):
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['play','run','benchmark'],nargs='?',default='play')
     p.add_argument('--render',action='store_true');p.add_argument('--hidden',action='store_true');p.add_argument('--mission',choices=['intercept_patrol','air','strike','combined','convoy','training']);p.add_argument('--aircraft',choices=[r['id'] for r in aircraft_catalog(include_library=True)['aircraft']],default='F22');p.add_argument('--loadout');p.add_argument('--seed',type=int,default=7)
-    p.add_argument('--width',type=int,default=1920);p.add_argument('--height',type=int,default=1080);p.add_argument('--quality',choices=['low','medium','high'],default='high');p.add_argument('--frames',type=int,default=300);p.add_argument('--output',type=Path,default=GAME/'captures');p.add_argument('--runtime',type=Path,default=GAME/'runtime.json');p.add_argument('--map',type=Path,default=DEFAULT_WORLD_MAP)
+    p.add_argument('--width',type=int,default=1920);p.add_argument('--height',type=int,default=1080);p.add_argument('--quality',choices=['low','medium','high']);p.add_argument('--frames',type=int,default=300);p.add_argument('--output',type=Path,default=GAME/'captures');p.add_argument('--runtime',type=Path,default=GAME/('runtime-ui.json' if (GAME/'runtime-ui.json').is_file() else 'runtime.json'));p.add_argument('--map',type=Path,default=DEFAULT_WORLD_MAP)
     p.add_argument('--visual-profile',type=Path,default=DEFAULT_VISUAL_PROFILE)
-    a=p.parse_args();game=FlightGame(render=a.render or a.command=='play' or a.command=='benchmark',visible=not a.hidden,width=a.width,height=a.height,runtime=a.runtime,map_path=a.map,output=a.output,visual_profile=a.visual_profile)
+    p.add_argument('--ignore-map-environment',action='store_true',help='Offline authoring: use the supplied profile instead of saved map weather')
+    from .map_library import DEFAULT_CATALOG,MapLibrary
+    p.add_argument('--map-catalog',type=Path,default=DEFAULT_CATALOG);p.add_argument('--map-version')
+    a=p.parse_args()
+    if a.map_version:a.map=Path(MapLibrary(a.map_catalog).resolve(a.map_version)['map'])
+    game=FlightGame(render=a.render or a.command=='play' or a.command=='benchmark',visible=not a.hidden,width=a.width,height=a.height,runtime=a.runtime,map_path=a.map,output=a.output,visual_profile=a.visual_profile,user_settings=ClientSettings.default_path() if a.command=='play' else None,map_catalog=a.map_catalog,map_environment=not a.ignore_map_environment)
+    if a.quality:game.frontend.settings.values['quality']=a.quality
     row=game.select_aircraft(a.aircraft,a.loadout)
     a.mission=a.mission or ('air' if a.command=='run' and 'air' in row['missions'] else row['missions'][0])
     if a.mission not in row['missions']:game.close();raise ValueError('Mission '+a.mission+' is unsupported for '+a.aircraft)
+    a.quality=a.quality or (game.quality if a.command=='play' else 'high')
     game.config.mission=a.mission;game.config.seed=a.seed;game.quality=a.quality
     if a.mission=='intercept_patrol':game.config.missiles=6;game.config.bombs=0;game.config.enemy_attacks=True
     if game.renderer:game.renderer.set_quality(a.quality)
@@ -741,7 +781,7 @@ def main():
             game.interactive=True
             game.sim.reset(game.config);game.sim.set_paused(True);last=time.perf_counter();accumulator=0
             while True:
-                now=time.perf_counter();dt=min(now-last,.1);last=now
+                now=time.perf_counter();dt=now-last;last=now
                 event=game.renderer.poll()
                 running,accumulator=game.run_client_frame(event,dt,accumulator)
                 if not running:break

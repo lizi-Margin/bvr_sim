@@ -51,21 +51,31 @@ def build_airfield(baker):
     for a in baker.r['airfields']:
         n,w=a['center'];lo=n-a['runway_length_m']/2;hi=n+a['runway_length_m']/2;taxi=w+a['taxi_offset_m']
         baker.surface_ribbon('runway_shoulder',[[lo-20,w],[hi+20,w]],a['runway_width_m']+16,'soil',.02)
-        baker.surface_ribbon('runway',[[lo,w],[hi,w]],a['runway_width_m'],'pavement',.06)
+        if not a.get('ground_layout'):baker.surface_ribbon('runway',[[lo,w],[hi,w]],a['runway_width_m'],'pavement',.06)
         for i,d in enumerate(np.arange(lo+90,hi-90,100)):baker.surface_rectangle(f'runway_center_{i}',[float(d),w],[30,1.5],'marking')
         for end in [lo+55,hi-55]:
             for lane in [-16,-10,-4,4,10,16]:baker.surface_rectangle(f'threshold_{end}_{lane}',[end,w+lane],[28,2.5],'marking')
-        baker.surface_ribbon('taxiway',[[lo+130,taxi],[hi-130,taxi]],22,'pavement',.06)
-        for i,cross in enumerate([lo+160,n,hi-160]):baker.surface_ribbon('taxi_link_'+str(i),[[cross,w],[cross,taxi]],22,'pavement',.06)
-        baker.surface_ribbon('apron_link',[[a['apron'][0],taxi],a['apron']],24,'pavement',.06)
-        baker.surface_rectangle('apron',a['apron'],a['apron_size_m'],'pavement')
+        if not a.get('ground_layout'):
+            baker.surface_ribbon('taxiway',[[lo+130,taxi],[hi-130,taxi]],22,'pavement',.06)
+            for i,cross in enumerate([lo+160,n,hi-160]):baker.surface_ribbon('taxi_link_'+str(i),[[cross,w],[cross,taxi]],22,'pavement',.06)
+        plans=None
+        if a.get('ground_layout'):
+            from .airport_layout import build_courts
+            plans=build_courts(baker,a)
+        else:
+            baker.surface_ribbon('apron_link',[[a['apron'][0],taxi],a['apron']],24,'pavement',.06)
+            baker.surface_rectangle('apron',a['apron'],a['apron_size_m'],'pavement')
         for i in range(a['hangars']):
             model=baker.r['asset_roles']['warehouse'][i%len(baker.r['asset_roles']['warehouse'])]
-            baker.place(model,a['apron'][0]-a['apron_size_m'][0]*.4+i*a['apron_size_m'][0]*.8/max(1,a['hangars']-1),
-                a['apron'][1]+a['apron_size_m'][1]/2+50,category='building',zone='airport_hangars',yaw=math.pi,scale=1.15,clearance=False)
+            position=plans[i]['position'] if plans else [a['apron'][0]-a['apron_size_m'][0]*.4+i*a['apron_size_m'][0]*.8/max(1,a['hangars']-1),a['apron'][1]+a['apron_size_m'][1]/2+50]
+            baker.place(model,*position,category='building',zone='airport_hangars',yaw=plans[i]['yaw'] if plans else math.pi,scale=1.15,clearance=False)
         for role,dn,dw,zone in [('utility',920,360,'airport_tower'),('airport_admin',970,550,'airport_administration'),('supply',-800,660,'airport_fuel')]:
             baker.place(baker.r['asset_roles'][role],n+dn,w+dw,category='building',zone=zone,yaw=math.pi/2,clearance=False)
-        for i in range(12):baker.place(baker.r['asset_roles']['apron_equipment'],a['apron'][0]-400+i*65,a['apron'][1]-170,category='prop',zone='apron_equipment',minimum=4,clearance=False)
+        if plans:
+            from .airport_layout import equipment_plans
+            equipment=equipment_plans(a)
+        else:equipment=[[a['apron'][0]-400+i*65,a['apron'][1]-170] for i in range(12)]
+        for point in equipment:baker.place(baker.r['asset_roles']['apron_equipment'],*point,category='prop',zone='apron_equipment',minimum=4,clearance=False)
 
 def build_industry(baker):
     target=baker.r['mission']['target'];baker.place(baker.r['asset_roles']['target'],*target,category='building',zone='mission_objective',clearance=False)
@@ -157,6 +167,24 @@ def agricultural_parcels(baker,fields):
                 'appearance_source':'Authored crop-cover/season variation, not measured GIS or crop species'})
     return result
 
+def building_foundation(item,manifest,height):
+    """One footprint/pose calculation for full bakes and local scene edits."""
+    bounds=manifest['bounds_blender'];mn,mx=bounds['min'],bounds['max'];scale=item['scale'];yaw=item['yaw']
+    n,w,z=item['position'];hn=(mx[1]-mn[1])*scale/2+1.5;hw=(mx[0]-mn[0])*scale/2+1.5
+    local_n=(mn[1]+mx[1])*scale/2;local_w=-(mn[0]+mx[0])*scale/2
+    cn=n+local_n*math.cos(yaw)-local_w*math.sin(yaw);cw=w+local_n*math.sin(yaw)+local_w*math.cos(yaw)
+    footprint=[[cn+dn*math.cos(yaw)-dw*math.sin(yaw),cw+dn*math.sin(yaw)+dw*math.cos(yaw)] for dn,dw in [(-hn,-hw),(hn,-hw),(hn,hw),(-hn,hw)]]
+    heights=[height(*v) for v in footprint];deck=max(heights)+.05
+    vertices=[[*v,deck] for v in footprint]+[[*v,h] for v,h in zip(footprint,heights)]
+    indices=[0,1,2,0,2,3]
+    for i in range(4):j=(i+1)%4;indices.extend([i,j,j+4,i,j+4,i+4])
+    foundation={'id':'foundation_'+item['id'],'material':'pavement','vertices':vertices,'indices':indices,'drivable':True,'authored':'local footprint earthwork from registered source bounds'}
+    item['position'][2]=round(deck-mn[2]*scale,6)
+    obstacle={'id':item['id'],'center':[cn,cw,item['position'][2]+(mn[2]+mx[2])*scale/2],
+        'half_size':[(mx[1]-mn[1])*scale/2,(mx[0]-mn[0])*scale/2,(mx[2]-mn[2])*scale/2],'yaw':yaw,'approximation':'registered source oriented bounds'}
+    return foundation,obstacle
+
+
 def finish_world(baker,document,out):
     # Individual footprint foundations, not landscape-wide flattening. The same
     # triangles/boxes feed rendering and the core environment.
@@ -204,19 +232,8 @@ def finish_world(baker,document,out):
             'ground_conform_approximation':'Shared upright source trees translated vertically per encoded base anchor using an aligned core terrain atlas in all raster passes. No terrain grading. GPU error/culling and natural appearance require separate runtime inspection.'}
     for item in document['instances']:
         if item['category']!='building':continue
-        bounds=baker.metadata[item['model']]['bounds_blender'];mn,mx=bounds['min'],bounds['max'];scale=item['scale'];yaw=item['yaw']
-        n,w,z=item['position'];hn=(mx[1]-mn[1])*scale/2+1.5;hw=(mx[0]-mn[0])*scale/2+1.5
-        local_n=(mn[1]+mx[1])*scale/2;local_w=-(mn[0]+mx[0])*scale/2
-        cn=n+local_n*math.cos(yaw)-local_w*math.sin(yaw);cw=w+local_n*math.sin(yaw)+local_w*math.cos(yaw)
-        footprint=[[cn+dn*math.cos(yaw)-dw*math.sin(yaw),cw+dn*math.sin(yaw)+dw*math.cos(yaw)] for dn,dw in [(-hn,-hw),(hn,-hw),(hn,hw),(-hn,hw)]]
-        heights=[height(*v) for v in footprint];deck=max(heights)+.05
-        vertices=[[*v,deck] for v in footprint]+[[*v,h] for v,h in zip(footprint,heights)]
-        indices=[0,1,2,0,2,3]
-        for i in range(4):j=(i+1)%4;indices.extend([i,j,j+4,i,j+4,i+4])
-        document['surfaces'].append({'id':'foundation_'+item['id'],'material':'pavement','vertices':vertices,'indices':indices,'drivable':True,'authored':'local footprint earthwork from registered source bounds'})
-        item['position'][2]=round(deck-mn[2]*scale,6)
-        obstacles.append({'id':item['id'],'center':[cn,cw,item['position'][2]+(mn[2]+mx[2])*scale/2],
-            'half_size':[(mx[1]-mn[1])*scale/2,(mx[0]-mn[0])*scale/2,(mx[2]-mn[2])*scale/2],'yaw':yaw,'approximation':'registered source oriented bounds'})
+        foundation,obstacle=building_foundation(item,baker.metadata[item['model']],height)
+        document['surfaces'].append(foundation);obstacles.append(obstacle)
     contacts=[{'id':s['id'],'material':'pavement','vertices':s['vertices'],'indices':s['indices'],'drivable':True}
         for s in document['surfaces'] if s['material']=='pavement' and s.get('drivable',True)]
     water=list(baker.water.geoms) if hasattr(baker.water,'geoms') else [baker.water]

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-MiG-21bis",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MiG-21bis\\FG-MiG-21bis.glb",
+  "source_sha256": "a5021963f7e8196d363f2835716e0660de7f5e77b4ebb6c738ed4dd9ab18d83e",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MiG-21bis.png",
+  "png_sha256": "6e0fe03c87daec4c7e9e2cd43472c98655bf538b35eaffc342be5e15f297db7d",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

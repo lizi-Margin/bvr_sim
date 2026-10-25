@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Buccaneer",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Buccaneer\\FG-Buccaneer.glb",
+  "source_sha256": "99e02f5facd4bfd4195acd5418333458e00dc473192fa67849ef283bf64e986f",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Buccaneer.png",
+  "png_sha256": "53e836970034ada4ad4d36bb91e386c0619087f9cbbd623edfd3eb7bf34c5969",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

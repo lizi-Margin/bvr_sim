@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-DH-106",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-DH-106\\FG-DH-106.glb",
+  "source_sha256": "020d02caded43e88d27df952f68b284578bdc29e5bde048ded6cfb5937aef0fb",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-DH-106.png",
+  "png_sha256": "15b2c77e61b14dbe9574817269bbe3b0f3b2b36222274c19d065dde2ad54ed60",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

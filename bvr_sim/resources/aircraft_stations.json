@@ -1,0 +1,657 @@
+{
+  "schema_version": 1,
+  "aircraft": [
+    {
+      "id": "F22",
+      "source": "https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104506/f-22-raptor/",
+      "limitations": "空空布局参考公开资料；图示不是精确安装坐标。此阶段不提供未经定义的对地挂载，不模拟挂载质量/阻力与舱门。",
+      "stations": [
+        {
+          "id": "SIDE-L",
+          "name": "左侧弹舱",
+          "diagram": [
+            0.15,
+            0.42
+          ],
+          "weapons": [
+            "AIM-9M"
+          ],
+          "mirror": "SIDE-R"
+        },
+        {
+          "id": "SIDE-R",
+          "name": "右侧弹舱",
+          "diagram": [
+            0.85,
+            0.42
+          ],
+          "weapons": [
+            "AIM-9M"
+          ],
+          "mirror": "SIDE-L"
+        },
+        {
+          "id": "MAIN-1",
+          "name": "主弹舱 1",
+          "diagram": [
+            0.38,
+            0.38
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "MAIN-2"
+        },
+        {
+          "id": "MAIN-2",
+          "name": "主弹舱 2",
+          "diagram": [
+            0.62,
+            0.38
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "MAIN-1"
+        },
+        {
+          "id": "MAIN-3",
+          "name": "主弹舱 3",
+          "diagram": [
+            0.38,
+            0.55
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "MAIN-4"
+        },
+        {
+          "id": "MAIN-4",
+          "name": "主弹舱 4",
+          "diagram": [
+            0.62,
+            0.55
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "MAIN-3"
+        },
+        {
+          "id": "MAIN-5",
+          "name": "主弹舱 5",
+          "diagram": [
+            0.38,
+            0.72
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "MAIN-6"
+        },
+        {
+          "id": "MAIN-6",
+          "name": "主弹舱 6",
+          "diagram": [
+            0.62,
+            0.72
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "MAIN-5"
+        }
+      ],
+      "presets": {
+        "mixed": {
+          "MAIN-1": "AIM-120C7",
+          "MAIN-2": "AIM-120C7",
+          "MAIN-3": "AIM-120C7",
+          "MAIN-4": "AIM-120C7",
+          "SIDE-L": "AIM-9M",
+          "SIDE-R": "AIM-9M"
+        },
+        "intercept": {
+          "MAIN-1": "AIM-120C7",
+          "MAIN-2": "AIM-120C7",
+          "MAIN-3": "AIM-120C7",
+          "MAIN-4": "AIM-120C7",
+          "MAIN-5": "AIM-120C7",
+          "MAIN-6": "AIM-120C7",
+          "SIDE-L": "AIM-9M",
+          "SIDE-R": "AIM-9M"
+        },
+        "strike": {},
+        "clean": {},
+        "unarmed": {}
+      }
+    },
+    {
+      "id": "F16",
+      "source": "https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104505/f-16-fighting-falcon/",
+      "limitations": "挂点图为简化示意；仅实现单挂弹药，不包含复合挂架、油箱与完整型号认证限制，不模拟挂载质量/阻力。",
+      "stations": [
+        {
+          "id": "1",
+          "name": "挂点 1",
+          "diagram": [
+            0.06,
+            0.4
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "9"
+        },
+        {
+          "id": "2",
+          "name": "挂点 2",
+          "diagram": [
+            0.17,
+            0.54
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "8"
+        },
+        {
+          "id": "3",
+          "name": "挂点 3",
+          "diagram": [
+            0.28,
+            0.69
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": "7"
+        },
+        {
+          "id": "4",
+          "name": "挂点 4",
+          "diagram": [
+            0.28,
+            0.82
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": "6"
+        },
+        {
+          "id": "5",
+          "name": "挂点 5",
+          "diagram": [
+            0.5,
+            0.82
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "6",
+          "name": "挂点 6",
+          "diagram": [
+            0.72,
+            0.82
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": "4"
+        },
+        {
+          "id": "7",
+          "name": "挂点 7",
+          "diagram": [
+            0.72,
+            0.69
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": "3"
+        },
+        {
+          "id": "8",
+          "name": "挂点 8",
+          "diagram": [
+            0.83,
+            0.54
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "2"
+        },
+        {
+          "id": "9",
+          "name": "挂点 9",
+          "diagram": [
+            0.94,
+            0.4
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "1"
+        }
+      ],
+      "presets": {
+        "mixed": {
+          "1": "AIM-9M",
+          "2": "AIM-120C7",
+          "3": "Mk-82",
+          "7": "Mk-82",
+          "8": "AIM-120C7",
+          "9": "AIM-9M"
+        },
+        "intercept": {
+          "1": "AIM-9M",
+          "2": "AIM-120C7",
+          "3": "AIM-120C7",
+          "7": "AIM-120C7",
+          "8": "AIM-120C7",
+          "9": "AIM-9M"
+        },
+        "strike": {
+          "3": "Mk-82",
+          "4": "Mk-82",
+          "6": "Mk-82",
+          "7": "Mk-82"
+        },
+        "clean": {},
+        "unarmed": {}
+      }
+    },
+    {
+      "id": "F15",
+      "source": "https://www.af.mil/About-Us/Fact-Sheets/Display/Article/104501/f-15-eagle/",
+      "limitations": "按 F-15C 空空构型简化为八条单弹挂位；非精确安装坐标，不模拟挂载质量/阻力。",
+      "stations": [
+        {
+          "id": "WING-L1",
+          "name": "左翼导轨 1",
+          "diagram": [
+            0.18,
+            0.6
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "WING-R1"
+        },
+        {
+          "id": "WING-L2",
+          "name": "左翼导轨 2",
+          "diagram": [
+            0.18,
+            0.76
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "WING-R2"
+        },
+        {
+          "id": "WING-R1",
+          "name": "右翼导轨 1",
+          "diagram": [
+            0.82,
+            0.6
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "WING-L1"
+        },
+        {
+          "id": "WING-R2",
+          "name": "右翼导轨 2",
+          "diagram": [
+            0.82,
+            0.76
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M"
+          ],
+          "mirror": "WING-L2"
+        },
+        {
+          "id": "BODY-L1",
+          "name": "左机腹 1",
+          "diagram": [
+            0.4,
+            0.6000000000000001
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "BODY-R1"
+        },
+        {
+          "id": "BODY-L2",
+          "name": "左机腹 2",
+          "diagram": [
+            0.4,
+            0.8
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "BODY-R2"
+        },
+        {
+          "id": "BODY-R1",
+          "name": "右机腹 1",
+          "diagram": [
+            0.6,
+            0.6000000000000001
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "BODY-L1"
+        },
+        {
+          "id": "BODY-R2",
+          "name": "右机腹 2",
+          "diagram": [
+            0.6,
+            0.8
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7"
+          ],
+          "mirror": "BODY-L2"
+        }
+      ],
+      "presets": {
+        "mixed": {
+          "WING-L1": "AIM-9M",
+          "WING-L2": "AIM-9M",
+          "WING-R1": "AIM-9M",
+          "WING-R2": "AIM-9M",
+          "BODY-L1": "AIM-120C7",
+          "BODY-L2": "AIM-120C7",
+          "BODY-R1": "AIM-120C7",
+          "BODY-R2": "AIM-120C7"
+        },
+        "intercept": {
+          "WING-L1": "AIM-9M",
+          "WING-L2": "AIM-9M",
+          "WING-R1": "AIM-9M",
+          "WING-R2": "AIM-9M",
+          "BODY-L1": "AIM-120C7",
+          "BODY-L2": "AIM-120C7",
+          "BODY-R1": "AIM-120C7",
+          "BODY-R2": "AIM-120C7"
+        },
+        "strike": {},
+        "clean": {},
+        "unarmed": {}
+      }
+    },
+    {
+      "id": "F18",
+      "source": "Existing repository Alpha weapon capability; not a certified real station layout.",
+      "limitations": "现有 Alpha 试验挂位，未按真实型号校准；无质量、阻力及真实位置模拟。",
+      "stations": [
+        {
+          "id": "ALPHA-1",
+          "name": "试验挂位 1",
+          "diagram": [
+            0.1,
+            0.48
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-2",
+          "name": "试验挂位 2",
+          "diagram": [
+            0.3666666666666667,
+            0.48
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-3",
+          "name": "试验挂位 3",
+          "diagram": [
+            0.6333333333333333,
+            0.48
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-4",
+          "name": "试验挂位 4",
+          "diagram": [
+            0.9000000000000001,
+            0.48
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-5",
+          "name": "试验挂位 5",
+          "diagram": [
+            0.1,
+            0.75
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-6",
+          "name": "试验挂位 6",
+          "diagram": [
+            0.3666666666666667,
+            0.75
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-7",
+          "name": "试验挂位 7",
+          "diagram": [
+            0.6333333333333333,
+            0.75
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-8",
+          "name": "试验挂位 8",
+          "diagram": [
+            0.9000000000000001,
+            0.75
+          ],
+          "weapons": [
+            "AIM-120C5",
+            "AIM-120C7",
+            "AIM-9M",
+            "Mk-82"
+          ],
+          "mirror": ""
+        }
+      ],
+      "presets": {
+        "mixed": {
+          "ALPHA-1": "AIM-9M",
+          "ALPHA-2": "AIM-9M",
+          "ALPHA-3": "AIM-120C7",
+          "ALPHA-4": "AIM-120C7",
+          "ALPHA-5": "Mk-82",
+          "ALPHA-6": "Mk-82"
+        },
+        "intercept": {
+          "ALPHA-1": "AIM-9M",
+          "ALPHA-2": "AIM-9M",
+          "ALPHA-3": "AIM-120C7",
+          "ALPHA-4": "AIM-120C7",
+          "ALPHA-5": "AIM-120C7",
+          "ALPHA-6": "AIM-120C7"
+        },
+        "strike": {
+          "ALPHA-5": "Mk-82",
+          "ALPHA-6": "Mk-82",
+          "ALPHA-7": "Mk-82",
+          "ALPHA-8": "Mk-82"
+        },
+        "clean": {},
+        "unarmed": {}
+      }
+    },
+    {
+      "id": "F4N",
+      "source": "Existing repository Alpha weapon capability; not a certified real station layout.",
+      "limitations": "现有 Alpha 试验挂位，未按真实型号校准；无质量、阻力及真实位置模拟。",
+      "stations": [
+        {
+          "id": "ALPHA-1",
+          "name": "试验挂位 1",
+          "diagram": [
+            0.1,
+            0.48
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-2",
+          "name": "试验挂位 2",
+          "diagram": [
+            0.9,
+            0.48
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-3",
+          "name": "试验挂位 3",
+          "diagram": [
+            0.1,
+            0.75
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": ""
+        },
+        {
+          "id": "ALPHA-4",
+          "name": "试验挂位 4",
+          "diagram": [
+            0.9,
+            0.75
+          ],
+          "weapons": [
+            "Mk-82"
+          ],
+          "mirror": ""
+        }
+      ],
+      "presets": {
+        "mixed": {
+          "ALPHA-1": "Mk-82",
+          "ALPHA-2": "Mk-82",
+          "ALPHA-3": "Mk-82",
+          "ALPHA-4": "Mk-82"
+        },
+        "intercept": {},
+        "strike": {
+          "ALPHA-1": "Mk-82",
+          "ALPHA-2": "Mk-82",
+          "ALPHA-3": "Mk-82",
+          "ALPHA-4": "Mk-82"
+        },
+        "clean": {},
+        "unarmed": {}
+      }
+    }
+  ]
+}

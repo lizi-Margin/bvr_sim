@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-F9F-Panther",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F9F-Panther\\FG-F9F-Panther.glb",
+  "source_sha256": "45fdab6b0ceeab7b5bf6c2f58ee3ef2629108e7b86631f8cf25433d72f071389",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F9F-Panther.png",
+  "png_sha256": "5e7b1d83ddefdeba1366314d261db876afc077ec8e8261d5e6d86aada24fbfe6",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

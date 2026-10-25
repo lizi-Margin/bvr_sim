@@ -52,7 +52,7 @@ class Baker:
         self.banks=unary_union([LineString(r['points']).buffer(r['width_m']/2+r['bank_width_m'],cap_style=2) for r in recipe['rivers']])
         self.roads=[(r,LineString(r['points'])) for r in recipe['roads']]
         self.road_exclusion=unary_union([l.buffer(r['width_m']/2+10) for r,l in self.roads])
-        self.forests={z['id']:Polygon(z['polygon']) for z in recipe['zones'] if z['type']=='forest'}
+        self.forests={z['id']:Polygon(z['polygon'],z.get('holes',[])) for z in recipe['zones'] if z['type']=='forest'}
         self.industry=next(Polygon(z['polygon']) for z in recipe['zones'] if z['type']=='industrial')
         self.exclusions=[(e,box(e['center'][0]-e['size_m'][0]/2,e['center'][1]-e['size_m'][1]/2,e['center'][0]+e['size_m'][0]/2,e['center'][1]+e['size_m'][1]/2)) for e in recipe['exclusion_zones']]
         self.metadata={}
@@ -67,7 +67,10 @@ class Baker:
                     path=ASSETS/'registered'/id/'manifest.json'
                     if not path.exists():raise FileNotFoundError('Recipe requires registered asset: '+id)
                     m=json.loads(path.read_text(encoding='utf8'))
-                    if not m.get('distribution_allowed') or m['license']!='CC0-1.0':raise ValueError('Uncleared scene resource '+id)
+                    if not m.get('distribution_allowed') or m['license']!='CC0-1.0':
+                        use=recipe.get('resource_use',{})
+                        if use.get('mode')!='local_private' or use.get('asset_manifest_sha256',{}).get(id)!=sha(path):
+                            raise ValueError('Recipe must explicitly pin the local-only resource manifest: '+id)
                     for lod in m['lods']:
                         if sha(path.parent/lod['file'])!=lod['sha256']:raise ValueError('Resource hash changed: '+id)
                     self.metadata[id]=m
@@ -272,7 +275,12 @@ class Baker:
         farm=box(-9800,-9800,9800,9800).difference(unary_union(exclusions))
         if self.r.get('landscape',{}).get('field_layout')=='road_recursive':
             from .rural_parcels import road_parcels
-            self.fields=road_parcels(self,farm);return self.fields
+            self.fields=road_parcels(self,farm)
+            woodland=self.r['landscape'].get('reference_woodland')
+            if woodland:
+                from .reference_woodland import clearing_fields
+                self.fields=clearing_fields(self.fields,unary_union([self.forests[id] for id in woodland['forest_zone_ids']]),self.r['settlements'])
+            return self.fields
         field_spacing=self.r.get('field_spacing_m',1600)
         seeds=[[n+self.rng.uniform(-350,350),w+self.rng.uniform(-350,350)] for n in range(-8800,8801,field_spacing) for w in range(-8800,8801,field_spacing)]
         fields=[]
@@ -287,6 +295,10 @@ class Baker:
         if self.r.get('landscape'):
             from .river_valley import subdivide_fields
             fields=subdivide_fields(self,fields)
+        woodland=self.r.get('landscape',{}).get('reference_woodland')
+        if woodland:
+            from .reference_woodland import clearing_fields
+            fields=clearing_fields(fields,unary_union([self.forests[id] for id in woodland['forest_zone_ids']]),self.r['settlements'])
         self.fields=fields;return fields
     def build_scatter(self):
         role=self.r['asset_roles']
@@ -366,12 +378,20 @@ class Baker:
         self.outer_landcover,self.outer_colors=outer,outer_colors
         return labels,colors
     def bake(self,out):
-        out=Path(out);out.mkdir(parents=True,exist_ok=True);terrain=self.build_terrain();self.build_airport();self.build_settlements();self.build_industry();self.build_fields()
+        print('MAP_BAKE_STAGE terrain',flush=True)
+        out=Path(out);out.mkdir(parents=True,exist_ok=True);terrain=self.build_terrain()
+        print('MAP_BAKE_STAGE infrastructure',flush=True)
+        self.build_airport();self.build_settlements();self.build_industry();self.build_fields()
         for r,line in self.roads:
             if self.r.get('landscape'):self.surface_ribbon(r['id']+'_shoulder',r['points'],r['width_m']+3,'soil',.015)
             self.surface_ribbon(r['id'],r['points'],r['width_m'],'pavement')
-        for river in self.r['rivers']:self.surface_ribbon(river['id'],river['points'],river['width_m'],'water',.025)
-        self.build_scatter();labels,colors=self.landcover();terrain_file=out/'terrain.npz'
+        if self.r.get('landscape',{}).get('water_surface_mode')=='union_tiles':
+            from .water_surface import build_water_surfaces
+            self.surfaces.extend(build_water_surfaces(self))
+        else:
+            for river in self.r['rivers']:self.surface_ribbon(river['id'],river['points'],river['width_m'],'water',.025)
+        print('MAP_BAKE_STAGE scatter',flush=True);self.build_scatter()
+        print('MAP_BAKE_STAGE landcover',flush=True);labels,colors=self.landcover();terrain_file=out/'terrain.npz'
         deterministic_npz(terrain_file,{'base':terrain.base,'focus':terrain.fine,'landcover':labels,'macro_color':colors,'outer_landcover':self.outer_landcover,'outer_macro_color':self.outer_colors})
         chunks={}
         for o in self.instances:chunks.setdefault(o['chunk'],[]).append(o['id'])
@@ -388,11 +408,25 @@ class Baker:
                     if len(files)!=1:raise FileNotFoundError('Missing/ambiguous material '+m['id']+':'+slot)
                     entry[slot]=str(files[0].resolve());entry[slot+'_sha256']=sha(files[0])
                 entry['license']=provider['license'];entry['source_url']=provider['source_url']
+            elif m['provider']=='polyhaven':
+                folder=ASSETS/'cache/polyhaven'/m['id'];provider=json.loads((folder/'manifest.json').read_text(encoding='utf8'))
+                known={row['path']:row['sha256'] for row in provider['files']}
+                for slot,suffix in [('base_color','diff'),('normal','nor_dx'),('roughness_map','rough')]:
+                    file=folder/(m['id']+'_'+suffix+'_'+provider['resolution']+'.jpg')
+                    if known.get(file.name)!=sha(file):raise ValueError('Missing or changed cached Poly Haven material: '+str(file))
+                    entry[slot]=str(file.resolve());entry[slot+'_sha256']=sha(file)
+                entry['license']=provider['license'];entry['source_url']=provider['source_url']
+            elif m['provider']=='local_texture':
+                if self.r.get('resource_use',{}).get('mode')!='local_private':raise ValueError('Local source textures require explicit local_private resource use')
+                for slot in ('base_color','normal','roughness_map'):
+                    if sha(m[slot])!=m[slot+'_sha256']:raise ValueError('Changed local source texture: '+m[slot])
+                if not m.get('license') or not m.get('source_url'):raise ValueError('Local texture source provenance is required')
             else:entry['license']='GPL-3.0-or-later';entry['source_url']='authored:game/recipes/training_range_v2.json'
             materials[name]=entry
         target=self.r['mission']['target'];mission=dict(self.r['mission']);mission['target']=[*target,round(terrain.height(*target),5)]
         result={'schema_version':2,'name':self.r['name'],'seed':self.r['seed'],'recipe_sha256':hashlib.sha256(canonical(self.r)).hexdigest(),'coordinates':{'units':'meters','source':'north,west,up','wicked':'-west,up,north','origin_lla':self.r['geographic_import']['origin_lla']},'terrain':{'version':2,'file':terrain_file.name,'sha256':sha(terrain_file),'base':terrain.base_meta,'details':[terrain.fine_meta],'cell_diagonal':'lower-left to upper-right in NWU grid; same triangle planes everywhere'},'focus_area_km':self.r['focus_area_km'],'materials':materials,'instances':self.instances,'surfaces':self.surfaces,'fields':self.fields,'zones':self.r['zones'],'roads':self.r['roads'],'rivers':self.r['rivers'],'airfields':self.r['airfields'],'settlements':self.r['settlements'],'exclusion_zones':self.r['exclusion_zones'],'chunks':chunks,'chunk_m':self.r['chunk_m'],'budgets':self.r['budgets'],'counts':counts,'placement_rejections':self.rejections,'mission':mission,'resource_versions':{id:registered_version(id,m) for id,m in self.metadata.items()},'geographic_import':self.r['geographic_import']}
         if self.r.get('detail_sample'):
+            print('MAP_BAKE_STAGE detail',flush=True)
             from .detail_bake import refine
             result=refine(self,result,out)
         if self.r.get('landscape'):
@@ -400,12 +434,12 @@ class Baker:
             from .detail_bake import _bake_material
             arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
             from .regional_cover import bake_outer_cover
-            bake_outer_cover(self,result,arrays,out)
+            print('MAP_BAKE_STAGE outer_material',flush=True);bake_outer_cover(self,result,arrays,out)
             regional={**self.r['detail_sample'],'size_m':[x*1000 for x in self.r['focus_area_km']],
                 'texture_resolution':self.r['landscape']['macro_resolution'],
                 'seam_blend_m':self.r['landscape'].get('outer_surface',{}).get('focus_blend_m',self.r['landscape']['regional_transition_m']),
                 'material_detail_strength':.65,'macro_source_tile_m':160}
-            _bake_material(result,arrays,result['terrain']['details'][0],regional,out,self,material_id='regional_1',prefix='regional')
+            print('MAP_BAKE_STAGE regional_material',flush=True);_bake_material(result,arrays,result['terrain']['details'][0],regional,out,self,material_id='regional_1',prefix='regional')
             result['terrain']['details'][0]['material']='regional_1'
             # Both height resolutions sample the identical macro image in the
             # same world coordinates. Independent bakes cannot change the
@@ -415,12 +449,14 @@ class Baker:
                 uv_origin_west=result['terrain']['details'][0]['origin_west'])
             result['terrain']['details'][1]['material']='regional_1'
             result['detail_sample']['material_mapping']='Same world-aligned regional macro and metre-scale repeated source detail as parent; fine height geometry remains independent'
-            result=finish_world(self,result,out)
+            print('MAP_BAKE_STAGE physical_environment',flush=True);result=finish_world(self,result,out)
             if self.r['landscape'].get('ground_atlas'):
                 from .ground_atlas import write_atlas
                 arrays=dict(np.load(out/'terrain.npz',allow_pickle=False))
                 result['terrain']['ground_atlas']=write_atlas(out,arrays,result['terrain'],self.r['landscape']['ground_atlas'])
+        if self.r.get('resource_use'):result['resource_use']=self.r['resource_use']
         write_json(out/'scene-recipe.json',self.r);write_json(out/'generated-map.json',result)
+        print('MAP_BAKE_STAGE complete',flush=True)
         return {'map':str(out/'generated-map.json'),'terrain_sha256':result['terrain']['sha256'],'generated_map_sha256':sha(out/'generated-map.json'),'instances':len(result['instances']),'counts':result['counts'],'chunks':len(result['chunks']),'fields':len(self.fields),'focus_spacing':terrain.fine_meta['spacing']}
 def main():
     p=argparse.ArgumentParser();p.add_argument('--recipe',type=Path,default=ROOT/'game/recipes/training_range_v2.json');p.add_argument('--output',type=Path,default=ROOT/'game/maps/training_range_v2');a=p.parse_args()

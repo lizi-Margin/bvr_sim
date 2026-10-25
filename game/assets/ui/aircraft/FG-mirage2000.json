@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-mirage2000",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-mirage2000\\FG-mirage2000.glb",
+  "source_sha256": "433770b17cf528290200be29a2dea04b0e10f19533c43227a94058a75e9e2c70",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-mirage2000.png",
+  "png_sha256": "ba79936eb639ed7dbe4e5acf5b5ca6be663e9ea346d625e43f9bb5626d51dd8e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

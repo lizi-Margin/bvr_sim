@@ -252,7 +252,10 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
             macro[area][mask]*=row[mask,None]
     if rural:
         macro=gaussian_filter(macro,sigma=(rural['tint_blend_m']/pixel,rural['tint_blend_m']/pixel,0),mode='nearest')
-    for forest in baker.forests.values():labels[contains_xy(forest,n,w)]=2
+    woodland=baker.r.get('landscape',{}).get('reference_woodland')
+    for forest in baker.forests.values():
+        mask=contains_xy(forest,n,w);labels[mask]=2
+        if woodland:macro[mask]=1.
     labels[contains_xy(baker.industry,n,w)]=3
     for road,line in baker.roads:
         shoulder=_distance_line(n,w,line)<road['width_m']/2+3;labels[shoulder]=3
@@ -266,22 +269,26 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
     forest_density=forest_floor_density(baker,labels,n,w) if baker.r.get('landscape',{}).get('forest_floor_transition') else None
     color=np.zeros((*n.shape,3),dtype=np.float32);normal=np.zeros_like(color);rough=np.zeros(n.shape,dtype=np.float32)
     source_files={};canopy_report=None
-    def source_image(file,slot):
+    def source_image(file,slot,macro_tile_m=None):
         source_files[file]=sha(file)
         image=np.asarray(Image.open(file).convert('RGB'),dtype=np.float32)/255
         if slot=='base_color':image=np.where(image<=.04045,image/12.92,((image+.055)/1.055)**2.4)
-        if source_scale:
+        if macro_tile_m:
+            h,w0=image.shape[:2];target=min(h,w0,2**math.ceil(math.log2(max(1,macro_tile_m/pixel))))
+            if h%target==0 and w0%target==0:image=image.reshape(target,h//target,target,w0//target,3).mean(axis=(1,3))
+        elif source_scale:
             # Area-filter in linear light before spatial stretching. Sampling
             # a metre-scale source every 4.88m had aliased into nearly uniform
             # fields. The independent 3m shader detail retains its real scale.
             h,w0=image.shape[:2];target=128
             if h%target==0 and w0%target==0:image=image.reshape(target,h//target,target,w0//target,3).mean(axis=(1,3))
         return image
-    def source_sample(image):
-        if source_scale:
+    def source_sample(image,tile_m=None):
+        scale=tile_m or source_scale
+        if scale:
             from scipy.ndimage import map_coordinates
-            u=np.mod(n/source_scale+.08*np.sin(w/370),1)*image.shape[1]
-            v=np.mod(w/source_scale+.08*np.cos(n/410),1)*image.shape[0]
+            u=np.mod(n/scale+.08*np.sin(w/370),1)*image.shape[1]
+            v=np.mod(w/scale+.08*np.cos(n/410),1)*image.shape[0]
             return np.stack([map_coordinates(image[...,i],[v,u],order=1,mode='grid-wrap') for i in range(3)],axis=2)
         u=((n/4+.15*np.sin(w/61))*image.shape[1]).astype(np.int64)%image.shape[1]
         v=((w/4+.15*np.cos(n/73))*image.shape[0]).astype(np.int64)%image.shape[0]
@@ -292,10 +299,10 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         weight=gaussian_filter(material_mask(labels,index,forest_density),sigma=spec.get('material_blend_m',7)/pixel,mode='nearest')
         for slot in ['base_color','normal','roughness_map']:
             if slot not in material:continue
-            file=material[slot];image=source_image(file,slot)
+            file=material[slot];image=source_image(file,slot,material.get('macro_tile_m'))
             # Slow deterministic UV warping breaks the grid while retaining actual source PBR detail.
-            sample=source_sample(image)
-            if index==2 and rural.get('forest_ground_source_mean'):
+            sample=source_sample(image,material.get('macro_tile_m'))
+            if index==2 and rural.get('forest_ground_source_mean') and not material.get('aerial_canopy_albedo'):
                 # A low-resolution macro image must not enlarge metre-scale
                 # forest-floor patches into160mblobs. Retain the linear source
                 # mean; the existing independent runtime detail stays at3m.
@@ -304,8 +311,8 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
                 strength=spec.get('material_detail_strength',.5)
                 sample=sample*strength+image.mean(axis=(0,1))*(1-strength)
                 if crop_cover is not None and index==1:
-                    grass=document['materials']['grass'];green=source_image(grass[slot],slot)
-                    green=source_sample(green)*strength+green.mean(axis=(0,1))*(1-strength)
+                    grass=document['materials']['grass'];green=source_image(grass[slot],slot,grass.get('macro_tile_m'))
+                    green=source_sample(green,grass.get('macro_tile_m'))*strength+green.mean(axis=(0,1))*(1-strength)
                     # Soil with variable source-grass cover: temperate parcels
                     # include pasture, growing crops and exposed/fallow soil.
                     sample=sample*(1-crop_cover[...,None])+green*crop_cover[...,None]
@@ -314,6 +321,16 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
                     mask=labels==2
                     sample[mask],canopy_report=blend_canopy(sample[mask],n[mask],w[mask],pixel,material['canopy_proxy'])
                     source_files[canopy_report['source_file']]=canopy_report['source_sha256']
+                if index==2 and woodland and not material.get('aerial_canopy_albedo'):
+                    from .regional_cover import smooth_noise
+                    file=woodland['crown_color_source_file']
+                    if sha(file)!=woodland['crown_color_source_sha256']:raise ValueError('Source crown color changed')
+                    source_files[file]=woodland['crown_color_source_sha256']
+                    cover=float(woodland['aerial_crown_color_fraction'])
+                    crown=np.asarray(woodland['crown_mean_linear'],dtype=np.float32)
+                    sample=sample*(1-cover)+crown*cover
+                    variation=.84+.2*smooth_noise(n,w,37,baker.r['seed']+833)+.12*smooth_noise(n,w,9,baker.r['seed']+839)
+                    sample=sample*variation[...,None]
             if slot=='base_color':color+=weight[...,None]*sample*np.array(material['color'][:3],dtype=np.float32)*macro
             elif slot=='normal':normal+=weight[...,None]*(sample*2-1)
             else:rough+=weight*sample[...,0]
@@ -389,6 +406,10 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         'roughness_map':str(paths['roughness'].resolve()),'roughness_map_sha256':sha(paths['roughness']),
         'license':'CC0 source PBR textures; authored bake recipe follows project license','source_url':'derived:ambientCG sources recorded below','source_files':source_files}
     document['materials'][material_id]['repeat_detail']=True
+    local_sources=[m for m in document['materials'].values() if m.get('distribution_allowed') is False]
+    if local_sources:
+        document['materials'][material_id].update(license='user-local source material blend',distribution_allowed=False,
+            source_url='derived:hash-pinned source textures',source_licenses=sorted({m['license'] for m in local_sources}))
     report=document['detail_sample'] if material_id=='detail_1' else document.setdefault('regional_surface',{})
     report['material_bake']={'resolution':[resolution,resolution],'pixel_m':pixel,'blend_m':spec.get('material_blend_m',7),'source_textures':source_files,
         'generator':'analytic land-use masks + linear-light source sampling/blending + sRGB color encoding; normals/roughness stay linear',
@@ -399,3 +420,4 @@ def _bake_material(document,arrays,meta,spec,out,baker,*,material_id='detail_1',
         'canopy_edge_rules':[{k:rule[k] for k in ['id','zones','edge_density']} for rule in baker.r['scatter_rules'] if rule['roles']=='canopy'],
         'scope':'Authored density-based ground-cover approximation, not measured ecology, canopy shadow baking or new physical terrain'}
     if canopy_report:report['material_bake']['forest_canopy_aggregate']=canopy_report
+    if woodland:report['material_bake']['reference_woodland']={**woodland,'scope':'Source-color aerial canopy/understory approximation with authored multiscale variation; physical terrain and live tree shading remain separate.'}

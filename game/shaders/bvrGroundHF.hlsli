@@ -22,9 +22,10 @@ float BvrGroundHeight(uint metadata_index, float2 north_west)
         : h11 + (1 - f.x) * (h01 - h11) + (1 - f.y) * (h10 - h11);
 }
 
-float3 BvrGroundTranslation(ShaderMaterial material, ShaderMeshInstance inst, float4 uvsets, out float3 base)
+float3 BvrGroundTranslationCore(ShaderMaterial material, ShaderMeshInstance inst, float4 uvsets, out float3 base, out bool inactive)
 {
     base = 0;
+    inactive = false;
     if (material.userdata.w != 0x47524e44u)
         return 0;
     ByteAddressBuffer params = bindless_buffers[descriptor_index(material.userdata.z - 1)];
@@ -52,17 +53,33 @@ float3 BvrGroundTranslation(ShaderMaterial material, ShaderMeshInstance inst, fl
         uint stream_srv_plus1 = bindless_buffers[descriptor_index(atlas_metadata)].Load(12);
         uint offset_plus1 = asuint(inst.padding.x);
         uint active_count = asuint(inst.padding.y);
+        inactive = tree_index >= active_count;
         if (stream_srv_plus1 == 0 || offset_plus1 == 0 || active_count == 0)
         {
             base = asfloat(0x7fc00000u);
             return base;
         }
         uint lookup_index = tree_index < active_count ? tree_index : 0;
+        // Static source-tree ground heights are evaluated once at map load
+        // from the same typed terrain. Avoid four atlas texture reads for
+        // every vertex in every prepass/reflection/opaque draw.
+        if (asfloat(bindless_buffers[descriptor_index(atlas_metadata)].Load(28)) > 0.5)
+        {
+            float3 north_west_height = asfloat(bindless_buffers[descriptor_index(stream_srv_plus1 - 1)].Load3((offset_plus1 - 1 + lookup_index) * 16));
+            base = float3(-north_west_height.y, north_west_height.z, north_west_height.x);
+            return base - source_base;
+        }
         float2 north_west = asfloat(bindless_buffers[descriptor_index(stream_srv_plus1 - 1)].Load2((offset_plus1 - 1 + lookup_index) * 8));
         base.xz = float2(-north_west.y, north_west.x);
     }
     base.y = BvrGroundHeight(atlas_metadata, float2(base.z, -base.x));
     return base - source_base;
+}
+
+float3 BvrGroundTranslation(ShaderMaterial material, ShaderMeshInstance inst, float4 uvsets, out float3 base)
+{
+    bool inactive;
+    return BvrGroundTranslationCore(material, inst, uvsets, base, inactive);
 }
 
 bool BvrGroundInactive(ShaderMaterial material, ShaderMeshInstance inst, float4 uvsets)
@@ -74,11 +91,12 @@ bool BvrGroundInactive(ShaderMaterial material, ShaderMeshInstance inst, float4 
 
 float3 BvrGroundPosition(ShaderMaterial material, ShaderMeshInstance inst, float4 uvsets, float3 world, out float3 base)
 {
-    float3 translation = BvrGroundTranslation(material, inst, uvsets, base);
+    bool inactive;
+    float3 translation = BvrGroundTranslationCore(material, inst, uvsets, base, inactive);
     // A short spatial batch keeps all its actual trees and collapses unused
     // source slots to one existing base point. Zero-area triangles cannot add
     // foliage/depth/shadows; no NaN clipping or hidden extra tree placements.
-    return BvrGroundInactive(material, inst, uvsets) ? base : world + translation;
+    return inactive ? base : world + translation;
 }
 
 float3 BvrGroundPackedTranslation(ShaderMaterial material, ShaderMeshInstance inst, float4 uvsets)

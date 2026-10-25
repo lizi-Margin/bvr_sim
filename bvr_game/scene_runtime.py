@@ -14,8 +14,14 @@ class BakedScene:
             from .ground_atlas import load_atlas
             self.ground_atlas=load_atlas(terrain['ground_atlas'],self.path,terrain['sha256'])
         for material in self.document['materials'].values():
-            for slot in ['base_color','normal','roughness_map']:
-                if slot in material and sha(material[slot])!=material[slot+'_sha256']:raise ValueError('Material hash mismatch: '+material[slot])
+            for layer in [material]+([material['ground_detail']] if material.get('ground_detail') else []):
+                for slot in ['base_color','normal','roughness_map']:
+                    if slot in layer:
+                        layer[slot]=str((self.path.parent/layer[slot]).resolve())
+                        if sha(layer[slot])!=layer[slot+'_sha256']:raise ValueError('Material hash mismatch: '+layer[slot])
+            if material.get('ground_detail'):
+                d=material['ground_detail']
+                if not all(k in d for k in ['base_color','normal','roughness_map']) or not 0<float(d['tile_m'])<=100 or not 0<float(d['mean_linear_luminance'])<=1 or not 0<=float(d['strength'])<=1:raise ValueError('Invalid saved ground detail')
         self.target=self.document['mission']['target']
     def terrain(self,native):
         terrain=native.GameTerrain();meta=self.document['terrain']
@@ -49,16 +55,20 @@ class BakedScene:
         return result
     def configure(self,renderer,bindings,terrain,visual_profile=None):
         from .content import ASSETS
+        if any(self.document['materials'][s['material']].get('ground_detail') for s in self.document['surfaces']) and not getattr(bindings,'SURFACE_DETAIL_UVS_V1',False):
+            raise RuntimeError('Surface detail materials require the matching native world-detail UV interface')
         if self.ground_atlas is not None:
             meta=self.document['terrain']['ground_atlas']
             if not hasattr(renderer,'configure_ground_atlas'):raise RuntimeError('Map requires the native source-tree ground atlas interface; rebuild the renderer')
             renderer.configure_ground_atlas(self.ground_atlas,meta['origin_north'],meta['origin_west'],meta['spacing'],meta['sha256'])
         frozen_canopy_assets={p['model'] for p in self.document.get('instances',[]) if 'ground_stems' in p}
         swap=self.document.get('source_card_resource_swap',{})
+        models={}
         for id,version in self.document['resource_versions'].items():
             directory=ASSETS/'registered'/id
-            for lod in version['lods']:
+            for i,lod in enumerate(version['lods']):
                 if sha(directory/lod['file'])!=lod['sha256']:raise ValueError('Baked map resource version mismatch: '+id)
+                models[id if i==0 else id+'::lod'+str(i)]=str(directory/lod['file'])
             manifest_file=directory/'manifest.json';manifest=json.loads(manifest_file.read_text(encoding='utf8'))
             if (manifest.get('impostor') or {}).get('requires_directional_view_selection'):raise RuntimeError('Offline aerial source views require a directional source view sampler; overlapping all source planes is unsupported')
             expected_manifest=version.get('manifest_sha256')
@@ -77,14 +87,15 @@ class BakedScene:
                             path=(directory/item['file']).resolve()
                             if not path.is_relative_to(directory.resolve()):raise ValueError('Source-card mip path leaves registered asset')
                             if checked.setdefault(path,item['sha256'])!=item['sha256'] or sha(path)!=item['sha256']:raise ValueError('Source-card mip sidecar changed: '+id)
+        if hasattr(renderer,'register_scene_models'):renderer.register_scene_models(models)
         materials=[];surfaces=[];placements=[]
         for id,data in self.document['materials'].items():
             m=bindings.SceneMaterial();m.id=id;m.color=data['color'];m.roughness=data['roughness'];m.tile_m=data['tile_m'];m.base_color=data.get('base_color','');m.normal=data.get('normal','');m.roughness_map=data.get('roughness_map','');m.water=id=='water';materials.append(m)
             if data.get('world_uv'):
                 if not hasattr(m,'world_uv'):raise RuntimeError('Map requires the native world-aligned material UV interface; rebuild the renderer')
                 m.world_uv=True;m.uv_origin_north=data['uv_origin_north'];m.uv_origin_west=data['uv_origin_west']
-            if (id=='detail_1' or data.get('repeat_detail')) and visual_profile and visual_profile.get('terrain_detail'):
-                d=visual_profile['terrain_detail']
+            d=data.get('ground_detail') or ((visual_profile or {}).get('terrain_detail') if id=='detail_1' or data.get('repeat_detail') else None)
+            if d:
                 for slot in ['base_color','normal','roughness_map']:
                     if sha(d[slot])!=d[slot+'_sha256']:raise ValueError('Detail texture hash mismatch: '+d[slot])
                 m.detail_color=d['base_color'];m.detail_normal=d['normal'];m.detail_roughness=d['roughness_map']
@@ -102,7 +113,13 @@ class BakedScene:
                 p.ground_stems=data['ground_stems']
             p.target_uid='depot' if data['zone']=='mission_objective' else ''
             placements.append(p)
-        args=[terrain,self.arrays['landcover'].astype(int).ravel().tolist(),self.arrays['macro_color'].reshape(-1,4).tolist(),materials,surfaces,placements,self.arrays['outer_landcover'].astype(int).ravel().tolist(),self.arrays['outer_macro_color'].reshape(-1,4).tolist()]
+        # A source-map macro can bind every terrain tile explicitly. Its
+        # legacy per-cell palette is then unused by native terrain_patch;
+        # avoid materialising millions of redundant Python colour objects.
+        bound_macro=self.document['terrain'].get('bound_macro_only',False)
+        if bound_macro and any(t.get('material') not in self.document['materials'] for t in [self.document['terrain']['base'],*self.document['terrain']['details']]):
+            raise ValueError('Bound macro terrain requires a declared material on every tile')
+        args=[terrain,[] if bound_macro else self.arrays['landcover'].astype(int).ravel().tolist(),[] if bound_macro else self.arrays['macro_color'].reshape(-1,4).tolist(),materials,surfaces,placements,[] if bound_macro else self.arrays['outer_landcover'].astype(int).ravel().tolist(),[] if bound_macro else self.arrays['outer_macro_color'].reshape(-1,4).tolist()]
         terrain_materials=[d.get('material','' if i==0 else 'detail_'+str(i)) for i,d in enumerate(self.document['terrain']['details'])]
         base_material=self.document['terrain']['base'].get('material')
         if base_material:

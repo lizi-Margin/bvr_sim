@@ -34,6 +34,9 @@ public:
 
     // Release weapon of specific type (with prefix matching)
     std::string release_weapon(const std::string& weapon_query) noexcept;
+    // Exact station operations used by player/typed launch APIs. No prefix ambiguity.
+    std::string find_station(const std::string& weapon, const std::string& station = "") const noexcept;
+    bool consume(const std::string& station, const std::string& expected_weapon) noexcept;
 
     // Get all pylon mounts
     const std::map<std::string, std::string>& get_all_mounts() const noexcept { return pylon_mounts; }

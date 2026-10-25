@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-FMA-IA36-Condor",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-FMA-IA36-Condor\\FG-FMA-IA36-Condor.glb",
+  "source_sha256": "aac0f0e2929a29518dd170f41d83eafe2b255fde375156b847ff36552ed3f13d",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-FMA-IA36-Condor.png",
+  "png_sha256": "ac8281c571b87a28bcef249732a4da34fb1a6fc2db851d8094edd5718908271d",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

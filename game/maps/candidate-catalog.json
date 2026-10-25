@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "maps": [
+    {
+      "id": "river-valley-v56@a12eae9e6ca6eff76e7eed27",
+      "label": "河谷机场 v56",
+      "quality": "baseline",
+      "supports_convoy": true,
+      "manifest": "published/river-valley-v56/a12eae9e6ca6eff76e7eed27/release.json",
+      "manifest_sha256": "f2cbcc3629b5e4cee2784fa42eb29b82ef53b55a6250a09be880d1b62b178639"
+    },
+    {
+      "id": "river-valley-v60@f25b5ea23c6e2bce0ccea20f",
+      "label": "河谷林冠 v60",
+      "quality": "candidate",
+      "supports_convoy": true,
+      "manifest": "published/river-valley-v60/f25b5ea23c6e2bce0ccea20f/release.json",
+      "manifest_sha256": "de24ec82dde9e734997cfca0ae58618cc4e8f03b928a3eed653bd906fa6c7d30"
+    },
+    {
+      "id": "river-valley-v61@e14ac14eb6a6f22d6d842010",
+      "label": "连续森林 v61",
+      "quality": "candidate",
+      "supports_convoy": true,
+      "manifest": "published/river-valley-v61/e14ac14eb6a6f22d6d842010/release.json",
+      "manifest_sha256": "472332b14d39b0cd4c15562c4b071836239603a3ad9a3e2829da84d7eedde9e3"
+    },
+    {
+      "id": "wt-oak-river-valley-v91@e9e1ff215fee3e10c59e65cb",
+      "label": "战雷原树河谷 v91",
+      "quality": "candidate",
+      "supports_convoy": true,
+      "manifest": "published/wt-oak-river-valley-v91/e9e1ff215fee3e10c59e65cb/release.json",
+      "manifest_sha256": "1ac178d4a664cbe56f55fdb4b81b6fff744f510b01796b36885881ed2f4c14a5"
+    },
+    {
+      "id": "source-roads-woodland-v237@86dafcdf29e02036afdf570e",
+      "label": "源地形道路森林 v237",
+      "quality": "candidate",
+      "supports_convoy": false,
+      "manifest": "published/source-roads-woodland-v237/86dafcdf29e02036afdf570e/release.json",
+      "manifest_sha256": "cf3900f22079accc82853d1b830b91a798fd798cec657b058188245cf09e6347"
+    },
+    {
+      "id": "source-ground-mosaic-v268@9f99e8710455fd510d109899",
+      "label": "林缘地表 v268",
+      "quality": "candidate",
+      "supports_convoy": false,
+      "manifest": "published/source-ground-mosaic-v268/9f99e8710455fd510d109899/release.json",
+      "manifest_sha256": "0c5f7b643f48680da74ae9b676e3eb59d53f9dfe60d8dacc6c877aaed0e7b75c",
+      "storage_root": "resources"
+    },
+    {
+      "id": "source-small-clearings-v281@aeb85e7631e2f34a0bc3d54a",
+      "label": "自然林间地景 v281",
+      "quality": "candidate",
+      "supports_convoy": false,
+      "manifest": "published/source-small-clearings-v281/aeb85e7631e2f34a0bc3d54a/release.json",
+      "manifest_sha256": "edd0cd94126ff959e400550f755cc6d2d1dcf6d8c0a2a2427a76256eec99f189",
+      "storage_root": "resources"
+    },
+    {
+      "id": "source-distance-lod-v326@775cc608ec9b7387ea9a700a",
+      "label": "连续森林·远景优化 v326",
+      "quality": "candidate",
+      "supports_convoy": false,
+      "manifest": "published/source-distance-lod-v326/775cc608ec9b7387ea9a700a/release.json",
+      "manifest_sha256": "4b2f58b926009623e7d75bd808f82c101d40bc4198fa298d24982ce7bd237e37",
+      "storage_root": "resources"
+    }
+  ],
+  "storage_roots": {
+    "resources": "D:/bvr_sim_resources/map-library"
+  },
+  "default_storage_root": "resources",
+  "registered_storage_roots": [
+    "D:/bvr_sim_resources/registered"
+  ]
+}

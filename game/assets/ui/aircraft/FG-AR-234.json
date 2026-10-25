@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-AR-234",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-AR-234\\FG-AR-234.glb",
+  "source_sha256": "e5e2ec8a35f5827d9efc505b8fa3ae6a56dc5c738f228efcd60dfd5913d773a2",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-AR-234.png",
+  "png_sha256": "e12ae9b84b55a813b5159c274c0105ff90e23c50a775f286aad146ff4401c1fa",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

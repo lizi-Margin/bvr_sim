@@ -1,0 +1,21 @@
+{
+  "name": "War Thunder original oak medium A LOD0, shared64 source copies",
+  "tags": ["vegetation", "oak", "source_geometry", "war_thunder", "full_detail"],
+  "source_ground_anchor_blender": [0, 0, 0],
+  "crown_albedo_material": "tree_oak_branches_tree_oak_branches_tree_oak_medium_a_pivot_pos",
+  "cluster": {
+    "count": 64,
+    "radius_m": 50,
+    "minimum_spacing_m": 8.5,
+    "inter_grove_stem_spacing_m": 2.5,
+    "seed": 90241,
+    "scale_range": [1, 1],
+    "ground_conform": true,
+    "independent_tree_positions": true,
+    "base_anchor_note": "Explicit original WT object pivot [0,0,0], transformed with the source normalization. Retains original buried root geometry rather than planting its lowest root at the surface."
+  },
+  "source_geometry_lods": {"near_triangles_per_tree": 500, "far_triangles_per_tree": 500},
+  "near_triangle_budget": 100000,
+  "recommended_density_per_km2": 11000,
+  "physical_size_note": "Original412-triangle WT oak medium A LOD0. Both budget thresholds exceed its actual source count: no simplification and no whole-tree impostor. Source scale and original ground pivot retained. DAE OBJ rounds coordinates to four decimals and recomputes normals. Original diffuse RGB/dedicated alpha; roughness0.9 approximation. Packed normals/PBR, wind and subsurface are not reconstructed. Runtime retains highest geometry regardless of distance."
+}

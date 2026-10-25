@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Alphajet",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Alphajet\\FG-Alphajet.glb",
+  "source_sha256": "eb5c0f89174a1e0fc11a1da8358ee024fa698c9ce4f705a8b944d2b6d37ded10",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Alphajet.png",
+  "png_sha256": "3f0be515af50042e24be4a7f7d612477d9ccddfc624dced77b46bc57c9023dbe",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

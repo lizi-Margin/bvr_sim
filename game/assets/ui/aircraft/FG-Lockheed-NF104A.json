@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Lockheed-NF104A",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-NF104A\\FG-Lockheed-NF104A.glb",
+  "source_sha256": "c731a113e444f9984820a2227c28d6104838cb13ceba62a1071dec2c668581cc",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-NF104A.png",
+  "png_sha256": "08871a09e1760f8108c0cf94f6832ad4bcdc296c8ea72a5cc4025781a6caf04b",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

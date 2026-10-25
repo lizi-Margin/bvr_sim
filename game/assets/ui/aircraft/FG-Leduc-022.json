@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Leduc-022",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Leduc-022\\FG-Leduc-022.glb",
+  "source_sha256": "65553acb6e77b7b870a24b18469af71e90fe051d8015833ac2a946e14b1d0d97",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Leduc-022.png",
+  "png_sha256": "c29c4c62c3292043531ee80bbb2f8a192bac059f124b81cf60111b5cc2b469bc",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

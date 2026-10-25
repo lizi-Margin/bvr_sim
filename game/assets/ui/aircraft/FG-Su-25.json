@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Su-25",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Su-25\\FG-Su-25.glb",
+  "source_sha256": "6213862c4b8cd1b40635aaa3d75bc4c1cd73de3da15929b39e221ad454baa2fa",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Su-25.png",
+  "png_sha256": "7525e78df1dd420959255f30aeefa81aee2703291a5523eb1bfc53b6bbcabd01",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

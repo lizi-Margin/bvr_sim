@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Nord-1405-Gerfaut-II",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Nord-1405-Gerfaut-II\\FG-Nord-1405-Gerfaut-II.glb",
+  "source_sha256": "686e414b090d8a999438fc83e9bdfaa27d874f190a422bf1a950b96e66499b43",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Nord-1405-Gerfaut-II.png",
+  "png_sha256": "6cd912f98a541ae45e07618a573d787623d0bb585f729eb82ee5e5f9b717ea83",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

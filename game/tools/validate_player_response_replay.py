@@ -37,7 +37,7 @@ def main():
             for action in tape['actions']:
                 g.submit_player(**action['player_intent']);remaining=action['ticks']
                 while remaining:
-                    count=min(remaining,5);g.step(count);remaining-=count
+                    count=min(remaining,tape.get('sample_ticks',5));g.step(count);remaining-=count
                     current=serialize(g.sim.player_flight_state());expected=samples[index]
                     if g.sim.frame().tick!=expected['tick']:difference={'sample':index,'path':'tick'};break
                     path=first_difference(expected['state'],current)
@@ -53,7 +53,7 @@ def main():
             if difference:break
         status='passed' if len(rows)==len(folders) and all(r['status']=='passed' for r in rows) else 'failed'
         write_json(a.output/'report.json',{'status':status,
-            'core_sha256':sha(Path(native.__file__)),'source_run':str(a.run),'cases':rows,'comparison':'Exact equality of every existing typed player state field at 0.1s and complete GameFrame SHA at every 0.5s intent boundary. No ignored fields or tolerance.'})
+            'core_sha256':sha(Path(native.__file__)),'source_run':str(a.run),'cases':rows,'comparison':'Exact equality of every existing typed player state field at each recorded sample interval (sample_ticks in each tape; legacy default5), and complete GameFrame SHA at every0.5sintent boundary. No ignored fields or tolerance.'})
         if status!='passed':raise SystemExit(1)
     finally:
         if g:g.close()

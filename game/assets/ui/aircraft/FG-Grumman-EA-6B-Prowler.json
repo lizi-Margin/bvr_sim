@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Grumman-EA-6B-Prowler",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Grumman-EA-6B-Prowler\\FG-Grumman-EA-6B-Prowler.glb",
+  "source_sha256": "00d1b32d3c4282e6f7793e2babf8cf10c03db077c59f7d21c0269c684d9b3128",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Grumman-EA-6B-Prowler.png",
+  "png_sha256": "40237cab305d352e7631e0c8b94590e309d29af049576eef412971ffaeb58e4b",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

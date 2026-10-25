@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Coanda-1910",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Coanda-1910\\FG-Coanda-1910.glb",
+  "source_sha256": "8990a5facf4d62cbc57cdd6868020eb2dde043198273921fc821976ab82b6a56",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Coanda-1910.png",
+  "png_sha256": "2e76c2bf966f07ef8d9bfbbae6908322bae6038860d4c08ba5635e8458b123d8",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

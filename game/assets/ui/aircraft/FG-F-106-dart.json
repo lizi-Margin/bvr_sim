@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-F-106-dart",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-106-dart\\FG-F-106-dart.glb",
+  "source_sha256": "d1ab77f3ac6da10d4848d19e700ff112e4cc8023afcfed78104ecb1a2f841496",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-106-dart.png",
+  "png_sha256": "8a76999d7fffcbb7babbf7e042e66a7807104136fe4af76696fc50601a0593b1",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

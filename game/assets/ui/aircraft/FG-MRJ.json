@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-MRJ",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MRJ\\FG-MRJ.glb",
+  "source_sha256": "497d42a6c0f629ca8e14ccd16b08a5fdc792f72773e7c3493ab8be6ace41dab6",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MRJ.png",
+  "png_sha256": "747c1360ee3a99a0cbe9f346d28127176fb768e5ce783e662d2ef33b340c18c2",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

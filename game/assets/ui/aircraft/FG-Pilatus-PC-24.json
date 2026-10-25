@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Pilatus-PC-24",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Pilatus-PC-24\\FG-Pilatus-PC-24.glb",
+  "source_sha256": "e0b7490ffe5f6f5df53f92fbd96def16d59231c96231881fcc4b74fae35c5eb8",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Pilatus-PC-24.png",
+  "png_sha256": "3b6bcbee67f45d21d90a1e228ffc64275b196dfb57b5d8a39d89f78c63754e27",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

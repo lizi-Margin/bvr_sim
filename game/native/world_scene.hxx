@@ -54,6 +54,14 @@ struct GroundVertexState {
     std::array<float,4> gpu_instance_sphere{};
 };
 class WorldScene {
+    struct FacingVertex {
+        uint32_t index=0;
+        DirectX::XMFLOAT3 center{}, delta{}, normal{};
+    };
+    struct FacingMesh {
+        wi::ecs::Entity entity=wi::ecs::INVALID_ENTITY;
+        std::vector<FacingVertex> vertices;
+    };
     struct Part {
         wi::ecs::Entity mesh;
         DirectX::XMFLOAT4X4 transform;
@@ -61,6 +69,7 @@ class WorldScene {
     };
     struct Prototype {
         std::vector<Part> parts;
+        std::vector<FacingMesh> facing_meshes;
         nlohmann::json ground_spec;
         nlohmann::json ground_cluster;
         wi::graphics::GPUBuffer ground_parameters;
@@ -72,6 +81,7 @@ class WorldScene {
         int lod = -1;
         bool shown = true;
         bool has_lod = false;
+        bool flat_world_transform = false;
         std::optional<wi::primitive::AABB> ground_bounds;
         uint32_t ground_tree_offset_plus1=0;
     };
@@ -92,6 +102,15 @@ class WorldScene {
     std::map<std::string, Prototype> prototypes;
     std::map<std::string, uint64_t> import_counts;
     std::vector<Instance> instances;
+    std::vector<size_t> changing_instances;
+    struct GroundBoundEntry {
+        wi::ecs::Entity entity;
+        wi::primitive::AABB box;
+        bool keep_visible;
+    };
+    std::vector<GroundBoundEntry> ground_bound_entries;
+    std::vector<GroundBoundsUpdate> ground_bound_patches;
+    uint64_t ground_bound_revision=0;
     std::unordered_map<wi::ecs::Entity, size_t> child_instances;
     std::vector<wi::ecs::Entity> world_geometry;
     std::vector<TerrainMesh> terrain_meshes;
@@ -99,6 +118,11 @@ class WorldScene {
     std::map<std::string, wi::ecs::Entity> materials;
     std::set<std::string> world_uv_materials;
     nlohmann::json material_profile;
+    std::optional<DirectX::XMFLOAT4X4> last_facing_basis;
+    uint64_t facing_pose_updates=0;
+    bool full_detail_vegetation(const ScenePlacement& spec) const {
+        return spec.category == "vegetation" && material_profile.value("vegetation_full_detail", true);
+    }
     Prototype &prototype(const std::string &model) {
         auto found = prototypes.find(model);
         if (found != prototypes.end())
@@ -199,12 +223,49 @@ class WorldScene {
         loaded.Update(0);
         Prototype data;
         data.ground_spec=std::move(ground_spec);data.ground_cluster=std::move(ground_cluster);data.ground_parameters=std::move(ground_parameters);
+        std::set<std::string> facing_materials;
+        auto facing_path=std::filesystem::path(file->second);facing_path.replace_extension(".facing.json");
+        if(std::filesystem::exists(facing_path)){
+            std::ifstream stream(facing_path);nlohmann::json metadata;stream>>metadata;
+            if(metadata.value("schema_version",0)!=1||metadata.value("encoding","")!="uv1_delta_xy_rg_half_z_v1")
+                throw std::runtime_error("Unsupported source leaf facing metadata");
+            for(const auto& name:metadata.at("leaf_materials"))facing_materials.insert(name.get<std::string>());
+            if(!data.ground_spec.is_null())throw std::runtime_error("Source leaf CPU facing and indexed grove grounding need separate attribute streams");
+        }
         for (size_t i = 0; i < loaded.objects.GetCount(); ++i) {
             auto entity = loaded.objects.GetEntity(i);
             auto &object = loaded.objects[i];
             auto transform = loaded.transforms.GetComponent(entity);
             if (!transform)
                 throw std::runtime_error("Mesh missing transform");
+            if(!facing_materials.empty()){
+                DirectX::XMFLOAT4X4 identity;DirectX::XMStoreFloat4x4(&identity,DirectX::XMMatrixIdentity());
+                for(int r=0;r<4;++r)for(int c=0;c<4;++c)if(std::abs(transform->world.m[r][c]-identity.m[r][c])>1e-5f)
+                    throw std::runtime_error("Source facing mesh nodes must have identity transforms");
+                auto mesh=loaded.meshes.GetComponent(object.meshID);
+                if(!mesh||mesh->vertex_uvset_1.size()!=mesh->vertex_positions.size()||mesh->vertex_colors.size()!=mesh->vertex_positions.size())
+                    throw std::runtime_error("Source facing mesh has no leaf payload");
+                FacingMesh facing;facing.entity=object.meshID;std::set<uint32_t> vertices;
+                for(const auto& subset:mesh->subsets){
+                    auto name=loaded.names.GetComponent(subset.materialID);auto material=loaded.materials.GetComponent(subset.materialID);
+                    if(material)material->SetUseVertexColors(false); // these bytes are geometry payload, not color tint
+                    if(!name||!facing_materials.count(name->name))continue;
+                    for(uint32_t j=0;j<subset.indexCount;++j)vertices.insert(mesh->indices[subset.indexOffset+j]);
+                }
+                for(auto index:vertices){
+                    const auto packed=mesh->vertex_colors.at(index);
+                    if(((packed>>16)&255u)!=165u)throw std::runtime_error("Source leaf payload marker changed during import");
+                    const uint32_t bits=packed&65535u,exp=(bits>>10)&31u,frac=bits&1023u;
+                    if(exp==31)throw std::runtime_error("Nonfinite source leaf offset");
+                    const float z=(bits&32768u?-1.f:1.f)*std::ldexp(float(exp?1024u+frac:frac),exp?int(exp)-25:-24);
+                    const auto xy=mesh->vertex_uvset_1.at(index);const auto point=mesh->vertex_positions.at(index);
+                    if(!std::isfinite(xy.x)||!std::isfinite(xy.y)||std::max({std::abs(xy.x),std::abs(xy.y),std::abs(z)})>256)
+                        throw std::runtime_error("Invalid source leaf offset range");
+                    facing.vertices.push_back({index,{point.x-xy.x,point.y-xy.y,point.z-z},{xy.x,xy.y,z},mesh->vertex_normals.at(index)});
+                }
+                if(facing.vertices.empty())throw std::runtime_error("No source facing-leaf subset matched metadata");
+                data.facing_meshes.push_back(std::move(facing));last_facing_basis.reset();
+            }
             if(!data.ground_spec.is_null()){
                 DirectX::XMFLOAT4X4 identity;DirectX::XMStoreFloat4x4(&identity,DirectX::XMMatrixIdentity());
                 for(int r=0;r<4;++r)for(int c=0;c<4;++c)if(std::abs(transform->world.m[r][c]-identity.m[r][c])>1e-5f)
@@ -226,15 +287,18 @@ class WorldScene {
         import_counts[model]++;
         return prototypes.emplace(model, std::move(data)).first->second;
     }
-    wi::ecs::Entity child(wi::ecs::Entity root, const Part &part, const std::string &name) {
+    wi::ecs::Entity child(wi::ecs::Entity root, const Part &part, const std::string &name, bool flat_world=false) {
         auto e = scene.Entity_CreateObject(name);
         auto object = scene.objects.GetComponent(e);
         object->meshID = part.mesh;
         object->color = part.color;
         auto t = scene.transforms.GetComponent(e);
-        t->MatrixTransform(DirectX::XMLoadFloat4x4(&part.transform));
+        auto matrix=DirectX::XMLoadFloat4x4(&part.transform);
+        if(flat_world)matrix*=scene.transforms.GetComponent(root)->GetWorldMatrix();
+        t->MatrixTransform(matrix);
         t->UpdateTransform();
-        scene.Component_Attach(e, root, true);
+        if(flat_world)scene.layers.GetComponent(e)->layerMask=1;
+        else scene.Component_Attach(e, root, true);
         return e;
     }
     wi::ecs::Entity material(const SceneMaterial &spec) {
@@ -373,10 +437,15 @@ class WorldScene {
                     indices.insert(indices.end(), group.begin(), group.end());
                 if (indices.empty())
                     continue;
-                auto e = scene.Entity_CreateMeshFromData("terrain_chunk", indices.size(), indices.data(),
-                                                         positions.size(), positions.data());
-                auto mesh = scene.meshes.GetComponent(e);
-                mesh->subsets.clear();
+                // Populate the complete mesh before its single GPU upload.
+                // Entity_CreateMeshFromData uploads immediately while computing
+                // normals, so calling it here needlessly allocates a second set
+                // of vertex/index descriptors for every terrain chunk.
+                auto e = scene.Entity_CreateObject("terrain_chunk");
+                scene.objects.GetComponent(e)->meshID=e;
+                auto mesh = &scene.meshes.Create(e);
+                mesh->indices=std::move(indices);
+                mesh->vertex_positions=std::move(positions);
                 uint32_t offset = 0;
                 for (size_t i = 0; i < grouped.size(); ++i)
                     if (!grouped[i].empty()) {
@@ -388,13 +457,13 @@ class WorldScene {
                         mesh->subsets.push_back(subset);
                         offset += subset.indexCount;
                     }
-                scene.materials.Remove(e);
                 mesh->SetQuantizedPositionsDisabled(true);
                 mesh->vertex_uvset_0 = std::move(uvs);
                 mesh->vertex_uvset_1 = std::move(detail_uvs);
                 if(!smooth_normals.empty())mesh->vertex_normals=std::move(smooth_normals);
                 mesh->vertex_colors = std::move(vertex_colors);
-                mesh->CreateRenderData();
+                if(mesh->vertex_normals.empty())mesh->ComputeNormals(wi::scene::MeshComponent::COMPUTE_NORMALS_SMOOTH_FAST);
+                else mesh->CreateRenderData();
                 scene.layers.GetComponent(e)->layerMask = 1;
                 world_geometry.push_back(e);
                 terrain_meshes.push_back({e, patch.origin_north + col0 * patch.spacing,
@@ -408,6 +477,7 @@ class WorldScene {
         : scene(s), model_files(files),material_profile(profile) {}
     wi::ecs::Entity instantiate(const std::string &uid, const std::string &model) {
         auto &data = prototype(model);
+        if(!data.facing_meshes.empty())throw std::runtime_error("Source facing foliage must use static unrotated scenery placements");
         if(!data.ground_spec.is_null())throw std::runtime_error("Ground-conforming resources must be configured as static scenery");
         auto root = scene.Entity_CreateTransform(uid);
         scene.layers.Create(root).layerMask = 1;
@@ -419,6 +489,8 @@ class WorldScene {
         for (auto &instance : instances)
             scene.Entity_Remove(instance.root);
         instances.clear();
+        changing_instances.clear();ground_bound_entries.clear();ground_bound_patches.clear();
+        ++ground_bound_revision;
         child_instances.clear();
         for (auto e : world_geometry)
             scene.Entity_Remove(e);
@@ -439,11 +511,14 @@ class WorldScene {
         using namespace DirectX;
         clear();
         std::vector<std::array<float,2>> streamed_points;
+        std::vector<float> cached_tree_heights;
+        const bool cache_heights=material_profile.value("cached_tree_heights",false);
         for(const auto& spec:placements)for(const auto& point:spec.ground_stems){
             if(!std::isfinite(point[0])||!std::isfinite(point[1]))throw std::invalid_argument("Nonfinite independent source tree position");
             streamed_points.push_back({float(point[0]),float(point[1])});
+            if(cache_heights)cached_tree_heights.push_back(float(terrain.height(point[0],point[1])));
         }
-        ground_atlas_.set_tree_positions(streamed_points);
+        ground_atlas_.set_tree_positions(streamed_points,cached_tree_heights);
         uint32_t stream_offset=0;
         for (const auto &m : mats)
             material(m);
@@ -463,7 +538,9 @@ class WorldScene {
         const std::string base_material=terrain_materials.size()>terrain.detail_tiles.size()?terrain_materials.back():"";
         if(!base_material.empty()&&!materials.count(base_material))
             throw std::invalid_argument("Unknown outer terrain material: "+base_material);
-        terrain_patch(base, 16, outer_cover, outer_colors, cut,base_material,&terrain);
+        // Group more existing cells per draw; sampling, triangle diagonals,
+        // cutouts, materials and all source heights remain unchanged.
+        terrain_patch(base, 64, outer_cover, outer_colors, cut,base_material,&terrain);
         for (size_t i = 0; i < terrain.detail_tiles.size(); ++i) {
             const auto &fine = terrain.detail_tiles[i];
             std::array<double, 4> inner{0, 0, 0, 0};
@@ -486,18 +563,22 @@ class WorldScene {
                 continue;
             wi::vector<XMFLOAT3> vertices;
             wi::vector<XMFLOAT2> uvs;
+            wi::vector<XMFLOAT2> detail_uvs;
             wi::vector<uint32_t> indices(surface.indices.begin(), surface.indices.end());
             for (auto p : surface.vertices) {
                 vertices.push_back({-p[1], p[2], p[0]});
                 uvs.push_back({p[0] / 2, p[1] / 2});
+                detail_uvs.push_back({p[0]/detail_tile_m_,p[1]/detail_tile_m_});
             }
-            auto e = scene.Entity_CreateMeshFromData(surface.id, indices.size(), indices.data(),
-                                                     vertices.size(), vertices.data());
-            auto mesh = scene.meshes.GetComponent(e);
-            mesh->subsets[0].materialID = materials.at(surface.material);
-            scene.materials.Remove(e);
+            auto e = scene.Entity_CreateObject(surface.id);
+            scene.objects.GetComponent(e)->meshID=e;
+            auto mesh = &scene.meshes.Create(e);
+            mesh->indices=std::move(indices);mesh->vertex_positions=std::move(vertices);
+            auto& subset=mesh->subsets.emplace_back();
+            subset.indexCount=uint32_t(mesh->indices.size());subset.materialID=materials.at(surface.material);
             mesh->vertex_uvset_0 = std::move(uvs);
-            mesh->CreateRenderData();
+            mesh->vertex_uvset_1 = std::move(detail_uvs);
+            mesh->ComputeNormals(wi::scene::MeshComponent::COMPUTE_NORMALS_SMOOTH_FAST);
             scene.layers.GetComponent(e)->layerMask = 1;
             scene.objects.GetComponent(e)->SetCastShadow(false);
             world_geometry.push_back(e);
@@ -514,15 +595,20 @@ class WorldScene {
         }
         for (const auto &spec : placements) {
             prototype(spec.model);
-            if (model_files.count(spec.model + "::lod1"))
+            const bool keep_detail = full_detail_vegetation(spec);
+            if (!keep_detail && model_files.count(spec.model + "::lod1"))
                 prototype(spec.model + "::lod1");
             auto &data = prototypes.at(spec.model);
+            if(!data.facing_meshes.empty()&&(std::abs(spec.yaw)>1e-7f||spec.up_normal!=std::array<float,3>{0,1,0}))
+                throw std::runtime_error("Source facing prototype sharing currently requires upright, unrotated scenery");
             size_t count = data.parts.size();
             if (prototypes.count(spec.model + "::lod1"))
                 count = std::max(count, prototypes.at(spec.model + "::lod1").parts.size());
             Instance instance;
             instance.spec = spec;
-            instance.has_lod = prototypes.count(spec.model+"::lod1")!=0;
+            instance.flat_world_transform=spec.category=="vegetation"&&spec.target_uid.empty()&&material_profile.value("flatten_static_vegetation",false);
+            instance.has_lod = !keep_detail && prototypes.count(spec.model+"::lod1")!=0;
+            if(keep_detail)instance.lod=0;
             instance.root = scene.Entity_CreateTransform(spec.id);
             scene.layers.Create(instance.root).layerMask = 1;
             auto t = scene.transforms.GetComponent(instance.root);
@@ -575,29 +661,62 @@ class WorldScene {
             stream_offset+=uint32_t(spec.ground_stems.size());
             for (size_t i = 0; i < count; ++i) {
                 auto e = child(instance.root, data.parts[std::min(i, data.parts.size() - 1)],
-                               spec.id + "_part" + std::to_string(i));
+                               spec.id + "_part" + std::to_string(i),instance.flat_world_transform);
                 child_instances[e] = instances.size();
                 instance.children.push_back(e);
-                scene.objects.GetComponent(e)->draw_distance = spec.cull_distance;
+                auto* object = scene.objects.GetComponent(e);
+                // Vegetation geometry LOD never implies distance disappearance.
+                object->draw_distance = spec.category == "vegetation" ? std::numeric_limits<float>::max() : spec.cull_distance;
+                if (keep_detail) object->lod_bias = -1000;
+                if(instance.ground_bounds){
+                    const auto& box=*instance.ground_bounds;const auto center=box.getCenter();
+                    ground_bound_entries.push_back({e,box,spec.category == "vegetation"});
+                    ground_bound_patches.push_back({uint32_t(scene.objects.GetIndex(e)),instance.ground_tree_offset_plus1,
+                        uint32_t(instance.spec.ground_stems.size()),0,{center.x,center.y,center.z,box.getRadius()}});
+                }
             }
+            if(!keep_detail||!spec.target_uid.empty())changing_instances.push_back(instances.size());
             instances.push_back(std::move(instance));
         }
     }
     GroundAtlas& ground_atlas() {return ground_atlas_;}
+    void set_vegetation_lod_distance(double meters) {
+        if(!std::isfinite(meters)||meters<1)throw std::invalid_argument("Vegetation LOD distance must be finite and positive");
+        material_profile["vegetation_lod_distance_m"]=meters;
+    }
+    nlohmann::json vegetation_state() const {
+        uint64_t trees=0,near_count=0,far_count=0,hidden=0;
+        for(const auto& instance:instances)if(instance.spec.category=="vegetation"){
+            const auto count=instance.spec.ground_stems.empty()?1:instance.spec.ground_stems.size();
+            trees+=count;(instance.lod==1?far_count:near_count)+=count;if(!instance.shown)hidden+=count;
+        }
+        return {{"trees",trees},{"near_trees",near_count},{"far_trees",far_count},{"distance_hidden_trees",hidden}};
+    }
     void ground_bounds_before_visibility() {
         // Scene::Update overwrites ordinary rigid bounds. Run after that update
         // and before both main/reflection visibility and shadow rendering.
-        std::vector<GroundBoundsUpdate> patches;
-        for(const auto& instance:instances)if(instance.ground_bounds){
-            const auto& box=*instance.ground_bounds;const auto center=box.getCenter();const float radius=box.getRadius();
-            for(auto e:instance.children){
-                const auto index=scene.objects.GetIndex(e);if(index==size_t(-1))continue;
-                auto& aabb=scene.aabb_objects[index];aabb._min=box._min;aabb._max=box._max;
-                scene.objects[index].center=center;scene.objects[index].radius=radius;
-                patches.push_back({uint32_t(index),instance.ground_tree_offset_plus1,uint32_t(instance.spec.ground_stems.size()),0,{center.x,center.y,center.z,radius}});
+        // Preserve the correct frustum and terrain/depth occlusion. Historical
+        // occlusion queries must not incorrectly hide distant source groves.
+        std::atomic<bool> moved=false,missing=false;
+        wi::jobsystem::context bounds_jobs;
+        wi::jobsystem::Dispatch(bounds_jobs,uint32_t(ground_bound_entries.size()),1024,[&](wi::jobsystem::JobArgs args){
+            const size_t i=args.jobIndex;
+            const auto& entry=ground_bound_entries[i];auto& patch=ground_bound_patches[i];
+            if(patch.index>=scene.objects.GetCount()||scene.objects.GetEntity(patch.index)!=entry.entity){
+                const auto index=scene.objects.GetIndex(entry.entity);
+                if(index==size_t(-1)){missing.store(true,std::memory_order_relaxed);return;}
+                patch.index=uint32_t(index);
+                moved.store(true,std::memory_order_relaxed);
             }
-        }
-        ground_bounds_updater.apply(scene,patches);
+            auto& object=scene.objects[patch.index];
+            if(entry.keep_visible)object.occlusion.occlusionHistory=~0u;
+            auto& aabb=scene.aabb_objects[patch.index];aabb._min=entry.box._min;aabb._max=entry.box._max;
+            object.center={patch.sphere[0],patch.sphere[1],patch.sphere[2]};object.radius=patch.sphere[3];
+        });
+        wi::jobsystem::Wait(bounds_jobs);
+        if(missing.load())throw std::runtime_error("Static grounded scenery was unexpectedly removed");
+        if(moved.load())++ground_bound_revision;
+        ground_bounds_updater.apply(scene,ground_bound_patches,ground_bound_revision);
     }
     std::vector<GroundVertexState> scenery_ground_vertices(const std::string& id,bool all_vertices=false) {
         for(const auto& instance:instances)if(instance.spec.id==id){
@@ -629,16 +748,65 @@ class WorldScene {
         }
         throw std::invalid_argument("Scenery instance not found: "+id);
     }
+    void update_facing_leaves(const wi::scene::CameraComponent& camera) {
+        using namespace DirectX;
+        bool present=false;for(const auto& [_,prototype]:prototypes)present|=!prototype.facing_meshes.empty();
+        if(!present)return;
+        auto basis=camera.GetInvView();basis.r[3]=XMVectorSet(0,0,0,1);
+        XMFLOAT4X4 current;XMStoreFloat4x4(&current,basis);
+        bool same=last_facing_basis.has_value();
+        if(same)for(int r=0;r<3;++r)for(int c=0;c<3;++c)same&=std::abs(current.m[r][c]-last_facing_basis->m[r][c])<1e-7f;
+        if(same)return;
+        wi::graphics::GetDevice()->WaitForGPU();
+        for(auto& [_,prototype]:prototypes)for(auto& facing:prototype.facing_meshes){
+            auto mesh=scene.meshes.GetComponent(facing.entity);if(!mesh)throw std::runtime_error("Source facing mesh was removed");
+            for(const auto& source:facing.vertices){
+                const auto delta=XMVector3TransformNormal(XMLoadFloat3(&source.delta),basis);
+                XMStoreFloat3(&mesh->vertex_positions[source.index],XMLoadFloat3(&source.center)+delta);
+                XMStoreFloat3(&mesh->vertex_normals[source.index],XMVector3TransformNormal(XMLoadFloat3(&source.normal),basis));
+            }
+            // Rebuild the actual raster/visibility geometry and bounds together.
+            // Every instance shares this one camera basis; no distance pruning.
+            mesh->CreateRenderData();
+        }
+        last_facing_basis=current;++facing_pose_updates;
+    }
+    nlohmann::json facing_leaf_state() const {
+        nlohmann::json result={{"pose_updates",facing_pose_updates},{"meshes",nlohmann::json::array()},
+            {"scope","Actual CPU mesh vertices uploaded through CreateRenderData; not GPU readback. Upright uniform-scale unrotated instances; wind disabled."}};
+        for(const auto& [name,prototype]:prototypes)for(const auto& facing:prototype.facing_meshes){
+            const auto mesh=scene.meshes.GetComponent(facing.entity);double error=0;
+            for(const auto& source:facing.vertices){
+                const auto p=mesh->vertex_positions[source.index];
+                const double length=std::hypot(p.x-source.center.x,p.y-source.center.y,p.z-source.center.z);
+                error=std::max(error,std::abs(length-std::hypot(source.delta.x,source.delta.y,source.delta.z)));
+            }
+            result["meshes"].push_back({{"model",name},{"leaf_vertices",facing.vertices.size()},{"max_offset_length_error_m",error}});
+        }
+        return result;
+    }
     void update(const DirectX::XMFLOAT3 &eye, const bvr_sim::GameFrame &frame) {
         using namespace DirectX;
-        for (auto &instance : instances) {
+        // Profile values are common to every tree batch. Parsing the same JSON
+        // hundreds of thousands of times per frame costs more than LOD itself.
+        const bool preserve_full_detail=material_profile.value("vegetation_full_detail",true);
+        const double vegetation_distance=material_profile.value("vegetation_lod_distance_m",-1.);
+        for (auto index : changing_instances) {
+            auto& instance=instances[index];
             auto &p = instance.spec;
+            // Immutable full-detail scenery never changes LOD or distance
+            // visibility. Keep every object and skip redundant per-frame work.
+            const bool vegetation=p.category=="vegetation";
+            if(vegetation&&preserve_full_detail&&!instance.has_lod&&p.target_uid.empty())continue;
             const double x=eye.x+p.position[1],y=eye.y-p.position[2],z=eye.z-p.position[0];
             const double distance_squared=x*x+y*y+z*z;
             // The thresholds and visible content are identical. Avoid two
             // square roots and a string allocation/map lookup per placement.
-            int lod = distance_squared > double(p.lod_distance)*p.lod_distance && instance.has_lod ? 1 : 0;
-            bool shown = distance_squared < double(p.cull_distance)*p.cull_distance;
+            const double threshold=vegetation&&vegetation_distance>0 ? vegetation_distance : double(p.lod_distance);
+            // Hysteresis avoids alternating meshes at a stationary threshold.
+            const double switch_distance=threshold*(instance.lod==1 ? .9 : 1.1);
+            int lod = distance_squared > switch_distance*switch_distance && instance.has_lod ? 1 : 0;
+            bool shown = vegetation || distance_squared < double(p.cull_distance)*p.cull_distance;
             if (lod != instance.lod || shown != instance.shown) {
                 auto &parts = prototypes.at(p.model + (lod ? "::lod1" : "")).parts;
                 for (size_t i = 0; i < instance.children.size(); ++i) {
@@ -650,7 +818,9 @@ class WorldScene {
                         object->color = parts[i].color;
                         auto t = scene.transforms.GetComponent(e);
                         t->ClearTransform();
-                        t->MatrixTransform(XMLoadFloat4x4(&parts[i].transform));
+                        auto matrix=XMLoadFloat4x4(&parts[i].transform);
+                        if(instance.flat_world_transform)matrix*=scene.transforms.GetComponent(instance.root)->GetWorldMatrix();
+                        t->MatrixTransform(matrix);
                         t->UpdateTransform();
                     }
                 }
@@ -697,6 +867,8 @@ class WorldScene {
             if (index >= scene.objects.GetCount())
                 continue;
             const auto &object = scene.objects[index];
+            if (!object.IsRenderable())
+                continue;
             auto mesh = scene.meshes.GetComponent(object.meshID);
             if (!mesh)
                 continue;

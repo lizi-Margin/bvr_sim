@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-A320-family",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A320-family\\FG-A320-family.glb",
+  "source_sha256": "5db8b5998689f18f3a2569d1ade77a6bb8681071eddd3a700d31c0e040c3f8ed",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A320-family.png",
+  "png_sha256": "1ed2d099c241d9a65deb93f5afc3aa75f53eb4bdf993e155262fed935f9d9068",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

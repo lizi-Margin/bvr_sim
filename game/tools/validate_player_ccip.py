@@ -9,6 +9,7 @@ from bvr_game.content import sha,write_json
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--map',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--river-case',action='store_true',help='Also release over the authored physical channel and require an actual below-water bed contact')
+    p.add_argument('--airport-case',action='store_true',help='Also release over the new airport taxi spine and require contact with its actual shared mesh')
     a=p.parse_args()
     a.output.mkdir(parents=True,exist_ok=False);os.environ['BVR_SORTIE_LOG_ROOT']=str(a.output/'sortie-logs')
     g=FlightGame(map_path=a.map,output=a.output/'client');rows=[]
@@ -16,6 +17,7 @@ def main():
            ('valley_slope','F16',[-6000,-2300,2000],250,[1,.1,-.04]),
            ('far_offset','F22',[150000,-50000,8500],500,[1,0,0])]
     if a.river_case:cases.append(('river_bed','F16',[-6500,380,500],180,[1,0,0]))
+    if a.airport_case:cases.append(('airport_courts','F16',[-3600,-3105,350],180,[1,0,0]))
     try:
         for name,model,position,speed,direction in cases:
             g.select_aircraft(model,'strike');g.config.mission='training';g.config.enemy_attacks=False;g.config.seed=2201
@@ -34,6 +36,9 @@ def main():
                 'release_frame':before,'impact':impact,'predicted':predicted,'actual_contact_height':contact,
                 'position_error_m':math.dist(predicted,actual),'actual_contact_height_error_m':abs(actual[2]-contact),
                 'predicted_actual_height_difference_m':abs(predicted[2]-actual[2]),'final_frame':frame}
+            if name=='airport_courts':
+                support=terrain.contact(actual[0],actual[1]);row.update(actual_contact_surface=support.surface_id,terrain_to_pavement_m=support.height-terrain.height(actual[0],actual[1]))
+                assert support.surface_id=='airport_courts' and .05<row['terrain_to_pavement_m']<.07,row
             if name=='river_bed':
                 from shapely.geometry import Point,LineString
                 document=g.baked_scene.document

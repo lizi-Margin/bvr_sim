@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-North-American-RA-5C-Vigilante",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-North-American-RA-5C-Vigilante\\FG-North-American-RA-5C-Vigilante.glb",
+  "source_sha256": "c7d6c5aadeb4ebe030ecf11bcf129e757b16fc38409a03024fc3a044d276b0ba",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-North-American-RA-5C-Vigilante.png",
+  "png_sha256": "91c818a213ad009517a0ee0409459af29810268a56ef692254432a2051d0be18",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

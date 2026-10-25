@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Stiletto",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Stiletto\\FG-Stiletto.glb",
+  "source_sha256": "612843507b91a1d1bcc78432547d028ee6276538045af2b2fca8df01873d7e28",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Stiletto.png",
+  "png_sha256": "b0e618c5a01c3a831294a2d60c15ae7507fcd4c92742936973829d570d37ae46",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

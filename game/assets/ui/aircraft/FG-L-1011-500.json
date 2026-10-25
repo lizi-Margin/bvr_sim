@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-L-1011-500",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-L-1011-500\\FG-L-1011-500.glb",
+  "source_sha256": "37c57caa3923af72ad37d1dc444a88b25db3c6149419a8acddfe41d65a181583",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-L-1011-500.png",
+  "png_sha256": "f45425ec13c256d90007854524477460b195a3cda26db6a86363f67ec9a02df5",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

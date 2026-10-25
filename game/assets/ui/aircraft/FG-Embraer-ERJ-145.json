@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Embraer-ERJ-145",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Embraer-ERJ-145\\FG-Embraer-ERJ-145.glb",
+  "source_sha256": "dd959ac8ebac7fb12aa34cbe4a31267440bf59c6d2de94919c2b7bdb7c5e1085",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Embraer-ERJ-145.png",
+  "png_sha256": "e97acf27bd47e6d33729bfeaf88b5379889c566d1b5913f9d93ea5f2671b97af",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

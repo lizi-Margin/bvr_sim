@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Campini-Caproni-N1",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Campini-Caproni-N1\\FG-Campini-Caproni-N1.glb",
+  "source_sha256": "e5c08b2ac4c8c4a110a5da82bb0868085341ea717d1f423e98628e308b146710",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Campini-Caproni-N1.png",
+  "png_sha256": "132b654a70b6b592bb02956f537884402d966d22c359bc2ae9b5f2487adf490a",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

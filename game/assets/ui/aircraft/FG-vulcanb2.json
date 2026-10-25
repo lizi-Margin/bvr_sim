@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-vulcanb2",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-vulcanb2\\FG-vulcanb2.glb",
+  "source_sha256": "4989c52597b62e27d5675f92dead960f40ad6aa6472edf1b9b265617a8e679d8",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-vulcanb2.png",
+  "png_sha256": "719e2d28fb2327946a4f7b48a4fdb3897658cb331b53ceda6fd5e2b4d2893dff",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

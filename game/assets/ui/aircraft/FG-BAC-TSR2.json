@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-BAC-TSR2",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-BAC-TSR2\\FG-BAC-TSR2.glb",
+  "source_sha256": "747668df2296dc2cf5cc5c0997989e223ef1c11a8ec6ab3dc0db73c3070106be",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-BAC-TSR2.png",
+  "png_sha256": "5474c08fae08baa6ada75f9b00dc9f22c5681e9446173c13ed5e14c190e853e6",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

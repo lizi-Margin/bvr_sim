@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-BAe-146",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-BAe-146\\FG-BAe-146.glb",
+  "source_sha256": "8a6fbb03f20208f91a14849d8a0ea2336a14d4fdef3701f264da1d9d5992c42f",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-BAe-146.png",
+  "png_sha256": "e3d214aadf1e89ca4cf4b6b12c704b9c7f86ca8cd75da4f1bb81b771ff79ce49",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-B-52F",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-B-52F\\FG-B-52F.glb",
+  "source_sha256": "26828fe605378edf465316cc1230b5aaa81a7c9c0909bcc84c55945b028740a7",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-B-52F.png",
+  "png_sha256": "252e88401be69d78e3f6f153693d15eb87863ca7d398966e0fea469c1554762e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

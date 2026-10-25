@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 #include <pybind11/eigen.h>
+#include <sstream>
 
 #include "core.hxx"
 #include "simulator/aircraft/fdm/yasim_fdm.hxx"
@@ -10,6 +11,8 @@
 #include "rl/rl_manager.hxx"
 #include "support/json.hpp"
 #include "gameplay/game_bindings.hxx"
+#include "simulator/weapon_bindings.hxx"
+#include "support/SL.hxx"
 
 namespace py = pybind11;
 using namespace bvr_sim;
@@ -94,7 +97,9 @@ json::JSON python_to_json(const py::handle& obj) {
 }
 
 PYBIND11_MODULE(bvr_sim_cpp, m) {
+    m.attr("GAME_API_ABI")=2;
     m.doc() = "BVR Sim C++ bindings";
+    bind_weapon_api(m);
     bind_game_api(m);
     py::class_<AircraftFDM>(m, "AircraftFDM")
         .def("reset",[](AircraftFDM& f,const std::array<double,3>& p,const std::array<double,3>& v,const std::array<double,3>& rpy){
@@ -125,9 +130,13 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("property",&YASimFDM::property)
         .def("set_property",&YASimFDM::set_property);
     py::class_<JSBSimFDM,AircraftFDM>(m,"JSBSimFDM")
-        .def(py::init([](double dt,const std::string& model){
-            return std::make_unique<JSBSimFDM>(dt,std::map<std::string,std::string>{{"aircraft_model",model}});
-        }),py::arg("dt"),py::arg("model"));
+          .def(py::init([](double dt,const std::string& model,double max_inner_dt){
+            std::ostringstream value;value.precision(17);value<<max_inner_dt;
+            return std::make_unique<JSBSimFDM>(dt,std::map<std::string,std::string>{{"aircraft_model",model},{"max_inner_dt",value.str()}});
+          }),py::arg("dt"),py::arg("model"),py::arg("max_inner_dt")=JSBSimFDM::default_max_inner_dt)
+          .def_property_readonly("max_inner_dt",&JSBSimFDM::max_inner_dt)
+          .def_property_readonly("inner_dt",&JSBSimFDM::inner_dt)
+          .def_property_readonly("inner_steps",&JSBSimFDM::inner_steps);
 
     py::enum_<TeamColor>(m, "TeamColor")
         .value("Red", TeamColor::Red)
@@ -135,12 +144,23 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .export_values();
 
     py::class_<SimCore, std::shared_ptr<SimCore>>(m, "SimCore")
+        .def(py::init<double,const std::string&,const std::string&,bool>(),py::arg("dt"),py::arg("log_file_path"),py::arg("acmi_file_path"),py::arg("enable_telemetry"))
         .def(py::init<double, const std::string&, const std::string&>(), py::arg("dt"), py::arg("log_file_path"), py::arg("acmi_file_path"))
         .def("start", &SimCore::start)
+        .def("reset_world",[](SimCore& core,std::uint32_t seed){require_sync_core(core);reset_core_world(seed);},py::arg("seed")=7)
+        .def("spawn_aircraft",[](SimCore& core,const AircraftSpawnSpec& spec){require_sync_core(core);spawn_core_aircraft(spec);})
+        .def("objects",[](SimCore& core){require_sync_core(core);return core_objects();})
+        .def("check_launch",[](SimCore& core,const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station){require_sync_core(core);return core_check_launch(uid,weapon,target,station);},py::arg("uid"),py::arg("weapon"),py::arg("target"),py::arg("station")="")
+        .def("launch_weapon",[](SimCore& core,const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station){require_sync_core(core);return core_launch_weapon(uid,weapon,target,station);},py::arg("uid"),py::arg("weapon"),py::arg("target"),py::arg("station")="")
+        .def("release_weapon",[](SimCore& core,const std::string& uid,const std::string& weapon,const std::string& station){require_sync_core(core);return core_release_weapon(uid,weapon,core_surface(core),station);},py::arg("uid"),py::arg("weapon"),py::arg("station")="")
+        .def("predict_bomb_impact",[](SimCore& core,const std::string& uid){require_sync_core(core);return core_predict_bomb(uid,*core_surface(core));})
+        .def("set_environment",[](SimCore& core,const Terrain& terrain){require_sync_core(core);auto copy=std::make_shared<Terrain>(terrain);copy->prepare_surfaces();core.set_environment(copy);})
+        .def("spawn_ground",[](SimCore& core,const GroundUnitSpec& spec){require_sync_core(core);create_ground_unit(spec,core_surface(core),core.get_dt());})
         .def("stop", &SimCore::stop)
+        .def("close",[](SimCore& core){core.stop();core.end_recording();reset_core_world(7);SL::shutdown();})
         .def("pause", &SimCore::pause)
         .def("resume", &SimCore::resume)
-        .def("step", &SimCore::step)
+        .def("step", &SimCore::step,py::arg("steps")=1)
         .def("step_sync", [](SimCore& self, int steps) {
             self.step(steps);
         }, py::arg("steps"))

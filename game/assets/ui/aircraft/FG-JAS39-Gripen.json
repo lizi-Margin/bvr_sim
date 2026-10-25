@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-JAS39-Gripen",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-JAS39-Gripen\\FG-JAS39-Gripen.glb",
+  "source_sha256": "66b00166ab67eaa2fdde17eb2b737d4bc93c9c58fec2233b56c658c4b37f8992",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-JAS39-Gripen.png",
+  "png_sha256": "99bc26ce70d804219bb46101a2a060079edf6be24772fdc2445e0514c8b493de",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

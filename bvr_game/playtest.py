@@ -192,6 +192,10 @@ def replay(tape,output,render=False,video=False,window_start=None,window_end=Non
             from PIL import Image
             encoder=subprocess.Popen([imageio_ffmpeg.get_ffmpeg_exe(),'-y','-loglevel','error','-f','rawvideo','-pix_fmt','rgb24','-s','1920x1080','-r','10','-i','-','-c:v','libx264','-preset','fast','-crf','20','-pix_fmt','yuv420p',str(video_path)],stdin=subprocess.PIPE)
         for index,a in enumerate(data['actions']):
+            if a.get('selected_weapon') is not None:
+                if a['selected_weapon'] not in ('AIM-120C7','Mk-82'):
+                    raise ValueError('Unknown recorded HUD weapon selection')
+                host.game.weapon=a['selected_weapon']
             now=host.game.sim.frame().sim_time
             if video and start_time-.5<=now<=end_time:
                 if a.get('player_intent'):host.game.submit_player(**a['player_intent'])
@@ -211,7 +215,12 @@ def replay(tape,output,render=False,video=False,window_start=None,window_end=Non
             same=digest(serialize(host.game.sim.frame()))==a['frame_sha256'];rows.append(same)
             if not same:break
         if encoder:encoder.stdin.close();assert encoder.wait()==0;encoder=None
-        report={'status':'passed' if all(rows) and len(rows)==len(data['actions']) else 'failed','complete_frames_compared':len(rows),'sample_interval_s':.5,'first_difference':next((i for i,v in enumerate(rows) if not v),None),'rendered':render,'core_sha256':host.core_sha,'tape':str(tape),'tape_sha256':sha(tape),'logs':host.game.log_paths(),'capture':host.game.capture('replay') if render else None,'shader_errors':host.game.renderer.shader_errors() if render else None}
+        endpoint_ticks=sorted({a['ticks'] for a in data['actions']})
+        first=data.get('initial_frame',{'tick':0,'sim_time':0.})
+        tick_span=data['final_frame']['tick']-first['tick']
+        seconds_per_tick=(data['final_frame']['sim_time']-first['sim_time'])/tick_span if tick_span else None
+        interval=round(endpoint_ticks[0]*seconds_per_tick,12) if len(endpoint_ticks)==1 and seconds_per_tick is not None else None
+        report={'status':'passed' if all(rows) and len(rows)==len(data['actions']) else 'failed','complete_frames_compared':len(rows),'sample_interval_s':interval,'endpoint_tick_counts':endpoint_ticks,'selected_weapon':host.game.weapon,'first_difference':next((i for i,v in enumerate(rows) if not v),None),'rendered':render,'core_sha256':host.core_sha,'tape':str(tape),'tape_sha256':sha(tape),'logs':host.game.log_paths(),'capture':host.game.capture('replay') if render else None,'shader_errors':host.game.renderer.shader_errors() if render else None}
         if video:
             movie={'file':str(video_path),'frames':video_frames,'fps':10,'sim_window_s':[start_time,end_time],'sim_sample_ticks':video_sample_ticks,'playback_speed':video_sample_ticks*.02*10,'seed':data['config']['seed'],'aircraft':data['config']['player_model'],'mission':data['config']['mission'],'resolution':[1920,1080],'quality':'high','map_sha256':host.game.scene_hash,'visual_profile':host.game.visual_profile,'keyframes':keyframes,'shader_errors':report['shader_errors']}
             movie['capture_method']='Direct sRGB backbuffer RGB readback' if hasattr(host.game.renderer,'capture_rgb') else 'Backbuffer PNG readback followed by RGB decoding'

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Horten-Ho-IX",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Horten-Ho-IX\\FG-Horten-Ho-IX.glb",
+  "source_sha256": "341b3ac19b478d2f5d4641d937436d0aba90f3f6712c87ad408436f15b677918",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Horten-Ho-IX.png",
+  "png_sha256": "7d172c1b4fb0b6d71c0973eb817a1125c388f3b79355f000af9d7a25afc9657e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

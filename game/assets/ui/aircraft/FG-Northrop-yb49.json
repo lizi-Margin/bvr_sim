@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Northrop-yb49",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Northrop-yb49\\FG-Northrop-yb49.glb",
+  "source_sha256": "34e7bbfa6299bbe1085c526bab0de23232b0ec3f4574193e728a21f8d7747bd1",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Northrop-yb49.png",
+  "png_sha256": "38ef5213ee4b4dd60b46f74f19f37a1f66b7736108235530214fdb01ff405a7e",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

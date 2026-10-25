@@ -1,5 +1,6 @@
 """Independent source-tree locations, spatially batched for shared source meshes."""
 import math
+from functools import lru_cache
 import numpy as np
 from shapely import contains_xy,distance,points as shape_points
 from shapely.geometry import Point,box
@@ -36,6 +37,15 @@ def forbidden_geometry(baker):
     return unary_union(blocked)
 
 
+@lru_cache(maxsize=8)
+def _boundary_samples(forest):
+    from shapely import segmentize,get_coordinates
+    from scipy.spatial import cKDTree
+    # Every straight boundary segment is sampled at <=50m. The nearest
+    # sample is at most25m from the exact nearest boundary location.
+    return cKDTree(get_coordinates(segmentize(forest.boundary,50.)))
+
+
 def edge_density_probability(forest,locations,config,seed):
     """Authored density transition inside unchanged forest/exclusion polygons."""
     from .regional_cover import smooth_noise
@@ -43,7 +53,15 @@ def edge_density_probability(forest,locations,config,seed):
     if not all(math.isfinite(v) for v in [width,variation,scale]) or not 0<width<=500 or not 0<=variation<=width or not 20<=scale<=1000:
         raise ValueError('Invalid source-tree edge density dimensions')
     locations=np.asarray(locations);n,w=locations.T
-    depth=distance(forest.boundary,shape_points(locations))
+    # Once the exact distance exceeds1.5*width+variation, this probability
+    # is identically1. A conservative sample-distance bound avoids expensive
+    # all-segment distances for millions of deep-interior bake pixels. Keep
+    # exact GEOS distances for every potentially nonconstant edge value.
+    sampled_distance=_boundary_samples(forest).query(locations)[0]
+    maximum_transition=1.5*width+variation
+    near=sampled_distance<=maximum_transition+25.+1e-6
+    depth=np.full(len(locations),maximum_transition+1.)
+    depth[near]=distance(forest.boundary,shape_points(locations[near]))
     local_width=width*(.5+smooth_noise(n,w,scale,seed+191))
     setback=variation*smooth_noise(n,w,scale*.63,seed+197)
     u=np.clip((depth-setback)/local_width,0,1);smooth=u*u*(3-2*u)

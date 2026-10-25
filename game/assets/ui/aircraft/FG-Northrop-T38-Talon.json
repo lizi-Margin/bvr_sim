@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Northrop-T38-Talon",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Northrop-T38-Talon\\FG-Northrop-T38-Talon.glb",
+  "source_sha256": "5a440e8483c06ac6f9a07fd2f857c02b15a53c440fe98adb1baa436f3ded0596",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Northrop-T38-Talon.png",
+  "png_sha256": "902da666980742c6423036bd24d2bc03b3e6c0786d08e36de82e1d4556c1c714",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

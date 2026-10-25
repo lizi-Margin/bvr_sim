@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Westwind-II",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Westwind-II\\FG-Westwind-II.glb",
+  "source_sha256": "85a559fa4d6a57a2f39be7d9fc9ba815b197b0d8a81f0ed14052167f3caa0827",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Westwind-II.png",
+  "png_sha256": "ed17b39ecca4a9a099132aabdd228bad3760fecfbf83c5a5ff692b850b102aea",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

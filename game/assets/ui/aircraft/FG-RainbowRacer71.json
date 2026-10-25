@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-RainbowRacer71",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-RainbowRacer71\\FG-RainbowRacer71.glb",
+  "source_sha256": "ee1f641397c50ca806f916733690ecaaee20d818a7d4625be2adb9c21b18b085",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-RainbowRacer71.png",
+  "png_sha256": "0bd84f84e9cbea0e35b03bd757277ddae6cae842d2f9f91d33a8d78d1c1adb11",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Sukhoi-Su-33",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Sukhoi-Su-33\\FG-Sukhoi-Su-33.glb",
+  "source_sha256": "45aa8091a5600f72cae69cd2f366ca94dc28a7221c6279fa92702a339c480336",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Sukhoi-Su-33.png",
+  "png_sha256": "449fcdb414a9f84e4d4dc78f331bf7fcad56a173a8ef4d4b8ade3565453b49c7",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

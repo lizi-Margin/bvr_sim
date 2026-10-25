@@ -1,0 +1,23 @@
+{
+  "name": "Original StonePineForest LOD0, shared64 source copies",
+  "tags": ["vegetation", "pine", "source_geometry", "user_local_ue", "full_detail"],
+  "select_object": "SM_StonePine01",
+  "crown_albedo_material": "T_TSP_Leafs",
+  "cluster": {
+    "count": 64,
+    "radius_m": 50,
+    "minimum_spacing_m": 8.5,
+    "inter_grove_stem_spacing_m": 2.5,
+    "seed": 63241,
+    "scale_range": [0.85, 1.15],
+    "ground_conform": true,
+    "independent_tree_positions": true
+  },
+  "source_geometry_lods": {
+    "near_triangles_per_tree": 10000,
+    "far_triangles_per_tree": 10000
+  },
+  "near_triangle_budget": 1000000,
+  "recommended_density_per_km2": 6700,
+  "physical_size_note": "Actual user-provided UE StonePineForest LOD0,8426 original triangles per tree. Source albedo and opacity retained; no mesh reduction or generated crown. Original11m full height normalized to source base for existing per-tree grounding. Both registered levels retain identical full source mesh; runtime vegetation always uses the highest level. Roughness0.8, bark normals converted to glTF convention; UE wind/SSS/WPO are not reproduced."
+}

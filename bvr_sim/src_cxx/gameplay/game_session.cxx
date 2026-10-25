@@ -12,6 +12,8 @@
 #include "simulator/ground/ground_static_target.hxx"
 #include "simulator/missile/base.hxx"
 #include "simulator/missile/aim120c.hxx"
+#include "simulator/missile/mmodelA.hxx"
+#include "simulator/weapon_launch.hxx"
 #include "simulator/sense/radar.hxx"
 #include "simulator/unit_factory.hxx"
 #include "so_pool.hxx"
@@ -98,11 +100,15 @@ std::shared_ptr<Fighter> create_fighter(const std::string &uid, const std::strin
     spec["position"] = json::Array(position[0], position[1], position[2]);
     spec["velocity"] = json::Array(velocity[0], velocity[1], velocity[2]);
     spec["pylon_mounts"] = json::Object();
-    for (int i = 0; i < config.missiles; ++i)
-        spec["pylon_mounts"]["M" + std::to_string(i)] = json::String("AIM-120C7");
-    if (player)
-        for (int i = 0; i < config.bombs; ++i)
-            spec["pylon_mounts"]["B" + std::to_string(i)] = json::String("Mk-82");
+    if(player&&config.use_station_loadout) {
+        for(const auto& [station,weapon]:config.loadout)spec["pylon_mounts"][station]=json::String(weapon);
+    } else {
+        for (int i = 0; i < config.missiles; ++i)
+            spec["pylon_mounts"]["M" + std::to_string(i)] = json::String("AIM-120C7");
+        if (player)
+            for (int i = 0; i < config.bombs; ++i)
+                spec["pylon_mounts"]["B" + std::to_string(i)] = json::String("Mk-82");
+    }
     auto unit = std::dynamic_pointer_cast<Fighter>(UnitFactory::create_unit(uid, spec));
     if (!unit)
         throw std::runtime_error("Cannot create aircraft: " + model);
@@ -175,7 +181,8 @@ void GameSession::reset(const GameConfig &config) {
     if (!config.library_aircraft)
         aircraft_definition(config.enemy_model);
     if (config.library_aircraft &&
-        (config.mission != "training" || config.missiles || config.bombs || config.enemy_attacks))
+        (config.mission != "training" || config.missiles || config.bombs || config.enemy_attacks ||
+         std::any_of(config.loadout.begin(),config.loadout.end(),[](const auto& item){return !item.second.empty();})))
         throw std::invalid_argument(
             "Imported library access is unarmed training-only; disable enemy weapons");
     if (config.mission != "air" && config.mission != "strike" && config.mission != "combined" &&
@@ -189,8 +196,12 @@ void GameSession::reset(const GameConfig &config) {
         throw std::invalid_argument("Unknown FDM");
     if (config.library_aircraft && config.fdm != "auto" && config.fdm != definition.fdm_type)
         throw std::invalid_argument("Requested backend differs from the imported source");
-    if (config.missiles < 0 || config.missiles > definition.max_missiles || config.bombs < 0 ||
-        config.bombs > definition.max_bombs)
+    if(config.use_station_loadout) {
+        const auto errors=validate_loadout(config.player_model,config.loadout);
+        if(!errors.empty())throw std::invalid_argument(errors.front());
+    }
+    if (!config.use_station_loadout && (config.missiles < 0 || config.missiles > definition.max_missiles || config.bombs < 0 ||
+        config.bombs > definition.max_bombs))
         throw std::invalid_argument("Invalid loadout");
     if (!std::isfinite(config.player_north) || !std::isfinite(config.player_west) ||
         !std::isfinite(config.ground_north) || !std::isfinite(config.ground_west) ||
@@ -200,6 +211,16 @@ void GameSession::reset(const GameConfig &config) {
         !std::isfinite(config.enemy_range) || config.enemy_range < 1000 || config.enemy_range > 500000)
         throw std::invalid_argument("Invalid sortie position or airspeed");
     config_ = config;
+    selected_weapon_="AIM-120C7";
+    if(config.use_station_loadout) {
+        config_.missiles=config_.bombs=0;selected_weapon_.clear();
+        for(const auto& [station,w]:config.loadout)if(!w.empty()) {
+            const auto* d=find_weapon(w);
+            if(d&&d->category=="missile")++config_.missiles;
+            if(d&&d->category=="bomb")++config_.bombs;
+            if(selected_weapon_.empty()||w=="AIM-120C7")selected_weapon_=w;
+        }
+    }
     cfg::dt = config.dt;
     cfg::sim_time = 0;
     BaselinePool::instance().clear();
@@ -314,6 +335,7 @@ void GameSession::apply_command(const PilotCommand &c,bool drive) {
         return;
     if(drive){pilot_controls_ = c;drive_player(c);}
     applied_tick_ = tick_;
+    if(find_weapon(c.weapon))selected_weapon_=c.weapon;
     if (c.lock) {
         const auto radar = std::dynamic_pointer_cast<Radar>(player->radar);
         const auto it = radar ? radar->get_data().find(c.target_uid)
@@ -327,30 +349,25 @@ void GameSession::apply_command(const PilotCommand &c,bool drive) {
             record("lock_rejected", c.uid, c.target_uid, "", "Target is not a radar contact");
     }
     if (c.fire) {
-        const auto fire_radar = std::dynamic_pointer_cast<Radar>(player->radar);
-        const std::string target = c.target_uid.empty() ? selected_target_ : c.target_uid;
-        const auto target_obj = SOPool::instance().get(target);
-        if (target.empty() || !target_obj || !target_obj->is_alive || target != selected_target_ ||
-            !fire_radar || !fire_radar->get_data().count(target) || c.weapon != "AIM-120C7" ||
-            !terrain_->line_of_sight(player->position, target_obj->position) ||
-            !player->can_shoot_enm(target_obj) ||
-            !launch_envelope(*player, target_obj->position, target_obj->velocity, target).in_range)
-            record("fire_rejected", c.uid, target, c.weapon, "A valid lock and launch zone are required");
-        else if (player->shoot(c.weapon, target)) {
-            player->last_shoot_time = cfg::sim_time;
-            record("missile_launched", c.uid, target, c.weapon, "Missile away", player->position);
-        } else
-            record("fire_rejected", c.uid, target, c.weapon, "No ammunition or weapon cooling down");
+        const std::string target=c.target_uid.empty()?selected_target_:c.target_uid;
+        const auto target_obj=SOPool::instance().get(target);
+        const auto check=check_weapon_launch(*player,c.weapon,target_obj,c.station);
+        const auto* weapon=find_weapon(c.weapon);
+        const bool radar=weapon&&weapon->seeker=="active_radar";
+        if(!check.allowed)
+            record("fire_rejected",c.uid,target,c.weapon,check.reason);
+        else if(!terrain_->line_of_sight(player->position,target_obj->position))
+            record("fire_rejected",c.uid,target,c.weapon,"Terrain blocks target");
+        else if(radar&&(target!=selected_target_||!launch_envelope(*player,target_obj->position,target_obj->velocity,target).in_range))
+            record("fire_rejected",c.uid,target,c.weapon,"A valid radar lock and launch zone are required");
+        else if(launch_weapon(*player,c.weapon,target_obj,c.station))
+            record("missile_launched",c.uid,target,c.weapon,"Missile away",player->position);
+        else record("fire_rejected",c.uid,target,c.weapon,"Weapon launch failed");
     }
     if (c.drop_bomb) {
-        const auto mount = player->pylon_manager.release_weapon("Mk-82");
-        if (mount.empty())
-            record("release_rejected", c.uid, "", "Mk-82", "No bombs remaining");
-        else {
-            SOPool::instance().add(std::make_shared<Mk82Bomb>("bomb_" + std::to_string(++bomb_serial_),
-                                                              *player, terrain_, config_.dt));
+        if(release_bomb(*player,"Mk-82",terrain_,c.station)) {
             record("bomb_released", c.uid, "", "Mk-82", "Bomb away", player->position);
-        }
+        } else record("release_rejected",c.uid,"","Mk-82","No bomb on the requested station");
     }
 }
 void GameSession::spawn_intercept_wave(){
@@ -469,7 +486,7 @@ void GameSession::advance(int n, bool force) {
                 if(auto p=fighter("player");p&&p->is_alive){
                     pilot_controls_.reset();p->set_player_flight(intent);
                     PilotCommand actions;actions.fire=intent.fire;actions.drop_bomb=intent.drop_bomb;
-                    actions.lock=intent.lock;actions.target_uid=intent.target_uid;actions.weapon=intent.weapon;
+                    actions.lock=intent.lock;actions.target_uid=intent.target_uid;actions.weapon=intent.weapon;actions.station=intent.station;
                     apply_command(actions,false);
                 }
             }
@@ -613,15 +630,18 @@ void GameSession::publish_frame() {
             e.kind = "missile";
             e.model = missile->missile_model;
             e.weapon_age = std::max(0.0, cfg::sim_time - weapon_launch_times_[obj->uid]);
-            e.motor_burning = e.weapon_age <= default_missile_parameter.t_thrust;
+            double burn_time=default_missile_parameter.t_thrust;
+            if(auto generic=std::dynamic_pointer_cast<MModelA>(missile))burn_time=generic->get_params().get_double_("t_thrust");
+            e.motor_burning = e.weapon_age <= burn_time;
             if (missile->is_alive && missile->target) {
                 MissileFlight flight;
                 flight.uid = obj->uid;
+                flight.model = missile->missile_model;
                 flight.owner = missile->parent ? missile->parent->uid : "";
                 flight.target = missile->target->uid;
                 flight.age = e.weapon_age;
                 flight.range = distance(obj->position, missile->target->position);
-                flight.seeker_active = missile->radar_on;
+                flight.seeker_active = missile->radar_on || missile->ir_on;
                 flight.motor_burning = e.motor_burning;
                 if (flight.range > 1) {
                     for (int i = 0; i < 3; ++i)
@@ -654,7 +674,11 @@ void GameSession::publish_frame() {
         if (auto radar = std::dynamic_pointer_cast<Radar>(player->radar))
             f.radar_range = radar->radar_range;
         else { f.radar_mode="OFF";f.radar_range=0; }
-        f.missiles_left = player->pylon_manager.num_left_weapons("AIM-120");
+        f.selected_weapon=selected_weapon_;
+        for(const auto& [station,w]:player->pylon_manager.get_all_mounts())if(!w.empty()) {
+            ++f.weapon_counts[w];const auto* d=find_weapon(w);
+            if(d&&d->category=="missile")++f.missiles_left;
+        }
         f.bombs_left = player->pylon_manager.num_left_weapons("Mk-82");
         if (f.bombs_left > 0 && player->is_alive) {
             f.bomb_impact =
@@ -666,9 +690,16 @@ void GameSession::publish_frame() {
                     terrain_->line_of_sight(player->position, observation->position)) {
                     f.contacts.push_back({uid, "radar", observation->position, observation->velocity,
                                           uid == selected_target_});
-                    if (uid == selected_target_)
-                        f.envelope =
-                            launch_envelope(*player, observation->position, observation->velocity, uid);
+                    if (uid == selected_target_) {
+                        const auto check=check_weapon_launch(*player,selected_weapon_,SOPool::instance().get(uid));
+                        f.launch_ready=check.allowed;f.launch_reason=check.reason;
+                        const auto* weapon=find_weapon(selected_weapon_);
+                        if(weapon&&weapon->seeker=="active_radar") {
+                            f.envelope=launch_envelope(*player,observation->position,observation->velocity,uid);
+                            f.launch_ready=f.launch_ready&&f.envelope.in_range;
+                            if(check.allowed&&!f.launch_ready)f.launch_reason="Outside launch zone";
+                        }
+                    }
                 }
             }
         const auto append_warning = [&](const auto &sensor, bool missile, bool localized) {
@@ -714,8 +745,11 @@ GameTerrain GameSession::terrain() const {
 }
 void GameSession::set_terrain(const GameTerrain &terrain) {
     if (!std::isfinite(terrain.origin_north) || !std::isfinite(terrain.origin_west) ||
-        !std::isfinite(terrain.spacing) || terrain.columns < 2 || terrain.rows < 2 || terrain.columns > 512 ||
-        terrain.rows > 512 || std::any_of(terrain.heights.begin(), terrain.heights.end(), [](double x) {
+        // Offline imported terrain can span128km at40m (3201 nodes).
+        // Keep a finite4096-square bound (~128MiB of doubles),without
+        // changing indexed sampling,contact,collision,or simulation timing.
+        !std::isfinite(terrain.spacing) || terrain.columns < 2 || terrain.rows < 2 || terrain.columns > 4096 ||
+        terrain.rows > 4096 || std::any_of(terrain.heights.begin(), terrain.heights.end(), [](double x) {
             return !std::isfinite(x);
         }))
         throw std::invalid_argument("Invalid terrain data");

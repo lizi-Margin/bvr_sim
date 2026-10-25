@@ -9,21 +9,30 @@ def unit(v):
     v=np.asarray(v,dtype=float);return v/max(np.linalg.norm(v),1e-12)
 def angle(a,b):return math.degrees(math.acos(float(np.clip(np.dot(unit(a),unit(b)),-1,1))))
 def summarize(folder,summary):
-    samples=json.loads((folder/'samples.json').read_text());t=np.array([s['time'] for s in samples]);active=t>=4
+    samples=json.loads((folder/'samples.json').read_text());t=np.array([s['time'] for s in samples])
+    # A sample at4.000000000000003 can still belong to the preceding intent
+    # interval. Locate the actual recorded request change instead of treating
+    # floating time>=4 as proof that the new command has been submitted.
+    onset_index=next((i for i,s in enumerate(samples) if s['target']!=samples[0]['target']),None)
+    tape=json.loads((folder/'intent-tape.json').read_text());dt=tape['config']['dt'];sample_ticks=summary.get('sample_ticks',tape.get('sample_ticks',5))
+    onset_tick=samples[onset_index]['tick']-sample_ticks if onset_index is not None else None
+    onset_s=onset_tick*dt if onset_tick is not None else None
+    active=np.arange(len(samples))>=onset_index if onset_index is not None else np.zeros(len(samples),dtype=bool)
     m=[s['state']['measured'] for s in samples];vel=np.array([unit(x['velocity']) for x in m])
     errors=np.array([s['direction_error_deg'] for s in samples]);result={'source':str(folder),
         'source_samples_sha256':sha(folder/'samples.json'),'summary':summary,'step_response':None,
-        'metrics_scope':'Extrema at recorded 0.1-second intervals; not guaranteed to capture every 0.02-second peak',
+        'metrics_scope':('Every0.02s core-controller sample' if summary.get('sample_ticks',5)==1 else 'Extrema at recorded0.1s intervals; not guaranteed to capture every0.02s peak'),
         'protecting_sample_fraction':sum(s['state']['protecting'] for s in samples)/len(samples),
         'energy_limited_sample_fraction':sum(s['state']['energy_limited'] for s in samples)/len(samples),
         'control_normalized_abs_max':{k:max(abs(s['state']['controls'][k]) for s in samples) for k in ['aileron','elevator','rudder']},
-        'raw_intent_error_rms_deg':float(np.sqrt(np.mean(errors[active]**2))),
+        'raw_intent_error_rms_deg':float(np.sqrt(np.mean(errors[active]**2))) if active.any() else None,
         'missing_measurements':[k for k in ['body_rates','alpha','beta','normal_g','density'] if all(x[k] is None for x in m)]}
     steady=summary['case'] in ['fine','up','down','turn_45','turn_90','turn_180']
     if steady and active.any():
-        base=unit(np.mean(vel[(t>=3)&(t<4)],axis=0));target=unit(samples[np.flatnonzero(active)[0]]['target']);amplitude=angle(base,target)
+        before_window=(~active)&(t>=onset_s-1-1e-8)
+        base=unit(np.mean(vel[before_window],axis=0));target=unit(samples[onset_index]['target']);amplitude=angle(base,target)
         if summary['case'].startswith('turn_'):
-            yaw=np.unwrap(np.arctan2(vel[:,1],vel[:,0]));before=float(np.mean(yaw[(t>=3)&(t<4)]))
+            yaw=np.unwrap(np.arctan2(vel[:,1],vel[:,0]));before=float(np.mean(yaw[before_window]))
             moved=np.degrees(yaw-before);index=next((i for i in np.flatnonzero(active) if abs(moved[i])>1),None)
             sign=math.copysign(1,moved[index]) if index is not None else 1
             progress=moved*sign;basis='Unwrapped heading progress in the actual initial turn direction; 180-degree intent has two equally valid turn directions'
@@ -33,13 +42,14 @@ def summarize(folder,summary):
             basis='Signed angular progress in the initial path/target great-circle plane; cross-plane error is separately retained in vector direction error'
         def crossing(fraction):
             indices=np.flatnonzero(active&(progress>=amplitude*fraction))
-            return float(t[indices[0]]-4) if len(indices) else None
+            return float(t[indices[0]]-onset_s) if len(indices) else None
         tolerance=max(.2,min(2,.1*amplitude));remaining=np.maximum.accumulate(errors[::-1])[::-1]
         indices=np.flatnonzero(active&(remaining<=tolerance)&(t<=t[-1]-2))
-        result['step_response']={'command_onset_s':4,'command_amplitude_deg':amplitude,'progress_basis':basis,
+        result['step_response']={'command_onset_s':onset_s,'command_onset_tick':onset_tick,'first_sample_with_new_request_tick':samples[onset_index]['tick'],
+            'onset_source':'Actual recorded target change and preceding sample interval; not a floating-time threshold','command_amplitude_deg':amplitude,'progress_basis':basis,
             'response_delay_10pct_s':crossing(.1),'rise_to_90pct_s':crossing(.9),
             'overshoot_progress_deg':float(max(0,np.max(progress[active])-amplitude)),
-            'settling_tolerance_deg':tolerance,'settling_s':float(t[indices[0]]-4) if len(indices) else None,
+            'settling_tolerance_deg':tolerance,'settling_s':float(t[indices[0]]-onset_s) if len(indices) else None,
             'settling_definition':'First recorded sample after onset whose vector path error stays inside tolerance for the rest of the run, with at least two seconds remaining',
             'final_error_deg':float(errors[-1])}
     return result

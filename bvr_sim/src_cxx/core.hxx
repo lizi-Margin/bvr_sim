@@ -37,6 +37,7 @@ public:
 
     void step(int steps = 1);
     void set_environment(std::shared_ptr<const Terrain> environment) { environment_=std::move(environment); }
+    std::shared_ptr<const Terrain> environment() const { return environment_; }
 
     json::JSON handle(const std::string& cmd);
     void set_acmi_file_path(const std::string& path);

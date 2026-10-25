@@ -1,9 +1,18 @@
 #include "weapon_factory.hxx"
 #include "simulator/missile/aim120c.hxx"
 #include "simulator/missile/mmodelA.hxx"
+#include "weapon_catalog.hxx"
+#include "bomb/mk82.hxx"
 #include <stdexcept>
 
 namespace bvr_sim {
+
+std::shared_ptr<Mk82Bomb> WeaponFactory::create_bomb(const std::string& name,
+    const std::shared_ptr<SimulatedObject>& parent,std::shared_ptr<const Terrain> environment) {
+    const auto* d=find_weapon(name);
+    if(!d||d->category!="bomb"||d->backend!="mk82"||!parent||!environment)return nullptr;
+    return std::make_shared<Mk82Bomb>(parent->uid+parent->get_new_uuid(),*parent,std::move(environment),parent->dt);
+}
 
 // std::string WeaponFactory::normalize_weapon_name(const std::string& weapon_name) noexcept {
 //     std::string normalized = weapon_name;
@@ -21,23 +30,11 @@ WeaponFactory::WeaponModelType WeaponFactory::parse_weapon_name(const std::strin
     if (weapon_name.empty()) {
         return WeaponModelType::Unknown;
     }
-    const static std::map<std::string, WeaponModelType> MAP = {
-        {"AIM-120", WeaponModelType::AIM120C},
-        {"AIM-120C", WeaponModelType::AIM120C},
-        {"AIM-120C5", WeaponModelType::AIM120C},
-        {"AIM-120C7", WeaponModelType::AIM120C},
-        {"AIM-120C-MModelA", WeaponModelType::MModelA},
-        {"AIM-120C-MModelA-Poor", WeaponModelType::MModelA},
-        {"AIM-9", WeaponModelType::MModelA},
-        {"AIM-9M", WeaponModelType::MModelA},
-        {"AIM-9M-Omni", WeaponModelType::MModelA},
-    };
-
-    auto it = MAP.find(weapon_name);
-    if (it == MAP.end()) {
-        return WeaponModelType::Unknown;
-    }
-    return it->second;
+    const auto* definition=find_weapon(weapon_name);
+    if(!definition)return WeaponModelType::Unknown;
+    if(definition->backend=="aim120c")return WeaponModelType::AIM120C;
+    if(definition->backend=="mmodelA")return WeaponModelType::MModelA;
+    return WeaponModelType::Unknown;
 }
 
 std::shared_ptr<Missile> WeaponFactory::create_missile(

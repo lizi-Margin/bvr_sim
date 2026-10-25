@@ -16,6 +16,7 @@
 #include <vector>
 #include <variant>
 #include "simulator/environment.hxx"
+#include "simulator/weapon_catalog.hxx"
 #include "simulator/ground/ground_types.hxx"
 #include "simulator/aircraft/tactical_pilot.hxx"
 #include "simulator/aircraft/player_flight_types.hxx"
@@ -41,6 +42,8 @@ struct GameConfig {
     bool enemy_evasion = false; // legacy callers keep their existing intercept behavior
     int missiles = 4;
     int bombs = 2;
+    bool use_station_loadout = false; // legacy count-only callers remain supported
+    LoadoutSpec loadout;
     std::vector<GroundUnitSpec> ground_units;
     int intercept_waves=3;
     double intercept_interval=120.,intercept_timeout=600.;
@@ -61,6 +64,7 @@ struct PilotCommand {
     bool lock = false;
     std::string target_uid;
     std::string weapon = "AIM-120C7";
+    std::string station;
 };
 
 struct GameContact {
@@ -108,7 +112,7 @@ struct LaunchEnvelope {
     bool in_range = false;
 };
 struct MissileFlight {
-    std::string uid, owner, target;
+    std::string uid, owner, target, model;
     double age = 0, range = 0, closing_speed = 0, eta = -1;
     bool seeker_active = false, motor_burning = false;
 };
@@ -131,6 +135,9 @@ struct GameFrame {
     std::vector<GroundState> ground_units;
     std::vector<CombatEvent> events;
     int missiles_left = 0, bombs_left = 0;
+    std::string selected_weapon, launch_reason;
+    bool launch_ready = false;
+    std::map<std::string,int> weapon_counts;
     int air_kills = 0, ground_kills = 0;
     bool radar_warning = false, missile_warning = false;
     std::string radar_mode = "RWS", rwr_mode = "quiet", enemy_behavior = "intercept";
@@ -197,6 +204,7 @@ class GameSession {
     std::uint64_t tick_ = 0, applied_tick_ = 0;
     unsigned bomb_serial_ = 0;
     std::string selected_target_, result_ = "running";
+    std::string selected_weapon_ = "AIM-120C7";
     std::string enemy_behavior_ = "intercept";
     bool enemy_locked_ = false;
     std::map<std::string, double> weapon_launch_times_;

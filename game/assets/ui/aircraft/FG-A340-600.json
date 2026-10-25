@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-A340-600",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A340-600\\FG-A340-600.glb",
+  "source_sha256": "1f0469aa07b1ca26971120cb654a79ff0c35a9b5c18ade7f80358936a5995d6f",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A340-600.png",
+  "png_sha256": "767274d3d9119fe7b2be1b7a900fd2c73430de453e23cf3f766d833d165cd354",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

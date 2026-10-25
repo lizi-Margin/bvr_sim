@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-M-4-Bison-A",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-M-4-Bison-A\\FG-M-4-Bison-A.glb",
+  "source_sha256": "84ff7e816d332a079e39d090bb7811da28b27164ea226a8f09866f6511046172",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-M-4-Bison-A.png",
+  "png_sha256": "1e31db6427fe4591c2770f7d48826d6436c6124d3b8c467825a202c88c0be0d5",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

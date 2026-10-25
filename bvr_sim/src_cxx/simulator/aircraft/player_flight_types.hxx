@@ -16,6 +16,7 @@ struct PlayerFlightIntent {
     PlayerFlightMode mode=PlayerFlightMode::Assisted;
     bool fire=false,drop_bomb=false,lock=false;
     std::string target_uid,weapon="AIM-120C7";
+    std::string station;
 };
 struct FlightMeasurements {
     std::array<double,3> position{},velocity{},orientation{};

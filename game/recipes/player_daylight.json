@@ -2,8 +2,8 @@
   "schema_version": 1,
   "name": "player_daylight",
   "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
-  "shader_source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shader-source",
-  "shader_cache": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\cache\\player-daylight\\shaders-owned-source-v1",
+  "shader_source": "D:\\bvr_sim_resources\\iteration-cache\\map-quality-v275\\visibility-v320\\shader-source",
+  "shader_cache": "D:\\bvr_sim_resources\\iteration-cache\\map-quality-v275\\visibility-v320\\shader-cache",
   "physical_sky": true,
   "aerial_perspective": true,
   "high_quality_sky": false,
@@ -54,7 +54,7 @@
   },
   "shader_patch": {
     "upstream_objectHF_sha256": "709cda99b3d2a0ff44fb40b086d959777799ec63474c8a42ef6c469d25b8806a",
-    "patched_objectHF_sha256": "a0b62b49b95bdda79bdf167fdfb53a33ad3d898764e4f347de016a124176add4",
+    "patched_objectHF_sha256": "b88b20ffc74dbe7f353f375a1dd2ee12327055bddd6dd7d867baec0f8223531d",
     "patched_sky_lut_sha256": "2a80ee8799ee11066a37e7f2fa001b7058b157143d0d12a47440e4bc679c0d53",
     "patched_skyHF_sha256": "a74dec34f77c16adc67783bc3d4d0be5e24e88c52be7c24db60a7e625d762e05",
     "flat_nwu_horizon_haze": "Removed world-horizontal farAP crossfade. Nonstationary background lookup clamps to last physical sky ray above the curved planet horizon; geometry and AP remain actual.",
@@ -68,7 +68,15 @@
     "source_tree_grounding": "Explicit source UV1 base anchors or source-tree indices with per-instance north/west position streams, shared R32 core height atlas and indexed-triangle interpolation. Same raster deformation in color/depth/shadows and GPU draw-buffer inspection. Static triangle preload shifts current/previous geometry for visibility depth/velocity. Unused partial-batch slots collapse to zero-area triangles. Owned GPU instance copy patches bounds and stream offsets/counts before visibility; indexed raster only.",
     "cache_provenance": "Owned-source-v1 cache starts without inherited compiled programs: old copied wishadermeta referenced upstream includes and left shadow variants stale. All compiled dependencies must refer to owned shader-source files.",
     "patched_surfaceHF_sha256": "5e0256d0777de092801d3c19908aad7d10e4f29683cd28e72cfc86939d818927",
-    "water_refraction_depth": "Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias."
+    "water_refraction_depth": "Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias.",
+    "wide_primitive_id_raster": {
+      "mode": "direct64_indexed",
+      "source_manifest": "D:\\bvr_sim_resources\\engine\\wide-primitive-v257\\preparation.json",
+      "manifest_sha256": "32f9a04a5d162a08630c4ca60105e4a26be938923b0b395da0093361a4080a9b",
+      "scope": "24-bit scene object,8-bit subset,32-bit triangle IDs. Indexed forward raster with no global meshlet lookup. All tree instances and source geometry retained."
+    },
+    "cached_tree_heights": "Opt-in16-byte north/west/core-height stream. Actual GPU grounding readback passed; every original source tree and its highest geometry are retained.",
+    "bvr_groundHF_sha256": "1f5264f3ef8d92420e3b6d774bcef71540ba117f5a5314c2d020d4762a5d2889"
   },
   "provenance": {
     "geometry": "Original registered FlightGear exterior geometry retained; F16 adds original source pilot_externalview.ac and Cockpit/Main/cockpit.ac, without new invented geometry or physical changes.",
@@ -108,6 +116,16 @@
     ],
     "basis": "Engineering linear-light albedo for existing stylized Kenney leaf/bark palette only. Source-derived textured pine is unchanged; not measured species reflectance."
   },
-  "aircraft_exhaust_profiles_file": "../config/aircraft_exhaust_profiles.json",
-  "aircraft_exhaust_profiles_sha256": "230c37be95f7c3b4f5491c0cdff68914268fae556eef203dba5097d64bb41158"
+  "aircraft_exhaust_profiles_file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\config\\aircraft_exhaust_profiles.json",
+  "aircraft_exhaust_profiles_sha256": "230c37be95f7c3b4f5491c0cdff68914268fae556eef203dba5097d64bb41158",
+  "wide_primitive_id_raster": true,
+  "cached_tree_heights": true,
+  "wide_visibility_compute_v1": true,
+  "visibility_compute_shading": true,
+  "vegetation_full_detail": false,
+  "vegetation_lod_distance_m": 1200,
+  "flatten_static_vegetation": true,
+  "occlusion_culling": false,
+  "planar_reflections": false,
+  "render_scale": 1.0
 }

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-ME-262",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-ME-262\\FG-ME-262.glb",
+  "source_sha256": "2ce4300654260eaaaf01aeedf92a5d22ffb59250ffff5c12a636b4b615552518",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-ME-262.png",
+  "png_sha256": "0ed487f5919e4ae31d94c5ad5b76e07f9709200ea0a46528a015bc7eecc51473",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Lockheed-SR71",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-SR71\\FG-Lockheed-SR71.glb",
+  "source_sha256": "cee6f8851a354782189e1e704d871162f00ad8fb64d51172bf76645bb298d0d7",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-SR71.png",
+  "png_sha256": "d1e951afcb50ec8c6ede39bd7f920aa1467e11c9a3f896fda5e4a4c15d754201",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

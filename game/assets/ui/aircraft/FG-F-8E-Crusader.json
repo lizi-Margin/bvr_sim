@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-F-8E-Crusader",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-8E-Crusader\\FG-F-8E-Crusader.glb",
+  "source_sha256": "ebbc5b359df7dd7735eb840cceaf899f99db9259ff14a40be9416434991a932a",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-8E-Crusader.png",
+  "png_sha256": "ee715953e367571a72b00980eb4cc03fcf04f7b8b18fce704cffb5deee0ba3e7",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

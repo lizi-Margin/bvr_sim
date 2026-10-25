@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Citation-Bravo",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Citation-Bravo\\FG-Citation-Bravo.glb",
+  "source_sha256": "1d65aabc726546d55d3e5cb60a3433d860cd9298475a6f4cd11282c5af2561a8",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Citation-Bravo.png",
+  "png_sha256": "27c45449849a779f9a3e891d690b4746ffa18e0f6f1adae3af4a9f294f241c57",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

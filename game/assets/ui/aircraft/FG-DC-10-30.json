@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-DC-10-30",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-DC-10-30\\FG-DC-10-30.glb",
+  "source_sha256": "543ec728cbe097f6e7ef3d42c2a135a9e9b40a0d6c9a451641cbc1b963711920",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-DC-10-30.png",
+  "png_sha256": "1c39f8957566ef981a7868f2a398e3241dbc955e725e4d16ae75108a0d5a609d",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

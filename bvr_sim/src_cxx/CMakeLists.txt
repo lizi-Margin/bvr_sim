@@ -77,6 +77,9 @@ set(BVR_SIM_SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/so_pool.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/bsl_pool.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/core.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/weapon_catalog.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/weapon_launch.cxx"
+    "${CMAKE_CURRENT_SOURCE_DIR}/simulator/core_aircraft.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/gameplay/game_session.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/environment.cxx"
     "${CMAKE_CURRENT_SOURCE_DIR}/simulator/bomb/mk82.cxx"
@@ -210,6 +213,12 @@ function(set_compiler_params target_name)
             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         )
+        # Versioned agent validation must never relink a module loaded by another client.
+        if(BVR_SIM_ARTIFACT_DIRECTORY)
+            set_target_properties(${target_name} PROPERTIES
+                LIBRARY_OUTPUT_DIRECTORY_RELEASE "${BVR_SIM_ARTIFACT_DIRECTORY}"
+                RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BVR_SIM_ARTIFACT_DIRECTORY}")
+        endif()
 
         message(STATUS "MSVC detected: Configuring for Windows")
 

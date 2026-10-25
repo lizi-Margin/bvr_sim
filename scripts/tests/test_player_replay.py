@@ -5,9 +5,34 @@ from types import SimpleNamespace
 from unittest.mock import patch
 from bvr_game.app import FlightGame,serialize,native
 from bvr_game.player_profiles import PlayerProfileStore
-from bvr_game.playtest import replay
+from bvr_game.playtest import replay,digest
 
 class PlayerReplayTests(unittest.TestCase):
+    def test_recorded_endpoint_cadence_includes_partial_final_step(self):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'BVR_SORTIE_LOG_ROOT':str(Path(temp)/'sorties')}):
+            for counts in ([5,5],[5,5,2]):
+                directory=Path(temp)/('-'.join(map(str,counts)));directory.mkdir()
+                g=FlightGame(output=directory/'client')
+                try:
+                    g.config.mission='training';g.start(start_position=[-20000,0,8500],initial_speed=300)
+                    initial=serialize(g.sim.frame());records=[]
+                    for count in counts:
+                        before=g.sim.frame().tick;g.command(throttle=.85,heading=0.,pitch=0.)
+                        frame=serialize(g.step(count))
+                        records.append({'tick':before,'ticks':count,'command':{'throttle':.85,'heading':0.,'pitch':0.},'frame_sha256':digest(frame),
+                                        'selected_weapon':'Mk-82' if len(records)==len(counts)-1 else 'AIM-120C7'})
+                    data={'map':str(g.map_path),'map_sha256':g.scene_hash,'config':serialize(g.config),
+                          'initial_position':[-20000,0,8500],'initial_speed':300,
+                          'initial_frame':initial,'player_profile':g.player_profile,'actions':records,'final_frame':frame}
+                finally:g.close()
+                tape=directory/'tape.json';tape.write_text(json.dumps(data),encoding='utf8')
+                report=replay(tape,directory/'replay')
+                self.assertEqual(report['status'],'passed')
+                self.assertEqual(report['complete_frames_compared'],len(counts))
+                self.assertEqual(report['endpoint_tick_counts'],sorted(set(counts)))
+                self.assertEqual(report['sample_interval_s'],.1 if len(set(counts))==1 else None)
+                self.assertEqual(report['selected_weapon'],'Mk-82')
+
     def test_client_intent_pause_exact_step_and_reload_replay_whole_frame(self):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'BVR_SORTIE_LOG_ROOT':str(Path(temp)/'sorties')}):
             g=FlightGame(output=Path(temp)/'client')

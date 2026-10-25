@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-McDonnell-Douglas-T-45-Goshawk",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-McDonnell-Douglas-T-45-Goshawk\\FG-McDonnell-Douglas-T-45-Goshawk.glb",
+  "source_sha256": "6a3f7a1c0ba031826a34421c7f1fa9150cc97600b7320164d5ed1f2deec7d029",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-McDonnell-Douglas-T-45-Goshawk.png",
+  "png_sha256": "89a734b56a48108d2473ce23943c58bfc6e8649cbc235e2f7d4e23190b75de97",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

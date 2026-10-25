@@ -1,0 +1,9 @@
+{
+  "aircraft": "F4N",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F4\\FG-F4.glb",
+  "source_sha256": "44da24a3d94e73fc23d36125b2c8d8f71c9d70e9036d36661cdc7504ccd01789",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\F4N.png",
+  "png_sha256": "dffdb7ec3be0734c6ca6b27a154d87a36c1a4ff4a69983ec4a9149f506711821",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

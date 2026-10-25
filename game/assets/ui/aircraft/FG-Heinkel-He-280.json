@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Heinkel-He-280",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Heinkel-He-280\\FG-Heinkel-He-280.glb",
+  "source_sha256": "617942e86f8fc126116ae16eb60faa715582ea59068b3623f038c2304d2b4e34",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Heinkel-He-280.png",
+  "png_sha256": "5d00cfc6cfbba468c37169acc6f56cfa6c9a572d190e063197d321b705acdfbf",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

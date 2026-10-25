@@ -107,7 +107,12 @@ private:
     std::string _nav_point_uuid;
 
 public:
+    // Numerical source-FDM setting, independent of player/AI gain profiles.
+    static constexpr double default_max_inner_dt=.005;
     explicit JSBSimFDM(double dt = 0.1, const std::map<std::string, std::string>& kwargs = {});
+    double max_inner_dt() const noexcept {return jsbsim_dt_max;}
+    double inner_dt() const noexcept {return jsbsim_inner_dt;}
+    int inner_steps() const noexcept {return jsbsim_inner_steps;}
 
     ~JSBSimFDM() noexcept override = default;
 

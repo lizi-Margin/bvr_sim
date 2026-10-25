@@ -1,0 +1,9 @@
+{
+  "aircraft": "FG-Lockheed-S3-Viking",
+  "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-S3-Viking\\FG-Lockheed-S3-Viking.glb",
+  "source_sha256": "bdc59eaa548f27022f043d2580555d18e90f90a236631070ee14a5a9245533a1",
+  "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-S3-Viking.png",
+  "png_sha256": "cafcce3bdeb5adb3257f4f8af336bfd0d52a4fb01e5f8c6bb61c41133dbe711c",
+  "renderer": "Blender Cycles CPU8samples",
+  "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+}

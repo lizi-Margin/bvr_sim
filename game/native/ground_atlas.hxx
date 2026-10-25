@@ -17,8 +17,9 @@ class GroundBoundsUpdater {
     wi::graphics::GPUBuffer patches[wi::graphics::GraphicsDevice::GetBufferCount()];
     int structured_views[wi::graphics::GraphicsDevice::GetBufferCount()]{};
     wi::graphics::Shader shader;
+    std::array<uint64_t,wi::graphics::GraphicsDevice::GetBufferCount()> uploaded_patch_revisions{};
   public:
-    void apply(wi::scene::Scene& scene,const std::vector<GroundBoundsUpdate>& values) {
+    void apply(wi::scene::Scene& scene,const std::vector<GroundBoundsUpdate>& values,uint64_t revision) {
         using namespace wi::graphics;
         if(values.empty())return;
         auto device=GetDevice();const auto frame=scene.cpu_gpu_mapped_resource_index;
@@ -39,8 +40,12 @@ class GroundBoundsUpdater {
             GPUBufferDesc desc;desc.size=values.size()*sizeof(GroundBoundsUpdate)*2;desc.usage=Usage::UPLOAD;
             desc.bind_flags=BindFlag::SHADER_RESOURCE;desc.misc_flags=ResourceMiscFlag::BUFFER_RAW;
             if(!device->CreateBuffer(&desc,nullptr,&input))throw std::runtime_error("Cannot allocate source grove bounds patches");
+            uploaded_patch_revisions[frame]=0;
         }
-        std::memcpy(input.mapped_data,values.data(),values.size()*sizeof(GroundBoundsUpdate));
+        if(uploaded_patch_revisions[frame]!=revision){
+            std::memcpy(input.mapped_data,values.data(),values.size()*sizeof(GroundBoundsUpdate));
+            uploaded_patch_revisions[frame]=revision;
+        }
         const auto cmd=device->BeginCommandList();
         device->Barrier(GPUBarrier::Buffer(&output,fresh?ResourceState::UNDEFINED:ResourceState::SHADER_RESOURCE,ResourceState::COPY_DST),cmd);
         if(source.desc.usage!=Usage::UPLOAD)device->Barrier(GPUBarrier::Buffer(&source,ResourceState::UNDEFINED,ResourceState::COPY_SRC),cmd);
@@ -130,20 +135,32 @@ class GroundAtlas {
         texture=std::move(next);cpu_metadata=value;
         info.columns=columns;info.rows=rows;info.origin_north=north;info.origin_west=west;info.spacing=spacing;info.bytes=size*sizeof(float);info.source_sha256=source_sha256;
     }
-    void set_tree_positions(const std::vector<std::array<float,2>>& points) {
+    void set_tree_positions(const std::vector<std::array<float,2>>& points,const std::vector<float>& cached_heights={}) {
         using namespace wi::graphics;
         if(points.empty()&&!valid())return;
         metadata_srv();auto device=GetDevice();device->WaitForGPU();GPUBuffer next;
+        if(!cached_heights.empty()&&cached_heights.size()!=points.size())throw std::invalid_argument("Source-tree height cache size mismatch");
+        std::vector<std::array<float,4>> cached;
+        if(!cached_heights.empty()){
+            cached.reserve(points.size());
+            for(size_t i=0;i<points.size();++i){
+                if(!std::isfinite(cached_heights[i]))throw std::invalid_argument("Nonfinite cached tree height");
+                cached.push_back({points[i][0],points[i][1],cached_heights[i],0});
+            }
+        }
+        const size_t stride=cached.empty()?sizeof(points[0]):sizeof(cached[0]);
         if(!points.empty()){
             for(auto p:points)if(!std::isfinite(p[0])||!std::isfinite(p[1])||!covers(p[0],p[1]))throw std::invalid_argument("Streamed source tree lies outside ground atlas");
-            GPUBufferDesc desc;desc.size=points.size()*sizeof(points[0]);desc.bind_flags=BindFlag::SHADER_RESOURCE;desc.misc_flags=ResourceMiscFlag::BUFFER_RAW;
-            if(!device->CreateBuffer(&desc,points.data(),&next))throw std::runtime_error("Cannot upload independent source tree positions");
+            GPUBufferDesc desc;desc.size=points.size()*stride;desc.bind_flags=BindFlag::SHADER_RESOURCE;desc.misc_flags=ResourceMiscFlag::BUFFER_RAW;
+            const void* data=cached.empty()?static_cast<const void*>(points.data()):static_cast<const void*>(cached.data());
+            if(!device->CreateBuffer(&desc,data,&next))throw std::runtime_error("Cannot upload independent source tree positions");
         }
         auto value=cpu_metadata;value.pad=next.IsValid()?uint32_t(device->GetDescriptorIndex(&next,SubresourceType::SRV))+1:0;
+        value.pad1=cached.empty()?0.f:1.f;
         auto cmd=device->BeginCommandList();device->Barrier(GPUBarrier::Buffer(&metadata,ResourceState::SHADER_RESOURCE,ResourceState::COPY_DST),cmd);
         device->UpdateBuffer(&metadata,&value,cmd,sizeof(value));device->Barrier(GPUBarrier::Buffer(&metadata,ResourceState::COPY_DST,ResourceState::SHADER_RESOURCE),cmd);
         device->SubmitCommandLists();device->WaitForGPU();tree_positions=std::move(next);cpu_metadata=value;
-        info.tree_positions_count=points.size();info.tree_positions_bytes=points.size()*sizeof(points[0]);
+        info.tree_positions_count=points.size();info.tree_positions_bytes=points.size()*stride;
     }
     wi::graphics::GPUBuffer parameters(const std::array<float,4>& range,const std::vector<std::array<float,2>>& anchors={}) const {
         using namespace wi::graphics;
