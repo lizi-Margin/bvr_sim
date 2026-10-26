@@ -61,3 +61,7 @@ __pycache__
 /game/maps/river_valley_forest_individual_a_stems/
 /game/maps/river_valley_forest_normal_a_water500/
 /game/maps/river_valley_outer_cover_v41/
+
+# Local map releases and validation artifacts; large, machine-specific outputs.
+/game/maps/published/
+/work/
