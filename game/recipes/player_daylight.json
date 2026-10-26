@@ -65,7 +65,7 @@
     "source_card_material_flag": "0x42565256",
     "source_card_backface_normals": "For registered source-volume cards only, mirror normal depth while retaining texture tangent/bitangent components on backfaces. Source images, alpha/depth and standard materials unchanged. Opposite-side volume lighting remains an impostor approximation.",
     "source_card_normal_encoding": "Exact retained source PNG loaded once per view as linear RGBA8; decode all three averaged normal channels for explicitly marked source-volume cards. No inferred hemisphere, altered source vectors or global normal-map change.",
-    "source_tree_grounding": "Explicit source UV1 base anchors or source-tree indices with per-instance north/west position streams, shared R32 core height atlas and indexed-triangle interpolation. Same raster deformation in color/depth/shadows and GPU draw-buffer inspection. Static triangle preload shifts current/previous geometry for visibility depth/velocity. Unused partial-batch slots collapse to zero-area triangles. Owned GPU instance copy patches bounds and stream offsets/counts before visibility; indexed raster only.",
+    "source_tree_grounding": "Explicit source-tree anchors and streams with the shared R32 core height atlas; same raster deformation in color/depth/shadows. Checked immutable bounds and stream metadata are packed once in the normal engine upload, then reused while entity, mesh, layout and ring buffer remain valid. Ordinary dynamic-object update and the unregistered fallback stay live. Actual GPU draw-buffer inspections certify bounded samples.",
     "cache_provenance": "Owned-source-v1 cache starts without inherited compiled programs: old copied wishadermeta referenced upstream includes and left shadow variants stale. All compiled dependencies must refer to owned shader-source files.",
     "patched_surfaceHF_sha256": "5e0256d0777de092801d3c19908aad7d10e4f29683cd28e72cfc86939d818927",
     "water_refraction_depth": "Retain coarse depth only for refracted UV selection; final attenuation uses the selected full-resolution depth sample. No retained mip-footprint depth bias.",
@@ -127,5 +127,37 @@
   "flatten_static_vegetation": true,
   "occlusion_culling": false,
   "planar_reflections": false,
-  "render_scale": 1.0
+  "render_scale": 1.0,
+  "vegetation_distance_lods": {
+    "WT-OakLargeGrove64-v181": {
+      "manifest": "D:\\bvr_sim_resources\\registered\\WT-OakLargeGrove64-Area-Q20261026\\manifest.json",
+      "manifest_sha256": "0682afcbf2821caa636b4963ce7d173ff5346e657e8ed0f8fbd01a1f346a94fa",
+      "parent_manifest": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\WT-OakLargeGrove64-v181\\manifest.json"
+    },
+    "WT-OakMediumGrove64-v91": {
+      "manifest": "D:\\bvr_sim_resources\\registered\\WT-OakMediumGrove64-Area-Q20261026\\manifest.json",
+      "manifest_sha256": "ee5ad10a5aa2c2c42d24d98c3bf0c5a95e8f53abd9c171af14f9d270399023cc",
+      "parent_manifest": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\WT-OakMediumGrove64-v91\\manifest.json"
+    },
+    "fir_grove_crown_volume_b": {
+      "parent_manifest": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\fir_grove_crown_volume_b\\manifest.json",
+      "manifest": "D:\\bvr_sim_resources\\registered\\FirGrove64-Support-Q20261026-v1\\manifest.json",
+      "manifest_sha256": "93b4178449005fcb8fdcb18c74d160ae25667160cd572cbddd12b0d8fa857fa4"
+    },
+    "WT-OakLargeGrove64-NativeNormals-v257": {
+      "parent_manifest": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\WT-OakLargeGrove64-NativeNormals-v257\\manifest.json",
+      "manifest": "D:\\bvr_sim_resources\\registered\\WT-OakLargeNative-Area-Q20261026\\manifest.json",
+      "manifest_sha256": "156926f97ff4b53a511ed9b374063cfffe4e29aacce6e7094c348dd8bd2292fd"
+    },
+    "WT-OakMediumGrove64-NativeNormals-v257": {
+      "parent_manifest": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\WT-OakMediumGrove64-NativeNormals-v257\\manifest.json",
+      "manifest": "D:\\bvr_sim_resources\\registered\\WT-OakMediumNative-Area-Q20261026\\manifest.json",
+      "manifest_sha256": "c08a8128a3dbb1a0586bae6654edbf0f97c9a7fb5e8e51b29eae4cacd28f41ea"
+    }
+  },
+  "rootless_static_vegetation": true,
+  "spatial_vegetation_lod": true,
+  "worker_threads": 0,
+  "cache_static_scenery": false,
+  "inline_ground_bounds": true
 }

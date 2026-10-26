@@ -122,11 +122,11 @@ def alpha_mask_glb(path):
     encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*((-len(encoded))%4)
     rest=data[20+length:];path.write_bytes(struct.pack('<III',0x46546c67,2,20+len(encoded)+len(rest))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+rest)
 
-def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False,reuse_bake=None,additional_views=()):
+def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEVEE',*,normal_maps=False,reuse_bake=None,additional_views=(),shading_normals=False):
     if render_engine not in ['BLENDER_EEVEE','CYCLES']:raise ValueError('Unsupported source-albedo bake engine')
     out.mkdir(parents=True,exist_ok=True)
     scene=bpy.context.scene;scene.render.engine=render_engine;scene.render.film_transparent=True
-    if render_engine=='CYCLES':scene.cycles.device='CPU';scene.cycles.samples=8;scene.cycles.use_denoising=False
+    if render_engine=='CYCLES':scene.cycles.device='CPU';scene.cycles.samples=8;scene.cycles.use_denoising=False;scene.cycles.transparent_max_bounces=256
     scene.render.resolution_x=scene.render.resolution_y=resolution;scene.render.resolution_percentage=100
     scene.render.image_settings.file_format='PNG';scene.render.image_settings.color_mode='RGBA'
     scene.view_settings.view_transform='Standard';scene.view_settings.look='None';scene.view_settings.exposure=0;scene.view_settings.gamma=1
@@ -178,9 +178,13 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
             nodes=m.node_tree.nodes;links=m.node_tree.links
             emission=next(n for n in nodes if n.type=='EMISSION')
             geometry=nodes.new('ShaderNodeNewGeometry');combine=nodes.new('ShaderNodeCombineXYZ');axes=[]
+            source_normal=geometry.outputs['Normal']
+            if shading_normals:
+                bsdf=next(n for n in nodes if n.type=='BSDF_PRINCIPLED')
+                if bsdf.inputs['Normal'].is_linked:source_normal=bsdf.inputs['Normal'].links[0].from_socket
             for axis in range(3):
                 dot=nodes.new('ShaderNodeVectorMath');dot.operation='DOT_PRODUCT'
-                links.new(geometry.outputs['Normal'],dot.inputs[0])
+                links.new(source_normal,dot.inputs[0])
                 encode=nodes.new('ShaderNodeMath');encode.operation='MULTIPLY_ADD';encode.inputs[1].default_value=.5;encode.inputs[2].default_value=.5
                 links.new(dot.outputs['Value'],encode.inputs[0]);links.new(encode.outputs[0],combine.inputs[axis]);axes.append(dot)
             links.new(combine.outputs[0],emission.inputs['Color']);normal_nodes.append(axes)
@@ -230,6 +234,7 @@ def impostors(objects,out,height,width,resolution=512,render_engine='BLENDER_EEV
         'view_directions_blender':[list(view_basis(angle)[2]) for angle,_ in views],
         'additional_aerial_views_degrees':list(additional_views),
         'normal_views':[str(file) for file in normal_views],
-        'normal_basis':'Actual source geometry normals projected onto per-card tangent/bitangent/front-normal, Raw linear RGB; no baked directional lighting' if normal_maps else None,
+        'normal_basis':('Source shading normals including linked normal maps' if shading_normals else 'Actual source geometry normals')+' projected onto per-card tangent/bitangent/front-normal, Raw linear RGB; no baked directional lighting' if normal_maps else None,
         'render_engine':render_engine,'reused_registered_bake':reuse_bake,
+        'transparent_max_bounces':scene.cycles.transparent_max_bounces if render_engine=='CYCLES' else None,
         'method':'Three source-albedo vertical views and one top view'+(', plus declared oblique source views. Requires view selection before use in the game; overlapping all views is not a valid runtime representation' if additional_views else '')+'. Approximate silhouette; not full source geometry or a measured BRDF.'}

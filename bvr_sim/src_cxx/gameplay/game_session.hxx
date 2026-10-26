@@ -28,7 +28,7 @@ class Fighter;
 struct GameConfig {
     std::string player_model = "F22";
     std::string enemy_model = "F16";
-    std::string mission = "air"; // air | strike | combined
+    std::string mission = "air"; // also dogfight_1v1: fixed4km head-on, one opponent
     std::string fdm = "jsbsim";
     bool library_aircraft = false; // explicit unarmed training access to separately imported aircraft
     std::uint32_t seed = 7;
@@ -184,6 +184,7 @@ class GameSession {
     void apply_command(const PilotCommand &command,bool drive=true);
     void drive_player(const PilotCommand &command);
     void update_enemy();
+    void update_dogfight_enemy();
     void spawn_intercept_wave();
     void update_intercept_enemies();
     void record(std::string kind, std::string actor, std::string target, std::string weapon,

@@ -1,10 +1,18 @@
 """Input mapping and full menu/combat loop using real simulation, no GPU needed."""
 import tempfile,unittest
 from types import SimpleNamespace
-from bvr_game.app import FlightGame
+from bvr_game.app import FlightGame,initial_catalog_aircraft
+from bvr_game.player_input import FREE_LOOK_KEY
 from bvr_game.presentation import mouse_pitch,curve
 import math
 class FlightGameTests(unittest.TestCase):
+    def test_reduced_aircraft_catalog_falls_back_from_native_default(self):
+        f16={'id':'F16','simulation_model':'F16','available':True}
+        unavailable={'id':'F22','simulation_model':'F22','available':False}
+        self.assertIs(initial_catalog_aircraft([f16], 'F22'),f16)
+        self.assertIs(initial_catalog_aircraft([unavailable,f16], 'F22'),f16)
+        self.assertIsNone(initial_catalog_aircraft([unavailable], 'F22'))
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.game=FlightGame(output=self.temp.name)
         self.game.config.enemy_attacks=False;self.game.config.enemy_range=3500
@@ -151,7 +159,7 @@ class FlightGameTests(unittest.TestCase):
         self.game.config.mission='training';self.game.start()
         original=list(self.game.player_input.direction)
         for _ in range(50):
-            self.game.input(SimpleNamespace(held=[67,83],pressed=[],x=1500,y=200,quit=False),.02)
+            self.game.input(SimpleNamespace(held=[FREE_LOOK_KEY,83],pressed=[],x=1500,y=200,quit=False),.02)
             self.game.step()
         self.assertEqual(self.game.player_input.direction,original)
         self.assertEqual(self.game.sim.player_flight_state().pitch_manual_weight,1)

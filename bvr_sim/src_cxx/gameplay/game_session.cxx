@@ -100,7 +100,10 @@ std::shared_ptr<Fighter> create_fighter(const std::string &uid, const std::strin
     spec["position"] = json::Array(position[0], position[1], position[2]);
     spec["velocity"] = json::Array(velocity[0], velocity[1], velocity[2]);
     spec["pylon_mounts"] = json::Object();
-    if(player&&config.use_station_loadout) {
+    if(config.mission=="dogfight_1v1") {
+        for(const auto& [station,weapon]:loadout_preset(model,"dogfight"))
+            spec["pylon_mounts"][station]=json::String(weapon);
+    } else if(player&&config.use_station_loadout) {
         for(const auto& [station,weapon]:config.loadout)spec["pylon_mounts"][station]=json::String(weapon);
     } else {
         for (int i = 0; i < config.missiles; ++i)
@@ -186,7 +189,7 @@ void GameSession::reset(const GameConfig &config) {
         throw std::invalid_argument(
             "Imported library access is unarmed training-only; disable enemy weapons");
     if (config.mission != "air" && config.mission != "strike" && config.mission != "combined" &&
-        config.mission != "convoy" && config.mission != "training" && config.mission != "intercept_patrol")
+        config.mission != "convoy" && config.mission != "training" && config.mission != "intercept_patrol" && config.mission!="dogfight_1v1")
         throw std::invalid_argument("Unknown mission");
     if(config.mission=="intercept_patrol" && (config.intercept_waves<1||config.intercept_waves>5||
        !std::isfinite(config.intercept_interval)||config.intercept_interval<30||
@@ -200,6 +203,10 @@ void GameSession::reset(const GameConfig &config) {
         const auto errors=validate_loadout(config.player_model,config.loadout);
         if(!errors.empty())throw std::invalid_argument(errors.front());
     }
+    if(config.mission=="dogfight_1v1"){
+        loadout_preset(config.player_model,"dogfight");
+        loadout_preset(config.enemy_model,"dogfight");
+    }
     if (!config.use_station_loadout && (config.missiles < 0 || config.missiles > definition.max_missiles || config.bombs < 0 ||
         config.bombs > definition.max_bombs))
         throw std::invalid_argument("Invalid loadout");
@@ -211,8 +218,11 @@ void GameSession::reset(const GameConfig &config) {
         !std::isfinite(config.enemy_range) || config.enemy_range < 1000 || config.enemy_range > 500000)
         throw std::invalid_argument("Invalid sortie position or airspeed");
     config_ = config;
-    selected_weapon_="AIM-120C7";
-    if(config.use_station_loadout) {
+    selected_weapon_=config.mission=="dogfight_1v1"?"AIM-9M":"AIM-120C7";
+    if(config.mission=="dogfight_1v1") {
+        config_.loadout=loadout_preset(config.player_model,"dogfight");
+        config_.missiles=static_cast<int>(config_.loadout.size());config_.bombs=0;
+    } else if(config.use_station_loadout) {
         config_.missiles=config_.bombs=0;selected_weapon_.clear();
         for(const auto& [station,w]:config.loadout)if(!w.empty()) {
             const auto* d=find_weapon(w);
@@ -244,11 +254,11 @@ void GameSession::reset(const GameConfig &config) {
     create_fighter("player", config.player_model, "Blue",
                    {config.player_north, config.player_west, config.altitude}, {config.speed, 0, 0}, config,
                    true);
-    if (config.mission == "air" || config.mission == "combined") {
+    if (config.mission == "air" || config.mission == "combined" || config.mission=="dogfight_1v1") {
         std::mt19937 random(config.seed);
-        const double west = std::uniform_real_distribution<double>(-100.0, 100.0)(random);
+        const double west = config.mission=="dogfight_1v1"?0:std::uniform_real_distribution<double>(-100.0, 100.0)(random);
         create_fighter("bandit", config.enemy_model, "Red",
-                       {config.player_north + config.enemy_range, config.player_west + west, config.altitude},
+                       {config.player_north + (config.mission=="dogfight_1v1"?4000.:config.enemy_range), config.player_west + west, config.altitude},
                        {-config.speed, 0, 0}, config, false);
     }
     if(config.mission=="intercept_patrol")spawn_intercept_wave();
@@ -349,17 +359,20 @@ void GameSession::apply_command(const PilotCommand &c,bool drive) {
             record("lock_rejected", c.uid, c.target_uid, "", "Target is not a radar contact");
     }
     if (c.fire) {
-        const std::string target=c.target_uid.empty()?selected_target_:c.target_uid;
-        const auto target_obj=SOPool::instance().get(target);
-        const auto check=check_weapon_launch(*player,c.weapon,target_obj,c.station);
         const auto* weapon=find_weapon(c.weapon);
+        const auto ir=weapon&&weapon->seeker=="infrared"?
+            acquire_infrared_target(*player,c.weapon,*terrain_,c.target_uid):nullptr;
+        const std::string target=weapon&&weapon->seeker=="infrared"?(ir?ir->uid:""):
+            (c.target_uid.empty()?selected_target_:c.target_uid);
+        const auto target_obj=ir?ir:SOPool::instance().get(target);
+        const auto check=check_weapon_launch(*player,c.weapon,target_obj,c.station);
         const bool radar=weapon&&weapon->seeker=="active_radar";
         if(!check.allowed)
             record("fire_rejected",c.uid,target,c.weapon,check.reason);
         else if(!terrain_->line_of_sight(player->position,target_obj->position))
             record("fire_rejected",c.uid,target,c.weapon,"Terrain blocks target");
-        else if(radar&&(target!=selected_target_||!launch_envelope(*player,target_obj->position,target_obj->velocity,target).in_range))
-            record("fire_rejected",c.uid,target,c.weapon,"A valid radar lock and launch zone are required");
+        else if(radar&&target!=selected_target_)
+            record("fire_rejected",c.uid,target,c.weapon,"A valid radar lock is required");
         else if(launch_weapon(*player,c.weapon,target_obj,c.station))
             record("missile_launched",c.uid,target,c.weapon,"Missile away",player->position);
         else record("fire_rejected",c.uid,target,c.weapon,"Weapon launch failed");
@@ -413,6 +426,7 @@ void GameSession::update_intercept_enemies(){
 }
 void GameSession::update_enemy() {
     if(config_.mission=="intercept_patrol"){update_intercept_enemies();return;}
+    if(config_.mission=="dogfight_1v1"){update_dogfight_enemy();return;}
     auto enemy = fighter("bandit"), player = fighter("player");
     if (!enemy || !player || !enemy->is_alive || !player->is_alive)
         return;
@@ -465,6 +479,35 @@ void GameSession::update_enemy() {
         enemy->can_shoot_enm(player) && enemy->shoot("AIM-120C7", "player")) {
         enemy->last_shoot_time = cfg::sim_time;
         record("missile_launched", "bandit", "player", "AIM-120C7", "Enemy missile launched", a);
+    }
+}
+void GameSession::update_dogfight_enemy(){
+    auto enemy=fighter("bandit"),player=fighter("player");
+    if(!enemy||!player||!enemy->is_alive||!player->is_alive)return;
+    const auto& a=enemy->position;const auto& b=player->position;
+    const double range=distance(a,b);
+    const bool visual=range<=12000&&terrain_->line_of_sight(a,b);
+    const double bearing=std::atan2(b[1]-a[1],b[0]-a[0]);
+    double desired=bearing;
+    double climb=std::clamp((b[2]-a[2])*.0002,-.3,.3);
+    std::string phase=visual?"merge":"search";
+    const bool missile_warning=enemy->mws&&!enemy->mws->get_data().empty();
+    if(missile_warning){
+        desired=norm_angle(bearing+((config_.seed&1)?1.:-1.)*pi*.58);
+        climb=a[2]>terrain_->height(a[0],a[1])+1500?-.2:.2;phase="defend";
+    }
+    enemy->set_pilot_input(std::clamp(norm_angle(desired-enemy->get_yaw())/(90*pi/180),-.85,.85),climb,.98);
+    if(phase!=enemy_behavior_){enemy_behavior_=phase;record("enemy_maneuver","bandit","player","","Dogfight AI: "+phase,a);}
+
+    bool airborne=false;
+    for(const auto& object:SOPool::instance().get_all())
+        if(auto missile=std::dynamic_pointer_cast<Missile>(object))
+            if(missile->is_alive&&missile->parent&&missile->parent->uid=="bandit")airborne=true;
+    if(config_.enemy_attacks&&!missile_warning&&!airborne&&visual){
+        const auto target=acquire_infrared_target(*enemy,"AIM-9M",*terrain_,"player");
+        if(target&&launch_weapon(*enemy,"AIM-9M",target)){
+            record("missile_launched","bandit","player","AIM-9M","Hostile AIM-9M launched",a);
+        }
     }
 }
 void GameSession::step(int n) { advance(n, false); }
@@ -538,7 +581,7 @@ void GameSession::advance(int n, bool force) {
         if (!player || !player->is_alive)
             result_ = "failed";
         else if ((config_.mission=="intercept_patrol" && int(intercept_weapon_kills_.size())==config_.intercept_waves) ||
-                 (config_.mission == "air" && seen_deaths_.count("bandit")) ||
+                 ((config_.mission == "air"||config_.mission=="dogfight_1v1") && seen_deaths_.count("bandit")) ||
                  (config_.mission == "strike" && seen_deaths_.count("depot")) ||
                  (config_.mission == "combined" && seen_deaths_.count("bandit") &&
                   seen_deaths_.count("depot")) ||
@@ -567,6 +610,7 @@ void GameSession::publish_frame() {
     f.enemy_behavior = enemy_behavior_;
     f.events = events_;
     f.air_kills = int(seen_deaths_.count("bandit"));
+    if(config_.mission=="dogfight_1v1")f.mission_total=f.mission_kills_required=1;
     if(config_.mission=="intercept_patrol"){
         f.air_kills=int(intercept_weapon_kills_.size());
         f.mission_wave=intercept_spawned_;f.mission_total=f.mission_kills_required=config_.intercept_waves;
@@ -696,12 +740,23 @@ void GameSession::publish_frame() {
                         const auto* weapon=find_weapon(selected_weapon_);
                         if(weapon&&weapon->seeker=="active_radar") {
                             f.envelope=launch_envelope(*player,observation->position,observation->velocity,uid);
-                            f.launch_ready=f.launch_ready&&f.envelope.in_range;
-                            if(check.allowed&&!f.launch_ready)f.launch_reason="Outside launch zone";
                         }
                     }
                 }
             }
+        const auto* selected=find_weapon(selected_weapon_);
+        if(selected&&selected->seeker=="infrared"){
+            const auto target=acquire_infrared_target(*player,selected_weapon_,*terrain_,selected_target_);
+            f.envelope={};f.launch_ready=false;f.launch_reason="IR SEARCH / point nose at target";f.selected_target.clear();
+            if(target){
+                f.selected_target=target->uid;
+                f.contacts.push_back({target->uid,"infrared",target->position,target->velocity,true});
+                const auto check=check_weapon_launch(*player,selected_weapon_,target);
+                f.launch_ready=check.allowed;f.launch_reason=check.allowed?"IR LOCK / Ready":check.reason;
+            }
+        }else if(selected&&selected->seeker=="active_radar"&&selected_target_.empty()){
+            f.launch_ready=false;f.launch_reason="Radar lock is required";
+        }
         const auto append_warning = [&](const auto &sensor, bool missile, bool localized) {
             if (!sensor)
                 return;
@@ -758,9 +813,10 @@ void GameSession::set_terrain(const GameTerrain &terrain) {
     double highest = *std::max_element(terrain.heights.begin(), terrain.heights.end());
     for (const auto &tile : terrain.detail_tiles) {
         if (!std::isfinite(tile.spacing) || tile.spacing <= 0 || tile.columns < 2 || tile.rows < 2 ||
-            // Bounded1024x1024 permits a continuous20km/25m regional tile
-            // (~5MiB of doubles); its sampling/physics are otherwise unchanged.
-            tile.columns > 1024 || tile.rows > 1024 || !std::isfinite(tile.origin_north) ||
+            // Match the bounded4096-square base-grid allowance so an imported
+            // source base can remain intact inside a larger regional grid.
+            // Indexed sampling, contacts and simulation timing are unchanged.
+            tile.columns > 4096 || tile.rows > 4096 || !std::isfinite(tile.origin_north) ||
             !std::isfinite(tile.origin_west) ||
             std::any_of(tile.heights.begin(), tile.heights.end(), [](double h) { return !std::isfinite(h); }))
             throw std::invalid_argument("Invalid detail height field");

@@ -1,7 +1,7 @@
 """World-intent invariants independent of camera and physical steering."""
 import math,unittest
 from types import SimpleNamespace
-from bvr_game.player_input import PlayerInputAdapter
+from bvr_game.player_input import FREE_LOOK_KEY,PlayerInputAdapter
 from bvr_game.player_profiles import PlayerProfileStore
 
 
@@ -32,7 +32,7 @@ class PlayerInputTests(unittest.TestCase):
             self.assertDirection(intent)
     def test_free_look_release_at_window_edge_does_not_arm_a_turn(self):
         intent=self.settled()
-        for _ in range(50):self.update(x=1919,y=50,hold=True,keys=[67,83])
+        for _ in range(50):self.update(x=1919,y=50,hold=True,keys=[FREE_LOOK_KEY,83])
         self.assertDirection(intent)
         for _ in range(200):self.update(x=1919,y=50)
         self.assertDirection(intent)

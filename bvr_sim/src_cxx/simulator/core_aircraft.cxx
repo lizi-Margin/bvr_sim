@@ -50,6 +50,11 @@ std::vector<CoreObjectState> core_objects() {
     }
     return result;
 }
+std::string core_acquire_ir_target(const std::string& uid,const std::string& weapon,const Terrain& terrain) {
+    auto own=std::dynamic_pointer_cast<Aircraft>(SOPool::instance().get(uid));
+    auto target=own?acquire_infrared_target(*own,weapon,terrain):nullptr;
+    return target?target->uid:"";
+}
 WeaponLaunchCheck core_check_launch(const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station) {
     auto a=std::dynamic_pointer_cast<Aircraft>(SOPool::instance().get(uid));
     if(!a)return {false,"Unknown aircraft","",0,0};

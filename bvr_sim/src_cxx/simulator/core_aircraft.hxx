@@ -20,6 +20,7 @@ struct CoreObjectState {
 void reset_core_world(std::uint32_t seed);
 void spawn_core_aircraft(const AircraftSpawnSpec& spec);
 std::vector<CoreObjectState> core_objects();
+std::string core_acquire_ir_target(const std::string& uid,const std::string& weapon,const Terrain& terrain);
 WeaponLaunchCheck core_check_launch(const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station="");
 bool core_launch_weapon(const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station="");
 bool core_release_weapon(const std::string& uid,const std::string& weapon,std::shared_ptr<const Terrain> terrain,const std::string& station="");

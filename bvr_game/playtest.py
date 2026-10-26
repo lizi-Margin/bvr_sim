@@ -9,7 +9,7 @@ ACMI and world trajectories are diagnostics written by the evaluator, never poli
 inputs. JSONL is an optional command boundary around the in-process typed host.
 """
 from __future__ import annotations
-from dataclasses import dataclass,asdict
+from dataclasses import dataclass,asdict,field
 from pathlib import Path
 import argparse,hashlib,json,math,os,subprocess,sys,time
 from .app import FlightGame,serialize,native,ROOT
@@ -32,14 +32,17 @@ class LocalObservation:
     missile_warning:bool
     rwr_mode:str
     mission:dict
+    weapon_counts:dict=field(default_factory=dict)
 
 class LocalCombatPilot:
     """Baseline strategy using own state, radar observations and warning bearings."""
-    def __init__(self,seed=7):
-        self.side=1 if seed&1 else -1;self.last_fire=-100.;self.last_seen=-100.;self.track=None;self.last_missiles=6;self.phase='search'
+    def __init__(self,seed=7,shot_interval=40.):
+        if not math.isfinite(shot_interval) or shot_interval<=0:raise ValueError('Shot interval must be finite and positive')
+        self.shot_interval=shot_interval
+        self.side=1 if seed&1 else -1;self.last_fire=-100.;self.last_seen=-100.;self.track=None;self.last_missiles=None;self.phase='search'
     def command(self,o:LocalObservation):
         own=o.own;p=own['position'];v=own['velocity'];yaw=own['orientation'][2]
-        if o.missiles<self.last_missiles:self.last_fire=o.time
+        if self.last_missiles is not None and o.missiles<self.last_missiles:self.last_fire=o.time
         self.last_missiles=o.missiles
         if o.contacts:
             self.track=min(o.contacts,key=lambda c:math.dist(p,c['position']));self.last_seen=o.time
@@ -58,7 +61,7 @@ class LocalCombatPilot:
                 c['heading']=yaw+warning['bearing']+self.side*math.radians(110)
                 c['pitch']=-.06 if own['agl']>1800 else .15
                 self.phase='defend'
-        elif o.time-self.last_fire<40:
+        elif o.time-self.last_fire<self.shot_interval:
             c['heading']=bearing+self.side*math.radians(20);self.phase='support'
         elif o.radar_warning and distance<45000:
             c['heading']=bearing+self.side*math.radians(20);self.phase='crank'
@@ -68,7 +71,8 @@ class LocalCombatPilot:
             closing=sum((a-b)*r for a,b,r in zip(v,self.track['velocity'],radial))
         # Baseline evidence: waiting until 28 km ceded the first shot in all 20
         # armed duels. Use only measured head-on geometry for an earlier shot.
-        if o.contacts and distance<45000 and closing>150 and o.missiles>0 and o.time-self.last_fire>40 and not o.missile_warning and abs(angle(bearing-yaw))<math.radians(40):
+        ammunition=o.weapon_counts.get('AIM-120C7',0) if o.weapon_counts else o.missiles
+        if o.contacts and distance<45000 and closing>150 and ammunition>0 and o.time-self.last_fire>self.shot_interval and not o.missile_warning and abs(angle(bearing-yaw))<math.radians(40):
             c.update(lock=True,fire=True,target_uid=self.track['uid']);self.phase='launch'
         return c
 
@@ -80,15 +84,15 @@ def observe_local(game):
     contacts=tuple({'uid':c.uid,'position':list(c.position),'velocity':list(c.velocity),'locked':c.locked} for c in f.contacts)
     warnings=tuple({'uid':w.uid,'bearing':w.bearing,'localized':w.localized,'range':w.range if w.localized else None,'missile':w.missile} for w in f.warnings)
     return LocalObservation(f.tick,f.sim_time,own,contacts,warnings,f.selected_target,f.missiles_left,f.radar_warning,f.missile_warning,f.rwr_mode,
-                            {'id':f.mission,'result':f.result,'kills':f.air_kills,'wave':f.mission_wave,'total':f.mission_total,'next_wave_time':f.next_wave_time,'search_heading':0.})
+                            {'id':f.mission,'result':f.result,'kills':f.air_kills,'wave':f.mission_wave,'total':f.mission_total,'next_wave_time':f.next_wave_time,'search_heading':0.},dict(f.weapon_counts))
 
 class ResidentPlaytest:
-    def __init__(self,output,render=False,map_path=None,visual_profile=None):
+    def __init__(self,output,render=False,map_path=None,visual_profile=None,*,visible=False):
         self.output=Path(output).resolve();self.output.mkdir(parents=True,exist_ok=True)
         self.spec=json.loads(SPEC.read_text());self.spec_sha=sha(SPEC)
         self.core_sha=sha(Path(native.__file__))
         presentation={'visual_profile':visual_profile} if visual_profile is not None else {}
-        self.game=FlightGame(render=render,visible=False,map_path=map_path or ROOT/self.spec['map'],output=self.output/'client',**presentation)
+        self.game=FlightGame(render=render,visible=visible,map_path=map_path or ROOT/self.spec['map'],output=self.output/'client',**presentation)
         self.game.quality='high'
         if self.game.renderer:self.game.renderer.set_quality('high')
         self.configured=False
@@ -98,12 +102,12 @@ class ResidentPlaytest:
         g=self.game;g.select_aircraft(model,'intercept');g.config.mission='intercept_patrol';g.config.seed=seed;g.start()
         self.configured=True;return self.observe()
     def observe(self):return observe_local(self.game)
-    def step(self,ticks=25,command=None,exact=False,player_intent=None):
+    def step(self,ticks=25,command=None,exact=False,player_intent=None,*,draw=True):
         if command and player_intent:raise ValueError('Choose AI command or player intent for one step')
         if command:self.game.command(**command)
         if player_intent:self.game.submit_player(**player_intent)
         self.game.step_exact(ticks) if exact else self.game.step(ticks)
-        if self.game.renderer:self.game.draw()
+        if draw and self.game.renderer:self.game.draw()
         return self.observe()
     def pause(self,paused=True):
         self.game.sim.set_paused(paused);self.game.journal.record('pause',paused,self.game.sim.frame().tick)

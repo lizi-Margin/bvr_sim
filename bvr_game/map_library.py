@@ -41,7 +41,9 @@ def scene_profile(base,document,*,use_environment=True,asset_root=None):
     shadow_cascades(result)
     return result
 
-def digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def digest(path):
+    # Multi-gigabyte map packages must not allocate another whole-file copy.
+    with Path(path).open('rb') as source:return hashlib.file_digest(source,'sha256').hexdigest()
 def read(path):return json.loads(Path(path).read_text(encoding='utf8'))
 def inside(root,path):
     result=(root/path).resolve()
@@ -55,6 +57,9 @@ def catalog_storage(catalog,data,alias=None):
     if not isinstance(alias,str) or not isinstance(roots,dict) or alias not in roots:
         raise ValueError('Unknown map storage root: '+str(alias))
     value=roots[alias]
+    # Portable distributions anchor self-contained map packages beside the
+    # catalog, without embedding the build machine's absolute drive path.
+    if value=='$catalog':return Path(catalog).resolve().parent
     if not isinstance(value,str) or not Path(value).is_absolute():
         raise ValueError('Map storage root must be an absolute directory')
     return Path(value).resolve()
@@ -92,24 +97,31 @@ class MapLibrary:
             row['map']=str(inside(Path(row['manifest']).parent,'generated-map.json'))
             result.append(row)
         return result
-    def resolve(self,id):
+    def resolve(self,id,*,with_document=False):
+        from .startup import progress
         row=next((r for r in self.versions() if r['id']==id),None)
         if row is None:raise ValueError('Unknown published map version: '+id)
         root=Path(row['manifest']).parent
         if digest(row['manifest'])!=row['manifest_sha256']:raise ValueError('Map release manifest changed')
         manifest=read(row['manifest'])
-        for file in manifest['files']:
+        for index,file in enumerate(manifest['files']):
+            progress('verify_map',f"正在校验地图文件 {index+1}/{len(manifest['files'])}")
             if digest(inside(root,file['path']))!=file['sha256']:raise ValueError('Map package file changed: '+file['path'])
         if digest(row['map'])!=manifest['map_sha256']:raise ValueError('Map version changed')
         from .content import ASSETS
         registered=(ASSETS/'registered').resolve()
         catalog=read(self.path)
-        for id,version in read(row['map'])['resource_versions'].items():
+        progress('read_map','正在读取大型地图，请稍候；可随时取消')
+        document=read(row['map'])
+        progress('verify_models','正在校验地图模型')
+        for id,version in document['resource_versions'].items():
             directory=registered_directory(registered,id,catalog)
             if digest(directory/'manifest.json')!=version['manifest_sha256']:raise ValueError('Registered map manifest changed: '+id)
             for lod in version['lods']:
                 if digest(inside(directory,lod['file']))!=lod['sha256']:raise ValueError('Registered map model changed: '+id)
-        return row
+        # The CLI can hand this exact verified document to FlightGame rather
+        # than parsing a gigabyte-sized JSON a second time before its window.
+        return (row,document) if with_document else row
 
 def choices(library,current):
     """Keep an explicit --map usable, without pretending it is published."""

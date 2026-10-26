@@ -8,7 +8,8 @@ KENNEY={
  'city-kit-roads':{'name':'City Kit Roads','tags':['road','fence','lamp','equipment']},
  'city-kit-industrial':{'name':'City Kit Industrial','tags':['warehouse','tank','industrial']},
  'city-kit-suburban':{'name':'City Kit Suburban','tags':['house','village','building']}}
-def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def sha(path):
+    with Path(path).open('rb') as source:return hashlib.file_digest(source,'sha256').hexdigest()
 
 def registered_version(asset_id,manifest):
     result={'sha256':manifest['glb_sha256'],'lods':manifest['lods']}

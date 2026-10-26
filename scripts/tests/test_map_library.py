@@ -5,10 +5,16 @@ import copy,json,tempfile,unittest
 import numpy as np
 from bvr_game.content import sha,write_json
 from bvr_game.map_authoring import publish
-from bvr_game.map_library import MapLibrary,scene_profile,registered_directory
+from bvr_game.map_library import MapLibrary,catalog_storage,scene_profile,registered_directory
 from bvr_game.app import FlightGame,serialize
 
 class MapLibraryTests(unittest.TestCase):
+    def test_portable_catalog_alias_resolves_to_its_own_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            catalog=Path(folder)/'game'/'maps'/'catalog.json';catalog.parent.mkdir(parents=True)
+            data={'storage_roots':{'portable':'$catalog'}}
+            self.assertEqual(catalog_storage(catalog,data,'portable'),catalog.parent.resolve())
+
     def test_registered_junction_requires_declared_root_and_same_asset_id(self):
         import os,subprocess
         with tempfile.TemporaryDirectory() as temp:
@@ -53,6 +59,32 @@ class MapLibraryTests(unittest.TestCase):
         source=self.source('first',10);review=json.loads((source/'review.json').read_text());review['map_sha256']='wrong';write_json(source/'review.json',review)
         with self.assertRaisesRegex(ValueError,'another map'):self.release(source)
         self.assertFalse(self.catalog.exists())
+    def test_verified_document_is_reused_by_game_without_reparsing_map(self):
+        from unittest.mock import patch
+        from bvr_game import map_library
+        release=self.release(self.source('handoff',31));library=MapLibrary(self.catalog)
+        with patch('bvr_game.map_library.read',wraps=map_library.read) as reader:
+            row,document=library.resolve(release['id'],with_document=True)
+        self.assertEqual(sum(Path(c.args[0])==Path(row['map']) for c in reader.call_args_list),1)
+        original=Path.read_text
+        def forbid_map_read(path,*args,**kwargs):
+            if path.resolve()==Path(row['map']).resolve():raise AssertionError('Map was reparsed')
+            return original(path,*args,**kwargs)
+        with patch.object(Path,'read_text',forbid_map_read):
+            game=FlightGame(map_path=row['map'],map_document=document,output=self.root/'handoff-client')
+            try:self.assertEqual(game._terrain.height(0,0),31)
+            finally:game.close()
+    def test_confirming_current_map_never_resolves_or_reloads_it(self):
+        from unittest.mock import patch
+        release=self.release(self.source('resident',31))
+        game=FlightGame(map_path=release['map'],map_catalog=self.catalog,output=self.root/'resident-client')
+        try:
+            scene=game.baked_scene;game.frontend.open_preparation(True)
+            with patch.object(game.map_library,'resolve',side_effect=AssertionError('Resident map was reloaded')):
+                game.frontend.launch()
+            self.assertEqual(game.mode,'flight');self.assertIs(game.baked_scene,scene)
+            self.assertEqual(game.sim.terrain().height(0,0),31)
+        finally:game.close()
     def test_external_volume_freezes_and_selects_without_a_local_package_copy(self):
         first=self.release(self.source('local',10));source=self.source('external',70)
         index=json.loads(self.catalog.read_text());external=self.root/'other-volume'
@@ -103,6 +135,19 @@ class MapLibraryTests(unittest.TestCase):
             before=serialize(game.sim.frame());config=serialize(game.config);game.frontend.open_preparation()
             game.frontend.preparation['map_version']='missing';game.frontend.launch()
             self.assertEqual(game.mode,'hangar');self.assertEqual(serialize(game.sim.frame()),before);self.assertEqual(serialize(game.config),config)
+        finally:game.close()
+
+    def test_returned_sortie_can_confirm_another_map_without_reselecting_aircraft(self):
+        first=self.release(self.source('advanced-first',10));second=self.release(self.source('advanced-second',70))
+        game=FlightGame(map_path=Path(first['map']),map_catalog=self.catalog,output=self.root/'advanced-client')
+        try:
+            game.config.mission='training';game.start();game.step(5);self.assertGreater(game.sim.frame().tick,0)
+            game.input(SimpleNamespace(held=[],pressed=[27],x=960,y=540,quit=False),.01)
+            self.assertEqual(game.mode,'hangar');game.frontend.open_preparation(True)
+            game.frontend.action(('option','map_version',second['id']));game.frontend.launch()
+            self.assertEqual(game.mode,'flight');self.assertEqual(game.map_path,Path(second['map']))
+            self.assertEqual(game.sim.frame().tick,0);self.assertEqual(game.sim.terrain().height(0,0),70)
+            game.step(1);self.assertEqual(game.sim.frame().tick,1)
         finally:game.close()
 
     def test_saved_cloud_data_is_frozen_resolved_and_verified(self):

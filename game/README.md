@@ -1,5 +1,13 @@
 # Flight Operations content-rich Alpha
 
+2026-10-26: eight published maps now average above30 FPS on the measured High
+1080p F16 routes, with remaining short stalls in dense woodland. The optional
+`Launch-Regional-Horizon.cmd` opens the new2048km shared-terrain candidate.
+See [map performance, exact conditions and limitations](MAP_PERFORMANCE.md).
+The regional launcher displays a cancellable loading window before importing
+native code. Large-map startup currently takes about one minute on this machine.
+Confirming a sortie on the resident map reuses it without re-reading the package.
+
 The current default is `game/maps/training_range_v2/generated-map.json`: a seeded
 20 x 20 km focus region with 50 m height samples, a 512 km coarse surround,
 airport, two villages, industry, river, irregular fields and clustered forests.
@@ -228,6 +236,48 @@ FlightGear geometry is used for presentation; flight and weapons use bvr_sim's
 existing models, not automatically imported FlightGear aerodynamic/XML logic.
 
 ## Agent simulation and GPU capture
+
+Watch the local Agent fly a complete armed three-wave patrol:
+
+```powershell
+python -m bvr_game.autoplay --aircraft F16 --seed 101 --speed 4
+python -m bvr_game.autoplay --aircraft F16 --seed 101 --speed 10 --video
+python -m bvr_game.autoplay --headless --aircraft F22 --seed 101
+python -m bvr_game.autoplay --map-version river-valley-v56@a12eae9e6ca6eff76e7eed27 --aircraft F16
+```
+
+Space pauses/resumes the Agent; Escape or closing the window stops the run.
+The Agent uses copied own state, radar contacts, weapon inventory and cockpit
+warnings. It makes tactical decisions every 0.5 simulation seconds. The default
+55-second interval between confirmed launches avoids spending a second radar
+missile just before the first one arrives. This remains a local scripted pilot;
+F-22 survival and general success are not guaranteed.
+
+Each attempt creates a fresh `game/captures/autoplay-...` directory with its
+result, decisions, captures and links to the normal ACMI/core/input journals.
+`--video` records the actual GPU backbuffer at 10 fps in simulation time; requested
+live speed depends on GPU/encoding performance. `--seconds N` limits a run and
+reports an unfinished mission honestly. `--output PATH` requires a new directory
+so earlier failed attempts cannot be overwritten. Replay a journal with:
+
+```powershell
+python -m bvr_game.playtest replay SORTIE_DIRECTORY/input-tape.json --output game/captures/autoplay-replay
+```
+
+`--map FILE` selects an explicit baked map; `--map-version ID` validates and loads
+a published version from the map catalog. The patrol still uses its 8500 m combat
+altitude. For map performance at lower altitudes, run the serial moving-flight check:
+
+```powershell
+python game/tools/benchmark_map_flights.py --seconds 20 --output work/my-map-flight-check
+```
+
+This flies F-16 at 850 m and 2400 m MSL on every published map at 1080p High,
+using the normal client's real-time simulation accumulator, HUD and logs. Each
+phase has a 20-second measurement window after warmup. Raw frame times, 1% low,
+P95/P99, captures, map weather and hardware context are saved per map. Loading,
+warmup, screenshots and video encoding are excluded from FPS. Saved map weather
+is retained, so cloud/shadow differences contribute to the observed comparison.
 
 ```powershell
 python -m bvr_game run --mission air

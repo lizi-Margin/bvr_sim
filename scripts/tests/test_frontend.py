@@ -49,6 +49,13 @@ class FrontendTests(unittest.TestCase):
     def test_invalid_seed_does_not_partially_commit_mission(self):
         before=serialize(self.g.config);self.f.open_preparation();self.f.preparation['mission']='strike';self.f.preparation['seed']=''
         self.f.launch();self.assertEqual(serialize(self.g.config),before);self.assertEqual(self.g.mode,'hangar')
+    def test_dogfight_mission_selects_the_real_ir_loadout_and_starts(self):
+        self.f.select('F16');self.f.open_preparation();self.f.action(('option','mission','dogfight_1v1'))
+        self.assertEqual(self.f.preparation['loadout'],'dogfight')
+        self.assertEqual(self.f.preparation['mounts'],{'1':'AIM-9M','9':'AIM-9M'})
+        self.f.launch()
+        self.assertEqual(self.g.mode,'flight');self.assertEqual(self.g.sim.frame().mission,'dogfight_1v1')
+        self.assertEqual(self.g.weapon,'AIM-9M');self.assertEqual(self.g.sim.frame().missiles_left,2)
     def test_invalid_preferences_never_replace_saved_file(self):
         store=ClientSettings(self.root/'preferences.json');store.save(DEFAULTS);before=store.path.read_bytes()
         invalid={**DEFAULTS,'mouse_sensitivity':99.}

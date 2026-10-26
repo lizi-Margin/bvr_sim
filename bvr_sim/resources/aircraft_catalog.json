@@ -59,6 +59,7 @@
       ],
       "default_loadout": "mixed",
       "missions": [
+        "dogfight_1v1",
         "intercept_patrol",
         "air",
         "strike",
@@ -141,6 +142,7 @@
       ],
       "default_loadout": "mixed",
       "missions": [
+        "dogfight_1v1",
         "intercept_patrol",
         "air",
         "strike",
@@ -212,6 +214,7 @@
       ],
       "default_loadout": "intercept",
       "missions": [
+        "dogfight_1v1",
         "air",
         "training"
       ],
@@ -290,6 +293,7 @@
       ],
       "default_loadout": "mixed",
       "missions": [
+        "dogfight_1v1",
         "air",
         "strike",
         "combined",
@@ -342,7 +346,8 @@
       "max_missiles": 0,
       "max_bombs": 4,
       "supported_weapons": [
-        "Mk-82"
+        "Mk-82",
+        "AIM-9M"
       ],
       "legal_loadouts": [
         {
@@ -358,6 +363,7 @@
       ],
       "default_loadout": "strike",
       "missions": [
+        "dogfight_1v1",
         "strike",
         "convoy",
         "training"

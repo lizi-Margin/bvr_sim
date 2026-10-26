@@ -1,5 +1,5 @@
 {
   "schema_version": 1,
-  "core_module": "C:/Users/hulc/Desktop/paper/bvr_sim/work/reference_map_quality/core-source-terrain-v173/Release/bvr_sim_cpp.cp314-win_amd64.pyd",
-  "core_sha256": "74697b9c9586b8ed92376c6e935ec1b2cb291622de8447ceda2072173ec0cb84"
+  "core_module": "D:/bvr_sim_resources/releases/regional-horizon-v327-20261026/core/bvr_sim_cpp.cp314-win_amd64.pyd",
+  "core_sha256": "7756a4cfe404b194e72ccbe708ea8fef47188e0115a1cd26f9bb50ed077f01b9"
 }

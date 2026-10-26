@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "release_id": "regional-horizon-v327-2026-10-26",
+  "status": "frozen",
+  "frozen_at": "2026-10-26",
+  "profile": {
+    "entrypoint": "game/Launch-Regional-Horizon.cmd",
+    "aircraft": "F16",
+    "quality": "high",
+    "map_version": "source-regional-horizon-v327@8d00e8c01c008c2dab680bab",
+    "map_label": "林缘地表·2048km天际线 v327",
+    "mission_selection": "interactive battle preparation"
+  },
+  "startup": {
+    "canonical_script": "game/Launch-Frontend.cmd",
+    "python_entry": "python -m bvr_game.launcher play",
+    "cancellable_loading_window": true,
+    "launcher_source": "bvr_game/launcher.py",
+    "launcher_source_sha256": "4f1725f3ca4a0b5e8fd5d25c638151699c3ce23fd1b3fd8ff1d823ba3b05f847"
+  },
+  "map": {
+    "release_manifest": "D:\\bvr_sim_resources\\map-library\\published\\source-regional-horizon-v327\\8d00e8c01c008c2dab680bab\\release.json",
+    "release_manifest_sha256": "f9d1ff85b5f550d107d7d48c20bfe6d5fe86153796647d53a601a11f359c500d",
+    "map_sha256": "15f80d79adefbe77b1ce646e7b7216aa9d02b1ef7e7caf4dd3585c977514eaa6",
+    "source_map_sha256": "10aa4f36d9f0e4c428227fa61b520390dc93d1c2f80d7ef6384b70507c95bee1",
+    "supports_convoy": false
+  },
+  "runtime": {
+    "runtime_config": "game/runtime-ui.json",
+    "runtime_config_sha256": "ab04a839986d8ea049628911a2721c0df2371f1e336b27b9de33ae587892ef7a",
+    "native_runtime_config": "game/native-runtime.json",
+    "native_runtime_config_sha256": "1c0315314453a30a8db6ffb6461ebb96df2871218596bfa24a6a19988e6b2149",
+    "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
+    "shader_cache": "D:\\bvr_sim_resources\\iteration-cache\\map-quality-v275\\visibility-v320\\shader-cache",
+    "shader_cache_exists": true
+  },
+  "artifacts": {
+    "core_module": {
+      "path": "D:\\bvr_sim_resources\\releases\\regional-horizon-v327-20261026\\core\\bvr_sim_cpp.cp314-win_amd64.pyd",
+      "sha256": "7756a4cfe404b194e72ccbe708ea8fef47188e0115a1cd26f9bb50ed077f01b9",
+      "bytes": 3798016
+    },
+    "renderer_module": {
+      "path": "D:\\bvr_sim_resources\\releases\\regional-horizon-v327-20261026\\renderer\\bvr_game_render.cp314-win_amd64.pyd",
+      "sha256": "ab06158b88ef03644b979ddce7ccaac7cfae8f5f2a446b69a71ac23e53f0de67",
+      "bytes": 9843200
+    },
+    "dxcompiler": {
+      "path": "D:\\bvr_sim_resources\\releases\\regional-horizon-v327-20261026\\renderer\\dxcompiler.dll",
+      "sha256": "9b5e10ed756c461b4ec2c83a99f1d6ace20e97826e9c0b0e966b7b1cd6f2aec6",
+      "bytes": 17987384
+    }
+  },
+  "launch_scripts": {
+    "Launch-Frontend.cmd": "b2ae55793510b6dd67c7c4305609fa3c34cc0203f498fdebbd24d96a623fd36e",
+    "Launch-Game.cmd": "30fb436d9e27f17591b61c4e426070f543c4c52fa5655a1fccb9488fd27d6b08",
+    "Launch-Regional-Horizon.cmd": "f25675aa90373e102d40ad266a43fa8b9d6fd135ded103d65fa0044d20b7bf80",
+    "Launch-Map-Candidate.cmd": "d9a3d1c3d1e298d7d8902c45a93b09fa4f08429aa797594938e31bb169bf5a1f"
+  },
+  "scope_notes": [
+    "Map catalog marks this map as a candidate and it does not support convoy missions.",
+    "Changing native modules, renderer, shader cache, runtime configuration, or map data requires a new frozen release record."
+  ],
+  "startup_smoke_test": {
+    "status": "ready",
+    "elapsed_seconds": 54.802,
+    "command": "game/Launch-Regional-Horizon.cmd",
+    "arguments": [
+      "play",
+      "--runtime",
+      "game/runtime-ui.json",
+      "--map-version",
+      "source-regional-horizon-v327@8d00e8c01c008c2dab680bab",
+      "--aircraft",
+      "F16",
+      "--quality",
+      "high"
+    ],
+    "log_directory": "game/logs/startup/20261026-171655-45416"
+  }
+}

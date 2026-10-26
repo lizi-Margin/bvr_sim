@@ -16,6 +16,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--parent',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--id',required=True);p.add_argument('--resolution',type=int,default=512)
+    p.add_argument('--registered-shading',action='store_true',help='Bake source slot0 of the exact registered near mesh, including its normal maps')
+    p.add_argument('--registered-lod',type=int,choices=[0,1],default=0)
     a=p.parse_args(sys.argv[sys.argv.index('--')+1:])
     if not re.fullmatch(r'[A-Za-z0-9_-]+',a.id):p.error('Invalid immutable asset ID')
     if not 128<=a.resolution<=2048 or a.resolution&(a.resolution-1):p.error('Resolution must be power-of-two128..2048')
@@ -24,16 +26,43 @@ def main():
     source=Path(parent['conversion_recipe']['source']);policy=parent['conversion_recipe']['policy']
     if sha(source)!=parent['source_sha256']:raise ValueError('Original single-tree source changed')
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(source))
-    objects=[o for o in bpy.context.scene.objects if o.type=='MESH'];bpy.context.view_layer.update()
+    objects=[o for o in bpy.context.scene.objects if o.type=='MESH']
+    if policy.get('select_object'):
+        selected=[o for o in objects if o.name==policy['select_object']]
+        if len(selected)!=1:raise ValueError('Recipe must select one exact source object')
+        for o in objects:
+            if o not in selected:bpy.data.objects.remove(o,do_unlink=True)
+        objects=selected
+    bpy.context.view_layer.update()
     points=[o.matrix_world@Vector(c) for o in objects for c in o.bound_box]
     lo=[min(v[i] for v in points)for i in range(3)];hi=[max(v[i] for v in points)for i in range(3)]
-    transform=Matrix.Translation(Vector((-(lo[0]+hi[0])/2,-(lo[1]+hi[1])/2,-lo[2])))
+    scale=policy.get('height_m',hi[2]-lo[2])/(hi[2]-lo[2])
+    if not .01<scale<150:raise ValueError('Invalid declared asset scale')
+    transform=Matrix.Translation(Vector((-(lo[0]+hi[0])*scale/2,-(lo[1]+hi[1])*scale/2,-lo[2]*scale)))@Matrix.Scale(scale,4)
     for o in objects:world=o.matrix_world.copy();o.parent=None;o.matrix_world=transform@world
-    height=hi[2]-lo[2];width=max(hi[i]-lo[i]for i in range(2))
+    height=(hi[2]-lo[2])*scale;width=max(hi[i]-lo[i]for i in range(2))*scale
     # Use the exact original per-axis normalization, including buried roots.
-    normalized=([-(hi[0]-lo[0])/2,-(hi[1]-lo[1])/2,0],[(hi[0]-lo[0])/2,(hi[1]-lo[1])/2,height])
-    anchor=list(transform@Vector(policy['source_ground_anchor_blender']))
-    cards,bake=impostors(objects,a.output/'source-bake',height,width,a.resolution,'CYCLES',normal_maps=True)
+    normalized=([-(hi[0]-lo[0])*scale/2,-(hi[1]-lo[1])*scale/2,0],[(hi[0]-lo[0])*scale/2,(hi[1]-lo[1])*scale/2,height])
+    anchor=parent['cluster']['source_base_anchor_blender']
+    if 'source_ground_anchor_blender' in policy and (Vector(anchor)-transform@Vector(policy['source_ground_anchor_blender'])).length>1e-5:
+        raise ValueError('Declared source anchor differs from registered source')
+    if a.registered_shading:
+        source_lod=parent['lods'][a.registered_lod]
+        near_source=a.parent.parent/source_lod['file']
+        if sha(near_source)!=source_lod['sha256']:raise ValueError('Registered source LOD changed')
+        for o in objects:bpy.data.objects.remove(o,do_unlink=True)
+        from tree_source_extract import extract
+        single=a.output/'registered-source-tree.glb';extract(near_source,single,0,parent['cluster']['source_copies'])
+        bpy.ops.import_scene.gltf(filepath=str(single));objects=[o for o in bpy.context.scene.objects if o.type=='MESH']
+        pose=parent['cluster']['poses_before_recentering'][0];center=Vector(parent['cluster']['recentering'])
+        matrix=Matrix.Translation(-center)@Matrix.Translation(Vector(pose['position']))@Matrix.Rotation(pose['yaw'],4,'Z')@Matrix.Scale(pose['scale'],4)
+        for o in objects:
+            world=o.matrix_world.copy();o.parent=None;o.matrix_world=matrix.inverted()@world
+        bpy.context.view_layer.update()
+    cards,bake=impostors(objects,a.output/'source-bake',height,width,a.resolution,'CYCLES',normal_maps=True,shading_normals=a.registered_shading)
+    bake['registered_near_slot0']=a.registered_shading
+    if a.registered_shading:
+        bake['registered_lod']=a.registered_lod;bake['registered_source_sha256']=source_lod['sha256'];bake['extraction_tool_sha256']=sha(Path(__file__).with_name('tree_source_extract.py'))
     far,bounds,cluster=make_cluster(cards,policy['cluster'],anchor,normalized)
     old=parent['cluster']
     for key in ['recentering','source_base_anchor_blender','poses_before_recentering']:

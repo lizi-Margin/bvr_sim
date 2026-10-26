@@ -130,7 +130,11 @@
         },
         "strike": {},
         "clean": {},
-        "unarmed": {}
+        "unarmed": {},
+        "dogfight": {
+          "SIDE-L": "AIM-9M",
+          "SIDE-R": "AIM-9M"
+        }
       }
     },
     {
@@ -285,7 +289,11 @@
           "7": "Mk-82"
         },
         "clean": {},
-        "unarmed": {}
+        "unarmed": {},
+        "dogfight": {
+          "1": "AIM-9M",
+          "9": "AIM-9M"
+        }
       }
     },
     {
@@ -425,7 +433,11 @@
         },
         "strike": {},
         "clean": {},
-        "unarmed": {}
+        "unarmed": {},
+        "dogfight": {
+          "WING-L1": "AIM-9M",
+          "WING-R1": "AIM-9M"
+        }
       }
     },
     {
@@ -578,7 +590,11 @@
           "ALPHA-8": "Mk-82"
         },
         "clean": {},
-        "unarmed": {}
+        "unarmed": {},
+        "dogfight": {
+          "ALPHA-1": "AIM-9M",
+          "ALPHA-2": "AIM-9M"
+        }
       }
     },
     {
@@ -594,7 +610,8 @@
             0.48
           ],
           "weapons": [
-            "Mk-82"
+            "Mk-82",
+            "AIM-9M"
           ],
           "mirror": ""
         },
@@ -606,7 +623,8 @@
             0.48
           ],
           "weapons": [
-            "Mk-82"
+            "Mk-82",
+            "AIM-9M"
           ],
           "mirror": ""
         },
@@ -650,7 +668,11 @@
           "ALPHA-4": "Mk-82"
         },
         "clean": {},
-        "unarmed": {}
+        "unarmed": {},
+        "dogfight": {
+          "ALPHA-1": "AIM-9M",
+          "ALPHA-2": "AIM-9M"
+        }
       }
     }
   ]

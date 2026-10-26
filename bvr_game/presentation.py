@@ -53,7 +53,7 @@ class ChaseCamera:
         yaw=math.atan2(entity.velocity[1],entity.velocity[0]) if math.hypot(*entity.velocity[:2])>.1 else entity.orientation[2]
         if self.yaw is None:self.yaw=yaw
         self.yaw+=math.remainder(yaw-self.yaw,2*math.pi)*alpha
-        desired=[(aim[0]/width-.5)*2*cfg['free_yaw_range'],(aim[1]/height-.5)*2*cfg['free_pitch_range']] if free else [0,0]
+        desired=[-(aim[0]/width-.5)*2*cfg['free_yaw_range'],(aim[1]/height-.5)*2*cfg['free_pitch_range']] if free else [0,0]
         self.free=[a+(b-a)*alpha for a,b in zip(self.free,desired)]
         self.roll+=(max(-cfg['roll_limit_rad'],min(cfg['roll_limit_rad'],entity.orientation[0]*cfg['roll_feedback']))-self.roll)*alpha
         self.fov+=((cfg['zoom_fov'] if zoom else cfg['normal_fov'])-self.fov)*alpha

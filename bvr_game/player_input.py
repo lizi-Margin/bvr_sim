@@ -1,6 +1,8 @@
 """Client input/projection only; actual assistance runs in the native core."""
 import math
 
+FREE_LOOK_KEY=0x14  # Win32 VK_CAPITAL (Caps Lock)
+
 def dot(a,b):return sum(x*y for x,y in zip(a,b))
 def cross(a,b):return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]
 def unit(a,fallback=(1,0,0)):

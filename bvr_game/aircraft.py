@@ -52,7 +52,7 @@ def loadout(row,id=None):
     if result is None:raise ValueError('Unsupported loadout '+id+' for '+row['id'])
     return result
 
-def runtime_models(runtime,resource_versions=None):
+def runtime_models(runtime,resource_versions=None,visual_profile=None):
     result=dict(runtime['models'])
     for row in aircraft_catalog()['aircraft']:
         # Explicit runtime entries have already passed manifest/hash validation.
@@ -74,4 +74,5 @@ def runtime_models(runtime,resource_versions=None):
             file=directory/lod['file']
             if sha(file)!=lod['sha256']:raise ValueError('Map resource hash mismatch: '+id)
             result[id if i==0 else id+'::lod'+str(i)]=str(file)
-    return result
+    from .render_assets import distance_lod_models
+    return distance_lod_models(result,visual_profile)

@@ -150,6 +150,7 @@ PYBIND11_MODULE(bvr_sim_cpp, m) {
         .def("reset_world",[](SimCore& core,std::uint32_t seed){require_sync_core(core);reset_core_world(seed);},py::arg("seed")=7)
         .def("spawn_aircraft",[](SimCore& core,const AircraftSpawnSpec& spec){require_sync_core(core);spawn_core_aircraft(spec);})
         .def("objects",[](SimCore& core){require_sync_core(core);return core_objects();})
+        .def("acquire_ir_target",[](SimCore& core,const std::string& uid,const std::string& weapon){require_sync_core(core);return core_acquire_ir_target(uid,weapon,*core_surface(core));},py::arg("uid"),py::arg("weapon")="AIM-9M")
         .def("check_launch",[](SimCore& core,const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station){require_sync_core(core);return core_check_launch(uid,weapon,target,station);},py::arg("uid"),py::arg("weapon"),py::arg("target"),py::arg("station")="")
         .def("launch_weapon",[](SimCore& core,const std::string& uid,const std::string& weapon,const std::string& target,const std::string& station){require_sync_core(core);return core_launch_weapon(uid,weapon,target,station);},py::arg("uid"),py::arg("weapon"),py::arg("target"),py::arg("station")="")
         .def("release_weapon",[](SimCore& core,const std::string& uid,const std::string& weapon,const std::string& station){require_sync_core(core);return core_release_weapon(uid,weapon,core_surface(core),station);},py::arg("uid"),py::arg("weapon"),py::arg("station")="")

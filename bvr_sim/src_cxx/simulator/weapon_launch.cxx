@@ -11,6 +11,7 @@
 #include "global_config.hxx"
 #include <algorithm>
 #include <cmath>
+#include <map>
 namespace bvr_sim {
 bool release_bomb(Aircraft& own,const std::string& weapon,std::shared_ptr<const Terrain> environment,
     const std::string& station) {
@@ -41,18 +42,46 @@ WeaponLaunchCheck check_weapon_launch(const Aircraft& own,const std::string& wea
     if(r.range<1)return reject("Target too close");
     r.angle=std::acos(std::clamp(dot/r.range,-1.,1.));
     if(definition->seeker=="infrared") {
-        // Existing MModelA acquisition cone/range approximation. No heat/flare model is implied.
-        static std::map<std::string,ParamStore> profiles;
-        auto it=profiles.find(weapon);
-        if(it==profiles.end())it=profiles.emplace(weapon,ParamStore::from_file(resource_paths::get_resource_path(definition->parameter_file).string())).first;
-        const auto& p=it->second;
-        if(r.range>p.get_double_("search_range"))return reject("IR target outside acquisition range");
-        if(r.angle>p.get_double_("search_fov"))return reject("IR seeker is not on target");
+        const auto seeker=check_infrared_acquisition(own,weapon,target);
+        if(!seeker.allowed)return reject(seeker.reason);
     } else {
         if(!own.can_shoot_enm(target))return reject("Radar contact is required");
-        if(r.angle>1.0471975512)return reject("Target outside launch cone");
     }
     r.allowed=true;r.reason="Ready";return r;
+}
+WeaponLaunchCheck check_infrared_acquisition(const Aircraft& own,const std::string& weapon,
+    const std::shared_ptr<SimulatedObject>& target) {
+    WeaponLaunchCheck r;
+    const auto* d=find_weapon(weapon);
+    if(!d||d->seeker!="infrared"){r.reason="Selected weapon has no IR seeker";return r;}
+    if(!own.is_alive||!target||!target->is_alive||target->Type!=SOT::Aircraft||target->color==own.color){
+        r.reason="No IR target in seeker cone";return r;
+    }
+    const auto a=own.get_rpy();double dot=0;
+    const std::array<double,3> nose={std::cos(a[1])*std::cos(a[2]),std::cos(a[1])*std::sin(a[2]),std::sin(a[1])};
+    for(int i=0;i<3;++i){const double v=target->position[i]-own.position[i];r.range+=v*v;dot+=v*nose[i];}
+    r.range=std::sqrt(r.range);
+    if(r.range<1){r.reason="Target too close";return r;}
+    r.angle=std::acos(std::clamp(dot/r.range,-1.,1.));
+    static std::map<std::string,ParamStore> profiles;
+    auto it=profiles.find(weapon);
+    if(it==profiles.end())it=profiles.emplace(weapon,ParamStore::from_file(resource_paths::get_resource_path(d->parameter_file).string())).first;
+    const auto& p=it->second;
+    if(r.range>p.get_double_("search_range")){r.reason="IR target outside acquisition range";return r;}
+    if(r.angle>p.get_double_("search_fov")){r.reason="IR seeker is not on target";return r;}
+    r.allowed=true;r.reason="IR seeker locked";return r;
+}
+std::shared_ptr<SimulatedObject> acquire_infrared_target(const Aircraft& own,const std::string& weapon,
+    const Terrain& terrain,const std::string& preferred) {
+    std::shared_ptr<SimulatedObject> best;double angle=10,range=1e30;
+    for(const auto& target:SOPool::instance().get_all()){
+        const auto check=check_infrared_acquisition(own,weapon,target);
+        if(!check.allowed||!terrain.line_of_sight(own.position,target->position))continue;
+        if(target->uid==preferred)return target;
+        if(!best||check.angle<angle||(check.angle==angle&&(check.range<range||
+           (check.range==range&&target->uid<best->uid)))){best=target;angle=check.angle;range=check.range;}
+    }
+    return best;
 }
 bool launch_weapon(Aircraft& own,const std::string& weapon,const std::shared_ptr<SimulatedObject>& target,
     const std::string& station) {

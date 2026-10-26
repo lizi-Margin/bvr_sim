@@ -5,7 +5,7 @@ The frontend owns navigation/drafts only. FlightGame starts the actual core sort
 """
 from pathlib import Path
 from . import loadouts
-import copy, math
+import copy, math, time
 from .client_settings import ClientSettings,DEFAULTS,CHOICES
 from .aircraft_tree import history,countries,ordered,decade_label,layout as tree_layout,ROLES
 
@@ -14,8 +14,8 @@ def rgba(value,alpha=255):
 INK=rgba('172028',230);PANEL=rgba('28343d',225);CONTROL=rgba('10171d',245)
 LINE=rgba('6a7880',110);TEXT=rgba('dfe4e5');MUTED=rgba('a4afb4');ACCENT=rgba('c25b31');GOLD=rgba('dbad6c');GREEN=rgba('9db89d')
 MISSIONS={'air':'空中作战','strike':'对地打击','combined':'联合打击','training':'自由试飞',
-          'intercept_patrol':'巡逻拦截','convoy':'车队打击'}
-LOADOUTS={'mixed':'多用途挂载','intercept':'空中拦截','strike':'对地挂载','unarmed':'无武装','clean':'无武装','custom':'自定义挂载'}
+          'intercept_patrol':'巡逻拦截','dogfight_1v1':'视距内 1v1','convoy':'车队打击'}
+LOADOUTS={'mixed':'多用途挂载','intercept':'空中拦截','strike':'对地挂载','dogfight':'视距内格斗','unarmed':'无武装','clean':'无武装','custom':'自定义挂载'}
 CONTROLS=[('鼠标移动','指向飞行方向'),('W / S','压低 / 拉起机头'),('A / D','向左 / 向右滚转'),
           ('C','自由观察'),('鼠标右键','缩放视野'),('鼠标滚轮','调整油门'),('R / Tab','锁定 / 切换目标'),
           ('Space / B','发射所选武器 / 投弹'),('V','切换武器'),('P / .','暂停 / 精确步进'),
@@ -43,7 +43,15 @@ class Frontend:
         if self.page=='prepare' and self.preparation.get('map_version'):
             version=next((r for r in self.game.map_versions() if r['id']==self.preparation['map_version']),None)
             if version and version.get('quality')!='external':convoy=version.get('supports_convoy',False)
-        return [m for m in MISSIONS if m in row['missions'] and (m!='convoy' or convoy) and (m not in ('strike','combined','convoy') or any('Mk-82' in s.weapons for s in loadouts.stations(row).stations))]
+        result=[]
+        for m in MISSIONS:
+            if m not in row['missions'] or (m=='convoy' and not convoy):continue
+            if m=='dogfight_1v1':
+                try:loadouts.preset(row,'dogfight')
+                except (ValueError,RuntimeError):continue
+            if m in ('strike','combined','convoy') and not any('Mk-82' in s.weapons for s in loadouts.stations(row).stations):continue
+            result.append(m)
+        return result
     def select(self,id):
         try:
             self.game.select_aircraft(id);self.notice=''
@@ -63,9 +71,9 @@ class Frontend:
                           'map_version':next(r['id'] for r in g.map_versions() if Path(r['map'])==g.map_path)}
         if self.preparation['mission'] not in self.missions():self.preparation['mission']=self.missions()[0]
         definition=loadouts.stations(row)
-        mounts=dict(g.config.loadout) if g.config.use_station_loadout else loadouts.preset(row,preset)
+        mounts=loadouts.preset(row,'dogfight') if self.preparation['mission']=='dogfight_1v1' else (dict(g.config.loadout) if g.config.use_station_loadout else loadouts.preset(row,preset))
         self.preparation['mounts']=mounts
-        self.preparation['loadout']=next((id for id,m in definition.presets.items() if dict(m)==mounts),'custom')
+        self.preparation['loadout']='dogfight' if self.preparation['mission']=='dogfight_1v1' else next((id for id,m in definition.presets.items() if dict(m)==mounts),'custom')
         self.station=definition.stations[0].id if definition.stations else ''
         self.normalize_preparation()
     def normalize_preparation(self):
@@ -85,10 +93,14 @@ class Frontend:
         g=self.game;row=g.current_aircraft();self.normalize_preparation()
         if not row['available']:self.notice=row['unavailable_reason'];return
         try:
+            from .startup import progress
+            g._sortie_start_clock=time.perf_counter()
+            progress('launch_sortie','正在准备出击')
             if self.preparation['mission'] not in self.missions():raise ValueError('unsupported mission')
             seed=int(self.preparation['seed'])
             if not 0<=seed<=2147483647:raise ValueError('invalid seed')
-            mounts=self.preparation['mounts']
+            mounts=loadouts.preset(row,'dogfight') if self.preparation['mission']=='dogfight_1v1' else self.preparation['mounts']
+            self.preparation['mounts']=mounts
             errors=loadouts.native.validate_loadout(row['simulation_model'],mounts)
             if errors:raise ValueError('; '.join(errors))
             g.load_map_version(self.preparation['map_version'])
@@ -97,7 +109,10 @@ class Frontend:
             g.config.enemy_attacks=self.preparation['enemy_attacks']
             g.weapon=loadouts.initial_weapon(mounts)
             self.home();g.start()
-        except (ValueError,StopIteration,OSError,RuntimeError) as error:self.notice='出击未开始：'+str(error)
+            progress('sortie_started','出击已开始',elapsed_seconds=time.perf_counter()-g._sortie_start_clock)
+        except (ValueError,StopIteration,OSError,RuntimeError) as error:
+            g._sortie_start_clock=None
+            self.notice='出击未开始：'+str(error)
     def rect(self,x,y,w,h,color=PANEL):self.lines.append((x,y,w,h,color,0))
     def text(self,x,y,value,size=18,color=TEXT):self.texts.append((x,y,str(value),size,color))
     def mask_text(self,x,y,w,h):
@@ -398,6 +413,12 @@ class Frontend:
             else:
                 self.preparation[{'enemy':'enemy_attacks'}.get(id,id)]=value
                 if id=='loadout':self.preparation['mounts']=loadouts.preset(g.current_aircraft(),value)
+                if id=='mission' and value=='dogfight_1v1':
+                    self.preparation['mounts']=loadouts.preset(g.current_aircraft(),'dogfight')
+                    self.preparation['loadout']='dogfight'
+                elif id=='mission' and self.preparation['loadout']=='dogfight':
+                    row=g.current_aircraft();self.preparation['loadout']=row['default_loadout']
+                    self.preparation['mounts']=loadouts.preset(row,row['default_loadout'])
                 if id=='map_version' and self.preparation['mission'] not in self.missions():self.preparation['mission']=self.missions()[0]
                 self.normalize_preparation()
             self.dropdown=None

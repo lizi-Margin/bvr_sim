@@ -7,9 +7,10 @@ from bvr_game.app import FlightGame,native,serialize,ROOT,DEFAULT_VISUAL_PROFILE
 from bvr_game.aircraft import aircraft
 from bvr_game.aircraft_library import player_test_flight
 from bvr_game.ground import apply_config
+from bvr_game.player_input import FREE_LOOK_KEY
 
 def event(index):
-    held=[83] if 20<=index<40 else [87] if 45<=index<60 else [65] if 65<=index<75 else [87,83] if 76<=index<80 else [2] if 90<=index<100 else [67,83] if 100<=index<115 else []
+    held=[83] if 20<=index<40 else [87] if 45<=index<60 else [65] if 65<=index<75 else [87,83] if 76<=index<80 else [2] if 90<=index<100 else [FREE_LOOK_KEY,83] if 100<=index<115 else []
     pressed={80:[80],81:[117],82:[190],85:[80]}.get(index,[])
     width,height=(1600,900) if 90<=index<125 else (1920,1080)
     return SimpleNamespace(held=held,pressed=pressed,x=width*.65 if 100<=index<125 else width*.5,

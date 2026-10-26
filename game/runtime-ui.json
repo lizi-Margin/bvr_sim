@@ -1,8 +1,8 @@
 {
-  "engine_source": "D:\\bvr_sim_resources\\engine\\wide-primitive-v257\\engine",
+  "engine_source": "D:/bvr_sim_resources/iteration-cache/fps-quality-20261026/engine",
   "engine_revision": "fb6aaa4e79fd6861697f1e52d604d1e23404d594",
   "shader_cache": "D:\\bvr_sim_resources\\iteration-cache\\map-quality-v275\\visibility-v320\\shader-cache",
-  "renderer_module": "D:\\bvr_sim_resources\\iteration-cache\\map-quality-v275\\renderer-v354\\Release",
+  "renderer_module": "D:/bvr_sim_resources/releases/regional-horizon-v327-20261026/renderer",
   "models": {
     "F22": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\F22\\F22.glb",
     "F16": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\F16\\F16.glb",

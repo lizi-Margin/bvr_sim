@@ -101,6 +101,19 @@ class CoreWeaponsTests(unittest.TestCase):
         self.assertTrue(self.core.launch_weapon('own','AIM-9M','target'))
         self.assertFalse(self.core.launch_weapon('own','AIM-120C7','target'))
         self.assertEqual(self.state('own').pylons['2'],'AIM-120C7')
+    def test_aim9m_acquires_and_launches_on_exact_tail_chase_without_radar(self):
+        self.spawn(radar=False)
+        self.spawn('target',team='red',position=(4500,0,3000),velocity=(200,0,0),mounts={})
+        self.core.step(10)
+        self.assertEqual(self.core.acquire_ir_target('own'),'target')
+        check=self.core.check_launch('own','AIM-9M','target','1')
+        self.assertTrue(check.allowed,check.reason)
+        self.assertAlmostEqual(check.angle,0.,places=5)
+        self.assertTrue(self.core.launch_weapon('own','AIM-9M','target','1'))
+        self.assertEqual(self.state('own').pylons['1'],'')
+        missile=next(o for o in self.core.objects() if o.kind=='missile')
+        self.assertEqual(missile.target,'target')
+        self.assertTrue(missile.alive)
     def test_bomb_factory_release_prediction_collision_damage_and_reset(self):
         traces=[]
         for repeat in range(2):
@@ -166,5 +179,37 @@ class SessionWeaponsTests(unittest.TestCase):
         p=next(e for e in f.entities if e.uid=='player')
         self.assertEqual(p.pylons['3'],'Mk-82');self.assertEqual(p.pylons['7'],'')
         self.assertEqual(f.bombs_left,1);self.assertTrue(any(e.kind=='bomb' for e in f.entities))
+    def test_aim120_range_is_advisory_when_radar_lock_exists(self):
+        c=self.config();c.enemy_range=45000;c.enemy_attacks=False
+        self.sim.reset(c)
+        for _ in range(300):
+            self.sim.step()
+            if any(contact.uid=='bandit' for contact in self.sim.frame().contacts):break
+        self.assertIn('bandit',[contact.uid for contact in self.sim.frame().contacts])
+        cmd=n.PilotCommand();cmd.lock=True;cmd.target_uid='bandit';cmd.weapon='AIM-120C7';self.sim.submit(cmd);self.sim.step()
+        frame=self.sim.frame();self.assertEqual(frame.selected_target,'bandit')
+        self.assertFalse(frame.envelope.in_range)
+        self.assertTrue(frame.launch_ready,frame.launch_reason)
+        cmd.fire=True;self.sim.submit(cmd);self.sim.step()
+        self.assertEqual(self.sim.frame().missiles_left,1)
+        self.assertTrue(any(e.kind=='missile_launched' and e.weapon=='AIM-120C7' for e in self.sim.frame().events))
+    def test_dogfight_1v1_spawns_loaded_opponent_and_fires_ir_missile(self):
+        c=self.config();c.mission='dogfight_1v1';c.enemy_attacks=True
+        self.sim.reset(c)
+        frame=self.sim.frame()
+        self.assertEqual(frame.mission,'dogfight_1v1')
+        self.assertEqual(frame.mission_total,1)
+        self.assertEqual(frame.missiles_left,2)
+        self.assertIn('bandit',[e.uid for e in frame.entities])
+        self.assertEqual(sum(w=='AIM-9M' for w in next(e for e in frame.entities if e.uid=='bandit').pylons.values()),2)
+        self.assertEqual(frame.selected_target,'bandit')
+        self.assertTrue(frame.launch_ready,frame.launch_reason)
+        player_cmd=n.PilotCommand();player_cmd.fire=True;player_cmd.weapon='AIM-9M'
+        self.sim.submit(player_cmd);self.sim.step()
+        self.assertTrue(any(e.kind=='missile_launched' and e.actor=='player' and e.weapon=='AIM-9M' for e in self.sim.frame().events))
+        for _ in range(100):
+            self.sim.step()
+            if any(e.kind=='missile_launched' for e in self.sim.frame().events):break
+        self.assertTrue(any(e.kind=='missile_launched' and e.actor=='bandit' and e.weapon=='AIM-9M' for e in self.sim.frame().events))
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,1370 @@
+[
+  {
+    "aircraft": "F22",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\F22\\F22.glb",
+    "source_sha256": "77fb9c6bf2b51c955e11f03c05dc020f7b8ac73994fc0aa9e5d9d19cbfb5b145",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\F22.png",
+    "png_sha256": "98927af98c65ffa13c804727e42f516e14fb7ec314a25b466136f0df513ec5b8",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "F16",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\F16\\F16.glb",
+    "source_sha256": "9284917cbc49b8b58d18ff9dc138abb72f6e89efdf7d0ec989f40cf36264c293",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\F16.png",
+    "png_sha256": "c10e847b630c1b7aaf6f3da85ed5ace05a77b256775d2686d46223babd359467",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "F15",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F15C\\FG-F15C.glb",
+    "source_sha256": "af4861922174ce2b9ecd3c32100d2d88681a198bb4be4b1de791981168804dbd",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\F15.png",
+    "png_sha256": "82e56e7c811eadf964a675db30e423872e5c82336cdaad9219aa3e9c3871e649",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "F18",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F18-CAF\\FG-F18-CAF.glb",
+    "source_sha256": "e0f10fdc1fe5fb72af879e6242c3032f0ba831f92aed7cfbb828f60b6e375b87",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\F18.png",
+    "png_sha256": "36d8cdee7391eb352658153c7feb75fd2b61b9c79f6f6b8af15d72d055c0245a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "F4N",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F4\\FG-F4.glb",
+    "source_sha256": "44da24a3d94e73fc23d36125b2c8d8f71c9d70e9036d36661cdc7504ccd01789",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\F4N.png",
+    "png_sha256": "dffdb7ec3be0734c6ca6b27a154d87a36c1a4ff4a69983ec4a9149f506711821",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-707",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-707\\FG-707.glb",
+    "source_sha256": "0e1908588c0c67a9ddb79cb771e715e761e08a8b860a8bf20afa4c749c058e7f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-707.png",
+    "png_sha256": "f93171a0e86471665ffe2d0e86ce980f820b03d718f9af8c26d51026eff8c1fe",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-717",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-717\\FG-717.glb",
+    "source_sha256": "720d41699f3ca2813ca199467e8cb097d5360ab9f3e6d8f821ccbac84dbef681",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-717.png",
+    "png_sha256": "f31ce4127278612115cdf6f5b353fb477b104fafd262130602d7c650992acb74",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-727-230",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-727-230\\FG-727-230.glb",
+    "source_sha256": "a8da45c3c96b57c244767c05d573f32f73ba4064edda7c9a3d62eb613e78ea42",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-727-230.png",
+    "png_sha256": "2b01c176cf5687604041f73a0488da2892596311d7d77dfce7e3f1a3abd8aeb8",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-737-800",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-737-800\\FG-737-800.glb",
+    "source_sha256": "d3d519da6e23055bf08857fac24024301b62b290dd7a6d1dab7d1b3c0c31a12a",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-737-800.png",
+    "png_sha256": "b2523c13c1201988ac533eff6e87e068be937b29ea3f4e54a94d286fe86379f4",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-747-8i",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-747-8i\\FG-747-8i.glb",
+    "source_sha256": "252c4b56c6ae83ba30efca569963d1b3c56c0ceca89c15f3b1469d28b468bf8b",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-747-8i.png",
+    "png_sha256": "cb20d09e33f940600347e96ac9cb39f49f5b0c185d10c4e9be92d97334110670",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-757-200",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-757-200\\FG-757-200.glb",
+    "source_sha256": "acd44e327ea722b803c0e50b4499c7b7f5c9e18df94132fe0de40a1ae6a83549",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-757-200.png",
+    "png_sha256": "2e10101255d41fd724b89061feaa0a05ae461b454b15ac1c1f6efbffc3c8253a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-767-300",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-767-300\\FG-767-300.glb",
+    "source_sha256": "a0e9f6608933e69327c73681d6179f6d77eaa8c7f2ff872f2698f27e47f8078a",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-767-300.png",
+    "png_sha256": "05317709af5d4bb9862806a580e408ac1fc86b9feed1f46953e2579965b92037",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-777",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-777\\FG-777.glb",
+    "source_sha256": "8065cddfcb7609af207995d0da9a32b84bf9191aeb4bfe9683a78fbbc91f7721",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-777.png",
+    "png_sha256": "f1b552dc101aeb81ff6927aaf24f5008350626779c078e57871a4ff22202a92e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-787-8",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-787-8\\FG-787-8.glb",
+    "source_sha256": "f1fee06f8a8b4c4c6e1c4d39110474d12131a7e74fe14579ac5488a32118dabb",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-787-8.png",
+    "png_sha256": "d966f8b0551c8efbd9c6a5d6ddb02e18eaa9231259acfcec81dd0e54cb50b5cd",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-A-10",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A-10\\FG-A-10.glb",
+    "source_sha256": "581b4cd5514a5efe056bb298812841bd0d21b770ad71c1b20cabf4a5bf03cabe",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A-10.png",
+    "png_sha256": "e992285aea6035e438420b7b9ea03af94778dec983fc7983b764658a9cc5780d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-A-6E",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A-6E\\FG-A-6E.glb",
+    "source_sha256": "995d52ca0c1aa977b25e0f0ffbc23c789f5c962eee430196eecc51ca005d12a3",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A-6E.png",
+    "png_sha256": "c5e798ba497e098744a6fc0dd2dec1b72c92c1be78259ef49678f63fc13b9d53",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-A300-600",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A300-600\\FG-A300-600.glb",
+    "source_sha256": "e3e75ea2ba68ea7f27746e9831ae2ddbd0c6cad770f450ac8e97fbd70d3525ce",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A300-600.png",
+    "png_sha256": "112bfb62c5de687b8b307951c2d01954bd20bed35e7875ca1ffcb88ac134fd48",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-A320-family",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A320-family\\FG-A320-family.glb",
+    "source_sha256": "5db8b5998689f18f3a2569d1ade77a6bb8681071eddd3a700d31c0e040c3f8ed",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A320-family.png",
+    "png_sha256": "1ed2d099c241d9a65deb93f5afc3aa75f53eb4bdf993e155262fed935f9d9068",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-A340-600",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A340-600\\FG-A340-600.glb",
+    "source_sha256": "1f0469aa07b1ca26971120cb654a79ff0c35a9b5c18ade7f80358936a5995d6f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A340-600.png",
+    "png_sha256": "767274d3d9119fe7b2be1b7a900fd2c73430de453e23cf3f766d833d165cd354",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-A380",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-A380\\FG-A380.glb",
+    "source_sha256": "151bafb7dc224d5c31454b53a6032744f5a655820ac9d014698aaf73012203e9",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-A380.png",
+    "png_sha256": "f13110cbe347daaeb268f81f6293200c4cfbb7b8acb500cc7b37a3c4b10da8ad",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-a4",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-a4\\FG-a4.glb",
+    "source_sha256": "34f1223cd681837d19378a338691393d45f5438099ccb56c667c55b683b8ae01",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-a4.png",
+    "png_sha256": "86f2b1b703c661bedad6a52e28a043e2997d3760c5e9ffb83f623190edd0bcb7",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Aermacchi-MB-339",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Aermacchi-MB-339\\FG-Aermacchi-MB-339.glb",
+    "source_sha256": "6d5fce8bb4eba2bf2a91d342131762c3edfd871baa527f746832d0b213cd6698",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Aermacchi-MB-339.png",
+    "png_sha256": "9b9010014da9129ea408b40264c25a334a019560efbe881c87633cb19f69c32e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Aero-L-29",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Aero-L-29\\FG-Aero-L-29.glb",
+    "source_sha256": "bc32440350b446b4c9f3a714a1f049ee310ff9fe36adf1f404f433e989a5f8dd",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Aero-L-29.png",
+    "png_sha256": "dea7191ba2652c11d2918d7b838066bb9802110e50df17aef2b12f11f5cdd4f9",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Alphajet",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Alphajet\\FG-Alphajet.glb",
+    "source_sha256": "eb5c0f89174a1e0fc11a1da8358ee024fa698c9ce4f705a8b944d2b6d37ded10",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Alphajet.png",
+    "png_sha256": "3f0be515af50042e24be4a7f7d612477d9ccddfc624dced77b46bc57c9023dbe",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-AN-225",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-AN-225\\FG-AN-225.glb",
+    "source_sha256": "2850b0cabac8714c894305676330d131b470b6ed9a4aa1a1d445c6a5cfe76793",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-AN-225.png",
+    "png_sha256": "877ad9dc5cba55c4637896072ac4ba0534b961ab391df022a586c5da4e6f99c4",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-AR-234",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-AR-234\\FG-AR-234.glb",
+    "source_sha256": "e5e2ec8a35f5827d9efc505b8fa3ae6a56dc5c738f228efcd60dfd5913d773a2",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-AR-234.png",
+    "png_sha256": "e12ae9b84b55a813b5159c274c0105ff90e23c50a775f286aad146ff4401c1fa",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Avro-Arrow",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Avro-Arrow\\FG-Avro-Arrow.glb",
+    "source_sha256": "5a1af8b76fbf6b16ec87181446b054cb1c4cd371d9b2cd47bff6e6dc08dd9b62",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Avro-Arrow.png",
+    "png_sha256": "7a0b7ede35165c31cf0ba0691d686bec16e2251211292cf5da91ae40e0f87911",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-B-1B",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-B-1B\\FG-B-1B.glb",
+    "source_sha256": "9d0cbd942916e250ef0496771992364d89935f268f6a171dfde9ad5bb0367440",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-B-1B.png",
+    "png_sha256": "6e0fd94b1c0522c0418b938ac833d9008281ac320581f12961ee8f23665d144a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-B-2",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-B-2\\FG-B-2.glb",
+    "source_sha256": "40be686b48db58cb7c594ee9dda97d3cab995383fd7668a746b5dc98203d3c63",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-B-2.png",
+    "png_sha256": "229821fa3c7547653c00056af109fc892556d731d0cba92888879940940b31bb",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-B-36D-Peacemaker",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-B-36D-Peacemaker\\FG-B-36D-Peacemaker.glb",
+    "source_sha256": "a1b34e78d39bfd48356ff31c9b979dcb2e815c582532048d27001301f34abfb5",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-B-36D-Peacemaker.png",
+    "png_sha256": "5d2f1b6cd7a7f06b58b500ea18b5c7a0bb9cd9667f9957dd0caa9924e243560a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-B-52F",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-B-52F\\FG-B-52F.glb",
+    "source_sha256": "26828fe605378edf465316cc1230b5aaa81a7c9c0909bcc84c55945b028740a7",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-B-52F.png",
+    "png_sha256": "252e88401be69d78e3f6f153693d15eb87863ca7d398966e0fea469c1554762e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-BAC-TSR2",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-BAC-TSR2\\FG-BAC-TSR2.glb",
+    "source_sha256": "747668df2296dc2cf5cc5c0997989e223ef1c11a8ec6ab3dc0db73c3070106be",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-BAC-TSR2.png",
+    "png_sha256": "5474c08fae08baa6ada75f9b00dc9f22c5681e9446173c13ed5e14c190e853e6",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-BAe-125",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-BAe-125\\FG-BAe-125.glb",
+    "source_sha256": "aba9b4b106ff47d47d60fc5fc072fa74a10a9094df43b651038161b8dd20a633",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-BAe-125.png",
+    "png_sha256": "120b50fd1fc159f3c39eb2ae525665ada668d017440b3c7afc640a1cb9528188",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-BAe-146",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-BAe-146\\FG-BAe-146.glb",
+    "source_sha256": "8a6fbb03f20208f91a14849d8a0ea2336a14d4fdef3701f264da1d9d5992c42f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-BAe-146.png",
+    "png_sha256": "e3d214aadf1e89ca4cf4b6b12c704b9c7f86ca8cd75da4f1bb81b771ff79ce49",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Bell-P-59",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Bell-P-59\\FG-Bell-P-59.glb",
+    "source_sha256": "c04bfe50b225ff9bbc5fe394b4879ffc5398e55aa5d45ee3b2f7ba749b1f011a",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Bell-P-59.png",
+    "png_sha256": "e55b6f4f7869042ef57bbfd853f91fe60dd5bd2456d80d57238687b0d710aa97",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Buccaneer",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Buccaneer\\FG-Buccaneer.glb",
+    "source_sha256": "99e02f5facd4bfd4195acd5418333458e00dc473192fa67849ef283bf64e986f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Buccaneer.png",
+    "png_sha256": "53e836970034ada4ad4d36bb91e386c0619087f9cbbd623edfd3eb7bf34c5969",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Campini-Caproni-N1",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Campini-Caproni-N1\\FG-Campini-Caproni-N1.glb",
+    "source_sha256": "e5c08b2ac4c8c4a110a5da82bb0868085341ea717d1f423e98628e308b146710",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Campini-Caproni-N1.png",
+    "png_sha256": "132b654a70b6b592bb02956f537884402d966d22c359bc2ae9b5f2487adf490a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-CanberraBI8",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CanberraBI8\\FG-CanberraBI8.glb",
+    "source_sha256": "67af6477789ad2165d008fdca8fec287d403a74d74406c04dfa8daaf9fe25b15",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CanberraBI8.png",
+    "png_sha256": "93f0c6bc57c7e302eee94cf262309a253fe0c0b54fa1b9a073f3c18c4ffbd927",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Caproni-C22J",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Caproni-C22J\\FG-Caproni-C22J.glb",
+    "source_sha256": "f706053fec958ab6c2916ca161e82710f31dfaabbff764bf4b4cc1e2a561197c",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Caproni-C22J.png",
+    "png_sha256": "5282c0844690f799309b10bd71abefb51887f444cb92884f671e59bae9d4c191",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Caravelle",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Caravelle\\FG-Caravelle.glb",
+    "source_sha256": "5a1ce8ed7f569e1279d5c6b6f410c3410e8dd7c251739af65771029c10b53a92",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Caravelle.png",
+    "png_sha256": "afe1f302eb2521badaaf2b13ac9bfcbe28d788e3c4d782e3b6339de2f2c645ed",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Carreidas",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Carreidas\\FG-Carreidas.glb",
+    "source_sha256": "ce43f706927750f32bd9c1578f2d25631abc4d0c144a594018d77f1fd09de036",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Carreidas.png",
+    "png_sha256": "d07252ed561a220ccbc049330ded746d4d3f987c686cb4674c776c85804230e9",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Citation-Bravo",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Citation-Bravo\\FG-Citation-Bravo.glb",
+    "source_sha256": "1d65aabc726546d55d3e5cb60a3433d860cd9298475a6f4cd11282c5af2561a8",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Citation-Bravo.png",
+    "png_sha256": "27c45449849a779f9a3e891d690b4746ffa18e0f6f1adae3af4a9f294f241c57",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-CitationX",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CitationX\\FG-CitationX.glb",
+    "source_sha256": "e5c3f25b346307217c360ba3df05b9ee4ec1e08efa1068a3cbf365bb79398235",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CitationX.png",
+    "png_sha256": "287c48e2ada68453ce76b6315c1ea4817bbf5639f9f654f96dfe64ec0172c66d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Coanda-1910",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Coanda-1910\\FG-Coanda-1910.glb",
+    "source_sha256": "8990a5facf4d62cbc57cdd6868020eb2dde043198273921fc821976ab82b6a56",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Coanda-1910.png",
+    "png_sha256": "2e76c2bf966f07ef8d9bfbbae6908322bae6038860d4c08ba5635e8458b123d8",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Concorde",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Concorde\\FG-Concorde.glb",
+    "source_sha256": "392cf9896c2463c0a3c1727e74a6d9052cc8b7c6ad4c27c9d9b4e769da1a61fe",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Concorde.png",
+    "png_sha256": "bb5277720a093958a545cc9174df82879cb35cc89c54727b03e0fdcd48c5e08d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-CRJ-200",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CRJ-200\\FG-CRJ-200.glb",
+    "source_sha256": "02e5cd2ca01d817d5a4b723d617f011b08319f689d8c03fcbfac59cd24c813e1",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CRJ-200.png",
+    "png_sha256": "dec729b8fec58c52b6cf8393a261f521f4e8aea0161f3b036c4db2f0f75c7ddd",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-CRJ700-family",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-CRJ700-family\\FG-CRJ700-family.glb",
+    "source_sha256": "db207c15f487c82f8c048478b49de9d21e3ca6d004d3e61ee733293e17a4a038",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-CRJ700-family.png",
+    "png_sha256": "a3a6fb11c68b59a237a99f792e5ed29d4618e4f987c226444bc7067933c1431a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Dassault-Mystere-IV",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Dassault-Mystere-IV\\FG-Dassault-Mystere-IV.glb",
+    "source_sha256": "2a2519c868f7078ddd5e2e196ed83854eb299ef47404849ddde78e597e8eeaa3",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Dassault-Mystere-IV.png",
+    "png_sha256": "a67a848d6c4abae1cf0cab8bd0a1bf5c2d8d83baa2bac0b640f0f9a9479dbf62",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-DC-10-30",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-DC-10-30\\FG-DC-10-30.glb",
+    "source_sha256": "543ec728cbe097f6e7ef3d42c2a135a9e9b40a0d6c9a451641cbc1b963711920",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-DC-10-30.png",
+    "png_sha256": "1c39f8957566ef981a7868f2a398e3241dbc955e725e4d16ae75108a0d5a609d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-dc8-73",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-dc8-73\\FG-dc8-73.glb",
+    "source_sha256": "b9c22505d7e66ca2c80a084f62a379ca4d227ba5503cbe4663a14da6bfc74ff6",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-dc8-73.png",
+    "png_sha256": "293ddcb1b64a09168d2cb03a17e68c560950d3179fcb4413162567c7961bdf2b",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-DH-106",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-DH-106\\FG-DH-106.glb",
+    "source_sha256": "020d02caded43e88d27df952f68b284578bdc29e5bde048ded6cfb5937aef0fb",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-DH-106.png",
+    "png_sha256": "15b2c77e61b14dbe9574817269bbe3b0f3b2b36222274c19d065dde2ad54ed60",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-E3B",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-E3B\\FG-E3B.glb",
+    "source_sha256": "ea6e57079266a27efbe47cc378e482a68c66da7b6a0c69370579967b206e7e0b",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-E3B.png",
+    "png_sha256": "b2b8d580605de493dbcd80c8e569388334c992c00440e22053f179c5d4f53e90",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Embraer-ERJ-145",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Embraer-ERJ-145\\FG-Embraer-ERJ-145.glb",
+    "source_sha256": "dd959ac8ebac7fb12aa34cbe4a31267440bf59c6d2de94919c2b7bdb7c5e1085",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Embraer-ERJ-145.png",
+    "png_sha256": "e97acf27bd47e6d33729bfeaf88b5379889c566d1b5913f9d93ea5f2671b97af",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-eurofighter",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-eurofighter\\FG-eurofighter.glb",
+    "source_sha256": "0490f90e39e7e19f58ca5075f9c9db495f3e3ec92e2d45e2cf751ee2bccfdec3",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-eurofighter.png",
+    "png_sha256": "184f66afcb4f5e7f9ceea9a5b8a622e3d761e792c9eebc292d1cfa048be4999f",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F-106-dart",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-106-dart\\FG-F-106-dart.glb",
+    "source_sha256": "d1ab77f3ac6da10d4848d19e700ff112e4cc8023afcfed78104ecb1a2f841496",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-106-dart.png",
+    "png_sha256": "8a76999d7fffcbb7babbf7e042e66a7807104136fe4af76696fc50601a0593b1",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F-117",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-117\\FG-F-117.glb",
+    "source_sha256": "30f148178f826b8b8004801f8e182ea661b829b1e8b96e43a9cbc16a2cc82971",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-117.png",
+    "png_sha256": "3fd43cae62fef81de68ed5cf91b4ced533e5ae3fcb1d713458f780fabeb154b3",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-f-14b",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-f-14b\\FG-f-14b.glb",
+    "source_sha256": "4d3fff0165871f45e6041bbbe2710e2f5ef2b86e2a7946e07807914fb79db99b",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-f-14b.png",
+    "png_sha256": "9126b0a0f295a8b8c6649b4c69a46537413b5ac7897ae5c353f03bdce3a216c6",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F15C",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F15C\\FG-F15C.glb",
+    "source_sha256": "af4861922174ce2b9ecd3c32100d2d88681a198bb4be4b1de791981168804dbd",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F15C.png",
+    "png_sha256": "14d7515f64a368c14319d8babbf67047de016136b5d76a90b2ee8d0f60b70be0",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F-35B",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-35B\\FG-F-35B.glb",
+    "source_sha256": "113ead73062e920f2cc15caed9242efa561b3f19f4b1be7cd5e3199bc59f1d03",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-35B.png",
+    "png_sha256": "3bbe0379e5d20721892826862a7bae0e0ad4435e13ec1a44ce11689cc738e612",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F-86",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-86\\FG-F-86.glb",
+    "source_sha256": "0bd54408589b2c2e5ce1e5fef7b75fdfe618db3db0cb625875c87d1d8404eaf8",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-86.png",
+    "png_sha256": "dba92c1d3ca32503dd54bcf0e3241bfde83f5967712fa01e10270d5113410869",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F-8E-Crusader",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F-8E-Crusader\\FG-F-8E-Crusader.glb",
+    "source_sha256": "ebbc5b359df7dd7735eb840cceaf899f99db9259ff14a40be9416434991a932a",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F-8E-Crusader.png",
+    "png_sha256": "ee715953e367571a72b00980eb4cc03fcf04f7b8b18fce704cffb5deee0ba3e7",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F11-Tiger",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F11-Tiger\\FG-F11-Tiger.glb",
+    "source_sha256": "91fb293470c86d1157a462ef60099e7efedd17decd07b09287318d9406c3d4dc",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F11-Tiger.png",
+    "png_sha256": "9355f93ff72a99e985ee094b28bbd10279513a7c43b2cf1dd2c6c05b3300ddaf",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F16",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F16\\FG-F16.glb",
+    "source_sha256": "4f25a3400ddd71d0a9784be836add59b5c9802e24798cf09ab59138ab970e4cb",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F16.png",
+    "png_sha256": "932d2fd563f2acd9e36f57f3a04e10fd2154672553a6b9a8dd09a77c94fc0854",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F18-CAF",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F18-CAF\\FG-F18-CAF.glb",
+    "source_sha256": "e0f10fdc1fe5fb72af879e6242c3032f0ba831f92aed7cfbb828f60b6e375b87",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F18-CAF.png",
+    "png_sha256": "b8ae00a819c8bf632dcdb9266146c66285128ef29db72cb20022fa73fe3fc8e7",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F80C",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F80C\\FG-F80C.glb",
+    "source_sha256": "a97683175a3844b6aa8552f2837bc5b84af66f59ad35aeee7c3f3e24ba2a92a4",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F80C.png",
+    "png_sha256": "5477ebe5e753a50b60150ccc11ab1eb58535312ac4983894a25834ce8b61d36c",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F9F-Panther",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F9F-Panther\\FG-F9F-Panther.glb",
+    "source_sha256": "45fdab6b0ceeab7b5bf6c2f58ee3ef2629108e7b86631f8cf25433d72f071389",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F9F-Panther.png",
+    "png_sha256": "5e7b1d83ddefdeba1366314d261db876afc077ec8e8261d5e6d86aada24fbfe6",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Falcon-50",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Falcon-50\\FG-Falcon-50.glb",
+    "source_sha256": "bb9415ca38d9d8d9932b6595685452e41282df867cae1f46debe12bcb7dbf74c",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Falcon-50.png",
+    "png_sha256": "453ea53fe6fd807adda31135b6d51ec6d800650e7f59482f57a74fe408b1e1ed",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-FMA-IA36-Condor",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-FMA-IA36-Condor\\FG-FMA-IA36-Condor.glb",
+    "source_sha256": "aac0f0e2929a29518dd170f41d83eafe2b255fde375156b847ff36552ed3f13d",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-FMA-IA36-Condor.png",
+    "png_sha256": "ac8281c571b87a28bcef249732a4da34fb1a6fc2db851d8094edd5718908271d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-fokker100",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-fokker100\\FG-fokker100.glb",
+    "source_sha256": "57683cf31168e1cb431995499aa5aecf28113810beaebd21b670c2d084b8475f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-fokker100.png",
+    "png_sha256": "ff7c50973de18f1a00187222b922df755096601a779cbfd4a984d3c48717eeaf",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Fouga-Magister",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Fouga-Magister\\FG-Fouga-Magister.glb",
+    "source_sha256": "22a7e5ff04914560467a96cf4b49bab7c930d6819c2cc616a4faf9c218892584",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Fouga-Magister.png",
+    "png_sha256": "5d2c4dd24d359c3d787761ba6dcc942e8002d80e16361be14ae86625976d847e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-G91-R",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-G91-R\\FG-G91-R.glb",
+    "source_sha256": "973eebee7bc802b3f963c316e94fbca60d7cbfcad9ff9dcae2777eb3aad829f9",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-G91-R.png",
+    "png_sha256": "6e043a8d1464098340436cb381a02a07b13ef0ba1012b351064184e08e9cd7ca",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Gloster-Meteor",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Gloster-Meteor\\FG-Gloster-Meteor.glb",
+    "source_sha256": "07bc61e0da4c37760ef617a07e1c03167d382debc018325e8fd5d5bd9e610382",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Gloster-Meteor.png",
+    "png_sha256": "81dc39c9bc97a09de14609da9aef00755763fb571b9fb4eb7bc18b7ab55b70fb",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Gloster-Whittle",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Gloster-Whittle\\FG-Gloster-Whittle.glb",
+    "source_sha256": "7dae91a6d5a33eeb25f101e1bed53b68e677c2141ede71f27f30c7ea6b25c500",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Gloster-Whittle.png",
+    "png_sha256": "26455f5ae2b30bf6ad15cb1e7c0724d9afb58824a121cc5bf30e108add88d006",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Grumman-EA-6B-Prowler",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Grumman-EA-6B-Prowler\\FG-Grumman-EA-6B-Prowler.glb",
+    "source_sha256": "00d1b32d3c4282e6f7793e2babf8cf10c03db077c59f7d21c0269c684d9b3128",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Grumman-EA-6B-Prowler.png",
+    "png_sha256": "40237cab305d352e7631e0c8b94590e309d29af049576eef412971ffaeb58e4b",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Hansajet",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Hansajet\\FG-Hansajet.glb",
+    "source_sha256": "79b14ef1338563cf484140df511e5c655c29923be68ef7de079fc58f67378486",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Hansajet.png",
+    "png_sha256": "0c84bb439ff68fd06596205c03862063ee965ed4cfd415d97704fbb666461df1",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-harrier",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-harrier\\FG-harrier.glb",
+    "source_sha256": "86134aa66cb8ce40728b9137e9e0accb3702bc7fb15ec56ce2877b2428b42bbf",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-harrier.png",
+    "png_sha256": "e175a90f1ee51211e2be66cbafd297eb429f5c6eb6e300a7fccd62840d35e95c",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Hawker-Siddeley-Nimrod",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Hawker-Siddeley-Nimrod\\FG-Hawker-Siddeley-Nimrod.glb",
+    "source_sha256": "90399aff579ad45fcf5a2102ead8061fa82fafec87ed26f65eafe173cc45309d",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Hawker-Siddeley-Nimrod.png",
+    "png_sha256": "f24c1d71752d63bc6ea563d83bf69e2fee58bf2bfafba95ff571af8d7353b465",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-He162",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-He162\\FG-He162.glb",
+    "source_sha256": "1f308b8a5da560031e2f88792de944d474001bf4586377610d93fca0efb0e062",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-He162.png",
+    "png_sha256": "f691c065d386b3c0c9886d1604d57cd9dbc0b8a501890e385d317e49acccc61b",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Heinkel-He-178",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Heinkel-He-178\\FG-Heinkel-He-178.glb",
+    "source_sha256": "0891d20a1d4744dbad0c3e9272a0e72f76d14203b2e31e228e67c5e4358e5bdd",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Heinkel-He-178.png",
+    "png_sha256": "b82e756a462c8725b2ab40e8c66a6e62f4a25fd2d9b57d8f2e96bcf8faa8a38c",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Heinkel-He-280",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Heinkel-He-280\\FG-Heinkel-He-280.glb",
+    "source_sha256": "617942e86f8fc126116ae16eb60faa715582ea59068b3623f038c2304d2b4e34",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Heinkel-He-280.png",
+    "png_sha256": "5d00cfc6cfbba468c37169acc6f56cfa6c9a572d190e063197d321b705acdfbf",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Horten-Ho-IX",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Horten-Ho-IX\\FG-Horten-Ho-IX.glb",
+    "source_sha256": "341b3ac19b478d2f5d4641d937436d0aba90f3f6712c87ad408436f15b677918",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Horten-Ho-IX.png",
+    "png_sha256": "7d172c1b4fb0b6d71c0973eb817a1125c388f3b79355f000af9d7a25afc9657e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Hunter",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Hunter\\FG-Hunter.glb",
+    "source_sha256": "7cf88c0be604cf3c303a19f9d9f268ffc414868420b02980b78f4f53e2cadc5b",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Hunter.png",
+    "png_sha256": "823f1336a51b978f066578fca891dbb2ddd8bab1e6296c1a7fec3204adb12370",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-IL-76",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-IL-76\\FG-IL-76.glb",
+    "source_sha256": "85753350a0eead715a990c91d29a71f1644ed0fd6858cb9c5a8c497c09eb962d",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-IL-76.png",
+    "png_sha256": "62645d624cfdc0bb16c45e4229354e411388742a2af049588ec423c7165fa294",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-j22",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-j22\\FG-j22.glb",
+    "source_sha256": "cd15899a09fdc04fb2c17f454e0689b6a77c82f68477a52f53757db5c77c3ae7",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-j22.png",
+    "png_sha256": "8c493a92efeff76a477f34109d63d7b3f6d7437bc9489e8bf9a98fd788e83fca",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-j7w",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-j7w\\FG-j7w.glb",
+    "source_sha256": "8980dc784086d50239b56555824dec90ef7b639c368d2aab32a8041cb0f96722",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-j7w.png",
+    "png_sha256": "62c1ffb5ec47eeea5b077cb0e7377c5f87355d0094091457907d1439432029a2",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-JA37",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-JA37\\FG-JA37.glb",
+    "source_sha256": "03fc2fa6f5dfa5d0a7ccd661117e47b422e66db2364806f5f9e4f2fbb5130268",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-JA37.png",
+    "png_sha256": "51ae288617c7388db2c17dcdb91200298da095887c5dbf9bb59be80bc38590df",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Jaguar",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Jaguar\\FG-Jaguar.glb",
+    "source_sha256": "e3dd6a329ba3c90aa42bffe19200ca1d153b87c3d2a53df45a4a91855986a20c",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Jaguar.png",
+    "png_sha256": "b0507b7a818629e52609335501bf53bbb75a59355a53e5aabe8c03ed3601d222",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-JAS39-Gripen",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-JAS39-Gripen\\FG-JAS39-Gripen.glb",
+    "source_sha256": "66b00166ab67eaa2fdde17eb2b737d4bc93c9c58fec2233b56c658c4b37f8992",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-JAS39-Gripen.png",
+    "png_sha256": "99bc26ce70d804219bb46101a2a060079edf6be24772fdc2445e0514c8b493de",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-KC135",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-KC135\\FG-KC135.glb",
+    "source_sha256": "2e38f3dd010e9e6f3455faaeef0fc159949481ba8a2c225c64a269f3c34a8d05",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-KC135.png",
+    "png_sha256": "1cb99e1d5502807ac90e5a5921bd2ce6959f8a50f75144369166e5e0d752a671",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-KM",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-KM\\FG-KM.glb",
+    "source_sha256": "2f36a6fad72470ff5ed4deb4e47bb80e0c314ca7fce8f814271a9eb6cd99f95a",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-KM.png",
+    "png_sha256": "ba4058dce8ada749f24ecce38188b7b2dfa82ec76cadba9c32984e9e79a7d241",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-L-1011-500",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-L-1011-500\\FG-L-1011-500.glb",
+    "source_sha256": "37c57caa3923af72ad37d1dc444a88b25db3c6149419a8acddfe41d65a181583",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-L-1011-500.png",
+    "png_sha256": "f45425ec13c256d90007854524477460b195a3cda26db6a86363f67ec9a02df5",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-l39",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-l39\\FG-l39.glb",
+    "source_sha256": "14c5bd6237bf46c28a0a0fb3bd1166a9c185adc29529178e555826973e2aba60",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-l39.png",
+    "png_sha256": "87d4188d752657f9874c60a81d3e26ed4e14f90bc26930ab18794b1785a0677d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Leduc-022",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Leduc-022\\FG-Leduc-022.glb",
+    "source_sha256": "65553acb6e77b7b870a24b18469af71e90fe051d8015833ac2a946e14b1d0d97",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Leduc-022.png",
+    "png_sha256": "c29c4c62c3292043531ee80bbb2f8a192bac059f124b81cf60111b5cc2b469bc",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Lightning",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lightning\\FG-Lightning.glb",
+    "source_sha256": "052b5be5aead6bc9357cd18ab60b2b8b7c84a3c86c8145c2aae7e3b0ef651d24",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lightning.png",
+    "png_sha256": "cb56973e436fae12b097daa526c4cc1ba7414e834bdb0d26041bbdd1af1bfad5",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F22",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F22\\FG-F22.glb",
+    "source_sha256": "26fb0f65306b87a6c948b8b50b73adee455b2b0a194b50cacd75b613ded8de0c",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F22.png",
+    "png_sha256": "433e1a7fb5d8a05ac15091bc8a29556ea8ee02998c27b1aea6c1b9bc377e70c2",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Lockheed-NF104A",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-NF104A\\FG-Lockheed-NF104A.glb",
+    "source_sha256": "c731a113e444f9984820a2227c28d6104838cb13ceba62a1071dec2c668581cc",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-NF104A.png",
+    "png_sha256": "08871a09e1760f8108c0cf94f6832ad4bcdc296c8ea72a5cc4025781a6caf04b",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Lockheed-P-2-Neptune",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-P-2-Neptune\\FG-Lockheed-P-2-Neptune.glb",
+    "source_sha256": "2636dca2d73803e491dbb3706de93a8c9e2101c5186396df4e478abffb3f465e",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-P-2-Neptune.png",
+    "png_sha256": "0667474b853c36e67caf06f60725e6eb66dcb21bfb527cf51f217fa20d45bb85",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Lockheed-S3-Viking",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-S3-Viking\\FG-Lockheed-S3-Viking.glb",
+    "source_sha256": "bdc59eaa548f27022f043d2580555d18e90f90a236631070ee14a5a9245533a1",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-S3-Viking.png",
+    "png_sha256": "cafcce3bdeb5adb3257f4f8af336bfd0d52a4fb01e5f8c6bb61c41133dbe711c",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Lockheed-SR71",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-SR71\\FG-Lockheed-SR71.glb",
+    "source_sha256": "cee6f8851a354782189e1e704d871162f00ad8fb64d51172bf76645bb298d0d7",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-SR71.png",
+    "png_sha256": "d1e951afcb50ec8c6ede39bd7f920aa1467e11c9a3f896fda5e4a4c15d754201",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Lockheed-U-2S",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Lockheed-U-2S\\FG-Lockheed-U-2S.glb",
+    "source_sha256": "c94e05677dea485af32d177492042167ed0bcd05c10b62aa5efb9d1bbc81b574",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Lockheed-U-2S.png",
+    "png_sha256": "6c18b3f4efdfa0d850274dda1cd8f65a20d6adef26145ce313c74352cb2b1422",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-M-4-Bison-A",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-M-4-Bison-A\\FG-M-4-Bison-A.glb",
+    "source_sha256": "84ff7e816d332a079e39d090bb7811da28b27164ea226a8f09866f6511046172",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-M-4-Bison-A.png",
+    "png_sha256": "1e31db6427fe4591c2770f7d48826d6436c6124d3b8c467825a202c88c0be0d5",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MB326",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MB326\\FG-MB326.glb",
+    "source_sha256": "27df8a9398efb911c832190c222849abc65ebfae125757bbe737b1e7e6e8d978",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MB326.png",
+    "png_sha256": "6e2140f839a7fa627112053c748597ef0403175e6b43bbc927b5dbb05847a90c",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MC-15",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MC-15\\FG-MC-15.glb",
+    "source_sha256": "a18e87c41769cbda0d3ac72b2f5759ec512555a08f0add961ccae727f1b3f4e7",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MC-15.png",
+    "png_sha256": "dfdc12b6c07056ea0e975ce5536368aea393f059046fe568c9546fed14a070c0",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-McDonnell-Douglas-T-45-Goshawk",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-McDonnell-Douglas-T-45-Goshawk\\FG-McDonnell-Douglas-T-45-Goshawk.glb",
+    "source_sha256": "6a3f7a1c0ba031826a34421c7f1fa9150cc97600b7320164d5ed1f2deec7d029",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-McDonnell-Douglas-T-45-Goshawk.png",
+    "png_sha256": "89a734b56a48108d2473ce23943c58bfc6e8649cbc235e2f7d4e23190b75de97",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-F4",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-F4\\FG-F4.glb",
+    "source_sha256": "44da24a3d94e73fc23d36125b2c8d8f71c9d70e9036d36661cdc7504ccd01789",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-F4.png",
+    "png_sha256": "6b168429ef0f82abc5f458e4c5dfcb4b5742503f39b471d1de177975c94d5a18",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MD-11",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MD-11\\FG-MD-11.glb",
+    "source_sha256": "6bb963b452f741e54947f50f085d55cdcb696fa636d064247db03505e619d12f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MD-11.png",
+    "png_sha256": "735ec059611a10d55a1712f7908db9ec740304ff56fdbb63bd40076a6826a810",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MD-80",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MD-80\\FG-MD-80.glb",
+    "source_sha256": "e8fdaac375ec0a161bdd8d94e161f06429deb1f1b8519d0007ee741d2019c453",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MD-80.png",
+    "png_sha256": "f5e0da7b26d6015a3eb934e62f0ce084df953780503404914044405547c8c73e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-ME-262",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-ME-262\\FG-ME-262.glb",
+    "source_sha256": "2ce4300654260eaaaf01aeedf92a5d22ffb59250ffff5c12a636b4b615552518",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-ME-262.png",
+    "png_sha256": "0ed487f5919e4ae31d94c5ad5b76e07f9709200ea0a46528a015bc7eecc51473",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Messerschmitt-Libelle",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Messerschmitt-Libelle\\FG-Messerschmitt-Libelle.glb",
+    "source_sha256": "acf5407ffd4c1cf62277af45f9bc8e189b9db439fbc2f5ba1d8e818659fbaf74",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Messerschmitt-Libelle.png",
+    "png_sha256": "b3f7ac484bd465f189277c1976bfc23cffec6576d3277ee808498f6123788e90",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Messerschmitt-P1101",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Messerschmitt-P1101\\FG-Messerschmitt-P1101.glb",
+    "source_sha256": "174b8cc5b16426b5cd98fefedac487472fd9ed52d52a16c902883acf01059602",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Messerschmitt-P1101.png",
+    "png_sha256": "3fdea6168b631cb64f8d626fefb19ef774117b83363194404352bba48749e0b2",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MiG-15",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MiG-15\\FG-MiG-15.glb",
+    "source_sha256": "c1d89553bd3b1f1e2f7416c9569cce65ab84c1cdb16023c634a6c6cca9a47031",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MiG-15.png",
+    "png_sha256": "bbae5cda6a305bf2ee2df2af8354b2216a3636c6650adaae9bbe862c013759b7",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MiG-21bis",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MiG-21bis\\FG-MiG-21bis.glb",
+    "source_sha256": "a5021963f7e8196d363f2835716e0660de7f5e77b4ebb6c738ed4dd9ab18d83e",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MiG-21bis.png",
+    "png_sha256": "6e0fe03c87daec4c7e9e2cd43472c98655bf538b35eaffc342be5e15f297db7d",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Mig-29",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Mig-29\\FG-Mig-29.glb",
+    "source_sha256": "fe5e47001a9de64a4a6379f5aa44301e4bee46ad4929f6c07c092337584fe53f",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Mig-29.png",
+    "png_sha256": "07ca8fe32d9937226df5b0e77cc0885c77887c7bfb6ec44d0319f4730b00da0f",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-mirage2000",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-mirage2000\\FG-mirage2000.glb",
+    "source_sha256": "433770b17cf528290200be29a2dea04b0e10f19533c43227a94058a75e9e2c70",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-mirage2000.png",
+    "png_sha256": "ba79936eb639ed7dbe4e5acf5b5ca6be663e9ea346d625e43f9bb5626d51dd8e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Mirage_F1",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Mirage_F1\\FG-Mirage_F1.glb",
+    "source_sha256": "08c6cbb3b688be98662b283cce9d786d6db80a022df4b6e5c75eeed9e857fa48",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Mirage_F1.png",
+    "png_sha256": "2c373d29219d6b5d29e3e1afec53315b5539d6120b58b4bcd3775754be775391",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MirageG8",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MirageG8\\FG-MirageG8.glb",
+    "source_sha256": "74782c162015b7ec3d9043f56fce7aeb909ee066e9d246cad9c78cbe394fbe73",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MirageG8.png",
+    "png_sha256": "579d1fb666c6c0304fb100d0dd7e912b3cf860725e721b6f4df2eb65a3288445",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MirageIII",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MirageIII\\FG-MirageIII.glb",
+    "source_sha256": "115fcd8dc11ed2ec47ffae2902309ba2b5f236d209252ab7ba7affe44596177d",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MirageIII.png",
+    "png_sha256": "3dac3492325568eb758817a4a9a3b893522f3b18f12bbbf93e0e35d2f029cbbd",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MirageIV",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MirageIV\\FG-MirageIV.glb",
+    "source_sha256": "fe74942995d2c92b6b4211bfd66064becf084381ed1b3889888c78976ffb7b8e",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MirageIV.png",
+    "png_sha256": "dcb04a4248bbe916110fdf4c71ede3c56bdb79158a5b1173de63457d4f1ad410",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MRJ",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MRJ\\FG-MRJ.glb",
+    "source_sha256": "497d42a6c0f629ca8e14ccd16b08a5fdc792f72773e7c3493ab8be6ace41dab6",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MRJ.png",
+    "png_sha256": "747c1360ee3a99a0cbe9f346d28127176fb768e5ce783e662d2ef33b340c18c2",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-MS-760",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-MS-760\\FG-MS-760.glb",
+    "source_sha256": "fa53911ca044d45c929b3334e3a6f13c21fcdeb447463052c722b690a83c8372",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-MS-760.png",
+    "png_sha256": "63adc4189af0f6dc3d168250d9e3115f4e2d70a43a88437f379a94d18aa877f4",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Nord-1405-Gerfaut-II",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Nord-1405-Gerfaut-II\\FG-Nord-1405-Gerfaut-II.glb",
+    "source_sha256": "686e414b090d8a999438fc83e9bdfaa27d874f190a422bf1a950b96e66499b43",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Nord-1405-Gerfaut-II.png",
+    "png_sha256": "6cd912f98a541ae45e07618a573d787623d0bb585f729eb82ee5e5f9b717ea83",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Nord-2502",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Nord-2502\\FG-Nord-2502.glb",
+    "source_sha256": "b110fc4c1965c508bbd3e2c54d6e137f1395ecc7995b58232fa890647a5e6f59",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Nord-2502.png",
+    "png_sha256": "00e4d6a9a50d4e403069409a0f2f126eb67cdc9e9c3c54e4bb86737d2d2f3c55",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-North-American-RA-5C-Vigilante",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-North-American-RA-5C-Vigilante\\FG-North-American-RA-5C-Vigilante.glb",
+    "source_sha256": "c7d6c5aadeb4ebe030ecf11bcf129e757b16fc38409a03024fc3a044d276b0ba",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-North-American-RA-5C-Vigilante.png",
+    "png_sha256": "91c818a213ad009517a0ee0409459af29810268a56ef692254432a2051d0be18",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Northrop-T38-Talon",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Northrop-T38-Talon\\FG-Northrop-T38-Talon.glb",
+    "source_sha256": "5a440e8483c06ac6f9a07fd2f857c02b15a53c440fe98adb1baa436f3ded0596",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Northrop-T38-Talon.png",
+    "png_sha256": "902da666980742c6423036bd24d2bc03b3e6c0786d08e36de82e1d4556c1c714",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Northrop-yb49",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Northrop-yb49\\FG-Northrop-yb49.glb",
+    "source_sha256": "34e7bbfa6299bbe1085c526bab0de23232b0ec3f4574193e728a21f8d7747bd1",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Northrop-yb49.png",
+    "png_sha256": "38ef5213ee4b4dd60b46f74f19f37a1f66b7736108235530214fdb01ff405a7e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Pilatus-PC-24",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Pilatus-PC-24\\FG-Pilatus-PC-24.glb",
+    "source_sha256": "e0b7490ffe5f6f5df53f92fbd96def16d59231c96231881fcc4b74fae35c5eb8",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Pilatus-PC-24.png",
+    "png_sha256": "3b6bcbee67f45d21d90a1e228ffc64275b196dfb57b5d8a39d89f78c63754e27",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-PZL-230F",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-PZL-230F\\FG-PZL-230F.glb",
+    "source_sha256": "ee8f31d161621883b250b8038c779cd27e53767cf4e6442f229b123c5a5c6a14",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-PZL-230F.png",
+    "png_sha256": "021a17d0b18abea4da8a57495560d35db5503b5bf34c705527f8fff1f5462fa4",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-RainbowRacer71",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-RainbowRacer71\\FG-RainbowRacer71.glb",
+    "source_sha256": "ee1f641397c50ca806f916733690ecaaee20d818a7d4625be2adb9c21b18b085",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-RainbowRacer71.png",
+    "png_sha256": "0bd84f84e9cbea0e35b03bd757277ddae6cae842d2f9f91d33a8d78d1c1adb11",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-SaabJ35F",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-SaabJ35F\\FG-SaabJ35F.glb",
+    "source_sha256": "9dcf18b553faf26ad4fd112a9ca57cd3eaac801c41438c4594146792e5e70c9b",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-SaabJ35F.png",
+    "png_sha256": "8f5a8e013f2be6ca9a8ba81d88766a3a895f1e392bca9ea8d4d8f607e8e92081",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-seahawk",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-seahawk\\FG-seahawk.glb",
+    "source_sha256": "07fadd3e239a3b84de95c40d906622246399f3d47453aab53b97ec561054caa8",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-seahawk.png",
+    "png_sha256": "306ccb03304fb1617cb8bcef4bfe0570572aeda8d6d6bd9aec549d04e64a09c5",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-SeaVixen",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-SeaVixen\\FG-SeaVixen.glb",
+    "source_sha256": "08f080a5b81bde41dd895d43bab048eae9c5ed60fddd1ecd3aa90bd40559d3fa",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-SeaVixen.png",
+    "png_sha256": "d2664b46ce6d52502e8db2ec3f6962cb485626d9591791b1f2d92cd64e5d748f",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Stiletto",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Stiletto\\FG-Stiletto.glb",
+    "source_sha256": "612843507b91a1d1bcc78432547d028ee6276538045af2b2fca8df01873d7e28",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Stiletto.png",
+    "png_sha256": "b0e618c5a01c3a831294a2d60c15ae7507fcd4c92742936973829d570d37ae46",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Su-25",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Su-25\\FG-Su-25.glb",
+    "source_sha256": "6213862c4b8cd1b40635aaa3d75bc4c1cd73de3da15929b39e221ad454baa2fa",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Su-25.png",
+    "png_sha256": "7525e78df1dd420959255f30aeefa81aee2703291a5523eb1bfc53b6bbcabd01",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-SU-37",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-SU-37\\FG-SU-37.glb",
+    "source_sha256": "74d2c23efce7a2e8c30ac34870282aae02d7afd951733a15e3814ddbae59bccd",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-SU-37.png",
+    "png_sha256": "7d47da91434cf75a3d2642470c7d2965d88519a6ebadd03557965c89492cd577",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Sukhoi-Su-33",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Sukhoi-Su-33\\FG-Sukhoi-Su-33.glb",
+    "source_sha256": "45aa8091a5600f72cae69cd2f366ca94dc28a7221c6279fa92702a339c480336",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Sukhoi-Su-33.png",
+    "png_sha256": "449fcdb414a9f84e4d4dc78f331bf7fcad56a173a8ef4d4b8ade3565453b49c7",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Super-Etendard",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Super-Etendard\\FG-Super-Etendard.glb",
+    "source_sha256": "fc48f6694816405dc960bae8969af655057d2b973426663b48b51db6fef02119",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Super-Etendard.png",
+    "png_sha256": "d5922535271becd875ee1a94bc1495e1b9c0048fa25eb9da263073a9ec76e1d9",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Supermarine-Swift",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Supermarine-Swift\\FG-Supermarine-Swift.glb",
+    "source_sha256": "ccf9df0a3c38015fd053520857cb3639aca1c448fb9d7851370f3343c6a3cfd9",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Supermarine-Swift.png",
+    "png_sha256": "3700513df7ba23735c7c814035ef674fe433f3ba5ccfee02f02d6836cac5e3c1",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-T-4",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-T-4\\FG-T-4.glb",
+    "source_sha256": "1cd27e408549d4053f29f833e136463db026edeadff610efe18d3aabfd6c9655",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-T-4.png",
+    "png_sha256": "88382a796d94ba14cae11aa411d1ceec753911487a50ae8bc7f16ec3e79350e9",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-T-50",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-T-50\\FG-T-50.glb",
+    "source_sha256": "8663d695d97000b9e15c2cc99a4b48f3614ab0265a98dbae1f624fab7d3969a5",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-T-50.png",
+    "png_sha256": "3af638c32fe94b8005e087d9346a3f5ac8fd7878c1ae3a90dcf880c8f9f3f22f",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-T37",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-T37\\FG-T37.glb",
+    "source_sha256": "72509245073c54b56d0972caabc1b8dd8a181860ed5e8e46dc2fa3a57ee44f16",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-T37.png",
+    "png_sha256": "294a304b733540136d0e0d7f06021fd45d4f180751a35ba22c2cf4c4e929683e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-T7-RedHawk",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-T7-RedHawk\\FG-T7-RedHawk.glb",
+    "source_sha256": "77231b8c2b88b4a87c72d2a96f9c2e53bf651b889ad8925f5762f37a4deb1b0e",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-T7-RedHawk.png",
+    "png_sha256": "5051744e9da656847da4b330e32f02f6107fe511d4296acb010f2e623247c25e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Tu-134",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Tu-134\\FG-Tu-134.glb",
+    "source_sha256": "cf4ca975cfa219944fc6018c775387f260bbc3149cea5ca7f2aa03091c150aa6",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Tu-134.png",
+    "png_sha256": "a918a45d007771d9ccda121793073e9537adcd45a46171082025e3a60d8f7ad8",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Tu-22-Blinder",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Tu-22-Blinder\\FG-Tu-22-Blinder.glb",
+    "source_sha256": "0f378b835287d6065bbd19fdcd12e5a3c1d3a342357ead824b717066b0674518",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Tu-22-Blinder.png",
+    "png_sha256": "c0abadefc4fab12fe3e6f611f9989040ed50c99b169a35fb7bfc13e04c8032b9",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-tu154b",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-tu154b\\FG-tu154b.glb",
+    "source_sha256": "82e118b66a4af6c800b94dd583b2d0c40e35478d832f1e2b148ec143544d6cf6",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-tu154b.png",
+    "png_sha256": "7553ccab73050402a8bbe1f4d4547bb12d44e291d63e0d41a1193f9ff07cc20f",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-victor",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-victor\\FG-victor.glb",
+    "source_sha256": "b83a9bbc9e4b72d353506bfbf4cfc1d821a7bf98bae799c5d4084c5a8e213793",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-victor.png",
+    "png_sha256": "5a993080e4dd08aacfcc4bf1eaa9765dbe877be5f80c157bce574fe018db9592",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-vulcanb2",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-vulcanb2\\FG-vulcanb2.glb",
+    "source_sha256": "4989c52597b62e27d5675f92dead960f40ad6aa6472edf1b9b265617a8e679d8",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-vulcanb2.png",
+    "png_sha256": "719e2d28fb2327946a4f7b48a4fdb3897658cb331b53ceda6fd5e2b4d2893dff",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Westwind-II",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Westwind-II\\FG-Westwind-II.glb",
+    "source_sha256": "85a559fa4d6a57a2f39be7d9fc9ba815b197b0d8a81f0ed14052167f3caa0827",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Westwind-II.png",
+    "png_sha256": "ed17b39ecca4a9a099132aabdd228bad3760fecfbf83c5a5ff692b850b102aea",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-XB-70",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-XB-70\\FG-XB-70.glb",
+    "source_sha256": "32848e82bef260a68eab8de153b7488127e67d74270e2f46cf8e7bdd70b12102",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-XB-70.png",
+    "png_sha256": "8a13611ffee81e1ed9a6f7c36ef6781b142b08a75f8a5ba2b164578175ecaa9e",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Yak-130",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Yak-130\\FG-Yak-130.glb",
+    "source_sha256": "b138722dc49c8649bdc95d96dab4ff04b1ae0bfc7628419545f776cde28f6675",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Yak-130.png",
+    "png_sha256": "53a58faaea59b6e9e09b890a5a6a262d4ab762d0af808642bdfeae1cdebe3e24",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Yak-23",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Yak-23\\FG-Yak-23.glb",
+    "source_sha256": "2a7da89535d34d7b6ad4fa059cbc8b452a1e2d8afa527d28b05837e28abd9443",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Yak-23.png",
+    "png_sha256": "98e86eddc63b356fa29f2f161833eb9c28a3e16af5c2cd58f4293bd56a1299c6",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-Yak-36",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-Yak-36\\FG-Yak-36.glb",
+    "source_sha256": "252399526cdb0bf5072f8737ec32914784360ddfd8d60b3c35bd995d5a1080ea",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-Yak-36.png",
+    "png_sha256": "11812f2d18b7c373fe3783000161048ebbf8e924a1d23fa4466e7ccc4fecbe89",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  },
+  {
+    "aircraft": "FG-YF-23",
+    "source": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\registered\\FG-YF-23\\FG-YF-23.glb",
+    "source_sha256": "aaaa54f88918ecaddd07c8ddfc12c11003f9100f2d6bae32e6b4ebddba7fcba0",
+    "file": "C:\\Users\\hulc\\Desktop\\paper\\bvr_sim\\bvr_sim\\game\\assets\\ui\\aircraft\\FG-YF-23.png",
+    "png_sha256": "712716ebc4cafe75f6dacdc293617425289ad1b666770701ecf18b2be6f4d10a",
+    "renderer": "Blender Cycles CPU8samples",
+    "scope": "Actual registered geometry/material render; thumbnail only, no FDM or source asset change."
+  }
+]

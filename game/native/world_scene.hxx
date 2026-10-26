@@ -7,6 +7,15 @@
 #include <fstream>
 #include "json.hpp"
 #include "ground_atlas.hxx"
+#ifdef BVR_STATIC_SCENERY_CACHE
+namespace wi::scene {
+void SetBvrStaticScenery(Scene&,const wi::ecs::Entity*,size_t);
+std::map<std::string,uint64_t> GetBvrStaticSceneryState(Scene&);
+#ifdef BVR_INLINE_GROUND_BOUNDS
+void SetBvrStaticGroundBounds(Scene&,const wi::ecs::Entity*,const float*,const uint32_t*,const float*,size_t);
+#endif
+}
+#endif
 struct ScenePlacement {
     std::string id, model, chunk, category, target_uid;
     std::array<double, 3> position{};
@@ -33,6 +42,8 @@ struct SceneStats {
     uint64_t unique_models = 0, imported_glbs = 0, mesh_resources = 0, material_resources = 0;
     uint64_t instances = 0, visible_instances = 0, visible_objects = 0, visible_triangles = 0,
              visible_mesh_subset_groups = 0;
+    uint64_t transform_components = 0;
+    uint64_t lod_candidates = 0;
     std::map<std::string, uint64_t> import_counts, chunk_instances;
     std::map<std::string, uint64_t> visible_chunks;
     std::array<uint64_t, 2> visible_lods{0, 0};
@@ -76,7 +87,8 @@ class WorldScene {
     };
     struct Instance {
         ScenePlacement spec;
-        wi::ecs::Entity root;
+        wi::ecs::Entity root=wi::ecs::INVALID_ENTITY;
+        DirectX::XMFLOAT4X4 placement_world;
         std::vector<wi::ecs::Entity> children;
         int lod = -1;
         bool shown = true;
@@ -103,6 +115,16 @@ class WorldScene {
     std::map<std::string, uint64_t> import_counts;
     std::vector<Instance> instances;
     std::vector<size_t> changing_instances;
+    std::map<std::pair<int,int>,std::vector<size_t>> vegetation_cells;
+    std::vector<size_t> nonvegetation_updates,near_vegetation,lod_candidates,lod_near_next;
+    std::vector<uint32_t> lod_marks;
+    uint32_t lod_generation=0;
+    bool spatial_lod_initialized=false;
+    size_t last_lod_candidates=0;
+    std::vector<wi::ecs::Entity> static_cache_entities;
+    bool inline_ground_bounds_active=false;
+    double maximum_vegetation_lod_distance=1;
+    static constexpr double vegetation_cell_m=1000.;
     struct GroundBoundEntry {
         wi::ecs::Entity entity;
         wi::primitive::AABB box;
@@ -287,14 +309,15 @@ class WorldScene {
         import_counts[model]++;
         return prototypes.emplace(model, std::move(data)).first->second;
     }
-    wi::ecs::Entity child(wi::ecs::Entity root, const Part &part, const std::string &name, bool flat_world=false) {
+    wi::ecs::Entity child(wi::ecs::Entity root, const Part &part, const std::string &name, bool flat_world=false,
+                          const DirectX::XMFLOAT4X4* placement_world=nullptr) {
         auto e = scene.Entity_CreateObject(name);
         auto object = scene.objects.GetComponent(e);
         object->meshID = part.mesh;
         object->color = part.color;
         auto t = scene.transforms.GetComponent(e);
         auto matrix=DirectX::XMLoadFloat4x4(&part.transform);
-        if(flat_world)matrix*=scene.transforms.GetComponent(root)->GetWorldMatrix();
+        if(flat_world)matrix*=placement_world?DirectX::XMLoadFloat4x4(placement_world):scene.transforms.GetComponent(root)->GetWorldMatrix();
         t->MatrixTransform(matrix);
         t->UpdateTransform();
         if(flat_world)scene.layers.GetComponent(e)->layerMask=1;
@@ -486,9 +509,19 @@ class WorldScene {
         return root;
     }
     void clear() {
-        for (auto &instance : instances)
-            scene.Entity_Remove(instance.root);
+#ifdef BVR_STATIC_SCENERY_CACHE
+        wi::scene::SetBvrStaticScenery(scene,nullptr,0);
+#endif
+        static_cache_entities.clear();
+        inline_ground_bounds_active=false;
+        for (auto &instance : instances){
+            // Flattened objects have no hierarchy link to the placement root.
+            for(auto entity:instance.children)scene.Entity_Remove(entity);
+            if(instance.root!=wi::ecs::INVALID_ENTITY)scene.Entity_Remove(instance.root);
+        }
         instances.clear();
+        vegetation_cells.clear();nonvegetation_updates.clear();near_vegetation.clear();lod_candidates.clear();lod_near_next.clear();lod_marks.clear();
+        spatial_lod_initialized=false;maximum_vegetation_lod_distance=1;last_lod_candidates=0;
         changing_instances.clear();ground_bound_entries.clear();ground_bound_patches.clear();
         ++ground_bound_revision;
         child_instances.clear();
@@ -519,6 +552,24 @@ class WorldScene {
             if(cache_heights)cached_tree_heights.push_back(float(terrain.height(point[0],point[1])));
         }
         ground_atlas_.set_tree_positions(streamed_points,cached_tree_heights);
+        // Cached source meshes survive a map switch; their parameter buffers
+        // must point at this map's newly allocated shared terrain metadata.
+        for(auto& [name,data]:prototypes)if(!data.ground_spec.is_null()){
+            const auto minimum=data.ground_spec.at("min_local_xz").get<std::array<float,2>>();
+            const auto span=data.ground_spec.at("span_local_xz").get<std::array<float,2>>();
+            std::vector<std::array<float,2>> anchors;
+            if(data.ground_spec.value("anchor_encoding","")=="source_tree_index_uv1"){
+                const auto center=data.ground_cluster.at("recentering").get<std::array<float,3>>();
+                for(const auto& pose:data.ground_cluster.at("poses_before_recentering")){
+                    const auto a=pose.at("base_anchor").get<std::array<float,3>>();anchors.push_back({a[0]-center[0],a[1]-center[1]});
+                }
+            }
+            data.ground_parameters=ground_atlas_.parameters({minimum[0],minimum[1],span[0],span[1]},anchors);
+            const auto srv=wi::graphics::GetDevice()->GetDescriptorIndex(&data.ground_parameters,wi::graphics::SubresourceType::SRV);
+            for(const auto& part:data.parts){const auto* mesh=scene.meshes.GetComponent(part.mesh);if(!mesh)continue;
+                for(const auto& subset:mesh->subsets){auto* material=scene.materials.GetComponent(subset.materialID);if(material){material->userdata.z=uint32_t(srv)+1;material->SetDirty();}}
+            }
+        }
         uint32_t stream_offset=0;
         for (const auto &m : mats)
             material(m);
@@ -551,12 +602,13 @@ class WorldScene {
             }
             const std::string material_name = i < terrain_materials.size() ? terrain_materials[i] :
                 (i > 0 ? "detail_" + std::to_string(i) : "");
+            const int chunk_cells=fine.spacing>=40?64:std::max(1,int(1000/fine.spacing));
             if (!material_name.empty() && !materials.count(material_name))
                 throw std::invalid_argument("Unknown terrain tile material: " + material_name);
             if (!material_name.empty())
-                terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), {}, {}, inner, material_name,&terrain);
+                terrain_patch(fine, chunk_cells, {}, {}, inner, material_name,&terrain);
             else
-                terrain_patch(fine, std::max(1, int(1000 / fine.spacing)), cover, colors, inner,"",&terrain);
+                terrain_patch(fine, chunk_cells, cover, colors, inner,"",&terrain);
         }
         for (const auto &surface : surfaces) {
             if (surface.indices.empty())
@@ -609,9 +661,16 @@ class WorldScene {
             instance.flat_world_transform=spec.category=="vegetation"&&spec.target_uid.empty()&&material_profile.value("flatten_static_vegetation",false);
             instance.has_lod = !keep_detail && prototypes.count(spec.model+"::lod1")!=0;
             if(keep_detail)instance.lod=0;
-            instance.root = scene.Entity_CreateTransform(spec.id);
-            scene.layers.Create(instance.root).layerMask = 1;
-            auto t = scene.transforms.GetComponent(instance.root);
+            // Flattened vegetation children already contain this exact world
+            // transform. Keeping an unused ECS root for every grove doubles
+            // transform/layer updates on the largest maps.
+            const bool rootless=instance.flat_world_transform&&material_profile.value("rootless_static_vegetation",false);
+            wi::scene::TransformComponent placement_transform;
+            if(!rootless){
+                instance.root=scene.Entity_CreateTransform(spec.id);
+                scene.layers.Create(instance.root).layerMask=1;
+            }
+            auto t=rootless?&placement_transform:scene.transforms.GetComponent(instance.root);
             t->Scale(XMFLOAT3(spec.scale, spec.scale, spec.scale));
             t->RotateRollPitchYaw(XMFLOAT3(0, -spec.yaw, 0));
             // Optional rigid terrain-plane fit for decorative source groves.
@@ -627,6 +686,7 @@ class WorldScene {
             t->Translate(
                 XMFLOAT3(float(-spec.position[1]), float(spec.position[2]), float(spec.position[0])));
             t->UpdateTransform();
+            instance.placement_world=t->world;
             if(!data.ground_spec.is_null()){
                 if(spec.up_normal!=std::array<float,3>{0,1,0}||spec.scale<=0)throw std::invalid_argument("Per-tree grounding requires upright static groves with positive scale");
                 const auto& cluster=data.ground_cluster;
@@ -661,7 +721,7 @@ class WorldScene {
             stream_offset+=uint32_t(spec.ground_stems.size());
             for (size_t i = 0; i < count; ++i) {
                 auto e = child(instance.root, data.parts[std::min(i, data.parts.size() - 1)],
-                               spec.id + "_part" + std::to_string(i),instance.flat_world_transform);
+                               spec.id + "_part" + std::to_string(i),instance.flat_world_transform,&instance.placement_world);
                 child_instances[e] = instances.size();
                 instance.children.push_back(e);
                 auto* object = scene.objects.GetComponent(e);
@@ -676,13 +736,56 @@ class WorldScene {
                 }
             }
             if(!keep_detail||!spec.target_uid.empty())changing_instances.push_back(instances.size());
+            if(spec.category=="vegetation"&&spec.target_uid.empty()&&instance.has_lod){
+                vegetation_cells[{int(std::floor(spec.position[0]/vegetation_cell_m)),int(std::floor(spec.position[1]/vegetation_cell_m))}].push_back(instances.size());
+                maximum_vegetation_lod_distance=std::max(maximum_vegetation_lod_distance,double(spec.lod_distance));
+            }else if(!keep_detail||!spec.target_uid.empty())nonvegetation_updates.push_back(instances.size());
             instances.push_back(std::move(instance));
         }
+        for(const auto& instance:instances)if(instance.flat_world_transform&&instance.ground_bounds&&instance.spec.target_uid.empty()&&prototypes.at(instance.spec.model).facing_meshes.empty())
+            static_cache_entities.insert(static_cache_entities.end(),instance.children.begin(),instance.children.end());
+        set_static_cache_enabled(material_profile.value("cache_static_scenery",false));
+        set_inline_ground_bounds(material_profile.value("inline_ground_bounds",false));
+    }
+    void set_inline_ground_bounds(bool enabled){
+        inline_ground_bounds_active=false;
+#ifdef BVR_INLINE_GROUND_BOUNDS
+        if(enabled&&static_cache_entities.size()==ground_bound_entries.size()){
+            std::vector<float> boxes,spheres;std::vector<uint32_t> streams;
+            for(size_t i=0;i<ground_bound_entries.size();++i){
+                const auto& entry=ground_bound_entries[i];const auto& patch=ground_bound_patches[i];
+                if(entry.entity!=static_cache_entities[i])throw std::runtime_error("Static ground registration order mismatch");
+                boxes.insert(boxes.end(),{entry.box._min.x,entry.box._min.y,entry.box._min.z,entry.box._max.x,entry.box._max.y,entry.box._max.z});
+                spheres.insert(spheres.end(),patch.sphere.begin(),patch.sphere.end());
+                streams.insert(streams.end(),{patch.tree_offset_plus1,patch.tree_count});
+            }
+            wi::scene::SetBvrStaticGroundBounds(scene,static_cache_entities.data(),boxes.data(),streams.data(),spheres.data(),static_cache_entities.size());
+            inline_ground_bounds_active=true;
+        }else wi::scene::SetBvrStaticScenery(scene,nullptr,0);
+#else
+        if(enabled)throw std::runtime_error("Inline ground bounds require the matching engine");
+#endif
+    }
+    void set_static_cache_enabled(bool enabled){
+        material_profile["cache_static_scenery"]=enabled;
+#ifdef BVR_STATIC_SCENERY_CACHE
+        wi::scene::SetBvrStaticScenery(scene,enabled?static_cache_entities.data():nullptr,enabled?static_cache_entities.size():0);
+#else
+        if(enabled)throw std::runtime_error("Static scenery cache requires the matching engine fork");
+#endif
+    }
+    std::map<std::string,uint64_t> static_cache_state() const {
+#ifdef BVR_STATIC_SCENERY_CACHE
+        return wi::scene::GetBvrStaticSceneryState(scene);
+#else
+        return {};
+#endif
     }
     GroundAtlas& ground_atlas() {return ground_atlas_;}
     void set_vegetation_lod_distance(double meters) {
         if(!std::isfinite(meters)||meters<1)throw std::invalid_argument("Vegetation LOD distance must be finite and positive");
         material_profile["vegetation_lod_distance_m"]=meters;
+        spatial_lod_initialized=false;
     }
     nlohmann::json vegetation_state() const {
         uint64_t trees=0,near_count=0,far_count=0,hidden=0;
@@ -692,7 +795,15 @@ class WorldScene {
         }
         return {{"trees",trees},{"near_trees",near_count},{"far_trees",far_count},{"distance_hidden_trees",hidden}};
     }
+    void set_spatial_vegetation_lod(bool enabled){material_profile["spatial_vegetation_lod"]=enabled;spatial_lod_initialized=false;}
+    std::vector<uint8_t> vegetation_lod_states() const {
+        std::vector<uint8_t> result;
+        for(const auto& instance:instances)if(instance.spec.category=="vegetation")
+            result.push_back(uint8_t((instance.lod&3)|(instance.shown?4:0)));
+        return result;
+    }
     void ground_bounds_before_visibility() {
+        if(inline_ground_bounds_active)return;
         // Scene::Update overwrites ordinary rigid bounds. Run after that update
         // and before both main/reflection visibility and shadow rendering.
         // Preserve the correct frustum and terrain/depth occlusion. Historical
@@ -791,7 +902,30 @@ class WorldScene {
         // hundreds of thousands of times per frame costs more than LOD itself.
         const bool preserve_full_detail=material_profile.value("vegetation_full_detail",true);
         const double vegetation_distance=material_profile.value("vegetation_lod_distance_m",-1.);
-        for (auto index : changing_instances) {
+        const bool spatial=material_profile.value("spatial_vegetation_lod",false);
+        const std::vector<size_t>* updates=&changing_instances;
+        if(spatial&&spatial_lod_initialized){
+            // Far vegetation cannot become near outside the hysteresis sphere.
+            // Include the previous near set so teleporting also updates objects
+            // left behind. This selects exactly the same LODs as a full scan.
+            if(lod_marks.size()!=instances.size())lod_marks.assign(instances.size(),0);
+            if(++lod_generation==0){std::fill(lod_marks.begin(),lod_marks.end(),0);++lod_generation;}
+            lod_candidates.clear();
+            auto append=[&](size_t i){if(lod_marks[i]!=lod_generation){lod_marks[i]=lod_generation;lod_candidates.push_back(i);}};
+            for(auto i:nonvegetation_updates)append(i);
+            for(auto i:near_vegetation)append(i);
+            const double radius=1.1*(vegetation_distance>0?vegetation_distance:maximum_vegetation_lod_distance);
+            const int n0=int(std::floor((eye.z-radius)/vegetation_cell_m)),n1=int(std::floor((eye.z+radius)/vegetation_cell_m));
+            const int w0=int(std::floor((-eye.x-radius)/vegetation_cell_m)),w1=int(std::floor((-eye.x+radius)/vegetation_cell_m));
+            for(int n=n0;n<=n1;++n)for(int w=w0;w<=w1;++w){
+                auto cell=vegetation_cells.find({n,w});
+                if(cell!=vegetation_cells.end())for(auto i:cell->second)append(i);
+            }
+            updates=&lod_candidates;
+        }
+        lod_near_next.clear();
+        last_lod_candidates=updates->size();
+        for (auto index : *updates) {
             auto& instance=instances[index];
             auto &p = instance.spec;
             // Immutable full-detail scenery never changes LOD or distance
@@ -819,7 +953,7 @@ class WorldScene {
                         auto t = scene.transforms.GetComponent(e);
                         t->ClearTransform();
                         auto matrix=XMLoadFloat4x4(&parts[i].transform);
-                        if(instance.flat_world_transform)matrix*=scene.transforms.GetComponent(instance.root)->GetWorldMatrix();
+                        if(instance.flat_world_transform)matrix*=XMLoadFloat4x4(&instance.placement_world);
                         t->MatrixTransform(matrix);
                         t->UpdateTransform();
                     }
@@ -827,6 +961,7 @@ class WorldScene {
                 instance.lod = lod;
                 instance.shown = shown;
             }
+            if(spatial&&vegetation&&instance.has_lod&&p.target_uid.empty()&&instance.lod==0)lod_near_next.push_back(index);
             if (!p.target_uid.empty())
                 for (const auto &entity : frame.entities)
                     if (entity.uid == p.target_uid) {
@@ -835,10 +970,11 @@ class WorldScene {
                                 entity.alive ? XMFLOAT4(1, 1, 1, 1) : XMFLOAT4(.1f, .1f, .1f, 1);
                     }
         }
+        if(spatial){near_vegetation.swap(lod_near_next);spatial_lod_initialized=true;}
     }
     std::vector<std::array<double,3>> scenery_points(const std::string& id,const std::vector<std::array<double,3>>& points) const {
         for(const auto& instance:instances)if(instance.spec.id==id){
-            const auto matrix=scene.transforms.GetComponent(instance.root)->GetWorldMatrix();
+            const auto matrix=DirectX::XMLoadFloat4x4(&instance.placement_world);
             std::vector<std::array<double,3>> result;result.reserve(points.size());
             for(const auto& p:points){
                 const auto v=DirectX::XMVector3TransformCoord(DirectX::XMVectorSet(float(p[0]),float(p[1]),float(p[2]),1),matrix);
@@ -850,6 +986,8 @@ class WorldScene {
     }
     SceneStats stats(const wi::renderer::Visibility &visibility) const {
         SceneStats result;
+        result.transform_components=scene.transforms.GetCount();
+        result.lod_candidates=last_lod_candidates;
         result.import_counts = import_counts;
         result.imported_glbs = import_counts.size();
         std::set<std::string> models;

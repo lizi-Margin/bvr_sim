@@ -50,10 +50,16 @@ class BakedScene:
         result=dict(self.document);result['id']=result['name'];result['version']=2
         result['player_start']=result['mission']['player_start'];result['ground_target']={'id':'depot','position':self.target}
         from .heightfield import sample_grid
-        airport=result['airfields'][0];height=float(sample_grid(self.arrays['focus'],result['terrain']['details'][0],*airport['center']))
+        airport=result['airfields'][0];n,w=airport['center'];meta=result['terrain'];selected=meta['base'];key='base'
+        for tile in meta['details']:
+            if tile['origin_north']<=n<=tile['origin_north']+(tile['columns']-1)*tile['spacing'] and tile['origin_west']<=w<=tile['origin_west']+(tile['rows']-1)*tile['spacing'] and (key=='base' or tile['spacing']<selected['spacing']):
+                selected=tile;key=tile.get('array_key','focus')
+        height=float(sample_grid(self.arrays[key],selected,n,w))
         result['runway']={'position':[*airport['center'],height],'length_m':airport['runway_length_m'],'width_m':airport['runway_width_m']}
         return result
     def configure(self,renderer,bindings,terrain,visual_profile=None):
+        for capability in self.document.get('required_renderer_capabilities',[]):
+            if not isinstance(capability,str) or not capability.replace('_','').isalnum() or not getattr(bindings,capability,False):raise RuntimeError('Map requires renderer capability: '+str(capability))
         from .content import ASSETS
         if any(self.document['materials'][s['material']].get('ground_detail') for s in self.document['surfaces']) and not getattr(bindings,'SURFACE_DETAIL_UVS_V1',False):
             raise RuntimeError('Surface detail materials require the matching native world-detail UV interface')
@@ -87,6 +93,8 @@ class BakedScene:
                             path=(directory/item['file']).resolve()
                             if not path.is_relative_to(directory.resolve()):raise ValueError('Source-card mip path leaves registered asset')
                             if checked.setdefault(path,item['sha256'])!=item['sha256'] or sha(path)!=item['sha256']:raise ValueError('Source-card mip sidecar changed: '+id)
+        from .render_assets import distance_lod_models
+        models=distance_lod_models(models,visual_profile)
         if hasattr(renderer,'register_scene_models'):renderer.register_scene_models(models)
         materials=[];surfaces=[];placements=[]
         for id,data in self.document['materials'].items():

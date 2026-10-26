@@ -66,6 +66,15 @@
       "manifest": "published/source-distance-lod-v326/775cc608ec9b7387ea9a700a/release.json",
       "manifest_sha256": "4b2f58b926009623e7d75bd808f82c101d40bc4198fa298d24982ce7bd237e37",
       "storage_root": "resources"
+    },
+    {
+      "id": "source-regional-horizon-v327@8d00e8c01c008c2dab680bab",
+      "label": "林缘地表·2048km天际线 v327",
+      "quality": "candidate",
+      "supports_convoy": false,
+      "manifest": "published/source-regional-horizon-v327/8d00e8c01c008c2dab680bab/release.json",
+      "manifest_sha256": "f9d1ff85b5f550d107d7d48c20bfe6d5fe86153796647d53a601a11f359c500d",
+      "storage_root": "resources"
     }
   ],
   "storage_roots": {

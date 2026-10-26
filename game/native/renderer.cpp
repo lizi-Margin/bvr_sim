@@ -1,4 +1,7 @@
 #include "WickedEngine.h"
+#ifdef BVR_FAR_DISTANCE
+namespace wi::renderer {float BvrDrawDistanceRoundTrip(float);}
+#endif
 #include "ModelImporter.h" // Upstream importer declarations require WickedEngine.h first.
 #include "gameplay/game_session.hxx"
 #include <Windows.h>
@@ -537,6 +540,11 @@ class Renderer {
     SceneStats statistics() const { return baked_world->stats(path->visibility_main); }
     void set_vegetation_lod_distance(double meters){baked_world->set_vegetation_lod_distance(meters);}
     std::string vegetation_state() const{return baked_world->vegetation_state().dump();}
+    void set_spatial_vegetation_lod(bool enabled){baked_world->set_spatial_vegetation_lod(enabled);}
+    py::bytes vegetation_lod_bytes() const {const auto states=baked_world->vegetation_lod_states();return py::bytes(reinterpret_cast<const char*>(states.data()),states.size());}
+    void set_static_cache_enabled(bool enabled){baked_world->set_static_cache_enabled(enabled);}
+    std::map<std::string,uint64_t> static_cache_state() const{return baked_world->static_cache_state();}
+    void set_inline_ground_bounds(bool enabled){baked_world->set_inline_ground_bounds(enabled);}
     void configure_ground_atlas(py::array_t<float,py::array::c_style> values,float north,float west,float spacing,const std::string& source_sha256) {
         if(values.ndim()!=2)throw std::invalid_argument("Terrain atlas must be a contiguous float32 array [west,north]");
         baked_world->ground_atlas().upload(values.data(),uint32_t(values.shape(1)),uint32_t(values.shape(0)),north,west,spacing,source_sha256);
@@ -1080,6 +1088,12 @@ class Renderer {
     }
 };
 PYBIND11_MODULE(bvr_game_render, m) {
+#ifdef BVR_FAR_DISTANCE
+    m.attr("TERRAIN_CONTINUATION_V1")=true;
+    m.def("draw_distance_round_trip",&wi::renderer::BvrDrawDistanceRoundTrip);
+#else
+    m.attr("TERRAIN_CONTINUATION_V1")=false;
+#endif
     m.attr("VISUAL_BETA")=true;
     m.attr("BAKED_ENVIRONMENT")=true;
     m.attr("SUN_SHADOW_PROFILE_V1")=true;
@@ -1087,6 +1101,17 @@ PYBIND11_MODULE(bvr_game_render, m) {
     m.attr("CACHED_TREE_HEIGHTS_V1")=true;
     m.attr("WIDE_VISIBILITY_COMPUTE_V1")=true;
     m.attr("STATIC_VEGETATION_WORLD_TRANSFORMS_V1")=true;
+    m.attr("ROOTLESS_SPATIAL_VEGETATION_V1")=true;
+#if defined(BVR_STATIC_SCENERY_CACHE) && !defined(BVR_INLINE_GROUND_BOUNDS)
+    m.attr("STATIC_SCENERY_CACHE_V1")=true;
+#else
+    m.attr("STATIC_SCENERY_CACHE_V1")=false;
+#endif
+#ifdef BVR_INLINE_GROUND_BOUNDS
+    m.attr("INLINE_GROUND_BOUNDS_V1")=true;
+#else
+    m.attr("INLINE_GROUND_BOUNDS_V1")=false;
+#endif
 #ifdef BVR_SCENE_MATERIAL_CACHE
     m.attr("SCENE_MATERIAL_CACHE_V1")=true;
 #else
@@ -1150,6 +1175,8 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def_readonly("imported_glbs", &SceneStats::imported_glbs)
         .def_readonly("mesh_resources", &SceneStats::mesh_resources)
         .def_readonly("material_resources", &SceneStats::material_resources)
+        .def_readonly("transform_components", &SceneStats::transform_components)
+        .def_readonly("lod_candidates", &SceneStats::lod_candidates)
         .def_readonly("instances", &SceneStats::instances)
         .def_readonly("visible_instances", &SceneStats::visible_instances)
         .def_readonly("visible_objects", &SceneStats::visible_objects)
@@ -1261,6 +1288,11 @@ PYBIND11_MODULE(bvr_game_render, m) {
         .def("statistics", &Renderer::statistics)
         .def("set_vegetation_lod_distance", &Renderer::set_vegetation_lod_distance)
         .def("vegetation_state", &Renderer::vegetation_state)
+        .def("set_spatial_vegetation_lod", &Renderer::set_spatial_vegetation_lod)
+        .def("vegetation_lod_bytes", &Renderer::vegetation_lod_bytes)
+        .def("set_static_cache_enabled", &Renderer::set_static_cache_enabled)
+        .def("static_cache_state", &Renderer::static_cache_state)
+        .def("set_inline_ground_bounds", &Renderer::set_inline_ground_bounds)
         .def("source_card_materials", &Renderer::source_card_materials)
         .def("facing_leaf_state", &Renderer::facing_leaf_state)
         .def("configure_ground_atlas", &Renderer::configure_ground_atlas,py::arg("values").noconvert(),py::arg("origin_north"),py::arg("origin_west"),py::arg("spacing"),py::arg("source_sha256"))

@@ -1,5 +1,7 @@
 # Native frontend
 
+The ordinary `play` command opens a separate cancellable loading window before starting the game process. It closes after the first game frame is ready; direct module tools such as `run` remain headless or render-on-demand.
+
 Run from the nested repository:
 
 ```powershell
@@ -14,7 +16,9 @@ python -m bvr_game play --runtime game/runtime-ui.json
 
 完整森林使用直接64位像素图元标识的索引光栅和配套 compute visibility shading，避免原25位 meshlet 编号及全局查找表容量溢出。它与 `player_daylight.json` 声明的独立 shader 源码/缓存成对使用；模块与配置不匹配会拒绝启动。14,498,176个原树位置保留，近处使用源几何，远处使用源模型离线烘焙的简化几何，树木绘制距离无限。Mesh shader 与 path tracing 未启用。
 
-`Launch-Game.cmd` follows the ordinary play default. `Launch-Frontend.cmd` explicitly selects `runtime-ui.json`. Restart an existing client to load a new native module. Both default runtime recipes must reference a renderer built against the current core `GAME_API_ABI`; old renderer binaries are retained for their matching old cores, not mixed with new weapon snapshots. Tools constructing `FlightGame` directly use `runtime.json` unless given an explicit runtime.
+All graphical `.cmd` entry points delegate to `Launch-Frontend.cmd`, which opens the cancellable loading window and selects `runtime-ui.json`; each profile keeps its own map, aircraft, and mission arguments. `Launch-Game.cmd` starts the F-22 training map, while `Launch-Regional-Horizon.cmd` starts the frozen F-16 regional map. Restart an existing client to load a new native module. Both default runtime recipes must reference a renderer built against the current core `GAME_API_ABI`; old renderer binaries are retained for their matching old cores, not mixed with new weapon snapshots. Tools constructing `FlightGame` directly use `runtime.json` unless given an explicit runtime.
+
+The frozen 2026-10-26 profile is recorded in [releases/regional-horizon-v327-2026-10-26.json](releases/regional-horizon-v327-2026-10-26.json). Its native core and renderer binaries live under `D:/bvr_sim_resources/releases/regional-horizon-v327-20261026/` and are SHA256-pinned in the runtime/release records. Launch it with `game/Launch-Regional-Horizon.cmd`; map selection and mission preparation remain available in the hangar UI. The map is still catalogued as a candidate and does not support convoy missions.
 
 The UI renderer loads the installed Windows font `%WINDIR%/Fonts/msyh.ttc` (Microsoft YaHei) before measuring or drawing text. The font is not redistributed. Chinese squares in an old process require a restart with the new renderer; changing the console encoding does not update its glyphs.
 
